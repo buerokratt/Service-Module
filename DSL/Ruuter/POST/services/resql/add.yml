@@ -1,0 +1,36 @@
+check_for_body:
+  switch:
+    - condition: ${incoming.body == null}
+      next: missing_parameter
+
+extract_request_data:
+  assign:
+    name: ${incoming.body.name}
+    sql: ${incoming.body.sql}
+
+check_for_required_parameters:
+  switch:
+    - condition: ${name == null || sql == null}
+      next: missing_parameter
+  next: add_resql
+
+missing_parameter:
+  status: 400
+  return: 'required parameters were not provided'
+  next: end
+
+add_resql:
+fetch:
+  call: http.post
+  args:
+    url: http://resql:8082/services/add-resql
+    body:
+      name: ${name}
+      sql: ${sql}
+  result: results  
+
+return_ok:
+  status: 200
+  return: 'ok'
+  next: end
+  
