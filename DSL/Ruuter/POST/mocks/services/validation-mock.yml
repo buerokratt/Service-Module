@@ -1,0 +1,3 @@
+return_with_status:
+  return: ${result}
+  status: 400
