@@ -31,3 +31,7 @@ This repo will primarily contain:
 * Navigate to current repo and run docker compose up -d
 
 * Go to https://localhost:3001
+
+### Database setup
+ * For setting up the users database initially, run 
+ `docker run --platform linux/amd64 --network=bykstack riaee/byk-users-db:liquibase20220615 --url=jdbc:postgresql://database:5432/byk --username=byk --password=01234 --changelog-file=./master.yml update`
