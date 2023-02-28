@@ -5,7 +5,9 @@ services:
     image: ruuter
     environment:
       - application.cors.allowedOrigins=http://localhost:3001
-      - application.httpCodesAllowList=200,201,202,400,401,403,500
+      - application.httpCodesAllowList=200,201,202,203,204,205,206,207,208,226
+      - application.logging.displayRequestContent=true
+      - application.logging.displayResponseContent=true
     volumes:
       - ./DSL/Ruuter:/DSL
     ports:
@@ -16,30 +18,36 @@ services:
     container_name: resql
     image: resql
     depends_on:
-      - users_db
+      - database
     environment:
-      - sqlms.datasources.[0].name=byk
-      - sqlms.datasources.[0].jdbcUrl=jdbc:postgresql://users_db:5432/byk
+      - sqlms.datasources.[0].name=users
+      - sqlms.datasources.[0].jdbcUrl=jdbc:postgresql://database:5432/users_db
       - sqlms.datasources.[0].username=byk
       - sqlms.datasources.[0].password=01234
+      - sqlms.datasources.[1].name=services
+      - sqlms.datasources.[1].jdbcUrl=jdbc:postgresql://database:5432/services_db
+      - sqlms.datasources.[1].username=byk
+      - sqlms.datasources.[1].password=01234
       - logging.level.org.springframework.boot=INFO
     ports:
       - 8082:8082
     volumes:
-      - ./DSL/Resql/services:/workspace/app/templates/byk
+      - ./DSL/Resql/services:/workspace/app/templates/users
+      - ./DSL/Resql/services:/workspace/app/templates/services
     networks:
       - bykstack
-  users_db:
-    container_name: users_db
+  database:
+    container_name: database
     image: postgres:14.1
     environment:
       - POSTGRES_USER=byk
       - POSTGRES_PASSWORD=01234
-      - POSTGRES_DB=byk
+      - POSTGRES_MULTIPLE_DATABASES=users_db,services_db
     ports:
       - 5433:5432
     volumes:
       - ./data:/var/lib/postgresql/data
+      - ./init-databases.sh:/docker-entrypoint-initdb.d/init-databases.sh
     networks:
       - bykstack
   data_mapper: 

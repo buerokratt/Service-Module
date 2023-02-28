@@ -1,0 +1,17 @@
+assign_step:
+  assign:
+    res: ${incoming.body.response}
+
+validate_status_code:
+  switch:
+    - condition: ${res != null && res.statusCodeValue >= 200 && res.statusCodeValue < 300}
+      next: return_true
+  next: return_false
+
+return_true:
+  return: true
+  next: end
+
+return_false:
+  return: false
+  next: end
