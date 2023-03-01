@@ -68,7 +68,7 @@ services:
     environment:
       - CONTENT_FOLDER=/data
     volumes:
-      - ./DSL/Resql:/data
+      - ./DSL:/data
     ports:
       - 3003:3003
     networks:
