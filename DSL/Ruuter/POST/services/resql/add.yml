@@ -20,16 +20,26 @@ missing_parameter:
   next: end
 
 add_resql:
-fetch:
   call: http.post
   args:
-    url: http://resql:8082/services/add-resql
+    url: http://custome_node_server:3003/file/write
     body:
-      name: ${name}
-      sql: ${sql}
-  result: results  
+      filename: '/services/${name}.sql'
+      content: ${sql}
+  result: results
+
+check_result:
+  switch:
+    - condition: ${200 <= results.response.statusCodeValue && results.response.statusCodeValue < 300}
+      next: return_ok
+  next: return_bad_request
 
 return_ok:
   status: 200
-  return: 'ok'
+  return: ${results.response.body.message}
+  next: end
+
+return_bad_request:
+  status: 400
+  return: ${results.response.body.message}
   next: end

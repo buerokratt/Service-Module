@@ -16,10 +16,10 @@ services:
     container_name: resql
     image: resql
     depends_on:
-      - users_db
+      - service_db
     environment:
       - sqlms.datasources.[0].name=byk
-      - sqlms.datasources.[0].jdbcUrl=jdbc:postgresql://users_db:5432/byk
+      - sqlms.datasources.[0].jdbcUrl=jdbc:postgresql://service_db:5432/byk
       - sqlms.datasources.[0].username=byk
       - sqlms.datasources.[0].password=01234
       - logging.level.org.springframework.boot=INFO
@@ -29,8 +29,8 @@ services:
       - ./DSL/Resql/services:/workspace/app/templates/byk
     networks:
       - bykstack
-  users_db:
-    container_name: users_db
+  service_db:
+    container_name: service_db
     image: postgres:14.1
     environment:
       - POSTGRES_USER=byk
@@ -42,16 +42,29 @@ services:
       - ./data:/var/lib/postgresql/data
     networks:
       - bykstack
-  data_mapper: 
-     container_name: data_mapper 
-     image: datamapper-node
-     volumes:
+  data_mapper:
+    container_name: data_mapper
+    image: datamapper-node
+    volumes:
       - ./DSL/DMapper/hbs:/workspace/app/views/services
       - ./DSL/DMapper/js:/workspace/app/js/services
-     ports:
+    ports:
       - 3000:3000
-     networks:
-      - bykstack 
+    networks:
+      - bykstack
+  custome_node_server:
+    container_name: custome_node_server
+    build:
+      context: ./DSL/Node
+      dockerfile: Dockerfile
+    environment:
+      - CONTENT_FOLDER=/data
+    volumes:
+      - ./DSL/Resql:/data
+    ports:
+      - 3003:3003
+    networks:
+      - bykstack
   gui_dev:
     container_name: gui_dev
     environment:
@@ -68,8 +81,8 @@ services:
       - /app/node_modules
       - ./GUI:/app
     networks:
-      - bykstack    
-     
+      - bykstack
+
 networks:
   bykstack:
     name: bykstack
