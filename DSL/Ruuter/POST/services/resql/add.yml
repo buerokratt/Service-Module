@@ -24,7 +24,7 @@ add_resql:
   args:
     url: http://custome_node_server:3003/file/write
     body:
-      filename: '/Resql/services/${name}.sql'
+      file_path: '/Resql/services/${name}.sql'
       content: ${sql}
   result: results
 
