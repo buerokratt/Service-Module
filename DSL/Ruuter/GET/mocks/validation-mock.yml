@@ -1,0 +1,17 @@
+call_mock:
+  call: reflect.mock
+  args:
+    response:
+      project: "Bürokratt"
+      website: "www.kratid.ee"
+  result: mock_res
+
+call_template:
+  template: templates/validation-template
+  requestType: post
+  body:
+    response: ${mock_res.response}
+  result: templateResult
+
+return_result:
+  return: ${templateResult}
