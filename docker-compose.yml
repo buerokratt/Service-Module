@@ -60,8 +60,8 @@ services:
       - 3000:3000
     networks:
       - bykstack
-  custome_node_server:
-    container_name: custome_node_server
+  custom_node_server:
+    container_name: custom_node_server
     build:
       context: ./DSL/Node
       dockerfile: Dockerfile

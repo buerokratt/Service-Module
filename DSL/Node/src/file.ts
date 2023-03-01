@@ -1,6 +1,6 @@
 import express, { Router } from 'express';
-import path from "path";
-import fs from "fs";
+import path from 'path';
+import fs from 'fs';
 import { buildContentFilePath, isValidFilename } from './util';
 const router: Router = express.Router();
 

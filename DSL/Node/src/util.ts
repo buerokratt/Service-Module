@@ -1,4 +1,4 @@
-import path from "path";
+import path from 'path';
 
 export const buildContentFilePath = (filename: string): string => {
     return path.join(process.env.CONTENT_FOLDER || 'data', filename)
