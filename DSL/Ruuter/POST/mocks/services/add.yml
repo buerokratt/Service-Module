@@ -10,23 +10,16 @@ check_for_required_parameters:
       next: return_incorrect_request
   next: service_add
 
-extract_request_data:
-  assign:
-    name: ${incoming.body.name}
-    description: ${incoming.body.description}
-
 service_add:
   call: reflect.mock
   args:
-    response:
-      id: 1
-      name: "New Service name"
-      description: "New Service description"
+    response: {}
   result: createdService
 
 return_value:
   status: 201
-  return: ${createdService.response.body}
+  wrapper: FALSE
+  return: ""
   next: end
 
 return_incorrect_request:
