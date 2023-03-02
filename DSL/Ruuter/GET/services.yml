@@ -1,7 +1,7 @@
 get_ruuter_services:
   call: http.get
   args:
-    url: http://custom_node_server:3003/ruuter/list
+    url: http://node_server:3003/ruuter/list
   result: results
 
 return_ok:
