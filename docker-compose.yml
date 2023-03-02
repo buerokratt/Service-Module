@@ -32,7 +32,6 @@ services:
     ports:
       - 8082:8082
     volumes:
-      - ./DSL/Resql/services:/workspace/app/templates/users
       - ./DSL/Resql/services:/workspace/app/templates/services
     networks:
       - bykstack
