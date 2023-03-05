@@ -28,3 +28,8 @@ const getAllFilesInsideFolder = function (dirPath: string, arrayOfFiles: string[
 
   return arrayOfFiles
 }
+
+export const readFile = function (filePath: string): string {
+  const data = fs.readFileSync(filePath, 'utf-8')
+  return Buffer.from(data).toString()
+}
