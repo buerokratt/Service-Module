@@ -35,7 +35,7 @@ router.get('/sticky', (req, res) => {
   return res.status(200).json(services)
 });
 
-router.get('/stickyByName', (req, res) => {
+router.get('/sticky/steps', (req, res) => {
   const name = req.query.name
 
   const file_path = getAllFiles('/Ruuter')
@@ -51,7 +51,8 @@ router.get('/stickyByName', (req, res) => {
     const ymlFile = readFile(file_path)
     const jsonFile = parseYmlToJson(ymlFile)
     return res.status(200).send(jsonFile)
-  } catch {
+  } catch (e) {
+    console.log(e)
     return res.status(500).send({ message: 'Cann\'t read the file' })
   }
 });
