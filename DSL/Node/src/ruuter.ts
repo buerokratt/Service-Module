@@ -35,7 +35,6 @@ router.get('/sticky', (req, res) => {
   return res.status(200).json(services)
 });
 
-
 router.get('/stickyByName', (req, res) => {
   const name = req.query.name
 
