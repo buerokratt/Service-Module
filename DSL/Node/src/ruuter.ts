@@ -38,16 +38,17 @@ router.get('/sticky', (req, res) => {
 router.get('/stickyByName', (req, res) => {
   const name = req.query.name
 
-  const file_paths = getAllFiles('/Ruuter')
+  const file_path = getAllFiles('/Ruuter')
     .filter(filename => filename.includes('/sticky/'))
     .filter(filename => filename.endsWith(`/${name}.yml`))
+    .at(0)
 
-  if (file_paths.length === 0) {
+  if (!file_path) {
     return res.status(404).json({ message: 'Sticky DSL not found' })
   }
 
   try {
-    const ymlFile = readFile(file_paths[0])
+    const ymlFile = readFile(file_path)
     const jsonFile = parseYmlToJson(ymlFile)
     return res.status(200).send(jsonFile)
   } catch {

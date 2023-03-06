@@ -22,7 +22,7 @@ const getAllFilesInsideFolder = function (dirPath: string, arrayOfFiles: string[
     if (fs.statSync(dirPath + '/' + file).isDirectory()) {
       arrayOfFiles = getAllFilesInsideFolder(dirPath + '/' + file, arrayOfFiles)
     } else {
-      arrayOfFiles.push(path.join(__dirname, dirPath, '/', file))
+      arrayOfFiles.push(path.join(dirPath, '/', file))
     }
   })
 
@@ -30,6 +30,6 @@ const getAllFilesInsideFolder = function (dirPath: string, arrayOfFiles: string[
 }
 
 export const readFile = function (filePath: string): string {
-  const data = fs.readFileSync(filePath, 'utf-8')
+  const data = fs.readFileSync(filePath, { encoding: 'utf8' })
   return Buffer.from(data).toString()
 }
