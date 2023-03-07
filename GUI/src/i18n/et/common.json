@@ -6,6 +6,8 @@
   },
   "menu": {
     "overview": "Ülevaade",
+    "services": "Teenused",
+    "newService": "Uus Teenus",
     "close": "Sulge menüü"
   }
 }

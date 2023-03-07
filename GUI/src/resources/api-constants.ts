@@ -6,3 +6,7 @@ export const dummyDataApi = (): string => {
 
 // Services
 export const getServicesAdd = (): string => `${baseUrl}/services/add`;
+
+
+// Mocks
+export const openApiSpeckMock = (): string => `${baseUrl}/mocks/services/open-api-spec-mock`;
