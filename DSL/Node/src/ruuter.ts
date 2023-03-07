@@ -53,7 +53,7 @@ router.get('/sticky/steps', (req, res) => {
     return res.status(200).send(jsonFile)
   } catch (e) {
     console.log(e)
-    return res.status(500).send({ message: 'Cann\'t read the file' })
+    return res.status(500).send({ message: 'Can\'t read the file' })
   }
 });
 
