@@ -6,6 +6,7 @@
   },
   "menu": {
     "overview": "Overview",
+    "flowbuilder": "Flow Builder",
     "close": "Close menu"
   }
 }

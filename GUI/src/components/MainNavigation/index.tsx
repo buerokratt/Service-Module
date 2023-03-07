@@ -8,6 +8,7 @@ import { Icon } from '../../components'
 import type { MenuItem } from '../../types/mainNavigation'
 import { menuIcons } from '../../constants/menuIcons'
 import './MainNavigation.scss'
+import { ROUTES } from '../../resources/routes-constants'
 
 const MainNavigation: FC = () => {
   const { t } = useTranslation()
@@ -138,10 +139,8 @@ const MainNavigation: FC = () => {
       label: t('global.services'),
       path: '/services',
       children: [
-        {
-          label: t('menu.overview'),
-          path: '/services/overview',
-        },
+        { path: ROUTES.OVERVIEW_ROUTE, label: t('menu.overview') },
+        { path: ROUTES.FLOW_ROUTE, label: t('menu.flowbuilder') },
       ],
     },
     {
