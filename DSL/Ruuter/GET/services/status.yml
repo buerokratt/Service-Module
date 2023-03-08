@@ -1,0 +1,10 @@
+get_status:
+  call: http.post
+  args:
+    url: http://resql:8082/status
+    body:
+      id: ${incoming.body.id}
+  result: res
+
+return_value:
+  return: ${res.response.body}

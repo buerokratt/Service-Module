@@ -1,0 +1,12 @@
+set_status:
+  call: http.post
+  args:
+    url: http://resql:8082/set-status
+    body:
+      id: ${incoming.body.id}
+      is_active: ${incoming.body.is_active}
+      type: ${incoming.body.type}
+  result: res
+
+return_value:
+  return: ${res.response}
