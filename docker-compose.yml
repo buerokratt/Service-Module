@@ -63,11 +63,12 @@ services:
     container_name: node_server
     build:
       context: ./DSL/Node
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.dev
     environment:
       - CONTENT_FOLDER=/data
     volumes:
       - ./DSL:/data
+      - ./DSL/Node:/app
     ports:
       - 3003:3003
     networks:
