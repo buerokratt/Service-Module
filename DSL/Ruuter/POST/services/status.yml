@@ -17,14 +17,13 @@ set_status:
     body:
       id: ${id}
       is_active: ${is_active}
-      ruuter_type: ${ruuter_type}
   result: res
   next: get_status_name
 
 get_status_name:
   call: http.post
   args:
-    url: http://resql:8082/get-service
+    url: http://resql:8082/get-service-name-by-id
     body:
       id: ${id}
   result: name_res
