@@ -34,7 +34,7 @@ check_for_status:
   switch:
     - condition: ${is_active === true}
       next: activate_service
-  next: in_activate_service  
+  next: deactivate_service  
 
 activate_service:
   call: http.post
@@ -46,7 +46,7 @@ activate_service:
   result: results  
   next: check_result
 
-in_activate_service:
+deactivate_service:
   call: http.post
   args:
     url: http://node_server:3003/file/move
