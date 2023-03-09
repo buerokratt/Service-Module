@@ -29,7 +29,7 @@ router.post('/write', (req, res) => {
   });
 });
 
-router.post('/move', (req, res) => {
+router.post('/move', async (req, res) => {
   const currentPath = buildContentFilePath(req.body.current_path)
   const newPath = buildContentFilePath(req.body.new_path)
 
@@ -42,6 +42,8 @@ router.post('/move', (req, res) => {
     res.status(400).json({ message: 'current contains illegal characters' });
     return;
   }
+
+  fs.mkdir(path.dirname(newPath), () => {});
 
   fs.rename(currentPath, newPath, function (err) {
     if (err) {
