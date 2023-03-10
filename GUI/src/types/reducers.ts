@@ -2,12 +2,12 @@
 export type DropType = 'switch' | 'text-space' | 'auth' | 'rule';
 
 export interface ConditionType {
-    id: number,
+    id: string,
     steps: StepType[],
 }
 
 export interface StepType {
-    id: number,
+    id: string,
     type: DropType,
     text?: string,
     title?: string,

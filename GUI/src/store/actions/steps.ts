@@ -8,11 +8,10 @@ export enum STEP_ACTIONS {
     CHANGE_TEXT_CONTENT = 'steps/change/text',
     ADD_CONDITION = 'steps/condition/add',
     DELETE_CONDITION = 'steps/condition/delete',
-
-    CHANGE_ORDER = 'steps/order',
+    // CHANGE_ORDER = 'steps/order',
 }
 
-export const addStepAction: ReduxAction<{ stepType: DropType, conditionId?: number }>
+export const addStepAction: ReduxAction<{ stepType: DropType, conditionId?: string }>
     = ({ stepType, conditionId = undefined }) => {
         return {
             type: STEP_ACTIONS.ADD_STEP,
@@ -23,28 +22,28 @@ export const addStepAction: ReduxAction<{ stepType: DropType, conditionId?: numb
         }
     }
 
-export const deleteItemAction: ReduxAction<number> = (id: number) => {
+export const deleteItemAction: ReduxAction<string> = (id: string) => {
     return {
         type: STEP_ACTIONS.DELETE,
         payload: id,
     }
 }
 
-export const changeStepTitleAction: ReduxAction<{ id: number, title: string }> = (payload) => {
+export const changeStepTitleAction: ReduxAction<{ id: string, title: string }> = (payload) => {
     return {
         type: STEP_ACTIONS.CHANGE_TITLE,
         payload,
     }
 }
 
-export const changeTextStepContentAction: ReduxAction<{ id: number, text: string }> = (payload) => {
+export const changeTextStepContentAction: ReduxAction<{ id: string, text: string }> = (payload) => {
     return {
         type: STEP_ACTIONS.CHANGE_TEXT_CONTENT,
         payload,
     }
 }
 
-export const addConditionAction: ReduxAction<number> = (parentId) => {
+export const addConditionAction: ReduxAction<string> = (parentId) => {
     return {
         type: STEP_ACTIONS.ADD_CONDITION,
         payload: parentId,

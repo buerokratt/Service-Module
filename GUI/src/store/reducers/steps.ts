@@ -1,3 +1,4 @@
+import { nanoid } from '@reduxjs/toolkit'
 import { ReduxActionStep, StepReducer } from '../../types/reducers'
 import { DropType } from '../../types/reducers'
 import { STEP_ACTIONS } from '../actions/steps'
@@ -25,7 +26,7 @@ const stepState = (state = initialState, action: ReduxActionStep<any>): StepRedu
 
 export default stepState
 
-function addStep(state: StepReducer, payload: { stepType: DropType, conditionId?: number }): StepReducer {
+function addStep(state: StepReducer, payload: { stepType: DropType, conditionId?: string }): StepReducer {
     if (!payload.conditionId) {
         if (payload.stepType === 'rule')
             return { ...state }
@@ -34,7 +35,7 @@ function addStep(state: StepReducer, payload: { stepType: DropType, conditionId?
             steps: [
                 ...state?.steps,
                 {
-                    id: Math.random(),
+                    id: nanoid(),
                     type: payload.stepType,
                     text: payload.stepType === 'text-space' ? 'Some text from redux' : undefined,
                     title: payload.stepType === 'switch' ? 'Switch case' : undefined,
@@ -71,7 +72,7 @@ function addStep(state: StepReducer, payload: { stepType: DropType, conditionId?
                         steps: [
                             ...y.steps,
                             {
-                                id: Math.random(),
+                                id: nanoid(),
                                 type: payload.stepType,
                                 text: payload.stepType === 'text-space' ? 'Some text from redux' : undefined,
                             },
@@ -83,7 +84,7 @@ function addStep(state: StepReducer, payload: { stepType: DropType, conditionId?
     }
 }
 
-function deleteItem(state: StepReducer, id: number): StepReducer {
+function deleteItem(state: StepReducer, id: string): StepReducer {
     return {
         ...state,
         steps: state?.steps.filter(x => x.id !== id)
@@ -98,7 +99,7 @@ function deleteItem(state: StepReducer, id: number): StepReducer {
     }
 }
 
-function changeStepTitle(state: StepReducer, { id, title }: { id: number, title: string }): StepReducer {
+function changeStepTitle(state: StepReducer, { id, title }: { id: string, title: string }): StepReducer {
     return {
         ...state,
         steps: state?.steps.map(x => {
@@ -113,7 +114,7 @@ function changeStepTitle(state: StepReducer, { id, title }: { id: number, title:
     }
 }
 
-function changeTextStepContent(state: StepReducer, { id, text }: { id: number, text: string }): StepReducer {
+function changeTextStepContent(state: StepReducer, { id, text }: { id: string, text: string }): StepReducer {
     return {
         ...state,
         steps: state?.steps.map(x => {
@@ -134,7 +135,7 @@ function changeTextStepContent(state: StepReducer, { id, text }: { id: number, t
     }
 }
 
-function addCondition(state: StepReducer, parentId: number): StepReducer {
+function addCondition(state: StepReducer, parentId: string): StepReducer {
     return {
         ...state,
         steps: state?.steps.map(x => {
@@ -145,7 +146,7 @@ function addCondition(state: StepReducer, parentId: number): StepReducer {
                 ...x,
                 conditions: [
                     ...x.conditions ?? [],
-                    { id: Math.random(), steps: [] }
+                    { id: nanoid(), steps: [] }
                 ],
             }
         }),

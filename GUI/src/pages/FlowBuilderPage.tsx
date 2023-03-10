@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import { DndProvider } from 'react-dnd'
 import { HTML5Backend } from 'react-dnd-html5-backend'
-import { useTranslation } from 'react-i18next'
 import { Track } from '../components'
-import FlowCanvas, { StepTypes } from '../components/FlowCanvas'
+import FlowCanvas from '../components/FlowCanvas'
+import StepTypes from '../components/StepTypes'
 
 const FlowBuilderPage: React.FC = () => {
   return (
@@ -22,7 +22,6 @@ const FlowBuilderPage: React.FC = () => {
         </Track>
       </Track>
     </DndProvider>
-
   )
 }
 
