@@ -1,12 +1,13 @@
-check_for_body:
-  switch:
-    - condition: ${incoming.body == null}
-      next: return_incorrect_request
-  next: check_for_required_parameters
+extract_request_data:
+  assign:
+    name: ${incoming.body.name}
+    description: ${incoming.body.description}
+    type: ${incoming.body.type}
+    content: ${incoming.body.content}
 
 check_for_required_parameters:
   switch:
-    - condition: ${incoming.body.name == null || incoming.body.description == null}
+    - condition: ${name == null || description == null || type == null || content == null}
       next: return_incorrect_request
   next: service_add
 
@@ -15,14 +16,52 @@ service_add:
   args:
     url: http://resql:8082/add
     body:
-      name: ${incoming.body.name}
-      description: ${incoming.body.description}
+      name: ${name}
+      description: ${description}
+      type: ${type}
   result: createdService
+  next: check_for_type
 
-return_value:
-  status: 201
-  wrapper: FALSE
-  return: ""
+check_for_type:
+  switch:
+    - condition: ${type === 'GET'}
+      next: add_get_dsl
+  next: add_post_dsl
+
+add_get_dsl:
+  call: http.post
+  args:
+    url: http://node_server:3003/file/write
+    body:
+      file_path: '/Ruuter/GET/services/${name}.yml'
+      content: ${content}
+  result: results
+  next: check_result
+
+add_post_dsl:
+  call: http.post
+  args:
+    url: http://node_server:3003/file/write
+    body:
+      file_path: '/Ruuter/POST/services/${name}.yml'
+      content: ${content}
+  result: results  
+  next: check_result
+
+check_result:
+  switch:
+    - condition: ${200 <= results.response.statusCodeValue && results.response.statusCodeValue < 300}
+      next: return_ok
+  next: return_bad_request
+
+return_ok:
+  status: 200
+  return: ${results.response.body.message}
+  next: end
+
+return_bad_request:
+  status: 400
+  return: ${results.response.body.message}
   next: end
 
 return_incorrect_request:
