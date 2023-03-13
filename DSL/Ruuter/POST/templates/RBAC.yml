@@ -25,7 +25,7 @@ fetch_user_roles_from_db:
 
 return_value:
   status: 200
-  return: "${result.response.body}"
+  return: "${result.response.body[0]}"
   next: end
 
 missing_parameter:
