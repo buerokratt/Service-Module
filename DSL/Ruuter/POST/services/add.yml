@@ -18,13 +18,13 @@ service_add:
     body:
       name: ${name}
       description: ${description}
-      ruuter_type: ${type}
+      ruuter_type: ${type.toUpperCase()}
   result: createdService
   next: check_for_type
 
 check_for_type:
   switch:
-    - condition: ${type === 'GET' || type === 'get'}
+    - condition: ${type.toUpperCase() === 'GET'}
       next: add_get_dsl
   next: add_post_dsl
 
