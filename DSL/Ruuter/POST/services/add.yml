@@ -18,13 +18,13 @@ service_add:
     body:
       name: ${name}
       description: ${description}
-      type: ${type}
+      ruuter_type: ${type}
   result: createdService
   next: check_for_type
 
 check_for_type:
   switch:
-    - condition: ${type === 'GET'}
+    - condition: ${type === 'GET' || type === 'get'}
       next: add_get_dsl
   next: add_post_dsl
 
