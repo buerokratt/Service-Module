@@ -32,7 +32,7 @@ delete_deactivated_service:
   args:
     url: http://node_server:3003/file/delete
     body:
-      path: '/Ruuter/${ruuter_type}/services/${name_res.response.body[0].name}.yml'
+      path: '/Ruuter/${ruuter_type}/services/inactive/${name_res.response.body[0].name}.yml'
   result: results  
   next: check_result   
 
