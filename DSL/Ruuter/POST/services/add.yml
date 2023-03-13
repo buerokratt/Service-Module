@@ -1,14 +1,15 @@
+check_for_required_parameters:
+  switch:
+    - condition: ${incoming.body.name == null || incoming.body.description == null || incoming.body.type == null || incoming.body.content == null}
+      next: return_incorrect_request
+  next: extract_request_data
+
 extract_request_data:
   assign:
     name: ${incoming.body.name}
     description: ${incoming.body.description}
-    type: ${incoming.body.type}
+    type: ${incoming.body.type.toUpperCase()}
     content: ${incoming.body.content}
-
-check_for_required_parameters:
-  switch:
-    - condition: ${name == null || description == null || type == null || content == null}
-      next: return_incorrect_request
   next: service_add
 
 service_add:
@@ -18,7 +19,7 @@ service_add:
     body:
       name: ${name}
       description: ${description}
-      type: ${type}
+      ruuter_type: ${type}
   result: createdService
   next: check_for_type
 
