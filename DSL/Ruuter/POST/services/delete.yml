@@ -1,12 +1,13 @@
+check_for_required_parameters:
+  switch:
+    - condition: ${incoming.body.id == null || incoming.body.type == null}
+      next: return_incorrect_request
+  next: extract_request_data
+
 extract_request_data:
   assign:
     id: ${incoming.body.id}
     ruuter_type: ${incoming.body.type.toUpperCase()}
-
-check_for_required_parameters:
-  switch:
-    - condition: ${id == null}
-      next: return_incorrect_request
   next: get_status_name
 
 get_status_name:
