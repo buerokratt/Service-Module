@@ -1,0 +1,77 @@
+extract_request_data:
+  assign:
+    id: ${incoming.body.id}
+    is_active: ${incoming.body.is_active}
+    ruuter_type: ${incoming.body.type}
+
+check_for_required_parameters:
+  switch:
+    - condition: ${id == null || is_active == null || ruuter_type == null}
+      next: return_incorrect_request
+  next: set_status    
+
+set_status:
+  call: http.post
+  args:
+    url: http://resql:8082/set-status
+    body:
+      id: ${id}
+      is_active: ${is_active}
+  result: res
+  next: get_status_name
+
+get_status_name:
+  call: http.post
+  args:
+    url: http://resql:8082/get-service-name-by-id
+    body:
+      id: ${id}
+  result: name_res
+  next: check_for_status
+
+check_for_status:
+  switch:
+    - condition: ${is_active === true}
+      next: activate_service
+  next: deactivate_service  
+
+activate_service:
+  call: http.post
+  args:
+    url: http://node_server:3003/file/move
+    body:
+      current_path: '/Ruuter/${ruuter_type}/services/inactive/${name_res.response.body[0].name}.yml'
+      new_path: '/Ruuter/${ruuter_type}/services/${name_res.response.body[0].name}.yml'
+  result: results  
+  next: check_result
+
+deactivate_service:
+  call: http.post
+  args:
+    url: http://node_server:3003/file/move
+    body:
+      current_path: '/Ruuter/${ruuter_type}/services/${name_res.response.body[0].name}.yml'
+      new_path: '/Ruuter/${ruuter_type}/services/inactive/${name_res.response.body[0].name}.yml'
+  result: results  
+  next: check_result 
+
+check_result:
+  switch:
+    - condition: ${200 <= results.response.statusCodeValue && results.response.statusCodeValue < 300}
+      next: return_ok
+  next: return_bad_request
+
+return_ok:
+  status: 200
+  return: "Status Changed Successfully"
+  next: end
+
+return_bad_request:
+  status: 400
+  return: ${results.response.body.message}
+  next: end  
+
+return_incorrect_request:
+  status: 400
+  return: "Required parameter(s) missing"
+  next: end
