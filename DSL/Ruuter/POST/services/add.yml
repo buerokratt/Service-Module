@@ -2,7 +2,7 @@ extract_request_data:
   assign:
     name: ${incoming.body.name}
     description: ${incoming.body.description}
-    type: ${incoming.body.type}
+    type: ${incoming.body.type.toUpperCase()}
     content: ${incoming.body.content}
 
 check_for_required_parameters:
@@ -18,13 +18,13 @@ service_add:
     body:
       name: ${name}
       description: ${description}
-      ruuter_type: ${type.toUpperCase()}
+      ruuter_type: ${type}
   result: createdService
   next: check_for_type
 
 check_for_type:
   switch:
-    - condition: ${type.toUpperCase() === 'GET'}
+    - condition: ${type === 'GET'}
       next: add_get_dsl
   next: add_post_dsl
 
