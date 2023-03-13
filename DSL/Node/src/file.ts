@@ -56,4 +56,29 @@ router.post('/move', async (req, res) => {
   })
 });
 
+
+router.post('/delete', async (req, res) => {
+  const filePath = buildContentFilePath(req.body.path)
+
+  if (!filePath) {
+    res.status(400).json({ message: 'Path is required' });
+    return;
+  }
+
+  if (!isValidFilename(filePath) || path.normalize(filePath).includes('..')) {
+    res.status(400).json({ message: 'current contains illegal characters' });
+    return;
+  }
+
+  fs.unlink(filePath, function (err) {
+    if (err) {
+      res.status(500).json({ message: 'Unable to delete file' });
+      return;
+    }
+
+    res.status(201).json({ message: 'File deleted successfully' });
+    return;
+  })
+});
+
 export default router;
