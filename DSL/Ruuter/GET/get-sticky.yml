@@ -1,0 +1,26 @@
+check_for_parameters:
+  switch:
+    - condition: ${incoming.params == null || incoming.params.name == null || incoming.params.name == ''}
+      next: get_all_sticky_services
+  next: get_single_sticky_service
+
+get_single_sticky_service:
+  call: http.get
+  args:
+    url: http://node_server:3003/ruuter/sticky/steps
+    query:
+      name: ${incoming.params.name}
+  result: results
+  next: return_ok
+
+get_all_sticky_services:
+  call: http.get
+  args:
+    url: http://node_server:3003/ruuter/sticky
+  result: results
+  next: return_ok
+
+return_ok:
+  status: 200
+  return: ${results.response.body}
+  next: end
