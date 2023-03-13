@@ -12,38 +12,38 @@ import TextSpace from '../TextSpace'
 import './styles.scss'
 
 const FlowCanvas: React.FC = () => {
-    const steps = useSelector((state: RootReducer) => state.stepReducer.steps)
-    const dispatch = useDispatch()
+  const steps = useSelector((state: RootReducer) => state.stepReducer.steps)
+  const dispatch = useDispatch()
 
-    const [_, drop] = useDrop(
-        () => ({
-            accept: 'card',
-            drop(_item: any, monitor) {
-                const didDrop = monitor.didDrop()
-                if (didDrop) return;
-                dispatch(addStepAction({ stepType: _item.dropType }))
-            },
-        }),
-        [steps],
-    )
+  const [_, drop] = useDrop(
+    () => ({
+      accept: 'card',
+      drop(_item: any, monitor) {
+        const didDrop = monitor.didDrop()
+        if (didDrop) return;
+        dispatch(addStepAction({ stepType: _item.dropType }))
+      },
+    }),
+    [steps],
+  )
 
-    return (
-        <div ref={drop} className='canvas-container'>
-            {steps?.map((x, index) =>
-                <Track key={x.id} direction='horizontal'>
-                    <Track direction='vertical'>
-                        {index}.
-                        <DeleteButton id={x.id} />
-                    </Track>
-                    <Track className='canvas' align='stretch' >
-                        {x.type === 'text-space' && <TextSpace step={x} />}
-                        {x.type === 'switch' && <SwitchStep step={x} />}
-                        {x.type === 'auth' && <StepDev>TARA authorization</StepDev>}
-                    </Track>
-                </Track>
-            )}
-        </div>
-    )
+  return (
+    <div ref={drop} className='canvas-container'>
+      {steps?.map((x, index) =>
+        <Track key={x.id} direction='horizontal'>
+          <Track direction='vertical'>
+            {index}.
+            <DeleteButton id={x.id} />
+          </Track>
+          <Track className='canvas' align='stretch' >
+            {x.type === 'text-space' && <TextSpace step={x} />}
+            {x.type === 'switch' && <SwitchStep step={x} />}
+            {x.type === 'auth' && <StepDev>TARA authorization</StepDev>}
+          </Track>
+        </Track>
+      )}
+    </div>
+  )
 }
 
 export default FlowCanvas

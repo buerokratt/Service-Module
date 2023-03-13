@@ -3,12 +3,11 @@ import { useTranslation } from 'react-i18next'
 import { NavLink, useLocation } from 'react-router-dom'
 import { MdClose, MdKeyboardArrowDown } from 'react-icons/md'
 import clsx from 'clsx'
-
 import { Icon } from '../../components'
 import type { MenuItem } from '../../types/mainNavigation'
 import { menuIcons } from '../../constants/menuIcons'
-import './MainNavigation.scss'
 import { ROUTES } from '../../resources/routes-constants'
+import './MainNavigation.scss'
 
 const MainNavigation: FC = () => {
   const { t } = useTranslation()
