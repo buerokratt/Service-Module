@@ -1,5 +1,5 @@
 SELECT (
-        SELECT array_agg(authorities)::text[] AS "user_roles"
+        SELECT array_agg(UPPER(authorities))::text[] AS "user_roles"
         FROM (
                 SELECT unnest(authority_name) AS authorities
                 FROM public.user_authority
@@ -8,7 +8,7 @@ SELECT (
             ) AS _
     ) && (
         SELECT (
-                SELECT array_agg(allowedRole)::text[] AS "roles"
+                SELECT array_agg(UPPER(allowedRole))::text[] AS "roles"
                 FROM(
                         SELECT unnest(ARRAY [:allowedRoles::text]::text[]) AS allowedRole
                         ORDER BY allowedRole
