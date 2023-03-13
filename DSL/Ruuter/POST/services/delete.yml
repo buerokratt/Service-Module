@@ -1,7 +1,7 @@
 extract_request_data:
   assign:
     id: ${incoming.body.id}
-    ruuter_type: ${incoming.body.type}
+    ruuter_type: ${incoming.body.type.toUpperCase()}
 
 check_for_required_parameters:
   switch:
