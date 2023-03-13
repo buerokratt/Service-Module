@@ -6,7 +6,7 @@ SELECT (
                 WHERE user_id = :userId::text
                 ORDER BY authorities
             ) AS _
-    ) @> (
+    ) && (
         SELECT (
                 SELECT array_agg(allowedRole)::text[] AS "roles"
                 FROM(
