@@ -29,4 +29,31 @@ router.post('/write', (req, res) => {
   });
 });
 
+router.post('/move', async (req, res) => {
+  const currentPath = buildContentFilePath(req.body.current_path)
+  const newPath = buildContentFilePath(req.body.new_path)
+
+  if (!currentPath || !newPath) {
+    res.status(400).json({ message: 'current path and new path are required' });
+    return;
+  }
+
+  if (!isValidFilename(currentPath) || path.normalize(currentPath).includes('..')) {
+    res.status(400).json({ message: 'current contains illegal characters' });
+    return;
+  }
+
+  fs.mkdir(path.dirname(newPath), () => {});
+
+  fs.rename(currentPath, newPath, function (err) {
+    if (err) {
+      res.status(500).json({ message: 'Unable to move file' });
+      return;
+    }
+
+    res.status(201).json({ message: 'File moved successfully' });
+    return;
+  })
+});
+
 export default router;
