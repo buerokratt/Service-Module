@@ -21,18 +21,14 @@ check_type:
 get_GET_services_stat:
   call: http.get
   args:
-    url: https://opensearch-node1:9200/services/_doc/GET
-    headers:
-      Authorization: 'Basic YWRtaW46YWRtaW4='
+    url: https://${username}:${password}@opensearch-node1:9200/services/_doc/GET
   result: results
   next: check_result
 
 get_POST_services_stat:
   call: http.get
   args:
-    url: https://opensearch-node1:9200/services/_doc/POST
-    headers:
-      authorization: 'Basic YWRtaW46YWRtaW4='
+    url: https://${username}:${password}opensearch-node1:9200/services/_doc/POST
   result: results
   next: check_result
 

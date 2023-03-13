@@ -1,7 +1,18 @@
+check_for_body:
+  switch:
+    - condition: ${incoming.body === null}
+      next: return_bad_request
+  next: extract_body
+  
+extract_body:
+  assign:
+    username: ${incoming.body.username}
+    password: ${incoming.body.password}
+
 post_GET_services_stat:
   call: http.post
   args:
-    url: https://{username}:{password}@opensearch-node1:9200/services/_doc/GET
+    url: https://${username}:${password}@opensearch-node1:9200/services/_doc/GET
     body:
       get-sticky: 123,
       services: 333,
@@ -12,7 +23,7 @@ post_GET_services_stat:
 post_POST_services_stat:
   call: http.post
   args:
-    url: https://{username}:{password}@opensearch-node1:9200/services/_doc/POST
+    url: https://${username}:${password}@opensearch-node1:9200/services/_doc/POST
     body:
       services/add: 9,
       services/resql/add: 8,
