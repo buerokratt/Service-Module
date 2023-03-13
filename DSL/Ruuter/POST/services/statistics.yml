@@ -1,0 +1,58 @@
+check_for_body:
+  switch:
+    - condition: ${incoming.body === null}
+      next: return_bad_request
+  next: extract_body
+  
+extract_body:
+  assign:
+    type: ${incoming.body.type}
+    username: ${incoming.body.username}
+    password: ${incoming.body.password}
+
+check_type:
+  switch:
+    - condition: ${type === 'POST'}
+      next: get_POST_services_stat
+    - condition: ${type === 'GET'}
+      next: get_GET_services_stat
+  next: return_bad_request
+
+get_GET_services_stat:
+  call: http.get
+  args:
+    url: https://opensearch-node1:9200/services/_doc/GET
+    headers:
+      Authorization: 'Basic YWRtaW46YWRtaW4='
+  result: results
+  next: check_result
+
+get_POST_services_stat:
+  call: http.get
+  args:
+    url: https://opensearch-node1:9200/services/_doc/POST
+    headers:
+      authorization: 'Basic YWRtaW46YWRtaW4='
+  result: results
+  next: check_result
+
+check_result:
+  switch:
+    - condition: ${results.response.body.found === true}
+      next: return_ok
+  next: return_not_found
+
+return_not_found:
+  status: 404
+  return: 'Opensearch index not found'
+  next: end
+
+return_ok:
+  status: 200
+  return: ${results.response.body._source}
+  next: end
+
+return_bad_request:
+  status: 400
+  return: 'Bad request'
+  next: end

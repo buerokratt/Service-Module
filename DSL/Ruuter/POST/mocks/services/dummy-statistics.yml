@@ -1,0 +1,24 @@
+post_GET_services_stat:
+  call: http.post
+  args:
+    url: https://{username}:{password}@opensearch-node1:9200/services/_doc/GET
+    body:
+      get-sticky: 123,
+      services: 333,
+      sticky/example: 1,
+      mocks/validation-mock: 99
+  result: results
+
+post_POST_services_stat:
+  call: http.post
+  args:
+    url: https://{username}:{password}@opensearch-node1:9200/services/_doc/POST
+    body:
+      services/add: 9,
+      services/resql/add: 8,
+  result: results
+
+return_ok:
+  status: 200
+  return: 'ok'
+  next: end
