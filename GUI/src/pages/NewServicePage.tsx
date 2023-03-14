@@ -20,8 +20,6 @@ const NewServicePage: React.FC = () => {
 
   useEffect(() => {
     if (jsonSchema != undefined) {
-      console.log(jsonSchema);
-     console.log(jsonSchema.properties?.paths?.properties[selectedEndpoint]);
      setSelectedSchema(jsonSchema.properties?.paths?.properties[selectedEndpoint]);
    }
   }, [selectedEndpoint]);
