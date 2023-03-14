@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from "react";
-import { useTranslation } from "react-i18next";
-import axios from "axios";
-import { Track } from "../components";
-import { dummyDataApi } from "../resources/api-constants";
+import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import axios from 'axios';
+import { Track } from '../components';
+import { dummyDataApi } from '../resources/api-constants';
 
 const OverviewPage: React.FC = () => {
   const [dummyData, setDummyData] = useState('')
