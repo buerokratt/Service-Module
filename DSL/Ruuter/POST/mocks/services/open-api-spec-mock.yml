@@ -1,7 +1,7 @@
 get_message:
   call: http.get
   args:
-    url: http://resql:8082/v3/api-docs
+    url: https://petstore3.swagger.io/api/v3/openapi.json
   result: res
 
 return_value:
