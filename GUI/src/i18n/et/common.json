@@ -2,10 +2,26 @@
   "global": {
     "title": "Teenindus moodul",
     "services": "Teenindus",
-    "backhome": "Tagasi avalehele"
+    "backhome": "Tagasi avalehele",
+    "resultCount": "Kuvan korraga"
   },
   "menu": {
     "overview": "Ülevaade",
     "close": "Sulge menüü"
+  },
+  "overview": {
+    "services": "Teenused",
+    "create": "Loo uus teenus",
+    "edit": "Muuda",
+    "delete": "Kustuta",
+    "service": {
+      "name": "Nimetus",
+      "usedCount": "Kasutamise arv",
+      "state": "Olek",
+      "status": {
+        "active": "Aktiivne",
+        "inactive": "Mitteaktiivne"
+      }
+    }
   }
 }
