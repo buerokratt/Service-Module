@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import { MdDeleteOutline, MdOutlineEdit } from "react-icons/md";
 import { Button, Card, Icon, Label, Track } from "..";
 import { Service } from "../../types/service";
+import { ServiceStatus } from "../../types/service-status";
 import DataTable from "../DataTable";
 
 import "./ServicesTable.scss";
@@ -75,9 +76,9 @@ const ServicesTable = (props: Props) => {
       meta: {
         size: 90,
       },
-      cell: (_) => (
+      cell: (props) => (
         <Track align="right">
-          <Button appearance="text">
+          <Button disabled={props.row.original.state === ServiceStatus.Active} appearance="text">
             <Icon icon={<MdDeleteOutline />} size="medium" />
             {t("overview.delete")}
           </Button>
