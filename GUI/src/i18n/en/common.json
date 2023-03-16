@@ -3,7 +3,10 @@
     "title": "Service Module",
     "services": "Services",
     "backhome": "Back to homepage",
-    "resultCount": "Results per page"
+    "resultCount": "Results per page",
+    "gotoPage": "Go to page",
+    "notification": "Notification",
+    "paginationNavigation": "Navigate"
   },
   "menu": {
     "overview": "Overview",

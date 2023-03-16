@@ -3,7 +3,10 @@
     "title": "Teenindus moodul",
     "services": "Teenindus",
     "backhome": "Tagasi avalehele",
-    "resultCount": "Kuvan korraga"
+    "resultCount": "Kuvan korraga",
+    "gotoPage": "Mine leheküljele",
+    "notification": "Teade",
+    "paginationNavigation": "Navigeeri"
   },
   "menu": {
     "overview": "Ülevaade",
