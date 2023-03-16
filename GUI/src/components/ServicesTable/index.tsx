@@ -96,7 +96,7 @@ const ServicesTable = (props: Props) => {
       ),
     }),
     columnHelper.display({
-      id: "remove",
+      id: "delete",
       meta: {
         size: 90,
       },
