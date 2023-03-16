@@ -14,14 +14,21 @@
     "create": "Loo uus teenus",
     "edit": "Muuda",
     "delete": "Kustuta",
+    "cancel": "Tühista",
     "service": {
       "name": "Nimetus",
       "usedCount": "Kasutamise arv",
       "state": "Olek",
-      "status": {
+      "states": {
         "active": "Aktiivne",
         "inactive": "Mitteaktiivne"
       }
+    },
+    "popup": {
+      "delete": "Kas oled kindel, et soovid teenuse kustutada?",
+      "setActive": "Kas oled kindel, et tahad teenuse aktiveerida?",
+      "setInactive": "Kas oled kindel, et tahad teenuse deaktiveerida?",
+      "setState": "Uuenda olek"
     }
   }
 }

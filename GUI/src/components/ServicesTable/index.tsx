@@ -2,9 +2,9 @@ import { createColumnHelper, PaginationState } from "@tanstack/react-table";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { MdDeleteOutline, MdOutlineEdit } from "react-icons/md";
-import { Button, Card, Icon, Label, Track } from "..";
+import { Button, Card, Icon, Label, Modal, Track } from "..";
 import { Service } from "../../types/service";
-import { ServiceStatus } from "../../types/service-status";
+import { ServiceState } from "../../types/service-state";
 import DataTable from "../DataTable";
 
 import "./ServicesTable.scss";
@@ -20,6 +20,9 @@ const ServicesTable = (props: Props) => {
   });
   const { t } = useTranslation();
   const [services, setServices] = useState<Service[]>([]);
+  const [isDeletePopupVisible, setDeletePopupVisible] = useState(false);
+  const [isStatePopupVisible, setStatePopupVisible] = useState(false);
+  const [popupText, setPopupText] = useState("");
   const columnHelper = createColumnHelper<Service>();
 
   useEffect(() => {
@@ -27,6 +30,11 @@ const ServicesTable = (props: Props) => {
 
     fetchServices().catch(console.error);
   }, [props.dataSource]);
+
+  const showStatePopup = (text: string) => {
+    setPopupText(text);
+    setStatePopupVisible(true);
+  };
 
   const columns = [
     columnHelper.accessor("name", {
@@ -47,12 +55,28 @@ const ServicesTable = (props: Props) => {
         size: 120,
       },
       cell: (props) => (
-        <Track justify="around">
+        <Track
+          justify="around"
+          onClick={() =>
+            showStatePopup(
+              t(
+                props.row.original.state === ServiceState.Active
+                  ? "overview.popup.setInactive"
+                  : "overview.popup.setActive"
+              )
+            )
+          }
+          style={{ cursor: "pointer" }}
+        >
           <Label
-            type={props.row.original.state === "active" ? "success" : "error"}
+            type={
+              props.row.original.state === ServiceState.Active
+                ? "success"
+                : "error"
+            }
             tooltip={<></>}
           >
-            {t(`overview.service.status.${props.row.original.state}`)}
+            {t(`overview.service.states.${props.row.original.state}`)}
           </Label>
         </Track>
       ),
@@ -78,7 +102,11 @@ const ServicesTable = (props: Props) => {
       },
       cell: (props) => (
         <Track align="right">
-          <Button disabled={props.row.original.state === ServiceStatus.Active} appearance="text">
+          <Button
+            disabled={props.row.original.state === ServiceState.Active}
+            appearance="text"
+            onClick={() => setDeletePopupVisible(true)}
+          >
             <Icon icon={<MdDeleteOutline />} size="medium" />
             {t("overview.delete")}
           </Button>
@@ -89,6 +117,42 @@ const ServicesTable = (props: Props) => {
 
   return (
     <Card>
+      {isDeletePopupVisible && (
+        <Modal
+          title={t("overview.popup.delete")}
+          onClose={() => setDeletePopupVisible(false)}
+        >
+          <Track justify="end" gap={16}>
+            <Button
+              appearance="secondary"
+              onClick={() => setDeletePopupVisible(false)}
+            >
+              {t("overview.cancel")}
+            </Button>
+            <Button
+              appearance="error"
+              onClick={() => setDeletePopupVisible(false)}
+            >
+              {t("overview.delete")}
+            </Button>
+          </Track>
+        </Modal>
+      )}
+      {isStatePopupVisible && (
+        <Modal title={popupText} onClose={() => setStatePopupVisible(false)}>
+          <Track justify="end" gap={16}>
+            <Button
+              appearance="secondary"
+              onClick={() => setStatePopupVisible(false)}
+            >
+              {t("overview.cancel")}
+            </Button>
+            <Button onClick={() => setStatePopupVisible(false)}>
+              {t("overview.popup.setState")}
+            </Button>
+          </Track>
+        </Modal>
+      )}
       <DataTable
         sortable={true}
         data={services}

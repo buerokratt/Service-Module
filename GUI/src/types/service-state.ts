@@ -1,4 +1,4 @@
-export enum ServiceStatus {
+export enum ServiceState {
   Active = "active",
   Inactive = "inactive",
 }

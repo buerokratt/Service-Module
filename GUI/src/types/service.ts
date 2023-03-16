@@ -1,7 +1,7 @@
-import { ServiceStatus } from "./service-status";
+import { ServiceState } from "./service-state";
 
 export interface Service {
   name: string;
   usedCount: number;
-  state: ServiceStatus;
+  state: ServiceState;
 }
