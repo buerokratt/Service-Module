@@ -64,7 +64,6 @@ const ServicesTable = (props: Props) => {
               )
             )
           }
-          style={{ cursor: "pointer" }}
         >
           <Label
             type={
