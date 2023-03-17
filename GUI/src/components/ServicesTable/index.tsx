@@ -26,9 +26,7 @@ const ServicesTable = (props: Props) => {
   const columnHelper = createColumnHelper<Service>();
 
   useEffect(() => {
-    const fetchServices = async () => setServices(props.dataSource);
-
-    fetchServices().catch(console.error);
+    setServices(props.dataSource);
   }, [props.dataSource]);
 
   const showStatePopup = (text: string) => {
