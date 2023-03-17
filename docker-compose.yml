@@ -107,14 +107,13 @@ services:
       - ./GUI:/app
     networks:
       - bykstack
-  opensearch-node1:
+  opensearch:
     image: opensearchproject/opensearch:latest
-    container_name: opensearch-node1
+    container_name: opensearch
     environment:
-      - cluster.name=opensearch-cluster
-      - node.name=opensearch-node1
-      - discovery.seed_hosts=opensearch-node1,opensearch-node2
-      - cluster.initial_cluster_manager_nodes=opensearch-node1,opensearch-node2
+      - node.name=opensearch
+      - discovery.seed_hosts=opensearch
+      - discovery.type=single-node
       - bootstrap.memory_lock=true
       - "OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m"
     ulimits:
@@ -131,42 +130,21 @@ services:
       - 9600:9600
     networks:
       - bykstack
-  opensearch-node2:
-    image: opensearchproject/opensearch:latest
-    container_name: opensearch-node2
-    environment:
-      - cluster.name=opensearch-cluster
-      - node.name=opensearch-node2
-      - discovery.seed_hosts=opensearch-node1,opensearch-node2
-      - cluster.initial_cluster_manager_nodes=opensearch-node1,opensearch-node2
-      - bootstrap.memory_lock=true
-      - "OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m"
-    ulimits:
-      memlock:
-        soft: -1
-        hard: -1
-      nofile:
-        soft: 65536
-        hard: 65536
-    volumes:
-      - opensearch-data2:/usr/share/opensearch/data
-    networks:
-      - bykstack
-  opensearch-dashboards:
+  opensearch-dashboard:
     image: opensearchproject/opensearch-dashboards:latest
-    container_name: opensearch-dashboards
+    container_name: opensearch-dashboard
     ports:
       - 5601:5601
     expose:
       - "5601"
     environment:
-      OPENSEARCH_HOSTS: '["https://opensearch-node1:9200","https://opensearch-node2:9200"]'
+     - 'OPENSEARCH_HOSTS=["https://opensearch:9200"]'
+     - "DISABLE_SECURITY_DASHBOARDS_PLUGIN=true"
     networks:
       - bykstack
 
 volumes:
   opensearch-data1:
-  opensearch-data2:      
 
 networks:
   bykstack:
