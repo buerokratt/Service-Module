@@ -131,6 +131,16 @@ services:
       - 9600:9600
     networks:
       - bykstack
+  logstash:
+    image: opensearchproject/logstash-oss-with-opensearch-output-plugin:latest
+    container_name: logstash
+    ports:
+    - 5044:5044
+    volumes:
+    - ./DSL/OpenSearch/logstash.conf:/usr/share/logstash/pipeline/logstash.conf
+    networks:
+      - bykstack    
+
 
 volumes:
   opensearch-data1:
