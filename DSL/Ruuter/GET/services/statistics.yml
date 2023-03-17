@@ -1,12 +1,11 @@
 get_services_stat:
   call: http.post
   args:
-    url: https://opensearch-node1:9200/services/_search/template
+    url: http://opensearch-node1:9200/services/_search/template
     body:
       id: 'get-services-stat'
-      params: ${incoming.body}
+      params: ${incoming.params}
   result: results
-  next: check_result
 
 check_result:
   switch:
@@ -16,7 +15,7 @@ check_result:
 
 return_not_found:
   status: 404
-  return: 'Opensearch index not found'
+  return: 'index not found'
   next: end
 
 return_ok:
