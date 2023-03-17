@@ -6,6 +6,7 @@
   },
   "menu": {
     "overview": "Overview",
+    "ruuterlogs": "Ruuter Logs",
     "close": "Close menu"
   }
 }
