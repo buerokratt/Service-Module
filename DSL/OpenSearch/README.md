@@ -20,3 +20,10 @@ curl -H "Content-Type: application/x-ndjson" -X PUT "http://localhost:9200/inten
 ```
 curl -H 'Content-Type: application/json' -X GET "http://localhost:9200/intents/_search?pretty=true" -ku admin:admin -d' {"query":{"match":{"intent":"common_tervitus"}}}'
 ```
+##### Templates for searching intents
+```
+curl -L -X POST 'http://localhost:9200/_scripts/search_intents' -H 'Content-Type: application/json' --data-binary "@templates/search_intents.json"
+```
+##### Test template
+```
+curl -L -X GET 'http://localhost:9200/intents/_search/template' -H 'Content-Type: application/json' --data-raw '{"id": "search_intents", "params": {"keyword": "andmekaitse"}}'
