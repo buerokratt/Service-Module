@@ -1,0 +1,21 @@
+{
+  "mappings": {
+    "properties": {
+      "service": {
+        "type": "text"
+      },
+      "requestId": {
+        "type": "number"
+      },
+      "level": {
+        "type": "text"
+      },
+      "date": {
+        "type": "number"
+      },
+      "content": {
+        "type": "number"
+      }
+    }
+  }
+}
