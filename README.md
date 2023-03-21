@@ -42,6 +42,8 @@ This repo will primarily contain:
 - When creating new migrations, use the helper `./create-migration.sh name-of-migration` which will create a timestamped file in the correct directory and add the required headers
 
 ### DataMapper
+[Changes based on this example](https://github.com/express-handlebars/express-handlebars/tree/master/examples/advanced)
+
 DataMapper directory:
 - create new directory: **lib**
 
@@ -50,6 +52,11 @@ DataMapper directory:
 ```
 import * as helpers from "./lib/helpers.js";
 ```
+
+```
+const hbs = create(); -> const hbs = create({ helpers });
+```
+
 ``` 
 app.post('/hbs/*', (req, res) => {
   res.render(req.params[0], req.body, function (_, response) {
