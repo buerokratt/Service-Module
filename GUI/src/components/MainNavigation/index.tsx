@@ -142,6 +142,10 @@ const MainNavigation: FC = () => {
           label: t('menu.overview'),
           path: '/services/overview',
         },
+        {
+          label: t('menu.Intents'),
+          path: '/services/intents',
+        },
       ],
     },
     {

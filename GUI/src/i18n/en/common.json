@@ -6,6 +6,7 @@
   },
   "menu": {
     "overview": "Overview",
-    "close": "Close menu"
+    "close": "Close menu",
+    "Intents": "Intents"
   }
 }
