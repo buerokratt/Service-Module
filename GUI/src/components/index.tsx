@@ -22,6 +22,7 @@ import Box from './Box'
 import Drawer from './Drawer'
 import Dialog from './Dialog'
 import Section from './Section'
+import Modal from './Modal'
 
 export {
   Layout,
@@ -46,4 +47,5 @@ export {
   Drawer,
   Dialog,
   Section,
+  Modal,
 }
