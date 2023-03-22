@@ -69,7 +69,7 @@ app.post('/hbs/*', (req, res) => {
   });
 });
 ```
-to enable handlebars templates to receive a body and return a json
+To enable handlebars templates to receive a body and return a json
 * When Building a handlebars template make sure to add `layout:false` so that hbs response in the data-mapper will discard the html layout and only return the body data
 
 ### DMapper helper functions
