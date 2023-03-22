@@ -1,9 +1,10 @@
-@import 'src/styles/tools/spacing';
-@import 'src/styles/tools/color';
+@import "src/styles/tools/spacing";
+@import "src/styles/tools/color";
 
 .layout {
   height: 100%;
   display: flex;
+  overflow-x: scroll;
 
   &__wrapper {
     flex: 1;
