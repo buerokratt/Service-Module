@@ -1,78 +1,80 @@
-import React, { useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import axios from 'axios';
-import { Button, FormInput, FormSelect, Track } from '../components';
-import { openApiSpeckMock } from '../resources/api-constants';
-import Form from '@rjsf/core';
-import { EndpointType } from '../types/endpoint-type';
-import toJsonSchema from 'to-json-schema';
-import validator from '@rjsf/validator-ajv8';
+import React, {  useState } from "react";
+import { useTranslation } from "react-i18next";
+import {
+  Button,
+  Card,
+  EndpointOpenAPI,
+  FormInput,
+  FormSelect,
+  FormTextarea,
+  Layout,
+  NewServiceHeader,
+  Track,
+} from "../components";
+import { Option } from "../types/option";
+
 
 const NewServicePage: React.FC = () => {
-  const [openApiSpec, setOpenApiSpec] = useState('');
-  const [jsonSchema, setJsonSchema] = useState<any>();
-  const [selectedSchema, setSelectedSchema] = useState<any>();
-  const [endpoints, setEndpoints] = useState<EndpointType[]>([]);
-  const [selectedEndpoint, setSelectedEndpoint] = useState<string>('');
+  const [option, setOption] = useState<Option | null>();
+
+  const options: Option[] = [
+    { label: "Open API", value: "openAPI" },
+    { label: "Custom endpoint", value: "custom" },
+  ]
 
   const { t } = useTranslation();
 
-  useEffect(() => {
-    if (jsonSchema) {
-     setSelectedSchema(jsonSchema.properties?.paths?.properties[selectedEndpoint]);
-   }
-  }, [selectedEndpoint]);
-
-  const fetchOpenApiSpecMock = async () => {
-    const result = await axios.post(openApiSpeckMock());
-    const schema = toJsonSchema(result.data.response);
-    const paths = Object.keys(schema.properties?.paths?.properties ?? []);
-    const endpointsArr: EndpointType[] = [];
-    paths.forEach((e) => {
-      endpointsArr.push({
-        label: `${e}`,
-        value: `${e}`,
-      });
-    });
-    filterSchema(schema);
-    setJsonSchema(schema);
-    setEndpoints(endpointsArr);
-    setOpenApiSpec(result.data.response);
-  };
-
-  const filterSchema = (schema: any) => {
-    delete schema.properties?.openapi;
-    delete schema.properties?.components;
-    delete schema.properties?.info;
-    delete schema.properties?.servers;
-  }
-
   return (
-    <Track direction='vertical'>
-      <link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css' />
-      <h1>{t('menu.newService')}</h1>
-      <a style={{ marginBottom: '10p' }}></a>
-      <Track>
-        <FormInput name={''} label={''}></FormInput>
-        <a style={{ marginLeft: '20px' }}></a>
-        <Button>Ask For Spec</Button>
-        <a style={{ marginLeft: '10px' }}></a>
-        <Button appearance='text' onClick={fetchOpenApiSpecMock}>
-          Mock It
-        </Button>
+    <Layout disableMenu customHeader={<NewServiceHeader />}>
+      <Track
+        style={{ width: 800, alignSelf: "center" }}
+        direction="vertical"
+        gap={16}
+        align="stretch"
+      >
+        <h1>Teenuse seadistamine</h1>
+        <Card>
+          <Track direction="vertical" align="stretch" gap={16}>
+            <div>
+              <label htmlFor="name">Nimetus</label>
+              <FormInput name="name" label="Nimetus" hideLabel />
+            </div>
+            <div>
+              <label htmlFor="description">Kirjeldus</label>
+              <FormTextarea
+                name="description"
+                label="Kirjeldus"
+                hideLabel
+                style={{ 
+                  height: 120, 
+                  resize: 'vertical' 
+                }}
+              />
+            </div>
+          </Track>
+        </Card>
+        <Card header={<h5>API otspunkt</h5>}>
+          <Track direction="vertical" align="stretch" gap={16}>
+            <div>
+              <label htmlFor="service-type">Teenus kasutab</label>
+              <FormSelect
+                name="service-type"
+                label={"Teenus kasutab"}
+                options={options}
+                hideLabel
+                placeholder="Vali.."
+                onSelectionChange={(selection) => setOption(selection)}
+              />
+            </div>
+            {option?.value === "openAPI" && <>
+              <EndpointOpenAPI />
+            </> }
+            {option?.value === "custom" && <p>custom</p> }
+          </Track>
+        </Card>
+        <Button appearance="text">+ Lisa API otspunkt</Button>
       </Track>
-      <a style={{ marginBottom: '20px' }}></a>
-      {endpoints.length > 0 && (
-        <FormSelect
-          name={''}
-          label={''}
-          placeholder={'Select Endpoint'}
-          options={endpoints}
-          onSelectionChange={(value) => setSelectedEndpoint(value?.value ?? '')}
-        />
-      )}
-      {selectedSchema != undefined && <Form schema={selectedSchema} validator={validator}  />}
-    </Track>
+    </Layout>
   );
 };
 

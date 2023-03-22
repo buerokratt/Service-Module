@@ -6,7 +6,8 @@
     "resultCount": "Results per page",
     "gotoPage": "Go to page",
     "notification": "Notification",
-    "paginationNavigation": "Navigate"
+    "paginationNavigation": "Navigate",
+    "choose": "Choose"
   },
   "menu": {
     "overview": "Overview",

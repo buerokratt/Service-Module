@@ -3,6 +3,8 @@ import Button from "./Button";
 import Card from "./Card";
 import Dialog from "./Dialog";
 import Drawer from "./Drawer";
+import EndpointCustom from "./Endpoints/Custom";
+import EndpointOpenAPI from "./Endpoints/OpenAPI";
 import {
   FormCheckbox,
   FormCheckboxes,
@@ -33,6 +35,8 @@ export {
   Card,
   Dialog,
   Drawer,
+  EndpointCustom,
+  EndpointOpenAPI,
   FormCheckbox,
   FormCheckboxes,
   FormDatepicker,
