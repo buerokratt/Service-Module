@@ -2,12 +2,38 @@
   "global": {
     "title": "Service Module",
     "services": "Services",
-    "backhome": "Back to homepage"
+    "backhome": "Back to homepage",
+    "resultCount": "Results per page",
+    "gotoPage": "Go to page",
+    "notification": "Notification",
+    "paginationNavigation": "Navigate"
   },
   "menu": {
     "overview": "Overview",
     "services": "Services",
     "newService": "New Service",
     "close": "Close menu"
+  },
+  "overview": {
+    "services": "Services",
+    "create": "Create new service",
+    "edit": "Edit",
+    "delete": "Delete",
+    "cancel": "Cancel",
+    "service": {
+      "name": "Name",
+      "usedCount": "Times service has been triggered",
+      "state": "State",
+      "states": {
+        "active": "Active",
+        "inactive": "Inactive"
+      }
+    },
+    "popup": {
+      "delete": "Are you sure that you want to delete the service?",
+      "setActive": "Are you sure you want to activate this service?",
+      "setInactive": "Are you sure you want to deactivate this service?",
+      "setState": "Update state"
+    }
   }
 }

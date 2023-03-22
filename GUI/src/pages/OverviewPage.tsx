@@ -1,26 +1,28 @@
-import React, { useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import axios from 'axios';
-import { Track } from '../components';
-import { dummyDataApi } from '../resources/api-constants';
+import React, { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
+import { Button, Track } from "../components";
+import { dummyServiceData } from "../resources/api-constants";
+import ServicesTable from "../components/ServicesTable";
+import { Service } from "../types/service";
 
 const OverviewPage: React.FC = () => {
-  const [dummyData, setDummyData] = useState('')
+  const [dummyData, setDummyData] = useState<Service[]>([]);
 
-  const { t } = useTranslation()
+  const { t } = useTranslation();
 
   useEffect(() => {
-    axios.get(dummyDataApi())
-      .then((res) => setDummyData(JSON.stringify(res.data)))
-      .catch((error) => setDummyData(error.message.toString()));
-  }, [])
+    setDummyData(dummyServiceData);
+  }, []);
 
   return (
-    <Track direction='vertical'>
-      <h1>{t('menu.overview')}</h1>
-      <span>{JSON.stringify(dummyData, null, 2)}</span>
-    </Track>
-  )
-}
+    <>
+      <Track justify="between">
+        <h1>{t("overview.services")}</h1>
+        <Button>{t("overview.create")}</Button>
+      </Track>
+      <ServicesTable dataSource={dummyData} />
+    </>
+  );
+};
 
 export default OverviewPage;

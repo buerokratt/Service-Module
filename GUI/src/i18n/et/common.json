@@ -2,12 +2,38 @@
   "global": {
     "title": "Teenindus moodul",
     "services": "Teenindus",
-    "backhome": "Tagasi avalehele"
+    "backhome": "Tagasi avalehele",
+    "resultCount": "Kuvan korraga",
+    "gotoPage": "Mine leheküljele",
+    "notification": "Teade",
+    "paginationNavigation": "Navigeeri"
   },
   "menu": {
     "overview": "Ülevaade",
     "services": "Teenused",
     "newService": "Uus Teenus",
     "close": "Sulge menüü"
+  },
+  "overview": {
+    "services": "Teenused",
+    "create": "Loo uus teenus",
+    "edit": "Muuda",
+    "delete": "Kustuta",
+    "cancel": "Tühista",
+    "service": {
+      "name": "Nimetus",
+      "usedCount": "Kasutamise arv",
+      "state": "Olek",
+      "states": {
+        "active": "Aktiivne",
+        "inactive": "Mitteaktiivne"
+      }
+    },
+    "popup": {
+      "delete": "Kas oled kindel, et soovid teenuse kustutada?",
+      "setActive": "Kas oled kindel, et tahad teenuse aktiveerida?",
+      "setInactive": "Kas oled kindel, et tahad teenuse deaktiveerida?",
+      "setState": "Uuenda olek"
+    }
   }
 }
