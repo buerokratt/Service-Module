@@ -1,8 +1,9 @@
-import React, {  useState } from "react";
+import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
   Button,
   Card,
+  EndpointCustom,
   EndpointOpenAPI,
   FormInput,
   FormSelect,
@@ -13,14 +14,13 @@ import {
 } from "../components";
 import { Option } from "../types/option";
 
-
 const NewServicePage: React.FC = () => {
   const [option, setOption] = useState<Option | null>();
 
   const options: Option[] = [
     { label: "Open API", value: "openAPI" },
     { label: "Custom endpoint", value: "custom" },
-  ]
+  ];
 
   const { t } = useTranslation();
 
@@ -45,9 +45,9 @@ const NewServicePage: React.FC = () => {
                 name="description"
                 label="Kirjeldus"
                 hideLabel
-                style={{ 
-                  height: 120, 
-                  resize: 'vertical' 
+                style={{
+                  height: 120,
+                  resize: "vertical",
                 }}
               />
             </div>
@@ -66,10 +66,8 @@ const NewServicePage: React.FC = () => {
                 onSelectionChange={(selection) => setOption(selection)}
               />
             </div>
-            {option?.value === "openAPI" && <>
-              <EndpointOpenAPI />
-            </> }
-            {option?.value === "custom" && <p>custom</p> }
+            {option?.value === "openAPI" && <EndpointOpenAPI />}
+            {option?.value === "custom" && <EndpointCustom />}
           </Track>
         </Card>
         <Button appearance="text">+ Lisa API otspunkt</Button>
