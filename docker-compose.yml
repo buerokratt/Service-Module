@@ -69,6 +69,7 @@ services:
     volumes:
       - ./DSL/DMapper/hbs:/workspace/app/views/services
       - ./DSL/DMapper/js:/workspace/app/js/services
+      - ./DSL/DMapper/lib:/workspace/app/lib
     ports:
       - 3000:3000
     networks:
