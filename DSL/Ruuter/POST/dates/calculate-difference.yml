@@ -29,10 +29,10 @@ check_is_output_type_valid:
 calculate_difference:
   call: http.post
   args:
-    url: http://data_mapper:3000/hbs/services/calculate-date-difference
+    url: http://data_mapper:3005/hbs/services/calculate-date-difference
     headers:
-      type: 'json'
-    body: 
+      type: "json"
+    body:
       startDate: ${startDate}
       endDate: ${endDate}
       outputType: ${outputType}
