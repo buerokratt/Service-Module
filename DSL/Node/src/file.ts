@@ -1,84 +1,123 @@
-import express, { Router } from 'express';
-import path from 'path';
-import fs from 'fs';
-import { buildContentFilePath, isValidFilename } from './util';
+import express, { Router } from "express";
+import path from "path";
+import fs from "fs";
+import * as replace from "replace-in-file";
+import { buildContentFilePath, isValidFilename } from "./util";
 const router: Router = express.Router();
 
-router.post('/write', (req, res) => {
-  const filename = buildContentFilePath(req.body.file_path)
-  const content = req.body.content
+router.post("/write", (req, res) => {
+  const filename = buildContentFilePath(req.body.file_path);
+  const content = req.body.content;
 
   if (!filename || !content) {
-    res.status(400).json({ message: 'Filename and content are required' });
+    res.status(400).json({ message: "Filename and content are required" });
     return;
   }
 
-  if (!isValidFilename(filename) || path.normalize(filename).includes('..')) {
-    res.status(400).json({ message: 'Filename contains illegal characters' });
+  if (!isValidFilename(filename) || path.normalize(filename).includes("..")) {
+    res.status(400).json({ message: "Filename contains illegal characters" });
     return;
   }
 
   fs.writeFile(filename, content, (err) => {
     if (err) {
-      res.status(500).json({ message: 'Unable to save file' });
+      res.status(500).json({ message: "Unable to save file" });
       return;
     }
 
-    res.status(201).json({ message: 'File saved successfully' });
+    res.status(201).json({ message: "File saved successfully" });
     return;
   });
 });
 
-router.post('/move', async (req, res) => {
-  const currentPath = buildContentFilePath(req.body.current_path)
-  const newPath = buildContentFilePath(req.body.new_path)
+router.post("/move", async (req, res) => {
+  const currentPath = buildContentFilePath(req.body.current_path);
+  const newPath = buildContentFilePath(req.body.new_path);
 
   if (!currentPath || !newPath) {
-    res.status(400).json({ message: 'current path and new path are required' });
+    res.status(400).json({ message: "current path and new path are required" });
     return;
   }
 
-  if (!isValidFilename(currentPath) || path.normalize(currentPath).includes('..')) {
-    res.status(400).json({ message: 'current contains illegal characters' });
+  if (
+    !isValidFilename(currentPath) ||
+    path.normalize(currentPath).includes("..")
+  ) {
+    res.status(400).json({ message: "current contains illegal characters" });
     return;
   }
+
+  console.log(currentPath);
+  console.log(newPath);
 
   fs.mkdir(path.dirname(newPath), () => {});
 
   fs.rename(currentPath, newPath, function (err) {
     if (err) {
-      res.status(500).json({ message: 'Unable to move file' });
+      res.status(500).json({ message: "Unable to move file" });
       return;
     }
 
-    res.status(201).json({ message: 'File moved successfully' });
+    res.status(201).json({ message: "File moved successfully" });
     return;
-  })
+  });
 });
 
-
-router.post('/delete', async (req, res) => {
-  const filePath = buildContentFilePath(req.body.path)
+router.post("/delete", async (req, res) => {
+  const filePath = buildContentFilePath(req.body.path);
 
   if (!filePath) {
-    res.status(400).json({ message: 'Path is required' });
+    res.status(400).json({ message: "Path is required" });
     return;
   }
 
-  if (!isValidFilename(filePath) || path.normalize(filePath).includes('..')) {
-    res.status(400).json({ message: 'current contains illegal characters' });
+  if (!isValidFilename(filePath) || path.normalize(filePath).includes("..")) {
+    res.status(400).json({ message: "current contains illegal characters" });
     return;
   }
 
   fs.unlink(filePath, function (err) {
     if (err) {
-      res.status(500).json({ message: 'Unable to delete file' });
+      res.status(500).json({ message: "Unable to delete file" });
       return;
     }
 
-    res.status(201).json({ message: 'File deleted successfully' });
+    res.status(201).json({ message: "File deleted successfully" });
     return;
-  })
+  });
+});
+
+router.post("/edit", async (req, res) => {
+  const filePath = buildContentFilePath(req.body.path);
+  const from = req.body.from;
+  const to = req.body.to;
+
+  if (!filePath) {
+    res.status(400).json({ message: "Path is required" });
+    return;
+  }
+
+  if (!isValidFilename(filePath) || path.normalize(filePath).includes("..")) {
+    res.status(400).json({ message: "current contains illegal characters" });
+    return;
+  }
+
+  const options = {
+    files: filePath,
+    from: from,
+    to: to,
+  };
+
+  console.log(options);
+
+  replace.replaceInFile(options, (err) => {
+    if (err) {
+      res.status(500).json({ message: "Unable to edit file" });
+      return;
+    }
+
+    res.status(200).json({ message: "File edited successfully" });
+  });
 });
 
 export default router;
