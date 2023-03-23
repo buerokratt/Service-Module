@@ -8,6 +8,7 @@ import { Button, FormInput, FormSelect, Track } from "../..";
 import { Option } from "../../../types/option";
 import DataTable from "../../DataTable";
 import { createColumnHelper, PaginationState } from "@tanstack/react-table";
+import { useTranslation } from "react-i18next";
 
 const EndpointOpenAPI: React.FC = () => {
   const [selectedEndpoint, setSelectedEndpoint] = useState<Option | null>();
@@ -15,6 +16,7 @@ const EndpointOpenAPI: React.FC = () => {
   const [selectedOptions, setSelectedOptions] = useState<{
     [label: string]: string;
   }>({});
+  const { t } = useTranslation();
   const columnHelper = createColumnHelper<{ variable: string; value: any }>();
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
@@ -31,15 +33,14 @@ const EndpointOpenAPI: React.FC = () => {
 
   const columns = [
     columnHelper.accessor("variable", {
-      header: "Muutuja",
+      header: t("newService.endpoint.variable") ?? "",
     }),
     columnHelper.accessor("value", {
-      header: "Väärtus",
+      header: t("newService.endpoint.value") ?? "",
       cell: (props) => (
         <FormSelect
           name={props.row.original.variable}
-          label={props.row.original.variable}
-          hideLabel
+          label={""}
           options={dummyVariableOptions}
           defaultValue={
             selectedOptions[
@@ -57,28 +58,25 @@ const EndpointOpenAPI: React.FC = () => {
   return (
     <Track direction="vertical" align="stretch" gap={16}>
       <div>
-        <label htmlFor="name">API otspunkti URL</label>
+        <label htmlFor="name">{t("newService.endpoint.url")}</label>
         <Track gap={8}>
           <FormInput
             name="name"
-            label="Nimetus"
-            hideLabel
-            placeholder="Sisesta API otspunkt.."
+            label=""
+            placeholder={t("newService.endpoint.insert") ?? ""}
           />
           <Button onClick={() => setEndpoints(dummyEndpointsData)}>
-            Küsi otspunktid
+            {t("newService.endpoint.ask")}
           </Button>
         </Track>
       </div>
       {endpoints.length > 0 && (
         <div>
-        <label htmlFor="select-endpoint">Otspunktid</label>
+        <label htmlFor="select-endpoint">{t("newService.endpoints")}</label>
         <FormSelect
-          name={""}
-          label={"select-endpoint"}
-          placeholder={"Vali.."}
+          name={"select-endpoint"}
+          label={""}
           options={endpoints}
-          hideLabel
           onSelectionChange={(value) => setSelectedEndpoint(value)}
           />
           </div>

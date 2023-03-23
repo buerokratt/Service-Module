@@ -1,3 +1,4 @@
+import { t } from "i18next";
 import React, { FC } from "react";
 import { Button, StepCounter, Track } from "..";
 import "../Header/Header.scss";
@@ -7,10 +8,10 @@ const NewServiceHeader: FC = () => {
     <>
       <header className="header" style={{ paddingLeft: 24 }}>
         <Track justify="between" gap={16}>
-          <h1 style={{ whiteSpace: "nowrap" }}>Uus teenus</h1>
+          <h1 style={{ whiteSpace: "nowrap" }}>{t("menu.newService")}</h1>
           <StepCounter />
-          <Button appearance="secondary">Salvesta mustandina</Button>
-          <Button>Jätka</Button>
+          <Button appearance="secondary">{t("newService.saveDraft")}</Button>
+          <Button>{t("global.continue")}</Button>
         </Track>
       </header>
     </>

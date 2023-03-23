@@ -7,12 +7,13 @@
     "gotoPage": "Mine leheküljele",
     "notification": "Teade",
     "paginationNavigation": "Navigeeri",
-    "choose": "Vali"
+    "choose": "Vali..",
+    "continue": "Jätka"
   },
   "menu": {
     "overview": "Ülevaade",
     "services": "Teenused",
-    "newService": "Uus Teenus",
+    "newService": "Uus teenus",
     "close": "Sulge menüü"
   },
   "overview": {
@@ -36,5 +37,25 @@
       "setInactive": "Kas oled kindel, et tahad teenuse deaktiveerida?",
       "setState": "Uuenda olek"
     }
+  },
+  "newService": {
+    "endpoints": "Otspunktid",
+    "endpoint": {
+      "add": "+ Lisa API otspunkt",
+      "api": "API otspunkt",
+      "insert": "Sisesta API otspunkt..",
+      "ask": "Küsi otspunktid",
+      "url": "API otspunkti URL",
+      "test": "Testi URLi",
+      "variable": "Muutuja",
+      "value": "Väärtus"
+    },
+    "saveDraft": "Salvesta mustandina",
+    "trainingModuleSetup": "Treenningmooduli seadistamine",
+    "serviceSetup": "Teenuse seadistamine",
+    "serviceFlowCreation": "Teenusvoo loomine",
+    "name": "Nimetus",
+    "description": "Kirjeldus",
+    "uses": "Teenus kasutab"
   }
 }

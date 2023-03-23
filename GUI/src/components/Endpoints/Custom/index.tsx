@@ -1,11 +1,14 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { Button, FormInput, FormSelect, Track } from "../..";
 
 const EndpointCustom: React.FC = () => {
+  const { t } = useTranslation();
+
   return (
     <Track direction="vertical" align="stretch" gap={16}>
       <div>
-        <label htmlFor="name">API otspunkti URL</label>
+        <label htmlFor="name">{t("newService.endpoint.url")}</label>
         <Track gap={8}>
           <Track style={{ width: "100%" }}>
             <div style={{ width: 108 }}>
@@ -25,10 +28,10 @@ const EndpointCustom: React.FC = () => {
               name="name"
               label="Nimetus"
               hideLabel
-              placeholder="Sisesta API otspunkt.."
+              placeholder={t("newService.endpoint.insert") ?? ""}
             />
           </Track>
-          <Button>Testi URLi</Button>
+          <Button>{t("newService.endpoint.test")}</Button>
         </Track>
       </div>
     </Track>

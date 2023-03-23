@@ -32,19 +32,18 @@ const NewServicePage: React.FC = () => {
         gap={16}
         align="stretch"
       >
-        <h1>Teenuse seadistamine</h1>
+        <h1>{t("newService.serviceSetup")}</h1>
         <Card>
           <Track direction="vertical" align="stretch" gap={16}>
             <div>
-              <label htmlFor="name">Nimetus</label>
-              <FormInput name="name" label="Nimetus" hideLabel />
+              <label htmlFor="name">{t("newService.name")}</label>
+              <FormInput name="name" label="" />
             </div>
             <div>
-              <label htmlFor="description">Kirjeldus</label>
+              <label htmlFor="description">{t("newService.description")}</label>
               <FormTextarea
                 name="description"
-                label="Kirjeldus"
-                hideLabel
+                label=""
                 style={{
                   height: 120,
                   resize: "vertical",
@@ -53,15 +52,14 @@ const NewServicePage: React.FC = () => {
             </div>
           </Track>
         </Card>
-        <Card header={<h5>API otspunkt</h5>}>
+        <Card header={<h5>{t("newService.endpoint.api")}</h5>}>
           <Track direction="vertical" align="stretch" gap={16}>
             <div>
-              <label htmlFor="service-type">Teenus kasutab</label>
+              <label htmlFor="service-type">{t("newService.uses")}</label>
               <FormSelect
                 name="service-type"
-                label={"Teenus kasutab"}
+                label={""}
                 options={options}
-                hideLabel
                 placeholder="Vali.."
                 onSelectionChange={(selection) => setOption(selection)}
               />
@@ -70,7 +68,7 @@ const NewServicePage: React.FC = () => {
             {option?.value === "custom" && <EndpointCustom />}
           </Track>
         </Card>
-        <Button appearance="text">+ Lisa API otspunkt</Button>
+        <Button appearance="text">{t("newService.endpoint.add")}</Button>
       </Track>
     </Layout>
   );
