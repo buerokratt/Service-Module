@@ -89,6 +89,7 @@ const DataTable: FC<DataTableProps> = ({
   disableHead,
   meta,
 }) => {
+  const pagesShown = 7;
   const id = useId()
   const { t } = useTranslation()
   const [sorting, setSorting] = useState<SortingState>([])
@@ -118,6 +119,23 @@ const DataTable: FC<DataTableProps> = ({
     ...(pagination && { getPaginationRowModel: getPaginationRowModel() }),
     ...(sortable && { getSortedRowModel: getSortedRowModel() }),
   })
+
+  const getPages = (): number[] => {
+    const current = table.getState().pagination.pageIndex;
+    const pages: number[] = [];
+    const lastShownPage = Math.min(table.getPageCount(), current + pagesShown);
+
+    pages.push(current);
+    for (; pages.length < Math.min(pagesShown, table.getPageCount());) {
+      if (pages[0] > 0) pages.unshift(pages[0] - 1);
+      if (pages[pages.length - 1] + 1 < lastShownPage) {
+        pages.push(pages[pages.length - 1] + 1);
+      }
+    }
+
+    return pages;
+  };
+
 
   return (
     <div className="data-table__wrapper">
@@ -174,21 +192,29 @@ const DataTable: FC<DataTableProps> = ({
               </button>
               <nav role="navigation" aria-label={t('global.paginationNavigation') || ''}>
                 <ul className="links">
-                  {[...Array(table.getPageCount())].map((_, index) => (
-                    <li
-                      key={`${id}-${index}`}
-                      className={clsx({ active: table.getState().pagination.pageIndex === index })}
+                {getPages().map((page, i) => {
+                    if (
+                      (i === 0 && page !== 0) ||
+                      (i === pagesShown - 1 && page !== table.getPageCount() - 1)
+                    ) {
+                      return <p key={`${id}-${page}`}>...</p>;
+                    }
+                    return (
+                      <li
+                      key={`${id}-${page}`}
+                      className={clsx({ active: table.getState().pagination.pageIndex === page })}
                     >
                       <Link
-                        to={`?page=${index + 1}`}
-                        onClick={() => table.setPageIndex(index)}
-                        aria-label={t('global.gotoPage') + index}
-                        aria-current={table.getState().pagination.pageIndex === index}
+                        to={`?page=${page + 1}`}
+                        onClick={() => table.setPageIndex(page)}
+                        aria-label={t('global.gotoPage') + page}
+                        aria-current={table.getState().pagination.pageIndex === page}
                       >
-                        {index + 1}
+                        {page + 1}
                       </Link>
                     </li>
-                  ))}
+                    );
+                  })}
                 </ul>
               </nav>
               <button
