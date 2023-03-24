@@ -8,6 +8,7 @@ services:
       - application.httpCodesAllowList=200,201,202,203,204,205,206,207,208,226
       - application.logging.displayRequestContent=true
       - application.logging.displayResponseContent=true
+      - server.port=8085
     volumes:
       - ./DSL/Ruuter:/DSL
     ports:
@@ -25,6 +26,7 @@ services:
       - sqlms.datasources.[0].username=byk
       - sqlms.datasources.[0].password=01234
       - logging.level.org.springframework.boot=INFO
+      - server.port=8087
     ports:
       - 8087:8087
     volumes:
