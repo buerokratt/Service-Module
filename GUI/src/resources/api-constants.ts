@@ -24,5 +24,4 @@ export const dummyServiceData = [
 ];
 
 // Mocks
-export const openApiSpeckMock = (): string =>
-  `${baseUrl}/mocks/services/open-api-spec-mock`;
+export const openApiSpeckMock = (): string => `${baseUrl}/mocks/services/open-api-spec-mock`;
