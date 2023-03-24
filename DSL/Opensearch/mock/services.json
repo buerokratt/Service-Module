@@ -1,0 +1,9 @@
+{"index":{"_id":"1"}}
+{"service":"service1", "usage": 9}
+{"index":{"_id":"2"}}
+{"service":"service2", "usage": 12}
+{"index":{"_id":"3"}}
+{"service":"service3", "usage": 99}
+{"index":{"_id":"4"}}
+{"service":"service4", "usage": 0}
+

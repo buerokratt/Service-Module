@@ -1,13 +1,13 @@
-import React, { FC, MouseEvent, useState } from "react";
-import { useTranslation } from "react-i18next";
-import { NavLink, useLocation } from "react-router-dom";
-import { MdClose, MdKeyboardArrowDown } from "react-icons/md";
-import clsx from "clsx";
-
-import { Icon } from "../../components";
-import type { MenuItem } from "../../types/mainNavigation";
-import { menuIcons } from "../../constants/menuIcons";
-import "./MainNavigation.scss";
+import React, { FC, MouseEvent, useState } from 'react'
+import { useTranslation } from 'react-i18next'
+import { NavLink, useLocation } from 'react-router-dom'
+import { MdClose, MdKeyboardArrowDown } from 'react-icons/md'
+import clsx from 'clsx'
+import { Icon } from '../../components'
+import type { MenuItem } from '../../types/mainNavigation'
+import { menuIcons } from '../../constants/menuIcons'
+import { ROUTES } from '../../resources/routes-constants'
+import './MainNavigation.scss'
 
 const MainNavigation: FC = () => {
   const { t } = useTranslation();
@@ -138,14 +138,9 @@ const MainNavigation: FC = () => {
       label: t("global.services"),
       path: "/services",
       children: [
-        {
-          label: t("menu.overview"),
-          path: "/services/overview",
-        },
-        {
-          label: t("menu.newService"),
-          path: "/services/newService",
-        },
+        { path: ROUTES.OVERVIEW_ROUTE, label: t('menu.overview') },
+        { path: ROUTES.FLOW_ROUTE, label: t('menu.flowbuilder') },
+        { path: ROUTES.NEWSERVICE_ROUTE, label: t("menu.newService") },
       ],
     },
     {

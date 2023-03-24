@@ -10,6 +10,7 @@
   },
   "menu": {
     "overview": "Overview",
+    "flowbuilder": "Flow Builder",
     "services": "Services",
     "newService": "New Service",
     "close": "Close menu"
