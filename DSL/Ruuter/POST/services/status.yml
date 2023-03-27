@@ -6,8 +6,31 @@ extract_request_data:
 
 check_for_required_parameters:
   switch:
-    - condition: ${id == null || new_state == null || new_state == "draft" || ruuter_type == null}
+    - condition: ${id == null || new_state == null || ruuter_type == null}
       next: return_incorrect_request
+    - condition: ${new_state == "draft"}
+      next: return_cant_set_to_draft
+  next: get_current_status
+
+get_current_status:
+  call: http.post
+  args:
+    url: http://resql:8087/status
+    body:
+      id: ${id}
+  result: status_res
+  next: assign_old_status_and_path
+
+assign_old_status_and_path:
+  assign:
+    old_file_status_path: "${status_res.response.body[0].currentState !== 'active' ? status_res.response.body[0].currentState : ''}"
+    old_file_end: "${status_res.response.body[0].currentState !== 'active' ? '.tmp' : '.yml'}"
+  next: check_status
+
+check_status:
+  switch:
+    - condition: ${status_res.response.body[0].currentState === new_state}
+      next: return_same_state_update
   next: set_status
 
 set_status:
@@ -35,18 +58,32 @@ assign_values:
     service_name: "service_${name_res.response.body[0].name}"
   next: check_for_status
 
+check_file_exists:
+  call: http.post
+  args:
+    url: http://node_server:3008/file/check
+    body:
+      file_path: "/Ruuter/${ruuter_type}/services/${old_file_status_path}/${name + old_file_end}"
+  next: validate_file_exists
+
+validate_file_exists:
+  switch:
+    - condition: ${tmpFileExists.response.body}
+      next: check_for_status
+  next: return_service_file_missing
+
 check_for_status:
   switch:
     - condition: ${new_state === "active"}
       next: activate_service
   next: deactivate_service
-# TODO check if file exists
+
 activate_service:
   call: http.post
   args:
     url: http://node_server:3008/file/move
     body:
-      current_path: "/Ruuter/${ruuter_type}/services/inactive/${name}.tmp"
+      current_path: "/Ruuter/${ruuter_type}/services/${old_file_status_path}/${name + old_file_end}"
       new_path: "/Ruuter/${ruuter_type}/services/${name}.yml"
   result: activate_service_result
 
@@ -174,4 +211,19 @@ return_bad_request:
 return_incorrect_request:
   status: 400
   return: "Required parameter(s) missing"
+  next: end
+
+return_cant_set_to_draft:
+  status: 400
+  return: "Changing state to draft is not allowed"
+  next: end
+
+return_same_state_update:
+  status: 400
+  return: "Service is already in this state"
+  next: end
+
+return_service_file_missing:
+  status: 500
+  return: "Service file to update is missing"
   next: end
