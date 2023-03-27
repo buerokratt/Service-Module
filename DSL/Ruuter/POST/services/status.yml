@@ -6,9 +6,9 @@ extract_request_data:
 
 check_for_required_parameters:
   switch:
-    - condition: ${id == null || new_state == null || ruuter_type == null}
+    - condition: ${id === null || new_state === null || ruuter_type === null}
       next: return_incorrect_request
-    - condition: ${new_state == "draft"}
+    - condition: ${new_state === "draft"}
       next: return_cant_set_to_draft
   next: get_current_status
 
