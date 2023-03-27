@@ -1,7 +1,6 @@
 import express, { Router } from "express";
 import path from "path";
 import fs from "fs";
-import * as replace from "replace-in-file";
 import { buildContentFilePath, isValidFilename } from "./util";
 const router: Router = express.Router();
 
@@ -84,39 +83,6 @@ router.post("/delete", async (req, res) => {
 
     res.status(201).json({ message: "File deleted successfully" });
     return;
-  });
-});
-
-router.post("/edit", async (req, res) => {
-  const filePath = buildContentFilePath(req.body.path);
-  const from = req.body.from;
-  const to = req.body.to;
-
-  if (!filePath) {
-    res.status(400).json({ message: "Path is required" });
-    return;
-  }
-
-  if (!isValidFilename(filePath) || path.normalize(filePath).includes("..")) {
-    res.status(400).json({ message: "current contains illegal characters" });
-    return;
-  }
-
-  const options = {
-    files: filePath,
-    from: from,
-    to: to,
-  };
-
-  console.log(options);
-
-  replace.replaceInFile(options, (err) => {
-    if (err) {
-      res.status(500).json({ message: "Unable to edit file" });
-      return;
-    }
-
-    res.status(200).json({ message: "File edited successfully" });
   });
 });
 
