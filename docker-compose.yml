@@ -68,6 +68,8 @@ services:
   data_mapper:
     container_name: data_mapper
     image: datamapper-node
+    environment:
+      - PORT=3005
     volumes:
       - ./DSL/DMapper/hbs:/workspace/app/views/services
       - ./DSL/DMapper/js:/workspace/app/js/services
