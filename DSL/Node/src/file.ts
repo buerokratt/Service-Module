@@ -46,9 +46,6 @@ router.post("/move", async (req, res) => {
     return;
   }
 
-  console.log(currentPath);
-  console.log(newPath);
-
   fs.mkdir(path.dirname(newPath), () => {});
 
   fs.rename(currentPath, newPath, function (err) {
