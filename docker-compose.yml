@@ -96,12 +96,12 @@ services:
       - NODE_ENV=development
       - CHOKIDAR_USEPOLLING=true
       - REACT_APP_API_URL=http://localhost:8085
-      - PORT=3001
+      - PORT=3006
     build:
       context: ./GUI
       dockerfile: Dockerfile.dev
     ports:
-      - 3001:3001
+      - 3006:3006
     volumes:
       - /app/node_modules
       - ./GUI:/app
