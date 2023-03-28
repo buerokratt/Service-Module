@@ -152,7 +152,7 @@ add_rule:
       cookie: ""
     body:
       rule: ${service_name}
-      steps: ${new Map([["intent", service_name], ["action", "utter_" + service_name ]])}
+      steps: ${[new Map([["intent", service_name]]), new Map([["action", "utter_" + service_name]])]}
   result: add_rule_result
   next: return_ok
 
