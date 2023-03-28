@@ -161,7 +161,7 @@ deactivate_service:
   args:
     url: http://node_server:3008/file/move
     body:
-      current_path: "/Ruuter/${ruuter_type}/services/active/${name}.yml"
+      current_path: "/Ruuter/${ruuter_type}/services/${old_file_status_path}/${name + old_file_end}"
       new_path: "/Ruuter/${ruuter_type}/services/inactive/${name}.tmp"
   result: deactivate_service_result
   next: delete_rule
@@ -193,7 +193,7 @@ rename_intent_to_tmp:
   args:
     url: http://node_server:3008/file/move
     body:
-      current_path: "/mock1/data/nlu/removed/${service_name}_nlu.yml"
+      current_path: "/mock1/data/nlu/removed/${service_name + '_nlu' + old_file_end}"
       new_path: "/mock1/data/nlu/removed/${service_name}_nlu.tmp"
   result: activate_intent_result
   next: return_ok
