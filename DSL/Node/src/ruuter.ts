@@ -17,7 +17,11 @@ router.get('/list', (req, res) => {
       if (!services[name]) {
         services[name] = { type, status }
       } else {
-        services[name] = [{ ...services[name] }, { type, status }]
+        if (services[name].length > 1) {
+          services[name] = [...services[name], { type, status }]
+        } else {
+          services[name] = [{ ...services[name] }, { type, status }]
+        }
       }
     })
 
@@ -37,7 +41,11 @@ router.get('/sticky', (req, res) => {
       if (!services[name]) {
         services[name] = { type, status }
       } else {
-        services[name] = [{ ...services[name] }, { type, status }]
+        if (services[name].length > 1) {
+          services[name] = [...services[name], { type, status }]
+        } else {
+          services[name] = [{ ...services[name] }, { type, status }]
+        }
       }
     })
 
