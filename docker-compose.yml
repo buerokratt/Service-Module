@@ -66,6 +66,8 @@ services:
   data_mapper:
     container_name: data_mapper
     image: datamapper-node
+    environment:
+      - CONTENT_FOLDER=/data
     volumes:
       - ./DSL/DMapper/hbs:/workspace/app/views/services
       - ./DSL/DMapper/js:/workspace/app/js/services
