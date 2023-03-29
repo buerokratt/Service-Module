@@ -66,9 +66,12 @@ services:
   data_mapper:
     container_name: data_mapper
     image: datamapper-node
+    environment:
+      - CONTENT_FOLDER=/data
     volumes:
       - ./DSL/DMapper/hbs:/workspace/app/views/services
       - ./DSL/DMapper/js:/workspace/app/js/services
+      - ./DSL/DMapper/lib:/workspace/app/lib
     ports:
       - 3000:3000
     networks:
@@ -104,6 +107,34 @@ services:
       - ./GUI:/app
     networks:
       - bykstack
+  opensearch:
+    image: opensearchproject/opensearch:latest
+    container_name: opensearch
+    environment:
+      - node.name=opensearch
+      - discovery.seed_hosts=opensearch
+      - discovery.type=single-node
+      - bootstrap.memory_lock=true
+      - "OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m"
+      - plugins.security.disabled=true
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 65536
+        hard: 65536
+    volumes:
+      - opensearch-data1:/usr/share/opensearch/data
+    ports:
+      - 9200:9200
+      - 9600:9600
+    networks:
+      - bykstack
+
+volumes:
+  opensearch-data1:
+
 
 networks:
   bykstack:

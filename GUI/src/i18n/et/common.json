@@ -12,6 +12,7 @@
   },
   "menu": {
     "overview": "Ülevaade",
+    "flowbuilder": "Flow Builder",
     "services": "Teenused",
     "newService": "Uus teenus",
     "close": "Sulge menüü"

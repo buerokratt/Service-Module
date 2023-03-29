@@ -27,82 +27,22 @@ check_is_output_type_valid:
       next: return_incorrect_output_type
 
 calculate_difference:
-  switch:
-    - condition: ${outputType === 'years'}
-      next: calculate_difference_in_years
-    - condition: ${outputType === 'months'}
-      next: calculate_difference_in_months
-    - condition: ${outputType === 'hours'}
-      next: calculate_difference_in_hours
-    - condition: ${outputType === 'minutes'}
-      next: calculate_difference_in_minutes
-    - condition: ${outputType === 'seconds'}
-      next: calculate_difference_in_seconds
-  next: calculate_difference_in_days
-
-calculate_difference_in_years:
   call: http.post
   args:
-    url: http://resql:8082/calculate-date-difference-years
-    body:
+    url: http://data_mapper:3000/hbs/services/calculate-date-difference
+    headers:
+      type: 'json'
+    body: 
       startDate: ${startDate}
       endDate: ${endDate}
-  result: result
-  next: return_value
-
-calculate_difference_in_months:
-  call: http.post
-  args:
-    url: http://resql:8082/calculate-date-difference-months
-    body:
-      startDate: ${startDate}
-      endDate: ${endDate}
-  result: result
-  next: return_value
-
-calculate_difference_in_days:
-  call: http.post
-  args:
-    url: http://resql:8082/calculate-date-difference-days
-    body:
-      startDate: ${startDate}
-      endDate: ${endDate}
-  result: result
-  next: return_value
-
-calculate_difference_in_hours:
-  call: http.post
-  args:
-    url: http://resql:8082/calculate-date-difference-hours
-    body:
-      startDate: ${startDate}
-      endDate: ${endDate}
-  result: result
-  next: return_value
-
-calculate_difference_in_minutes:
-  call: http.post
-  args:
-    url: http://resql:8082/calculate-date-difference-minutes
-    body:
-      startDate: ${startDate}
-      endDate: ${endDate}
-  result: result
-  next: return_value
-
-calculate_difference_in_seconds:
-  call: http.post
-  args:
-    url: http://resql:8082/calculate-date-difference-seconds
-    body:
-      startDate: ${startDate}
-      endDate: ${endDate}
+      outputType: ${outputType}
+      layout: false
   result: result
   next: return_value
 
 return_value:
   status: 200
-  return: ${result.response.body[0]}
+  return: ${result.response.body}
   next: end
 
 return_incorrect_date:

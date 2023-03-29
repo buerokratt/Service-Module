@@ -1,0 +1,23 @@
+{
+  "script": {
+    "lang": "mustache",
+    "source": {
+      "size": 10000,
+      "query": {
+        "bool": {
+          "must": [
+            {
+              "match_all": {}
+            }
+          ],
+          "filter": {
+            "terms": {
+              "service": "{{#toJson}}services{{/toJson}}"
+            }
+          }
+        }
+      }
+    },
+    "params": {}
+  }
+}
