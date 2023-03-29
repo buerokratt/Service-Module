@@ -1,0 +1,9 @@
+@import "src/styles/tools/color";
+
+.canvas-container {
+  background: linear-gradient(90deg, white (14px), transparent 1%) center,
+    linear-gradient(white (14px), transparent 1%) center,
+    get-color(black-coral-2);
+  background-size: 16px 16px;
+  background-position: 16px 16px;
+}
