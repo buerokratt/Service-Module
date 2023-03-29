@@ -25,7 +25,7 @@ const NewServicePage: React.FC = () => {
   const { t } = useTranslation();
 
   return (
-    <Layout disableMenu customHeader={<NewServiceHeader />}>
+    <Layout disableMenu customHeader={<NewServiceHeader activeStep={2}/>}>
       <Track
         style={{ width: 800, alignSelf: "center" }}
         direction="vertical"

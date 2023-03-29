@@ -6,17 +6,17 @@ import './Step.scss';
 type StepProps = {
   step: number;
   name: string;
-  isActive?: boolean;
+  activeStep: number;
 };
 
-const Step: FC<StepProps> = ({ step, name, isActive }) => {
+const Step: FC<StepProps> = ({ step, name, activeStep }) => {
   return (
     <Track>
-      <Track gap={8} className={isActive ? "active-step" : ""} style={{ padding: 8, height: 38 }}>
+      <Track gap={8} className={activeStep === step ? "active-step" : ""} style={{ padding: 8, height: 38 }}>
         <p className="step" >{step}</p>
-        <p className={isActive ? "active-step__name" : ""} style={{ whiteSpace: "nowrap" }}>{name}</p>
+        <p className={activeStep === step ? "active-step__name" : ""} style={{ whiteSpace: "nowrap" }}>{name}</p>
       </Track>
-      {isActive && <img src={pointer} style={{ height: 38 }} />}
+      {activeStep === step && <img src={pointer} style={{ height: 38 }} />}
     </Track>
   );
 };

@@ -4,14 +4,18 @@ import "./StepCounter.scss";
 import Step from "./Step";
 import { useTranslation } from "react-i18next";
 
-const StepCounter: FC = () => {
+type StepCounterProps = {
+  activeStep: number;
+}
+
+const StepCounter: FC<StepCounterProps> = ({activeStep}) => {
   const { t } = useTranslation();
 
   return (
     <Track className="step-counter" gap={24}>
-      <Step step={1} name={t("newService.trainingModuleSetup")} />
-      <Step step={2} name={t("newService.serviceSetup")} isActive />
-      <Step step={3} name={t("newService.serviceFlowCreation")} />
+      <Step step={1} activeStep={activeStep} name={t("newService.trainingModuleSetup")} />
+      <Step step={2} activeStep={activeStep} name={t("newService.serviceSetup")} />
+      <Step step={3} activeStep={activeStep} name={t("newService.serviceFlowCreation")} />
     </Track>
   );
 };
