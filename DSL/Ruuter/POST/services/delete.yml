@@ -17,6 +17,26 @@ get_status_name:
     body:
       id: ${id}
   result: name_res
+  next: get_current_status
+
+get_current_status:
+  call: http.post
+  args:
+    url: http://resql:8087/status
+    body:
+      id: ${id}
+  result: status_res
+  next: check_status
+
+check_status:
+  switch:
+    - condition: ${status_res.response.body[0].currentState === 'active'}
+      next: return_cannot_delete_active_service
+  next: assign_old_path
+
+assign_old_path:
+  assign:
+    old_file_status_path: ${status_res.response.body[0].currentState}
   next: delete_service
 
 delete_service:
@@ -33,15 +53,35 @@ delete_deactivated_service:
   args:
     url: http://node_server:3008/file/delete
     body:
-      path: "/Ruuter/${ruuter_type}/services/inactive/${name_res.response.body[0].name}.tmp"
+      path: "/Ruuter/${ruuter_type}/services/${old_file_status_path}/${name_res.response.body[0].name}.tmp"
   result: results
   next: check_result
 
 check_result:
   switch:
     - condition: ${200 <= results.response.statusCodeValue && results.response.statusCodeValue < 300}
-      next: return_ok
+      next: delete_response
   next: return_bad_request
+
+delete_response:
+  call: http.post
+  args:
+    url: host.docker.internal:8080/rasa/responses/delete
+    headers:
+      cookie: ""
+    body:
+      response_name: "utter_service_${name_res.response.body[0].name}"
+  result: delete_response_result
+  next: delete_intent
+
+delete_intent:
+  call: http.post
+  args:
+    url: http://node_server:3008/file/delete
+    body:
+      path: "/mock1/data/nlu/removed/service_${name_res.response.body[0].name}_nlu.tmp"
+  result: delete_intent_result
+  next: return_ok
 
 return_ok:
   status: 200
@@ -56,4 +96,9 @@ return_bad_request:
 return_incorrect_request:
   status: 400
   return: "Required parameter(s) missing"
+  next: end
+
+return_cannot_delete_active_service:
+  status: 400
+  return: "Cannot delete active service"
   next: end
