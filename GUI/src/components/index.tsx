@@ -1,6 +1,7 @@
 import Box from "./Box";
 import Button from "./Button";
 import Card from "./Card";
+import Collapsible from "./Collapsible";
 import Dialog from "./Dialog";
 import Drawer from "./Drawer";
 import EndpointCustom from "./Endpoints/Custom";
@@ -33,6 +34,7 @@ export {
   Box,
   Button,
   Card,
+  Collapsible,
   Dialog,
   Drawer,
   EndpointCustom,
