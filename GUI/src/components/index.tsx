@@ -16,6 +16,8 @@ import {
   SwitchBox,
 } from "./FormElements";
 import Header from "./Header";
+import HeaderStep from "./HeaderStepCounter/HeaderStep";
+import HeaderStepCounter from "./HeaderStepCounter";
 import Icon from "./Icon";
 import Label from "./Label";
 import Layout from "./Layout";
@@ -24,8 +26,6 @@ import Modal from "./Modal";
 import NewServiceHeader from "./NewServiceHeader";
 import Popover from "./Popover";
 import Section from "./Section";
-import Step from "./StepCounter/Step";
-import StepCounter from "./StepCounter";
 import Tooltip from "./Tooltip";
 import Track from "./Track";
 
@@ -43,7 +43,9 @@ export {
   FormInput,
   FormSelect,
   FormTextarea,
-  Header,
+  Header,  
+  HeaderStep,
+  HeaderStepCounter,
   Icon,
   Label,
   Layout,
@@ -52,8 +54,6 @@ export {
   NewServiceHeader,
   Popover,
   Section,
-  Step,
-  StepCounter,
   Switch,
   SwitchBox,
   Tooltip,

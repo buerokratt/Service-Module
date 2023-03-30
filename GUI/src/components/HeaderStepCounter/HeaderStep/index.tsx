@@ -1,15 +1,15 @@
 import React, { FC } from "react";
 import { Track } from "../..";
 import pointer from "../../../assets/images/pointer.svg";
-import './Step.scss';
+import './HeaderStep.scss';
 
-type StepProps = {
+type HeaderStepProps = {
   step: number;
   name: string;
   activeStep: number;
 };
 
-const Step: FC<StepProps> = ({ step, name, activeStep }) => {
+const HeaderStep: FC<HeaderStepProps> = ({ step, name, activeStep }) => {
   return (
     <Track>
       <Track gap={8} className={activeStep === step ? "active-step" : ""} style={{ padding: 8, height: 38 }}>
@@ -21,4 +21,4 @@ const Step: FC<StepProps> = ({ step, name, activeStep }) => {
   );
 };
 
-export default Step;
+export default HeaderStep;

@@ -1,14 +1,14 @@
 import React, { FC } from "react";
-import { Track } from "../../components";
-import "./StepCounter.scss";
-import Step from "./Step";
+import { Track } from "..";
+import "./HeaderStepCounter.scss";
+import Step from "./HeaderStep";
 import { useTranslation } from "react-i18next";
 
 type StepCounterProps = {
   activeStep: number;
 }
 
-const StepCounter: FC<StepCounterProps> = ({activeStep}) => {
+const HeaderStepCounter: FC<StepCounterProps> = ({activeStep}) => {
   const { t } = useTranslation();
 
   return (
@@ -20,4 +20,4 @@ const StepCounter: FC<StepCounterProps> = ({activeStep}) => {
   );
 };
 
-export default StepCounter;
+export default HeaderStepCounter;
