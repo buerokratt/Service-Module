@@ -12,7 +12,7 @@ const HeaderStepCounter: FC<StepCounterProps> = ({activeStep}) => {
   const { t } = useTranslation();
 
   return (
-    <Track className="step-counter" gap={24}>
+    <Track className="header-step-counter" gap={24}>
       <Step step={1} activeStep={activeStep} name={t("newService.trainingModuleSetup")} />
       <Step step={2} activeStep={activeStep} name={t("newService.serviceSetup")} />
       <Step step={3} activeStep={activeStep} name={t("newService.serviceFlowCreation")} />
