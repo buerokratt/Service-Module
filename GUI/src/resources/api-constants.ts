@@ -23,6 +23,5 @@ export const dummyServiceData = [
   { name: "eleventh", usedCount: 11, state: ServiceState.Inactive },
 ];
 
-
 // Mocks
 export const openApiSpeckMock = (): string => `${baseUrl}/mocks/services/open-api-spec-mock`;
