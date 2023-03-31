@@ -1,3 +1,3 @@
 UPDATE services
-SET is_active = :is_active
+SET current_state = :new_state::service_state
 WHERE id = :id
