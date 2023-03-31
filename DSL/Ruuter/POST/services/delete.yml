@@ -13,7 +13,7 @@ extract_request_data:
 get_status_name:
   call: http.post
   args:
-    url: http://resql:8082/get-service-name-by-id
+    url: http://resql:8087/get-service-name-by-id
     body:
       id: ${id}
   result: name_res
@@ -22,20 +22,20 @@ get_status_name:
 delete_service:
   call: http.post
   args:
-    url: http://resql:8082/delete-service
+    url: http://resql:8087/delete-service
     body:
       id: ${id}
   result: res
-  next: delete_deactivated_service  
+  next: delete_deactivated_service
 
 delete_deactivated_service:
   call: http.post
   args:
-    url: http://node_server:3003/file/delete
+    url: http://node_server:3008/file/delete
     body:
-      path: '/Ruuter/${ruuter_type}/services/inactive/${name_res.response.body[0].name}.yml'
-  result: results  
-  next: check_result   
+      path: "/Ruuter/${ruuter_type}/services/inactive/${name_res.response.body[0].name}.tmp"
+  result: results
+  next: check_result
 
 check_result:
   switch:
@@ -51,7 +51,7 @@ return_ok:
 return_bad_request:
   status: 400
   return: ${results.response.body.message}
-  next: end  
+  next: end
 
 return_incorrect_request:
   status: 400
