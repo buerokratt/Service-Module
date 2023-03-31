@@ -1,7 +1,7 @@
-import { FC } from 'react';
+import { Dispatch, FC, SetStateAction } from 'react';
 import { Handle, NodeProps, Position } from 'reactflow';
 import { useTranslation } from 'react-i18next';
-import { MdDeleteOutline, MdOutlineDelete, MdOutlineEdit } from 'react-icons/md';
+import { MdDeleteOutline, MdOutlineEdit } from 'react-icons/md';
 
 import { Box, Button, Icon, Track } from '../';
 import StepNode from './StepNode';
@@ -11,6 +11,7 @@ type NodeDataProps = {
   data: {
     label: string;
     onDelete: (id: string) => void;
+    setPopupVisible: Dispatch<SetStateAction<boolean>>;
     type: string;
   }
 }
@@ -33,7 +34,7 @@ const CustomNode: FC<NodeProps & NodeDataProps> = (props) => {
     <Box color={data.type === "finishing-step" ? "red" : "blue"}>
       <Track direction='horizontal' gap={4} align='left'>
         <StepNode data={data} />
-        <Button appearance="text">
+        <Button appearance="text" onClick={() => data.setPopupVisible(true)}>
             <Icon icon={<MdOutlineEdit />} size="medium" />
             {t("overview.edit")}
           </Button>

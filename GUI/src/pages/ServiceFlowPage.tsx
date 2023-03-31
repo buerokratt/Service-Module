@@ -1,4 +1,4 @@
-import { FC, useCallback } from "react";
+import { FC, useCallback, useState } from "react";
 import { MdPlayCircleFilled } from "react-icons/md";
 import ReactFlow, {
   addEdge,
@@ -13,6 +13,7 @@ import "reactflow/dist/style.css";
 
 import {
   Box,
+  Button,
   Collapsible,
   NewServiceHeader,
   Track,
@@ -20,6 +21,7 @@ import {
 import CustomNode from "../components/Steps/CustomNode";
 import "./ServiceFlowPage.scss";
 import { Step } from "../types/step";
+import Popup from "../components/Popup";
 
 const GRID_UNIT = 16;
 
@@ -63,6 +65,7 @@ const ServiceFlowPage: FC = () => {
 
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
+  const [isPopupVisible, setPopupVisible] = useState(false);
 
   const onConnect = useCallback(
     (params: Connection) => setEdges((eds) => addEdge(params, eds)),
@@ -114,6 +117,7 @@ const ServiceFlowPage: FC = () => {
           data: {
             label,
             onDelete: handleNodeDelete,
+            setPopupVisible,
             type,
             checkpoint,
           },
@@ -127,7 +131,26 @@ const ServiceFlowPage: FC = () => {
     <>
       <NewServiceHeader activeStep={3} />
       <h1 style={{ padding: 16 }}>Teenusvoog "Raamatu laenutus"</h1>
-
+      {isPopupVisible && (
+        <Popup
+          style={{ maxWidth: 700 }}
+          title={"Hello"}
+          onClose={() => setPopupVisible(false)}
+          footer={
+            <Track gap={16}>
+              <Button
+                appearance="secondary"
+                onClick={() => setPopupVisible(false)}
+              >
+                Discard
+              </Button>
+              <Button onClick={() => setPopupVisible(false)}>Save</Button>
+            </Track>
+          }
+        >
+          <p>hello</p>
+        </Popup>
+      )}
       <div className="graph">
         <div className="graph__controls">
           <Track direction="vertical" gap={16} align="stretch">
@@ -140,9 +163,10 @@ const ServiceFlowPage: FC = () => {
                       onClick={() =>
                         handleNodeAdd({
                           label: step.label,
-                          type: step.type === "finishing-step"
-                          ? "finishing-step"
-                          : "step",
+                          type:
+                            step.type === "finishing-step"
+                              ? "finishing-step"
+                              : "step",
                           className:
                             step.type === "finishing-step"
                               ? "finishing-step"
@@ -170,9 +194,10 @@ const ServiceFlowPage: FC = () => {
                       onClick={() =>
                         handleNodeAdd({
                           label: step.label,
-                          type: step.type === "finishing-step"
-                          ? "finishing-step"
-                          : "step",
+                          type:
+                            step.type === "finishing-step"
+                              ? "finishing-step"
+                              : "step",
                           className:
                             step.type === "finishing-step"
                               ? "finishing-step"
@@ -208,9 +233,9 @@ const ServiceFlowPage: FC = () => {
             onNodeMouseEnter={(_, node) => {
               setNodes((prevNodes) =>
                 prevNodes.map((prevNode) => {
-                  if (prevNode.id !== '1' && prevNode.data === node.data) {
+                  if (prevNode.id !== "1" && prevNode.data === node.data) {
                     prevNode.selected = true;
-                    prevNode.className = 'selected';
+                    prevNode.className = "selected";
                   }
                   return prevNode;
                 })
@@ -219,7 +244,7 @@ const ServiceFlowPage: FC = () => {
             onNodeMouseLeave={(_, node) => {
               setNodes((prevNodes) =>
                 prevNodes.map((prevNode) => {
-                  if (prevNode.id !== '1' && prevNode.data === node.data) {
+                  if (prevNode.id !== "1" && prevNode.data === node.data) {
                     prevNode.selected = false;
                     prevNode.className = prevNode.data.type;
                   }
