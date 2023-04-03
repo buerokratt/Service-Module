@@ -1,0 +1,12 @@
+{
+  "mappings": {
+    "properties": {
+      "service": {
+        "type": "text"
+      },
+      "usage": {
+        "type": "number"
+      }
+    }
+  }
+}

@@ -6,3 +6,8 @@ curl -H "Content-Type: application/x-ndjson" -X PUT "http://localhost:9200/logs"
 curl -H "Content-Type: application/x-ndjson" -X PUT "http://localhost:9200/logs/_bulk" -ku admin:admin --data-binary "@mock/logs.json"
 curl -L -X POST 'http://localhost:9200/_scripts/get-log-by-request' -H 'Content-Type: application/json' -H 'Cookie: customJwtCookie=test' --data-binary "@templates/get-log-by-request.json"
 curl -L -X POST 'http://localhost:9200/_scripts/get-log-by-service' -H 'Content-Type: application/json' -H 'Cookie: customJwtCookie=test' --data-binary "@templates/get-log-by-service.json"
+
+#services
+curl -H "Content-Type: application/x-ndjson" -X PUT "http://localhost:9200/services" -ku admin:admin --data-binary "@fieldMappings/services.json"
+curl -H "Content-Type: application/x-ndjson" -X PUT "http://localhost:9200/services/_bulk" -ku admin:admin --data-binary "@mock/services.json"
+curl -L -X POST 'http://localhost:9200/_scripts/get-services-stat' -H 'Content-Type: application/json' -H 'Cookie: customJwtCookie=test' --data-binary "@templates/get-services-stat.json"

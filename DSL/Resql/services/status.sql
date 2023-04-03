@@ -1,2 +1,2 @@
-SELECT is_active, ruuter_type FROM services
+SELECT current_state, ruuter_type FROM services
 WHERE id = :id;

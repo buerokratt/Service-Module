@@ -4,6 +4,8 @@ import { Layout } from './components'
 import NotFoundPage from './pages/NotFoundPage'
 import OverviewPage from './pages/OverviewPage'
 import RuuterLogsPage from './pages/RuuterLogsPage'
+import FlowBuilderPage from './pages/FlowBuilderPage'
+import NewServicePage from './pages/NewServicePage'
 import { ROUTES } from './resources/routes-constants'
 import './styles/main.scss'
 
@@ -13,10 +15,12 @@ const RootComponent: React.FC = () => {
       <Route element={<Layout />}>
         <Route path={ROUTES.OVERVIEW_ROUTE} element={<OverviewPage />} />
         <Route path={ROUTES.RUUTER_LOGS_ROUTE} element={<RuuterLogsPage />} />
+        <Route path={ROUTES.FLOW_ROUTE} element={<FlowBuilderPage />} />
+        <Route path={ROUTES.NEWSERVICE_ROUTE} element={<NewServicePage />} />
         <Route path="*" element={<NotFoundPage />} />
       </Route>
     </Routes>
-  )
-}
+  );
+};
 
-export default RootComponent
+export default RootComponent;
