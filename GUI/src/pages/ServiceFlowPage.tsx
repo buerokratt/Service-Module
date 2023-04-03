@@ -38,12 +38,12 @@ const initialNodes: Node[] = [
     id: "1",
     type: "input",
     position: {
-      x: 14.5 * GRID_UNIT,
+      x: 14 * GRID_UNIT,
       y: GRID_UNIT,
     },
     data: {
       label: <MdPlayCircleFilled />,
-      type: 'input'
+      type: "input",
     },
     className: "start",
     selectable: false,
@@ -53,11 +53,11 @@ const initialNodes: Node[] = [
     id: "2",
     type: "placeholder",
     position: {
-      x: -3.5 * GRID_UNIT,
+      x: -4 * GRID_UNIT,
       y: 8 * GRID_UNIT,
     },
     data: {
-      type: 'placeholder'
+      type: "placeholder",
     },
     className: "placeholder",
     selectable: false,
@@ -110,6 +110,24 @@ const ServiceFlowPage: FC = () => {
     event.dataTransfer.effectAllowed = "move";
   };
 
+  const onNodeDrag = useCallback(
+    (_event: React.MouseEvent, draggedNode: Node) => {
+      const edge = edges.find((edge) => edge.source === draggedNode.id);
+      if (!edge) return;
+      const placeholder = nodes.find((node) => node.id === edge.target);
+      if (!placeholder || placeholder.type !== "placeholder") return;
+      setNodes((prevNodes) =>
+        prevNodes.map((prevNode) => {
+          if (prevNode.id !== placeholder.id) return prevNode;
+          prevNode.position.x = draggedNode.position.x;
+          prevNode.position.y = 2 * GRID_UNIT + draggedNode.position.y + 72;
+          return prevNode;
+        })
+      );
+    },
+    [edges, nodes]
+  );
+
   const onDragOver = useCallback((event: any) => {
     event.preventDefault();
     event.dataTransfer.dropEffect = "move";
@@ -126,20 +144,45 @@ const ServiceFlowPage: FC = () => {
         event.dataTransfer.getData("application/reactflow-type"),
       ];
       const position = reactFlowInstance.project({
-        x: event.clientX - reactFlowBounds.left - 200,
+        x: event.clientX - reactFlowBounds.left,
         y: event.clientY - reactFlowBounds.top,
       });
 
-      setNodes((prevNodes) => {
-        const prevNode = prevNodes[prevNodes.length - 1];
-        if (prevNode.type === "output") return prevNodes;
+      const matchingPlaceholder = reactFlowInstance.getNodes().find((node) => {
+        if (node.type !== "placeholder") return false;
+        return (
+          node.position.x <= position.x &&
+          position.x <= node.position.x + node.width! &&
+          node.position.y <= position.y &&
+          position.y <= node.position.y + node.height!
+        );
+      });
+      if (!matchingPlaceholder) return;
 
+      const connectedNodeId = reactFlowInstance
+        .getEdges()
+        .find((edge) => edge.target === matchingPlaceholder.id)?.source;
+      if (!connectedNodeId) return;
+
+      setNodes((prevNodes) => {
         setEdges((prevEdges) => [
-          ...reactFlowInstance.getEdges(),
+          ...prevEdges.filter((edge) => edge.target !== matchingPlaceholder.id),
           {
             id: `edge-${prevEdges.length}`,
-            source: prevNodes[prevNodes.length - 1].id,
+            source: connectedNodeId,
+            target: String(prevNodes.length),
+            type: "smoothstep",
+
+            markerEnd: {
+              type: MarkerType.ArrowClosed,
+            },
+          },
+          {
+            id: `edge-${prevEdges.length + 1}`,
+            source: String(prevNodes.length),
             target: String(prevNodes.length + 1),
+            type: "smoothstep",
+
             markerEnd: {
               type: MarkerType.ArrowClosed,
             },
@@ -147,10 +190,10 @@ const ServiceFlowPage: FC = () => {
         ]);
 
         return [
-          ...prevNodes,
+          ...prevNodes.filter((node) => node.id !== matchingPlaceholder.id),
           {
-            id: String(reactFlowInstance.getNodes().length + 1),
-            position,
+            id: String(prevNodes.length),
+            position: matchingPlaceholder.position,
             type: "customNode",
             data: {
               label,
@@ -160,10 +203,24 @@ const ServiceFlowPage: FC = () => {
             },
             className: type === "finishing-step" ? "finishing-step" : "step",
           },
+          {
+            id: String(prevNodes.length + 1),
+            type: "placeholder",
+            position: {
+              x: matchingPlaceholder.position.x,
+              y: 2 * GRID_UNIT + matchingPlaceholder.position.y + 72,
+            },
+            data: {
+              type: "placeholder",
+            },
+            className: "placeholder",
+            selectable: false,
+            draggable: false,
+          },
         ];
       });
     },
-    [reactFlowInstance]
+    [reactFlowInstance, nodes, edges]
   );
 
   const handleNodeDelete = (id: string) => {
@@ -252,10 +309,14 @@ const ServiceFlowPage: FC = () => {
               onInit={setReactFlowInstance}
               onDragOver={onDragOver}
               onDrop={onDrop}
+              onNodeDrag={onNodeDrag}
               onNodeMouseEnter={(_, node) => {
                 setNodes((prevNodes) =>
                   prevNodes.map((prevNode) => {
-                    if (prevNode.type === "customNode" && prevNode.data === node.data) {
+                    if (
+                      prevNode.type === "customNode" &&
+                      prevNode.data === node.data
+                    ) {
                       prevNode.selected = true;
                       prevNode.className = "selected";
                     }
@@ -266,7 +327,10 @@ const ServiceFlowPage: FC = () => {
               onNodeMouseLeave={(_, node) => {
                 setNodes((prevNodes) =>
                   prevNodes.map((prevNode) => {
-                    if (prevNode.type === "customNode" && prevNode.data === node.data) {
+                    if (
+                      prevNode.type === "customNode" &&
+                      prevNode.data === node.data
+                    ) {
                       prevNode.selected = false;
                       prevNode.className = prevNode.data.type;
                     }
