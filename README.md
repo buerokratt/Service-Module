@@ -41,4 +41,36 @@ This repo will primarily contain:
 - Run migrations added in this repository by running the helper script `./migrate.sh`
 - When creating new migrations, use the helper `./create-migration.sh name-of-migration` which will create a timestamped file in the correct directory and add the required headers
 
-### [OpenSearch setup](https://github.com/Devtailor/Service-Module/blob/19-Extract-and-label-data-based-on-user-input/DSL/OpenSearch/README.md)
+### DataMapper
+[Changes based on this example](https://github.com/express-handlebars/express-handlebars/tree/master/examples/advanced)
+
+DataMapper directory:
+- create new directory: **lib**
+
+**Update server.js**
+
+```
+import * as helpers from "./lib/helpers.js";
+```
+
+```
+const hbs = create(); -> const hbs = create({ helpers });
+```
+
+``` 
+app.post('/hbs/*', (req, res) => {
+  res.render(req.params[0], req.body, function (_, response) {
+    if (req.get('type') === 'csv') {
+      res.json({ response });
+    } else if (req.get('type') === 'json') {
+      res.json(JSON.parse(response));
+    }
+    res.render(req.params[0], req.body);
+  });
+});
+```
+To enable handlebars templates to receive a body and return a json
+* When Building a handlebars template make sure to add `layout:false` so that hbs response in the data-mapper will discard the html layout and only return the body data
+
+### DMapper helper functions
+- Add all the helper functions to **DSL/DMapper/lib/helpers.js**

@@ -24,6 +24,7 @@ import Dialog from './Dialog'
 import Section from './Section'
 import DataTable from './DataTable'
 import Toast from './Toast'
+import Modal from './Modal'
 
 export {
   Layout,
@@ -50,4 +51,5 @@ export {
   Section,
   DataTable,
   Toast
+  Modal,
 }
