@@ -15,7 +15,7 @@ extract_request_data:
 service_add:
   call: http.post
   args:
-    url: http://resql:8082/add
+    url: http://resql:8087/add
     body:
       name: ${name}
       description: ${description}
@@ -32,9 +32,9 @@ check_for_type:
 add_get_dsl:
   call: http.post
   args:
-    url: http://node_server:3003/file/write
+    url: http://node_server:3008/file/write
     body:
-      file_path: '/Ruuter/GET/services/${name}.yml'
+      file_path: "/Ruuter/GET/services/draft/${name}.tmp"
       content: ${content}
   result: results
   next: check_result
@@ -42,11 +42,11 @@ add_get_dsl:
 add_post_dsl:
   call: http.post
   args:
-    url: http://node_server:3003/file/write
+    url: http://node_server:3008/file/write
     body:
-      file_path: '/Ruuter/POST/services/${name}.yml'
+      file_path: "/Ruuter/POST/services/draft/${name}.tmp"
       content: ${content}
-  result: results  
+  result: results
   next: check_result
 
 check_result:
