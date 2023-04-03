@@ -24,11 +24,13 @@ import CustomNode from "../components/Steps/CustomNode";
 import "./ServiceFlowPage.scss";
 import { Step } from "../types/step";
 import Popup from "../components/Popup";
+import PlaceholderNode from "../components/Steps/PlaceholderNode";
 
 const GRID_UNIT = 16;
 
 const nodeTypes = {
   customNode: CustomNode,
+  placeholder: PlaceholderNode,
 };
 
 const initialNodes: Node[] = [
@@ -41,8 +43,23 @@ const initialNodes: Node[] = [
     },
     data: {
       label: <MdPlayCircleFilled />,
+      type: 'input'
     },
     className: "start",
+    selectable: false,
+    draggable: false,
+  },
+  {
+    id: "2",
+    type: "placeholder",
+    position: {
+      x: -3.5 * GRID_UNIT,
+      y: 8 * GRID_UNIT,
+    },
+    data: {
+      type: 'placeholder'
+    },
+    className: "placeholder",
     selectable: false,
     draggable: false,
   },
@@ -69,7 +86,17 @@ const ServiceFlowPage: FC = () => {
   const [reactFlowInstance, setReactFlowInstance] =
     useState<ReactFlowInstance>();
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
-  const [edges, setEdges, onEdgesChange] = useEdgesState([]);
+  const [edges, setEdges, onEdgesChange] = useEdgesState([
+    {
+      type: "smoothstep",
+      id: "edge-1-2",
+      source: "1",
+      target: "2",
+      markerEnd: {
+        type: MarkerType.ArrowClosed,
+      },
+    },
+  ]);
   const [isPopupVisible, setPopupVisible] = useState(false);
 
   const onConnect = useCallback(
@@ -228,7 +255,7 @@ const ServiceFlowPage: FC = () => {
               onNodeMouseEnter={(_, node) => {
                 setNodes((prevNodes) =>
                   prevNodes.map((prevNode) => {
-                    if (prevNode.id !== "1" && prevNode.data === node.data) {
+                    if (prevNode.type === "customNode" && prevNode.data === node.data) {
                       prevNode.selected = true;
                       prevNode.className = "selected";
                     }
@@ -239,7 +266,7 @@ const ServiceFlowPage: FC = () => {
               onNodeMouseLeave={(_, node) => {
                 setNodes((prevNodes) =>
                   prevNodes.map((prevNode) => {
-                    if (prevNode.id !== "1" && prevNode.data === node.data) {
+                    if (prevNode.type === "customNode" && prevNode.data === node.data) {
                       prevNode.selected = false;
                       prevNode.className = prevNode.data.type;
                     }

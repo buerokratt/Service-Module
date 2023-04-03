@@ -48,6 +48,8 @@
     font-size: $veera-font-size-100;
     line-height: $veera-line-height-500;
     min-width: 400px;
+    max-width: 640px;
+    width: 100%;
 
     &-default {
       width: 320px;
@@ -76,6 +78,15 @@
       color: get-color(white);
       border: 0;
       min-width: revert;
+    }
+
+    &.placeholder {
+      background-color: get-color(extra-light);
+      border: dashed 1px get-color(black-coral-10);
+
+      p {
+        color: get-color(black-coral-6);
+      }
     }
 
     &.start {
