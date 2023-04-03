@@ -1,4 +1,4 @@
-import { FC, useCallback, useState } from "react";
+import { FC, useCallback, useRef, useState } from "react";
 import { MdPlayCircleFilled } from "react-icons/md";
 import ReactFlow, {
   addEdge,
@@ -6,6 +6,8 @@ import ReactFlow, {
   Connection,
   MarkerType,
   Node,
+  ReactFlowInstance,
+  ReactFlowProvider,
   useEdgesState,
   useNodesState,
 } from "reactflow";
@@ -63,6 +65,9 @@ const ServiceFlowPage: FC = () => {
     { id: 9, label: "Direct to Customer Support", type: "finishing-step" },
   ];
 
+  const reactFlowWrapper = useRef<HTMLDivElement>(null);
+  const [reactFlowInstance, setReactFlowInstance] =
+    useState<ReactFlowInstance>();
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const [isPopupVisible, setPopupVisible] = useState(false);
@@ -72,58 +77,72 @@ const ServiceFlowPage: FC = () => {
     [setEdges]
   );
 
+  const onDragStart = (event: React.DragEvent<HTMLDivElement>, step: Step) => {
+    event.dataTransfer.setData("application/reactflow-label", step.label);
+    event.dataTransfer.setData("application/reactflow-type", step.type);
+    event.dataTransfer.effectAllowed = "move";
+  };
+
+  const onDragOver = useCallback((event: any) => {
+    event.preventDefault();
+    event.dataTransfer.dropEffect = "move";
+  }, []);
+
+  const onDrop = useCallback(
+    (event: React.DragEvent<HTMLDivElement>) => {
+      event.preventDefault();
+      if (!reactFlowInstance || !reactFlowWrapper.current) return;
+
+      const reactFlowBounds = reactFlowWrapper.current.getBoundingClientRect();
+      const [label, type] = [
+        event.dataTransfer.getData("application/reactflow-label"),
+        event.dataTransfer.getData("application/reactflow-type"),
+      ];
+      const position = reactFlowInstance.project({
+        x: event.clientX - reactFlowBounds.left - 200,
+        y: event.clientY - reactFlowBounds.top,
+      });
+
+      setNodes((prevNodes) => {
+        const prevNode = prevNodes[prevNodes.length - 1];
+        if (prevNode.type === "output") return prevNodes;
+
+        setEdges((prevEdges) => [
+          ...reactFlowInstance.getEdges(),
+          {
+            id: `edge-${prevEdges.length}`,
+            source: prevNodes[prevNodes.length - 1].id,
+            target: String(prevNodes.length + 1),
+            markerEnd: {
+              type: MarkerType.ArrowClosed,
+            },
+          },
+        ]);
+
+        return [
+          ...prevNodes,
+          {
+            id: String(reactFlowInstance.getNodes().length + 1),
+            position,
+            type: "customNode",
+            data: {
+              label,
+              onDelete: handleNodeDelete,
+              setPopupVisible,
+              type: type === "finishing-step" ? "finishing-step" : "step",
+            },
+            className: type === "finishing-step" ? "finishing-step" : "step",
+          },
+        ];
+      });
+    },
+    [reactFlowInstance]
+  );
+
   const handleNodeDelete = (id: string) => {
     setNodes((prevNodes) => {
       const deleteIndex = prevNodes.findIndex((n) => n.id === id);
       return prevNodes.slice(0, deleteIndex);
-    });
-  };
-
-  const handleNodeAdd = ({
-    label,
-    type,
-    className,
-    checkpoint,
-  }: {
-    label: string;
-    type: string;
-    className: string;
-    checkpoint?: boolean;
-  }) => {
-    setNodes((prevNodes) => {
-      const prevNode = prevNodes[prevNodes.length - 1];
-      if (prevNode.type === "output") return prevNodes;
-      const newNodeY =
-        prevNode.position.y + (prevNode.height || 0) + 4 * GRID_UNIT;
-
-      setEdges((prevEdges) => [
-        ...edges,
-        {
-          id: `edge-${prevEdges.length}`,
-          source: prevNodes[prevNodes.length - 1].id,
-          target: String(prevNodes.length + 1),
-          markerEnd: {
-            type: MarkerType.ArrowClosed,
-          },
-        },
-      ]);
-
-      return [
-        ...prevNodes,
-        {
-          id: String(prevNodes.length + 1),
-          position: { x: 12 * GRID_UNIT - 160 + 32, y: newNodeY },
-          type: "customNode",
-          data: {
-            label,
-            onDelete: handleNodeDelete,
-            setPopupVisible,
-            type,
-            checkpoint,
-          },
-          className,
-        },
-      ];
     });
   };
 
@@ -158,28 +177,14 @@ const ServiceFlowPage: FC = () => {
               <Collapsible title="Setup elements">
                 <Track direction="vertical" align="stretch" gap={4}>
                   {setupElements.map((step) => (
-                    <button
+                    <Box
                       key={step.id}
-                      onClick={() =>
-                        handleNodeAdd({
-                          label: step.label,
-                          type:
-                            step.type === "finishing-step"
-                              ? "finishing-step"
-                              : "step",
-                          className:
-                            step.type === "finishing-step"
-                              ? "finishing-step"
-                              : "step",
-                        })
-                      }
+                      color={step.type === "finishing-step" ? "red" : "blue"}
+                      onDragStart={(event) => onDragStart(event, step)}
+                      draggable
                     >
-                      <Box
-                        color={step.type === "finishing-step" ? "red" : "blue"}
-                      >
-                        {step.label}
-                      </Box>
-                    </button>
+                      {step.label}
+                    </Box>
                   ))}
                 </Track>
               </Collapsible>
@@ -189,73 +194,64 @@ const ServiceFlowPage: FC = () => {
               <Collapsible title="All elements">
                 <Track direction="vertical" align="stretch" gap={4}>
                   {allElements.map((step) => (
-                    <button
+                    <Box
                       key={step.id}
-                      onClick={() =>
-                        handleNodeAdd({
-                          label: step.label,
-                          type:
-                            step.type === "finishing-step"
-                              ? "finishing-step"
-                              : "step",
-                          className:
-                            step.type === "finishing-step"
-                              ? "finishing-step"
-                              : "step",
-                        })
-                      }
+                      color={step.type === "finishing-step" ? "red" : "blue"}
+                      onDragStart={(event) => onDragStart(event, step)}
+                      draggable
                     >
-                      <Box
-                        color={step.type === "finishing-step" ? "red" : "blue"}
-                      >
-                        {step.label}
-                      </Box>
-                    </button>
+                      {step.label}
+                    </Box>
                   ))}
                 </Track>
               </Collapsible>
             )}
           </Track>
         </div>
-        <div className="graph__body">
-          <ReactFlow
-            nodes={nodes}
-            edges={edges}
-            onNodesChange={onNodesChange}
-            onEdgesChange={onEdgesChange}
-            onConnect={onConnect}
-            snapToGrid
-            snapGrid={[GRID_UNIT, GRID_UNIT]}
-            defaultViewport={{ x: 38 * GRID_UNIT, y: 3 * GRID_UNIT, zoom: 0 }}
-            minZoom={1}
-            maxZoom={1}
-            nodeTypes={nodeTypes}
-            onNodeMouseEnter={(_, node) => {
-              setNodes((prevNodes) =>
-                prevNodes.map((prevNode) => {
-                  if (prevNode.id !== "1" && prevNode.data === node.data) {
-                    prevNode.selected = true;
-                    prevNode.className = "selected";
-                  }
-                  return prevNode;
-                })
-              );
-            }}
-            onNodeMouseLeave={(_, node) => {
-              setNodes((prevNodes) =>
-                prevNodes.map((prevNode) => {
-                  if (prevNode.id !== "1" && prevNode.data === node.data) {
-                    prevNode.selected = false;
-                    prevNode.className = prevNode.data.type;
-                  }
-                  return prevNode;
-                })
-              );
-            }}
-          >
-            <Background color="#D2D3D8" gap={16} lineWidth={2} />
-          </ReactFlow>
-        </div>
+        <ReactFlowProvider>
+          <div className="graph__body" ref={reactFlowWrapper}>
+            <ReactFlow
+              nodes={nodes}
+              edges={edges}
+              onNodesChange={onNodesChange}
+              onEdgesChange={onEdgesChange}
+              onConnect={onConnect}
+              snapToGrid
+              snapGrid={[GRID_UNIT, GRID_UNIT]}
+              defaultViewport={{ x: 38 * GRID_UNIT, y: 3 * GRID_UNIT, zoom: 0 }}
+              minZoom={1}
+              maxZoom={1}
+              nodeTypes={nodeTypes}
+              onInit={setReactFlowInstance}
+              onDragOver={onDragOver}
+              onDrop={onDrop}
+              onNodeMouseEnter={(_, node) => {
+                setNodes((prevNodes) =>
+                  prevNodes.map((prevNode) => {
+                    if (prevNode.id !== "1" && prevNode.data === node.data) {
+                      prevNode.selected = true;
+                      prevNode.className = "selected";
+                    }
+                    return prevNode;
+                  })
+                );
+              }}
+              onNodeMouseLeave={(_, node) => {
+                setNodes((prevNodes) =>
+                  prevNodes.map((prevNode) => {
+                    if (prevNode.id !== "1" && prevNode.data === node.data) {
+                      prevNode.selected = false;
+                      prevNode.className = prevNode.data.type;
+                    }
+                    return prevNode;
+                  })
+                );
+              }}
+            >
+              <Background color="#D2D3D8" gap={16} lineWidth={2} />
+            </ReactFlow>
+          </div>
+        </ReactFlowProvider>
       </div>
     </>
   );
