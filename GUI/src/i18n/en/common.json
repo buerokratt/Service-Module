@@ -6,13 +6,15 @@
     "resultCount": "Results per page",
     "gotoPage": "Go to page",
     "notification": "Notification",
-    "paginationNavigation": "Navigate"
+    "paginationNavigation": "Navigate",
+    "choose": "Choose..",
+    "continue": "Continue"
   },
   "menu": {
     "overview": "Overview",
     "flowbuilder": "Flow Builder",
     "services": "Services",
-    "newService": "New Service",
+    "newService": "New service",
     "close": "Close menu"
   },
   "overview": {
@@ -36,5 +38,25 @@
       "setInactive": "Are you sure you want to deactivate this service?",
       "setState": "Update state"
     }
+  },
+  "newService": {
+    "endpoints": "Endpoints",
+    "endpoint": {
+      "add": "+ Add API endpoint",
+      "api": "API endpoint",
+      "insert": "Insert API endpoint..",
+      "ask": "Ask for endpoints",
+      "url": "API endpoint URL",
+      "test": "Test URL",
+      "variable": "Variable",
+      "value": "Value"
+    },
+    "saveDraft": "Save draft",
+    "trainingModuleSetup": "Training module setup",
+    "serviceSetup": "Service setup",
+    "serviceFlowCreation": "Service flow creation",
+    "name": "Name",
+    "description": "Description",
+    "uses": "Service uses"
   }
 }

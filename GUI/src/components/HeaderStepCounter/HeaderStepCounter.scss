@@ -1,0 +1,13 @@
+@import "src/styles/tools/color";
+
+.header-step-counter {
+  background-color: get-color(black-coral-0);
+  border-radius: 4px;
+  margin: 0 16px 0 16px;
+  width: 100%;
+
+  p {
+    font-size: 14px;
+    line-height: 21px;
+  }
+}
