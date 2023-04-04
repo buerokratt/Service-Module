@@ -16,15 +16,15 @@ check_for_required_parameters:
 
 missing_parameter:
   status: 400
-  return: 'required parameters were not provided'
+  return: "required parameters were not provided"
   next: end
 
 add_resql:
   call: http.post
   args:
-    url: http://node_server:3003/file/write
+    url: http://node_server:3008/file/write
     body:
-      file_path: '/Resql/services/${name}.sql'
+      file_path: "/Resql/services/${name}.sql"
       content: ${sql}
   result: results
 

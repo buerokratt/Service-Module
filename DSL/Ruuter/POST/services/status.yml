@@ -1,65 +1,202 @@
 extract_request_data:
   assign:
     id: ${incoming.body.id}
-    is_active: ${incoming.body.is_active}
+    new_state: ${incoming.body.state}
     ruuter_type: ${incoming.body.type}
 
 check_for_required_parameters:
   switch:
-    - condition: ${id == null || is_active == null || ruuter_type == null}
+    - condition: ${id === null || new_state === null || ruuter_type === null}
       next: return_incorrect_request
-  next: set_status    
+    - condition: ${new_state === "draft"}
+      next: return_cant_set_to_draft
+  next: get_current_status
+
+get_current_status:
+  call: http.post
+  args:
+    url: http://resql:8087/status
+    body:
+      id: ${id}
+  result: status_res
+  next: assign_old_status_and_path
+
+assign_old_status_and_path:
+  assign:
+    old_file_status_path: ${status_res.response.body[0].currentState}
+    old_file_end: "${status_res.response.body[0].currentState !== 'active' ? '.tmp' : '.yml'}"
+  next: check_status
+
+check_status:
+  switch:
+    - condition: ${status_res.response.body[0].currentState === new_state}
+      next: return_same_state_update
+  next: set_status
 
 set_status:
   call: http.post
   args:
-    url: http://resql:8082/set-status
+    url: http://resql:8087/set-status
     body:
       id: ${id}
-      is_active: ${is_active}
+      new_state: ${new_state}
   result: res
   next: get_status_name
 
 get_status_name:
   call: http.post
   args:
-    url: http://resql:8082/get-service-name-by-id
+    url: http://resql:8087/get-service-name-by-id
     body:
       id: ${id}
   result: name_res
+  next: assign_values
+
+assign_values:
+  assign:
+    name: ${name_res.response.body[0].name}
+    service_name: "service_${name_res.response.body[0].name}"
   next: check_for_status
+
+check_file_exists:
+  call: http.post
+  args:
+    url: http://node_server:3008/file/check
+    body:
+      file_path: "/Ruuter/${ruuter_type}/services/${old_file_status_path}/${name + old_file_end}"
+  next: validate_file_exists
+
+validate_file_exists:
+  switch:
+    - condition: ${tmpFileExists.response.body}
+      next: check_for_status
+  next: return_service_file_missing
 
 check_for_status:
   switch:
-    - condition: ${is_active === true}
+    - condition: ${new_state === "active"}
       next: activate_service
-  next: deactivate_service  
+  next: deactivate_service
 
 activate_service:
   call: http.post
   args:
-    url: http://node_server:3003/file/move
+    url: http://node_server:3008/file/move
     body:
-      current_path: '/Ruuter/${ruuter_type}/services/inactive/${name_res.response.body[0].name}.yml'
-      new_path: '/Ruuter/${ruuter_type}/services/${name_res.response.body[0].name}.yml'
-  result: results  
-  next: check_result
+      current_path: "/Ruuter/${ruuter_type}/services/${old_file_status_path}/${name + old_file_end}"
+      new_path: "/Ruuter/${ruuter_type}/services/active/${name}.yml"
+  result: activate_service_result
+
+activate_intent_file:
+  call: http.post
+  args:
+    url: http://node_server:3008/file/move
+    body:
+      current_path: "/mock1/data/nlu/removed/${service_name}_nlu.tmp"
+      new_path: "/mock1/data/nlu/${service_name}_nlu.yml"
+  result: activate_intent_result
+
+getFileLocations:
+  call: http.get
+  args:
+    url: http://host.docker.internal:8080/return-file-locations
+  result: fileLocations
+
+getDomainFile:
+  call: http.get
+  args:
+    url: http://host.docker.internal:8080/domain-file
+    headers:
+      cookie: ""
+  result: domainData
+
+mergeIntents:
+  call: http.post
+  args:
+    url: http://host.docker.internal:3000/merge
+    body:
+      array1: ${[service_name]}
+      array2: ${domainData.response.body.response.intents}
+  result: mergedIntents
+
+convertDomainJsonToYaml:
+  call: http.post
+  args:
+    url: http://host.docker.internal:3000/convert/json-to-yaml
+    body:
+      version: ${domainData.response.body.response.version}
+      intents: ${mergedIntents.response.body}
+      entities: ${domainData.response.body.response.entities}
+      slots: ${domainData.response.body.response.slots}
+      forms: ${domainData.response.body.response.forms}
+      actions: ${domainData.response.body.response.actions}
+      responses: ${domainData.response.body.response.responses}
+      session_config: ${domainData.response.body.response.session_config}
+  result: domainYaml
+
+saveDomainFile:
+  call: http.post
+  args:
+    url: http://host.docker.internal:3000/file/write
+    body:
+      file_path: ${fileLocations.response.body.response.domain_location}
+      content: ${domainYaml.response.body.json}
+  result: fileResult
+  next: add_rule
+
+add_rule:
+  call: http.post
+  args:
+    url: host.docker.internal:8080/rasa/rules/add
+    headers:
+      cookie: ""
+    body:
+      rule: ${service_name}
+      steps: ${[new Map([["intent", service_name]]), new Map([["action", "utter_" + service_name]])]}
+  result: add_rule_result
+  next: return_ok
 
 deactivate_service:
   call: http.post
   args:
-    url: http://node_server:3003/file/move
+    url: http://node_server:3008/file/move
     body:
-      current_path: '/Ruuter/${ruuter_type}/services/${name_res.response.body[0].name}.yml'
-      new_path: '/Ruuter/${ruuter_type}/services/inactive/${name_res.response.body[0].name}.yml'
-  result: results  
-  next: check_result 
+      current_path: "/Ruuter/${ruuter_type}/services/${old_file_status_path}/${name + old_file_end}"
+      new_path: "/Ruuter/${ruuter_type}/services/inactive/${name}.tmp"
+  result: deactivate_service_result
+  next: delete_rule
 
-check_result:
-  switch:
-    - condition: ${200 <= results.response.statusCodeValue && results.response.statusCodeValue < 300}
-      next: return_ok
-  next: return_bad_request
+delete_rule:
+  call: http.post
+  args:
+    url: host.docker.internal:8080/rasa/rules/delete
+    headers:
+      cookie: ""
+    body:
+      rule: ${service_name}
+  result: delete_intent_result
+  next: delete_intent
+
+delete_intent:
+  call: http.post
+  args:
+    url: host.docker.internal:8080/rasa/intents/delete
+    headers:
+      cookie: ""
+    body:
+      intent: ${service_name}
+  result: delete_intent_result
+  next: rename_intent_to_tmp
+
+rename_intent_to_tmp:
+  call: http.post
+  args:
+    url: http://node_server:3008/file/move
+    body:
+      current_path: "/mock1/data/nlu/removed/${service_name + '_nlu' + old_file_end}"
+      new_path: "/mock1/data/nlu/removed/${service_name}_nlu.tmp"
+  result: activate_intent_result
+  next: return_ok
 
 return_ok:
   status: 200
@@ -68,10 +205,25 @@ return_ok:
 
 return_bad_request:
   status: 400
-  return: ${results.response.body.message}
-  next: end  
+  return: ${err_result.response.body.message}
+  next: end
 
 return_incorrect_request:
   status: 400
   return: "Required parameter(s) missing"
+  next: end
+
+return_cant_set_to_draft:
+  status: 400
+  return: "Changing state to draft is not allowed"
+  next: end
+
+return_same_state_update:
+  status: 400
+  return: "Service is already in this state"
+  next: end
+
+return_service_file_missing:
+  status: 500
+  return: "Service file to update is missing"
   next: end
