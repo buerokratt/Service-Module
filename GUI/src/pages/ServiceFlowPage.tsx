@@ -38,7 +38,7 @@ const initialNodes: Node[] = [
     id: "1",
     type: "input",
     position: {
-      x: 14 * GRID_UNIT,
+      x: 13.5 * GRID_UNIT,
       y: GRID_UNIT,
     },
     data: {
@@ -53,7 +53,7 @@ const initialNodes: Node[] = [
     id: "2",
     type: "placeholder",
     position: {
-      x: 3.5 * GRID_UNIT,
+      x: 3 * GRID_UNIT,
       y: 8 * GRID_UNIT,
     },
     data: {
@@ -164,15 +164,30 @@ const ServiceFlowPage: FC = () => {
 
   const onNodeDrag = useCallback(
     (_event: React.MouseEvent, draggedNode: Node) => {
-      const edge = edges.find((edge) => edge.source === draggedNode.id);
-      if (!edge) return;
-      const placeholder = nodes.find((node) => node.id === edge.target);
-      if (!placeholder || placeholder.type !== "placeholder") return;
+      const draggedEdges = edges.filter(
+        (edge) => edge.source === draggedNode.id
+      );
+      if (draggedEdges.length === 0) return;
+      const placeholders = nodes.filter(
+        (node) =>
+          draggedEdges.map((edge) => edge.target).includes(node.id) &&
+          node.type === "placeholder"
+      );
+      if (placeholders.length === 0) return;
+
       setNodes((prevNodes) =>
         prevNodes.map((prevNode) => {
-          if (prevNode.id !== placeholder.id) return prevNode;
-          prevNode.position.x = draggedNode.position.x;
-          prevNode.position.y = 2 * GRID_UNIT + draggedNode.position.y + 72;
+          placeholders.forEach((placeholder) => {
+            if (prevNode.id !== placeholder.id) return;
+            let positionX = draggedNode.position.x;
+
+            if (prevNode.position.x > draggedNode.position.x) positionX += 330;
+            if (prevNode.position.x < draggedNode.position.x) positionX -= 330;
+            if (draggedEdges.length === 1) positionX = draggedNode.position.x;
+
+            prevNode.position.x = positionX;
+            prevNode.position.y = 3 * GRID_UNIT + draggedNode.position.y + 72;
+          });
           return prevNode;
         })
       );
