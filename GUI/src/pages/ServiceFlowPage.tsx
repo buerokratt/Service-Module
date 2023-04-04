@@ -53,7 +53,7 @@ const initialNodes: Node[] = [
     id: "2",
     type: "placeholder",
     position: {
-      x: -4 * GRID_UNIT,
+      x: 3.5 * GRID_UNIT,
       y: 8 * GRID_UNIT,
     },
     data: {
@@ -134,13 +134,13 @@ const ServiceFlowPage: FC = () => {
     sourceHandle,
     target,
   }: {
-    id: number;
+    id: string;
     source: string;
-    sourceHandle?: string;
+    sourceHandle?: string | null;
     target: string;
   }) => {
     return {
-      id: `edge-${id}`,
+      id,
       sourceHandle,
       source,
       target,
@@ -210,38 +210,39 @@ const ServiceFlowPage: FC = () => {
         );
       });
       if (!matchingPlaceholder) return;
-
-      const connectedNodeId = reactFlowInstance
+      const connectedNodeEdge = reactFlowInstance
         .getEdges()
-        .find((edge) => edge.target === matchingPlaceholder.id)?.source;
-      if (!connectedNodeId) return;
+        .find((edge) => edge.target === matchingPlaceholder.id);
+      if (!connectedNodeEdge) return;
 
       setNodes((prevNodes) => {
-        const newNodeId = prevNodes.length;
+        const newNodeId = matchingPlaceholder.id;
+        const newPlaceholderId = nodes.length;
         setEdges((prevEdges) => {
           const newEdges = [
             ...prevEdges.filter(
               (edge) => edge.target !== matchingPlaceholder.id
             ),
             buildEdge({
-              id: prevEdges.length,
-              source: connectedNodeId,
+              id: connectedNodeEdge.id!,
+              source: connectedNodeEdge.source,
+              sourceHandle: connectedNodeEdge.sourceHandle,
               target: `${newNodeId}`,
             }),
             buildEdge({
-              id: prevEdges.length + 1,
+              id: `edge-${prevEdges.length + 1}`,
               source: `${newNodeId}`,
               sourceHandle: `handle-${newNodeId}-1`,
-              target: `${newNodeId + 1}`,
+              target: `${newPlaceholderId + 1}`,
             }),
           ];
           if (type === "input") {
             newEdges.push(
               buildEdge({
-                id: prevEdges.length + 2,
+                id: `edge-${prevEdges.length + 2}`,
                 source: `${newNodeId}`,
                 sourceHandle: `handle-${newNodeId}-2`,
-                target: `${newNodeId + 2}`,
+                target: `${newPlaceholderId + 2}`,
               })
             );
           }
@@ -264,7 +265,7 @@ const ServiceFlowPage: FC = () => {
             className: type === "finishing-step" ? "finishing-step" : "step",
           },
           buildPlaceholder({
-            id: `${newNodeId + 1}`,
+            id: `${newPlaceholderId + 1}`,
             alignment: type === "input" ? "left" : "center",
             matchingPlaceholder,
           }),
@@ -273,13 +274,12 @@ const ServiceFlowPage: FC = () => {
         if (type === "input") {
           newNodes.push(
             buildPlaceholder({
-              id: `${newNodeId + 2}`,
+              id: `${newPlaceholderId + 2}`,
               alignment: "right",
               matchingPlaceholder,
             })
           );
         }
-
         return newNodes;
       });
     },
