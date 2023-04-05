@@ -4,6 +4,7 @@ import ReactFlow, {
   addEdge,
   Background,
   Connection,
+  Edge,
   MarkerType,
   Node,
   ReactFlowInstance,
@@ -33,6 +34,31 @@ const nodeTypes = {
   placeholder: PlaceholderNode,
 };
 
+const initialPlaceholder = {
+  id: "2",
+  type: "placeholder",
+  position: {
+    x: 3 * GRID_UNIT,
+    y: 8 * GRID_UNIT,
+  },
+  data: {
+    type: "placeholder",
+  },
+  className: "placeholder",
+  selectable: false,
+  draggable: false,
+};
+
+const initialEdge = {
+  type: "smoothstep",
+  id: "edge-1-2",
+  source: "1",
+  target: "2",
+  markerEnd: {
+    type: MarkerType.ArrowClosed,
+  },
+};
+
 const initialNodes: Node[] = [
   {
     id: "1",
@@ -49,20 +75,7 @@ const initialNodes: Node[] = [
     selectable: false,
     draggable: false,
   },
-  {
-    id: "2",
-    type: "placeholder",
-    position: {
-      x: 3 * GRID_UNIT,
-      y: 8 * GRID_UNIT,
-    },
-    data: {
-      type: "placeholder",
-    },
-    className: "placeholder",
-    selectable: false,
-    draggable: false,
-  },
+  initialPlaceholder,
 ];
 
 const ServiceFlowPage: FC = () => {
@@ -86,17 +99,7 @@ const ServiceFlowPage: FC = () => {
   const [reactFlowInstance, setReactFlowInstance] =
     useState<ReactFlowInstance>();
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
-  const [edges, setEdges, onEdgesChange] = useEdgesState([
-    {
-      type: "smoothstep",
-      id: "edge-1-2",
-      source: "1",
-      target: "2",
-      markerEnd: {
-        type: MarkerType.ArrowClosed,
-      },
-    },
-  ]);
+  const [edges, setEdges, onEdgesChange] = useEdgesState([initialEdge]);
   const [isPopupVisible, setPopupVisible] = useState(false);
 
   const buildPlaceholder = ({
@@ -127,6 +130,14 @@ const ServiceFlowPage: FC = () => {
       draggable: false,
     };
   };
+
+  const onEdit = useCallback(
+    (id: any) => {
+      console.log(id);
+      console.log(nodes);
+    },
+    [nodes]
+  );
 
   const buildEdge = ({
     id,
@@ -160,6 +171,8 @@ const ServiceFlowPage: FC = () => {
     event.dataTransfer.setData("application/reactflow-label", step.label);
     event.dataTransfer.setData("application/reactflow-type", step.type);
     event.dataTransfer.effectAllowed = "move";
+    console.log(nodes);
+    console.log(edges);
   };
 
   const onNodeDrag = useCallback(
@@ -232,7 +245,7 @@ const ServiceFlowPage: FC = () => {
 
       setNodes((prevNodes) => {
         const newNodeId = matchingPlaceholder.id;
-        const newPlaceholderId = nodes.length;
+        const newPlaceholderId = +nodes[nodes.length - 1].id + 1;
         setEdges((prevEdges) => {
           const newEdges = [
             ...prevEdges.filter(
@@ -245,7 +258,7 @@ const ServiceFlowPage: FC = () => {
               target: `${newNodeId}`,
             }),
             buildEdge({
-              id: `edge-${prevEdges.length + 1}`,
+              id: `edge-${newNodeId}-${newPlaceholderId + 1}`,
               source: `${newNodeId}`,
               sourceHandle: `handle-${newNodeId}-1`,
               target: `${newPlaceholderId + 1}`,
@@ -254,7 +267,7 @@ const ServiceFlowPage: FC = () => {
           if (type === "input") {
             newEdges.push(
               buildEdge({
-                id: `edge-${prevEdges.length + 2}`,
+                id: `edge-${newNodeId}-${newPlaceholderId + 2}`,
                 source: `${newNodeId}`,
                 sourceHandle: `handle-${newNodeId}-2`,
                 target: `${newPlaceholderId + 2}`,
@@ -272,10 +285,11 @@ const ServiceFlowPage: FC = () => {
             type: "customNode",
             data: {
               label,
-              onDelete: handleNodeDelete,
+              onDelete,
               setPopupVisible,
               type: type === "finishing-step" ? "finishing-step" : "step",
               stepType: type,
+              onEdit: onEdit,
             },
             className: type === "finishing-step" ? "finishing-step" : "step",
           },
@@ -301,12 +315,55 @@ const ServiceFlowPage: FC = () => {
     [reactFlowInstance, nodes, edges]
   );
 
-  const handleNodeDelete = (id: string) => {
-    setNodes((prevNodes) => {
-      const deleteIndex = prevNodes.findIndex((n) => n.id === id);
-      return prevNodes.slice(0, deleteIndex);
-    });
-  };
+  const onDelete = useCallback(
+    (id: string) => {
+      if (!reactFlowInstance) return;
+      const deletedNode = reactFlowInstance
+        .getNodes()
+        .find((node) => node.id === id);
+      if (!deletedNode) return;
+      let edgesToBeRemoved: Edge[] = [];
+
+      setEdges((prevEdges) => {
+        edgesToBeRemoved = prevEdges.filter(
+          (edge) => edge.target === id || edge.source === id
+        );
+        if (edgesToBeRemoved.length < 2) return prevEdges;
+        const newEdges = [
+          ...prevEdges.filter((edge) => !edgesToBeRemoved.includes(edge)),
+        ];
+        if (deletedNode.data.stepType !== "input" && newEdges.length > 0) {
+          newEdges.push(
+            buildEdge({
+              id: `edge-${edgesToBeRemoved[0].source}-${edgesToBeRemoved[1].target}`,
+              source: edgesToBeRemoved[0].source,
+              sourceHandle: edgesToBeRemoved[0].sourceHandle,
+              target: edgesToBeRemoved[1].target,
+            })
+          );
+        }
+        if (newEdges.length === 0) newEdges.push(initialEdge);
+
+        return newEdges;
+      });
+      setNodes((prevNodes) => {
+        const newNodes = [
+          ...prevNodes.filter(
+            (node) =>
+              node.id !== id &&
+              !(
+                edgesToBeRemoved.map((edge) => edge.target).includes(node.id) &&
+                node.type === "placeholder"
+              )
+          ),
+        ];
+        if (newNodes.length === 1) newNodes.push(initialPlaceholder);
+
+        return newNodes;
+      });
+    },
+    [reactFlowInstance, nodes]
+  );
 
   return (
     <>
