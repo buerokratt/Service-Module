@@ -11,6 +11,7 @@ import ReactFlow, {
   ReactFlowProvider,
   useEdgesState,
   useNodesState,
+  XYPosition,
 } from "reactflow";
 import "reactflow/dist/style.css";
 
@@ -106,12 +107,18 @@ const ServiceFlowPage: FC = () => {
     id,
     alignment,
     matchingPlaceholder,
+    position,
   }: {
     id: string;
     alignment: "left" | "center" | "right";
-    matchingPlaceholder: Node;
+    matchingPlaceholder?: Node;
+    position?: XYPosition;
   }): Node => {
-    let positionX = matchingPlaceholder.position.x;
+    if (!matchingPlaceholder && !position)
+      throw Error("Either matchingPlaceholder or position have to be defined.");
+
+    let positionX = position ? position.x : matchingPlaceholder!.position.x;
+    let positionY = position ? position.y : matchingPlaceholder!.position.y;
     if (alignment === "left") positionX -= 330;
     if (alignment === "right") positionX += 330;
 
@@ -120,7 +127,7 @@ const ServiceFlowPage: FC = () => {
       type: "placeholder",
       position: {
         x: positionX,
-        y: 3 * GRID_UNIT + matchingPlaceholder.position.y + 72,
+        y: 3 * GRID_UNIT + positionY + 72,
       },
       data: {
         type: "placeholder",
@@ -131,13 +138,85 @@ const ServiceFlowPage: FC = () => {
     };
   };
 
-  const onEdit = useCallback(
-    (id: any) => {
-      console.log(id);
-      console.log(nodes);
-    },
-    [nodes]
-  );
+  const buildRuleWithPlaceholder = ({
+    id,
+    alignment,
+    matchingPlaceholder,
+    label,
+  }: {
+    id: number;
+    alignment: "left" | "center" | "right";
+    matchingPlaceholder: Node;
+    label: string;
+  }): Node[] => {
+    let positionX = matchingPlaceholder.position.x;
+    const positionY = 3 * GRID_UNIT + matchingPlaceholder.position.y + 72;
+    if (alignment === "left") positionX -= 330;
+    if (alignment === "right") positionX += 330;
+
+    return [
+      {
+        id: `${id}`,
+        position: {
+          x: positionX,
+          y: positionY,
+        },
+        type: "customNode",
+        data: {
+          label,
+          onDelete,
+          setPopupVisible,
+          type: "rule",
+          stepType: "rule",
+        },
+        className: "rule",
+      },
+      buildPlaceholder({
+        id: `${id + 1}`,
+        position: { x: positionX, y: positionY },
+        alignment: "center",
+      }),
+    ];
+  };
+
+  const buildRulesEdges = ({
+    inputId,
+    placeholderId,
+  }: {
+    inputId: number;
+    placeholderId: number;
+  }) => {
+    return [
+      // input -> left rule
+      buildEdge({
+        id: `edge-${inputId}-${placeholderId}`,
+        source: `${inputId}`,
+        sourceHandle: `handle-${inputId}-1`,
+        target: `${placeholderId}`,
+      }),
+      // input -> right rule
+      buildEdge({
+        id: `edge-${inputId}-${placeholderId + 2}`,
+        source: `${inputId}`,
+        sourceHandle: `handle-${inputId}-2`,
+        target: `${placeholderId + 2}`,
+      }),
+      // left rule -> left placeholder
+      buildEdge({
+        id: `edge-${placeholderId}-${placeholderId + 1}`,
+        source: `${placeholderId}`,
+        sourceHandle: `handle-${placeholderId}-1`,
+        target: `${placeholderId + 1}`,
+      }),
+      // right rule -> right placeholder
+      buildEdge({
+        id: `edge-${placeholderId + 2}-${placeholderId + 3}`,
+        source: `${placeholderId + 2}`,
+        sourceHandle: `handle-${placeholderId + 2}-1`,
+        target: `${placeholderId + 3}`,
+      }),
+    ];
+  };
 
   const buildEdge = ({
     id,
@@ -149,7 +228,7 @@ const ServiceFlowPage: FC = () => {
     source: string;
     sourceHandle?: string | null;
     target: string;
-  }) => {
+  }): Edge => {
     return {
       id,
       sourceHandle,
@@ -192,13 +271,7 @@ const ServiceFlowPage: FC = () => {
         prevNodes.map((prevNode) => {
           placeholders.forEach((placeholder) => {
             if (prevNode.id !== placeholder.id) return;
-            let positionX = draggedNode.position.x;
-
-            if (prevNode.position.x > draggedNode.position.x) positionX += 330;
-            if (prevNode.position.x < draggedNode.position.x) positionX -= 330;
-            if (draggedEdges.length === 1) positionX = draggedNode.position.x;
-
-            prevNode.position.x = positionX;
+            prevNode.position.x = draggedNode.position.x;
             prevNode.position.y = 3 * GRID_UNIT + draggedNode.position.y + 72;
           });
           return prevNode;
@@ -255,22 +328,25 @@ const ServiceFlowPage: FC = () => {
               id: connectedNodeEdge.id!,
               source: connectedNodeEdge.source,
               sourceHandle: connectedNodeEdge.sourceHandle,
-              target: `${newNodeId}`,
-            }),
-            buildEdge({
-              id: `edge-${newNodeId}-${newPlaceholderId + 1}`,
-              source: `${newNodeId}`,
-              sourceHandle: `handle-${newNodeId}-1`,
-              target: `${newPlaceholderId + 1}`,
+              target: newNodeId,
             }),
           ];
-          if (type === "input") {
+
+          if (type !== "input") {
             newEdges.push(
               buildEdge({
-                id: `edge-${newNodeId}-${newPlaceholderId + 2}`,
-                source: `${newNodeId}`,
-                sourceHandle: `handle-${newNodeId}-2`,
-                target: `${newPlaceholderId + 2}`,
+                id: `edge-${newNodeId}-${newPlaceholderId + 1}`,
+                source: newNodeId,
+                sourceHandle: `handle-${newNodeId}-1`,
+                target: `${newPlaceholderId + 1}`,
+              })
+            );
+          }
+          if (type === "input") {
+            newEdges.push(
+              ...buildRulesEdges({
+                inputId: +newNodeId,
+                placeholderId: newPlaceholderId,
               })
             );
           }
@@ -289,21 +365,32 @@ const ServiceFlowPage: FC = () => {
               setPopupVisible,
               type: type === "finishing-step" ? "finishing-step" : "step",
               stepType: type,
-              onEdit: onEdit,
             },
             className: type === "finishing-step" ? "finishing-step" : "step",
           },
-          buildPlaceholder({
-            id: `${newPlaceholderId + 1}`,
-            alignment: type === "input" ? "left" : "center",
-            matchingPlaceholder,
-          }),
         ];
+
+        if (type !== "input") {
+          newNodes.push(
+            buildPlaceholder({
+              id: `${newPlaceholderId + 1}`,
+              alignment: type === "input" ? "left" : "center",
+              matchingPlaceholder,
+            })
+          );
+        }
 
         if (type === "input") {
           newNodes.push(
-            buildPlaceholder({
-              id: `${newPlaceholderId + 2}`,
+            ...buildRuleWithPlaceholder({
+              id: newPlaceholderId,
+              label: "rule 1",
+              alignment: "left",
+              matchingPlaceholder,
+            }),
+            ...buildRuleWithPlaceholder({
+              id: newPlaceholderId + 2,
+              label: "rule 2",
               alignment: "right",
               matchingPlaceholder,
             })
