@@ -7,6 +7,8 @@ import { ROUTES } from './resources/routes-constants'
 import OldNewServicePage from './pages/OldNewServicePage'
 import './styles/main.scss'
 import ServiceFlowPage from './pages/ServiceFlowPage'
+import FlowBuilderPage from './pages/FlowBuilderPage'
+import NewServicePage from './pages/NewServicePage'
 
 const RootComponent: React.FC = () => {
   return (
