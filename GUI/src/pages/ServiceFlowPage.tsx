@@ -409,47 +409,84 @@ const ServiceFlowPage: FC = () => {
         .getNodes()
         .find((node) => node.id === id);
       if (!deletedNode) return;
-      let edgesToBeRemoved: Edge[] = [];
+      let updatedNodes: Node[] = [];
 
+      setNodes((prevNodes) => {
+        let newNodes: Node[] = [];
+        const currentEdges = reactFlowInstance.getEdges();
+
+        if (deletedNode.data.stepType !== "input") {
+          newNodes.push(...prevNodes.filter((node) => node.id !== id));
+        } else {
+          const deletedRules = currentEdges
+            .filter((edge) => edge.source === id)
+            .map((edge) => edge.target);
+
+          newNodes.push(
+            ...prevNodes.filter(
+              (node) => node.id !== id && !deletedRules.includes(node.id)
+            )
+          );
+        }
+
+        // cleanup leftover placeholders
+        newNodes = newNodes.filter((node) => {
+          if (node.type !== "placeholder") return true;
+
+          const pointingEdge = currentEdges.find(
+            (edge) => edge.target === node.id
+          );
+          const edgeStart = newNodes.find(
+            (newNode) => newNode.id === pointingEdge?.source
+          );
+          if (!edgeStart) return false;
+          return true;
+        });
+
+        if (newNodes.length === 1) newNodes.push(initialPlaceholder);
+        updatedNodes = newNodes;
+        return newNodes;
+      });
       setEdges((prevEdges) => {
-        edgesToBeRemoved = prevEdges.filter(
-          (edge) => edge.target === id || edge.source === id
-        );
-        if (edgesToBeRemoved.length < 2) return prevEdges;
-        const newEdges = [
-          ...prevEdges.filter((edge) => !edgesToBeRemoved.includes(edge)),
+        const toRemove = prevEdges.filter((edge) => {
+          if (deletedNode.data.stepType !== "input") {
+            return edge.target === id || edge.source === id;
+          } else {
+            return !updatedNodes.map((node) => node.id).includes(edge.target);
+          }
+        });
+
+        if (toRemove.length === 0) return prevEdges;
+        let newEdges = [
+          ...prevEdges.filter((edge) => !toRemove.includes(edge)),
         ];
-        if (deletedNode.data.stepType !== "input" && newEdges.length > 0) {
+        if (
+          deletedNode.data.stepType !== "input" &&
+          (newEdges.length > 0)
+        ) {
           newEdges.push(
             buildEdge({
-              id: `edge-${edgesToBeRemoved[0].source}-${edgesToBeRemoved[1].target}`,
-              source: edgesToBeRemoved[0].source,
-              sourceHandle: edgesToBeRemoved[0].sourceHandle,
-              target: edgesToBeRemoved[1].target,
+              id: `edge-${toRemove[0].source}-${toRemove[toRemove.length - 1].target}`,
+              source: toRemove[0].source,
+              sourceHandle: toRemove[0].sourceHandle,
+              target: toRemove[toRemove.length - 1].target,
             })
           );
         }
+
+        // cleanup leftover edges
+        newEdges = newEdges.filter(
+          (edge) =>
+            updatedNodes.find((node) => node.id === edge.source) &&
+            updatedNodes.find((node) => node.id === edge.target)
+        );
+
         if (newEdges.length === 0) newEdges.push(initialEdge);
 
         return newEdges;
       });
-      setNodes((prevNodes) => {
-        const newNodes = [
-          ...prevNodes.filter(
-            (node) =>
-              node.id !== id &&
-              !(
-                edgesToBeRemoved.map((edge) => edge.target).includes(node.id) &&
-                node.type === "placeholder"
-              )
-          ),
-        ];
-        if (newNodes.length === 1) newNodes.push(initialPlaceholder);
-
-        return newNodes;
-      });
     },
-    [reactFlowInstance, nodes]
+    [reactFlowInstance]
   );
 
   return (
