@@ -38,7 +38,7 @@ const initialNodes: Node[] = [
     id: "1",
     type: "input",
     position: {
-      x: 14 * GRID_UNIT,
+      x: 13.5 * GRID_UNIT,
       y: GRID_UNIT,
     },
     data: {
@@ -53,7 +53,7 @@ const initialNodes: Node[] = [
     id: "2",
     type: "placeholder",
     position: {
-      x: -4 * GRID_UNIT,
+      x: 3 * GRID_UNIT,
       y: 8 * GRID_UNIT,
     },
     data: {
@@ -99,6 +99,58 @@ const ServiceFlowPage: FC = () => {
   ]);
   const [isPopupVisible, setPopupVisible] = useState(false);
 
+  const buildPlaceholder = ({
+    id,
+    alignment,
+    matchingPlaceholder,
+  }: {
+    id: string;
+    alignment: "left" | "center" | "right";
+    matchingPlaceholder: Node;
+  }): Node => {
+    let positionX = matchingPlaceholder.position.x;
+    if (alignment === "left") positionX -= 330;
+    if (alignment === "right") positionX += 330;
+
+    return {
+      id,
+      type: "placeholder",
+      position: {
+        x: positionX,
+        y: 3 * GRID_UNIT + matchingPlaceholder.position.y + 72,
+      },
+      data: {
+        type: "placeholder",
+      },
+      className: "placeholder",
+      selectable: false,
+      draggable: false,
+    };
+  };
+
+  const buildEdge = ({
+    id,
+    source,
+    sourceHandle,
+    target,
+  }: {
+    id: string;
+    source: string;
+    sourceHandle?: string | null;
+    target: string;
+  }) => {
+    return {
+      id,
+      sourceHandle,
+      source,
+      target,
+      type: "smoothstep",
+      markerEnd: {
+        type: MarkerType.ArrowClosed,
+      },
+    };
+  };
+
   const onConnect = useCallback(
     (params: Connection) => setEdges((eds) => addEdge(params, eds)),
     [setEdges]
@@ -112,15 +164,30 @@ const ServiceFlowPage: FC = () => {
 
   const onNodeDrag = useCallback(
     (_event: React.MouseEvent, draggedNode: Node) => {
-      const edge = edges.find((edge) => edge.source === draggedNode.id);
-      if (!edge) return;
-      const placeholder = nodes.find((node) => node.id === edge.target);
-      if (!placeholder || placeholder.type !== "placeholder") return;
+      const draggedEdges = edges.filter(
+        (edge) => edge.source === draggedNode.id
+      );
+      if (draggedEdges.length === 0) return;
+      const placeholders = nodes.filter(
+        (node) =>
+          draggedEdges.map((edge) => edge.target).includes(node.id) &&
+          node.type === "placeholder"
+      );
+      if (placeholders.length === 0) return;
+
       setNodes((prevNodes) =>
         prevNodes.map((prevNode) => {
-          if (prevNode.id !== placeholder.id) return prevNode;
-          prevNode.position.x = draggedNode.position.x;
-          prevNode.position.y = 2 * GRID_UNIT + draggedNode.position.y + 72;
+          placeholders.forEach((placeholder) => {
+            if (prevNode.id !== placeholder.id) return;
+            let positionX = draggedNode.position.x;
+
+            if (prevNode.position.x > draggedNode.position.x) positionX += 330;
+            if (prevNode.position.x < draggedNode.position.x) positionX -= 330;
+            if (draggedEdges.length === 1) positionX = draggedNode.position.x;
+
+            prevNode.position.x = positionX;
+            prevNode.position.y = 3 * GRID_UNIT + draggedNode.position.y + 72;
+          });
           return prevNode;
         })
       );
@@ -158,41 +225,49 @@ const ServiceFlowPage: FC = () => {
         );
       });
       if (!matchingPlaceholder) return;
-
-      const connectedNodeId = reactFlowInstance
+      const connectedNodeEdge = reactFlowInstance
         .getEdges()
-        .find((edge) => edge.target === matchingPlaceholder.id)?.source;
-      if (!connectedNodeId) return;
+        .find((edge) => edge.target === matchingPlaceholder.id);
+      if (!connectedNodeEdge) return;
 
       setNodes((prevNodes) => {
-        setEdges((prevEdges) => [
-          ...prevEdges.filter((edge) => edge.target !== matchingPlaceholder.id),
-          {
-            id: `edge-${prevEdges.length}`,
-            source: connectedNodeId,
-            target: String(prevNodes.length),
-            type: "smoothstep",
+        const newNodeId = matchingPlaceholder.id;
+        const newPlaceholderId = nodes.length;
+        setEdges((prevEdges) => {
+          const newEdges = [
+            ...prevEdges.filter(
+              (edge) => edge.target !== matchingPlaceholder.id
+            ),
+            buildEdge({
+              id: connectedNodeEdge.id!,
+              source: connectedNodeEdge.source,
+              sourceHandle: connectedNodeEdge.sourceHandle,
+              target: `${newNodeId}`,
+            }),
+            buildEdge({
+              id: `edge-${prevEdges.length + 1}`,
+              source: `${newNodeId}`,
+              sourceHandle: `handle-${newNodeId}-1`,
+              target: `${newPlaceholderId + 1}`,
+            }),
+          ];
+          if (type === "input") {
+            newEdges.push(
+              buildEdge({
+                id: `edge-${prevEdges.length + 2}`,
+                source: `${newNodeId}`,
+                sourceHandle: `handle-${newNodeId}-2`,
+                target: `${newPlaceholderId + 2}`,
+              })
+            );
+          }
+          return newEdges;
+        });
 
-            markerEnd: {
-              type: MarkerType.ArrowClosed,
-            },
-          },
-          {
-            id: `edge-${prevEdges.length + 1}`,
-            source: String(prevNodes.length),
-            target: String(prevNodes.length + 1),
-            type: "smoothstep",
-
-            markerEnd: {
-              type: MarkerType.ArrowClosed,
-            },
-          },
-        ]);
-
-        return [
+        const newNodes = [
           ...prevNodes.filter((node) => node.id !== matchingPlaceholder.id),
           {
-            id: String(prevNodes.length),
+            id: `${newNodeId}`,
             position: matchingPlaceholder.position,
             type: "customNode",
             data: {
@@ -200,24 +275,27 @@ const ServiceFlowPage: FC = () => {
               onDelete: handleNodeDelete,
               setPopupVisible,
               type: type === "finishing-step" ? "finishing-step" : "step",
+              stepType: type,
             },
             className: type === "finishing-step" ? "finishing-step" : "step",
           },
-          {
-            id: String(prevNodes.length + 1),
-            type: "placeholder",
-            position: {
-              x: matchingPlaceholder.position.x,
-              y: 2 * GRID_UNIT + matchingPlaceholder.position.y + 72,
-            },
-            data: {
-              type: "placeholder",
-            },
-            className: "placeholder",
-            selectable: false,
-            draggable: false,
-          },
+          buildPlaceholder({
+            id: `${newPlaceholderId + 1}`,
+            alignment: type === "input" ? "left" : "center",
+            matchingPlaceholder,
+          }),
         ];
+
+        if (type === "input") {
+          newNodes.push(
+            buildPlaceholder({
+              id: `${newPlaceholderId + 2}`,
+              alignment: "right",
+              matchingPlaceholder,
+            })
+          );
+        }
+        return newNodes;
       });
     },
     [reactFlowInstance, nodes, edges]
