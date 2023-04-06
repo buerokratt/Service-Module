@@ -318,7 +318,7 @@ const ServiceFlowPage: FC = () => {
 
       setNodes((prevNodes) => {
         const newNodeId = matchingPlaceholder.id;
-        const newPlaceholderId = +nodes[nodes.length - 1].id + 1;
+        const newPlaceholderId = Math.max(...nodes.map((node) => +node.id)) + 1;
         setEdges((prevEdges) => {
           const newEdges = [
             ...prevEdges.filter(
@@ -408,6 +408,9 @@ const ServiceFlowPage: FC = () => {
       const deletedNode = reactFlowInstance
         .getNodes()
         .find((node) => node.id === id);
+      const edgeToDeletedNode = reactFlowInstance
+        .getEdges()
+        .find((edge) => edge.target === id);
       if (!deletedNode) return;
       let updatedNodes: Node[] = [];
 
@@ -416,8 +419,10 @@ const ServiceFlowPage: FC = () => {
         const currentEdges = reactFlowInstance.getEdges();
 
         if (deletedNode.data.stepType !== "input") {
+          // delete only targeted node
           newNodes.push(...prevNodes.filter((node) => node.id !== id));
         } else {
+          // delete input node with it's rules
           const deletedRules = currentEdges
             .filter((edge) => edge.source === id)
             .map((edge) => edge.target);
@@ -436,22 +441,24 @@ const ServiceFlowPage: FC = () => {
           const pointingEdge = currentEdges.find(
             (edge) => edge.target === node.id
           );
-          const edgeStart = newNodes.find(
+          const pointingEdgeSource = newNodes.find(
             (newNode) => newNode.id === pointingEdge?.source
           );
-          if (!edgeStart) return false;
+          if (!pointingEdgeSource) return false;
           return true;
         });
 
-        if (newNodes.length === 1) newNodes.push(initialPlaceholder);
         updatedNodes = newNodes;
         return newNodes;
       });
+
       setEdges((prevEdges) => {
         const toRemove = prevEdges.filter((edge) => {
           if (deletedNode.data.stepType !== "input") {
+            // remove edges pointing to/from removed node
             return edge.target === id || edge.source === id;
           } else {
+            // remove edges not pointing to present nodes
             return !updatedNodes.map((node) => node.id).includes(edge.target);
           }
         });
@@ -462,11 +469,15 @@ const ServiceFlowPage: FC = () => {
         ];
         if (
           deletedNode.data.stepType !== "input" &&
-          (newEdges.length > 0)
+          newEdges.length > 0 &&
+          toRemove.length > 1
         ) {
+          // if only 1 node was removed, point edge to whatever it was pointing to
           newEdges.push(
             buildEdge({
-              id: `edge-${toRemove[0].source}-${toRemove[toRemove.length - 1].target}`,
+              id: `edge-${toRemove[0].source}-${
+                toRemove[toRemove.length - 1].target
+              }`,
               source: toRemove[0].source,
               sourceHandle: toRemove[0].sourceHandle,
               target: toRemove[toRemove.length - 1].target,
@@ -474,16 +485,50 @@ const ServiceFlowPage: FC = () => {
           );
         }
 
-        // cleanup leftover edges
+        // cleanup possible leftover edges
         newEdges = newEdges.filter(
           (edge) =>
             updatedNodes.find((node) => node.id === edge.source) &&
             updatedNodes.find((node) => node.id === edge.target)
         );
 
-        if (newEdges.length === 0) newEdges.push(initialEdge);
-
         return newEdges;
+      });
+
+      if (!edgeToDeletedNode) return;
+      setEdges((prevEdges) => {
+        // check if previous node points to anything
+        if (
+          prevEdges.find((edge) => edge.source === edgeToDeletedNode.source)
+        ) {
+          return prevEdges;
+        }
+
+        // Previous node points to nothing -> add placeholder with edge
+        setNodes((prevNodes) => {
+          const sourceNode = prevNodes.find(
+            (node) => node.id === edgeToDeletedNode.source
+          );
+          if (!sourceNode) return prevNodes;
+          return [
+            ...prevNodes,
+            buildPlaceholder({
+              id: deletedNode.id,
+              alignment: "center",
+              matchingPlaceholder: sourceNode,
+            }),
+          ];
+        });
+
+        prevEdges.push(
+          buildEdge({
+            id: `edge-${edgeToDeletedNode.source}-${deletedNode.id}`,
+            source: edgeToDeletedNode.source,
+            sourceHandle: `handle-${edgeToDeletedNode.source}-1`,
+            target: deletedNode.id,
+          })
+        );
+        return prevEdges;
       });
     },
     [reactFlowInstance]
