@@ -281,6 +281,57 @@ const ServiceFlowPage: FC = () => {
     [edges, nodes]
   );
 
+  const onNodeDragStop = useCallback(
+    (event: any, draggedNode: Node) => {
+      if (!reactFlowInstance || !reactFlowWrapper.current) return;
+      // Check if node was dropped on a placeholder
+      const reactFlowBounds = reactFlowWrapper.current.getBoundingClientRect();
+      const position = reactFlowInstance.project({
+        x: event.clientX - reactFlowBounds.left,
+        y: event.clientY - reactFlowBounds.top,
+      });
+      const matchingPlaceholder = reactFlowInstance.getNodes().find((node) => {
+        if (node.type !== "placeholder") return false;
+        return (
+          node.position.x <= position.x &&
+          position.x <= node.position.x + node.width! &&
+          node.position.y <= position.y &&
+          position.y <= node.position.y + node.height!
+        );
+      });
+      if (!matchingPlaceholder) return;
+      
+      // Delete matching placeholder and set node's position to match
+      setNodes((prevNodes) =>
+        prevNodes
+          .filter((node) => node.id !== matchingPlaceholder.id)
+          .map((node) => {
+            if (node.id !== draggedNode.id) return node;
+            node.position.x = matchingPlaceholder.position.x;
+            node.position.y = matchingPlaceholder.position.y;
+            return node;
+          })
+      );
+      // Remove old edge and create a new one pointing to draggedNode
+      setEdges((prevEdges) => {
+        const toRemove = prevEdges.find(
+          (edge) => edge.target === matchingPlaceholder.id
+        );
+        if (!toRemove) return prevEdges;
+        return [
+          ...prevEdges.filter((edge) => edge !== toRemove),
+          buildEdge({
+            id: `edge-${toRemove.source}-${draggedNode.id}`,
+            source: toRemove.source,
+            sourceHandle: `handle-${toRemove.source}-1`,
+            target: draggedNode.id,
+          }),
+        ];
+      });
+    },
+    [reactFlowInstance]
+  );
+
   const onDragOver = useCallback((event: any) => {
     event.preventDefault();
     event.dataTransfer.dropEffect = "move";
@@ -618,6 +669,7 @@ const ServiceFlowPage: FC = () => {
               onDragOver={onDragOver}
               onDrop={onDrop}
               onNodeDrag={onNodeDrag}
+              onNodeDragStop={onNodeDragStop}
               onNodeMouseEnter={(_, node) => {
                 setNodes((prevNodes) =>
                   prevNodes.map((prevNode) => {
