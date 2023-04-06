@@ -50,6 +50,6 @@ export {
   Dialog,
   Section,
   DataTable,
-  Toast
+  Toast,
   Modal,
 }
