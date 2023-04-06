@@ -5,7 +5,6 @@ import './Box.scss'
 
 type BoxProps = BaseHTMLAttributes<HTMLDivElement> & {
   color?: 'default' | 'blue' | 'yellow' | 'green' | 'red' | 'gray',
-  draggable?: boolean
 }
 
 const Box = forwardRef<HTMLDivElement, PropsWithChildren<BoxProps>>(({ color = 'default', children, ...rest }, ref) => {
