@@ -340,6 +340,7 @@ const ServiceFlowPage: FC = () => {
   const onDrop = useCallback(
     (event: React.DragEvent<HTMLDivElement>) => {
       event.preventDefault();
+      // Find matching placeholder
       if (!reactFlowInstance || !reactFlowWrapper.current) return;
 
       const reactFlowBounds = reactFlowWrapper.current.getBoundingClientRect();
@@ -371,6 +372,7 @@ const ServiceFlowPage: FC = () => {
         const newNodeId = matchingPlaceholder.id;
         const newPlaceholderId = Math.max(...nodes.map((node) => +node.id)) + 1;
         setEdges((prevEdges) => {
+          // Point edge from placeholder to new node
           const newEdges = [
             ...prevEdges.filter(
               (edge) => edge.target !== matchingPlaceholder.id
@@ -383,7 +385,8 @@ const ServiceFlowPage: FC = () => {
             }),
           ];
 
-          if (type !== "input") {
+          if (!["input", 'finishing-step'].includes(type)) {
+            // Point edge from new node to new placeholder
             newEdges.push(
               buildEdge({
                 id: `edge-${newNodeId}-${newPlaceholderId + 1}`,
@@ -394,6 +397,7 @@ const ServiceFlowPage: FC = () => {
             );
           }
           if (type === "input") {
+            // Create edges from input node to rules and from rules to placeholders
             newEdges.push(
               ...buildRulesEdges({
                 inputId: +newNodeId,
@@ -404,6 +408,7 @@ const ServiceFlowPage: FC = () => {
           return newEdges;
         });
 
+        // Add new node in place of old placeholder
         const newNodes = [
           ...prevNodes.filter((node) => node.id !== matchingPlaceholder.id),
           {
@@ -421,7 +426,8 @@ const ServiceFlowPage: FC = () => {
           },
         ];
 
-        if (type !== "input") {
+        if (!["input", 'finishing-step'].includes(type)) {
+          // Add placeholder right below new node
           newNodes.push(
             buildPlaceholder({
               id: `${newPlaceholderId + 1}`,
@@ -432,6 +438,7 @@ const ServiceFlowPage: FC = () => {
         }
 
         if (type === "input") {
+          // Add 2 rules below input node and placeholders under each
           newNodes.push(
             ...buildRuleWithPlaceholder({
               id: newPlaceholderId,
