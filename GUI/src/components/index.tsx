@@ -22,6 +22,8 @@ import Box from './Box'
 import Drawer from './Drawer'
 import Dialog from './Dialog'
 import Section from './Section'
+import DataTable from './DataTable'
+import Toast from './Toast'
 import Modal from './Modal'
 
 export {
@@ -47,5 +49,7 @@ export {
   Drawer,
   Dialog,
   Section,
+  DataTable,
+  Toast
   Modal,
 }
