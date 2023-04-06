@@ -1,4 +1,5 @@
 /data
+/docker
 .DS_Store
 .vscode
 .env

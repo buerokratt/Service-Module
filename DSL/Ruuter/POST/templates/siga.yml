@@ -1,0 +1,84 @@
+check_for_body:
+  switch:
+    - condition: ${incoming.body == null}
+      next: missing_parameters
+  next: extract_request_data
+
+extract_request_data:
+  assign:
+    signType: ${incoming.body.type}
+    identifier: ${incoming.body.personIdentifier}
+    country: ${incoming.body.country}
+    phoneNumber: ${incoming.body.phoneNr}
+  next: check_for_type
+
+check_for_type:
+  switch:
+    - condition: ${signType === null}
+      next: missing_type
+  next: check_for_sign_type
+
+check_for_sign_type:
+  switch:
+    - condition: ${signType === "smart_id"}
+      next: check_for_smart_id_params
+    - condition: ${signType === "mobile_sign"}
+      next: check_for_mobile_sign_params
+  next: missing_smart_id_params
+
+check_for_smart_id_params:
+  switch:
+    - condition: ${identifier === null || country === null}
+      next: missing_smart_id_params
+  next: sign_via_smart_id
+
+check_for_mobile_sign_params:
+  switch:
+    - condition: ${phoneNumber === null || identifier === null || country === null}
+      next: missing_mobile_sign_params
+  next: sign_via_mobile
+
+sign_via_smart_id:
+  call: http.post
+  args:
+    url: https://siga-demo.localhost:9443/smartid-signing
+    headers:
+      Content-Type: "application/json"
+    body:
+      personIdentifier: ${identifier}
+      country: ${country}
+  return: res
+  next: end
+
+sign_via_mobile:
+  call: http.post
+  args:
+    url: https://siga-demo.localhost:9443/mobile-signing
+    headers:
+      Content-Type: "application/json"
+    body:
+      phoneNr: ${phoneNumber}
+      personIdentifier: ${identifier}
+      country: ${country}
+  return: res
+  next: end
+
+missing_smart_id_params:
+  status: 400
+  return: "Id, country - missing"
+  next: end
+
+missing_mobile_sign_params:
+  status: 400
+  return: "Phone number, country - missing"
+  next: end
+
+missing_type:
+  status: 400
+  return: "Sign type is missing"
+  next: end
+
+missing_parameters:
+  status: 400
+  return: "Missing Parameters"
+  next: end
