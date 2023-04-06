@@ -15,13 +15,7 @@ import ReactFlow, {
 } from "reactflow";
 import "reactflow/dist/style.css";
 
-import {
-  Box,
-  Button,
-  Collapsible,
-  NewServiceHeader,
-  Track,
-} from "../components";
+import { Box, Button, Collapsible, NewServiceHeader, Track } from "../components";
 import CustomNode from "../components/Steps/CustomNode";
 import "./ServiceFlowPage.scss";
 import { Step } from "../types/step";
@@ -92,13 +86,16 @@ const ServiceFlowPage: FC = () => {
     { id: 5, label: "Open webpage", type: "open-webpage" },
     { id: 6, label: "File generate", type: "file-generate" },
     { id: 7, label: "File sign", type: "file-sign" },
-    { id: 8, label: "End conversation", type: "finishing-step" },
-    { id: 9, label: "Direct to Customer Support", type: "finishing-step" },
+    { id: 8, label: "End conversation", type: "finishing-step-end" },
+    {
+      id: 9,
+      label: "Direct to Customer Support",
+      type: "finishing-step-redirect",
+    },
   ];
 
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
-  const [reactFlowInstance, setReactFlowInstance] =
-    useState<ReactFlowInstance>();
+  const [reactFlowInstance, setReactFlowInstance] = useState<ReactFlowInstance>();
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState([initialEdge]);
   const [isPopupVisible, setPopupVisible] = useState(false);
@@ -114,8 +111,7 @@ const ServiceFlowPage: FC = () => {
     matchingPlaceholder?: Node;
     position?: XYPosition;
   }): Node => {
-    if (!matchingPlaceholder && !position)
-      throw Error("Either matchingPlaceholder or position have to be defined.");
+    if (!matchingPlaceholder && !position) throw Error("Either matchingPlaceholder or position have to be defined.");
 
     let positionX = position ? position.x : matchingPlaceholder!.position.x;
     let positionY = position ? position.y : matchingPlaceholder!.position.y;
@@ -168,6 +164,7 @@ const ServiceFlowPage: FC = () => {
           setPopupVisible,
           type: "rule",
           stepType: "rule",
+          readonly: true,
         },
         className: "rule",
       },
@@ -179,13 +176,7 @@ const ServiceFlowPage: FC = () => {
     ];
   };
 
-  const buildRulesEdges = ({
-    inputId,
-    placeholderId,
-  }: {
-    inputId: number;
-    placeholderId: number;
-  }) => {
+  const buildRulesEdges = ({ inputId, placeholderId }: { inputId: number; placeholderId: number }) => {
     return [
       // input -> left rule
       buildEdge({
@@ -241,10 +232,7 @@ const ServiceFlowPage: FC = () => {
     };
   };
 
-  const onConnect = useCallback(
-    (params: Connection) => setEdges((eds) => addEdge(params, eds)),
-    [setEdges]
-  );
+  const onConnect = useCallback((params: Connection) => setEdges((eds) => addEdge(params, eds)), [setEdges]);
 
   const onDragStart = (event: React.DragEvent<HTMLDivElement>, step: Step) => {
     event.dataTransfer.setData("application/reactflow-label", step.label);
@@ -256,14 +244,10 @@ const ServiceFlowPage: FC = () => {
 
   const onNodeDrag = useCallback(
     (_event: React.MouseEvent, draggedNode: Node) => {
-      const draggedEdges = edges.filter(
-        (edge) => edge.source === draggedNode.id
-      );
+      const draggedEdges = edges.filter((edge) => edge.source === draggedNode.id);
       if (draggedEdges.length === 0) return;
       const placeholders = nodes.filter(
-        (node) =>
-          draggedEdges.map((edge) => edge.target).includes(node.id) &&
-          node.type === "placeholder"
+        (node) => draggedEdges.map((edge) => edge.target).includes(node.id) && node.type === "placeholder"
       );
       if (placeholders.length === 0) return;
 
@@ -300,7 +284,7 @@ const ServiceFlowPage: FC = () => {
         );
       });
       if (!matchingPlaceholder) return;
-      
+
       // Delete matching placeholder and set node's position to match
       setNodes((prevNodes) =>
         prevNodes
@@ -314,9 +298,7 @@ const ServiceFlowPage: FC = () => {
       );
       // Remove old edge and create a new one pointing to draggedNode
       setEdges((prevEdges) => {
-        const toRemove = prevEdges.find(
-          (edge) => edge.target === matchingPlaceholder.id
-        );
+        const toRemove = prevEdges.find((edge) => edge.target === matchingPlaceholder.id);
         if (!toRemove) return prevEdges;
         return [
           ...prevEdges.filter((edge) => edge !== toRemove),
@@ -363,9 +345,7 @@ const ServiceFlowPage: FC = () => {
         );
       });
       if (!matchingPlaceholder) return;
-      const connectedNodeEdge = reactFlowInstance
-        .getEdges()
-        .find((edge) => edge.target === matchingPlaceholder.id);
+      const connectedNodeEdge = reactFlowInstance.getEdges().find((edge) => edge.target === matchingPlaceholder.id);
       if (!connectedNodeEdge) return;
 
       setNodes((prevNodes) => {
@@ -374,9 +354,7 @@ const ServiceFlowPage: FC = () => {
         setEdges((prevEdges) => {
           // Point edge from placeholder to new node
           const newEdges = [
-            ...prevEdges.filter(
-              (edge) => edge.target !== matchingPlaceholder.id
-            ),
+            ...prevEdges.filter((edge) => edge.target !== matchingPlaceholder.id),
             buildEdge({
               id: connectedNodeEdge.id!,
               source: connectedNodeEdge.source,
@@ -385,7 +363,7 @@ const ServiceFlowPage: FC = () => {
             }),
           ];
 
-          if (!["input", 'finishing-step'].includes(type)) {
+          if (!["input", "finishing-step-end", "finishing-step-redirect"].includes(type)) {
             // Point edge from new node to new placeholder
             newEdges.push(
               buildEdge({
@@ -419,14 +397,15 @@ const ServiceFlowPage: FC = () => {
               label,
               onDelete,
               setPopupVisible,
-              type: type === "finishing-step" ? "finishing-step" : "step",
+              type: ["finishing-step-end", "finishing-step-redirect"].includes(type) ? "finishing-step" : "step",
               stepType: type,
+              readonly: type === "finishing-step-end",
             },
-            className: type === "finishing-step" ? "finishing-step" : "step",
+            className: ["finishing-step-end", "finishing-step-redirect"].includes(type) ? "finishing-step" : "step",
           },
         ];
 
-        if (!["input", 'finishing-step'].includes(type)) {
+        if (!["input", "finishing-step-end", "finishing-step-redirect"].includes(type)) {
           // Add placeholder right below new node
           newNodes.push(
             buildPlaceholder({
@@ -463,12 +442,8 @@ const ServiceFlowPage: FC = () => {
   const onDelete = useCallback(
     (id: string) => {
       if (!reactFlowInstance) return;
-      const deletedNode = reactFlowInstance
-        .getNodes()
-        .find((node) => node.id === id);
-      const edgeToDeletedNode = reactFlowInstance
-        .getEdges()
-        .find((edge) => edge.target === id);
+      const deletedNode = reactFlowInstance.getNodes().find((node) => node.id === id);
+      const edgeToDeletedNode = reactFlowInstance.getEdges().find((edge) => edge.target === id);
       if (!deletedNode) return;
       let updatedNodes: Node[] = [];
 
@@ -481,27 +456,17 @@ const ServiceFlowPage: FC = () => {
           newNodes.push(...prevNodes.filter((node) => node.id !== id));
         } else {
           // delete input node with it's rules
-          const deletedRules = currentEdges
-            .filter((edge) => edge.source === id)
-            .map((edge) => edge.target);
+          const deletedRules = currentEdges.filter((edge) => edge.source === id).map((edge) => edge.target);
 
-          newNodes.push(
-            ...prevNodes.filter(
-              (node) => node.id !== id && !deletedRules.includes(node.id)
-            )
-          );
+          newNodes.push(...prevNodes.filter((node) => node.id !== id && !deletedRules.includes(node.id)));
         }
 
         // cleanup leftover placeholders
         newNodes = newNodes.filter((node) => {
           if (node.type !== "placeholder") return true;
 
-          const pointingEdge = currentEdges.find(
-            (edge) => edge.target === node.id
-          );
-          const pointingEdgeSource = newNodes.find(
-            (newNode) => newNode.id === pointingEdge?.source
-          );
+          const pointingEdge = currentEdges.find((edge) => edge.target === node.id);
+          const pointingEdgeSource = newNodes.find((newNode) => newNode.id === pointingEdge?.source);
           if (!pointingEdgeSource) return false;
           return true;
         });
@@ -522,20 +487,12 @@ const ServiceFlowPage: FC = () => {
         });
 
         if (toRemove.length === 0) return prevEdges;
-        let newEdges = [
-          ...prevEdges.filter((edge) => !toRemove.includes(edge)),
-        ];
-        if (
-          deletedNode.data.stepType !== "input" &&
-          newEdges.length > 0 &&
-          toRemove.length > 1
-        ) {
+        let newEdges = [...prevEdges.filter((edge) => !toRemove.includes(edge))];
+        if (deletedNode.data.stepType !== "input" && newEdges.length > 0 && toRemove.length > 1) {
           // if only 1 node was removed, point edge to whatever it was pointing to
           newEdges.push(
             buildEdge({
-              id: `edge-${toRemove[0].source}-${
-                toRemove[toRemove.length - 1].target
-              }`,
+              id: `edge-${toRemove[0].source}-${toRemove[toRemove.length - 1].target}`,
               source: toRemove[0].source,
               sourceHandle: toRemove[0].sourceHandle,
               target: toRemove[toRemove.length - 1].target,
@@ -546,8 +503,7 @@ const ServiceFlowPage: FC = () => {
         // cleanup possible leftover edges
         newEdges = newEdges.filter(
           (edge) =>
-            updatedNodes.find((node) => node.id === edge.source) &&
-            updatedNodes.find((node) => node.id === edge.target)
+            updatedNodes.find((node) => node.id === edge.source) && updatedNodes.find((node) => node.id === edge.target)
         );
 
         return newEdges;
@@ -556,27 +512,20 @@ const ServiceFlowPage: FC = () => {
       if (!edgeToDeletedNode) return;
       setEdges((prevEdges) => {
         // check if previous node points to anything
-        if (
-          prevEdges.find((edge) => edge.source === edgeToDeletedNode.source)
-        ) {
+        if (prevEdges.find((edge) => edge.source === edgeToDeletedNode.source)) {
           return prevEdges;
         }
 
         // Previous node points to nothing -> add placeholder with edge
         setNodes((prevNodes) => {
-          const sourceNode = prevNodes.find(
-            (node) => node.id === edgeToDeletedNode.source
-          );
+          const sourceNode = prevNodes.find((node) => node.id === edgeToDeletedNode.source);
           if (!sourceNode) return prevNodes;
           const placeholder = buildPlaceholder({
             id: deletedNode.id,
             alignment: "center",
             position: {
               y: sourceNode.position.y,
-              x:
-                sourceNode.type === "input"
-                  ? sourceNode.position.x - 10.5 * GRID_UNIT
-                  : sourceNode.position.x,
+              x: sourceNode.type === "input" ? sourceNode.position.x - 10.5 * GRID_UNIT : sourceNode.position.x,
             },
           });
           return [...prevNodes, placeholder];
@@ -607,10 +556,7 @@ const ServiceFlowPage: FC = () => {
           onClose={() => setPopupVisible(false)}
           footer={
             <Track gap={16}>
-              <Button
-                appearance="secondary"
-                onClick={() => setPopupVisible(false)}
-              >
+              <Button appearance="secondary" onClick={() => setPopupVisible(false)}>
                 Discard
               </Button>
               <Button onClick={() => setPopupVisible(false)}>Save</Button>
@@ -629,7 +575,7 @@ const ServiceFlowPage: FC = () => {
                   {setupElements.map((step) => (
                     <Box
                       key={step.id}
-                      color={step.type === "finishing-step" ? "red" : "blue"}
+                      color={["finishing-step-end", "finishing-step-redirect"].includes(step.type) ? "red" : "blue"}
                       onDragStart={(event) => onDragStart(event, step)}
                       draggable
                     >
@@ -646,7 +592,7 @@ const ServiceFlowPage: FC = () => {
                   {allElements.map((step) => (
                     <Box
                       key={step.id}
-                      color={step.type === "finishing-step" ? "red" : "blue"}
+                      color={["finishing-step-end", "finishing-step-redirect"].includes(step.type) ? "red" : "blue"}
                       onDragStart={(event) => onDragStart(event, step)}
                       draggable
                     >
@@ -680,10 +626,7 @@ const ServiceFlowPage: FC = () => {
               onNodeMouseEnter={(_, node) => {
                 setNodes((prevNodes) =>
                   prevNodes.map((prevNode) => {
-                    if (
-                      prevNode.type === "customNode" &&
-                      prevNode.data === node.data
-                    ) {
+                    if (prevNode.type === "customNode" && prevNode.data === node.data) {
                       prevNode.selected = true;
                       prevNode.className = "selected";
                     }
@@ -694,10 +637,7 @@ const ServiceFlowPage: FC = () => {
               onNodeMouseLeave={(_, node) => {
                 setNodes((prevNodes) =>
                   prevNodes.map((prevNode) => {
-                    if (
-                      prevNode.type === "customNode" &&
-                      prevNode.data === node.data
-                    ) {
+                    if (prevNode.type === "customNode" && prevNode.data === node.data) {
                       prevNode.selected = false;
                       prevNode.className = prevNode.data.type;
                     }

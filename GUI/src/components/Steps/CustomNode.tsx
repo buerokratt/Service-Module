@@ -1,7 +1,7 @@
 import { Dispatch, FC, SetStateAction } from "react";
 import { Handle, NodeProps, Position } from "reactflow";
 import { useTranslation } from "react-i18next";
-import { MdDeleteOutline, MdOutlineEdit } from "react-icons/md";
+import { MdDeleteOutline, MdOutlineEdit, MdOutlineRemoveRedEye } from "react-icons/md";
 
 import { Box, Button, Icon, Track } from "../";
 import StepNode from "./StepNode";
@@ -14,28 +14,34 @@ type NodeDataProps = {
     setPopupVisible: Dispatch<SetStateAction<boolean>>;
     type: string;
     stepType: string;
+    readonly: boolean;
   };
+};
+
+const boxTypeColors: { [key: string]: any } = {
+  step: "blue",
+  "finishing-step": "red",
+  rule: "gray",
 };
 
 const CustomNode: FC<NodeProps & NodeDataProps> = (props) => {
   const { t } = useTranslation();
   const { data, isConnectable, id, selected } = props;
 
+  const isFinishingStep = () => {
+    return data.type === "finishing-step";
+  };
+
   return selected ? (
     <div className="selected">
-      <Handle
-        type="target"
-        position={Position.Top}
-        isConnectable={isConnectable}
-        style={{ display: "none" }}
-      />
+      <Handle type="target" position={Position.Top} isConnectable={isConnectable} style={{ display: "none" }} />
 
-      <Box color={data.type === "finishing-step" ? "red" : "blue"}>
+      <Box color={boxTypeColors[data.type]}>
         <Track direction="horizontal" gap={4} align="left">
           <StepNode data={data} />
           <Button appearance="text" onClick={() => data.setPopupVisible(true)}>
-            <Icon icon={<MdOutlineEdit />} size="medium" />
-            {t("overview.edit")}
+            <Icon icon={data.readonly ? <MdOutlineRemoveRedEye /> : <MdOutlineEdit />} size="medium" />
+            {t(data.readonly ? "global.view" : "overview.edit")}
           </Button>
           <Button appearance="text" onClick={() => data.onDelete(id)}>
             <Icon icon={<MdDeleteOutline />} size="medium" />
@@ -66,28 +72,17 @@ const CustomNode: FC<NodeProps & NodeDataProps> = (props) => {
           id={`handle-${id}-1`}
           type="source"
           position={Position.Bottom}
-          isConnectable={isConnectable}
+          isConnectable={isConnectable && !isFinishingStep()}
+          hidden={isFinishingStep()}
         />
       )}
     </div>
   ) : (
     <>
-      <Handle
-        type="target"
-        position={Position.Top}
-        isConnectable={isConnectable}
-      />
+      <Handle type="target" position={Position.Top} isConnectable={isConnectable} />
 
       <Track direction="horizontal" gap={4} align="left">
         <StepNode data={data} />
-        <Button appearance="text">
-          <Icon icon={<MdOutlineEdit />} size="medium" />
-          {t("overview.edit")}
-        </Button>
-        <Button appearance="text" onClick={() => data.onDelete(id)}>
-          <Icon icon={<MdDeleteOutline />} size="medium" />
-          {t("overview.delete")}
-        </Button>
       </Track>
 
       {data.stepType === "input" ? (
@@ -112,7 +107,8 @@ const CustomNode: FC<NodeProps & NodeDataProps> = (props) => {
           id={`handle-${id}-1`}
           type="source"
           position={Position.Bottom}
-          isConnectable={isConnectable}
+          isConnectable={isConnectable && !isFinishingStep()}
+          hidden={isFinishingStep()}
         />
       )}
     </>

@@ -11,6 +11,7 @@ export interface Step {
     | "file-sign"
     | "step"
     | "rule"
-    | "finishing-step";
+    | "finishing-step-end"
+    | "finishing-step-redirect";
   action?: string;
 }
