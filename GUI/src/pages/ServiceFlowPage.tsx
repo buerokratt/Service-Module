@@ -510,14 +510,18 @@ const ServiceFlowPage: FC = () => {
             (node) => node.id === edgeToDeletedNode.source
           );
           if (!sourceNode) return prevNodes;
-          return [
-            ...prevNodes,
-            buildPlaceholder({
-              id: deletedNode.id,
-              alignment: "center",
-              matchingPlaceholder: sourceNode,
-            }),
-          ];
+          const placeholder = buildPlaceholder({
+            id: deletedNode.id,
+            alignment: "center",
+            position: {
+              y: sourceNode.position.y,
+              x:
+                sourceNode.type === "input"
+                  ? sourceNode.position.x - 10.5 * GRID_UNIT
+                  : sourceNode.position.x,
+            },
+          });
+          return [...prevNodes, placeholder];
         });
 
         prevEdges.push(
