@@ -6,6 +6,7 @@ import { MdDeleteOutline, MdOutlineEdit, MdOutlineRemoveRedEye } from "react-ico
 import { Box, Button, Icon, Track } from "../";
 import StepNode from "./StepNode";
 import "./Node.scss";
+import { StepType } from '../../types/step';
 
 type NodeDataProps = {
   data: {
@@ -13,7 +14,7 @@ type NodeDataProps = {
     onDelete: (id: string) => void;
     setPopupVisible: Dispatch<SetStateAction<boolean>>;
     type: string;
-    stepType: string;
+    stepType: StepType;
     readonly: boolean;
   };
 };
@@ -50,7 +51,7 @@ const CustomNode: FC<NodeProps & NodeDataProps> = (props) => {
         </Track>
       </Box>
 
-      {data.stepType === "input" ? (
+      {data.stepType === StepType.Input ? (
         <>
           <Handle
             id={`handle-${id}-1`}
@@ -85,7 +86,7 @@ const CustomNode: FC<NodeProps & NodeDataProps> = (props) => {
         <StepNode data={data} />
       </Track>
 
-      {data.stepType === "input" ? (
+      {data.stepType === StepType.Input ? (
         <>
           <Handle
             id={`handle-${id}-1`}

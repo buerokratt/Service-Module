@@ -18,7 +18,7 @@ import "reactflow/dist/style.css";
 import { Box, Button, Collapsible, NewServiceHeader, Track } from "../components";
 import CustomNode from "../components/Steps/CustomNode";
 import "./ServiceFlowPage.scss";
-import { Step } from "../types/step";
+import { Step, StepType } from "../types/step";
 import Popup from "../components/Popup";
 import PlaceholderNode from "../components/Steps/PlaceholderNode";
 
@@ -75,22 +75,22 @@ const initialNodes: Node[] = [
 
 const ServiceFlowPage: FC = () => {
   const setupElements: Step[] = [
-    { id: 1, label: "TARA auth", type: "auth" },
-    { id: 3, label: "Client input", type: "input" },
+    { id: 1, label: "TARA auth", type: StepType.Auth },
+    { id: 3, label: "Client input", type: StepType.Input },
   ];
   const allElements: Step[] = [
-    { id: 1, label: "TARA auth", type: "auth" },
-    { id: 2, label: "Textfield", type: "textfield" },
-    { id: 3, label: "Client input", type: "input" },
-    { id: 4, label: "Rule definition", type: "rule-definition" },
-    { id: 5, label: "Open webpage", type: "open-webpage" },
-    { id: 6, label: "File generate", type: "file-generate" },
-    { id: 7, label: "File sign", type: "file-sign" },
-    { id: 8, label: "End conversation", type: "finishing-step-end" },
+    { id: 1, label: "TARA auth", type: StepType.Auth },
+    { id: 2, label: "Textfield", type: StepType.Textfield },
+    { id: 3, label: "Client input", type: StepType.Input },
+    { id: 4, label: "Rule definition", type: StepType.RuleDefinition },
+    { id: 5, label: "Open webpage", type: StepType.OpenWebpage },
+    { id: 6, label: "File generate", type: StepType.FileGenerate },
+    { id: 7, label: "File sign", type: StepType.FileSign },
+    { id: 8, label: "End conversation", type: StepType.FinishingStepEnd },
     {
       id: 9,
       label: "Direct to Customer Support",
-      type: "finishing-step-redirect",
+      type: StepType.FinishingStepRedirect,
     },
   ];
 
@@ -328,7 +328,7 @@ const ServiceFlowPage: FC = () => {
       const reactFlowBounds = reactFlowWrapper.current.getBoundingClientRect();
       const [label, type] = [
         event.dataTransfer.getData("application/reactflow-label"),
-        event.dataTransfer.getData("application/reactflow-type"),
+        event.dataTransfer.getData("application/reactflow-type") as StepType,
       ];
       const position = reactFlowInstance.project({
         x: event.clientX - reactFlowBounds.left,
@@ -363,7 +363,7 @@ const ServiceFlowPage: FC = () => {
             }),
           ];
 
-          if (!["input", "finishing-step-end", "finishing-step-redirect"].includes(type)) {
+          if (![StepType.Input, StepType.FinishingStepEnd, StepType.FinishingStepRedirect].includes(type)) {
             // Point edge from new node to new placeholder
             newEdges.push(
               buildEdge({
@@ -374,7 +374,7 @@ const ServiceFlowPage: FC = () => {
               })
             );
           }
-          if (type === "input") {
+          if (type === StepType.Input) {
             // Create edges from input node to rules and from rules to placeholders
             newEdges.push(
               ...buildRulesEdges({
@@ -397,26 +397,37 @@ const ServiceFlowPage: FC = () => {
               label,
               onDelete,
               setPopupVisible,
-              type: ["finishing-step-end", "finishing-step-redirect"].includes(type) ? "finishing-step" : "step",
+              type: [
+                StepType.FinishingStepEnd,
+                StepType.FinishingStepRedirect
+              ].includes(type) ? "finishing-step" : "step",
               stepType: type,
-              readonly: type === "finishing-step-end",
+              readonly: [
+                StepType.Auth,
+                StepType.FileSign,
+                StepType.FinishingStepEnd,
+                StepType.FinishingStepRedirect,
+              ].includes(type),
             },
-            className: ["finishing-step-end", "finishing-step-redirect"].includes(type) ? "finishing-step" : "step",
+            className: [
+              StepType.FinishingStepEnd,
+              StepType.FinishingStepRedirect
+            ].includes(type) ? "finishing-step" : "step",
           },
         ];
 
-        if (!["input", "finishing-step-end", "finishing-step-redirect"].includes(type)) {
+        if (![StepType.Input, StepType.FinishingStepEnd, StepType.FinishingStepRedirect].includes(type)) {
           // Add placeholder right below new node
           newNodes.push(
             buildPlaceholder({
               id: `${newPlaceholderId + 1}`,
-              alignment: type === "input" ? "left" : "center",
+              alignment: type === StepType.Input ? "left" : "center",
               matchingPlaceholder,
             })
           );
         }
 
-        if (type === "input") {
+        if (type === StepType.Input) {
           // Add 2 rules below input node and placeholders under each
           newNodes.push(
             ...buildRuleWithPlaceholder({
@@ -575,7 +586,7 @@ const ServiceFlowPage: FC = () => {
                   {setupElements.map((step) => (
                     <Box
                       key={step.id}
-                      color={["finishing-step-end", "finishing-step-redirect"].includes(step.type) ? "red" : "blue"}
+                      color={[StepType.FinishingStepEnd, StepType.FinishingStepRedirect].includes(step.type) ? "red" : "blue"}
                       onDragStart={(event) => onDragStart(event, step)}
                       draggable
                     >
@@ -592,7 +603,7 @@ const ServiceFlowPage: FC = () => {
                   {allElements.map((step) => (
                     <Box
                       key={step.id}
-                      color={["finishing-step-end", "finishing-step-redirect"].includes(step.type) ? "red" : "blue"}
+                      color={[StepType.FinishingStepEnd, StepType.FinishingStepRedirect].includes(step.type) ? "red" : "blue"}
                       onDragStart={(event) => onDragStart(event, step)}
                       draggable
                     >
