@@ -29,6 +29,7 @@ import Popover from "./Popover";
 import Section from "./Section";
 import Tooltip from "./Tooltip";
 import Track from "./Track";
+import ExclamationBadge from "./ExclamationBadge";
 
 export {
   Box,
@@ -39,6 +40,7 @@ export {
   Drawer,
   EndpointCustom,
   EndpointOpenAPI,
+  ExclamationBadge,
   FormCheckbox,
   FormCheckboxes,
   FormDatepicker,
