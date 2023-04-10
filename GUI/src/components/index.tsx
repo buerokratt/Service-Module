@@ -6,6 +6,7 @@ import Dialog from "./Dialog";
 import Drawer from "./Drawer";
 import EndpointCustom from "./Endpoints/Custom";
 import EndpointOpenAPI from "./Endpoints/OpenAPI";
+import FlowBuilder from "./FlowBuilder/FlowBuilder";
 import {
   FormCheckbox,
   FormCheckboxes,
@@ -39,6 +40,7 @@ export {
   Drawer,
   EndpointCustom,
   EndpointOpenAPI,
+  FlowBuilder,
   FormCheckbox,
   FormCheckboxes,
   FormDatepicker,

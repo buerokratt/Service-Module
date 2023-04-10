@@ -10,8 +10,9 @@ import "./Node.scss";
 type NodeDataProps = {
   data: {
     label: string;
-    onDelete: (id: string) => void;
+    onDelete: (id: string, shouldAddPlaceholder: boolean) => void;
     setPopupVisible: Dispatch<SetStateAction<boolean>>;
+    setClickedNode: Dispatch<SetStateAction<string>>;
     type: string;
     stepType: string;
     readonly: boolean;
@@ -62,11 +63,17 @@ const CustomNode: FC<NodeProps & NodeDataProps> = (props) => {
       <Box color={boxTypeColors[data.type]}>
         <Track direction="horizontal" gap={4} align="left">
           <StepNode data={data} />
-          <Button appearance="text" onClick={() => data.setPopupVisible(true)}>
+          <Button
+            appearance="text"
+            onClick={() => {
+              data.setPopupVisible(true);
+              data.setClickedNode(id);
+            }}
+          >
             <Icon icon={data.readonly ? <MdOutlineRemoveRedEye /> : <MdOutlineEdit />} size="medium" />
             {t(data.readonly ? "global.view" : "overview.edit")}
           </Button>
-          <Button appearance="text" onClick={() => data.onDelete(id)}>
+          <Button appearance="text" onClick={() => data.onDelete(id, true)}>
             <Icon icon={<MdDeleteOutline />} size="medium" />
             {t("overview.delete")}
           </Button>
