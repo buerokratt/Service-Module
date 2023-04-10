@@ -462,7 +462,7 @@ const ServiceFlowPage: FC = () => {
         let newNodes: Node[] = [];
         const currentEdges = reactFlowInstance.getEdges();
 
-        if (deletedNode.data.stepType !== "input") {
+        if (deletedNode.data.stepType !== StepType.Input) {
           // delete only targeted node
           newNodes.push(...prevNodes.filter((node) => node.id !== id));
         } else {
