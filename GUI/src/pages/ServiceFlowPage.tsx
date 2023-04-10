@@ -99,15 +99,14 @@ const ServiceFlowPage: FC = () => {
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState([initialEdge]);
   const [isPopupVisible, setPopupVisible] = useState(false);
+  const nodePositionOffset = 420;
 
   const buildPlaceholder = ({
     id,
-    alignment,
     matchingPlaceholder,
     position,
   }: {
     id: string;
-    alignment: "left" | "center" | "right";
     matchingPlaceholder?: Node;
     position?: XYPosition;
   }): Node => {
@@ -115,15 +114,13 @@ const ServiceFlowPage: FC = () => {
 
     let positionX = position ? position.x : matchingPlaceholder!.position.x;
     let positionY = position ? position.y : matchingPlaceholder!.position.y;
-    if (alignment === "left") positionX -= 330;
-    if (alignment === "right") positionX += 330;
 
     return {
       id,
       type: "placeholder",
       position: {
         x: positionX,
-        y: 3 * GRID_UNIT + positionY + 72,
+        y: 7 * GRID_UNIT + positionY,
       },
       data: {
         type: "placeholder",
@@ -136,25 +133,23 @@ const ServiceFlowPage: FC = () => {
 
   const buildRuleWithPlaceholder = ({
     id,
-    alignment,
+    offset,
     matchingPlaceholder,
     label,
   }: {
     id: number;
-    alignment: "left" | "center" | "right";
+    offset: number;
     matchingPlaceholder: Node;
     label: string;
   }): Node[] => {
     let positionX = matchingPlaceholder.position.x;
-    const positionY = 3 * GRID_UNIT + matchingPlaceholder.position.y + 72;
-    if (alignment === "left") positionX -= 330;
-    if (alignment === "right") positionX += 330;
+    const positionY = 7 * GRID_UNIT + matchingPlaceholder.position.y;
 
     return [
       {
         id: `${id}`,
         position: {
-          x: positionX,
+          x: positionX + offset,
           y: positionY,
         },
         type: "customNode",
@@ -170,43 +165,41 @@ const ServiceFlowPage: FC = () => {
       },
       buildPlaceholder({
         id: `${id + 1}`,
-        position: { x: positionX, y: positionY },
-        alignment: "center",
+        position: { x: positionX + offset, y: positionY },
       }),
     ];
   };
 
-  const buildRulesEdges = ({ inputId, placeholderId }: { inputId: number; placeholderId: number }) => {
-    return [
-      // input -> left rule
-      buildEdge({
-        id: `edge-${inputId}-${placeholderId}`,
-        source: `${inputId}`,
-        sourceHandle: `handle-${inputId}-1`,
-        target: `${placeholderId}`,
-      }),
-      // input -> right rule
-      buildEdge({
-        id: `edge-${inputId}-${placeholderId + 2}`,
-        source: `${inputId}`,
-        sourceHandle: `handle-${inputId}-2`,
-        target: `${placeholderId + 2}`,
-      }),
-      // left rule -> left placeholder
-      buildEdge({
-        id: `edge-${placeholderId}-${placeholderId + 1}`,
-        source: `${placeholderId}`,
-        sourceHandle: `handle-${placeholderId}-1`,
-        target: `${placeholderId + 1}`,
-      }),
-      // right rule -> right placeholder
-      buildEdge({
-        id: `edge-${placeholderId + 2}-${placeholderId + 3}`,
-        source: `${placeholderId + 2}`,
-        sourceHandle: `handle-${placeholderId + 2}-1`,
-        target: `${placeholderId + 3}`,
-      }),
-    ];
+  const buildRulesEdges = ({
+    inputId,
+    initialTargetId,
+    count,
+  }: {
+    inputId: number;
+    initialTargetId: number;
+    count: number;
+  }) => {
+    const rulesEdges = [];
+    for (let i = 0; i < count; i++) {
+      const targetId = initialTargetId + (i * 2);
+      rulesEdges.push(
+        // input -> rule
+        buildEdge({
+          id: `edge-${inputId}-${targetId}`,
+          source: `${inputId}`,
+          sourceHandle: `handle-${inputId}-${i}`,
+          target: `${targetId}`,
+        }),
+        // rule -> placeholder
+        buildEdge({
+          id: `edge-${targetId}-${targetId + 1}`,
+          source: `${targetId}`,
+          sourceHandle: `handle-${targetId}-${i}`,
+          target: `${targetId + 1}`,
+        })
+      );
+    }
+    return rulesEdges;
   };
 
   const buildEdge = ({
@@ -256,7 +249,7 @@ const ServiceFlowPage: FC = () => {
           placeholders.forEach((placeholder) => {
             if (prevNode.id !== placeholder.id) return;
             prevNode.position.x = draggedNode.position.x;
-            prevNode.position.y = 3 * GRID_UNIT + draggedNode.position.y + 72;
+            prevNode.position.y = 7 * GRID_UNIT + draggedNode.position.y;
           });
           return prevNode;
         })
@@ -334,6 +327,7 @@ const ServiceFlowPage: FC = () => {
         x: event.clientX - reactFlowBounds.left,
         y: event.clientY - reactFlowBounds.top,
       });
+      const inputRuleCount = 2;
 
       const matchingPlaceholder = reactFlowInstance.getNodes().find((node) => {
         if (node.type !== "placeholder") return false;
@@ -369,7 +363,7 @@ const ServiceFlowPage: FC = () => {
               buildEdge({
                 id: `edge-${newNodeId}-${newPlaceholderId + 1}`,
                 source: newNodeId,
-                sourceHandle: `handle-${newNodeId}-1`,
+                sourceHandle: `handle-${newNodeId}-0`,
                 target: `${newPlaceholderId + 1}`,
               })
             );
@@ -379,7 +373,8 @@ const ServiceFlowPage: FC = () => {
             newEdges.push(
               ...buildRulesEdges({
                 inputId: +newNodeId,
-                placeholderId: newPlaceholderId,
+                initialTargetId: newPlaceholderId,
+                count: inputRuleCount,
               })
             );
           }
@@ -400,6 +395,7 @@ const ServiceFlowPage: FC = () => {
               type: ["finishing-step-end", "finishing-step-redirect"].includes(type) ? "finishing-step" : "step",
               stepType: type,
               readonly: type === "finishing-step-end",
+              childrenCount: type === 'input' ? inputRuleCount : 1,
             },
             className: ["finishing-step-end", "finishing-step-redirect"].includes(type) ? "finishing-step" : "step",
           },
@@ -410,7 +406,6 @@ const ServiceFlowPage: FC = () => {
           newNodes.push(
             buildPlaceholder({
               id: `${newPlaceholderId + 1}`,
-              alignment: type === "input" ? "left" : "center",
               matchingPlaceholder,
             })
           );
@@ -418,20 +413,19 @@ const ServiceFlowPage: FC = () => {
 
         if (type === "input") {
           // Add 2 rules below input node and placeholders under each
-          newNodes.push(
-            ...buildRuleWithPlaceholder({
-              id: newPlaceholderId,
-              label: "rule 1",
-              alignment: "left",
-              matchingPlaceholder,
-            }),
-            ...buildRuleWithPlaceholder({
-              id: newPlaceholderId + 2,
-              label: "rule 2",
-              alignment: "right",
-              matchingPlaceholder,
-            })
-          );
+          let offsetLeft = nodePositionOffset * Math.floor(inputRuleCount / 2);
+          if (inputRuleCount % 2 === 0) offsetLeft -= nodePositionOffset / 2;
+
+          for (let i = 0; i < inputRuleCount; i++) {
+            newNodes.push(
+              ...buildRuleWithPlaceholder({
+                id: newPlaceholderId + i * 2,
+                label: `rule ${i}`,
+                offset: -offsetLeft + i * nodePositionOffset,
+                matchingPlaceholder,
+              })
+            );
+          }
         }
         return newNodes;
       });
@@ -522,7 +516,6 @@ const ServiceFlowPage: FC = () => {
           if (!sourceNode) return prevNodes;
           const placeholder = buildPlaceholder({
             id: deletedNode.id,
-            alignment: "center",
             position: {
               y: sourceNode.position.y,
               x: sourceNode.type === "input" ? sourceNode.position.x - 10.5 * GRID_UNIT : sourceNode.position.x,
