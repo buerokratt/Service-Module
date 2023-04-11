@@ -132,9 +132,7 @@ const FlowBuilder: FC<FlowBuilderProps> = ({
     handleId: number;
     placeholderId?: string;
   }): Edge[] => {
-    const ruleEdges = [];
-
-    ruleEdges.push(
+    return [
       // input -> rule
       buildEdge({
         id: `edge-${inputId}-${targetId}`,
@@ -148,10 +146,8 @@ const FlowBuilder: FC<FlowBuilderProps> = ({
         source: `${targetId}`,
         sourceHandle: `handle-${targetId}-0`,
         target: `${placeholderId ?? targetId + 1}`,
-      })
-    );
-
-    return ruleEdges;
+      }),
+    ];
   };
 
   const buildEdge = ({
@@ -179,6 +175,7 @@ const FlowBuilder: FC<FlowBuilderProps> = ({
 
   const onConnect = useCallback((params: Connection) => setEdges((eds) => addEdge(params, eds)), [setEdges]);
 
+  // Move the placeholder together with the node being moved
   const onNodeDrag = useCallback(
     (_event: React.MouseEvent, draggedNode: Node) => {
       const draggedEdges = edges.filter((edge) => edge.source === draggedNode.id);
@@ -203,6 +200,7 @@ const FlowBuilder: FC<FlowBuilderProps> = ({
     [edges, nodes]
   );
 
+  // Dragging existing node onto placeholder
   const onNodeDragStop = useCallback(
     (event: any, draggedNode: Node) => {
       if (!reactFlowInstance || !reactFlowWrapper.current) return;
@@ -223,7 +221,7 @@ const FlowBuilder: FC<FlowBuilderProps> = ({
       });
       if (!matchingPlaceholder) return;
 
-      // If edge is pointing to node it cannot be attached
+      // If an existing edge is already pointing to node, then it cannot be attached
       const edgeToNode = edges.find((edge) => edge.target === draggedNode.id);
       if (edgeToNode) return;
 
@@ -261,6 +259,8 @@ const FlowBuilder: FC<FlowBuilderProps> = ({
     event.dataTransfer.dropEffect = "move";
   }, []);
 
+  // Dragging and dropping the element from the list on the left
+  // onto the placeholder node adds it to the flow
   const onDrop = useCallback(
     (event: React.DragEvent<HTMLDivElement>) => {
       event.preventDefault();
@@ -295,7 +295,7 @@ const FlowBuilder: FC<FlowBuilderProps> = ({
         const newNodeId = matchingPlaceholder.id;
         const newPlaceholderId = Math.max(...nodes.map((node) => +node.id)) + 1;
         setEdges((prevEdges) => {
-          // Point edge from placeholder to new node
+          // Point edge from previous node to new node
           const newEdges = [
             ...prevEdges.filter((edge) => edge.target !== matchingPlaceholder.id),
             buildEdge({
@@ -365,7 +365,7 @@ const FlowBuilder: FC<FlowBuilderProps> = ({
         }
 
         if (type === "input") {
-          // Add 2 rules below input node and placeholders under each
+          // Add rules below input node and placeholders under each
           let offsetLeft = nodePositionOffset * Math.floor(inputRuleCount / 2);
           if (inputRuleCount % 2 === 0) offsetLeft -= nodePositionOffset / 2;
           for (let i = 0; i < inputRuleCount; i++) {
