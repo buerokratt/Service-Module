@@ -83,8 +83,6 @@ const ServiceFlowPage: FC = () => {
     event.dataTransfer.setData("application/reactflow-label", step.label);
     event.dataTransfer.setData("application/reactflow-type", step.type);
     event.dataTransfer.effectAllowed = "move";
-    console.log(nodes);
-    console.log(edges);
   };
 
   const contentStyle: CSSProperties = { overflowY: 'auto', maxHeight: '40vh'};
@@ -108,7 +106,7 @@ const ServiceFlowPage: FC = () => {
           }
         >
           <p>hello</p>
-          <Button onClick={() => setUpdatedRules(["5", null, null, null])}>update rule count</Button>
+          <Button onClick={() => setUpdatedRules([null, null, null])}>update rule count</Button>
         </Popup>
       )}
       <ReactFlowProvider>
