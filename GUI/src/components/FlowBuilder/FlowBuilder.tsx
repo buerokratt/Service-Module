@@ -125,10 +125,12 @@ const FlowBuilder: FC<FlowBuilderProps> = ({
     inputId,
     targetId,
     handleId,
+    placeholderId,
   }: {
     inputId: number;
     targetId: number;
     handleId: number;
+    placeholderId?: string;
   }): Edge[] => {
     const ruleEdges = [];
 
@@ -142,10 +144,10 @@ const FlowBuilder: FC<FlowBuilderProps> = ({
       }),
       // rule -> placeholder
       buildEdge({
-        id: `edge-${targetId}-${targetId + 1}`,
+        id: `edge-${targetId}-${placeholderId ?? targetId + 1}`,
         source: `${targetId}`,
         sourceHandle: `handle-${targetId}-0`,
-        target: `${targetId + 1}`,
+        target: `${placeholderId ?? targetId + 1}`,
       })
     );
 
@@ -510,11 +512,11 @@ const FlowBuilder: FC<FlowBuilderProps> = ({
       edges
         .filter((edge) => nodesToRemove.includes(edge.source))
         .forEach((edge) => {
-          console.log(edge);
           const placeholder = nodes.find((node) => node.id === edge.target && node.type === "placeholder");
           if (placeholder) nodesToRemove.push(placeholder.id);
         });
       let newRules: string[] = [];
+      let updatedNodes: Node[] = [];
 
       setNodes((prevNodes) => {
         // Remove deleted nodes and placeholders after them
@@ -568,6 +570,7 @@ const FlowBuilder: FC<FlowBuilderProps> = ({
             return rule;
           }
         });
+        updatedNodes = newNodes;
         return newNodes;
       });
       setEdges((prevEdges) => {
@@ -580,15 +583,17 @@ const FlowBuilder: FC<FlowBuilderProps> = ({
         );
         // Add new edges to connect new rules and placeholders
         newRules.forEach((rule, i) => {
-          if (rule !== null) {
-            newEdges.push(
-              ...buildRuleEdges({
-                inputId: +clickedNode!,
-                targetId: +rule!,
-                handleId: i,
-              })
-            );
-          }
+          if (rule === null) return;
+          const oldEdgeAfterNewRule = prevEdges.find((edge) => edge.source === rule);
+          const nodeAfterNewRule = updatedNodes.find((node) => node.id === oldEdgeAfterNewRule?.target);
+          newEdges.push(
+            ...buildRuleEdges({
+              inputId: +clickedNode!,
+              targetId: +rule!,
+              handleId: i,
+              placeholderId: nodeAfterNewRule?.id,
+            })
+          );
         });
         return newEdges;
       });
