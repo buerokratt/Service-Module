@@ -45,7 +45,7 @@ const FlowBuilder: FC<FlowBuilderProps> = ({
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
   const [reactFlowInstance, setReactFlowInstance] = useState<ReactFlowInstance>();
   const [clickedNode, setClickedNode] = useState();
-  const nodePositionOffset = 420;
+  const nodePositionOffset = 28 * GRID_UNIT;
   const updateNodeInternals = useUpdateNodeInternals();
 
   const buildPlaceholder = ({
