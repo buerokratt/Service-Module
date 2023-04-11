@@ -3,7 +3,6 @@ import { Entity } from '../types/entity';
 
 export async function addEntity(entityData: { name: string }) {
   const { data } = await api.post('entities', entityData);
-  console.log(`a7a ${data}`)
   return data;
 }
 

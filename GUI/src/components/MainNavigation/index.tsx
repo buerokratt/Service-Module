@@ -141,6 +141,7 @@ const MainNavigation: FC = () => {
         { path: ROUTES.OVERVIEW_ROUTE, label: t('menu.overview') },
         { path: ROUTES.FLOW_ROUTE, label: t('menu.flowbuilder') },
         { path: ROUTES.NEWSERVICE_ROUTE, label: t("menu.newService") },
+        { path: ROUTES.INTENTS_ROUTE, label: t("menu.intents") },
       ],
     },
     {
