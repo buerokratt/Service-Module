@@ -506,16 +506,26 @@ const FlowBuilder: FC<FlowBuilderProps> = ({
       const nodesToRemove: string[] = nodes
         .filter((node) => oldRules.includes(node.id) && !updatedRules.includes(node.id))
         .map((node) => node.id);
-
+      // Find placeholders after rules to be removed
+      edges
+        .filter((edge) => nodesToRemove.includes(edge.source))
+        .forEach((edge) => {
+          console.log(edge);
+          const placeholder = nodes.find((node) => node.id === edge.target && node.type === "placeholder");
+          if (placeholder) nodesToRemove.push(placeholder.id);
+        });
       let newRules: string[] = [];
 
       setNodes((prevNodes) => {
+        // Remove deleted nodes and placeholders after them
         // Set client input node handle amount to match new rules
-        const newNodes = prevNodes.map((node) => {
-          if (node.id !== clickedNode) return node;
-          node.data.childrenCount = updatedRules.length;
-          return node;
-        });
+        const newNodes = prevNodes
+          .filter((node) => !nodesToRemove.includes(node.id))
+          .map((node) => {
+            if (node.id !== clickedNode) return node;
+            node.data.childrenCount = updatedRules.length;
+            return node;
+          });
         updateNodeInternals(clickedNode);
         const inputNode = prevNodes.find((node) => node.id === clickedNode);
         let offsetLeft = nodePositionOffset * Math.floor(newRules.length / 2);
@@ -562,7 +572,11 @@ const FlowBuilder: FC<FlowBuilderProps> = ({
       });
       setEdges((prevEdges) => {
         const newEdges: Edge[] = prevEdges.filter(
-          (edge) => !newRules.includes(edge.target) && !newRules.includes(edge.source)
+          (edge) =>
+            !newRules.includes(edge.target) &&
+            !newRules.includes(edge.source) &&
+            !nodesToRemove.includes(edge.source) &&
+            !nodesToRemove.includes(edge.target)
         );
         // Add new edges to connect new rules and placeholders
         newRules.forEach((rule, i) => {
@@ -576,10 +590,8 @@ const FlowBuilder: FC<FlowBuilderProps> = ({
             );
           }
         });
-        return [...newEdges];
+        return newEdges;
       });
-
-      nodesToRemove.forEach((node) => onDelete(node, false));
     },
     [edges, nodes]
   );
