@@ -63,20 +63,24 @@ const CustomNode: FC<NodeProps & NodeDataProps> = (props) => {
       <Box color={boxTypeColors[data.type]}>
         <Track direction="horizontal" gap={4} align="left">
           <StepNode data={data} />
-          <Button
-            appearance="text"
-            onClick={() => {
-              data.setPopupVisible(true);
-              data.setClickedNode(id);
-            }}
-          >
-            <Icon icon={data.readonly ? <MdOutlineRemoveRedEye /> : <MdOutlineEdit />} size="medium" />
-            {t(data.readonly ? "global.view" : "overview.edit")}
-          </Button>
-          <Button appearance="text" onClick={() => data.onDelete(id, true)}>
-            <Icon icon={<MdDeleteOutline />} size="medium" />
-            {t("overview.delete")}
-          </Button>
+          {data.stepType !== "rule" && (
+            <>
+              <Button
+                appearance="text"
+                onClick={() => {
+                  data.setPopupVisible(true);
+                  data.setClickedNode(id);
+                }}
+              >
+                <Icon icon={data.readonly ? <MdOutlineRemoveRedEye /> : <MdOutlineEdit />} size="medium" />
+                {t(data.readonly ? "global.view" : "overview.edit")}
+              </Button>
+              <Button appearance="text" onClick={() => data.onDelete(id, true)}>
+                <Icon icon={<MdDeleteOutline />} size="medium" />
+                {t("overview.delete")}
+              </Button>
+            </>
+          )}
         </Track>
       </Box>
       {bottomHandles()}
