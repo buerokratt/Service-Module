@@ -8,10 +8,11 @@ services:
       - application.httpCodesAllowList=200,201,202,203,204,205,206,207,208,226
       - application.logging.displayRequestContent=true
       - application.logging.displayResponseContent=true
+      - server.port=8085
     volumes:
       - ./DSL/Ruuter:/DSL
     ports:
-      - 8080:8080
+      - 8085:8085
     networks:
       - bykstack
   resql:
@@ -25,8 +26,9 @@ services:
       - sqlms.datasources.[0].username=byk
       - sqlms.datasources.[0].password=01234
       - logging.level.org.springframework.boot=INFO
+      - server.port=8087
     ports:
-      - 8082:8082
+      - 8087:8087
     volumes:
       - ./DSL/Resql/services:/workspace/app/templates/services
     networks:
@@ -37,14 +39,14 @@ services:
     depends_on:
       - database
     environment:
-      - server.port=8083
+      - server.port=8088
       - sqlms.datasources.[0].name=users
       - sqlms.datasources.[0].jdbcUrl=jdbc:postgresql://database:5432/users_db
       - sqlms.datasources.[0].username=byk
       - sqlms.datasources.[0].password=01234
       - logging.level.org.springframework.boot=INFO
     ports:
-      - 8083:8083
+      - 8088:8088
     volumes:
       - ./DSL/Resql/users:/workspace/app/templates/users
     networks:
@@ -67,13 +69,14 @@ services:
     container_name: data_mapper
     image: datamapper-node
     environment:
+      - PORT=3005
       - CONTENT_FOLDER=/data
     volumes:
       - ./DSL/DMapper/hbs:/workspace/app/views/services
       - ./DSL/DMapper/js:/workspace/app/js/services
       - ./DSL/DMapper/lib:/workspace/app/lib
     ports:
-      - 3000:3000
+      - 3005:3005
     networks:
       - bykstack
   node_server:
@@ -87,7 +90,7 @@ services:
       - ./DSL:/data
       - ./DSL/Node:/app
     ports:
-      - 3003:3003
+      - 3008:3008
     networks:
       - bykstack
   gui_dev:
@@ -95,13 +98,13 @@ services:
     environment:
       - NODE_ENV=development
       - CHOKIDAR_USEPOLLING=true
-      - REACT_APP_API_URL=http://localhost:8080
-      - PORT=3001
+      - REACT_APP_API_URL=http://localhost:8085
+      - PORT=3006
     build:
       context: ./GUI
       dockerfile: Dockerfile.dev
     ports:
-      - 3001:3001
+      - 3006:3006
     volumes:
       - /app/node_modules
       - ./GUI:/app
