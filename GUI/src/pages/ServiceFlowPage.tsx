@@ -488,7 +488,7 @@ const ServiceFlowPage: FC = () => {
 
       setEdges((prevEdges) => {
         const toRemove = prevEdges.filter((edge) => {
-          if (deletedNode.data.stepType !== "input") {
+          if (deletedNode.data.stepType !== StepType.Input) {
             // remove edges pointing to/from removed node
             return edge.target === id || edge.source === id;
           } else {
@@ -499,7 +499,7 @@ const ServiceFlowPage: FC = () => {
 
         if (toRemove.length === 0) return prevEdges;
         let newEdges = [...prevEdges.filter((edge) => !toRemove.includes(edge))];
-        if (deletedNode.data.stepType !== "input" && newEdges.length > 0 && toRemove.length > 1) {
+        if (deletedNode.data.stepType !== StepType.Input && newEdges.length > 0 && toRemove.length > 1) {
           // if only 1 node was removed, point edge to whatever it was pointing to
           newEdges.push(
             buildEdge({
