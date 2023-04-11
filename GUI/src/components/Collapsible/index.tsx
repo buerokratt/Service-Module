@@ -4,13 +4,15 @@ import { MdOutlineAddBox, MdOutlineIndeterminateCheckBox } from 'react-icons/md'
 
 import { Icon } from '../';
 import './Collapsible.scss';
+import { CSSProperties } from 'react';
 
 type CollapsibleProps = {
   title: string;
   defaultOpen?: boolean;
+  contentStyle?: CSSProperties
 }
 
-const Collapsible: FC<PropsWithChildren<CollapsibleProps>> = ({ defaultOpen = false, title, children }) => {
+const Collapsible: FC<PropsWithChildren<CollapsibleProps>> = ({ defaultOpen = false, title, contentStyle, children }) => {
   const [open, setOpen] = useState(defaultOpen);
 
   return (
@@ -21,7 +23,7 @@ const Collapsible: FC<PropsWithChildren<CollapsibleProps>> = ({ defaultOpen = fa
           <h3 className='h6'>{title}</h3>
         </button>
       </RadixCollapsible.Trigger>
-      <RadixCollapsible.Content className='collapsible__content'>
+      <RadixCollapsible.Content className='collapsible__content' style={contentStyle}>
         {children}
       </RadixCollapsible.Content>
     </RadixCollapsible.Root>

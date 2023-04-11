@@ -8,6 +8,7 @@ import "./ServiceFlowPage.scss";
 import { Step } from "../types/step";
 import Popup from "../components/Popup";
 import { GRID_UNIT } from "../components/FlowBuilder/FlowBuilder";
+import { CSSProperties } from "react";
 
 const initialPlaceholder = {
   id: "2",
@@ -86,6 +87,8 @@ const ServiceFlowPage: FC = () => {
     console.log(edges);
   };
 
+  const contentStyle: CSSProperties = { overflowY: 'auto', maxHeight: '40vh'};
+
   return (
     <>
       <NewServiceHeader activeStep={3} />
@@ -113,7 +116,7 @@ const ServiceFlowPage: FC = () => {
           <div className="graph__controls">
             <Track direction="vertical" gap={16} align="stretch">
               {setupElements && (
-                <Collapsible title="Setup elements">
+                <Collapsible title="Setup elements" contentStyle={contentStyle}>
                   <Track direction="vertical" align="stretch" gap={4}>
                     {setupElements.map((step) => (
                       <Box
@@ -128,9 +131,8 @@ const ServiceFlowPage: FC = () => {
                   </Track>
                 </Collapsible>
               )}
-
               {allElements && (
-                <Collapsible title="All elements">
+                <Collapsible title="All elements" contentStyle={contentStyle}>
                   <Track direction="vertical" align="stretch" gap={4}>
                     {allElements.map((step) => (
                       <Box
