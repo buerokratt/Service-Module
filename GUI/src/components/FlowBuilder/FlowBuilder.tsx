@@ -1,8 +1,6 @@
 import { Dispatch, FC, SetStateAction, useCallback, useEffect, useRef, useState } from "react";
 import ReactFlow, {
-  addEdge,
   Background,
-  Connection,
   Edge,
   MarkerType,
   Node,
