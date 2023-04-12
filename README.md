@@ -30,7 +30,23 @@ This repo will primarily contain:
 
 - Navigate to Data Mapper and build the image docker build -t datamapper-node .
 
-- Navigate to current repo and run docker compose up -d
+- Clone [SiGA](https://github.com/open-eid/SiGa)
+
+- Set java version to 11
+
+- Navigate to SiGA & run `./mvnw clean install`
+
+- Navigate to SiGA & run `./mvnw spring-boot:build-image -pl siga-webapp`
+
+- Copy docker folder from SiGA directory & paste it into current repo directory.
+
+- Clone [SiGA Demo](https://github.com/open-eid/SiGa-demo-application)
+
+- Set java version to 17
+
+- Build demo docker image using `./mvnw spring-boot:build-image`
+
+- Navigate to current repo and run `docker-compose $(find docker-* | sed -e 's/^/-f /') up -d`
 
 - Go to https://localhost:3001
 
