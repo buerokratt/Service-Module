@@ -1,8 +1,6 @@
 import { FC, memo } from 'react';
-import { useTranslation } from 'react-i18next';
-import { Controller, useForm } from 'react-hook-form';
 
-import { Switch, Track } from '../';
+import { Track } from '../';
 
 type NodeDataProps = {
   data: {
@@ -13,7 +11,6 @@ type NodeDataProps = {
 }
 
 const StepNode: FC<NodeDataProps> = ({ data }) => {
-  const { t } = useTranslation();
 
   return (
     <Track style={{width: '100%'}} direction='vertical' align='left'>
