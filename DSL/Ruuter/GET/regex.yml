@@ -9,7 +9,7 @@ mapRegexesData:
   args:
     url: http://data_mapper:3005/hbs/services/get-regexes
     headers:
-      type: 'json'
+      type: "json"
     body:
       hits: ${getRegexesResult.response.body.hits.hits}
   result: regexesData

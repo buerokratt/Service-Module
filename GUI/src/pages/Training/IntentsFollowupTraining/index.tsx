@@ -20,7 +20,7 @@ const IntentsFollowupTraining: FC = () => {
 
   return (
     <>
-      <h1>{t('menu.intents')}</h1>
+      <h1>{t('menu.followupTraining')}</h1>
 
       <Tabs.Root
         className='vertical-tabs'

@@ -11,11 +11,9 @@ import { Button, DataTable, Dialog, FormInput, FormSelect, Icon, Track } from '.
 import { useToast } from '../../../hooks/useToast';
 import { addRegex, deleteRegex } from '../../../services/regex';
 import { Entity } from '../../../types/entity';
-
-type RegexTeaser = {
-  readonly id: number;
-  name: string;
-}
+import { getEntities } from '../../../services/entities';
+import { getRegexes } from '../../../services/regex';
+import { RegexTeaser } from '../../../types/regexTeaser';
 
 const Regex: FC = () => {
   const { t } = useTranslation();
@@ -27,9 +25,11 @@ const Regex: FC = () => {
   const [deletableRow, setDeletableRow] = useState<string | number | null>(null);
   const { data: regexList } = useQuery<RegexTeaser[]>({
     queryKey: ['regex'],
+    queryFn: getRegexes
   });
   const { data: entities } = useQuery<Entity[]>({
     queryKey: ['entities'],
+    queryFn: getEntities
   });
   const { control, handleSubmit } = useForm<{ name: string }>();
 

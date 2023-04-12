@@ -15,6 +15,7 @@
     "services": "Services",
     "newService": "New Service",
     "intents": "Intents",
+    "followupTraining": "Followup Training",
     "close": "Close menu"
   },
   "intents": {

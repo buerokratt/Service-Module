@@ -9,7 +9,7 @@ import { Button, DataTable, Dialog, FormInput, Icon, Tooltip, Track } from '../.
 import { Entity } from '../../../types/entity';
 import useDocumentEscapeListener from '../../../hooks/useDocumentEscapeListener';
 import { useToast } from '../../../hooks/useToast';
-import { addEntity, deleteEntity, editEntity } from '../../../services/entities';
+import { getEntities, addEntity, deleteEntity, editEntity } from '../../../services/entities';
 import { Link } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 
@@ -26,6 +26,7 @@ const Entities: FC = () => {
   const [newEntityFormOpen, setNewEntityFormOpen] = useState(false);
   const { data: entities } = useQuery<Entity[]>({
     queryKey: ['entities'],
+    queryFn: getEntities
   });
   const { register, handleSubmit } = useForm<{ name: string }>();
 
@@ -42,7 +43,7 @@ const Entities: FC = () => {
       toast.open({
         type: 'success',
         title: t('intents.notification'),
-        message: 'New entity added',
+        message: 'New Entity Added',
       });
     },
     onError: (error: AxiosError) => {
@@ -184,8 +185,6 @@ const Entities: FC = () => {
   const handleNewEntitySubmit = handleSubmit((data) => {
     entityAddMutation.mutate(data);
   });
-
- console.log(entities);
 
   return (
     <>

@@ -15,7 +15,9 @@
     "services": "Teenused",
     "intents": "Kavatsus",
     "newService": "Uus Teenus",
-    "close": "Sulge menüü"
+    "close": "Sulge menüü",
+    "followupTraining": "Teemade järeltreenimine",
+    "entities": "Üksused"
   },
   "intents": {
     "entities": "Üksused",
