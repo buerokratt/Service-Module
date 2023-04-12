@@ -9,6 +9,8 @@ import { Step } from "../types/step";
 import Popup from "../components/Popup";
 import { GRID_UNIT } from "../components/FlowBuilder/FlowBuilder";
 import { CSSProperties } from "react";
+import { useNavigate } from "react-router-dom";
+import { ROUTES } from "../resources/routes-constants";
 
 const initialPlaceholder = {
   id: "2",
@@ -78,6 +80,7 @@ const ServiceFlowPage: FC = () => {
   const [updatedRules, setUpdatedRules] = useState<(string | null)[]>([]);
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState([initialEdge]);
+  const navigate = useNavigate();
 
   const onDragStart = (event: React.DragEvent<HTMLDivElement>, step: Step) => {
     event.dataTransfer.setData("application/reactflow-label", step.label);
@@ -89,7 +92,7 @@ const ServiceFlowPage: FC = () => {
 
   return (
     <>
-      <NewServiceHeader activeStep={3} />
+      <NewServiceHeader activeStep={3} continueOnClick={() => navigate(ROUTES.OVERVIEW_ROUTE)}/>
       <h1 style={{ padding: 16 }}>Teenusvoog "Raamatu laenutus"</h1>
       {isPopupVisible && (
         <Popup
