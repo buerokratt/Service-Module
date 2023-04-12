@@ -6,6 +6,10 @@ import ReactFlow, {
   Edge,
   MarkerType,
   Node,
+  NodeChange,
+  NodeDimensionChange,
+  OnEdgesChange,
+  OnNodesChange,
   ReactFlowInstance,
   useUpdateNodeInternals,
   XYPosition,
@@ -26,10 +30,10 @@ type FlowBuilderProps = {
   updatedRules: (string | null)[];
   nodes: Node[];
   setNodes: Dispatch<SetStateAction<Node[]>>;
-  onNodesChange: any;
+  onNodesChange: OnNodesChange;
   edges: Edge[];
   setEdges: Dispatch<SetStateAction<Edge[]>>;
-  onEdgesChange: any;
+  onEdgesChange: OnEdgesChange;
 };
 
 const FlowBuilder: FC<FlowBuilderProps> = ({
@@ -48,6 +52,33 @@ const FlowBuilder: FC<FlowBuilderProps> = ({
   const nodePositionOffset = 28 * GRID_UNIT;
   const updateNodeInternals = useUpdateNodeInternals();
 
+  const getEdgeLength = () => 5 * GRID_UNIT;
+
+  // Align nodes in case any got overlapped
+  const alignNodes = (nodeChanges: NodeChange[]) => {
+    setNodes((prevNodes) => {
+      // Find node following every updated node to see if it overlaps
+      nodeChanges.forEach((nodeChange: NodeChange) => {
+        if (nodeChange.type !== "dimensions") return;
+        const nodeId = (nodeChange as NodeDimensionChange).id;
+        const updatedNode = prevNodes.find((node) => node.id === nodeId);
+        if (!updatedNode) return;
+        const edgesAfterNode = edges.filter((edge) => edge.source === updatedNode.id).map((edge) => edge.target);
+        if (edgesAfterNode.length === 0) return;
+        const followingNodes = prevNodes.filter((node) => edgesAfterNode.includes(node.id));
+        if (followingNodes.length === 0) return;
+
+        followingNodes.forEach((node) => {
+          // If this node is overlapped by the previous one, pull it down
+          if (node.position.y <= updatedNode.position.y + (updatedNode.height ?? 0)) {
+            node.position.y = getEdgeLength() + updatedNode.position.y + (updatedNode.height ?? 0);
+          }
+        });
+      });
+      return prevNodes;
+    });
+  };
+
   const buildPlaceholder = ({
     id,
     matchingPlaceholder,
@@ -60,14 +91,14 @@ const FlowBuilder: FC<FlowBuilderProps> = ({
     if (!matchingPlaceholder && !position) throw Error("Either matchingPlaceholder or position have to be defined.");
 
     const positionX = position ? position.x : matchingPlaceholder!.position.x;
-    const positionY = position ? position.y : matchingPlaceholder!.position.y;
+    const positionY = position ? position.y : matchingPlaceholder!.position.y + (matchingPlaceholder!.height ?? 0);
 
     return {
       id,
       type: "placeholder",
       position: {
         x: positionX,
-        y: 7 * GRID_UNIT + positionY,
+        y: getEdgeLength() + positionY,
       },
       data: {
         type: "placeholder",
@@ -81,20 +112,16 @@ const FlowBuilder: FC<FlowBuilderProps> = ({
   const buildRuleWithPlaceholder = ({
     id,
     offset,
-    matchingPlaceholder,
-    position,
+    inputNode,
     label,
   }: {
     id: number;
     offset: number;
-    matchingPlaceholder?: Node;
-    position?: XYPosition;
+    inputNode: Node;
     label: string;
   }): Node[] => {
-    if (!matchingPlaceholder && !position) throw Error("Either matchingPlaceholder or position have to be defined.");
-
-    const positionX = position ? position.x : matchingPlaceholder!.position.x;
-    const positionY = 7 * GRID_UNIT + (position ? position.y : matchingPlaceholder!.position.y);
+    const positionX = inputNode.position.x;
+    const positionY = getEdgeLength() + inputNode.position.y + (inputNode.height ?? 0);
 
     return [
       {
@@ -116,7 +143,7 @@ const FlowBuilder: FC<FlowBuilderProps> = ({
       },
       buildPlaceholder({
         id: `${id + 1}`,
-        position: { x: positionX + offset, y: positionY },
+        position: { x: positionX + offset, y: positionY + (inputNode.height ?? 0) },
       }),
     ];
   };
@@ -191,7 +218,7 @@ const FlowBuilder: FC<FlowBuilderProps> = ({
           placeholders.forEach((placeholder) => {
             if (prevNode.id !== placeholder.id) return;
             prevNode.position.x = draggedNode.position.x;
-            prevNode.position.y = 7 * GRID_UNIT + draggedNode.position.y;
+            prevNode.position.y = getEdgeLength() + draggedNode.position.y + (draggedNode.height ?? 0);
           });
           return prevNode;
         })
@@ -374,7 +401,7 @@ const FlowBuilder: FC<FlowBuilderProps> = ({
                 id: newPlaceholderId + i * 2,
                 label: `rule ${i}`,
                 offset: -offsetLeft + i * nodePositionOffset,
-                matchingPlaceholder,
+                inputNode: matchingPlaceholder,
               })
             );
           }
@@ -475,6 +502,7 @@ const FlowBuilder: FC<FlowBuilderProps> = ({
             id: deletedNode.id,
             position: {
               y: sourceNode.position.y,
+              // Green starting node is not aligned with others, thus small offset is needed
               x: sourceNode.type === "input" ? sourceNode.position.x - 10.5 * GRID_UNIT : sourceNode.position.x,
             },
           });
@@ -530,6 +558,8 @@ const FlowBuilder: FC<FlowBuilderProps> = ({
           });
         updateNodeInternals(clickedNode);
         const inputNode = prevNodes.find((node) => node.id === clickedNode);
+        if (!inputNode) return prevNodes;
+
         let offsetLeft = nodePositionOffset * Math.floor(newRules.length / 2);
         if (newRules.length % 2 === 0) offsetLeft -= nodePositionOffset / 2;
         const newPlaceholderId = Math.max(...nodes.map((node) => +node.id)) + 1;
@@ -546,10 +576,7 @@ const FlowBuilder: FC<FlowBuilderProps> = ({
                 id: newRuleId,
                 label: `rule ${i}`,
                 offset: offset,
-                position: {
-                  x: inputNode!.position.x,
-                  y: inputNode!.position.y,
-                },
+                inputNode: inputNode,
               })
             );
             return `${newRuleId}`;
@@ -558,7 +585,7 @@ const FlowBuilder: FC<FlowBuilderProps> = ({
             const ruleNode = newNodes.find((node) => node.id === rule);
             if (!ruleNode) return rule;
             ruleNode.data.label = `rule ${i}`;
-            ruleNode.position.x = inputNode!.position.x + offset;
+            ruleNode.position.x = inputNode.position.x + offset;
 
             const ruleEdge = edges.find((edge) => edge.source === rule);
             if (!ruleEdge) return rule;
@@ -566,7 +593,7 @@ const FlowBuilder: FC<FlowBuilderProps> = ({
             const ruleFollowingNode = newNodes.find((node) => node.id === ruleEdge.target);
             if (!ruleFollowingNode) return rule;
 
-            ruleFollowingNode.position.x = inputNode!.position.x + offset;
+            ruleFollowingNode.position.x = inputNode.position.x + offset;
             return rule;
           }
         });
@@ -606,7 +633,10 @@ const FlowBuilder: FC<FlowBuilderProps> = ({
       <ReactFlow
         nodes={nodes}
         edges={edges}
-        onNodesChange={onNodesChange}
+        onNodesChange={(changes: NodeChange[]) => {
+          onNodesChange(changes);
+          alignNodes(changes);
+        }}
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}
         snapToGrid
