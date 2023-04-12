@@ -5,8 +5,6 @@ import FlowBuilderPage from './pages/FlowBuilderPage'
 import NewServicePage from './pages/NewServicePage'
 import NotFoundPage from './pages/NotFoundPage'
 import OverviewPage from './pages/OverviewPage'
-import FlowBuilderPage from './pages/FlowBuilderPage'
-import NewServicePage from './pages/NewServicePage'
 import { ROUTES } from './resources/routes-constants'
 import './styles/main.scss'
 
