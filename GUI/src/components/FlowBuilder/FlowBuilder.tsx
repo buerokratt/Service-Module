@@ -200,7 +200,6 @@ const FlowBuilder: FC<FlowBuilderProps> = ({
     };
   };
 
-  const onConnect = useCallback((params: Connection) => setEdges((eds) => addEdge(params, eds)), [setEdges]);
 
   // Move the placeholder together with the node being moved
   const onNodeDrag = useCallback(
@@ -501,7 +500,7 @@ const FlowBuilder: FC<FlowBuilderProps> = ({
           const placeholder = buildPlaceholder({
             id: deletedNode.id,
             position: {
-              y: sourceNode.position.y,
+              y: sourceNode.position.y + (sourceNode.height ?? 0),
               // Green starting node is not aligned with others, thus small offset is needed
               x: sourceNode.type === "input" ? sourceNode.position.x - 10.5 * GRID_UNIT : sourceNode.position.x,
             },
@@ -638,7 +637,6 @@ const FlowBuilder: FC<FlowBuilderProps> = ({
           alignNodes(changes);
         }}
         onEdgesChange={onEdgesChange}
-        onConnect={onConnect}
         snapToGrid
         snapGrid={[GRID_UNIT, GRID_UNIT]}
         defaultViewport={{ x: 38 * GRID_UNIT, y: 3 * GRID_UNIT, zoom: 0 }}
