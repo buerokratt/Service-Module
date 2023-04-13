@@ -21,6 +21,7 @@ import {
   Collapsible,
   FormInput,
   FormRichText,
+  FormTextarea,
   NewServiceHeader,
   OutputElementBox,
   Track,
@@ -717,6 +718,40 @@ const ServiceFlowPage: FC = () => {
     setMessageTestInputFields(placeholders);
   }
 
+  const buildDefaultMessageContentBlock = (message: string) => {
+    return (
+      <>
+        <Track direction='vertical' align="left" style={{ width: '100%', ...popupBodyCss }}>
+          <label htmlFor="messageToClient">Klient näeb sõnumit</label>
+          <FormTextarea
+            name={"messageToClient"}
+            label={"Klient näeb sõnumit"}
+            hideLabel={true}
+            defaultValue={message}
+            style={{
+              backgroundColor: '#F0F0F2',
+              resize: 'vertical',
+            }}
+            readOnly
+          >
+          </FormTextarea>
+        </Track>
+      </>
+    );
+  };
+
+  const buildEndConversationContentBlock = () => {
+    return (
+      <>
+        <Track direction="vertical" style={popupBodyCss} align="left">
+          <p style={{ color: '#9799A4', fontSize: 14 }}>
+            Selle sammuga lõpeb suhtlus. Et teenusvoogu jätkata, tuleb vestluse lõpetamine voost eemaldada.
+          </p>
+        </Track>
+      </>
+    );
+  }
+
   return (
     <>
       <NewServiceHeader activeStep={3} />
@@ -770,6 +805,11 @@ const ServiceFlowPage: FC = () => {
 
               <Tabs.Content value={t('serviceFlow.tabs.setup')} className='vertical-tabs__body'>
                 {selectedNode.data.stepType === StepType.Textfield && buildTextFieldContentBlock()}
+                {selectedNode.data.stepType === StepType.FinishingStepEnd && buildEndConversationContentBlock()}
+                {
+                  selectedNode.data.stepType === StepType.FinishingStepRedirect &&
+                  buildDefaultMessageContentBlock('Vestlus suunatakse klienditeenindajale')
+                }
               </Tabs.Content>
               {!selectedNode.data.readonly && <Tabs.Content value={t('serviceFlow.tabs.test')} className='vertical-tabs__body'>
                 {selectedNode.data.stepType === StepType.Textfield && buildTextFieldTestContentBlock()}
