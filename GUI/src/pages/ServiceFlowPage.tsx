@@ -420,6 +420,7 @@ const ServiceFlowPage: FC = () => {
                 StepType.FinishingStepEnd,
                 StepType.FinishingStepRedirect,
               ].includes(type),
+              message: setDefaultMessages(type),
             },
             className: [
               StepType.FinishingStepEnd,
@@ -461,6 +462,15 @@ const ServiceFlowPage: FC = () => {
     },
     [reactFlowInstance, nodes, edges]
   );
+
+  const setDefaultMessages = (stepType: StepType) => {
+    switch (stepType) {
+      case StepType.FinishingStepEnd:
+        return 'Vestlus on lõpetatud';
+      case StepType.FinishingStepRedirect:
+        return 'Vestlus suunatakse klienditeenindajale';
+    }
+  }
 
   const onDelete = useCallback(
     (id: string) => {
