@@ -21,6 +21,7 @@ import "./ServiceFlowPage.scss";
 import { Step, StepType } from "../types/step";
 import Popup from "../components/Popup";
 import PlaceholderNode from "../components/Steps/PlaceholderNode";
+import { useTranslation } from "react-i18next";
 
 const GRID_UNIT = 16;
 
@@ -74,22 +75,23 @@ const initialNodes: Node[] = [
 ];
 
 const ServiceFlowPage: FC = () => {
+  const { t } = useTranslation();
+
   const setupElements: Step[] = [
-    { id: 1, label: "TARA auth", type: StepType.Auth },
-    { id: 3, label: "Client input", type: StepType.Input },
+    { id: 1, label: t('serviceFlow.element.taraAuthentication'), type: StepType.Auth },
+    { id: 3, label: t('serviceFlow.element.clientInput'), type: StepType.Input },
   ];
   const allElements: Step[] = [
-    { id: 1, label: "TARA auth", type: StepType.Auth },
-    { id: 2, label: "Textfield", type: StepType.Textfield },
-    { id: 3, label: "Client input", type: StepType.Input },
-    { id: 4, label: "Rule definition", type: StepType.RuleDefinition },
-    { id: 5, label: "Open webpage", type: StepType.OpenWebpage },
-    { id: 6, label: "File generate", type: StepType.FileGenerate },
-    { id: 7, label: "File sign", type: StepType.FileSign },
-    { id: 8, label: "End conversation", type: StepType.FinishingStepEnd },
+    { id: 1, label: t('serviceFlow.element.taraAuthentication'), type: StepType.Auth },
+    { id: 2, label: t('serviceFlow.element.textfield'), type: StepType.Textfield },
+    { id: 3, label: t('serviceFlow.element.clientInput'), type: StepType.Input },
+    { id: 4, label: t('serviceFlow.element.openNewWebpage'), type: StepType.OpenWebpage },
+    { id: 5, label: t('serviceFlow.element.fileGeneration'), type: StepType.FileGenerate },
+    { id: 6, label: t('serviceFlow.element.fileSigning'), type: StepType.FileSign },
+    { id: 7, label: t('serviceFlow.element.conversationEnd'), type: StepType.FinishingStepEnd },
     {
-      id: 9,
-      label: "Direct to Customer Support",
+      id: 8,
+      label: t('serviceFlow.element.redirectConversationToSupport'),
       type: StepType.FinishingStepRedirect,
     },
   ];
