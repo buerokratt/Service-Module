@@ -1,0 +1,16 @@
+@import "src/styles/tools/color";
+@import "src/styles/settings/variables/typography";
+
+.variable-required {
+  align-items: center;
+  border-radius: 50%;
+  border: 2px solid get-color(sapphire-blue-10);
+  color: get-color(sapphire-blue-10);
+  display: flex;
+  font-size: 13px;
+  font-weight: $veera-font-weight-delta;
+  height: 16px;
+  justify-content: center;
+  line-height: 15px;
+  width: 16px;
+}

@@ -45,13 +45,14 @@
     "endpoint": {
       "add": "+ Lisa API otspunkt",
       "api": "API otspunkt",
-      "insert": "Sisesta API otspunkt..",
       "ask": "Küsi otspunktid",
-      "url": "API otspunkti URL",
-      "variable": "Muutuja",
-      "value": "Väärtus",
+      "insert": "Sisesta API otspunkt..",
       "live": "Live otspunkt",
-      "test": "Test otspunkt"
+      "name": "Otspunkti nimetus",
+      "test": "Test otspunkt",
+      "url": "API otspunkti URL",
+      "value": "Väärtus",
+      "variable": "Muutuja"
     },
     "saveDraft": "Salvesta mustandina",
     "trainingModuleSetup": "Treenningmooduli seadistamine",

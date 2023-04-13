@@ -8,7 +8,7 @@ const EndpointCustom: React.FC = () => {
   return (
     <Track direction="vertical" align="stretch" gap={16}>
       <div>
-        <label htmlFor="name">{t("newService.endpoint.url")}</label>
+        <label htmlFor="endpointUrl">{t("newService.endpoint.url")}</label>
         <Track gap={8}>
           <Track style={{ width: "100%" }}>
             <div style={{ width: 108 }}>
@@ -25,9 +25,8 @@ const EndpointCustom: React.FC = () => {
             </div>
             <FormInput
               style={{ borderRadius: "0 4px 4px 0" }}
-              name="name"
-              label="Nimetus"
-              hideLabel
+              name="endpointUrl"
+              label=""
               placeholder={t("newService.endpoint.insert") ?? ""}
             />
           </Track>

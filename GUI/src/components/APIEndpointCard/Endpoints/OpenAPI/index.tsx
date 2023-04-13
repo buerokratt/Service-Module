@@ -4,11 +4,20 @@ import {
   dummyVariableOptions,
   dummyVariablesData,
 } from "../../../../resources/api-constants";
-import { Button, FormInput, FormSelect, Track } from "../../..";
+import {
+  Button,
+  FormInput,
+  FormSelect,
+  Icon,
+  Label,
+  Tooltip,
+  Track,
+} from "../../..";
 import { Option } from "../../../../types/option";
 import DataTable from "../../../DataTable";
 import { createColumnHelper, PaginationState } from "@tanstack/react-table";
 import { useTranslation } from "react-i18next";
+import { MdDeleteOutline } from "react-icons/md";
 
 const EndpointOpenAPI: React.FC = () => {
   const [selectedEndpoint, setSelectedEndpoint] = useState<Option | null>();
@@ -17,7 +26,11 @@ const EndpointOpenAPI: React.FC = () => {
     [label: string]: string;
   }>({});
   const { t } = useTranslation();
-  const columnHelper = createColumnHelper<{ variable: string; value: any }>();
+  const columnHelper = createColumnHelper<{
+    variable: string;
+    required: boolean;
+    value: any;
+  }>();
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
     pageSize: 10,
@@ -37,31 +50,55 @@ const EndpointOpenAPI: React.FC = () => {
     }),
     columnHelper.accessor("value", {
       header: t("newService.endpoint.value") ?? "",
-      cell: (props) => (
-        <FormSelect
-          name={props.row.original.variable}
-          label={""}
-          options={dummyVariableOptions}
-          defaultValue={
-            selectedOptions[
-              getKey(selectedEndpoint?.value, props.row.original.variable)
-            ]
-          }
-          onSelectionChange={(selection) =>
-            updateSelection(props.row.original.variable, selection)
-          }
-        />
-      ),
+      cell: (props) => {
+        const selectedOption =
+          selectedOptions[
+            getKey(selectedEndpoint?.value, props.row.original.variable)
+          ];
+        console.log(selectedOption);
+        return (
+          <FormSelect
+            name={props.row.original.variable}
+            label={""}
+            options={dummyVariableOptions}
+            defaultValue={selectedOption}
+            onSelectionChange={(selection) =>
+              updateSelection(props.row.original.variable, selection)
+            }
+          />
+        );
+      },
+    }),
+    columnHelper.display({
+      id: "delete",
+      meta: {
+        size: 60,
+      },
+      cell: (props) => {
+        return (
+          <Track justify="center">
+            {props.row.original.required ? (
+              <Tooltip content={<p>This variable is required</p>}>
+                <span className="variable-required">!</span>
+              </Tooltip>
+            ) : (
+              <Button appearance="text">
+                <Icon icon={<MdDeleteOutline />} size="medium" />
+              </Button>
+            )}
+          </Track>
+        );
+      },
     }),
   ];
 
   return (
     <Track direction="vertical" align="stretch" gap={16}>
       <div>
-        <label htmlFor="name">{t("newService.endpoint.url")}</label>
+        <label htmlFor="endpointUrl">{t("newService.endpoint.url")}</label>
         <Track gap={8}>
           <FormInput
-            name="name"
+            name="endpointUrl"
             label=""
             placeholder={t("newService.endpoint.insert") ?? ""}
           />
@@ -72,14 +109,15 @@ const EndpointOpenAPI: React.FC = () => {
       </div>
       {endpoints.length > 0 && (
         <div>
-        <label htmlFor="select-endpoint">{t("newService.endpoints")}</label>
-        <FormSelect
-          name={"select-endpoint"}
-          label={""}
-          options={endpoints}
-          onSelectionChange={(value) => setSelectedEndpoint(value)}
+          <label htmlFor="select-endpoint">{t("newService.endpoints")}</label>
+          <FormSelect
+            name={"select-endpoint"}
+            label={""}
+            options={endpoints}
+            onSelectionChange={(value) => setSelectedEndpoint(value)}
+            style={{ color: selectedEndpoint ? "black" : "#9799A4" }}
           />
-          </div>
+        </div>
       )}
       {selectedEndpoint && (
         <DataTable

@@ -5,6 +5,7 @@ import {
   Button,
   EndpointCustom,
   EndpointOpenAPI,
+  FormInput,
   FormSelect,
   Icon,
   Track,
@@ -12,7 +13,7 @@ import {
 import { Option } from "../../types/option";
 import { useTranslation } from "react-i18next";
 import { MdDeleteOutline } from "react-icons/md";
-
+import "./APIEndpointCard.scss";
 type EndpointCardProps = {
   onDelete: () => void;
 };
@@ -20,9 +21,9 @@ type EndpointCardProps = {
 const APIEndpointCard: FC<EndpointCardProps> = ({ onDelete }) => {
   const [option, setOption] = useState<Option | null>();
   const [selectedTab, setSelectedTab] = useState<string>("live");
-  const options: Option[] = [
-    { label: "Open API", value: "openAPI" },
-    { label: "Custom endpoint", value: "custom" },
+  const options = [
+    { label: "Open API", value: "openAPI", name: "da" },
+    { label: "Custom endpoint", value: "custom", name: "da" },
   ];
   const { t } = useTranslation();
 
@@ -33,7 +34,7 @@ const APIEndpointCard: FC<EndpointCardProps> = ({ onDelete }) => {
     <Tabs.Root
       defaultValue="live"
       onValueChange={(value) => setSelectedTab(value)}
-      className='tab-group'
+      className="tab-group"
     >
       <Track justify="between">
         <Tabs.List className="tab-group__list" aria-label="environment">
@@ -46,7 +47,11 @@ const APIEndpointCard: FC<EndpointCardProps> = ({ onDelete }) => {
           </Tabs.Trigger>
         </Tabs.List>
         <>
-          <Button appearance="text" onClick={onDelete} style={{color: '#9799A4'}}>
+          <Button
+            appearance="text"
+            onClick={onDelete}
+            style={{ color: "#9799A4" }}
+          >
             <Icon icon={<MdDeleteOutline />} size="medium" />
             {t("overview.delete")}
           </Button>
@@ -65,6 +70,14 @@ const APIEndpointCard: FC<EndpointCardProps> = ({ onDelete }) => {
               style={{ color: option ? "black" : "#9799A4" }}
             />
           </div>
+          {option && (
+            <div>
+              <label htmlFor="endpointName">
+                {t("newService.endpoint.name")}
+              </label>
+              <FormInput name="endpointName" label="" />
+            </div>
+          )}
           {option?.value === "openAPI" && <EndpointOpenAPI />}
           {option?.value === "custom" && <EndpointCustom />}
         </Track>
