@@ -20,7 +20,7 @@ const IntentsFollowupTraining: FC = () => {
 
   return (
     <>
-      <h1>{t('training.intents.followupTraining')}</h1>
+      <h1>{t('menu.followupTraining')}</h1>
 
       <Tabs.Root
         className='vertical-tabs'
@@ -33,8 +33,8 @@ const IntentsFollowupTraining: FC = () => {
           aria-label={t('training.intents.followupTraining') || ''}
         >
           {[
-            { label: t('training.intents.entities'), value: 'entities' },
-            { label: t('training.intents.regex'), value: 'regex' },
+            { label: t('intents.entities'), value: 'entities' },
+            { label: t('intents.regex'), value: 'regex' },
           ].map((tab, index) => (
             <Tabs.Trigger key={`${tab.value}-${index}`} value={tab.value} className='vertical-tabs__trigger'>
               {tab.label}

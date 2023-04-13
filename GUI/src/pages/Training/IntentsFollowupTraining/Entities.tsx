@@ -9,7 +9,7 @@ import { Button, DataTable, Dialog, FormInput, Icon, Tooltip, Track } from '../.
 import { Entity } from '../../../types/entity';
 import useDocumentEscapeListener from '../../../hooks/useDocumentEscapeListener';
 import { useToast } from '../../../hooks/useToast';
-import { addEntity, deleteEntity, editEntity } from '../../../services/entities';
+import { getEntities, addEntity, deleteEntity, editEntity } from '../../../services/entities';
 import { Link } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 
@@ -26,6 +26,7 @@ const Entities: FC = () => {
   const [newEntityFormOpen, setNewEntityFormOpen] = useState(false);
   const { data: entities } = useQuery<Entity[]>({
     queryKey: ['entities'],
+    queryFn: getEntities
   });
   const { register, handleSubmit } = useForm<{ name: string }>();
 
@@ -41,14 +42,14 @@ const Entities: FC = () => {
       await queryClient.invalidateQueries(['entities']);
       toast.open({
         type: 'success',
-        title: t('global.notification'),
-        message: 'New entity added',
+        title: t('intents.notification'),
+        message: 'New Entity Added',
       });
     },
     onError: (error: AxiosError) => {
       toast.open({
         type: 'error',
-        title: t('global.notificationError'),
+        title: t('intents.notificationError'),
         message: error.message,
       });
     },
@@ -61,14 +62,14 @@ const Entities: FC = () => {
       await queryClient.invalidateQueries(['entities']);
       toast.open({
         type: 'success',
-        title: t('global.notification'),
+        title: t('intents.notification'),
         message: 'Entity changes saved',
       });
     },
     onError: (error: AxiosError) => {
       toast.open({
         type: 'error',
-        title: t('global.notificationError'),
+        title: t('intents.notificationError'),
         message: error.message,
       });
     },
@@ -81,14 +82,14 @@ const Entities: FC = () => {
       await queryClient.invalidateQueries(['entities']);
       toast.open({
         type: 'success',
-        title: t('global.notification'),
+        title: t('intents.notification'),
         message: 'Entity deleted',
       });
     },
     onError: (error: AxiosError) => {
       toast.open({
         type: 'error',
-        title: t('global.notificationError'),
+        title: t('intents.notificationError'),
         message: error.message,
       });
     },
@@ -99,18 +100,18 @@ const Entities: FC = () => {
 
   const entitiesColumns = useMemo(() => [
     columnHelper.accessor('name', {
-      header: t('training.intents.entities') || '',
+      header: t('intents.entities') || '',
       cell: (props) => editableRow && editableRow.id === props.row.original.id ? (
         <FormInput
           name={`entity-${props.row.original.id}`}
-          label={t('training.intents.entity')}
+          label={t('intents.entity')}
           defaultValue={editableRow.name}
           hideLabel
         />
       ) : props.row.original.relatedIntents ? (
         <Tooltip content={
           <Track direction='vertical' align='left'>
-            <strong>{t('training.intents.title')}</strong>
+            <strong>{t('intents.title')}</strong>
             {props.row.original.relatedIntents.map((intent) => (
               <Link
                 key={intent}
@@ -139,10 +140,10 @@ const Entities: FC = () => {
               data: { name: props.row.original.name },
             })}>
               <Icon
-                label={t('global.save')}
+                label={t('intents.save')}
                 icon={<MdOutlineSave color={'rgba(0,0,0,0.54)'} />}
               />
-              {t('global.save')}
+              {t('intents.save')}
             </Button>
           ) : (
             <Button
@@ -150,10 +151,10 @@ const Entities: FC = () => {
               onClick={() => handleEditableRow(props.row.original)}
             >
               <Icon
-                label={t('global.edit')}
+                label={t('intents.edit')}
                 icon={<MdOutlineModeEditOutline color={'rgba(0,0,0,0.54)'} />}
               />
-              {t('global.edit')}
+              {t('intents.edit')}
             </Button>
           )}
         </>
@@ -168,10 +169,10 @@ const Entities: FC = () => {
       cell: (props) => (
         <Button appearance='text' onClick={() => setDeletableRow(props.row.original.id)}>
           <Icon
-            label={t('global.delete')}
+            label={t('intents.delete')}
             icon={<MdDeleteOutline color={'rgba(0,0,0,0.54)'} />}
           />
-          {t('global.delete')}
+          {t('intents.delete')}
         </Button>
       ),
       id: 'delete',
@@ -191,25 +192,25 @@ const Entities: FC = () => {
         <Track gap={8} direction='vertical' align='stretch'>
           <Track gap={16}>
             <FormInput
-              label={t('global.search')}
+              label={t('intents.search')}
               name='searchEntities'
-              placeholder={t('global.search') + '...'}
+              placeholder={t('intents.search') + '...'}
               hideLabel
               onChange={(e) => setFilter(e.target.value)}
             />
-            <Button onClick={() => setNewEntityFormOpen(true)}>{t('global.add')}</Button>
+            <Button onClick={() => setNewEntityFormOpen(true)}>{t('intents.add')}</Button>
           </Track>
           {newEntityFormOpen && (
             <Track gap={16}>
               <FormInput
                 {...register('name')}
-                label={t('training.intent.entityName')}
-                placeholder={t('training.intents.entityName') || ''}
+                label={t('intents.entityName')}
+                placeholder={t('intents.entityName') || ''}
                 hideLabel
               />
               <Track gap={16}>
-                <Button appearance='secondary' onClick={() => setNewEntityFormOpen(false)}>{t('global.cancel')}</Button>
-                <Button onClick={handleNewEntitySubmit}>{t('global.save')}</Button>
+                <Button appearance='secondary' onClick={() => setNewEntityFormOpen(false)}>{t('intents.cancel')}</Button>
+                <Button onClick={handleNewEntitySubmit}>{t('intents.save')}</Button>
               </Track>
             </Track>
           )}
@@ -228,21 +229,21 @@ const Entities: FC = () => {
 
       {deletableRow !== null && (
         <Dialog
-          title={t('training.intents.deleteEntity')}
+          title={t('intents.delete')}
           onClose={() => setDeletableRow(null)}
           footer={
             <>
-              <Button appearance='secondary' onClick={() => setDeletableRow(null)}>{t('global.no')}</Button>
+              <Button appearance='secondary' onClick={() => setDeletableRow(null)}>{t('intents.no')}</Button>
               <Button
                 appearance='error'
                 onClick={() => entityDeleteMutation.mutate({ id: deletableRow })}
               >
-                {t('global.yes')}
+                {t('intents.yes')}
               </Button>
             </>
           }
         >
-          <p>{t('global.removeValidation')}</p>
+          <p>{t('intents.removeValidation')}</p>
         </Dialog>
       )}
     </>

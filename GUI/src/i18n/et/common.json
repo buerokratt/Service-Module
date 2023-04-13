@@ -6,14 +6,35 @@
     "resultCount": "Kuvan korraga",
     "gotoPage": "Mine leheküljele",
     "notification": "Teade",
-    "paginationNavigation": "Navigeeri"
+    "paginationNavigation": "Navigeeri",
+    "choose": "Vali"
   },
   "menu": {
     "overview": "Ülevaade",
     "flowbuilder": "Flow Builder",
     "services": "Teenused",
+    "intents": "Kavatsus",
     "newService": "Uus Teenus",
-    "close": "Sulge menüü"
+    "close": "Sulge menüü",
+    "followupTraining": "Teemade järeltreenimine",
+    "entities": "Üksused"
+  },
+  "intents": {
+    "entities": "Üksused",
+    "regex": "Regex",
+    "add": "Lisa",
+    "yes": "Jah",
+    "no": "Ei",
+    "removeValidation": "Eemalda valideerimine",
+    "search": "Otsing",
+    "delete": "Kustutada",
+    "edit": "Muuda",
+    "save": "Salvesta",
+    "cancel": "Tühista",
+    "notification": "Teavitus",
+    "notificationError": "Viga",
+    "entityName": "Nimi",
+    "title": "Pealkiri"
   },
   "overview": {
     "services": "Teenused",

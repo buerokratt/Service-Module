@@ -1,9 +1,18 @@
 import api from './api';
 import { Entity } from '../types/entity';
 
+export async function getEntities(): Promise<Entity[]> {
+  const { data } = await api.get('entities');
+  const entities: Entity[] = [];
+  for (let i = 0; i < data.response.entities.length ; i++) {
+    entities.push({id: i, name: data.response.entities[i], relatedIntents: []})
+  }
+  return entities;
+}
+
 export async function addEntity(entityData: { name: string }) {
-  const { data } = await api.post('entities', entityData);
-  console.log(`a7a ${data}`)
+  const { data } = await api.post('rasa/entities/add', entityData);
+  console.log(data);
   return data;
 }
 

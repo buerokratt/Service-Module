@@ -1,4 +1,14 @@
 import api from './api';
+import { RegexTeaser } from '../types/regexTeaser';
+
+export async function getRegexes(): Promise<RegexTeaser[]> {
+  const { data } = await api.get('regex');
+  const regexes: RegexTeaser[] = [];
+  for (let i = 0; i < data.response.regexes.length ; i++) {
+    regexes.push({id: i, name: data.response.regexes[i]})
+  }
+  return regexes;
+}
 
 export async function addRegex(regexData: { name: string }) {
   const { data } = await api.post<{ readonly id: number; name: string }>('regex');

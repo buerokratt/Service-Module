@@ -11,11 +11,9 @@ import { Button, DataTable, Dialog, FormInput, FormSelect, Icon, Track } from '.
 import { useToast } from '../../../hooks/useToast';
 import { addRegex, deleteRegex } from '../../../services/regex';
 import { Entity } from '../../../types/entity';
-
-type RegexTeaser = {
-  readonly id: number;
-  name: string;
-}
+import { getEntities } from '../../../services/entities';
+import { getRegexes } from '../../../services/regex';
+import { RegexTeaser } from '../../../types/regexTeaser';
 
 const Regex: FC = () => {
   const { t } = useTranslation();
@@ -27,9 +25,11 @@ const Regex: FC = () => {
   const [deletableRow, setDeletableRow] = useState<string | number | null>(null);
   const { data: regexList } = useQuery<RegexTeaser[]>({
     queryKey: ['regex'],
+    queryFn: getRegexes
   });
   const { data: entities } = useQuery<Entity[]>({
     queryKey: ['entities'],
+    queryFn: getEntities
   });
   const { control, handleSubmit } = useForm<{ name: string }>();
 
@@ -40,14 +40,14 @@ const Regex: FC = () => {
       setAddFormVisible(false);
       toast.open({
         type: 'success',
-        title: t('global.notification'),
+        title: t('intents.notification'),
         message: 'New regex added',
       });
     },
     onError: (error: AxiosError) => {
       toast.open({
         type: 'error',
-        title: t('global.notificationError'),
+        title: t('intents.notificationError'),
         message: error.message,
       });
     },
@@ -64,14 +64,14 @@ const Regex: FC = () => {
       await queryClient.invalidateQueries(['regex']);
       toast.open({
         type: 'success',
-        title: t('global.notification'),
+        title: t('intents.notification'),
         message: 'REGEX deleted',
       });
     },
     onError: (error: AxiosError) => {
       toast.open({
         type: 'error',
-        title: t('global.notificationError'),
+        title: t('intents.notificationError'),
         message: error.message,
       });
     },
@@ -82,18 +82,18 @@ const Regex: FC = () => {
 
   const regexColumns = useMemo(() => [
     columnHelper.accessor('name', {
-      header: t('training.intents.regex') || '',
+      header: t('intents.regex') || '',
     }),
     columnHelper.display({
       header: '',
       cell: (props) => (
         <Button appearance='text'
-                onClick={() => navigate(`/treening/treening/teemade-jareltreenimine/regex/${props.row.original.id}`)}>
+          onClick={() => navigate(`/treening/treening/teemade-jareltreenimine/regex/${props.row.original.id}`)}>
           <Icon
-            label={t('global.edit')}
+            label={t('intents.edit')}
             icon={<MdOutlineEdit color={'rgba(0,0,0,0.54)'} />}
           />
-          {t('global.edit')}
+          {t('intents.edit')}
         </Button>
       ),
       id: 'edit',
@@ -106,10 +106,10 @@ const Regex: FC = () => {
       cell: (props) => (
         <Button appearance='text' onClick={() => setDeletableRow(props.row.original.id)}>
           <Icon
-            label={t('global.delete')}
+            label={t('intents.delete')}
             icon={<MdDeleteOutline color={'rgba(0,0,0,0.54)'} />}
           />
-          {t('global.delete')}
+          {t('intents.delete')}
         </Button>
       ),
       id: 'delete',
@@ -129,13 +129,13 @@ const Regex: FC = () => {
         <Track gap={8} direction='vertical' align='stretch'>
           <Track gap={16}>
             <FormInput
-              label={t('global.search')}
+              label={t('intents.search')}
               name='searchRegex'
-              placeholder={t('global.search') + '...'}
+              placeholder={t('intents.search') + '...'}
               hideLabel
               onChange={(e) => setFilter(e.target.value)}
             />
-            <Button onClick={() => setAddFormVisible(true)}>{t('global.add')}</Button>
+            <Button onClick={() => setAddFormVisible(true)}>{t('intents.add')}</Button>
           </Track>
           {addFormVisible && (
             <Track gap={16}>
@@ -143,15 +143,15 @@ const Regex: FC = () => {
                 <Controller name='name' control={control} render={({ field }) => (
                   <FormSelect
                     {...field}
-                    label={t('training.intents.entity')}
+                    label={t('intents.entity')}
                     hideLabel
                     options={availableEntities || []}
                   />
                 )} />
               </div>
               <Track gap={16}>
-                <Button appearance='secondary' onClick={() => setAddFormVisible(false)}>{t('global.cancel')}</Button>
-                <Button onClick={handleNewRegexSubmit}>{t('global.save')}</Button>
+                <Button appearance='secondary' onClick={() => setAddFormVisible(false)}>{t('intents.cancel')}</Button>
+                <Button onClick={handleNewRegexSubmit}>{t('intents.save')}</Button>
               </Track>
             </Track>
           )}
@@ -170,21 +170,21 @@ const Regex: FC = () => {
 
       {deletableRow !== null && (
         <Dialog
-          title={t('training.intents.deleteRegex')}
+          title={t('intents.delete')}
           onClose={() => setDeletableRow(null)}
           footer={
             <>
-              <Button appearance='secondary' onClick={() => setDeletableRow(null)}>{t('global.no')}</Button>
+              <Button appearance='secondary' onClick={() => setDeletableRow(null)}>{t('intents.no')}</Button>
               <Button
                 appearance='error'
                 onClick={() => regexDeleteMutation.mutate({ id: deletableRow })}
               >
-                {t('global.yes')}
+                {t('intents.yes')}
               </Button>
             </>
           }
         >
-          <p>{t('global.removeValidation')}</p>
+          <p>{t('intents.removeValidation')}</p>
         </Dialog>
       )}
     </>
