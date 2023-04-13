@@ -41,6 +41,7 @@ const APIEndpointCard: FC = () => {
               options={options}
               placeholder={t("global.choose") ?? ""}
               onSelectionChange={(selection) => setOption(selection)}
+              style={{color: option ? 'black' : '#9799A4'}}
             />
           </div>
           {option?.value === "openAPI" && <EndpointOpenAPI />}
