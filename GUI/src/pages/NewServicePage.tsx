@@ -1,27 +1,19 @@
-import React, { useState } from "react";
+import React, { ReactNode, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
+  APIEndpointCard,
   Button,
   Card,
-  EndpointCustom,
-  EndpointOpenAPI,
   FormInput,
-  FormSelect,
   FormTextarea,
   Layout,
   NewServiceHeader,
   Track,
 } from "../components";
-import { Option } from "../types/option";
+import { v4 as uuid } from "uuid";
 
 const NewServicePage: React.FC = () => {
-  const [option, setOption] = useState<Option | null>();
-
-  const options: Option[] = [
-    { label: "Open API", value: "openAPI" },
-    { label: "Custom endpoint", value: "custom" },
-  ];
-
+  const [endpoints, setEndpoints] = useState<ReactNode[]>([]);
   const { t } = useTranslation();
 
   return (
@@ -52,23 +44,18 @@ const NewServicePage: React.FC = () => {
             </div>
           </Track>
         </Card>
-        <Card header={<h5>{t("newService.endpoint.api")}</h5>}>
-          <Track direction="vertical" align="stretch" gap={16}>
-            <div>
-              <label htmlFor="service-type">{t("newService.uses")}</label>
-              <FormSelect
-                name="service-type"
-                label={""}
-                options={options}
-                placeholder="Vali.."
-                onSelectionChange={(selection) => setOption(selection)}
-              />
-            </div>
-            {option?.value === "openAPI" && <EndpointOpenAPI />}
-            {option?.value === "custom" && <EndpointCustom />}
-          </Track>
-        </Card>
-        <Button appearance="text">{t("newService.endpoint.add")}</Button>
+        {endpoints}
+        <Button
+          appearance="text"
+          onClick={() =>
+            setEndpoints((endpoints) => [
+              ...endpoints,
+              <APIEndpointCard key={uuid()} />,
+            ])
+          }
+        >
+          {t("newService.endpoint.add")}
+        </Button>
       </Track>
     </Layout>
   );

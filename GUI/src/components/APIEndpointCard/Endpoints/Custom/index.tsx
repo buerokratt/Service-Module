@@ -1,6 +1,6 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { Button, FormInput, FormSelect, Track } from "../..";
+import { Button, FormInput, FormSelect, Track } from "../../..";
 
 const EndpointCustom: React.FC = () => {
   const { t } = useTranslation();
@@ -31,7 +31,7 @@ const EndpointCustom: React.FC = () => {
               placeholder={t("newService.endpoint.insert") ?? ""}
             />
           </Track>
-          <Button>{t("newService.endpoint.test")}</Button>
+          <Button>{t("newService.test")}</Button>
         </Track>
       </div>
     </Track>

@@ -1,10 +1,11 @@
+import APIEndpointCard from "./APIEndpointCard";
 import Box from "./Box";
 import Button from "./Button";
 import Card from "./Card";
 import Dialog from "./Dialog";
 import Drawer from "./Drawer";
-import EndpointCustom from "./Endpoints/Custom";
-import EndpointOpenAPI from "./Endpoints/OpenAPI";
+import EndpointCustom from "./APIEndpointCard/Endpoints/Custom";
+import EndpointOpenAPI from "./APIEndpointCard/Endpoints/OpenAPI";
 import {
   FormCheckbox,
   FormCheckboxes,
@@ -30,6 +31,7 @@ import Tooltip from "./Tooltip";
 import Track from "./Track";
 
 export {
+  APIEndpointCard,
   Box,
   Button,
   Card,

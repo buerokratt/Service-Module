@@ -3,10 +3,10 @@ import {
   dummyEndpointsData,
   dummyVariableOptions,
   dummyVariablesData,
-} from "../../../resources/api-constants";
-import { Button, FormInput, FormSelect, Track } from "../..";
-import { Option } from "../../../types/option";
-import DataTable from "../../DataTable";
+} from "../../../../resources/api-constants";
+import { Button, FormInput, FormSelect, Track } from "../../..";
+import { Option } from "../../../../types/option";
+import DataTable from "../../../DataTable";
 import { createColumnHelper, PaginationState } from "@tanstack/react-table";
 import { useTranslation } from "react-i18next";
 
