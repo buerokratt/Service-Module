@@ -13,9 +13,14 @@ import {
 import { v4 as uuid } from "uuid";
 
 const NewServicePage: React.FC = () => {
-  const [endpoints, setEndpoints] = useState<ReactNode[]>([]);
+  const [endpoints, setEndpoints] = useState<{ id: string }[]>([]);
   const { t } = useTranslation();
 
+  const onDelete = (id: string) => {
+    setEndpoints((prevEndpoints) =>
+      prevEndpoints.filter((prevEndpoint) => prevEndpoint.id !== id)
+    );
+  };
   return (
     <Layout disableMenu customHeader={<NewServiceHeader />}>
       <Track
@@ -44,14 +49,18 @@ const NewServicePage: React.FC = () => {
             </div>
           </Track>
         </Card>
-        {endpoints}
+        {endpoints.map((endpoint) => (
+          <APIEndpointCard
+            key={endpoint.id}
+            onDelete={() => onDelete(endpoint.id)}
+          />
+        ))}
         <Button
           appearance="text"
           onClick={() =>
-            setEndpoints((endpoints) => [
-              ...endpoints,
-              <APIEndpointCard key={uuid()} />,
-            ])
+            setEndpoints((endpoints) => {
+              return [...endpoints, { id: uuid() }];
+            })
           }
         >
           {t("newService.endpoint.add")}
