@@ -11,7 +11,7 @@ const PlaceholderNode: FC = () => {
         type='target'
         position={Position.Top}
       />
-      <p style={{textAlign: 'center'}}>Lohista järgmine samm voogu</p>
+      <p style={{textAlign: 'center'}}>{t('serviceFlow.placeholderNode')}</p>
     </>
   );
 };
