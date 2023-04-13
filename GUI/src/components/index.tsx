@@ -31,6 +31,7 @@ import Section from "./Section";
 import Tooltip from "./Tooltip";
 import Track from "./Track";
 import ExclamationBadge from "./ExclamationBadge";
+import OutputElementBox from "./OutputElementBox";
 
 export {
   Box,
@@ -58,6 +59,7 @@ export {
   MainNavigation,
   Modal,
   NewServiceHeader,
+  OutputElementBox,
   Popover,
   Section,
   Switch,
