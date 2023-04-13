@@ -55,7 +55,6 @@ const EndpointOpenAPI: React.FC = () => {
           selectedOptions[
             getKey(selectedEndpoint?.value, props.row.original.variable)
           ];
-        console.log(selectedOption);
         return (
           <FormSelect
             name={props.row.original.variable}
@@ -78,7 +77,7 @@ const EndpointOpenAPI: React.FC = () => {
         return (
           <Track justify="center">
             {props.row.original.required ? (
-              <Tooltip content={<p>This variable is required</p>}>
+              <Tooltip content={t("newService.endpoint.required")}>
                 <span className="variable-required">!</span>
               </Tooltip>
             ) : (

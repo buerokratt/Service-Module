@@ -1,9 +1,11 @@
-import React from "react";
+import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Button, FormInput, FormSelect, Track } from "../../..";
+import { MdErrorOutline } from "react-icons/md";
+import { Button, FormInput, FormSelect, Icon, Track } from "../../..";
 
 const EndpointCustom: React.FC = () => {
   const { t } = useTranslation();
+  const [error, setError] = useState<string | null>();
 
   return (
     <Track direction="vertical" align="stretch" gap={16}>
@@ -30,9 +32,26 @@ const EndpointCustom: React.FC = () => {
               placeholder={t("newService.endpoint.insert") ?? ""}
             />
           </Track>
-          <Button>{t("newService.test")}</Button>
+          <Button
+            onClick={() =>
+              setError(error ? undefined : t("newService.endpoint.error"))
+            }
+          >
+            {t("newService.test")}
+          </Button>
         </Track>
       </div>
+      {error && (
+        <div
+          className={"toast toast--error"}
+          style={{ padding: "8px 16px 8px 16px" }}
+        >
+          <div className="toast__title">
+            <Icon icon={<MdErrorOutline />} />
+            {error}
+          </div>
+        </div>
+      )}
     </Track>
   );
 };
