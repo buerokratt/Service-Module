@@ -782,7 +782,6 @@ const ServiceFlowPage: FC = () => {
             </Track>
           }
         >
-          <p>hello</p>
           <Track direction='vertical' align="left" gap={16}>
             <Tabs.Root
               className='vertical-tabs__column'
