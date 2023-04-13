@@ -3,4 +3,5 @@ export const ROUTES = {
   FLOW_ROUTE: "/services/flow",
   NEWSERVICE_ROUTE: "/services/newService",
   NEWSERVICE_FLOW_ROUTE: "/services/newService/flow",
+  FOLLOWUPTRAINING_ROUTE: '/services/followupTraining',
 };

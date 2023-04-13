@@ -8,6 +8,7 @@ import OldNewServicePage from './pages/OldNewServicePage'
 import ServiceFlowPage from './pages/ServiceFlowPage'
 import FlowBuilderPage from './pages/FlowBuilderPage'
 import NewServicePage from './pages/NewServicePage'
+import IntentsFollowupTraining from './pages/Training/IntentsFollowupTraining'
 import './styles/main.scss'
 
 const RootComponent: React.FC = () => {
@@ -22,6 +23,7 @@ const RootComponent: React.FC = () => {
           element={<OldNewServicePage />}
         />
         <Route path={ROUTES.FLOW_ROUTE} element={<FlowBuilderPage />} />
+        <Route path={ROUTES.FOLLOWUPTRAINING_ROUTE} element={<IntentsFollowupTraining />} />
         <Route path="*" element={<NotFoundPage />} />
       </Route>
     </Routes>

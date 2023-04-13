@@ -1,0 +1,13 @@
+search_intents:
+  call: http.post
+  args:
+    url: http://opensearch:9200/intents/_search/template
+    body:
+      id: 'search_intents'
+      params: ${incoming.body}
+  result: results
+  next: return_value
+
+return_value:
+   return: ${results.response}
+   next: end

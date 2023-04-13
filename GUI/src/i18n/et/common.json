@@ -15,7 +15,27 @@
     "flowbuilder": "Flow Builder",
     "services": "Teenused",
     "newService": "Uus teenus",
-    "close": "Sulge menüü"
+    "close": "Sulge menüü",
+    "intents": "Kavatsus",
+    "followupTraining": "Teemade järeltreenimine",
+    "entities": "Üksused"
+  },
+  "intents": {
+    "entities": "Üksused",
+    "regex": "Regex",
+    "add": "Lisa",
+    "yes": "Jah",
+    "no": "Ei",
+    "removeValidation": "Eemalda valideerimine",
+    "search": "Otsing",
+    "delete": "Kustutada",
+    "edit": "Muuda",
+    "save": "Salvesta",
+    "cancel": "Tühista",
+    "notification": "Teavitus",
+    "notificationError": "Viga",
+    "entityName": "Nimi",
+    "title": "Pealkiri"
   },
   "overview": {
     "services": "Teenused",
