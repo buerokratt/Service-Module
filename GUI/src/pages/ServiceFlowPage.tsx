@@ -1,4 +1,4 @@
-import { FC, useCallback, useRef, useState } from "react";
+import { CSSProperties, FC, useCallback, useRef, useState } from "react";
 import { MdPlayCircleFilled } from "react-icons/md";
 import ReactFlow, {
   addEdge,
@@ -15,12 +15,22 @@ import ReactFlow, {
 } from "reactflow";
 import "reactflow/dist/style.css";
 
-import { Box, Button, Collapsible, NewServiceHeader, Track } from "../components";
+import {
+  Box,
+  Button,
+  Collapsible,
+  FormInput,
+  FormRichText,
+  NewServiceHeader,
+  OutputElementBox,
+  Track,
+} from "../components";
 import CustomNode from "../components/Steps/CustomNode";
 import "./ServiceFlowPage.scss";
 import { Step, StepType } from "../types/step";
 import Popup from "../components/Popup";
 import PlaceholderNode from "../components/Steps/PlaceholderNode";
+import * as Tabs from '@radix-ui/react-tabs';
 import { useTranslation } from "react-i18next";
 
 const GRID_UNIT = 16;
@@ -108,11 +118,22 @@ const ServiceFlowPage: FC = () => {
     },
   ];
 
+  const availableOutputElements = [
+    '{{otspunktinimetus.idCode}}',
+    '{{otspunktinimetus.firstName}}',
+    '{{otspunktinimetus.surName}}',
+  ];
+
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
   const [reactFlowInstance, setReactFlowInstance] = useState<ReactFlowInstance>();
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState([initialEdge]);
   const [selectedNode, setSelectedNode] = useState<Node<NodeDataProps> | null>(null);
+  const [selectedTab, setSelectedTab] = useState<string | null>(null);
+  // Message to client
+  const [messageToClientInput, setMessageToClientInput] = useState<string | null>(null);
+  const [messageTestInputFields, setMessageTestInputFields] = useState<{ [key: string]: string }>({})
+  const [messageTestOutput, setMessageTestOutput] = useState<string | null>(null)
 
   const buildPlaceholder = ({
     id,
@@ -585,9 +606,117 @@ const ServiceFlowPage: FC = () => {
     setSelectedNode(node ?? null);
   }, [reactFlowInstance]);
   const handlePopupClose = () => resetStates();
-  const resetStates = () => {
-    setSelectedNode(null);
+
+  const handlePopupSave = () => {
+    resetStates();
+    if (selectedNode?.data.stepType === StepType.FinishingStepEnd) return;
+
+    setNodes((prevNodes) =>
+      prevNodes.map((prevNode) => {
+        if (prevNode.id !== selectedNode!.id) return prevNode;
+        return {
+          ...prevNode,
+          data: {
+            ...prevNode.data,
+            message: messageToClientInput
+          }
+        }
+      })
+    )
   };
+
+  const resetStates = () => {
+    setMessageToClientInput(null);
+    setSelectedNode(null);
+    setSelectedTab(null);
+  };
+
+  const popupBodyCss: CSSProperties = {
+    padding: 16,
+    borderBottom: `1px solid #D2D3D8`
+  }
+
+
+  const buildTextFieldContentBlock = () => {
+    return (
+      <>
+        <Track direction='vertical' align="left" style={{ width: '100%', ...popupBodyCss }}>
+          <label htmlFor="message">{t('serviceFlow.popup.messageLabel')}</label>
+          <FormRichText
+            onChange={(value) => {
+              setMessageToClientInput(value);
+              findMessagePlaceholders(value!);
+            }}
+            defaultValue={selectedNode?.data.message ?? (messageToClientInput ?? undefined)}
+          ></FormRichText>
+        </Track>
+        <Track direction='vertical' align="left" style={{ width: '100%', ...popupBodyCss, backgroundColor: '#F9F9F9' }}>
+          <label htmlFor="json">{t('serviceFlow.popup.availableOutputElementsLabel')}</label>
+          <Track
+            direction='horizontal'
+            gap={4}
+            justify='start'
+            isMultiline={true}
+          >
+            {availableOutputElements.map((element, i) => (
+              <OutputElementBox
+                key={`${element}-${i}`}
+                text={element}
+              ></OutputElementBox>
+            ))}
+          </Track>
+        </Track>
+      </>
+    );
+  };
+
+  const buildTextFieldTestContentBlock = () => {
+    return (
+      <Track direction="vertical" align="left" style={{ ...popupBodyCss }} gap={16}>
+        {Object.keys(messageTestInputFields).map((key, i) => (
+          <Track direction="vertical" align="left" style={{ width: '100%' }} key={key + i}>
+            <>
+              <label htmlFor={key}>{key}</label>
+              <FormInput
+                name={key}
+                label={key}
+                placeholder="Väärtus..."
+                onChange={(event) => {
+                  setMessageTestInputFields((previous) => {
+                    previous[key] = event.target.value;
+                    return previous;
+                  })
+                }}
+                hideLabel
+              ></FormInput>
+            </>
+          </Track>
+        ))}
+        <Track direction="vertical" align="left" style={{ width: '100%' }}>
+          {messageTestOutput}
+        </Track>
+        <Button
+          onClick={() => {
+            const regex = /{{(.*?)}}/g;
+            const result = messageToClientInput!.replace(regex, (match, _) => messageTestInputFields[match.trim()] || match);
+            setMessageTestOutput(result);
+          }}
+        >Testi</Button>
+      </Track>
+    );
+  }
+
+  const findMessagePlaceholders = (text: string | null) => {
+    if (!text) return;
+
+    const pattern = /\{\{(.+?)\}\}/g;
+    const placeholders: { [key: string]: string } = {};
+    let match;
+
+    while (match = pattern.exec(text)) placeholders[match[0]] = '';
+    setMessageTestInputFields(placeholders);
+  }
+
   return (
     <>
       <NewServiceHeader activeStep={3} />
@@ -595,6 +724,7 @@ const ServiceFlowPage: FC = () => {
       {selectedNode && (
         <Popup
           style={{ maxWidth: 700 }}
+          hasDefaultBody={false}
           title={selectedNode.data.label}
           onClose={() => handlePopupClose()}
           footer={
@@ -603,17 +733,56 @@ const ServiceFlowPage: FC = () => {
                 Discard
               </Button>
               <Button onClick={() => handlePopupClose()}>Save</Button>
+              <Track gap={16}>
+                {
+                  !selectedNode.data.readonly && <Button
+                    appearance="secondary"
+                    onClick={() => handlePopupClose()}
+                  >
+                    {t('global.cancel')}
+                  </Button>
+                }
+                <Button onClick={() => selectedNode.data.readonly ? handlePopupClose() : handlePopupSave()}>{t(selectedNode.data.readonly ? 'global.close' : 'global.save')}</Button>
+              </Track>
             </Track>
           }
         >
           <p>hello</p>
+          <Track direction='vertical' align="left" gap={16}>
+            <Tabs.Root
+              className='vertical-tabs__column'
+              orientation='horizontal'
+              value={selectedTab ?? t('serviceFlow.tabs.setup')!}
+              onValueChange={(value) => {
+                setSelectedTab(value);
+                // reset test outputs
+                setMessageTestOutput(null);
+              }}
+            >
+              <Tabs.List>
+                <Tabs.Trigger className='vertical-tabs__trigger' value={t('serviceFlow.tabs.setup')}>
+                  {t('serviceFlow.tabs.setup')}
+                </Tabs.Trigger>
+                {!selectedNode.data.readonly && <Tabs.Trigger className='vertical-tabs__trigger' value={t('serviceFlow.tabs.test')}>
+                  {t('serviceFlow.tabs.test')}
+                </Tabs.Trigger>}
+              </Tabs.List>
+
+              <Tabs.Content value={t('serviceFlow.tabs.setup')} className='vertical-tabs__body'>
+                {selectedNode.data.stepType === StepType.Textfield && buildTextFieldContentBlock()}
+              </Tabs.Content>
+              {!selectedNode.data.readonly && <Tabs.Content value={t('serviceFlow.tabs.test')} className='vertical-tabs__body'>
+                {selectedNode.data.stepType === StepType.Textfield && buildTextFieldTestContentBlock()}
+              </Tabs.Content>}
+            </Tabs.Root>
+          </Track>
         </Popup>
       )}
       <div className="graph">
         <div className="graph__controls">
           <Track direction="vertical" gap={16} align="stretch">
             {setupElements && (
-              <Collapsible title="Setup elements">
+              <Collapsible title={t('serviceFlow.setupElements')}>
                 <Track direction="vertical" align="stretch" gap={4}>
                   {setupElements.map((step) => (
                     <Box
@@ -630,7 +799,7 @@ const ServiceFlowPage: FC = () => {
             )}
 
             {allElements && (
-              <Collapsible title="All elements">
+              <Collapsible title={t('serviceFlow.allElements')}>
                 <Track direction="vertical" align="stretch" gap={4}>
                   {allElements.map((step) => (
                     <Box
