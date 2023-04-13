@@ -55,6 +55,18 @@ const initialEdge = {
   },
 };
 
+
+// TODO: refactoring
+type NodeDataProps = {
+  label: string;
+  onDelete: (id: string) => void;
+  onEdit: (id: string) => void;
+  type: string;
+  stepType: StepType;
+  readonly: boolean;
+  message?: string;
+}
+
 const initialNodes: Node[] = [
   {
     id: "1",
@@ -100,7 +112,7 @@ const ServiceFlowPage: FC = () => {
   const [reactFlowInstance, setReactFlowInstance] = useState<ReactFlowInstance>();
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState([initialEdge]);
-  const [isPopupVisible, setPopupVisible] = useState(false);
+  const [selectedNode, setSelectedNode] = useState<Node<NodeDataProps> | null>(null);
 
   const buildPlaceholder = ({
     id,
@@ -163,7 +175,7 @@ const ServiceFlowPage: FC = () => {
         data: {
           label,
           onDelete,
-          setPopupVisible,
+          onEdit: handleNodeEdit,
           type: "rule",
           stepType: "rule",
           readonly: true,
@@ -240,8 +252,6 @@ const ServiceFlowPage: FC = () => {
     event.dataTransfer.setData("application/reactflow-label", step.label);
     event.dataTransfer.setData("application/reactflow-type", step.type);
     event.dataTransfer.effectAllowed = "move";
-    console.log(nodes);
-    console.log(edges);
   };
 
   const onNodeDrag = useCallback(
@@ -398,7 +408,7 @@ const ServiceFlowPage: FC = () => {
             data: {
               label,
               onDelete,
-              setPopupVisible,
+              onEdit: handleNodeEdit,
               type: [
                 StepType.FinishingStepEnd,
                 StepType.FinishingStepRedirect
@@ -558,21 +568,31 @@ const ServiceFlowPage: FC = () => {
     [reactFlowInstance]
   );
 
+  const handleNodeEdit = useCallback(async (selectedNodeId: string) => {
+    if (!reactFlowInstance) return;
+    const node = reactFlowInstance.getNode(selectedNodeId);
+
+    setSelectedNode(node ?? null);
+  }, [reactFlowInstance]);
+  const handlePopupClose = () => resetStates();
+  const resetStates = () => {
+    setSelectedNode(null);
+  };
   return (
     <>
       <NewServiceHeader activeStep={3} />
       <h1 style={{ padding: 16 }}>Teenusvoog "Raamatu laenutus"</h1>
-      {isPopupVisible && (
+      {selectedNode && (
         <Popup
           style={{ maxWidth: 700 }}
-          title={"Hello"}
-          onClose={() => setPopupVisible(false)}
+          title={selectedNode.data.label}
+          onClose={() => handlePopupClose()}
           footer={
             <Track gap={16}>
-              <Button appearance="secondary" onClick={() => setPopupVisible(false)}>
+              <Button appearance="secondary" onClick={() => handlePopupClose()}>
                 Discard
               </Button>
-              <Button onClick={() => setPopupVisible(false)}>Save</Button>
+              <Button onClick={() => handlePopupClose()}>Save</Button>
             </Track>
           }
         >
