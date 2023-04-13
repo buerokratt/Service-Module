@@ -8,10 +8,11 @@ import './Popup.scss';
 type DialogProps = HTMLAttributes<HTMLDivElement> & {
   title: string;
   footer?: ReactNode;
+  hasDefaultBody?: boolean;
   onClose: () => void;
 }
 
-const Popup: FC<PropsWithChildren<DialogProps>> = ({ title, footer, onClose, children, ...rest }) => {
+const Popup: FC<PropsWithChildren<DialogProps>> = ({ title, footer, onClose, hasDefaultBody = true, children, ...rest }) => {
   return (
     <RadixDialog.Root defaultOpen={true} onOpenChange={onClose}>
       <RadixDialog.Portal>
@@ -25,7 +26,7 @@ const Popup: FC<PropsWithChildren<DialogProps>> = ({ title, footer, onClose, chi
               </button>
             </RadixDialog.Close>
           </div>
-          <div className='popup__body'>
+          <div className={hasDefaultBody ? 'popup__body' : ''}>
             {children}
           </div>
           {footer && (
