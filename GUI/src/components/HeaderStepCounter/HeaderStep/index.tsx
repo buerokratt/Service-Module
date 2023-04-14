@@ -16,7 +16,7 @@ const HeaderStep: FC<HeaderStepProps> = ({ step, name, activeStep }) => {
         <p className="header-step" >{step}</p>
         <p className={activeStep === step ? "active-step__name" : ""} style={{ whiteSpace: "nowrap" }}>{name}</p>
       </Track>
-      {activeStep === step && <img src={pointer} style={{ height: 38 }} />}
+      {activeStep === step && <img alt='' src={pointer} style={{ height: 38 }} />}
     </Track>
   );
 };

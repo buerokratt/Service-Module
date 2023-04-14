@@ -16,7 +16,6 @@ type NodeDataProps = {
 }
 
 const StepNode: FC<NodeDataProps> = ({ data }) => {
-
   const createMarkup = (text: string) => {
     return {
       __html: text

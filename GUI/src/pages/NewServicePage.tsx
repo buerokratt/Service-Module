@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router-dom";
 import {
   Button,
   Card,
@@ -12,6 +13,7 @@ import {
   NewServiceHeader,
   Track,
 } from "../components";
+import { ROUTES } from "../resources/routes-constants";
 import { Option } from "../types/option";
 
 const NewServicePage: React.FC = () => {
@@ -23,9 +25,10 @@ const NewServicePage: React.FC = () => {
   ];
 
   const { t } = useTranslation();
+  const navigate = useNavigate();
 
   return (
-    <Layout disableMenu customHeader={<NewServiceHeader activeStep={2}/>}>
+    <Layout disableMenu customHeader={<NewServiceHeader activeStep={2} continueOnClick={() => navigate(ROUTES.FLOW_ROUTE)}/>}>
       <Track
         style={{ width: 800, alignSelf: "center" }}
         direction="vertical"
