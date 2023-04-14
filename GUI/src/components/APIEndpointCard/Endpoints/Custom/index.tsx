@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { MdErrorOutline } from "react-icons/md";
 import { Button, FormInput, FormSelect, Icon, Track } from "../../..";
@@ -26,12 +26,13 @@ const EndpointCustom: React.FC = () => {
   const [selectedTab, setSelectedTab] = useState<string>(tabs[0]);
   const [endpoint, setEndpoint] = useState<string>("");
   const [showTable, setShowTable] = useState<boolean>(false);
+  const [tableKey, setTableKey] = useState<number>(0);
   const columnHelper = createColumnHelper<TableColumns>();
 
   const getInitialRowsData = () => {
     const data: { [tab: string]: RowData[] } = {};
     tabs.forEach((tab) => {
-      data[tab] = [{ id: "0" }, { id: "1" }, { id: "2" }];
+      data[tab] = [{ id: "0" }];
     });
     return data;
   };
@@ -48,6 +49,15 @@ const EndpointCustom: React.FC = () => {
       if (row.id !== id) return row;
       row.value = selection.value;
       return row;
+    });
+  };
+
+  const addNewRow = (id: string) => {
+    if (id !== `${rowsData[selectedTab].length - 1}`) return;
+    setRowsData((prevRowsData) => {
+      prevRowsData[selectedTab].push({ id: `${rowsData[selectedTab].length}` });
+      setTableKey((key) => key + 1);
+      return prevRowsData;
     });
   };
 
@@ -79,7 +89,7 @@ const EndpointCustom: React.FC = () => {
             style={{ borderRadius: "0 4px 4px 0" }}
             name={`endpoint-variable-${props.row.id}`}
             label=""
-            onChange={(event) =>
+            onChange={(event) => {
               setRowsData((prevRowsData) => {
                 prevRowsData[selectedTab].map((row) => {
                   if (row.id !== props.row.id) return row;
@@ -87,13 +97,15 @@ const EndpointCustom: React.FC = () => {
                   return row;
                 });
                 return prevRowsData;
-              })
-            }
+              });
+              addNewRow(props.row.id);
+            }}
+            autoFocus={props.row.id === `${rowsData[selectedTab].length - 2}`}
             defaultValue={
               rowsData[selectedTab].find((row) => row.id === props.row.id)
                 ?.variable
             }
-            placeholder={t("newService.endpoint.variable") + '..'}
+            placeholder={t("newService.endpoint.variable") + ".."}
           />
         );
       },
@@ -205,6 +217,7 @@ const EndpointCustom: React.FC = () => {
                 sortable={true}
                 data={rowsData[tab]}
                 columns={columns}
+                key={tableKey}
               />
               <hr style={{ margin: 0, borderTop: "1px solid #D2D3D8" }} />
             </Tabs.Content>
