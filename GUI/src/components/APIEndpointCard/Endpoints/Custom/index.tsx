@@ -1,7 +1,14 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { MdErrorOutline } from "react-icons/md";
-import { Button, FormInput, FormSelect, Icon, Track } from "../../..";
+import {
+  Button,
+  FormInput,
+  FormSelect,
+  Icon,
+  SwitchBox,
+  Track,
+} from "../../..";
 import * as Tabs from "@radix-ui/react-tabs";
 import DataTable from "../../../DataTable";
 import { dummyVariableOptions } from "../../../../resources/api-constants";
@@ -193,20 +200,33 @@ const EndpointCustom: React.FC = () => {
           onValueChange={(value) => setSelectedTab(value)}
           className="endpoint-tab-group"
         >
-          <Tabs.List
-            className="endpoint-tab-group__list"
-            aria-label="environment"
+          <Track
+            justify="between"
+            style={{ borderBottom: "solid 1px #5d6071" }}
           >
-            {tabs.map((tab) => (
-              <Tabs.Trigger
-                className={getTabTriggerClasses(tab)}
-                value={tab}
-                key={tab}
-              >
-                {t(`newService.endpoint.${tab}`)}
-              </Tabs.Trigger>
-            ))}
-          </Tabs.List>
+            <Tabs.List
+              className="endpoint-tab-group__list"
+              aria-label="environment"
+            >
+              {tabs.map((tab) => (
+                <Tabs.Trigger
+                  className={getTabTriggerClasses(tab)}
+                  value={tab}
+                  key={tab}
+                >
+                  {t(`newService.endpoint.${tab}`)}
+                </Tabs.Trigger>
+              ))}
+            </Tabs.List>
+            <Track style={{ paddingRight: 16 }} gap={8}>
+              <SwitchBox
+                style={{ width: "fit-content" }}
+                label={""}
+                name={"raw-data"}
+              />
+              <p style={{ whiteSpace: "nowrap", color: "#34394C" }}>Raw data</p>
+            </Track>
+          </Track>
           {tabs.map((tab) => (
             <Tabs.Content
               className="endpoint-tab-group__tab-content"

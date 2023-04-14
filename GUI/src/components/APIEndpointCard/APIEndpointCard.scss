@@ -23,6 +23,7 @@
     display: flex;
     list-style-type: none;
     border-bottom: 1px solid get-color(black-coral-10);
+    margin-bottom: -1px;
   }
   &__tab-btn {
     padding: get-spacing("haapsalu");
