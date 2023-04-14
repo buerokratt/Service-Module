@@ -67,7 +67,6 @@ const APIEndpointCard: FC<EndpointCardProps> = ({ onDelete }) => {
               options={options}
               placeholder={t("global.choose") ?? ""}
               onSelectionChange={(selection) => setOption(selection)}
-              style={{ color: option ? "black" : "#9799A4" }}
             />
           </div>
           {option && (

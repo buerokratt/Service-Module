@@ -114,7 +114,6 @@ const EndpointOpenAPI: React.FC = () => {
             label={""}
             options={endpoints}
             onSelectionChange={(value) => setSelectedEndpoint(value)}
-            style={{ color: selectedEndpoint ? "black" : "#9799A4" }}
           />
         </div>
       )}
