@@ -116,7 +116,6 @@ const ServiceFlowPage: FC = () => {
   const [messageToClientInput, setMessageToClientInput] = useState<string | null>(null);
   const [messageTestInputFields, setMessageTestInputFields] = useState<{ [key: string]: string }>({})
   const [messageTestOutput, setMessageTestOutput] = useState<string | null>(null)
-  const [isPopupVisible, setPopupVisible] = useState(false);
   const [updatedRules, setUpdatedRules] = useState<(string | null)[]>([]);
   const navigate = useNavigate();
 
@@ -286,21 +285,19 @@ const ServiceFlowPage: FC = () => {
           onClose={() => handlePopupClose()}
           footer={
             <Track gap={16}>
-              <Button appearance="secondary" onClick={() => handlePopupClose()}>
-                Discard
+              {
+                !selectedNode.data.readonly && <Button
+                  appearance="secondary"
+                  onClick={() => handlePopupClose()}
+                >
+                  {t('global.cancel')}
+                </Button>
+              }
+              <Button
+                onClick={() => selectedNode.data.readonly ? handlePopupClose() : handlePopupSave()}
+              >
+                {t(selectedNode.data.readonly ? 'global.close' : 'global.save')}
               </Button>
-              <Button onClick={() => handlePopupClose()}>Save</Button>
-              <Track gap={16}>
-                {
-                  !selectedNode.data.readonly && <Button
-                    appearance="secondary"
-                    onClick={() => handlePopupClose()}
-                  >
-                    {t('global.cancel')}
-                  </Button>
-                }
-                <Button onClick={() => selectedNode.data.readonly ? handlePopupClose() : handlePopupSave()}>{t(selectedNode.data.readonly ? 'global.close' : 'global.save')}</Button>
-              </Track>
             </Track>
           }
         >
@@ -379,7 +376,9 @@ const ServiceFlowPage: FC = () => {
             </Track>
           </div>
           <FlowBuilder
-            setPopupVisible={setPopupVisible}
+            onNodeEdit={(selectedNode) => {
+              setSelectedNode(selectedNode);
+            }}
             updatedRules={updatedRules}
             nodes={nodes}
             setNodes={setNodes}

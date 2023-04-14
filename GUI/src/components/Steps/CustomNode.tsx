@@ -13,7 +13,6 @@ type NodeDataProps = {
     label: string;
     onDelete: (id: string, shouldAddPlaceholder: boolean) => void;
     onEdit: (id: string) => void;
-    setPopupVisible: Dispatch<SetStateAction<boolean>>;
     setClickedNode: Dispatch<SetStateAction<string>>;
     type: string;
     stepType: StepType;
@@ -70,8 +69,8 @@ const CustomNode: FC<NodeProps & NodeDataProps> = (props) => {
               <Button
                 appearance="text"
                 onClick={() => {
-                  data.setPopupVisible(true);
                   data.setClickedNode(id);
+                  data.onEdit(id);
                 }}
               >
                 <Icon icon={data.readonly ? <MdOutlineRemoveRedEye /> : <MdOutlineEdit />} size="medium" />
