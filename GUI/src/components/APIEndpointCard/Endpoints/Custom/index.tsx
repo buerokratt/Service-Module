@@ -5,44 +5,65 @@ import { Button, FormInput, FormSelect, Icon, Track } from "../../..";
 import * as Tabs from "@radix-ui/react-tabs";
 import DataTable from "../../../DataTable";
 import { dummyVariableOptions } from "../../../../resources/api-constants";
-import { createColumnHelper, PaginationState } from "@tanstack/react-table";
+import { createColumnHelper, Row } from "@tanstack/react-table";
 import { Option } from "../../../../types/option";
+
+type RowData = {
+  id: string;
+  variable?: string;
+  value?: string;
+};
+
+type TableColumns = {
+  variable: string;
+  value: any;
+};
 
 const EndpointCustom: React.FC = () => {
   const { t } = useTranslation();
-  const tabs = ["Params", "Header", "Body"];
+  const tabs = ["params", "headers", "body"];
   const [error, setError] = useState<string | null>();
   const [selectedTab, setSelectedTab] = useState<string>(tabs[0]);
   const [endpoint, setEndpoint] = useState<string>("");
   const [showTable, setShowTable] = useState<boolean>(false);
-  const [selectedOptions, setSelectedOptions] = useState<{
-    [label: string]: string;
-  }>({});
-  const columnHelper = createColumnHelper<{
-    variable: string;
-    value: any;
-  }>();
+  const columnHelper = createColumnHelper<TableColumns>();
+
+  const getInitialRowsData = () => {
+    const data: { [tab: string]: RowData[] } = {};
+    tabs.forEach((tab) => {
+      data[tab] = [{ id: "0" }, { id: "1" }, { id: "2" }];
+    });
+    return data;
+  };
+  const [rowsData, setRowsData] = useState<{ [tab: string]: RowData[] }>(
+    getInitialRowsData()
+  );
 
   const getTabTriggerClasses = (tab: string) =>
     `endpoint-tab-group__tab-btn ${selectedTab === tab ? "active" : ""}`;
 
-  const getKey = (id: string, source: string) =>
-    `${selectedTab}-${source}-${id}`;
-
-  const updateSelection = (
-    id: string,
-    source: string,
-    selection: Option | null
-  ) => {
+  const updateSelection = (id: string, selection: Option | null) => {
     if (!selection) return;
-    selectedOptions[getKey(id, source)] = selection.value;
+    rowsData[selectedTab].map((row) => {
+      if (row.id !== id) return row;
+      row.value = selection.value;
+      return row;
+    });
   };
 
-  const sortRows = (rowA: any, rowB: any, source: string): number => {
-    const valueA = selectedOptions[getKey(rowA.id, source)] ?? "";
-    const valueB = selectedOptions[getKey(rowB.id, source)] ?? "";
-    return valueA < valueB ? 1 : -1;
-  }
+  const sortRows = (
+    rowA: Row<TableColumns>,
+    rowB: Row<TableColumns>,
+    type: "variable" | "value"
+  ): number => {
+    console.log(rowA, rowB);
+    const valueA = rowsData[selectedTab].find((row) => row.id === rowA.id);
+    const valueB = rowsData[selectedTab].find((row) => row.id === rowB.id);
+    if (type === "variable") {
+      return (valueA?.variable ?? "") < (valueB?.variable ?? "") ? 1 : -1;
+    }
+    return (valueA?.value ?? "") < (valueB?.value ?? "") ? 1 : -1;
+  };
 
   const columns = [
     columnHelper.accessor("variable", {
@@ -50,7 +71,8 @@ const EndpointCustom: React.FC = () => {
       meta: {
         size: "50%",
       },
-      sortingFn: (rowA: any, rowB: any) => sortRows(rowA, rowB, 'variable'),
+      sortingFn: (rowA: Row<TableColumns>, rowB: Row<TableColumns>) =>
+        sortRows(rowA, rowB, "variable"),
       cell: (props) => {
         return (
           <FormInput
@@ -58,11 +80,20 @@ const EndpointCustom: React.FC = () => {
             name={`endpoint-variable-${props.row.id}`}
             label=""
             onChange={(event) =>
-              (selectedOptions[getKey(props.row.id, "variable")] =
-                event.target.value)
+              setRowsData((prevRowsData) => {
+                prevRowsData[selectedTab].map((row) => {
+                  if (row.id !== props.row.id) return row;
+                  row.variable = event.target.value;
+                  return row;
+                });
+                return prevRowsData;
+              })
             }
-            defaultValue={selectedOptions[getKey(props.row.id, "variable")]}
-            placeholder={"Muutuja.."}
+            defaultValue={
+              rowsData[selectedTab].find((row) => row.id === props.row.id)
+                ?.variable
+            }
+            placeholder={t("newService.endpoint.variable") + '..'}
           />
         );
       },
@@ -72,17 +103,20 @@ const EndpointCustom: React.FC = () => {
       meta: {
         size: "50%",
       },
-      sortingFn: (rowA: any, rowB: any) => sortRows(rowA, rowB, 'value'),
+      sortingFn: (rowA: Row<TableColumns>, rowB: Row<TableColumns>) =>
+        sortRows(rowA, rowB, "value"),
       cell: (props) => {
-        const selectedOption = selectedOptions[getKey(props.row.id, "value")];
         return (
           <FormSelect
             name={props.row.original.variable}
             label={""}
             options={dummyVariableOptions}
-            defaultValue={selectedOption}
+            defaultValue={
+              rowsData[selectedTab].find((row) => row.id === props.row.id)
+                ?.value
+            }
             onSelectionChange={(selection) =>
-              updateSelection(props.row.id, "value", selection)
+              updateSelection(props.row.id, selection)
             }
           />
         );
@@ -157,7 +191,7 @@ const EndpointCustom: React.FC = () => {
                 value={tab}
                 key={tab}
               >
-                {tab}
+                {t(`newService.endpoint.${tab}`)}
               </Tabs.Trigger>
             ))}
           </Tabs.List>
@@ -169,7 +203,7 @@ const EndpointCustom: React.FC = () => {
             >
               <DataTable
                 sortable={true}
-                data={[{}, {}, {}]}
+                data={rowsData[tab]}
                 columns={columns}
               />
               <hr style={{ margin: 0, borderTop: "1px solid #D2D3D8" }} />

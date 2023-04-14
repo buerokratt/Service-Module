@@ -15,7 +15,7 @@ import {
 } from "../../..";
 import { Option } from "../../../../types/option";
 import DataTable from "../../../DataTable";
-import { createColumnHelper, PaginationState } from "@tanstack/react-table";
+import { createColumnHelper } from "@tanstack/react-table";
 import { useTranslation } from "react-i18next";
 import { MdDeleteOutline } from "react-icons/md";
 
