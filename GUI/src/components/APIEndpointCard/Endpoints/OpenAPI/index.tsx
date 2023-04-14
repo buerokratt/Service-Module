@@ -31,10 +31,6 @@ const EndpointOpenAPI: React.FC = () => {
     required: boolean;
     value: any;
   }>();
-  const [pagination, setPagination] = useState<PaginationState>({
-    pageIndex: 0,
-    pageSize: 10,
-  });
 
   const getKey = (endpoint: string | undefined, optionValue: string) =>
     `${endpoint}-${optionValue}`;
@@ -122,8 +118,6 @@ const EndpointOpenAPI: React.FC = () => {
           sortable={true}
           data={dummyVariablesData}
           columns={columns}
-          pagination={pagination}
-          setPagination={setPagination}
         />
       )}
     </Track>
