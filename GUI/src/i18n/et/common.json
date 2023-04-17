@@ -40,7 +40,6 @@
     }
   },
   "newService": {
-    "endpoints": "Otspunktid",
     "test": "Testi URLi",
     "endpoint": {
       "add": "+ Lisa API otspunkt",
@@ -54,6 +53,7 @@
       "name": "Otspunkti nimetus",
       "params": "Params",
       "required": "Muutuja on kohustuslik",
+      "single": "Otspunkt",
       "test": "Test otspunkt",
       "url": "API otspunkti URL",
       "value": "Väärtus",

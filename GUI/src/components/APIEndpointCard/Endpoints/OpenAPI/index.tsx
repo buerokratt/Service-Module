@@ -104,7 +104,7 @@ const EndpointOpenAPI: React.FC = () => {
       </div>
       {endpoints.length > 0 && (
         <div>
-          <label htmlFor="select-endpoint">{t("newService.endpoints")}</label>
+          <label htmlFor="select-endpoint">{t("newService.endpoint.single")}</label>
           <FormSelect
             name={"select-endpoint"}
             label={""}

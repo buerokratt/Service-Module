@@ -40,7 +40,6 @@
     }
   },
   "newService": {
-    "endpoints": "Endpoints",
     "test": "Test URL",
     "endpoint": {
       "add": "+ Add API endpoint",
@@ -54,6 +53,7 @@
       "name": "Endpoint name",
       "params": "Params",
       "required": "Variable is required",
+      "single": "Endpoint",
       "test": "Test endpoint",
       "url": "API endpoint URL",
       "value": "Value",
