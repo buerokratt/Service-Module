@@ -22,6 +22,8 @@ type EndpointCardProps = {
 const APIEndpointCard: FC<EndpointCardProps> = ({ onDelete }) => {
   const [option, setOption] = useState<Option | null>();
   const [selectedTab, setSelectedTab] = useState<string>("live");
+  const [endpointName, setEndpointName] = useState<string>();
+  const [testEnvExists, setTestEnvExists] = useState<boolean>(false);
   const options = [
     { label: "Open API", value: "openAPI", name: "da" },
     { label: "Custom endpoint", value: "custom", name: "da" },
@@ -35,7 +37,10 @@ const APIEndpointCard: FC<EndpointCardProps> = ({ onDelete }) => {
   return (
     <Tabs.Root
       defaultValue="live"
-      onValueChange={(value) => setSelectedTab(value)}
+      onValueChange={(value) => {
+        setSelectedTab(value);
+        if (value === "test") setTestEnvExists(true);
+      }}
       className="tab-group"
     >
       <Track justify="between">
@@ -44,8 +49,11 @@ const APIEndpointCard: FC<EndpointCardProps> = ({ onDelete }) => {
             {t("newService.endpoint.live")}
           </Tabs.Trigger>
           <Tabs.Trigger className={getTabTriggerClasses("test")} value="test">
-            {/* TODO update text value based on if test environment is present */}
-            {t("newService.endpoint.test")}
+            {t(
+              testEnvExists
+                ? "newService.endpoint.testEnv"
+                : "newService.endpoint.addTestEnv"
+            )}
           </Tabs.Trigger>
         </Tabs.List>
         <>
@@ -69,6 +77,7 @@ const APIEndpointCard: FC<EndpointCardProps> = ({ onDelete }) => {
               options={options}
               placeholder={t("global.choose") ?? ""}
               onSelectionChange={(selection) => setOption(selection)}
+              defaultValue={option?.value}
             />
           </div>
           {option && (
@@ -76,7 +85,12 @@ const APIEndpointCard: FC<EndpointCardProps> = ({ onDelete }) => {
               <label htmlFor="endpointName">
                 {t("newService.endpoint.name")}
               </label>
-              <FormInput name="endpointName" label="" />
+              <FormInput
+                name="endpointName"
+                label=""
+                value={endpointName}
+                onChange={(e) => setEndpointName(e.target.value)}
+              />
             </div>
           )}
           {option?.value === "openAPI" && <EndpointOpenAPI />}
@@ -85,7 +99,35 @@ const APIEndpointCard: FC<EndpointCardProps> = ({ onDelete }) => {
         </Track>
       </Tabs.Content>
       <Tabs.Content className="tab-group__tab-content" value="test">
-        <h5>{t("newService.endpoint.api")}</h5>
+        <Track direction="vertical" align="stretch" gap={16}>
+          <div>
+            <label htmlFor="service-type">{t("newService.uses")}</label>
+            <FormSelect
+              name="service-type"
+              label={""}
+              disabled
+              placeholder={t("global.choose") ?? ""}
+              options={options}
+              defaultValue={option?.value}
+            />
+          </div>
+          {option && (
+            <div>
+              <label htmlFor="endpointName">
+                {t("newService.endpoint.name")}
+              </label>
+              <FormInput
+                name="endpointName"
+                label=""
+                value={endpointName}
+                disabled
+              />
+            </div>
+          )}
+          {option?.value === "openAPI" && <EndpointOpenAPI />}
+          {option?.value === "custom" && <EndpointCustom />}
+          {option?.value === "resql" && <EndpointResqlComponent />}
+        </Track>
       </Tabs.Content>
     </Tabs.Root>
   );

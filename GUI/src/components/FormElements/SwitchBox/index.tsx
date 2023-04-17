@@ -18,9 +18,9 @@ const SwitchBox = forwardRef<HTMLButtonElement, SwitchBoxProps>((
     checked,
     hideLabel,
     onCheckedChange,
+    ...rest
   },
   ref,
-  ...rest
 ) => {
   const id = useId();
 

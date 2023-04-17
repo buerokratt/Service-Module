@@ -43,6 +43,7 @@
     "test": "Test URL",
     "endpoint": {
       "add": "+ Add API endpoint",
+      "addtestEnv": "+ Add test environment",
       "api": "API endpoint",
       "ask": "Ask for endpoints",
       "body": "Body",
@@ -54,7 +55,7 @@
       "params": "Params",
       "required": "Variable is required",
       "single": "Endpoint",
-      "test": "Test endpoint",
+      "testEnv": "Test environment",
       "url": "API endpoint URL",
       "value": "Value",
       "variable": "Variable"

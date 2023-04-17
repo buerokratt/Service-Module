@@ -43,6 +43,7 @@
     "test": "Testi URLi",
     "endpoint": {
       "add": "+ Lisa API otspunkt",
+      "addTestEnv": "+ Lisa testkeskkond",
       "api": "API otspunkt",
       "ask": "Küsi otspunktid",
       "body": "Body",
@@ -54,7 +55,7 @@
       "params": "Params",
       "required": "Muutuja on kohustuslik",
       "single": "Otspunkt",
-      "test": "Test otspunkt",
+      "testEnv": "Testkeskkond",
       "url": "API otspunkti URL",
       "value": "Väärtus",
       "variable": "Muutuja"
