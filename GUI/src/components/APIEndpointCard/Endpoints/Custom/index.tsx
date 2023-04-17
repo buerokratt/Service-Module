@@ -5,6 +5,7 @@ import {
   Button,
   FormInput,
   FormSelect,
+  FormTextarea,
   Icon,
   SwitchBox,
   Track,
@@ -29,22 +30,35 @@ type TableColumns = {
 const EndpointCustom: React.FC = () => {
   const { t } = useTranslation();
   const tabs = ["params", "headers", "body"];
-  const [error, setError] = useState<string | null>();
+  const [urlError, setUrlError] = useState<string | null>();
+  const [jsonError, setJsonError] = useState<string | null>();
   const [selectedTab, setSelectedTab] = useState<string>(tabs[0]);
   const [endpoint, setEndpoint] = useState<string>("");
-  const [showTable, setShowTable] = useState<boolean>(false);
-  const [tableKey, setTableKey] = useState<number>(0);
+  const [showContent, setShowContent] = useState<boolean>(false);
+  const [showRawData, setShowRawData] = useState<boolean>(false);
+  const [key, setKey] = useState<number>(0);
   const columnHelper = createColumnHelper<TableColumns>();
 
-  const getInitialRowsData = () => {
+  const getInitialTabsRowsData = () => {
     const data: { [tab: string]: RowData[] } = {};
     tabs.forEach((tab) => {
       data[tab] = [{ id: "0" }];
     });
     return data;
   };
+
+  const getInitialTabsRawData = () => {
+    const data: { [tab: string]: string } = {};
+    tabs.forEach((tab) => {
+      data[tab] = "";
+    });
+    return data;
+  };
   const [rowsData, setRowsData] = useState<{ [tab: string]: RowData[] }>(
-    getInitialRowsData()
+    getInitialTabsRowsData()
+  );
+  const [tabRawData, setTabRawData] = useState<{ [tab: string]: string }>(
+    getInitialTabsRawData()
   );
 
   const getTabTriggerClasses = (tab: string) =>
@@ -63,7 +77,7 @@ const EndpointCustom: React.FC = () => {
     if (id !== `${rowsData[selectedTab].length - 1}`) return;
     setRowsData((prevRowsData) => {
       prevRowsData[selectedTab].push({ id: `${rowsData[selectedTab].length}` });
-      setTableKey((key) => key + 1);
+      setKey(key + 1);
       return prevRowsData;
     });
   };
@@ -73,7 +87,6 @@ const EndpointCustom: React.FC = () => {
     rowB: Row<TableColumns>,
     type: "variable" | "value"
   ): number => {
-    console.log(rowA, rowB);
     const valueA = rowsData[selectedTab].find((row) => row.id === rowA.id);
     const valueB = rowsData[selectedTab].find((row) => row.id === rowB.id);
     if (type === "variable") {
@@ -143,6 +156,57 @@ const EndpointCustom: React.FC = () => {
     }),
   ];
 
+  const buildRawDataView = (): JSX.Element => {
+    return (
+      <>
+        <Track
+          justify="between"
+          style={{ padding: "8px 0 8px 0" }}
+        >
+          <p style={{ color: "#d73e3e" }}>{jsonError}</p>
+          <Button
+            appearance="text"
+            onClick={() => {
+              setTabRawData((prevRawData) => {
+                try {
+                  prevRawData[selectedTab] = JSON.stringify(
+                    JSON.parse(prevRawData[selectedTab]),
+                    null,
+                    4
+                  );
+                } catch (e: any) {
+                  setJsonError(
+                    "Unable to parse json, please check input and try again."
+                  );
+                  // setJsonError(
+                  //   `Unable to format JSON. ${e.message}`
+                  // );
+                }
+                return prevRawData;
+              });
+              setKey(key + 1);
+            }}
+          >
+            Format JSON
+          </Button>
+        </Track>
+        <FormTextarea
+          key={`${selectedTab}-raw-data`}
+          name={`${selectedTab}-raw-data`}
+          label={""}
+          defaultValue={tabRawData[selectedTab]}
+          onChange={(event) => {
+            setJsonError(undefined);
+            setTabRawData((prevRawData) => {
+              prevRawData[selectedTab] = event.target.value;
+              return prevRawData;
+            });
+          }}
+        />
+      </>
+    );
+  };
+
   return (
     <Track direction="vertical" align="stretch" gap={16}>
       <div>
@@ -175,30 +239,31 @@ const EndpointCustom: React.FC = () => {
               const errorMsg = endpoint
                 ? undefined
                 : t("newService.endpoint.error");
-              setShowTable(!errorMsg);
-              setError(errorMsg);
+              setShowContent(!errorMsg);
+              setUrlError(errorMsg);
             }}
           >
             {t("newService.test")}
           </Button>
         </Track>
       </div>
-      {error && (
+      {urlError && (
         <div
           className={"toast toast--error"}
           style={{ padding: "8px 16px 8px 16px" }}
         >
           <div className="toast__title">
             <Icon icon={<MdErrorOutline />} />
-            {error}
+            {urlError}
           </div>
         </div>
       )}
-      {showTable && (
+      {showContent && (
         <Tabs.Root
           defaultValue={selectedTab}
           onValueChange={(value) => setSelectedTab(value)}
           className="endpoint-tab-group"
+          key={key}
         >
           <Track
             justify="between"
@@ -223,6 +288,8 @@ const EndpointCustom: React.FC = () => {
                 style={{ width: "fit-content" }}
                 label={""}
                 name={"raw-data"}
+                checked={showRawData}
+                onCheckedChange={(checked) => setShowRawData(checked)}
               />
               <p style={{ whiteSpace: "nowrap", color: "#34394C" }}>Raw data</p>
             </Track>
@@ -233,13 +300,18 @@ const EndpointCustom: React.FC = () => {
               value={tab}
               key={tab}
             >
-              <DataTable
-                sortable={true}
-                data={rowsData[tab]}
-                columns={columns}
-                key={tableKey}
-              />
-              <hr style={{ margin: 0, borderTop: "1px solid #D2D3D8" }} />
+              {showRawData ? (
+                buildRawDataView()
+              ) : (
+                <>
+                  <DataTable
+                    sortable={true}
+                    data={rowsData[tab]}
+                    columns={columns}
+                  />
+                  <hr style={{ margin: 0, borderTop: "1px solid #D2D3D8" }} />
+                </>
+              )}
             </Tabs.Content>
           ))}
         </Tabs.Root>
