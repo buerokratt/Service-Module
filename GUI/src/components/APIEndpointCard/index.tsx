@@ -5,6 +5,7 @@ import {
   Button,
   EndpointCustom,
   EndpointOpenAPI,
+  EndpointResqlComponent,
   FormInput,
   FormSelect,
   Icon,
@@ -24,6 +25,7 @@ const APIEndpointCard: FC<EndpointCardProps> = ({ onDelete }) => {
   const options = [
     { label: "Open API", value: "openAPI", name: "da" },
     { label: "Custom endpoint", value: "custom", name: "da" },
+    { label: "Internal Resql component", value: "resql", name: "da" },
   ];
   const { t } = useTranslation();
 
@@ -79,6 +81,7 @@ const APIEndpointCard: FC<EndpointCardProps> = ({ onDelete }) => {
           )}
           {option?.value === "openAPI" && <EndpointOpenAPI />}
           {option?.value === "custom" && <EndpointCustom />}
+          {option?.value === "resql" && <EndpointResqlComponent />}
         </Track>
       </Tabs.Content>
       <Tabs.Content className="tab-group__tab-content" value="test">

@@ -6,6 +6,7 @@ import Dialog from "./Dialog";
 import Drawer from "./Drawer";
 import EndpointCustom from "./APIEndpointCard/Endpoints/Custom";
 import EndpointOpenAPI from "./APIEndpointCard/Endpoints/OpenAPI";
+import EndpointResqlComponent from "./APIEndpointCard/Endpoints/ResqlComponent";
 import {
   FormCheckbox,
   FormCheckboxes,
@@ -24,6 +25,7 @@ import MainNavigation from "./MainNavigation";
 import Modal from "./Modal";
 import NewServiceHeader from "./NewServiceHeader";
 import Popover from "./Popover";
+import RequestVariables from "./APIEndpointCard/Endpoints/RequestVariables";
 import Section from "./Section";
 import Step from "./StepCounter/Step";
 import StepCounter from "./StepCounter";
@@ -39,6 +41,7 @@ export {
   Drawer,
   EndpointCustom,
   EndpointOpenAPI,
+  EndpointResqlComponent,
   FormCheckbox,
   FormCheckboxes,
   FormDatepicker,
@@ -53,6 +56,7 @@ export {
   Modal,
   NewServiceHeader,
   Popover,
+  RequestVariables,
   Section,
   Step,
   StepCounter,
