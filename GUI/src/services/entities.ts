@@ -12,7 +12,6 @@ export async function getEntities(): Promise<Entity[]> {
 
 export async function addEntity(entityData: { name: string }) {
   const { data } = await api.post('rasa/entities/add', entityData);
-  console.log(data);
   return data;
 }
 
