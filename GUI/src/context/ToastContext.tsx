@@ -28,7 +28,7 @@ type ToastContextType = {
 
 export const ToastContext = createContext<ToastContextType>(null!);
 
-export const ToastProvider: FC<PropsWithChildren> = ({ children }) => {
+export const ToastProvider: FC<PropsWithChildren> = ({children}) => {
   const { t } = useTranslation();
   const [toasts, setToasts] = useState<ToastTypeWithId[]>([]);
   const open = (content: ToastType) => {
