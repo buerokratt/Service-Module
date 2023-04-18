@@ -6,14 +6,34 @@
     "resultCount": "Results per page",
     "gotoPage": "Go to page",
     "notification": "Notification",
-    "paginationNavigation": "Navigate"
+    "paginationNavigation": "Navigate",
+    "choose": "Choose"
   },
   "menu": {
     "overview": "Overview",
     "flowbuilder": "Flow Builder",
     "services": "Services",
     "newService": "New Service",
+    "intents": "Intents",
+    "followupTraining": "Followup Training",
     "close": "Close menu"
+  },
+  "intents": {
+    "entities": "Entities",
+    "regex": "Regex",
+    "add": "Add",
+    "yes": "Yes",
+    "no": "No",
+    "removeValidation": "Remove Validation",
+    "search": "Search",
+    "delete": "Delete",
+    "edit": "Edit",
+    "save": "Save",
+    "cancel": "Cancel",
+    "notification": "Notification",
+    "notificationError": "Error",
+    "entityName": "Name",
+    "title": "Title"
   },
   "overview": {
     "services": "Services",
