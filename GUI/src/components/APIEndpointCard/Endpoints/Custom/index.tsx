@@ -1,12 +1,18 @@
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { MdErrorOutline } from "react-icons/md";
-import { Button, FormInput, FormSelect, Icon, Track } from "../../..";
-import RequestVariables from "../RequestVariables";
+import {
+  Button,
+  FormInput,
+  FormSelect,
+  Icon,
+  RequestVariables,
+  Track,
+} from "../../..";
 
 const EndpointCustom: React.FC = () => {
   const { t } = useTranslation();
-  const [urlError, setUrlError] = useState<string | null>();
+  const [urlError, setUrlError] = useState<string>();
   const [endpoint, setEndpoint] = useState<string>("");
   const [showContent, setShowContent] = useState<boolean>(false);
 

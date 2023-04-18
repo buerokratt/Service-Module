@@ -28,7 +28,7 @@ type TableColumns = {
 const RequestVariables: React.FC = () => {
   const { t } = useTranslation();
   const tabs = ["params", "headers", "body"];
-  const [jsonError, setJsonError] = useState<string | null>();
+  const [jsonError, setJsonError] = useState<string>();
   const [selectedTab, setSelectedTab] = useState<string>(tabs[0]);
   const [showRawData, setShowRawData] = useState<boolean>(false);
   const [key, setKey] = useState<number>(0);
@@ -96,8 +96,9 @@ const RequestVariables: React.FC = () => {
       meta: {
         size: "50%",
       },
-      sortingFn: (rowA: Row<TableColumns>, rowB: Row<TableColumns>) =>
-        sortRows(rowA, rowB, "variable"),
+      sortingFn: (rowA: Row<TableColumns>, rowB: Row<TableColumns>) => {
+        return sortRows(rowA, rowB, "variable");
+      },
       cell: (props) => {
         return (
           <FormInput
@@ -130,8 +131,9 @@ const RequestVariables: React.FC = () => {
       meta: {
         size: "50%",
       },
-      sortingFn: (rowA: Row<TableColumns>, rowB: Row<TableColumns>) =>
-        sortRows(rowA, rowB, "value"),
+      sortingFn: (rowA: Row<TableColumns>, rowB: Row<TableColumns>) => {
+        return sortRows(rowA, rowB, "value");
+      },
       cell: (props) => {
         return (
           <FormSelect
@@ -167,9 +169,7 @@ const RequestVariables: React.FC = () => {
                     4
                   );
                 } catch (e: any) {
-                  setJsonError(
-                    `Unable to format JSON. ${e.message}`
-                  );
+                  setJsonError(`Unable to format JSON. ${e.message}`);
                 }
                 return prevRawData;
               });

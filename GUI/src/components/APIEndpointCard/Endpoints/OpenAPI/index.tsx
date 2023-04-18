@@ -4,15 +4,7 @@ import {
   dummyVariableOptions,
   dummyVariablesData,
 } from "../../../../resources/api-constants";
-import {
-  Button,
-  FormInput,
-  FormSelect,
-  Icon,
-  Label,
-  Tooltip,
-  Track,
-} from "../../..";
+import { Button, FormInput, FormSelect, Icon, Tooltip, Track } from "../../..";
 import { Option } from "../../../../types/option";
 import DataTable from "../../../DataTable";
 import { createColumnHelper } from "@tanstack/react-table";
@@ -104,7 +96,9 @@ const EndpointOpenAPI: React.FC = () => {
       </div>
       {endpoints.length > 0 && (
         <div>
-          <label htmlFor="select-endpoint">{t("newService.endpoint.single")}</label>
+          <label htmlFor="select-endpoint">
+            {t("newService.endpoint.single")}
+          </label>
           <FormSelect
             name={"select-endpoint"}
             label={""}

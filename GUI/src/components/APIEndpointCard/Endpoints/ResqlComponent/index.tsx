@@ -16,7 +16,9 @@ const EndpointResqlComponent: React.FC = () => {
   return (
     <Track direction="vertical" align="stretch" gap={16}>
       <div>
-        <label htmlFor="resql-enpoints">{t("newService.endpoint.single")}</label>
+        <label htmlFor="resql-enpoints">
+          {t("newService.endpoint.single")}
+        </label>
         <FormSelect
           name={"resql-enpoints"}
           label={""}
