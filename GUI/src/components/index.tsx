@@ -32,6 +32,7 @@ import Section from './Section'
 import DataTable from './DataTable'
 import Toast from './Toast'
 import Modal from './Modal'
+import FlowElementsPopup from './FlowElementsPopup'
 
 export {
   Box,
@@ -66,4 +67,5 @@ export {
   Track,
   DataTable,
   Toast,
+  FlowElementsPopup,
 }
