@@ -31,6 +31,7 @@ const FormSelect: FC<FormSelectProps> = (
     placeholder,
     defaultValue,
     onSelectionChange,
+    ...rest
   },
 ) => {
   const id = useId();
@@ -66,7 +67,7 @@ const FormSelect: FC<FormSelectProps> = (
     <div className={selectClasses}>
       {label && !hideLabel && <label htmlFor={id} className='select__label' {...getLabelProps()}>{label}</label>}
       <div className='select__wrapper'>
-        <div className='select__trigger' {...getToggleButtonProps()}>
+        <div className='select__trigger' {...getToggleButtonProps()} {...rest}>
           {selectedItem?.label ?? placeholderValue}
           <Icon label='Dropdown icon' size='medium' icon={<MdArrowDropDown color='#5D6071' />} />
         </div>

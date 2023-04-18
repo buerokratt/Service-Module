@@ -1,22 +1,22 @@
-import React, { FC, PropsWithChildren, ReactNode } from 'react';
+import React, { FC, HTMLAttributes, PropsWithChildren, ReactNode } from 'react';
 import * as RadixDialog from '@radix-ui/react-dialog';
 import { MdOutlineClose } from 'react-icons/md';
 
 import { Icon, Track } from '..';
 import './Popup.scss';
 
-type DialogProps = {
+type DialogProps = HTMLAttributes<HTMLDivElement> & {
   title: string;
   footer?: ReactNode;
   onClose: () => void;
 }
 
-const Popup: FC<PropsWithChildren<DialogProps>> = ({ title, footer, onClose, children }) => {
+const Popup: FC<PropsWithChildren<DialogProps>> = ({ title, footer, onClose, children, ...rest }) => {
   return (
     <RadixDialog.Root defaultOpen={true} onOpenChange={onClose}>
       <RadixDialog.Portal>
         <RadixDialog.Overlay className='popup__overlay' />
-        <RadixDialog.Content className='popup'>
+        <RadixDialog.Content className='popup' {...rest}>
           <div className='popup__header'>
             <RadixDialog.Title className='h3 popup__title'>{title}</RadixDialog.Title>
             <RadixDialog.Close asChild>

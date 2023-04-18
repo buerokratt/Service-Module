@@ -23,5 +23,35 @@ export const dummyServiceData = [
   { name: "eleventh", usedCount: 11, state: ServiceState.Inactive },
 ];
 
+export const dummyEndpointsData = [
+  { label: "/me", value: "/me" },
+  { label: "/you", value: "/you" },
+];
+
+export const dummyVariablesData = [
+  { variable: "first", value: "1" },
+  { variable: "second", value: "20" },
+  { variable: "third", value: "3000" },
+  { variable: "fourth", value: "4000" },
+  { variable: "fifth", value: "500000" },
+  { variable: "sixth", value: "6000000" },
+  { variable: "seventh", value: "70000000" },
+  { variable: "eight", value: "800000000" },
+  { variable: "ninth", value: "900000000" },
+  { variable: "tenth", value: "10000000000" },
+  { variable: "eleventh", value: "11" },
+];
+
+export const dummyVariableOptions = [
+  { label: "0", value: "0" },
+  { label: "10", value: "10" },
+  { label: "20", value: "20" },
+  { label: "30", value: "30" },
+  { label: "40", value: "40" },
+  { label: "50", value: "50" },
+  { label: "60", value: "60" },
+];
+
 // Mocks
-export const openApiSpeckMock = (): string => `${baseUrl}/mocks/services/open-api-spec-mock`;
+export const openApiSpeckMock = (): string =>
+  `${baseUrl}/mocks/services/open-api-spec-mock`;

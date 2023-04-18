@@ -1,0 +1,132 @@
+@import "src/styles/tools/spacing";
+@import "src/styles/tools/color";
+@import "src/styles/settings/variables/other";
+@import "src/styles/settings/variables/typography";
+
+.graph {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background-color: get-color(white);
+  border-left: 1px solid get-color(black-coral-2);
+  position: sticky;
+  right: -16px;
+  top: -16px;
+  height: calc(100vh - 105px);
+
+  &__controls {
+    position: absolute;
+    width: 27%;
+    padding: 16px 0 16px 16px;
+    z-index: 1;
+  }
+  &__header,
+  &__footer {
+    padding: get-spacing(haapsalu);
+  }
+
+  &__header {
+    border-bottom: 1px solid get-color(black-coral-2);
+    background-color: get-color(extra-light);
+    border-radius: $veera-radius-s $veera-radius-s 0 0;
+  }
+
+  &__footer {
+    border-top: 1px solid get-color(black-coral-2);
+  }
+
+  &__body {
+    flex: 1;
+  }
+}
+
+.react-flow {
+  &__node {
+    padding: 8px;
+    border-radius: 4px;
+    color: get-color(black);
+    font-size: $veera-font-size-100;
+    line-height: $veera-line-height-500;
+    min-width: 400px;
+    max-width: 354px;
+    width: 100%;
+
+    &-default {
+      width: 320px;
+      overflow-wrap: break-word;
+    }
+
+    .select__label,
+    .switch__label,
+    .input__label {
+      flex: 0 0 100px;
+    }
+
+    &.selectable {
+      box-shadow: none;
+    }
+
+    &.start,
+    &.end {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      font-size: 20px;
+      color: get-color(white);
+      border: 0;
+      min-width: revert;
+    }
+
+    &.placeholder {
+      background-color: get-color(extra-light);
+      border: dashed 1px get-color(black-coral-10);
+
+      p {
+        color: get-color(black-coral-6);
+      }
+    }
+
+    &.start {
+      background-color: get-color(sea-green-10);
+    }
+
+    &.end {
+      background-color: get-color(jasper-10);
+    }
+
+    &.step {
+      background-color: get-color(sapphire-blue-0);
+      border: 1px solid get-color(sapphire-blue-2);
+    }
+
+    &.rule {
+      background-color: get-color(black-coral-1);
+      border: 1px solid get-color(black-coral-3);
+    }
+
+    &.finishing-step {
+      background-color: get-color(jasper-1);
+      border: 1px solid get-color(jasper-3);
+    }
+
+    &.selected {
+      border: dashed 1px get-color(black-coral-1);
+    }
+  }
+
+  &__edge-path {
+    stroke: get-color(black-coral-10);
+    stroke-width: 2px;
+  }
+
+  &__arrowhead {
+    polyline {
+      stroke: get-color(black-coral-10);
+      fill: get-color(black-coral-10);
+      stroke-linejoin: bevel;
+    }
+  }
+}

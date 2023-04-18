@@ -7,7 +7,9 @@
     "gotoPage": "Go to page",
     "notification": "Notification",
     "paginationNavigation": "Navigate",
-    "choose": "Choose"
+    "choose": "Choose..",
+    "continue": "Continue",
+    "view": "View"
   },
   "menu": {
     "overview": "Overview",
@@ -56,5 +58,25 @@
       "setInactive": "Are you sure you want to deactivate this service?",
       "setState": "Update state"
     }
+  },
+  "newService": {
+    "endpoints": "Endpoints",
+    "endpoint": {
+      "add": "+ Add API endpoint",
+      "api": "API endpoint",
+      "insert": "Insert API endpoint..",
+      "ask": "Ask for endpoints",
+      "url": "API endpoint URL",
+      "test": "Test URL",
+      "variable": "Variable",
+      "value": "Value"
+    },
+    "saveDraft": "Save draft",
+    "trainingModuleSetup": "Training module setup",
+    "serviceSetup": "Service setup",
+    "serviceFlowCreation": "Service flow creation",
+    "name": "Name",
+    "description": "Description",
+    "uses": "Service uses"
   }
 }
