@@ -46,7 +46,7 @@ const CustomNode: FC<NodeProps & NodeDataProps> = (props) => {
 
       {data.stepType === "input" ? (
         <>
-          <Handle
+          {/* <Handle
             id={`handle-${id}-1`}
             type="source"
             position={Position.Bottom}
@@ -59,7 +59,7 @@ const CustomNode: FC<NodeProps & NodeDataProps> = (props) => {
             position={Position.Bottom}
             isConnectable={isConnectable}
             className="right-handle"
-          />
+          /> */}
         </>
       ) : (
         <Handle
@@ -92,7 +92,7 @@ const CustomNode: FC<NodeProps & NodeDataProps> = (props) => {
 
       {data.stepType === "input" ? (
         <>
-          <Handle
+          {/* <Handle
             id={`handle-${id}-1`}
             type="source"
             position={Position.Bottom}
@@ -105,7 +105,7 @@ const CustomNode: FC<NodeProps & NodeDataProps> = (props) => {
             position={Position.Bottom}
             isConnectable={isConnectable}
             className="right-handle"
-          />
+          /> */}
         </>
       ) : (
         <Handle

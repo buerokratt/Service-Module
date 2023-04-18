@@ -16,9 +16,8 @@ const StepNode: FC<NodeDataProps> = ({ data }) => {
   const { t } = useTranslation();
 
   return (
-    <Track style={{width: '100%'}} direction='vertical' align='left'>
+    <Track style={{ width: '100%' }} direction='vertical' align='left'>
       {'label' in data && (<p>{data.label}</p>)}
-        <p>hello</p>
     </Track>
   );
 };
