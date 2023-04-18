@@ -1,8 +1,16 @@
 import express, { Router } from "express";
 import path from "path";
 import fs from "fs";
+import mime from "mime-types";
+import array from "lodash";
 import { buildContentFilePath, isValidFilename } from "./util";
 const router: Router = express.Router();
+
+interface MergeRequestBody {
+  array1: Array<Record<string, any>>;
+  array2: Array<Record<string, any>>;
+  iteratee: string;
+}
 
 router.post("/write", (req, res) => {
   const filename = buildContentFilePath(req.body.file_path);
@@ -46,7 +54,7 @@ router.post("/move", async (req, res) => {
     return;
   }
 
-  fs.mkdir(path.dirname(newPath), () => {});
+  fs.mkdir(path.dirname(newPath), () => { });
 
   fs.rename(currentPath, newPath, function (err) {
     if (err) {
@@ -103,6 +111,52 @@ router.post("/check", (req, res) => {
       res.json(true);
     }
   });
+});
+
+router.post("/read", (req, res) => {
+  const filePath = buildContentFilePath(req.body.file_path);
+
+  if (!filePath) {
+    res.status(400).send("File path is required");
+    return;
+  }
+
+  if (filePath.includes("..")) {
+    res.status(400).send("Relative paths are not allowed");
+    return;
+  }
+  const mimeType = mime.lookup(filePath);
+  const name = filePath.split(/(\\|\/)/g).pop();
+
+  fs.readFile(filePath, 'utf-8', (err, data) => {
+    if (err) {
+      res.status(404).send('File not found');
+      return;
+    }
+    const file = Buffer.from(data).toString('base64');
+
+    res.setHeader('Content-Type', 'application/json');
+
+    const result = {
+      name: name,
+      file: file,
+      mimeType: mimeType
+    };
+    res.json(result);
+  });
+});
+
+router.post("/merge", (req, res) => {
+  const { array1, array2, iteratee }: MergeRequestBody = req.body;
+
+    if (!array1 || !array2) {
+        res.status(400).send('Both arrays are required');
+        return;
+    }
+
+    const merged = array.unionBy(array2, array1, iteratee);
+
+    res.json(merged);
 });
 
 export default router;

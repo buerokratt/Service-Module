@@ -1,0 +1,27 @@
+assign_values:
+  assign:
+    params: ${incoming.body}
+
+getEntitiesWithName:
+  call: http.post
+  args:
+    url: http://opensearch:9200/entities/_search/template
+    body:
+      id: "entity-with-name"
+      params: ${params}
+  result: getEntitiesResult
+
+mapEntitiesData:
+  call: http.post
+  args:
+    url: http://data_mapper:3005/hbs/services/get-entity-with-name
+    headers:
+      type: 'json'
+    body:
+      hits: ${getEntitiesResult.response.body.hits.hits}
+  result: entitiesData
+  next: returnSuccess
+
+returnSuccess:
+  return: ${entitiesData.response.body}
+  next: end

@@ -3,11 +3,12 @@ import { Route, Routes } from 'react-router-dom'
 import { Layout } from './components'
 import NotFoundPage from './pages/NotFoundPage'
 import OverviewPage from './pages/OverviewPage'
-import FlowBuilderPage from './pages/FlowBuilderPage'
-import NewServicePage from './pages/NewServicePage'
 import { ROUTES } from './resources/routes-constants'
 import OldNewServicePage from './pages/OldNewServicePage'
 import './styles/main.scss'
+import IntentsFollowupTraining from './pages/Training/IntentsFollowupTraining'
+import FlowBuilderPage from './pages/FlowBuilderPage'
+import NewServicePage from './pages/NewServicePage'
 
 const RootComponent: React.FC = () => {
   return (
@@ -20,6 +21,7 @@ const RootComponent: React.FC = () => {
           element={<OldNewServicePage />}
         />
         <Route path={ROUTES.FLOW_ROUTE} element={<FlowBuilderPage />} />
+        <Route path={ROUTES.FOLLOWUPTRAINING_ROUTE} element={<IntentsFollowupTraining />} />
         <Route path="*" element={<NotFoundPage />} />
       </Route>
     </Routes>
