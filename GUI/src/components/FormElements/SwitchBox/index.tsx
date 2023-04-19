@@ -1,10 +1,10 @@
-import React, { forwardRef, useId } from 'react';
+import React, { forwardRef, HTMLAttributes, useId } from 'react';
 import * as RadixSwitch from '@radix-ui/react-switch';
 import { ControllerRenderProps } from 'react-hook-form';
 
 import './SwitchBox.scss';
 
-type SwitchBoxProps = Partial<ControllerRenderProps> & {
+type SwitchBoxProps = HTMLAttributes<HTMLDivElement> & Partial<ControllerRenderProps> & {
   name: string;
   label: string;
   checked?: boolean;
@@ -18,13 +18,14 @@ const SwitchBox = forwardRef<HTMLButtonElement, SwitchBoxProps>((
     checked,
     hideLabel,
     onCheckedChange,
+    ...rest
   },
   ref,
 ) => {
   const id = useId();
 
   return (
-    <div className='switchbox'>
+    <div className='switchbox' {...rest}>
       {label && !hideLabel && <label htmlFor={id} className='switch__label'>{label}</label>}
       <RadixSwitch.Root
         ref={ref}
