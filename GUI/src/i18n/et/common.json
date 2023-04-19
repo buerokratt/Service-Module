@@ -8,7 +8,8 @@
     "notification": "Teade",
     "paginationNavigation": "Navigeeri",
     "choose": "Vali..",
-    "continue": "Jätka"
+    "continue": "Jätka",
+    "view": "Vaata"
   },
   "menu": {
     "overview": "Ülevaade",
@@ -60,6 +61,7 @@
     }
   },
   "newService": {
+    "endpoints": "Otspunktid",
     "test": "Testi URLi",
     "endpoint": {
       "add": "+ Lisa API otspunkt",

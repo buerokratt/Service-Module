@@ -1,20 +1,23 @@
-import React, { ReactNode, useState } from "react";
+import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router-dom";
 import {
-  APIEndpointCard,
   Button,
   Card,
   FormInput,
+  ApiEndpointCard,
   FormTextarea,
   Layout,
   NewServiceHeader,
   Track,
 } from "../components";
 import { v4 as uuid } from "uuid";
+import { ROUTES } from "../resources/routes-constants";
 
 const NewServicePage: React.FC = () => {
   const [endpoints, setEndpoints] = useState<{ id: string }[]>([]);
   const { t } = useTranslation();
+  const navigate = useNavigate();
 
   const onDelete = (id: string) => {
     setEndpoints((prevEndpoints) =>
@@ -22,7 +25,8 @@ const NewServicePage: React.FC = () => {
     );
   };
   return (
-    <Layout disableMenu customHeader={<NewServiceHeader />}>
+    <Layout disableMenu customHeader={<NewServiceHeader activeStep={2} continueOnClick={() => navigate(ROUTES.FLOW_ROUTE)}/>}>
+
       <Track
         style={{ width: 800, alignSelf: "center" }}
         direction="vertical"
@@ -49,8 +53,9 @@ const NewServicePage: React.FC = () => {
             </div>
           </Track>
         </Card>
+
         {endpoints.map((endpoint) => (
-          <APIEndpointCard
+          <ApiEndpointCard
             key={endpoint.id}
             onDelete={() => onDelete(endpoint.id)}
           />
