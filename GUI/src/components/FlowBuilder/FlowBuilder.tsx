@@ -24,7 +24,7 @@ const nodeTypes = {
 };
 
 type FlowBuilderProps = {
-  setPopupVisible: Dispatch<SetStateAction<boolean>>;
+  setVisiblePopupNode: Dispatch<SetStateAction<Node | null>>;
   updatedRules: (string | null)[];
   nodes: Node[];
   setNodes: Dispatch<SetStateAction<Node[]>>;
@@ -35,7 +35,7 @@ type FlowBuilderProps = {
 };
 
 const FlowBuilder: FC<FlowBuilderProps> = ({
-  setPopupVisible,
+  setVisiblePopupNode,
   updatedRules,
   nodes,
   setNodes,
@@ -132,7 +132,7 @@ const FlowBuilder: FC<FlowBuilderProps> = ({
         data: {
           label,
           onDelete,
-          setPopupVisible,
+          setPopupVisible: () => setVisiblePopupNode(null),
           type: "rule",
           stepType: "rule",
           readonly: true,
@@ -366,7 +366,7 @@ const FlowBuilder: FC<FlowBuilderProps> = ({
             data: {
               label,
               onDelete,
-              setPopupVisible,
+              setPopupVisible: () => setVisiblePopupNode({ ...matchingPlaceholder, type }),
               type: ["finishing-step-end", "finishing-step-redirect"].includes(type) ? "finishing-step" : "step",
               stepType: type,
               readonly: type === "finishing-step-end",

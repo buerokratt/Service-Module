@@ -11,6 +11,7 @@ import { GRID_UNIT } from "../components/FlowBuilder/FlowBuilder";
 import { CSSProperties } from "react";
 import { useNavigate } from "react-router-dom";
 import { ROUTES } from "../resources/routes-constants";
+import FileGenerateContent from "../components/FlowElementsPopup/FileGenerateContent";
 
 const initialPlaceholder = {
   id: "2",
@@ -76,7 +77,7 @@ const ServiceFlowPage: FC = () => {
       type: "finishing-step-redirect",
     },
   ];
-  const [isPopupVisible, setPopupVisible] = useState(false);
+  const [visiblePopupNode, setVisiblePopupNode] = useState<Node | null>(null);
   const [updatedRules, setUpdatedRules] = useState<(string | null)[]>([]);
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState([initialEdge]);
@@ -88,28 +89,37 @@ const ServiceFlowPage: FC = () => {
     event.dataTransfer.effectAllowed = "move";
   };
 
-  const contentStyle: CSSProperties = { overflowY: 'auto', maxHeight: '40vh'};
+  const contentStyle: CSSProperties = { overflowY: 'auto', maxHeight: '40vh' };
 
   return (
     <>
-      <NewServiceHeader activeStep={3} continueOnClick={() => navigate(ROUTES.OVERVIEW_ROUTE)}/>
+      <NewServiceHeader activeStep={3} continueOnClick={() => navigate(ROUTES.OVERVIEW_ROUTE)} />
       <h1 style={{ padding: 16 }}>Teenusvoog "Raamatu laenutus"</h1>
-      {isPopupVisible && (
+      {visiblePopupNode && (
         <Popup
           style={{ maxWidth: 700 }}
-          title={"Hello"}
-          onClose={() => setPopupVisible(false)}
+          title={visiblePopupNode?.type === 'file-generate' ? "File Generate" : "Hello"}
+          onClose={() => setVisiblePopupNode(null)}
           footer={
             <Track gap={16}>
-              <Button appearance="secondary" onClick={() => setPopupVisible(false)}>
+              <Button appearance="secondary" onClick={() => setVisiblePopupNode(null)}>
                 Discard
               </Button>
-              <Button onClick={() => setPopupVisible(false)}>Save</Button>
+              <Button onClick={() => setVisiblePopupNode(null)}>Save</Button>
             </Track>
           }
         >
-          <p>hello</p>
-          <Button onClick={() => setUpdatedRules([null, null, null])}>update rule count</Button>
+          {
+            visiblePopupNode?.type === 'file-generate' &&
+            <FileGenerateContent />
+          }
+          {
+            visiblePopupNode?.type !== 'file-generate' &&
+            <>
+              <p>{visiblePopupNode?.type}</p>
+              <Button onClick={() => setUpdatedRules([null, null, null])}>update rule count</Button>
+            </>
+          }
         </Popup>
       )}
       <ReactFlowProvider>
@@ -151,7 +161,7 @@ const ServiceFlowPage: FC = () => {
             </Track>
           </div>
           <FlowBuilder
-            setPopupVisible={setPopupVisible}
+            setVisiblePopupNode={setVisiblePopupNode}
             updatedRules={updatedRules}
             nodes={nodes}
             setNodes={setNodes}

@@ -19,8 +19,8 @@ const OldNewServicePage: React.FC = () => {
 
   useEffect(() => {
     if (jsonSchema) {
-     setSelectedSchema(jsonSchema.properties?.paths?.properties[selectedEndpoint]);
-   }
+      setSelectedSchema(jsonSchema.properties?.paths?.properties[selectedEndpoint]);
+    }
   }, [selectedEndpoint]);
 
   const fetchOpenApiSpecMock = async () => {
@@ -71,7 +71,7 @@ const OldNewServicePage: React.FC = () => {
           onSelectionChange={(value) => setSelectedEndpoint(value?.value ?? '')}
         />
       )}
-      {selectedSchema != undefined && <Form schema={selectedSchema} validator={validator}  />}
+      {selectedSchema != undefined && <Form schema={selectedSchema} validator={validator} />}
     </Track>
   );
 };
