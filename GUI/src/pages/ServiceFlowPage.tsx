@@ -12,17 +12,15 @@ import {
   Collapsible,
   NewServiceHeader,
   Track,
-  FlowBuilder,
   FlowElementsPopup,
 } from "../components";
-import "./ServiceFlowPage.scss";
-import "./ServiceFlowPage.scss";
 import { Step } from "../types/step";
-import { GRID_UNIT } from "../components/FlowBuilder/FlowBuilder";
+import FlowBuilder, { GRID_UNIT } from "../components/FlowBuilder/FlowBuilder";
 import { CSSProperties } from "react";
 import { useNavigate } from "react-router-dom";
 import { ROUTES } from "../resources/routes-constants";
 import "reactflow/dist/style.css";
+import "./ServiceFlowPage.scss";
 
 const initialPlaceholder = {
   id: "2",

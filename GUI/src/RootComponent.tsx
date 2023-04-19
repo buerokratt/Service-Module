@@ -5,9 +5,9 @@ import NotFoundPage from './pages/NotFoundPage'
 import OverviewPage from './pages/OverviewPage'
 import { ROUTES } from './resources/routes-constants'
 import OldNewServicePage from './pages/OldNewServicePage'
-import ServiceFlowPage from './pages/ServiceFlowPage'
-import NewServicePage from './pages/NewServicePage'
 import IntentsFollowupTraining from './pages/Training/IntentsFollowupTraining'
+import NewServicePage from './pages/NewServicePage'
+import ServiceFlowPage from './pages/ServiceFlowPage'
 import './styles/main.scss'
 
 const RootComponent: React.FC = () => {
@@ -15,13 +15,13 @@ const RootComponent: React.FC = () => {
     <Routes>
       <Route element={<Layout />}>
         <Route path={ROUTES.NEWSERVICE_ROUTE} element={<NewServicePage />} />
-        <Route path={ROUTES.NEWSERVICE_FLOW_ROUTE} element={<ServiceFlowPage />} />
+        <Route path={ROUTES.FLOW_ROUTE} element={<ServiceFlowPage />} />
         <Route path={ROUTES.OVERVIEW_ROUTE} element={<OverviewPage />} />
         <Route path={ROUTES.NEWSERVICE_ROUTE + "/old"} element={<OldNewServicePage />} />
         <Route path={ROUTES.FOLLOWUPTRAINING_ROUTE} element={<IntentsFollowupTraining />} />
         <Route path="*" element={<NotFoundPage />} />
-      </Route>
-    </Routes>
+      </Route >
+    </Routes >
   );
 };
 

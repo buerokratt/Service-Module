@@ -340,7 +340,6 @@ const FlowBuilder: FC<FlowBuilderProps> = ({
               })
             );
           }
-
           return newEdges;
         });
 
