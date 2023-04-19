@@ -29,10 +29,10 @@ const OldNewServicePage: React.FC = () => {
     const paths = Object.keys(schema.properties?.paths?.properties ?? []);
     const endpointsArr: EndpointType[] = [];
     paths.forEach((e) => {
-      endpointsArr.push({
-        label: `${e}`,
-        value: `${e}`,
-      });
+      // endpointsArr.push({
+      //   label: `${e}`,
+      //   value: `${e}`,
+      // });
     });
     filterSchema(schema);
     setJsonSchema(schema);

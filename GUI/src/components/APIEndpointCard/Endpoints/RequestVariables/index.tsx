@@ -1,67 +1,78 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import {
-  Button,
-  FormInput,
-  FormSelect,
-  FormTextarea,
-  SwitchBox,
-  Track,
-} from "../../..";
+import { Button, FormInput, FormSelect, FormTextarea, Icon, SwitchBox, Tooltip, Track } from "../../..";
 import * as Tabs from "@radix-ui/react-tabs";
 import DataTable from "../../../DataTable";
 import { dummyVariableOptions } from "../../../../resources/api-constants";
 import { createColumnHelper, Row } from "@tanstack/react-table";
 import { Option } from "../../../../types/option";
+import { MdDeleteOutline } from "react-icons/md";
+import { EndpointType } from "../../../../types/endpoint-type";
+import { EndpointTab } from "../../../../types/endpoint-tab.enum";
+import { RequestVariablesTableColumns } from "../../../../types/request-variables-table-columns";
+import { RequestVariablesTabsRowsData } from "../../../../types/request-variables-tabs-rows-data";
+import { RequestVariablesTabsRawData } from "../../../../types/request-variables-tabs-raw-data";
 
-type RowData = {
-  id: string;
-  variable?: string;
-  value?: string;
+type RequestVariablesProps = {
+  disableRawData?: boolean;
+  endpointData?: EndpointType;
 };
 
-type TableColumns = {
-  variable: string;
-  value: any;
-};
-
-const RequestVariables: React.FC = () => {
+const RequestVariables: React.FC<RequestVariablesProps> = ({ disableRawData, endpointData }) => {
   const { t } = useTranslation();
-  const tabs = ["params", "headers", "body"];
+  const tabs: EndpointTab[] = [EndpointTab.Params, EndpointTab.Headers, EndpointTab.Body];
   const [jsonError, setJsonError] = useState<string>();
-  const [selectedTab, setSelectedTab] = useState<string>(tabs[0]);
+  const [selectedTab, setSelectedTab] = useState<EndpointTab>(tabs[0]);
   const [showRawData, setShowRawData] = useState<boolean>(false);
   const [key, setKey] = useState<number>(0);
-  const columnHelper = createColumnHelper<TableColumns>();
+  const columnHelper = createColumnHelper<RequestVariablesTableColumns>();
 
-  const getInitialTabsRowsData = () => {
-    const data: { [tab: string]: RowData[] } = {};
-    tabs.forEach((tab) => {
-      data[tab] = [{ id: "0" }];
-    });
-    return data;
+  const getInitialTabsRowsData = (): RequestVariablesTabsRowsData => {
+    return tabs.reduce((tabsRowsData, tab) => {
+      const rows = [];
+      if (endpointData) {
+        if (!endpointData[tab]) return tabsRowsData;
+        endpointData[tab]!.forEach((variable, i) =>
+          rows.push({
+            id: `${i}`,
+            required: variable.required,
+            variable: variable.name,
+            isNameEditable: false,
+            type: variable.type,
+            description: variable.description,
+          })
+        );
+      }
+      if (rows.length === 0) {
+        rows.push({
+          id: `0`,
+          required: false,
+          isNameEditable: true,
+        });
+      }
+      return { ...tabsRowsData, [tab]: rows };
+    }, {});
   };
 
-  const getInitialTabsRawData = () => {
-    const data: { [tab: string]: string } = {};
-    tabs.forEach((tab) => {
-      data[tab] = "";
-    });
-    return data;
+  const getInitialTabsRawData = (): RequestVariablesTabsRawData => {
+    return tabs.reduce((tabsRawData, tab) => {
+      return { ...tabsRawData, [tab]: "" };
+    }, {});
   };
-  const [rowsData, setRowsData] = useState<{ [tab: string]: RowData[] }>(
-    getInitialTabsRowsData()
-  );
-  const [tabRawData, setTabRawData] = useState<{ [tab: string]: string }>(
-    getInitialTabsRawData()
-  );
+  const [rowsData, setRowsData] = useState<RequestVariablesTabsRowsData>(getInitialTabsRowsData());
+  const [tabRawData, setTabRawData] = useState<RequestVariablesTabsRawData>(getInitialTabsRawData());
 
-  const getTabTriggerClasses = (tab: string) =>
+  useEffect(() => {
+    setSelectedTab(Object.keys(rowsData)[0] as EndpointTab);
+    setKey(key + 1);
+  }, [setRowsData]);
+
+  const getTabTriggerClasses = (tab: EndpointTab) =>
     `endpoint-tab-group__tab-btn ${selectedTab === tab ? "active" : ""}`;
 
   const updateSelection = (id: string, selection: Option | null) => {
-    if (!selection) return;
-    rowsData[selectedTab].map((row) => {
+    if (!selection || !rowsData[selectedTab]) return;
+    rowsData[selectedTab]!.map((row) => {
       if (row.id !== id) return row;
       row.value = selection.value;
       return row;
@@ -69,21 +80,26 @@ const RequestVariables: React.FC = () => {
   };
 
   const addNewRow = (id: string) => {
-    if (id !== `${rowsData[selectedTab].length - 1}`) return;
+    if (!rowsData[selectedTab] || id !== `${rowsData[selectedTab]!.length - 1}`) return;
     setRowsData((prevRowsData) => {
-      prevRowsData[selectedTab].push({ id: `${rowsData[selectedTab].length}` });
+      prevRowsData[selectedTab]!.push({
+        id: `${rowsData[selectedTab]!.length}`,
+        required: false,
+        isNameEditable: true,
+      });
       setKey(key + 1);
       return prevRowsData;
     });
   };
 
   const sortRows = (
-    rowA: Row<TableColumns>,
-    rowB: Row<TableColumns>,
+    rowA: Row<RequestVariablesTableColumns>,
+    rowB: Row<RequestVariablesTableColumns>,
     type: "variable" | "value"
   ): number => {
-    const valueA = rowsData[selectedTab].find((row) => row.id === rowA.id);
-    const valueB = rowsData[selectedTab].find((row) => row.id === rowB.id);
+    if (!rowsData[selectedTab]) return 1;
+    const valueA = rowsData[selectedTab]!.find((row) => row.id === rowA.id);
+    const valueB = rowsData[selectedTab]!.find((row) => row.id === rowB.id);
     if (type === "variable") {
       return (valueA?.variable ?? "") < (valueB?.variable ?? "") ? 1 : -1;
     }
@@ -96,18 +112,20 @@ const RequestVariables: React.FC = () => {
       meta: {
         size: "50%",
       },
-      sortingFn: (rowA: Row<TableColumns>, rowB: Row<TableColumns>) => {
+      sortingFn: (rowA: Row<RequestVariablesTableColumns>, rowB: Row<RequestVariablesTableColumns>) => {
         return sortRows(rowA, rowB, "variable");
       },
       cell: (props) => {
-        return (
+        const rowData = rowsData[selectedTab]![+props.row.id];
+        if (!rowData) return;
+        return rowData.isNameEditable ? (
           <FormInput
             style={{ borderRadius: "0 4px 4px 0" }}
             name={`endpoint-variable-${props.row.id}`}
             label=""
             onChange={(event) => {
               setRowsData((prevRowsData) => {
-                prevRowsData[selectedTab].map((row) => {
+                prevRowsData[selectedTab]!.map((row) => {
                   if (row.id !== props.row.id) return row;
                   row.variable = event.target.value;
                   return row;
@@ -116,13 +134,16 @@ const RequestVariables: React.FC = () => {
               });
               addNewRow(props.row.id);
             }}
-            autoFocus={props.row.id === `${rowsData[selectedTab].length - 2}`}
-            defaultValue={
-              rowsData[selectedTab].find((row) => row.id === props.row.id)
-                ?.variable
-            }
+            autoFocus={props.row.id === `${rowsData[selectedTab]!.length - 2}`}
+            defaultValue={rowsData[selectedTab]!.find((row) => row.id === props.row.id)?.variable}
             placeholder={t("newService.endpoint.variable") + ".."}
           />
+        ) : (
+          <p>
+            {rowData.variable}
+            {rowData.type && `, (${rowData.type})`}
+            {rowData.description && `, (${rowData.description})`}
+          </p>
         );
       },
     }),
@@ -131,7 +152,7 @@ const RequestVariables: React.FC = () => {
       meta: {
         size: "50%",
       },
-      sortingFn: (rowA: Row<TableColumns>, rowB: Row<TableColumns>) => {
+      sortingFn: (rowA: Row<RequestVariablesTableColumns>, rowB: Row<RequestVariablesTableColumns>) => {
         return sortRows(rowA, rowB, "value");
       },
       cell: (props) => {
@@ -140,14 +161,40 @@ const RequestVariables: React.FC = () => {
             name={props.row.original.variable}
             label={""}
             options={dummyVariableOptions}
-            defaultValue={
-              rowsData[selectedTab].find((row) => row.id === props.row.id)
-                ?.value
-            }
-            onSelectionChange={(selection) =>
-              updateSelection(props.row.id, selection)
-            }
+            defaultValue={rowsData[selectedTab]!.find((row) => row.id === props.row.id)?.value}
+            onSelectionChange={(selection) => updateSelection(props.row.id, selection)}
           />
+        );
+      },
+    }),
+    columnHelper.display({
+      id: "delete",
+      cell: (props) => {
+        return (
+          <Track justify="center" style={{ paddingRight: 8 }}>
+            {props.row.original.required ? (
+              <Tooltip content={t("newService.endpoint.required")}>
+                <span className="variable-required">!</span>
+              </Tooltip>
+            ) : (
+              <Button
+                appearance="text"
+                onClick={() => {
+                  setRowsData((prevRowsData) => {
+                    prevRowsData[selectedTab] = prevRowsData[selectedTab]!.filter((row) => row.id !== props.row.id).map(
+                      (row, index) => {
+                        return { ...row, id: `${index}` };
+                      }
+                    );
+                    return prevRowsData;
+                  });
+                  setKey(key + 1);
+                }}
+              >
+                <Icon icon={<MdDeleteOutline />} size="medium" />
+              </Button>
+            )}
+          </Track>
         );
       },
     }),
@@ -163,11 +210,7 @@ const RequestVariables: React.FC = () => {
             onClick={() => {
               setTabRawData((prevRawData) => {
                 try {
-                  prevRawData[selectedTab] = JSON.stringify(
-                    JSON.parse(prevRawData[selectedTab]),
-                    null,
-                    4
-                  );
+                  prevRawData[selectedTab] = JSON.stringify(JSON.parse(prevRawData[selectedTab]!), null, 4);
                 } catch (e: any) {
                   setJsonError(`Unable to format JSON. ${e.message}`);
                 }
@@ -199,51 +242,40 @@ const RequestVariables: React.FC = () => {
   return (
     <Tabs.Root
       defaultValue={selectedTab}
-      onValueChange={(value) => setSelectedTab(value)}
+      onValueChange={(value) => setSelectedTab(value as EndpointTab)}
       className="endpoint-tab-group"
       key={key}
     >
       <Track justify="between" style={{ borderBottom: "solid 1px #5d6071" }}>
-        <Tabs.List
-          className="endpoint-tab-group__list"
-          aria-label="environment"
-        >
-          {tabs.map((tab) => (
-            <Tabs.Trigger
-              className={getTabTriggerClasses(tab)}
-              value={tab}
-              key={tab}
-            >
-              {t(`newService.endpoint.${tab}`)}
-            </Tabs.Trigger>
-          ))}
+        <Tabs.List className="endpoint-tab-group__list" aria-label="environment">
+          {Object.keys(rowsData).map((tab) => {
+            return (
+              <Tabs.Trigger className={getTabTriggerClasses(tab as EndpointTab)} value={tab} key={tab}>
+                {t(`newService.endpoint.${tab}`)}
+              </Tabs.Trigger>
+            );
+          })}
         </Tabs.List>
-        <Track style={{ paddingRight: 16 }} gap={8}>
-          <SwitchBox
-            style={{ width: "fit-content" }}
-            label={""}
-            name={"raw-data"}
-            checked={showRawData}
-            onCheckedChange={(checked) => setShowRawData(checked)}
-          />
-          <p style={{ whiteSpace: "nowrap", color: "#34394C" }}>Raw data</p>
-        </Track>
+        {!disableRawData && (
+          <Track style={{ paddingRight: 16 }} gap={8}>
+            <SwitchBox
+              style={{ width: "fit-content" }}
+              label={""}
+              name={"raw-data"}
+              checked={showRawData}
+              onCheckedChange={(checked) => setShowRawData(checked)}
+            />
+            <p style={{ whiteSpace: "nowrap", color: "#34394C" }}>Raw data</p>
+          </Track>
+        )}
       </Track>
-      {tabs.map((tab) => (
-        <Tabs.Content
-          className="endpoint-tab-group__tab-content"
-          value={tab}
-          key={tab}
-        >
+      {Object.keys(rowsData).map((tab) => (
+        <Tabs.Content className="endpoint-tab-group__tab-content" value={tab} key={tab}>
           {showRawData ? (
             buildRawDataView()
           ) : (
             <>
-              <DataTable
-                sortable={true}
-                data={rowsData[tab]}
-                columns={columns}
-              />
+              <DataTable sortable={true} data={rowsData[tab as EndpointTab]} columns={columns} />
               <hr style={{ margin: 0, borderTop: "1px solid #D2D3D8" }} />
             </>
           )}
