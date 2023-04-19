@@ -7,7 +7,8 @@
     "gotoPage": "Go to page",
     "notification": "Notification",
     "paginationNavigation": "Navigate",
-    "choose": "Choose"
+    "choose": "Choose..",
+    "continue": "Continue"
   },
   "menu": {
     "overview": "Overview",
@@ -56,5 +57,34 @@
       "setInactive": "Are you sure you want to deactivate this service?",
       "setState": "Update state"
     }
+  },
+  "newService": {
+    "test": "Test URL",
+    "endpoint": {
+      "add": "+ Add API endpoint",
+      "addtestEnv": "+ Add test environment",
+      "api": "API endpoint",
+      "ask": "Ask for endpoints",
+      "body": "Body",
+      "error": "No response from endpoint. Please check URL and try again",
+      "headers": "Headers",
+      "insert": "Insert API endpoint..",
+      "live": "Live endpoint",
+      "name": "Endpoint name",
+      "params": "Params",
+      "required": "Variable is required",
+      "single": "Endpoint",
+      "testEnv": "Test environment",
+      "url": "API endpoint URL",
+      "value": "Value",
+      "variable": "Variable"
+    },
+    "saveDraft": "Save draft",
+    "trainingModuleSetup": "Training module setup",
+    "serviceSetup": "Service setup",
+    "serviceFlowCreation": "Service flow creation",
+    "name": "Name",
+    "description": "Description",
+    "uses": "Service uses"
   }
 }

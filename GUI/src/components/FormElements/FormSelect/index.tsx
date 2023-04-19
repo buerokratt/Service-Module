@@ -31,6 +31,7 @@ const FormSelect: FC<FormSelectProps> = (
     placeholder,
     defaultValue,
     onSelectionChange,
+    ...rest
   },
 ) => {
   const id = useId();
@@ -57,7 +58,6 @@ const FormSelect: FC<FormSelectProps> = (
 
   const selectClasses = clsx(
     'select',
-    disabled && 'select--disabled',
   );
 
   const placeholderValue = placeholder || t('global.choose');
@@ -66,7 +66,7 @@ const FormSelect: FC<FormSelectProps> = (
     <div className={selectClasses}>
       {label && !hideLabel && <label htmlFor={id} className='select__label' {...getLabelProps()}>{label}</label>}
       <div className='select__wrapper'>
-        <div className='select__trigger' {...getToggleButtonProps()}>
+        <div className={`select__trigger ${disabled && 'select__trigger--disabled'}`} {...getToggleButtonProps()} style={{color: selectedItem?.label ? '#1A1B1F' :'#5D6071'}} {...rest} >
           {selectedItem?.label ?? placeholderValue}
           <Icon label='Dropdown icon' size='medium' icon={<MdArrowDropDown color='#5D6071' />} />
         </div>

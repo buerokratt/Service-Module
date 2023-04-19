@@ -4,6 +4,7 @@
 .layout {
   height: 100%;
   display: flex;
+  overflow-x: scroll;
 
   &__wrapper {
     flex: 1;

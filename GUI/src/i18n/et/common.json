@@ -7,14 +7,15 @@
     "gotoPage": "Mine leheküljele",
     "notification": "Teade",
     "paginationNavigation": "Navigeeri",
-    "choose": "Vali"
+    "choose": "Vali..",
+    "continue": "Jätka"
   },
   "menu": {
     "overview": "Ülevaade",
     "flowbuilder": "Flow Builder",
     "services": "Teenused",
     "intents": "Kavatsus",
-    "newService": "Uus Teenus",
+    "newService": "Uus teenus",
     "close": "Sulge menüü",
     "followupTraining": "Teemade järeltreenimine",
     "entities": "Üksused"
@@ -57,5 +58,34 @@
       "setInactive": "Kas oled kindel, et tahad teenuse deaktiveerida?",
       "setState": "Uuenda olek"
     }
+  },
+  "newService": {
+    "test": "Testi URLi",
+    "endpoint": {
+      "add": "+ Lisa API otspunkt",
+      "addTestEnv": "+ Lisa testkeskkond",
+      "api": "API otspunkt",
+      "ask": "Küsi otspunktid",
+      "body": "Body",
+      "error": "Otspunktiga ei olnud võimalik ühendust saada. Kontrolli URL'i ja proovi uuesti.",
+      "headers": "Headers",
+      "insert": "Sisesta API otspunkt..",
+      "live": "Live otspunkt",
+      "name": "Otspunkti nimetus",
+      "params": "Params",
+      "required": "Muutuja on kohustuslik",
+      "single": "Otspunkt",
+      "testEnv": "Testkeskkond",
+      "url": "API otspunkti URL",
+      "value": "Väärtus",
+      "variable": "Muutuja"
+    },
+    "saveDraft": "Salvesta mustandina",
+    "trainingModuleSetup": "Treenningmooduli seadistamine",
+    "serviceSetup": "Teenuse seadistamine",
+    "serviceFlowCreation": "Teenusvoo loomine",
+    "name": "Nimetus",
+    "description": "Kirjeldus",
+    "uses": "Teenus kasutab"
   }
 }
