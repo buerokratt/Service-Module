@@ -1,11 +1,11 @@
 check_for_parameters:
   switch:
-    - condition: ${incoming.params == null || incoming.params.name == null || incoming.params.name == ''}
+    - condition: ${incoming.params == null || incoming.params.name == null}
       next: get_all_sticky_services
   next: get_single_sticky_service
 
 get_single_sticky_service:
-  call: http.get
+  call: http.post
   args:
     url: http://node_server:3008/ruuter/sticky/steps
     query:
