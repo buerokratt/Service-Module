@@ -14,7 +14,7 @@ import {
 import { Option } from "../../types/option";
 import { useTranslation } from "react-i18next";
 import { MdDeleteOutline } from "react-icons/md";
-import "./APIEndpointCard.scss";
+import "./ApiEndpointCard.scss";
 
 type EndpointCardProps = {
   onDelete: () => void;
