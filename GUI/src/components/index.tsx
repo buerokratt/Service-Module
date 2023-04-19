@@ -30,7 +30,7 @@ import MainNavigation from "./MainNavigation";
 import Modal from "./Modal";
 import NewServiceHeader from "./NewServiceHeader";
 import Popover from "./Popover";
-import RequestVariables from "./APIEndpointCard/Endpoints/RequestVariables";
+import RequestVariables from "./ApiEndpointCard/Endpoints/RequestVariables";
 import Section from "./Section";
 import Step from "./StepCounter/Step";
 import StepCounter from "./StepCounter";
