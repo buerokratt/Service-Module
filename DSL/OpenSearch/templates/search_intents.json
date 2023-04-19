@@ -1,0 +1,22 @@
+{
+    "script": {
+      "lang": "mustache",
+      "source": {
+        "size": 10000,
+        "query": {
+          "query_string": {
+            "query":  "*{{keyword}}*"
+          }
+        },
+        "highlight": {
+           "require_field_match": "false", 
+             "fields": {
+             "*": {}
+            }
+        }
+      },
+      "params": {
+        "keyword": ""
+      }
+    }
+}

@@ -72,6 +72,7 @@ services:
       - PORT=3005
       - CONTENT_FOLDER=/data
     volumes:
+      - ./DSL:/data
       - ./DSL/DMapper/hbs:/workspace/app/views/services
       - ./DSL/DMapper/js:/workspace/app/js/services
       - ./DSL/DMapper/lib:/workspace/app/lib
@@ -137,7 +138,6 @@ services:
 
 volumes:
   opensearch-data1:
-
 
 networks:
   bykstack:

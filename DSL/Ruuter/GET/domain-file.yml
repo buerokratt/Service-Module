@@ -1,0 +1,24 @@
+getFileLocations:
+  call: http.get
+  args:
+    url: http://ruuter:8085/return-file-locations
+  result: fileLocations
+
+getDomainFile:
+  call: http.post
+  args:
+    url: http://node_server:3008/file/read
+    body:
+      file_path: ${fileLocations.response.body.response.domain_location}
+  result: domainFile
+
+convertYamlToJson:
+  call: http.post
+  args:
+    url: http://node_server:3008/conversion/yaml_to_json
+    body:
+      file: ${domainFile.response.body.file}
+  result: domainData
+
+return_value:
+  return: ${domainData.response.body}

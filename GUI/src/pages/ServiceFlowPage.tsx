@@ -14,6 +14,7 @@ import {
   NewServiceHeader,
   OutputElementBox,
   Track,
+  FlowElementsPopup,
 } from "../components";
 
 import "./ServiceFlowPage.scss";
@@ -24,6 +25,7 @@ import * as Tabs from '@radix-ui/react-tabs';
 import { GRID_UNIT } from "../components/FlowBuilder/FlowBuilder";
 import { useNavigate } from "react-router-dom";
 import { ROUTES } from "../resources/routes-constants";
+import "reactflow/dist/style.css";
 
 const initialPlaceholder = {
   id: "2",
@@ -102,12 +104,14 @@ const ServiceFlowPage: FC = () => {
       type: StepType.FinishingStepRedirect,
     },
   ];
+
   const availableOutputElements = [
     '{{otspunktinimetus.idCode}}',
     '{{otspunktinimetus.firstName}}',
     '{{otspunktinimetus.surName}}',
   ];
 
+  const [visiblePopupNode, setVisiblePopupNode] = useState<Node | null>(null);
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState([initialEdge]);
   const [selectedNode, setSelectedNode] = useState<Node<NodeDataProps> | null>(null);
@@ -277,7 +281,7 @@ const ServiceFlowPage: FC = () => {
     <>
       <NewServiceHeader activeStep={3} continueOnClick={() => navigate(ROUTES.OVERVIEW_ROUTE)} />
       <h1 style={{ padding: 16 }}>Teenusvoog "Raamatu laenutus"</h1>
-      {selectedNode && (
+      {/* {selectedNode && (
         <Popup
           style={{ maxWidth: 700 }}
           hasDefaultBody={false}
@@ -336,7 +340,19 @@ const ServiceFlowPage: FC = () => {
             </Tabs.Root>
           </Track>
         </Popup>
-      )}
+      )} */}
+
+      <FlowElementsPopup
+        // onClose={() => setVisiblePopupNode(null)}
+        onClose={() => handlePopupClose()}
+        onSave={(rules: any) => {
+          setUpdatedRules(rules)
+          setVisiblePopupNode(null)
+        }}
+        node={selectedNode}
+        oldRules={updatedRules}
+        addRuleCount={() => setUpdatedRules([null, null, null])}
+      />
       <ReactFlowProvider>
         <div className="graph">
           <div className="graph__controls">
@@ -379,6 +395,7 @@ const ServiceFlowPage: FC = () => {
             onNodeEdit={(selectedNode) => {
               setSelectedNode(selectedNode);
             }}
+            setVisiblePopupNode={setVisiblePopupNode}
             updatedRules={updatedRules}
             nodes={nodes}
             setNodes={setNodes}
