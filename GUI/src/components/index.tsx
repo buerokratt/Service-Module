@@ -32,8 +32,6 @@ import NewServiceHeader from "./NewServiceHeader";
 import Popover from "./Popover";
 import RequestVariables from "./ApiEndpointCard/Endpoints/RequestVariables";
 import Section from "./Section";
-import Step from "./StepCounter/Step";
-import StepCounter from "./StepCounter";
 import Toast from "./Toast";
 import Tooltip from "./Tooltip";
 import Track from "./Track";
@@ -69,8 +67,6 @@ export {
   Popover,
   RequestVariables,
   Section,
-  Step,
-  StepCounter,
   Switch,
   SwitchBox,
   Toast,
