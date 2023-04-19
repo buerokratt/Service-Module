@@ -4,6 +4,7 @@ import Card from "./Card";
 import Collapsible from "./Collapsible";
 import Dialog from "./Dialog";
 import Drawer from "./Drawer";
+import FlowBuilder from "./FlowBuilder/FlowBuilder";
 import DataTable from "./DataTable";
 import {
   FormCheckbox,
@@ -47,6 +48,7 @@ export {
   Drawer,
   EndpointCustom,
   EndpointOpenAPI,
+  FlowBuilder,
   EndpointResqlComponent,
   FormCheckbox,
   FormCheckboxes,
@@ -54,9 +56,9 @@ export {
   FormInput,
   FormSelect,
   FormTextarea,
-  Header,
   HeaderStep,
   HeaderStepCounter,
+  Header,
   Icon,
   Label,
   Layout,
@@ -64,6 +66,7 @@ export {
   Modal,
   NewServiceHeader,
   Popover,
+  RequestVariables,
   Section,
   Switch,
   SwitchBox,
@@ -71,5 +74,4 @@ export {
   Track,
   Toast,
   FlowElementsPopup,
-  RequestVariables,
 };
