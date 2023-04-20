@@ -17,7 +17,7 @@ import DefaultMessageContent from "./DefaultMessageContent";
 import EndConversationContent from "./EndConversationContent";
 import JsonRequestContent from "./JsonRequestContent";
 import axios from "axios";
-import { servicesRequestsExplainMock } from "../../resources/api-constants";
+import { servicesRequestsExplain } from "../../resources/api-constants";
 import OpenWebPageContent from "./OpenWebPageContent";
 import OpenWebPageTestContent from "./OpenWebPageTestContent";
 
@@ -68,7 +68,7 @@ const FlowElementsPopup = ({ node, onClose, onSave, oldRules, onRulesUpdate }: a
 
   const fetchExplainRequestJson = async () => {
     try {
-      const response = await axios.post(servicesRequestsExplainMock(), {});
+      const response = await axios.post(servicesRequestsExplain(), {});
       setJsonRequestContent(response.data);
     } catch (error) {
       console.log("Error: ", error);
@@ -79,6 +79,8 @@ const FlowElementsPopup = ({ node, onClose, onSave, oldRules, onRulesUpdate }: a
     setSelectedTab(null);
     setIsJsonRequestVisible(false);
     setJsonRequestContent(null);
+    setTextfieldMessage(null);
+    setTextfieldMessagePlaceholders({});
   }
 
   return (
