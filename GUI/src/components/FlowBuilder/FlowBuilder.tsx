@@ -26,7 +26,6 @@ const nodeTypes = {
 
 type FlowBuilderProps = {
   onNodeEdit: (selectedNode: Node | null) => void;
-  setVisiblePopupNode: Dispatch<SetStateAction<Node | null>>;
   updatedRules: (string | null)[];
   nodes: Node[];
   setNodes: Dispatch<SetStateAction<Node[]>>;
@@ -38,7 +37,6 @@ type FlowBuilderProps = {
 
 const FlowBuilder: FC<FlowBuilderProps> = ({
   onNodeEdit,
-  setVisiblePopupNode,
   updatedRules,
   nodes,
   setNodes,
@@ -136,9 +134,8 @@ const FlowBuilder: FC<FlowBuilderProps> = ({
           label,
           onDelete,
           onEdit: handleNodeEdit,
-          setPopupVisible: () => setVisiblePopupNode(null),
           type: "rule",
-          stepType: "rule",
+          stepType: StepType.Rule,
           readonly: true,
         },
         className: "rule",
@@ -370,7 +367,6 @@ const FlowBuilder: FC<FlowBuilderProps> = ({
                 StepType.FinishingStepRedirect,
               ].includes(type),
               childrenCount: type === StepType.Input ? 0 : 1,
-              setPopupVisible: () => setVisiblePopupNode({ ...matchingPlaceholder, type }),
               setClickedNode,
               update: updateInputRules,
               message: setDefaultMessages(type),

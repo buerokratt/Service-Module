@@ -5,6 +5,7 @@ import { StepType } from '../../types/step';
 
 type NodeDataProps = {
   data: {
+    childrenCount: number;
     label: string;
     onDelete: (id: string) => void;
     onEdit: (id: string) => void;
@@ -22,10 +23,16 @@ const StepNode: FC<NodeDataProps> = ({ data }) => {
     };
   };
 
+  const isStepValid = () => {
+    if (data.stepType === StepType.Input) return data.childrenCount < 2;
+
+    return !(data.readonly || !!data.message?.length);
+  }
+
   return (
     <Track style={{ width: '100%' }} direction='vertical' align='left'>
       <p>
-        {!(data.readonly || !!data.message?.length) && <ExclamationBadge></ExclamationBadge>}
+        {isStepValid() && <ExclamationBadge></ExclamationBadge>}
         {data.label}
       </p>
       <div dangerouslySetInnerHTML={createMarkup(data.message ?? '')}></div>

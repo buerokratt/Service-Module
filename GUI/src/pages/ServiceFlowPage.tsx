@@ -1,27 +1,20 @@
-import { CSSProperties, FC, useCallback, useRef, useState } from "react";
+import { CSSProperties, FC, useState } from "react";
 import { MdPlayCircleFilled } from "react-icons/md";
 import { MarkerType, Node, ReactFlowProvider, useEdgesState, useNodesState } from "reactflow";
 import "reactflow/dist/style.css";
 
 import {
   Box,
-  Button,
   Collapsible,
-  FormInput,
-  FormRichText,
   FlowBuilder,
-  FormTextarea,
   NewServiceHeader,
-  OutputElementBox,
   Track,
   FlowElementsPopup,
 } from "../components";
 
 import "./ServiceFlowPage.scss";
 import { Step, StepType } from "../types/step";
-import Popup from "../components/Popup";
 import { useTranslation } from "react-i18next";
-import * as Tabs from '@radix-ui/react-tabs';
 import { GRID_UNIT } from "../components/FlowBuilder/FlowBuilder";
 import { useNavigate } from "react-router-dom";
 import { ROUTES } from "../resources/routes-constants";
@@ -105,21 +98,9 @@ const ServiceFlowPage: FC = () => {
     },
   ];
 
-  const availableOutputElements = [
-    '{{otspunktinimetus.idCode}}',
-    '{{otspunktinimetus.firstName}}',
-    '{{otspunktinimetus.surName}}',
-  ];
-
-  const [visiblePopupNode, setVisiblePopupNode] = useState<Node | null>(null);
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState([initialEdge]);
   const [selectedNode, setSelectedNode] = useState<Node<NodeDataProps> | null>(null);
-  const [selectedTab, setSelectedTab] = useState<string | null>(null);
-  // Message to client
-  const [messageToClientInput, setMessageToClientInput] = useState<string | null>(null);
-  const [messageTestInputFields, setMessageTestInputFields] = useState<{ [key: string]: string }>({})
-  const [messageTestOutput, setMessageTestOutput] = useState<string | null>(null)
   const [updatedRules, setUpdatedRules] = useState<(string | null)[]>([]);
   const navigate = useNavigate();
 
@@ -133,7 +114,7 @@ const ServiceFlowPage: FC = () => {
 
   const handlePopupClose = () => resetStates();
 
-  const handlePopupSave = () => {
+  const handlePopupSave = (updatedNode: Node<NodeDataProps>) => {
     resetStates();
     if (selectedNode?.data.stepType === StepType.FinishingStepEnd) return;
 
@@ -144,7 +125,7 @@ const ServiceFlowPage: FC = () => {
           ...prevNode,
           data: {
             ...prevNode.data,
-            message: messageToClientInput
+            message: updatedNode.data.message,
           }
         }
       })
@@ -152,206 +133,25 @@ const ServiceFlowPage: FC = () => {
   };
 
   const resetStates = () => {
-    setMessageToClientInput(null);
     setSelectedNode(null);
-    setSelectedTab(null);
   };
-
-  const popupBodyCss: CSSProperties = {
-    padding: 16,
-    borderBottom: `1px solid #D2D3D8`
-  }
-
-
-  const buildTextFieldContentBlock = () => {
-    return (
-      <>
-        <Track direction='vertical' align="left" style={{ width: '100%', ...popupBodyCss }}>
-          <label htmlFor="message">{t('serviceFlow.popup.messageLabel')}</label>
-          <FormRichText
-            onChange={(value) => {
-              setMessageToClientInput(value);
-              findMessagePlaceholders(value!);
-            }}
-            defaultValue={selectedNode?.data.message ?? (messageToClientInput ?? undefined)}
-          ></FormRichText>
-        </Track>
-        <Track direction='vertical' align="left" style={{ width: '100%', ...popupBodyCss, backgroundColor: '#F9F9F9' }}>
-          <label htmlFor="json">{t('serviceFlow.popup.availableOutputElementsLabel')}</label>
-          <Track
-            direction='horizontal'
-            gap={4}
-            justify='start'
-            isMultiline={true}
-          >
-            {availableOutputElements.map((element, i) => (
-              <OutputElementBox
-                key={`${element}-${i}`}
-                text={element}
-              ></OutputElementBox>
-            ))}
-          </Track>
-        </Track>
-      </>
-    );
-  };
-
-  const buildTextFieldTestContentBlock = () => {
-    return (
-      <Track direction="vertical" align="left" style={{ ...popupBodyCss }} gap={16}>
-        {Object.keys(messageTestInputFields).map((key, i) => (
-          <Track direction="vertical" align="left" style={{ width: '100%' }} key={key + i}>
-            <>
-              <label htmlFor={key}>{key}</label>
-              <FormInput
-                name={key}
-                label={key}
-                placeholder="Väärtus..."
-                onChange={(event) => {
-                  setMessageTestInputFields((previous) => {
-                    previous[key] = event.target.value;
-                    return previous;
-                  })
-                }}
-                hideLabel
-              ></FormInput>
-            </>
-          </Track>
-        ))}
-        <Track direction="vertical" align="left" style={{ width: '100%' }}>
-          {messageTestOutput}
-        </Track>
-        <Button
-          onClick={() => {
-            const regex = /{{(.*?)}}/g;
-            const result = messageToClientInput!.replace(regex, (match, _) => messageTestInputFields[match.trim()] || match);
-            setMessageTestOutput(result);
-          }}
-        >Testi</Button>
-      </Track>
-    );
-  }
-
-  const findMessagePlaceholders = (text: string | null) => {
-    if (!text) return;
-
-    const pattern = /\{\{(.+?)\}\}/g;
-    const placeholders: { [key: string]: string } = {};
-    let match;
-
-    while (match = pattern.exec(text)) placeholders[match[0]] = '';
-    setMessageTestInputFields(placeholders);
-  }
-
-  const buildDefaultMessageContentBlock = (message: string) => {
-    return (
-      <>
-        <Track direction='vertical' align="left" style={{ width: '100%', ...popupBodyCss }}>
-          <label htmlFor="messageToClient">Klient näeb sõnumit</label>
-          <FormTextarea
-            name={"messageToClient"}
-            label={"Klient näeb sõnumit"}
-            hideLabel={true}
-            defaultValue={message}
-            style={{
-              backgroundColor: '#F0F0F2',
-              resize: 'vertical',
-            }}
-            readOnly
-          >
-          </FormTextarea>
-        </Track>
-      </>
-    );
-  };
-
-  const buildEndConversationContentBlock = () => {
-    return (
-      <>
-        <Track direction="vertical" style={popupBodyCss} align="left">
-          <p style={{ color: '#9799A4', fontSize: 14 }}>
-            Selle sammuga lõpeb suhtlus. Et teenusvoogu jätkata, tuleb vestluse lõpetamine voost eemaldada.
-          </p>
-        </Track>
-      </>
-    );
-  }
 
   return (
     <>
       <NewServiceHeader activeStep={3} continueOnClick={() => navigate(ROUTES.OVERVIEW_ROUTE)} />
       <h1 style={{ padding: 16 }}>Teenusvoog "Raamatu laenutus"</h1>
-      {/* {selectedNode && (
-        <Popup
-          style={{ maxWidth: 700 }}
-          hasDefaultBody={false}
-          title={selectedNode.data.label}
-          onClose={() => handlePopupClose()}
-          footer={
-            <Track gap={16}>
-              {
-                !selectedNode.data.readonly && <Button
-                  appearance="secondary"
-                  onClick={() => handlePopupClose()}
-                >
-                  {t('global.cancel')}
-                </Button>
-              }
-              <Button
-                onClick={() => selectedNode.data.readonly ? handlePopupClose() : handlePopupSave()}
-              >
-                {t(selectedNode.data.readonly ? 'global.close' : 'global.save')}
-              </Button>
-            </Track>
-          }
-        >
-
-          <Track direction='vertical' align="left" gap={16}>
-            <Tabs.Root
-              className='vertical-tabs__column'
-              orientation='horizontal'
-              value={selectedTab ?? t('serviceFlow.tabs.setup')!}
-              onValueChange={(value) => {
-                setSelectedTab(value);
-                // reset test outputs
-                setMessageTestOutput(null);
-              }}
-            >
-              <Tabs.List>
-                <Tabs.Trigger className='vertical-tabs__trigger' value={t('serviceFlow.tabs.setup')}>
-                  {t('serviceFlow.tabs.setup')}
-                </Tabs.Trigger>
-                {!selectedNode.data.readonly && <Tabs.Trigger className='vertical-tabs__trigger' value={t('serviceFlow.tabs.test')}>
-                  {t('serviceFlow.tabs.test')}
-                </Tabs.Trigger>}
-              </Tabs.List>
-
-              <Tabs.Content value={t('serviceFlow.tabs.setup')} className='vertical-tabs__body'>
-                {selectedNode.data.stepType === StepType.Textfield && buildTextFieldContentBlock()}
-                {selectedNode.data.stepType === StepType.FinishingStepEnd && buildEndConversationContentBlock()}
-                {
-                  selectedNode.data.stepType === StepType.FinishingStepRedirect &&
-                  buildDefaultMessageContentBlock('Vestlus suunatakse klienditeenindajale')
-                }
-              </Tabs.Content>
-              {!selectedNode.data.readonly && <Tabs.Content value={t('serviceFlow.tabs.test')} className='vertical-tabs__body'>
-                {selectedNode.data.stepType === StepType.Textfield && buildTextFieldTestContentBlock()}
-              </Tabs.Content>}
-            </Tabs.Root>
-          </Track>
-        </Popup>
-      )} */}
 
       <FlowElementsPopup
-        // onClose={() => setVisiblePopupNode(null)}
         onClose={() => handlePopupClose()}
-        onSave={(rules: any) => {
-          setUpdatedRules(rules)
-          setVisiblePopupNode(null)
+        onSave={(updatedNode: Node) => {
+          handlePopupSave(updatedNode);
+        }}
+        onRulesUpdate={(rules: []) => {
+          if (selectedNode?.data.stepType === StepType.Input) setUpdatedRules(rules)
+          resetStates();
         }}
         node={selectedNode}
         oldRules={updatedRules}
-        addRuleCount={() => setUpdatedRules([null, null, null])}
       />
       <ReactFlowProvider>
         <div className="graph">
@@ -392,10 +192,7 @@ const ServiceFlowPage: FC = () => {
             </Track>
           </div>
           <FlowBuilder
-            onNodeEdit={(selectedNode) => {
-              setSelectedNode(selectedNode);
-            }}
-            setVisiblePopupNode={setVisiblePopupNode}
+            onNodeEdit={setSelectedNode}
             updatedRules={updatedRules}
             nodes={nodes}
             setNodes={setNodes}
