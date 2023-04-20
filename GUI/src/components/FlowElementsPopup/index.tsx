@@ -18,6 +18,8 @@ import EndConversationContent from "./EndConversationContent";
 import JsonRequestContent from "./JsonRequestContent";
 import axios from "axios";
 import { servicesRequestsExplainMock } from "../../resources/api-constants";
+import OpenWebPageContent from "./OpenWebPageContent";
+import OpenWebPageTestContent from "./OpenWebPageTestContent";
 
 
 const FlowElementsPopup = ({ node, onClose, onSave, oldRules, onRulesUpdate }: any) => {
@@ -31,6 +33,9 @@ const FlowElementsPopup = ({ node, onClose, onSave, oldRules, onRulesUpdate }: a
   // StepType.Textfield 
   const [textfieldMessage, setTextfieldMessage] = useState<string | null>(null);
   const [textfieldMessagePlaceholders, setTextfieldMessagePlaceholders] = useState<{ [key: string]: string }>({});
+  // StepType.OpenWebpage
+  const [webpageName, setWebpageName] = useState<string | null>(null);
+  const [webpageUrl, setWebpageUrl] = useState<string | null>(null);
 
   if (!node) return <></>
 
@@ -145,7 +150,13 @@ const FlowElementsPopup = ({ node, onClose, onSave, oldRules, onRulesUpdate }: a
                 }}
               ></TextfieldContent>
             }
-
+            {
+              stepType === StepType.OpenWebpage &&
+              <OpenWebPageContent
+                onWebpageNameChange={setWebpageName}
+                onWebpageUrlChange={setWebpageUrl}
+              ></OpenWebPageContent>
+            }
             {
               stepType === StepType.Input && <DndProvider backend={HTML5Backend}>
                 <Track direction='vertical' align='stretch'>
@@ -194,7 +205,13 @@ const FlowElementsPopup = ({ node, onClose, onSave, oldRules, onRulesUpdate }: a
                 message={textfieldMessage || node.data.message}
               ></TextfieldTestContent>
             }
-
+            {
+              stepType === StepType.OpenWebpage &&
+              <OpenWebPageTestContent
+                websiteUrl={webpageUrl}
+                websiteName={webpageName}
+              ></OpenWebPageTestContent>
+            }
           </Tabs.Content>}
         </Tabs.Root>
       </Track>
