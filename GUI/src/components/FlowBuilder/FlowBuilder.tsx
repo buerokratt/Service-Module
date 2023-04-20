@@ -397,7 +397,7 @@ const FlowBuilder: FC<FlowBuilderProps> = ({
   const setDefaultMessages = (stepType: StepType) => {
     switch (stepType) {
       case StepType.FinishingStepEnd:
-        return 'Vestlus on lõpetatud';
+        return 'Teenus on lõpetatud';
       case StepType.FinishingStepRedirect:
         return 'Vestlus suunatakse klienditeenindajale';
     }
