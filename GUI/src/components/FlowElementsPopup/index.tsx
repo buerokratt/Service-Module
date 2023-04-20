@@ -15,6 +15,9 @@ import * as Tabs from '@radix-ui/react-tabs';
 import TextfieldTestContent from "./TextfieldTestContent";
 import DefaultMessageContent from "./DefaultMessageContent";
 import EndConversationContent from "./EndConversationContent";
+import JsonRequestContent from "./JsonRequestContent";
+import axios from "axios";
+import { servicesRequestsExplainMock } from "../../resources/api-constants";
 
 
 const FlowElementsPopup = ({ node, onClose, onSave, oldRules, onRulesUpdate }: any) => {
@@ -22,6 +25,8 @@ const FlowElementsPopup = ({ node, onClose, onSave, oldRules, onRulesUpdate }: a
   const [isYesNoQuestion, setIsYesNoQuestion] = useState(node?.isYesNoQuestion ?? false)
   const [rules, setRules] = useState<ConditiobRuleType[]>(node?.rules ?? [])
   const [selectedTab, setSelectedTab] = useState<string | null>(null);
+  const [isJsonRequestVisible, setIsJsonRequestVisible] = useState(false);
+  const [jsonRequestContent, setJsonRequestContent] = useState<string | null>(null);
 
   // StepType.Textfield 
   const [textfieldMessage, setTextfieldMessage] = useState<string | null>(null);
@@ -56,28 +61,60 @@ const FlowElementsPopup = ({ node, onClose, onSave, oldRules, onRulesUpdate }: a
     onSave(updatedNode);
   }
 
+  const fetchExplainRequestJson = async () => {
+    try {
+      const response = await axios.post(servicesRequestsExplainMock(), {});
+      setJsonRequestContent(response.data);
+    } catch (error) {
+      console.log("Error: ", error);
+    }
+  }
+
+  const resetStates = () => {
+    setSelectedTab(null);
+    setIsJsonRequestVisible(false);
+    setJsonRequestContent(null);
+  }
+
   return (
     <Popup
       style={{ maxWidth: 700 }}
       title={title}
       onClose={() => {
-        setSelectedTab(null);
+        resetStates();
         onClose();
       }}
       footer={
-        <Track gap={16}>
-          {
-            !isReadonly && <Button
-              appearance="secondary"
-              onClick={onClose}
-            >
-              {t('global.cancel')}
-            </Button>
-          }
-          <Button onClick={handleSaveClick}>
-            {t(isReadonly ? 'global.close' : 'global.save')}
+        <Track direction='horizontal' gap={16} justify='between' style={{ width: '100%' }}>
+          <Button
+            appearance='text'
+            onClick={async () => {
+              await fetchExplainRequestJson();
+              setIsJsonRequestVisible(!isJsonRequestVisible)
+            }}
+          >
+            {t(isJsonRequestVisible ? 'serviceFlow.popup.hideJsonRequest' : 'serviceFlow.popup.showJsonRequest')}
           </Button>
+          <Track gap={16}>
+            {
+              !isReadonly && <Button
+                appearance="secondary"
+                onClick={onClose}
+              >
+                {t('global.cancel')}
+              </Button>
+            }
+            <Button
+              onClick={() => {
+                handleSaveClick();
+                resetStates();
+              }}
+            >
+              {t(isReadonly ? 'global.close' : 'global.save')}
+            </Button>
+          </Track>
         </Track>
+
       }
     >
       <Track direction='vertical' align="stretch" gap={16} className="flow-body-reverse-margin">
@@ -147,6 +184,7 @@ const FlowElementsPopup = ({ node, onClose, onSave, oldRules, onRulesUpdate }: a
               stepType === StepType.FinishingStepEnd &&
               <EndConversationContent></EndConversationContent>
             }
+            <JsonRequestContent isVisible={isJsonRequestVisible} jsonContent={jsonRequestContent}></JsonRequestContent>
           </Tabs.Content>
           {!isReadonly && <Tabs.Content value={t('serviceFlow.tabs.test')} className='vertical-tabs__body'>
             {
