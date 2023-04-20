@@ -1,10 +1,10 @@
 version: "3.7"
-
 services:
   siga-demo-application:
     image: siga-demo-application:latest
     environment:
       - server.port=9443
+      - server.ssl.enabled=false
       - server.ssl.key-store=/etc/siga-demo/siga-demo.localhost.keystore.p12
       - siga.api.trust-store=file:/etc/siga-demo/siga-demo.truststore.p12
     ports:
