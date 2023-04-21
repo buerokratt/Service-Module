@@ -12,6 +12,8 @@ import { EndpointTab } from "../../../../types/endpoint-tab.enum";
 import { RequestVariablesTableColumns } from "../../../../types/request-variables-table-columns";
 import { RequestVariablesTabsRowsData } from "../../../../types/request-variables-tabs-rows-data";
 import { RequestVariablesTabsRawData } from "../../../../types/request-variables-tabs-raw-data";
+import { EndpointRequestData } from "../../../../types/endpoint-request-data";
+import { RequestVariablesRowData } from "../../../../types/request-variables-row-data";
 
 type RequestVariablesProps = {
   disableRawData?: boolean;
@@ -34,32 +36,65 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
   const [key, setKey] = useState<number>(0);
   const columnHelper = createColumnHelper<RequestVariablesTableColumns>();
 
+  const constructRow = (id: number, data: EndpointRequestData, nestedLevel: number): RequestVariablesRowData => {
+    return {
+      id: `${id}`,
+      endpointVariableId: data.id,
+      required: data.required,
+      variable: data.name,
+      value: isLive ? data.value : data.testValue,
+      isNameEditable: false,
+      type: data.type,
+      description: data.description,
+      arrayType: data.arrayType,
+      nestedLevel,
+    };
+  };
+
   const getInitialTabsRowsData = (): RequestVariablesTabsRowsData => {
     return tabs.reduce((tabsRowsData, tab) => {
-      const rows = [];
+      const rows: RequestVariablesRowData[] = [];
       if (endpointData) {
         if (!endpointData[tab]) return tabsRowsData;
-        endpointData[tab]!.forEach((variable, i) =>
-          rows.push({
-            id: `${i}`,
-            required: variable.required,
-            variable: variable.name,
-            value: isLive ? variable.value : variable.testValue,
-            isNameEditable: false,
-            type: variable.type,
-            description: variable.description,
-          })
-        );
+        let rowIdx = 0;
+        endpointData[tab]!.forEach((variable) => {
+          rows.push(constructRow(rowIdx, variable, 0));
+          if (["schema", "array"].includes(variable.type)) {
+            rowIdx = getRowsFromNestedSchema(variable, rowIdx, rows, 1);
+          }
+          rowIdx++;
+        });
       }
       if (rows.length === 0) {
         rows.push({
           id: `0`,
           required: false,
           isNameEditable: true,
+          nestedLevel: 0,
         });
       }
       return { ...tabsRowsData, [tab]: rows };
     }, {});
+  };
+
+  const getRowsFromNestedSchema = (
+    variable: EndpointRequestData,
+    oldRowIdx: number,
+    rows: RequestVariablesRowData[],
+    nestedLevel: number
+  ): number => {
+    let rowIdx = oldRowIdx;
+    const variableData = variable.type === "schema" ? variable.schemaData : variable.arrayData;
+    if (variableData instanceof Array) {
+      (variableData as EndpointRequestData[]).forEach((data) => {
+        rowIdx++;
+        rows.push(constructRow(rowIdx, data, nestedLevel));
+        if (["schema", "array"].includes(data.type)) {
+          rowIdx = getRowsFromNestedSchema(data, rowIdx, rows, nestedLevel + 1);
+        }
+      });
+    }
+    return rowIdx;
   };
 
   const getInitialTabsRawData = (): RequestVariablesTabsRawData => {
@@ -95,6 +130,7 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
         id: `${rowsData[selectedTab]!.length}`,
         required: false,
         isNameEditable: true,
+        nestedLevel: 0,
       });
       setKey(key + 1);
       return prevRowsData;
@@ -148,7 +184,7 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
             placeholder={t("newService.endpoint.variable") + ".."}
           />
         ) : (
-          <p>
+          <p style={{ paddingLeft: 40 * rowData.nestedLevel }}>
             {rowData.variable}
             {rowData.type && `, (${rowData.type})`}
             {rowData.description && `, (${rowData.description})`}
@@ -165,7 +201,11 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
         return sortRows(rowA, rowB, "value");
       },
       cell: (props) => {
-        return (
+        const rowData = rowsData[selectedTab]![+props.row.id];
+        if (!rowData) return;
+        return rowData.type === "schema" || (rowData.type === "array" && rowData.arrayType === "schema") ? (
+          <></>
+        ) : (
           <FormSelect
             name={props.row.original.variable}
             label={""}
