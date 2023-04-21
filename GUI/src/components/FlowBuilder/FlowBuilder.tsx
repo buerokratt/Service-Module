@@ -15,10 +15,12 @@ import ReactFlow, {
 import "reactflow/dist/style.css";
 import CustomNode from "../Steps/CustomNode";
 import PlaceholderNode from "../Steps/PlaceholderNode";
+import StartNode from "../Steps/StartNode";
 
 export const GRID_UNIT = 16;
 
 const nodeTypes = {
+  startNode: StartNode,
   customNode: CustomNode,
   placeholder: PlaceholderNode,
 };
@@ -32,6 +34,8 @@ type FlowBuilderProps = {
   edges: Edge[];
   setEdges: Dispatch<SetStateAction<Edge[]>>;
   onEdgesChange: OnEdgesChange;
+  reactFlowInstance?: ReactFlowInstance,
+  setReactFlowInstance: Dispatch<SetStateAction<ReactFlowInstance | undefined>>
 };
 
 const FlowBuilder: FC<FlowBuilderProps> = ({
@@ -43,9 +47,10 @@ const FlowBuilder: FC<FlowBuilderProps> = ({
   edges,
   setEdges,
   onEdgesChange,
+  reactFlowInstance,
+  setReactFlowInstance,
 }) => {
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
-  const [reactFlowInstance, setReactFlowInstance] = useState<ReactFlowInstance>();
   const [clickedNode, setClickedNode] = useState();
   const nodePositionOffset = 28 * GRID_UNIT;
   const updateNodeInternals = useUpdateNodeInternals();

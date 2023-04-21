@@ -1,6 +1,6 @@
-import { FC, useState } from "react";
+import { FC, useCallback, useState } from "react";
 import { MdPlayCircleFilled } from "react-icons/md";
-import { MarkerType, Node, ReactFlowProvider, useEdgesState, useNodesState } from "reactflow";
+import { Edge, MarkerType, Node, ReactFlowInstance, ReactFlowProvider, useEdgesState, useNodesState } from "reactflow";
 import "reactflow/dist/style.css";
 
 import { Box, Button, Collapsible, FlowBuilder, NewServiceHeader, Track } from "../components";
@@ -9,7 +9,7 @@ import { Step } from "../types/step";
 import Popup from "../components/Popup";
 import { GRID_UNIT } from "../components/FlowBuilder/FlowBuilder";
 import { CSSProperties } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { ROUTES } from "../resources/routes-constants";
 
 const initialPlaceholder = {
@@ -40,14 +40,12 @@ const initialEdge = {
 const initialNodes: Node[] = [
   {
     id: "1",
-    type: "input",
+    type: "startNode",
     position: {
       x: 13.5 * GRID_UNIT,
       y: GRID_UNIT,
     },
     data: {
-      label: <MdPlayCircleFilled />,
-      type: "input",
     },
     className: "start",
     selectable: false,
@@ -78,9 +76,12 @@ const ServiceFlowPage: FC = () => {
   ];
   const [isPopupVisible, setPopupVisible] = useState(false);
   const [updatedRules, setUpdatedRules] = useState<(string | null)[]>([]);
-  const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
-  const [edges, setEdges, onEdgesChange] = useEdgesState([initialEdge]);
+  const location = useLocation();
   const navigate = useNavigate();
+  const flow = location.state?.flow ? JSON.parse(location.state?.flow) : undefined;
+  const [nodes, setNodes, onNodesChange] = useNodesState<Node[]>(flow ? flow.nodes : initialNodes);
+  const [edges, setEdges, onEdgesChange] = useEdgesState<Edge[]>(flow ? flow.edges : [initialEdge]);
+  const [reactFlowInstance, setReactFlowInstance] = useState<ReactFlowInstance>();
 
   const onDragStart = (event: React.DragEvent<HTMLDivElement>, step: Step) => {
     event.dataTransfer.setData("application/reactflow-label", step.label);
@@ -92,7 +93,7 @@ const ServiceFlowPage: FC = () => {
 
   return (
     <>
-      <NewServiceHeader activeStep={3} saveDraftOnClick={() => {}} continueOnClick={() => navigate(ROUTES.OVERVIEW_ROUTE)}/>
+      <NewServiceHeader activeStep={3} saveDraftOnClick={() => {}} continueOnClick={() => navigate(ROUTES.NEWSERVICE_ROUTE, {state: {endpoints: location.state?.endpoints, flow: JSON.stringify(reactFlowInstance?.toObject())}})}/>
       <h1 style={{ padding: 16 }}>Teenusvoog "Raamatu laenutus"</h1>
       {isPopupVisible && (
         <Popup
@@ -151,6 +152,8 @@ const ServiceFlowPage: FC = () => {
             </Track>
           </div>
           <FlowBuilder
+            reactFlowInstance={reactFlowInstance}
+            setReactFlowInstance={setReactFlowInstance}
             setPopupVisible={setPopupVisible}
             updatedRules={updatedRules}
             nodes={nodes}

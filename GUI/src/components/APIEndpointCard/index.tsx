@@ -16,7 +16,6 @@ type EndpointCardProps = {
 };
 
 const APIEndpointCard: FC<EndpointCardProps> = ({ onDelete, setEndpoints, endpoint }) => {
-  const [option, setOption] = useState<Option | null>();
   const [selectedTab, setSelectedTab] = useState<EndpointEnv>(EndpointEnv.Live);
   const [endpointName, setEndpointName] = useState<string>("");
   const [testEnvExists, setTestEnvExists] = useState<boolean>(false);
@@ -24,6 +23,7 @@ const APIEndpointCard: FC<EndpointCardProps> = ({ onDelete, setEndpoints, endpoi
     { label: "Open API", value: "openAPI", name: "da" },
     { label: "Custom endpoint", value: "custom", name: "da" },
   ];
+  const [option, setOption] = useState<Option | null>(options.find((o) => o.value === endpoint.type) ?? null);
   const { t } = useTranslation();
 
   const getTabTriggerClasses = (tab: EndpointEnv) => `tab-group__tab-btn ${selectedTab === tab ? "active" : ""}`;
@@ -70,7 +70,7 @@ const APIEndpointCard: FC<EndpointCardProps> = ({ onDelete, setEndpoints, endpoi
                     setEndpoints((prevEndpoints) => {
                       prevEndpoints.map((prevEndpoint) => {
                         if (prevEndpoint.id !== endpoint.id) return prevEndpoint;
-                        prevEndpoint.type = selection?.label;
+                        prevEndpoint.type = selection?.value;
                         return prevEndpoint;
                       });
                       return prevEndpoints;

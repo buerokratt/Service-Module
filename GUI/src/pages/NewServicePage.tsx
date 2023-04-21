@@ -1,15 +1,16 @@
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { Button, Card, FormInput, ApiEndpointCard, FormTextarea, Layout, NewServiceHeader, Track } from "../components";
 import { v4 as uuid } from "uuid";
 import { ROUTES } from "../resources/routes-constants";
 import { EndpointData } from "../types/endpoint-data";
 
 const NewServicePage: React.FC = () => {
-  const [endpoints, setEndpoints] = useState<EndpointData[]>([]);
   const { t } = useTranslation();
+  const location = useLocation();
   const navigate = useNavigate();
+  const [endpoints, setEndpoints] = useState<EndpointData[]>(location.state?.endpoints ?? []);
 
   const onDelete = (id: string) => {
     setEndpoints((prevEndpoints) => prevEndpoints.filter((prevEndpoint) => prevEndpoint.id !== id));
@@ -33,7 +34,7 @@ const NewServicePage: React.FC = () => {
         <NewServiceHeader
           activeStep={2}
           saveDraftOnClick={saveDraft}
-          continueOnClick={() => navigate(ROUTES.FLOW_ROUTE)}
+          continueOnClick={() => navigate(ROUTES.FLOW_ROUTE, {state: {endpoints: endpoints, flow: location.state?.flow}})}
         />
       }
     >
