@@ -1,11 +1,14 @@
+import { EndpointRequestData } from "./endpoint-request-data";
+
 export type EndpointType = {
+  id: string;
   label: string;
-  value: string;
-  url: string;
+  path: string;
   methodType: string;
   supported: boolean;
+  isSelected: boolean;
   description?: string;
-  params?: any[];
-  headers?: any[];
-  body?: any[];
+  params?: EndpointRequestData[];
+  headers?: EndpointRequestData[];
+  body?: EndpointRequestData[];
 };

@@ -67,7 +67,8 @@ const OldNewServicePage: React.FC = () => {
           name={''}
           label={''}
           placeholder={'Select Endpoint'}
-          options={endpoints}
+          options={[]}
+          // options={endpoints}
           onSelectionChange={(value) => setSelectedEndpoint(value?.value ?? '')}
         />
       )}

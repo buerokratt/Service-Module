@@ -67,7 +67,7 @@ const EndpointCustom: React.FC = () => {
           </div>
         </div>
       )}
-      {showContent && <RequestVariables />}
+      {showContent && <RequestVariables updateEndpointData={() => {}} isLive />}
     </Track>
   );
 };

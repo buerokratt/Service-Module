@@ -16,9 +16,16 @@ import { RequestVariablesTabsRawData } from "../../../../types/request-variables
 type RequestVariablesProps = {
   disableRawData?: boolean;
   endpointData?: EndpointType;
+  updateEndpointData: (data: RequestVariablesTabsRowsData, openApiEndpointId?: string) => void;
+  isLive: boolean;
 };
 
-const RequestVariables: React.FC<RequestVariablesProps> = ({ disableRawData, endpointData }) => {
+const RequestVariables: React.FC<RequestVariablesProps> = ({
+  disableRawData,
+  endpointData,
+  updateEndpointData,
+  isLive,
+}) => {
   const { t } = useTranslation();
   const tabs: EndpointTab[] = [EndpointTab.Params, EndpointTab.Headers, EndpointTab.Body];
   const [jsonError, setJsonError] = useState<string>();
@@ -37,6 +44,7 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({ disableRawData, end
             id: `${i}`,
             required: variable.required,
             variable: variable.name,
+            value: isLive ? variable.value : variable.testValue,
             isNameEditable: false,
             type: variable.type,
             description: variable.description,
@@ -77,6 +85,7 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({ disableRawData, end
       row.value = selection.value;
       return row;
     });
+    updateEndpointData(rowsData, endpointData?.id);
   };
 
   const addNewRow = (id: string) => {

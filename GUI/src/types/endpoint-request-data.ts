@@ -9,4 +9,6 @@ export type EndpointRequestData = {
   integerFormat?: string;
   in?: string;
   default?: string;
+  value?: string;
+  testValue?: string;
 };

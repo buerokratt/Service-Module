@@ -92,7 +92,7 @@ const ServiceFlowPage: FC = () => {
 
   return (
     <>
-      <NewServiceHeader activeStep={3} continueOnClick={() => navigate(ROUTES.OVERVIEW_ROUTE)}/>
+      <NewServiceHeader activeStep={3} saveDraftOnClick={() => {}} continueOnClick={() => navigate(ROUTES.OVERVIEW_ROUTE)}/>
       <h1 style={{ padding: 16 }}>Teenusvoog "Raamatu laenutus"</h1>
       {isPopupVisible && (
         <Popup

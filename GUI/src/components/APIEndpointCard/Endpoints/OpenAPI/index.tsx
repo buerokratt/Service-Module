@@ -1,20 +1,33 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { openApiSpeckMock } from "../../../../resources/api-constants";
 import { Button, FormInput, FormSelect, Track } from "../../..";
-import { Option } from "../../../../types/option";
 import { useTranslation } from "react-i18next";
 import RequestVariables from "../RequestVariables";
 import axios from "axios";
 import { EndpointType } from "../../../../types/endpoint-type";
 import { EndpointRequestData } from "../../../../types/endpoint-request-data";
 import { ApiSpecProperty } from "../../../../types/api-spec-property";
+import { v4 as uuid } from "uuid";
+import { EndpointTab } from "../../../../types/endpoint-tab.enum";
+import { RequestVariablesTabsRowsData } from "../../../../types/request-variables-tabs-rows-data";
+import { EndpointData } from "../../../../types/endpoint-data";
 
+type EndpointOpenAPIProps = {
+  endpoint: EndpointData;
+  setEndpoints: React.Dispatch<React.SetStateAction<EndpointData[]>>;
+  isLive: boolean;
+};
 
-const EndpointOpenAPI: React.FC = () => {
-  const [selectedEndpoint, setSelectedEndpoint] = useState<Option | null>();
-  const [endpoints, setEndpoints] = useState<EndpointType[]>([]);
+const EndpointOpenAPI: React.FC<EndpointOpenAPIProps> = ({ endpoint, setEndpoints, isLive }) => {
+  const [openApiUrl, setOpenApiUrl] = useState<string>(endpoint.url ?? "");
+  const [selectedEndpoint, setSelectedEndpoint] = useState<EndpointType | undefined>(
+    endpoint.definedEndpoints.find((e) => e.isSelected)
+  );
+  const [openApiEndpoints, setOpenApiEndpoints] = useState<EndpointType[]>(endpoint.definedEndpoints ?? []);
   const [key, setKey] = useState<number>(0);
   const { t } = useTranslation();
+
+  useEffect(() => setKey(key + 1), [isLive]);
 
   const getEndpointBody = (
     apiSpec: ApiSpecProperty,
@@ -28,58 +41,43 @@ const EndpointOpenAPI: React.FC = () => {
           name: schemaPath.split("/").pop() ?? "",
           type: "array",
           required: false,
-          arrayData: parseBodyProperty(
-            apiSpec,
-            getPropertySchema(apiSpec, schemaPath)
-          ),
+          arrayData: parseBodyProperty(apiSpec, getPropertySchema(apiSpec, schemaPath)),
         },
       ];
     } else {
-      return parseBodyProperty(
-        apiSpec,
-        getPropertySchema(apiSpec, contentSchema.$ref)
-      );
+      return parseBodyProperty(apiSpec, getPropertySchema(apiSpec, contentSchema.$ref));
     }
   };
 
-  const parseBodyProperty = (
-    apiSpec: ApiSpecProperty,
-    schema: ApiSpecProperty
-  ): EndpointRequestData[] | undefined => {
+  const parseBodyProperty = (apiSpec: ApiSpecProperty, schema: ApiSpecProperty): EndpointRequestData[] | undefined => {
     if (!schema.properties) return;
 
     const result: EndpointRequestData[] = [];
-    Object.entries(schema?.properties as ApiSpecProperty).forEach(
-      ([variableName, data]: [string, ApiSpecProperty]) => {
-        const variableData: EndpointRequestData = {
-          name: variableName,
-          required: false,
-          type: Object.keys(data).includes("$ref") ? "schema" : data.type,
-        };
-        variableData.description = data.description;
+    Object.entries(schema?.properties as ApiSpecProperty).forEach(([variableName, data]: [string, ApiSpecProperty]) => {
+      const variableData: EndpointRequestData = {
+        name: variableName,
+        required: false,
+        type: Object.keys(data).includes("$ref") ? "schema" : data.type,
+      };
+      variableData.description = data.description;
 
-        if (Object.keys(data).includes("$ref")) {
-          const subSchema = getPropertySchema(apiSpec, data.$ref);
-          const parsedSubSchema = parseBodyProperty(apiSpec, subSchema);
-          variableData.schemaData = parsedSubSchema;
-        }
-        if (data.type === "array") {
-          if (!Object.keys(data.items).includes("$ref")) {
-            variableData.arrayData = data.items.type;
-          } else {
-            const parsedSubSchema = parseBodyProperty(
-              apiSpec,
-              getPropertySchema(apiSpec, data.items.$ref)
-            );
-            variableData.arrayData = parsedSubSchema;
-          }
-        }
-        if (Object.keys(data).includes("enum")) variableData.enum = data.enum;
-        if (data.type === "integer") variableData.integerFormat = data.format;
-
-        result.push(variableData);
+      if (Object.keys(data).includes("$ref")) {
+        const subSchema = getPropertySchema(apiSpec, data.$ref);
+        const parsedSubSchema = parseBodyProperty(apiSpec, subSchema);
+        variableData.schemaData = parsedSubSchema;
       }
-    );
+      if (data.type === "array") {
+        if (!Object.keys(data.items).includes("$ref")) {
+          variableData.arrayData = data.items.type;
+        } else {
+          variableData.arrayData = parseBodyProperty(apiSpec, getPropertySchema(apiSpec, data.items.$ref));
+        }
+      }
+      if (Object.keys(data).includes("enum")) variableData.enum = data.enum;
+      if (data.type === "integer") variableData.integerFormat = data.format;
+
+      result.push(variableData);
+    });
     if (!schema.required) return result;
     Object.values(schema?.required).forEach((name) => {
       result.map((variable) => {
@@ -91,19 +89,14 @@ const EndpointOpenAPI: React.FC = () => {
     return result;
   };
 
-  const getPropertySchema = (
-    apiSpec: ApiSpecProperty,
-    propertyPath: string
-  ): ApiSpecProperty => {
+  const getPropertySchema = (apiSpec: ApiSpecProperty, propertyPath: string): ApiSpecProperty => {
     const indices = propertyPath.split("/").slice(1);
     let schema = apiSpec;
     indices.forEach((indice) => (schema = schema[indice]));
     return schema;
   };
 
-  const getParams = (
-    params?: ApiSpecProperty[]
-  ): EndpointRequestData[] | undefined => {
+  const getParams = (params?: ApiSpecProperty[]): EndpointRequestData[] | undefined => {
     if (!params) return;
     return params.map((param) => {
       return {
@@ -120,60 +113,81 @@ const EndpointOpenAPI: React.FC = () => {
   };
 
   const fetchOpenApiSpecMock = async () => {
-    const result = await axios.post(openApiSpeckMock());
-    const apiSpec = result.data.response;
+    // const result = await axios.post(openApiSpeckMock());
+    // const apiSpec = result.data.response;
+    const result = await axios.get(openApiSpeckMock());
+    const apiSpec = result.data;
+    const url = new URL(openApiUrl).origin + apiSpec.servers[0].url;
+    console.log(apiSpec);
     const paths: EndpointType[] = [];
 
-    Object.entries(apiSpec.paths).forEach(([endpointName, endpointData]) => {
-      Object.entries(endpointData as ApiSpecProperty).forEach(
-        ([method, data]: [string, ApiSpecProperty]) => {
-          const path = `${method.toUpperCase()} ${endpointName}`;
-          if (!["get", "post"].includes(method.toLowerCase())) {
-            paths.push({
-              label: path,
-              value: path,
-              url: endpointName,
-              methodType: method,
-              supported: false,
-            });
-            return;
-          }
-          const body = getEndpointBody(
-            apiSpec,
-            data.requestBody?.content["application/json"]?.schema
-          );
-          const params = getParams(data.parameters);
-          const headers = undefined; // TODO find where to get headers
-
+    Object.entries(apiSpec.paths).forEach(([path, endpointData]) => {
+      Object.entries(endpointData as ApiSpecProperty).forEach(([method, data]: [string, ApiSpecProperty]) => {
+        const label = `${method.toUpperCase()} ${path}`;
+        if (!["get", "post"].includes(method.toLowerCase())) {
           paths.push({
-            label: path,
-            value: path,
-            url: endpointName,
+            id: uuid(),
+            label,
+            path: path,
             methodType: method,
-            supported: true,
-            description: data.summary ?? data.description,
-            body: body,
-            headers: headers,
-            params: params,
+            supported: false,
+            isSelected: false,
           });
+          return;
         }
-      );
+        const body = getEndpointBody(apiSpec, data.requestBody?.content["application/json"]?.schema);
+        const params = getParams(data.parameters);
+        const headers = undefined; // TODO find where to get headers
+
+        paths.push({
+          id: uuid(),
+          label,
+          path: path,
+          methodType: method,
+          supported: true,
+          isSelected: false,
+          description: data.summary ?? data.description,
+          body: body,
+          headers: headers,
+          params: params,
+        });
+      });
     });
 
-    setEndpoints(paths);
+    setOpenApiEndpoints(paths);
+    setEndpoints((prevEndpoints: any) => {
+      prevEndpoints.map((prevEndpoint: any) => {
+        if (prevEndpoint.id !== endpoint.id) return prevEndpoint;
+        prevEndpoint.definedEndpoints = paths;
+        prevEndpoint.url = url;
+        return prevEndpoint;
+      });
+      return prevEndpoints;
+    });
     setKey(key + 1);
   };
 
-  const isEndpointSupported = (): boolean => {
-    return getSelectedEndpointData()?.supported ?? false;
+  const updateEndpointData = (data: RequestVariablesTabsRowsData, openApiEndpointId?: string) => {
+    if (!openApiEndpointId) return;
+    setEndpoints((prevEndpoints) => {
+      return prevEndpoints.map((prevEndpoint) => {
+        if (prevEndpoint.id !== endpoint.id) return prevEndpoint;
+        prevEndpoint.definedEndpoints.map((openApiEndpoint) => {
+          if (openApiEndpoint.id !== openApiEndpointId) return openApiEndpoint;
+          Object.keys(data).forEach((key) => {
+            openApiEndpoint[key as EndpointTab]?.forEach((variable) => {
+              const updatedVariable = data[key as EndpointTab]!.find(
+                (updatedVariable) => updatedVariable.variable === variable.name
+              );
+              variable[isLive ? "value" : "testValue"] = updatedVariable?.value;
+            });
+          });
+          return openApiEndpoint;
+        });
+        return prevEndpoint;
+      });
+    });
   };
-
-  const getSelectedEndpointData = (): EndpointType | undefined => {
-    return endpoints.find(
-      (endpoint) => endpoint.value === selectedEndpoint?.value
-    );
-  };
-
   return (
     <Track direction="vertical" align="stretch" gap={16}>
       <div>
@@ -183,7 +197,8 @@ const EndpointOpenAPI: React.FC = () => {
             name="endpointUrl"
             label=""
             placeholder={t("newService.endpoint.insert") ?? ""}
-            onChange={(v) => console.log(endpoints)}
+            value={openApiUrl}
+            onChange={(e) => setOpenApiUrl(e.target.value)}
           />
           <Button
             onClick={() => {
@@ -194,30 +209,46 @@ const EndpointOpenAPI: React.FC = () => {
           </Button>
         </Track>
       </div>
-      {endpoints.length > 0 && (
+      {openApiEndpoints.length > 0 && (
         <div>
-          <label htmlFor="select-endpoint">
-            {t("newService.endpoint.single")}
-          </label>
+          <label htmlFor="select-endpoint">{t("newService.endpoint.single")}</label>
           <FormSelect
             name={"select-endpoint"}
             label={""}
-            options={endpoints}
-            onSelectionChange={(value) => {
-              setSelectedEndpoint(value);
+            defaultValue={selectedEndpoint?.label}
+            options={openApiEndpoints.map((openApiEndpoint) => {
+              return { label: openApiEndpoint.label, value: openApiEndpoint.label };
+            })}
+            onSelectionChange={(selection) => {
+              const newSelectedEndpoint = openApiEndpoints.find(
+                (openApiEndpoint) => openApiEndpoint.label === selection?.label
+              );
+              setSelectedEndpoint(newSelectedEndpoint);
+              setEndpoints((prevEndpoints) => {
+                return prevEndpoints.map((prevEndpoint) => {
+                  if (prevEndpoint.id !== endpoint.id) return prevEndpoint;
+                  prevEndpoint.definedEndpoints.map((definedEndpoint) => {
+                    definedEndpoint.isSelected = definedEndpoint === newSelectedEndpoint;
+                    return definedEndpoint;
+                  });
+                  return prevEndpoint;
+                });
+              });
               setKey(key + 1);
             }}
           />
         </div>
       )}
       {selectedEndpoint &&
-        (isEndpointSupported() ? (
+        (selectedEndpoint?.supported ? (
           <>
-            <p>{getSelectedEndpointData()?.description}</p>
+            <p>{selectedEndpoint?.description}</p>
             <RequestVariables
               key={key}
               disableRawData
-              endpointData={getSelectedEndpointData()}
+              isLive={isLive}
+              endpointData={selectedEndpoint}
+              updateEndpointData={updateEndpointData}
             />
           </>
         ) : (

@@ -8,7 +8,6 @@ import FlowBuilder from "./FlowBuilder/FlowBuilder";
 import ApiEndpointCard from "./ApiEndpointCard";
 import EndpointCustom from "./ApiEndpointCard/Endpoints/Custom";
 import EndpointOpenAPI from "./ApiEndpointCard/Endpoints/OpenAPI";
-import EndpointResqlComponent from "./ApiEndpointCard/Endpoints/ResqlComponent";
 import DataTable from "./DataTable";
 import {
   FormCheckbox,
@@ -48,7 +47,6 @@ export {
   EndpointCustom,
   EndpointOpenAPI,
   FlowBuilder,
-  EndpointResqlComponent,
   FormCheckbox,
   FormCheckboxes,
   FormDatepicker,
