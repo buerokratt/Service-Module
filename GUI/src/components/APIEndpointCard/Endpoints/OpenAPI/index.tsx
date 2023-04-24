@@ -5,21 +5,33 @@ import { useTranslation } from "react-i18next";
 import RequestVariables from "../RequestVariables";
 import axios from "axios";
 import { EndpointType } from "../../../../types/endpoint-type";
-import { EndpointRequestData } from "../../../../types/endpoint-request-data";
+import { EndpointVariableData } from "../../../../types/endpoint-variable-data";
 import { ApiSpecProperty } from "../../../../types/api-spec-property";
 import { v4 as uuid } from "uuid";
 import { EndpointTab } from "../../../../types/endpoint-tab.enum";
 import { RequestVariablesTabsRowsData } from "../../../../types/request-variables-tabs-rows-data";
 import { EndpointData } from "../../../../types/endpoint-data";
 import { RequestVariablesRowData } from "../../../../types/request-variables-row-data";
+import { Option } from "../../../../types/option";
+import { LastUpdatedRow } from "../../../../types/last-updated-row";
 
 type EndpointOpenAPIProps = {
   endpoint: EndpointData;
   setEndpoints: React.Dispatch<React.SetStateAction<EndpointData[]>>;
   isLive: boolean;
+  requestValues: Option[];
+  lastUpdatedRow: LastUpdatedRow | undefined;
+  setLastUpdatedRow: React.Dispatch<React.SetStateAction<LastUpdatedRow | undefined>>;
 };
 
-const EndpointOpenAPI: React.FC<EndpointOpenAPIProps> = ({ endpoint, setEndpoints, isLive }) => {
+const EndpointOpenAPI: React.FC<EndpointOpenAPIProps> = ({
+  endpoint,
+  setEndpoints,
+  isLive,
+  requestValues,
+  lastUpdatedRow,
+  setLastUpdatedRow,
+}) => {
   const [openApiUrl, setOpenApiUrl] = useState<string>(endpoint.url ?? "");
   const [selectedEndpoint, setSelectedEndpoint] = useState<EndpointType | undefined>(
     endpoint.definedEndpoints.find((e) => e.isSelected)
@@ -30,10 +42,10 @@ const EndpointOpenAPI: React.FC<EndpointOpenAPIProps> = ({ endpoint, setEndpoint
 
   useEffect(() => setKey(key + 1), [isLive]);
 
-  const getEndpointBody = (
+  const getEndpointSchema = (
     apiSpec: ApiSpecProperty,
     contentSchema?: ApiSpecProperty
-  ): EndpointRequestData[] | undefined => {
+  ): EndpointVariableData[] | undefined => {
     if (!contentSchema) return;
     if (contentSchema.items) {
       const schemaPath: string = contentSchema.items.$ref;
@@ -44,20 +56,41 @@ const EndpointOpenAPI: React.FC<EndpointOpenAPIProps> = ({ endpoint, setEndpoint
           type: "array",
           arrayType: "schema",
           required: false,
-          arrayData: parseBodyProperty(apiSpec, getPropertySchema(apiSpec, schemaPath)),
+          arrayData: parseSchemaProperty(apiSpec, getPropertySchema(apiSpec, schemaPath)),
         },
       ];
     } else {
-      return parseBodyProperty(apiSpec, getPropertySchema(apiSpec, contentSchema.$ref));
+      return parseSchemaProperty(apiSpec, getPropertySchema(apiSpec, contentSchema.$ref));
     }
   };
 
-  const parseBodyProperty = (apiSpec: ApiSpecProperty, schema: ApiSpecProperty): EndpointRequestData[] | undefined => {
+  const getEndpointResponse = (
+    apiSpec: ApiSpecProperty,
+    response?: ApiSpecProperty
+  ): EndpointVariableData[] | undefined => {
+    if (!response) return;
+    if (response.type === "object")
+      return [
+        {
+          id: uuid(),
+          name: "response",
+          type: response.additionalProperties?.type,
+          integerFormat: response.additionalProperties?.format,
+        },
+      ];
+    if (response.$ref || response.type === "array") return getEndpointSchema(apiSpec, response);
+    return [{ id: uuid(), name: "response", type: response.type }];
+  };
+
+  const parseSchemaProperty = (
+    apiSpec: ApiSpecProperty,
+    schema: ApiSpecProperty
+  ): EndpointVariableData[] | undefined => {
     if (!schema.properties) return;
 
-    const result: EndpointRequestData[] = [];
+    const result: EndpointVariableData[] = [];
     Object.entries(schema?.properties as ApiSpecProperty).forEach(([variableName, data]: [string, ApiSpecProperty]) => {
-      const variableData: EndpointRequestData = {
+      const variableData: EndpointVariableData = {
         id: uuid(),
         name: variableName,
         required: false,
@@ -67,7 +100,7 @@ const EndpointOpenAPI: React.FC<EndpointOpenAPIProps> = ({ endpoint, setEndpoint
 
       if (Object.keys(data).includes("$ref")) {
         const subSchema = getPropertySchema(apiSpec, data.$ref);
-        const parsedSubSchema = parseBodyProperty(apiSpec, subSchema);
+        const parsedSubSchema = parseSchemaProperty(apiSpec, subSchema);
         variableData.schemaData = parsedSubSchema;
       }
       if (data.type === "array") {
@@ -75,7 +108,7 @@ const EndpointOpenAPI: React.FC<EndpointOpenAPIProps> = ({ endpoint, setEndpoint
           variableData.arrayType = data.items.type;
         } else {
           variableData.arrayType = "schema";
-          variableData.arrayData = parseBodyProperty(apiSpec, getPropertySchema(apiSpec, data.items.$ref));
+          variableData.arrayData = parseSchemaProperty(apiSpec, getPropertySchema(apiSpec, data.items.$ref));
         }
       }
       if (Object.keys(data).includes("enum")) variableData.enum = data.enum;
@@ -101,7 +134,7 @@ const EndpointOpenAPI: React.FC<EndpointOpenAPIProps> = ({ endpoint, setEndpoint
     return schema;
   };
 
-  const getParams = (params?: ApiSpecProperty[]): EndpointRequestData[] | undefined => {
+  const getParams = (params?: ApiSpecProperty[]): EndpointVariableData[] | undefined => {
     if (!params || params.length === 0) return;
     return params.map((param) => {
       return {
@@ -135,95 +168,32 @@ const EndpointOpenAPI: React.FC<EndpointOpenAPIProps> = ({ endpoint, setEndpoint
           paths.push({
             id: uuid(),
             label,
-            path: path,
+            path,
+            type: "openApi",
             methodType: method,
             supported: false,
             isSelected: false,
           });
           return;
         }
-        const body = getEndpointBody(apiSpec, data.requestBody?.content["application/json"]?.schema);
-        // const body: EndpointRequestData[] = [
-        //   {
-        //     id: uuid(),
-        //     name: "query",
-        //     required: true,
-        //     type: "array",
-        //     arrayType: "schema",
-        //     arrayData: [
-        //       {
-        //         id: uuid(),
-        //         name: "code",
-        //         required: true,
-        //         type: "string",
-        //       },
-        //       {
-        //         id: uuid(),
-        //         name: "selection",
-        //         required: true,
-        //         type: "schema",
-        //         schemaData: [
-        //           {
-        //             id: uuid(),
-        //             name: "filter",
-        //             required: true,
-        //             type: "string",
-        //           },
-        //           {
-        //             id: uuid(),
-        //             name: "values",
-        //             required: true,
-        //             type: "array",
-        //             arrayType: "string",
-        //           },
-        //         ],
-        //       },
-        //     ],
-        //   },
-        //   {
-        //     id: uuid(),
-        //     name: "response",
-        //     required: true,
-        //     type: "schema",
-        //     schemaData: [
-        //       {
-        //         id: uuid(),
-        //         name: "format",
-        //         required: true,
-        //         type: "string",
-        //       },
-        //     ],
-        //   },
-        //   //  "query": [
-        //   //    {
-        //   //      "code": "Aasta",
-        //   //      "selection": {
-        //   //        "filter": "item",
-        //   //        "values": [
-        //   //          "2021"
-        //   //        ]
-        //   //      }
-        //   //    }
-        //   //  ],
-        //   //  "response": {
-        //   //    "format": "json-stat2"
-        //   //  }
-        //   // }
-        // ];
+        const body = getEndpointSchema(apiSpec, data.requestBody?.content["application/json"]?.schema);
         const params = getParams(data.parameters);
         const headers = undefined; // TODO find where to get headers
+        const response = getEndpointResponse(apiSpec, data.responses["200"]?.content["application/json"]?.schema);
 
         paths.push({
           id: uuid(),
           label,
-          path: path,
+          path,
+          type: "openApi",
           methodType: method,
           supported: true,
           isSelected: false,
           description: data.summary ?? data.description,
-          body: body,
-          headers: headers,
-          params: params,
+          body,
+          headers,
+          params,
+          response,
         });
       });
     });
@@ -241,10 +211,10 @@ const EndpointOpenAPI: React.FC<EndpointOpenAPIProps> = ({ endpoint, setEndpoint
     setKey(key + 1);
   };
 
-  const checkNestedVariables = (variable: EndpointRequestData, data: RequestVariablesRowData[]) => {
+  const checkNestedVariables = (variable: EndpointVariableData, data: RequestVariablesRowData[]) => {
     const variableData = variable.type === "schema" ? variable.schemaData : variable.arrayData;
     if (variableData instanceof Array) {
-      (variableData as EndpointRequestData[]).forEach((variableData) => {
+      (variableData as EndpointVariableData[]).forEach((variableData) => {
         const updatedVariable = data.find((updated) => updated.endpointVariableId === variableData.id);
         variableData[isLive ? "value" : "testValue"] = updatedVariable?.value;
         if (["schema", "array"].includes(variableData.type)) {
@@ -278,6 +248,23 @@ const EndpointOpenAPI: React.FC<EndpointOpenAPIProps> = ({ endpoint, setEndpoint
       });
     });
   };
+
+  const onSelectEndpoint = (selection: Option | null) => {
+    const newSelectedEndpoint = openApiEndpoints.find((openApiEndpoint) => openApiEndpoint.label === selection?.label);
+    setSelectedEndpoint(newSelectedEndpoint);
+    setEndpoints((prevEndpoints) => {
+      return prevEndpoints.map((prevEndpoint) => {
+        if (prevEndpoint.id !== endpoint.id) return prevEndpoint;
+        prevEndpoint.definedEndpoints.map((definedEndpoint) => {
+          definedEndpoint.isSelected = definedEndpoint === newSelectedEndpoint;
+          return definedEndpoint;
+        });
+        return prevEndpoint;
+      });
+    });
+    setKey(key + 1);
+  };
+
   return (
     <Track direction="vertical" align="stretch" gap={16}>
       <div>
@@ -309,23 +296,7 @@ const EndpointOpenAPI: React.FC<EndpointOpenAPIProps> = ({ endpoint, setEndpoint
             options={openApiEndpoints.map((openApiEndpoint) => {
               return { label: openApiEndpoint.label, value: openApiEndpoint.label };
             })}
-            onSelectionChange={(selection) => {
-              const newSelectedEndpoint = openApiEndpoints.find(
-                (openApiEndpoint) => openApiEndpoint.label === selection?.label
-              );
-              setSelectedEndpoint(newSelectedEndpoint);
-              setEndpoints((prevEndpoints) => {
-                return prevEndpoints.map((prevEndpoint) => {
-                  if (prevEndpoint.id !== endpoint.id) return prevEndpoint;
-                  prevEndpoint.definedEndpoints.map((definedEndpoint) => {
-                    definedEndpoint.isSelected = definedEndpoint === newSelectedEndpoint;
-                    return definedEndpoint;
-                  });
-                  return prevEndpoint;
-                });
-              });
-              setKey(key + 1);
-            }}
+            onSelectionChange={onSelectEndpoint}
           />
         </div>
       )}
@@ -339,6 +310,9 @@ const EndpointOpenAPI: React.FC<EndpointOpenAPIProps> = ({ endpoint, setEndpoint
               isLive={isLive}
               endpointData={selectedEndpoint}
               updateEndpointData={updateEndpointData}
+              requestValues={requestValues}
+              lastUpdatedRow={lastUpdatedRow}
+              setLastUpdatedRow={setLastUpdatedRow}
             />
           </>
         ) : (

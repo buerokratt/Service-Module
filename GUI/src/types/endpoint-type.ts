@@ -1,14 +1,16 @@
-import { EndpointRequestData } from "./endpoint-request-data";
+import { EndpointVariableData } from "./endpoint-variable-data";
 
 export type EndpointType = {
   id: string;
   label: string;
   path: string;
   methodType: string;
+  type: "openApi" | "custom";
   supported: boolean;
   isSelected: boolean;
   description?: string;
-  params?: EndpointRequestData[];
-  headers?: EndpointRequestData[];
-  body?: EndpointRequestData[];
+  params?: EndpointVariableData[];
+  headers?: EndpointVariableData[];
+  body?: EndpointVariableData[];
+  response?: EndpointVariableData[];
 };

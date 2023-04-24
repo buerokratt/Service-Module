@@ -3,7 +3,6 @@ import { useTranslation } from "react-i18next";
 import { Button, FormInput, FormSelect, FormTextarea, Icon, SwitchBox, Tooltip, Track } from "../../..";
 import * as Tabs from "@radix-ui/react-tabs";
 import DataTable from "../../../DataTable";
-import { dummyVariableOptions } from "../../../../resources/api-constants";
 import { createColumnHelper, Row } from "@tanstack/react-table";
 import { Option } from "../../../../types/option";
 import { MdDeleteOutline } from "react-icons/md";
@@ -12,14 +11,18 @@ import { EndpointTab } from "../../../../types/endpoint-tab.enum";
 import { RequestVariablesTableColumns } from "../../../../types/request-variables-table-columns";
 import { RequestVariablesTabsRowsData } from "../../../../types/request-variables-tabs-rows-data";
 import { RequestVariablesTabsRawData } from "../../../../types/request-variables-tabs-raw-data";
-import { EndpointRequestData } from "../../../../types/endpoint-request-data";
+import { EndpointVariableData } from "../../../../types/endpoint-variable-data";
 import { RequestVariablesRowData } from "../../../../types/request-variables-row-data";
+import { LastUpdatedRow } from "../../../../types/last-updated-row";
 
 type RequestVariablesProps = {
   disableRawData?: boolean;
-  endpointData?: EndpointType;
+  endpointData: EndpointType;
   updateEndpointData: (data: RequestVariablesTabsRowsData, openApiEndpointId?: string) => void;
   isLive: boolean;
+  requestValues: Option[];
+  lastUpdatedRow: LastUpdatedRow | undefined;
+  setLastUpdatedRow: React.Dispatch<React.SetStateAction<LastUpdatedRow | undefined>>;
 };
 
 const RequestVariables: React.FC<RequestVariablesProps> = ({
@@ -27,6 +30,9 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
   endpointData,
   updateEndpointData,
   isLive,
+  requestValues,
+  lastUpdatedRow,
+  setLastUpdatedRow,
 }) => {
   const { t } = useTranslation();
   const tabs: EndpointTab[] = [EndpointTab.Params, EndpointTab.Headers, EndpointTab.Body];
@@ -36,14 +42,14 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
   const [key, setKey] = useState<number>(0);
   const columnHelper = createColumnHelper<RequestVariablesTableColumns>();
 
-  const constructRow = (id: number, data: EndpointRequestData, nestedLevel: number): RequestVariablesRowData => {
+  const constructRow = (id: number, data: EndpointVariableData, nestedLevel: number): RequestVariablesRowData => {
     return {
       id: `${id}`,
       endpointVariableId: data.id,
-      required: data.required,
+      required: data.required ?? false,
       variable: data.name,
       value: isLive ? data.value : data.testValue,
-      isNameEditable: false,
+      isNameEditable: data.type === 'custom',
       type: data.type,
       description: data.description,
       arrayType: data.arrayType,
@@ -65,9 +71,9 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
           rowIdx++;
         });
       }
-      if (rows.length === 0) {
+      if (rows.length === 0 || endpointData.type === 'custom') {
         rows.push({
-          id: `0`,
+          id: `${rows.length}`,
           required: false,
           isNameEditable: true,
           nestedLevel: 0,
@@ -78,7 +84,7 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
   };
 
   const getRowsFromNestedSchema = (
-    variable: EndpointRequestData,
+    variable: EndpointVariableData,
     oldRowIdx: number,
     rows: RequestVariablesRowData[],
     nestedLevel: number
@@ -86,7 +92,7 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
     let rowIdx = oldRowIdx;
     const variableData = variable.type === "schema" ? variable.schemaData : variable.arrayData;
     if (variableData instanceof Array) {
-      (variableData as EndpointRequestData[]).forEach((data) => {
+      (variableData as EndpointVariableData[]).forEach((data) => {
         rowIdx++;
         rows.push(constructRow(rowIdx, data, nestedLevel));
         if (["schema", "array"].includes(data.type)) {
@@ -113,28 +119,36 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
   const getTabTriggerClasses = (tab: EndpointTab) =>
     `endpoint-tab-group__tab-btn ${selectedTab === tab ? "active" : ""}`;
 
-  const updateSelection = (id: string, selection: Option | null) => {
-    if (!selection || !rowsData[selectedTab]) return;
-    rowsData[selectedTab]!.map((row) => {
-      if (row.id !== id) return row;
-      row.value = selection.value;
-      return row;
-    });
-    updateEndpointData(rowsData, endpointData?.id);
-  };
-
-  const addNewRow = (id: string) => {
-    if (!rowsData[selectedTab] || id !== `${rowsData[selectedTab]!.length - 1}`) return;
+  const updateRowVariable = (id: string, variable: string) => {
     setRowsData((prevRowsData) => {
+      prevRowsData[selectedTab]!.map((row) => {
+        if (row.id !== id) return row;
+        row.variable = variable;
+        setLastUpdatedRow({ type: "variable", rowId: id, endpointCardId: endpointData?.id });
+        return row;
+      });
+      // if last row name is edited, add a new row
+      if (!rowsData[selectedTab] || id !== `${rowsData[selectedTab]!.length - 1}`) return prevRowsData;
       prevRowsData[selectedTab]!.push({
         id: `${rowsData[selectedTab]!.length}`,
         required: false,
         isNameEditable: true,
         nestedLevel: 0,
       });
-      setKey(key + 1);
       return prevRowsData;
     });
+    updateEndpointData(rowsData, endpointData?.id);
+  };
+
+  const updateRowValue = (id: string, value: string) => {
+    if (!rowsData[selectedTab]) return;
+    rowsData[selectedTab]!.map((row) => {
+      if (row.id !== id) return row;
+      row.value = value;
+      setLastUpdatedRow({ type: "value", rowId: id, endpointCardId: endpointData?.id });
+      return row;
+    });
+    updateEndpointData(rowsData, endpointData?.id);
   };
 
   const sortRows = (
@@ -168,18 +182,12 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
             style={{ borderRadius: "0 4px 4px 0" }}
             name={`endpoint-variable-${props.row.id}`}
             label=""
-            onChange={(event) => {
-              setRowsData((prevRowsData) => {
-                prevRowsData[selectedTab]!.map((row) => {
-                  if (row.id !== props.row.id) return row;
-                  row.variable = event.target.value;
-                  return row;
-                });
-                return prevRowsData;
-              });
-              addNewRow(props.row.id);
-            }}
-            autoFocus={props.row.id === `${rowsData[selectedTab]!.length - 2}`}
+            onChange={(event) => updateRowVariable(props.row.id, event.target.value)}
+            autoFocus={
+              props.row.id === lastUpdatedRow?.rowId &&
+              lastUpdatedRow.type === "variable" &&
+              lastUpdatedRow.endpointCardId === endpointData?.id
+            }
             defaultValue={rowsData[selectedTab]!.find((row) => row.id === props.row.id)?.variable}
             placeholder={t("newService.endpoint.variable") + ".."}
           />
@@ -206,13 +214,20 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
         return rowData.type === "schema" || (rowData.type === "array" && rowData.arrayType === "schema") ? (
           <></>
         ) : (
-          <FormSelect
-            name={props.row.original.variable}
-            label={""}
-            options={dummyVariableOptions}
-            defaultValue={rowsData[selectedTab]!.find((row) => row.id === props.row.id)?.value}
-            onSelectionChange={(selection) => updateSelection(props.row.id, selection)}
-          />
+          <>
+            <FormInput
+              name={`${props.row.original.variable}-2`}
+              label={""}
+              placeholder={t("global.choose") ?? ""}
+              defaultValue={rowsData[selectedTab]!.find((row) => row.id === props.row.id)?.value}
+              onChange={(e) => updateRowValue(props.row.id, e.target.value)}
+              autoFocus={
+                props.row.id === lastUpdatedRow?.rowId &&
+                lastUpdatedRow.type === "value" &&
+                lastUpdatedRow.endpointCardId === endpointData?.id
+              }
+            />
+          </>
         );
       },
     }),

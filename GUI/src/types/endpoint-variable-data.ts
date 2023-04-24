@@ -1,11 +1,11 @@
-export type EndpointRequestData = {
+export type EndpointVariableData = {
   id: string;
   name: string;
-  required: boolean;
+  required?: boolean;
   description?: string;
   type: string;
-  schemaData?: string | EndpointRequestData[];
-  arrayData?: string | EndpointRequestData[];
+  schemaData?: string | EndpointVariableData[];
+  arrayData?: string | EndpointVariableData[];
   arrayType?: string;
   enum?: string[];
   integerFormat?: string;

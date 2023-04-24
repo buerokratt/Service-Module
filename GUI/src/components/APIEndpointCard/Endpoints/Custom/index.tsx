@@ -1,20 +1,89 @@
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { MdErrorOutline } from "react-icons/md";
-import {
-  Button,
-  FormInput,
-  FormSelect,
-  Icon,
-  RequestVariables,
-  Track,
-} from "../../..";
+import { v4 as uuid } from "uuid";
+import { Button, FormInput, FormSelect, Icon, RequestVariables, Track } from "../../..";
+import { EndpointData } from "../../../../types/endpoint-data";
+import { EndpointTab } from "../../../../types/endpoint-tab.enum";
+import { EndpointType } from "../../../../types/endpoint-type";
+import { EndpointVariableData } from "../../../../types/endpoint-variable-data";
+import { LastUpdatedRow } from "../../../../types/last-updated-row";
+import { Option } from "../../../../types/option";
+import { RequestVariablesTabsRowsData } from "../../../../types/request-variables-tabs-rows-data";
 
-const EndpointCustom: React.FC = () => {
+type EndpointCustomProps = {
+  endpoint: EndpointData;
+  setEndpoints: React.Dispatch<React.SetStateAction<EndpointData[]>>;
+  isLive: boolean;
+  requestValues: Option[];
+  lastUpdatedRow: LastUpdatedRow | undefined;
+  setLastUpdatedRow: React.Dispatch<React.SetStateAction<LastUpdatedRow | undefined>>;
+};
+
+const EndpointCustom: React.FC<EndpointCustomProps> = ({
+  endpoint,
+  setEndpoints,
+  isLive,
+  requestValues,
+  lastUpdatedRow,
+  setLastUpdatedRow,
+}) => {
   const { t } = useTranslation();
   const [urlError, setUrlError] = useState<string>();
-  const [endpoint, setEndpoint] = useState<string>("");
   const [showContent, setShowContent] = useState<boolean>(false);
+  const [key, setKey] = useState<number>(0);
+  const [endpointData, setEndpointData] = useState<EndpointType>({
+    id: uuid(),
+    label: "",
+    methodType: "GET",
+    type: "custom",
+    path: "",
+    supported: true,
+    isSelected: true,
+    body: [],
+    headers: [],
+    params: [],
+  });
+
+  const updateEndpointData = (data: RequestVariablesTabsRowsData, endpointId?: string) => {
+    if (!endpointId) return;
+    setEndpoints((prevEndpoints) => {
+      return prevEndpoints.map((prevEndpoint: EndpointData) => {
+        if (prevEndpoint.id !== endpoint.id) return prevEndpoint;
+        prevEndpoint.definedEndpoints.map((defEndpoint) => {
+          if (defEndpoint.id !== endpointId) return defEndpoint;
+          Object.keys(data).forEach((key) => {
+            data[key as EndpointTab]?.forEach((row) => {
+              if (
+                !row.endpointVariableId &&
+                row.variable &&
+                !defEndpoint[key as EndpointTab]?.map((e) => e.name).includes(row.variable)
+              ) {
+                const newVariable: EndpointVariableData = {
+                  id: uuid(),
+                  name: row.variable,
+                  type: "custom",
+                  required: false,
+                };
+                newVariable[isLive ? "value" : "testValue"] = row.value;
+                defEndpoint[key as EndpointTab]?.push(newVariable);
+              }
+            });
+            defEndpoint[key as EndpointTab]?.forEach((variable) => {
+              const updatedVariable = data[key as EndpointTab]!.find(
+                (updated) => updated.endpointVariableId === variable.id
+              );
+              variable[isLive ? "value" : "testValue"] = updatedVariable?.value;
+              variable.name = updatedVariable?.variable ?? variable.name;
+            });
+          });
+          return defEndpoint;
+        });
+        return prevEndpoint;
+      });
+    });
+    setKey(key + 1);
+  };
 
   return (
     <Track direction="vertical" align="stretch" gap={16}>
@@ -31,6 +100,11 @@ const EndpointCustom: React.FC = () => {
                   { label: "GET", value: "GET" },
                   { label: "POST", value: "POST" },
                 ]}
+                onSelectionChange={(selection) => {
+                  setEndpointData((ed) => {
+                    return { ...ed, methodType: selection?.value ?? "GET" };
+                  });
+                }}
                 defaultValue="GET"
               />
             </div>
@@ -38,18 +112,23 @@ const EndpointCustom: React.FC = () => {
               style={{ borderRadius: "0 4px 4px 0" }}
               name="endpointUrl"
               label=""
-              value={endpoint}
-              onChange={(event) => setEndpoint(event.target.value)}
+              defaultValue={endpointData.path ?? ""}
+              onChange={(event) =>
+                setEndpointData((ed) => {
+                  //TODO change path to url and actual path to path
+                  return { ...ed, path: event.target.value };
+                })
+              }
               placeholder={t("newService.endpoint.insert") ?? ""}
             />
           </Track>
           <Button
             onClick={() => {
-              const errorMsg = endpoint
-                ? undefined
-                : t("newService.endpoint.error");
+              // TODO check if url is legit
+              const errorMsg = endpoint ? undefined : t("newService.endpoint.error");
               setShowContent(!errorMsg);
               setUrlError(errorMsg);
+              endpoint.definedEndpoints.push(endpointData);
             }}
           >
             {t("newService.test")}
@@ -57,17 +136,24 @@ const EndpointCustom: React.FC = () => {
         </Track>
       </div>
       {urlError && (
-        <div
-          className={"toast toast--error"}
-          style={{ padding: "8px 16px 8px 16px" }}
-        >
+        <div className={"toast toast--error"} style={{ padding: "8px 16px 8px 16px" }}>
           <div className="toast__title">
             <Icon icon={<MdErrorOutline />} />
             {urlError}
           </div>
         </div>
       )}
-      {showContent && <RequestVariables updateEndpointData={() => {}} isLive />}
+      {showContent && (
+        <RequestVariables
+          key={key}
+          lastUpdatedRow={lastUpdatedRow}
+          setLastUpdatedRow={setLastUpdatedRow}
+          requestValues={requestValues}
+          updateEndpointData={updateEndpointData}
+          isLive={isLive}
+          endpointData={endpointData}
+        />
+      )}
     </Track>
   );
 };

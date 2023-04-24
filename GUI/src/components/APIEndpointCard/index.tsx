@@ -1,4 +1,4 @@
-import { FC, useState } from "react";
+import { FC, useEffect, useState } from "react";
 
 import * as Tabs from "@radix-ui/react-tabs";
 import { Button, EndpointCustom, EndpointOpenAPI, FormInput, FormSelect, Icon, Track } from "..";
@@ -8,14 +8,25 @@ import { MdDeleteOutline } from "react-icons/md";
 import "./ApiEndpointCard.scss";
 import { EndpointData } from "../../types/endpoint-data";
 import { EndpointEnv } from "../../types/endpoint-env";
+import { LastUpdatedRow } from "../../types/last-updated-row";
 
 type EndpointCardProps = {
   onDelete: () => void;
   endpoint: EndpointData;
   setEndpoints: React.Dispatch<React.SetStateAction<EndpointData[]>>;
+  requestValues: Option[];
+  lastUpdatedRow: LastUpdatedRow | undefined;
+  setLastUpdatedRow: React.Dispatch<React.SetStateAction<LastUpdatedRow | undefined>>;
 };
 
-const APIEndpointCard: FC<EndpointCardProps> = ({ onDelete, setEndpoints, endpoint }) => {
+const APIEndpointCard: FC<EndpointCardProps> = ({
+  onDelete,
+  setEndpoints,
+  endpoint,
+  requestValues,
+  lastUpdatedRow,
+  setLastUpdatedRow,
+}) => {
   const [selectedTab, setSelectedTab] = useState<EndpointEnv>(EndpointEnv.Live);
   const [endpointName, setEndpointName] = useState<string>("");
   const [testEnvExists, setTestEnvExists] = useState<boolean>(false);
@@ -27,6 +38,11 @@ const APIEndpointCard: FC<EndpointCardProps> = ({ onDelete, setEndpoints, endpoi
   const { t } = useTranslation();
 
   const getTabTriggerClasses = (tab: EndpointEnv) => `tab-group__tab-btn ${selectedTab === tab ? "active" : ""}`;
+
+  useEffect(() => {
+    endpoint.name = endpointName;
+    setEndpoints((pe) => [...pe]);
+  }, [endpointName]);
 
   return (
     <Tabs.Root
@@ -87,7 +103,10 @@ const APIEndpointCard: FC<EndpointCardProps> = ({ onDelete, setEndpoints, endpoi
                     label=""
                     value={endpointName}
                     disabled={selectedTab === EndpointEnv.Test}
-                    onChange={(e) => setEndpointName(e.target.value)}
+                    onChange={(e) => {
+                      setEndpointName(e.target.value);
+                      setLastUpdatedRow(undefined);
+                    }}
                   />
                 </div>
               )}
@@ -96,9 +115,21 @@ const APIEndpointCard: FC<EndpointCardProps> = ({ onDelete, setEndpoints, endpoi
                   isLive={selectedTab === EndpointEnv.Live}
                   endpoint={endpoint}
                   setEndpoints={setEndpoints}
+                  requestValues={requestValues}
+                  lastUpdatedRow={lastUpdatedRow}
+                  setLastUpdatedRow={setLastUpdatedRow}
                 />
               )}
-              {option?.value === "custom" && <EndpointCustom />}
+              {option?.value === "custom" && (
+                <EndpointCustom
+                  endpoint={endpoint}
+                  setEndpoints={setEndpoints}
+                  requestValues={requestValues}
+                  isLive={selectedTab === EndpointEnv.Live}
+                  lastUpdatedRow={lastUpdatedRow}
+                  setLastUpdatedRow={setLastUpdatedRow}
+                />
+              )}
             </Track>
           </Tabs.Content>
         );
