@@ -112,7 +112,6 @@ const ServiceFlowPage: FC = () => {
         }}
         node={visiblePopupNode}
         oldRules={updatedRules}
-        addRuleCount={() => setUpdatedRules([null, null, null])}
       />
       <ReactFlowProvider>
         <div className="graph">

@@ -31,11 +31,11 @@ import Toast from "./Toast";
 import Tooltip from "./Tooltip";
 import Track from "./Track";
 import FlowElementsPopup from "./FlowElementsPopup";
-import ApiEndpointCard from "./APIEndpointCard";
-import EndpointOpenAPI from "./APIEndpointCard/Endpoints/OpenAPI";
-import EndpointCustom from "./APIEndpointCard/Endpoints/Custom";
-import EndpointResqlComponent from "./APIEndpointCard/Endpoints/ResqlComponent";
-import RequestVariables from "./APIEndpointCard/Endpoints/RequestVariables";
+import ApiEndpointCard from "./ApiEndpointCard";
+import EndpointOpenAPI from "./ApiEndpointCard/Endpoints/OpenAPI";
+import EndpointCustom from "./ApiEndpointCard/Endpoints/Custom";
+import EndpointResqlComponent from "./ApiEndpointCard/Endpoints/ResqlComponent";
+import RequestVariables from "./ApiEndpointCard/Endpoints/RequestVariables";
 
 export {
   Collapsible,

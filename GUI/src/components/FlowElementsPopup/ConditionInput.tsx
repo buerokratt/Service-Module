@@ -9,12 +9,7 @@ interface ConditiobInputProps {
 }
 
 const ConditionInput: React.FC<ConditiobInputProps> = ({ rule, handleNameChange }) => {
-  const [name, setName] = useState('')
-
-  useEffect(() => {
-    setName(rule.name)
-  }, [rule.name])
-
+  const [name, setName] = useState(rule.name)
 
   const [_, drop] = useDrop(
     () => ({
@@ -22,7 +17,7 @@ const ConditionInput: React.FC<ConditiobInputProps> = ({ rule, handleNameChange 
       drop(_item: any, monitor) {
         const didDrop = monitor.didDrop()
         if (didDrop) return;
-        setName("name + ' ' + _item.value")
+        setName(rule.name + ' ' + _item.value)
         handleNameChange(rule.id, name + ' ' + _item.value)
       },
     }),

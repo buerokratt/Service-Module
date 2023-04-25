@@ -8,8 +8,16 @@ import ConditiobRuleType from "./ConditiobRuleType";
 import YesNoPopupContent from "./YesNoPopupContent";
 import RulesBuilder from "./RulesBuilder";
 import './styles.scss'
+import { Node } from "reactflow";
 
-const FlowElementsPopup = ({ node, onClose, onSave, addRuleCount, oldRules }: any) => {
+interface FlowElementsPopupProps {
+  node: any
+  onClose: () => void
+  onSave: (rules: (string | null)[]) => void
+  oldRules: (string | null)[]
+}
+
+const FlowElementsPopup: React.FC<FlowElementsPopupProps> = ({ node, onClose, onSave, oldRules }) => {
   const [isYesNoQuestion, setIsYesNoQuestion] = useState(node?.isYesNoQuestion ?? false)
   const [rules, setRules] = useState<ConditiobRuleType[]>(node?.rules ?? [])
 
@@ -83,13 +91,6 @@ const FlowElementsPopup = ({ node, onClose, onSave, addRuleCount, oldRules }: an
           </Track>
         }
       </DndProvider>
-
-      {type !== 'input' &&
-        <>
-          <p>hello</p>
-          <Button onClick={addRuleCount}>update rule count</Button>
-        </>
-      }
     </Popup >
   )
 }
