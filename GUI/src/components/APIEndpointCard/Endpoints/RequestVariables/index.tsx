@@ -1,10 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Button, FormInput, FormSelect, FormTextarea, Icon, SwitchBox, Tooltip, Track } from "../../..";
+import { Button, FormAutocomplete, FormInput, FormTextarea, Icon, SwitchBox, Tooltip, Track } from "../../..";
 import * as Tabs from "@radix-ui/react-tabs";
 import DataTable from "../../../DataTable";
 import { createColumnHelper, Row } from "@tanstack/react-table";
-import { Option } from "../../../../types/option";
 import { MdDeleteOutline } from "react-icons/md";
 import { EndpointType } from "../../../../types/endpoint-type";
 import { EndpointTab } from "../../../../types/endpoint-tab.enum";
@@ -14,15 +13,15 @@ import { RequestVariablesTabsRawData } from "../../../../types/request-variables
 import { EndpointVariableData } from "../../../../types/endpoint-variable-data";
 import { RequestVariablesRowData } from "../../../../types/request-variables-row-data";
 import { LastUpdatedRow } from "../../../../types/last-updated-row";
+import ValueCell from "./ValueCell";
+import VariableCell from "./VariableCell";
 
 type RequestVariablesProps = {
   disableRawData?: boolean;
   endpointData: EndpointType;
   updateEndpointData: (data: RequestVariablesTabsRowsData, openApiEndpointId?: string) => void;
   isLive: boolean;
-  requestValues: Option[];
-  lastUpdatedRow: LastUpdatedRow | undefined;
-  setLastUpdatedRow: React.Dispatch<React.SetStateAction<LastUpdatedRow | undefined>>;
+  requestValues: string[];
 };
 
 const RequestVariables: React.FC<RequestVariablesProps> = ({
@@ -31,8 +30,6 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
   updateEndpointData,
   isLive,
   requestValues,
-  lastUpdatedRow,
-  setLastUpdatedRow,
 }) => {
   const { t } = useTranslation();
   const tabs: EndpointTab[] = [EndpointTab.Params, EndpointTab.Headers, EndpointTab.Body];
@@ -43,13 +40,14 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
   const columnHelper = createColumnHelper<RequestVariablesTableColumns>();
 
   const constructRow = (id: number, data: EndpointVariableData, nestedLevel: number): RequestVariablesRowData => {
+    const value = isLive ? data.value : data.testValue;
     return {
       id: `${id}`,
       endpointVariableId: data.id,
       required: data.required ?? false,
       variable: data.name,
-      value: isLive ? data.value : data.testValue,
-      isNameEditable: data.type === 'custom',
+      value,
+      isNameEditable: data.type === "custom",
       type: data.type,
       description: data.description,
       arrayType: data.arrayType,
@@ -71,7 +69,7 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
           rowIdx++;
         });
       }
-      if (rows.length === 0 || endpointData.type === 'custom') {
+      if (rows.length === 0 || endpointData.type === "custom") {
         rows.push({
           id: `${rows.length}`,
           required: false,
@@ -124,7 +122,6 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
       prevRowsData[selectedTab]!.map((row) => {
         if (row.id !== id) return row;
         row.variable = variable;
-        setLastUpdatedRow({ type: "variable", rowId: id, endpointCardId: endpointData?.id });
         return row;
       });
       // if last row name is edited, add a new row
@@ -145,10 +142,10 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
     rowsData[selectedTab]!.map((row) => {
       if (row.id !== id) return row;
       row.value = value;
-      setLastUpdatedRow({ type: "value", rowId: id, endpointCardId: endpointData?.id });
       return row;
     });
     updateEndpointData(rowsData, endpointData?.id);
+    setKey(key + 1);
   };
 
   const sortRows = (
@@ -174,31 +171,14 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
       sortingFn: (rowA: Row<RequestVariablesTableColumns>, rowB: Row<RequestVariablesTableColumns>) => {
         return sortRows(rowA, rowB, "variable");
       },
-      cell: (props) => {
-        const rowData = rowsData[selectedTab]![+props.row.id];
-        if (!rowData) return;
-        return rowData.isNameEditable ? (
-          <FormInput
-            style={{ borderRadius: "0 4px 4px 0" }}
-            name={`endpoint-variable-${props.row.id}`}
-            label=""
-            onChange={(event) => updateRowVariable(props.row.id, event.target.value)}
-            autoFocus={
-              props.row.id === lastUpdatedRow?.rowId &&
-              lastUpdatedRow.type === "variable" &&
-              lastUpdatedRow.endpointCardId === endpointData?.id
-            }
-            defaultValue={rowsData[selectedTab]!.find((row) => row.id === props.row.id)?.variable}
-            placeholder={t("newService.endpoint.variable") + ".."}
-          />
-        ) : (
-          <p style={{ paddingLeft: 40 * rowData.nestedLevel }}>
-            {rowData.variable}
-            {rowData.type && `, (${rowData.type})`}
-            {rowData.description && `, (${rowData.description})`}
-          </p>
-        );
-      },
+      cell: (props) => (
+        <VariableCell
+          row={props.row}
+          variable={rowsData[selectedTab]!.find((r) => r.id === props.row.id)?.variable ?? ""}
+          updateRowVariable={updateRowVariable}
+          rowData={rowsData[selectedTab]![+props.row.id]}
+        />
+      ),
     }),
     columnHelper.accessor("value", {
       header: t("newService.endpoint.value") ?? "",
@@ -208,28 +188,15 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
       sortingFn: (rowA: Row<RequestVariablesTableColumns>, rowB: Row<RequestVariablesTableColumns>) => {
         return sortRows(rowA, rowB, "value");
       },
-      cell: (props) => {
-        const rowData = rowsData[selectedTab]![+props.row.id];
-        if (!rowData) return;
-        return rowData.type === "schema" || (rowData.type === "array" && rowData.arrayType === "schema") ? (
-          <></>
-        ) : (
-          <>
-            <FormInput
-              name={`${props.row.original.variable}-2`}
-              label={""}
-              placeholder={t("global.choose") ?? ""}
-              defaultValue={rowsData[selectedTab]!.find((row) => row.id === props.row.id)?.value}
-              onChange={(e) => updateRowValue(props.row.id, e.target.value)}
-              autoFocus={
-                props.row.id === lastUpdatedRow?.rowId &&
-                lastUpdatedRow.type === "value" &&
-                lastUpdatedRow.endpointCardId === endpointData?.id
-              }
-            />
-          </>
-        );
-      },
+      cell: (props) => (
+        <ValueCell
+          row={props.row}
+          requestValues={requestValues}
+          rowData={rowsData[selectedTab]![+props.row.id]}
+          value={rowsData[selectedTab]!.find((r) => r.id === props.row.id)?.value ?? ""}
+          updateRowValue={updateRowValue}
+        />
+      ),
     }),
     columnHelper.display({
       id: "delete",

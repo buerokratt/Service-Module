@@ -14,9 +14,7 @@ type EndpointCardProps = {
   onDelete: () => void;
   endpoint: EndpointData;
   setEndpoints: React.Dispatch<React.SetStateAction<EndpointData[]>>;
-  requestValues: Option[];
-  lastUpdatedRow: LastUpdatedRow | undefined;
-  setLastUpdatedRow: React.Dispatch<React.SetStateAction<LastUpdatedRow | undefined>>;
+  requestValues: string[];
 };
 
 const APIEndpointCard: FC<EndpointCardProps> = ({
@@ -24,8 +22,6 @@ const APIEndpointCard: FC<EndpointCardProps> = ({
   setEndpoints,
   endpoint,
   requestValues,
-  lastUpdatedRow,
-  setLastUpdatedRow,
 }) => {
   const [selectedTab, setSelectedTab] = useState<EndpointEnv>(EndpointEnv.Live);
   const [endpointName, setEndpointName] = useState<string>("");
@@ -105,7 +101,6 @@ const APIEndpointCard: FC<EndpointCardProps> = ({
                     disabled={selectedTab === EndpointEnv.Test}
                     onChange={(e) => {
                       setEndpointName(e.target.value);
-                      setLastUpdatedRow(undefined);
                     }}
                   />
                 </div>
@@ -116,8 +111,6 @@ const APIEndpointCard: FC<EndpointCardProps> = ({
                   endpoint={endpoint}
                   setEndpoints={setEndpoints}
                   requestValues={requestValues}
-                  lastUpdatedRow={lastUpdatedRow}
-                  setLastUpdatedRow={setLastUpdatedRow}
                 />
               )}
               {option?.value === "custom" && (
@@ -126,8 +119,6 @@ const APIEndpointCard: FC<EndpointCardProps> = ({
                   setEndpoints={setEndpoints}
                   requestValues={requestValues}
                   isLive={selectedTab === EndpointEnv.Live}
-                  lastUpdatedRow={lastUpdatedRow}
-                  setLastUpdatedRow={setLastUpdatedRow}
                 />
               )}
             </Track>

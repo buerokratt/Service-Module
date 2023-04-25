@@ -13,8 +13,6 @@ const NewServicePage: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const [endpoints, setEndpoints] = useState<EndpointData[]>(location.state?.endpoints ?? []);
-  const [lastUpdatedRow, setLastUpdatedRow] = useState<LastUpdatedRow>();
-
   const onDelete = (id: string) => {
     setEndpoints((prevEndpoints) => prevEndpoints.filter((prevEndpoint) => prevEndpoint.id !== id));
   };
@@ -39,13 +37,12 @@ const NewServicePage: React.FC = () => {
     });
   };
 
-  const getAvailableRequestValues = (endpointId: string): Option[] => {
-    const requestValues: Option[] = [];
+  const getAvailableRequestValues = (endpointId: string): string[] => {
+    const requestValues: string[] = [];
     const otherEndpoints = getSelectedEndpoints().filter((otherEndpoint) => otherEndpoint.id !== endpointId);
     otherEndpoints.forEach((endpoint) => {
       endpoint.selectedEndpoint?.response?.forEach((response) => {
-        const requestValue = `${endpoint.name === "" ? endpoint.id : endpoint.name}.${response.name}`;
-        requestValues.push({ label: requestValue, value: requestValue });
+        requestValues.push(`{{${endpoint.name === "" ? endpoint.id : endpoint.name}.${response.name}}}`);
       });
     });
     return requestValues;
@@ -93,8 +90,6 @@ const NewServicePage: React.FC = () => {
             endpoint={endpoint}
             setEndpoints={setEndpoints}
             requestValues={getAvailableRequestValues(endpoint.id)}
-            lastUpdatedRow={lastUpdatedRow}
-            setLastUpdatedRow={setLastUpdatedRow}
           />
         ))}
         <Button

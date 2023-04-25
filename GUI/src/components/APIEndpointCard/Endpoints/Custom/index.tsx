@@ -15,9 +15,7 @@ type EndpointCustomProps = {
   endpoint: EndpointData;
   setEndpoints: React.Dispatch<React.SetStateAction<EndpointData[]>>;
   isLive: boolean;
-  requestValues: Option[];
-  lastUpdatedRow: LastUpdatedRow | undefined;
-  setLastUpdatedRow: React.Dispatch<React.SetStateAction<LastUpdatedRow | undefined>>;
+  requestValues: string[];
 };
 
 const EndpointCustom: React.FC<EndpointCustomProps> = ({
@@ -25,8 +23,6 @@ const EndpointCustom: React.FC<EndpointCustomProps> = ({
   setEndpoints,
   isLive,
   requestValues,
-  lastUpdatedRow,
-  setLastUpdatedRow,
 }) => {
   const { t } = useTranslation();
   const [urlError, setUrlError] = useState<string>();
@@ -146,8 +142,6 @@ const EndpointCustom: React.FC<EndpointCustomProps> = ({
       {showContent && (
         <RequestVariables
           key={key}
-          lastUpdatedRow={lastUpdatedRow}
-          setLastUpdatedRow={setLastUpdatedRow}
           requestValues={requestValues}
           updateEndpointData={updateEndpointData}
           isLive={isLive}

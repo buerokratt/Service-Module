@@ -10,6 +10,7 @@ import EndpointCustom from "./ApiEndpointCard/Endpoints/Custom";
 import EndpointOpenAPI from "./ApiEndpointCard/Endpoints/OpenAPI";
 import DataTable from "./DataTable";
 import {
+  FormAutocomplete,
   FormCheckbox,
   FormCheckboxes,
   FormDatepicker,
@@ -47,6 +48,7 @@ export {
   EndpointCustom,
   EndpointOpenAPI,
   FlowBuilder,
+  FormAutocomplete,
   FormCheckbox,
   FormCheckboxes,
   FormDatepicker,

@@ -19,9 +19,7 @@ type EndpointOpenAPIProps = {
   endpoint: EndpointData;
   setEndpoints: React.Dispatch<React.SetStateAction<EndpointData[]>>;
   isLive: boolean;
-  requestValues: Option[];
-  lastUpdatedRow: LastUpdatedRow | undefined;
-  setLastUpdatedRow: React.Dispatch<React.SetStateAction<LastUpdatedRow | undefined>>;
+  requestValues: string[];
 };
 
 const EndpointOpenAPI: React.FC<EndpointOpenAPIProps> = ({
@@ -29,8 +27,6 @@ const EndpointOpenAPI: React.FC<EndpointOpenAPIProps> = ({
   setEndpoints,
   isLive,
   requestValues,
-  lastUpdatedRow,
-  setLastUpdatedRow,
 }) => {
   const [openApiUrl, setOpenApiUrl] = useState<string>(endpoint.url ?? "");
   const [selectedEndpoint, setSelectedEndpoint] = useState<EndpointType | undefined>(
@@ -311,8 +307,6 @@ const EndpointOpenAPI: React.FC<EndpointOpenAPIProps> = ({
               endpointData={selectedEndpoint}
               updateEndpointData={updateEndpointData}
               requestValues={requestValues}
-              lastUpdatedRow={lastUpdatedRow}
-              setLastUpdatedRow={setLastUpdatedRow}
             />
           </>
         ) : (
