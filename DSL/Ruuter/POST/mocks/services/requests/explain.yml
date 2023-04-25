@@ -1,0 +1,26 @@
+service_explain_mock:
+  call: reflect.mock
+  args:
+    response:
+      request_headers:
+        Accept: "*/*"
+        Accept-Encoding: "gzip, deflate, br"
+        Accept-Language: "en-GB,en-US;q=0.9,en;q=0.8"
+        Access-Control-Request-Headers: "content-type"
+        Access-Control-Request-Method: "POST"
+        Connection: "keep-alive"
+        Host: "localhost:8085"
+        Origin: "http://localhost:3006"
+        Referer: "http://localhost:3006/"
+        Sec-Fetch-Dest: "empty"
+        Sec-Fetch-Mode: "cors"
+        Sec-Fetch-Site: "same-site"
+        User-Agent: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36"
+      request_params: {}
+      request_body: {}
+      request_response: {}
+  result: result
+
+return_value:
+  wrapper: false
+  return: ${result.response}
