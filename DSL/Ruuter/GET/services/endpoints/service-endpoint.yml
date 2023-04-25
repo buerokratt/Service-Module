@@ -1,0 +1,57 @@
+extract_request_data:
+  assign:
+    type: ${incoming.body.type}
+  next: check_for_type
+
+check_for_type:
+  switch:
+    - condition: ${type == null}
+      next: return_no_type_error
+  next: check_for_environment
+
+check_for_environment:
+  switch:
+    - condition: ${type.toLowerCase() === 'prod'}
+      next: get_prod_info
+  next: get_test_info
+
+get_prod_info:
+  call: http.get
+  args:
+    url: http://localhost:8085/services/endpoints/info/service-endpoint-prod-info
+  result: info
+  next: check_for_endpoint_url
+ 
+get_test_info:
+  call: http.get
+  args:
+    url: http://localhost:8085/services/endpoints/info/service-endpoint-test-info
+  result: info 
+  next: check_for_endpoint_url
+
+check_for_endpoint_url:
+  switch:
+    - condition: ${info.response.body.response[0].url == null}
+      next: return_no_url_provided
+  next: execute_endpoint
+
+execute_endpoint:
+  call: http.post
+  args:
+    url: ${info.response.body.response[0].url}
+  result: res
+  next: return_info
+
+return_info:
+  return: ${res.response.body}
+  next: end
+
+return_no_url_provided:
+  status: 400
+  return: "No Url Provided"
+  next: end
+
+return_no_type_error:
+  status: 400
+  return: "Please Specify Endpoint Type 'Prod' Or 'Test'"
+  next: end

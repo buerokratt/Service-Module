@@ -1,0 +1,10 @@
+request_explain:
+  call: http.post
+  args:
+    url: http://ruuter:8085/mocks/services/requests/explain
+    body: {}
+  result: result
+
+return_value:
+  wrapper: false
+  return: ${result.response.body}
