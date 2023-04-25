@@ -6,4 +6,5 @@ mock_variables:
   result: mock_res
 
 return_result:
-  return: ${mock_res.response}
+  wrapper: false
+  return: ${mock_res.response.body.data}
