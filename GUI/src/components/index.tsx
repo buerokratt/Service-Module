@@ -1,7 +1,5 @@
 import Button from "./Button";
 import Collapsible from "./Collapsible";
-import EndpointCustom from "./Endpoints/Custom";
-import EndpointOpenAPI from "./Endpoints/OpenAPI";
 import FlowBuilder from "./FlowBuilder/FlowBuilder";
 import Box from "./Box";
 import Card from "./Card";
@@ -32,9 +30,9 @@ import Popover from "./Popover";
 import Section from "./Section";
 import Tooltip from "./Tooltip";
 import Track from "./Track";
-import ApiEndpointCard from "./APIEndpointCard";
-import RequestVariables from "./APIEndpointCard/Endpoints/RequestVariables";
-import EndpointResqlComponent from "./APIEndpointCard/Endpoints/ResqlComponent";
+import ApiEndpointCard from "./ApiEndpointCard";
+import RequestVariables from "./ApiEndpointCard/Endpoints/RequestVariables";
+import EndpointResqlComponent from "./ApiEndpointCard/Endpoints/ResqlComponent";
 
 export {
   Box,
@@ -44,8 +42,6 @@ export {
   ApiEndpointCard,
   Dialog,
   Drawer,
-  EndpointCustom,
-  EndpointOpenAPI,
   FlowBuilder,
   EndpointResqlComponent,
   FormCheckbox,
