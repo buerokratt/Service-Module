@@ -12,6 +12,7 @@ export interface Step {
     | "step"
     | "rule"
     | "finishing-step-end"
-    | "finishing-step-redirect";
+    | "finishing-step-redirect"
+    | "user-defined";
   action?: string;
 }

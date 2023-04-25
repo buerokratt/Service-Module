@@ -1,4 +1,4 @@
-import { FC, useCallback, useState } from "react";
+import { FC, useCallback, useEffect, useState } from "react";
 import { MdPlayCircleFilled } from "react-icons/md";
 import { Edge, MarkerType, Node, ReactFlowInstance, ReactFlowProvider, useEdgesState, useNodesState } from "reactflow";
 import "reactflow/dist/style.css";
@@ -11,6 +11,7 @@ import { GRID_UNIT } from "../components/FlowBuilder/FlowBuilder";
 import { CSSProperties } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { ROUTES } from "../resources/routes-constants";
+import { EndpointData } from "../types/endpoint-data";
 
 const initialPlaceholder = {
   id: "2",
@@ -45,8 +46,7 @@ const initialNodes: Node[] = [
       x: 13.5 * GRID_UNIT,
       y: GRID_UNIT,
     },
-    data: {
-    },
+    data: {},
     className: "start",
     selectable: false,
     draggable: false,
@@ -55,10 +55,6 @@ const initialNodes: Node[] = [
 ];
 
 const ServiceFlowPage: FC = () => {
-  const setupElements: Step[] = [
-    { id: 1, label: "TARA auth", type: "auth" },
-    { id: 3, label: "Client input", type: "input" },
-  ];
   const allElements: Step[] = [
     { id: 1, label: "TARA auth", type: "auth" },
     { id: 2, label: "Textfield", type: "textfield" },
@@ -74,6 +70,7 @@ const ServiceFlowPage: FC = () => {
       type: "finishing-step-redirect",
     },
   ];
+  const [setupElements, setSetupElements] = useState<Step[]>([]);
   const [isPopupVisible, setPopupVisible] = useState(false);
   const [updatedRules, setUpdatedRules] = useState<(string | null)[]>([]);
   const location = useLocation();
@@ -83,17 +80,40 @@ const ServiceFlowPage: FC = () => {
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge[]>(flow ? flow.edges : [initialEdge]);
   const [reactFlowInstance, setReactFlowInstance] = useState<ReactFlowInstance>();
 
+  useEffect(() => {
+    const setupEndpoints: EndpointData[] = location.state?.endpoints;
+    const elements: Step[] = [];
+    setupEndpoints.forEach((endpoint) => {
+      const selectedEndpoint = endpoint.definedEndpoints.find((e) => e.isSelected);
+      if (!selectedEndpoint) return;
+      elements.push({
+        id: elements.length,
+        label: `${selectedEndpoint.methodType.toUpperCase()} ${selectedEndpoint.url}`,
+        type: "user-defined",
+      });
+    });
+    setSetupElements(elements);
+  }, []);
+
   const onDragStart = (event: React.DragEvent<HTMLDivElement>, step: Step) => {
     event.dataTransfer.setData("application/reactflow-label", step.label);
     event.dataTransfer.setData("application/reactflow-type", step.type);
     event.dataTransfer.effectAllowed = "move";
   };
 
-  const contentStyle: CSSProperties = { overflowY: 'auto', maxHeight: '40vh'};
+  const contentStyle: CSSProperties = { overflowY: "auto", maxHeight: "40vh" };
 
   return (
     <>
-      <NewServiceHeader activeStep={3} saveDraftOnClick={() => {}} continueOnClick={() => navigate(ROUTES.NEWSERVICE_ROUTE, {state: {endpoints: location.state?.endpoints, flow: JSON.stringify(reactFlowInstance?.toObject())}})}/>
+      <NewServiceHeader
+        activeStep={3}
+        saveDraftOnClick={() => {}}
+        continueOnClick={() =>
+          navigate(ROUTES.NEWSERVICE_ROUTE, {
+            state: { endpoints: location.state?.endpoints, flow: JSON.stringify(reactFlowInstance?.toObject()) },
+          })
+        }
+      />
       <h1 style={{ padding: 16 }}>Teenusvoog "Raamatu laenutus"</h1>
       {isPopupVisible && (
         <Popup

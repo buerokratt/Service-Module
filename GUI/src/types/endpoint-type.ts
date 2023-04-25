@@ -8,6 +8,7 @@ export type EndpointType = {
   type: "openApi" | "custom";
   supported: boolean;
   isSelected: boolean;
+  url?: string;
   description?: string;
   params?: EndpointVariableData[];
   headers?: EndpointVariableData[];

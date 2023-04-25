@@ -5,8 +5,6 @@ import { Button, Card, FormInput, ApiEndpointCard, FormTextarea, Layout, NewServ
 import { v4 as uuid } from "uuid";
 import { ROUTES } from "../resources/routes-constants";
 import { EndpointData } from "../types/endpoint-data";
-import { Option } from "../types/option";
-import { LastUpdatedRow } from "../types/last-updated-row";
 
 const NewServicePage: React.FC = () => {
   const { t } = useTranslation();

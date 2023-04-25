@@ -28,7 +28,7 @@ const EndpointOpenAPI: React.FC<EndpointOpenAPIProps> = ({
   isLive,
   requestValues,
 }) => {
-  const [openApiUrl, setOpenApiUrl] = useState<string>(endpoint.url ?? "");
+  const [openApiUrl, setOpenApiUrl] = useState<string>(endpoint.openApiUrl ?? "");
   const [selectedEndpoint, setSelectedEndpoint] = useState<EndpointType | undefined>(
     endpoint.definedEndpoints.find((e) => e.isSelected)
   );
@@ -159,12 +159,14 @@ const EndpointOpenAPI: React.FC<EndpointOpenAPIProps> = ({
 
     Object.entries(apiSpec.paths).forEach(([path, endpointData]) => {
       Object.entries(endpointData as ApiSpecProperty).forEach(([method, data]: [string, ApiSpecProperty]) => {
+        const endpointUrl = new URL(url).origin + apiSpec.servers[0].url + path;
         const label = `${method.toUpperCase()} ${path}`;
         if (!["get", "post"].includes(method.toLowerCase())) {
           paths.push({
             id: uuid(),
             label,
             path,
+            url: endpointUrl,
             type: "openApi",
             methodType: method,
             supported: false,
@@ -186,6 +188,7 @@ const EndpointOpenAPI: React.FC<EndpointOpenAPIProps> = ({
           supported: true,
           isSelected: false,
           description: data.summary ?? data.description,
+          url: endpointUrl,
           body,
           headers,
           params,
@@ -195,11 +198,11 @@ const EndpointOpenAPI: React.FC<EndpointOpenAPIProps> = ({
     });
 
     setOpenApiEndpoints(paths);
-    setEndpoints((prevEndpoints: any) => {
-      prevEndpoints.map((prevEndpoint: any) => {
+    setEndpoints((prevEndpoints) => {
+      prevEndpoints.map((prevEndpoint) => {
         if (prevEndpoint.id !== endpoint.id) return prevEndpoint;
         prevEndpoint.definedEndpoints = paths;
-        prevEndpoint.url = url;
+        prevEndpoint.openApiUrl = url;
         return prevEndpoint;
       });
       return prevEndpoints;

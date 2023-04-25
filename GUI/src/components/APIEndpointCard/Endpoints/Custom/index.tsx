@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { MdErrorOutline } from "react-icons/md";
 import { v4 as uuid } from "uuid";
@@ -18,28 +18,26 @@ type EndpointCustomProps = {
   requestValues: string[];
 };
 
-const EndpointCustom: React.FC<EndpointCustomProps> = ({
-  endpoint,
-  setEndpoints,
-  isLive,
-  requestValues,
-}) => {
+const EndpointCustom: React.FC<EndpointCustomProps> = ({ endpoint, setEndpoints, isLive, requestValues }) => {
   const { t } = useTranslation();
   const [urlError, setUrlError] = useState<string>();
   const [showContent, setShowContent] = useState<boolean>(false);
   const [key, setKey] = useState<number>(0);
-  const [endpointData, setEndpointData] = useState<EndpointType>({
-    id: uuid(),
-    label: "",
-    methodType: "GET",
-    type: "custom",
-    path: "",
-    supported: true,
-    isSelected: true,
-    body: [],
-    headers: [],
-    params: [],
-  });
+  // initial endpoint data
+  if (endpoint.definedEndpoints.length === 0) {
+    endpoint.definedEndpoints.push({
+      id: uuid(),
+      label: "",
+      methodType: "GET",
+      type: "custom",
+      path: "",
+      supported: true,
+      isSelected: true,
+      body: [],
+      headers: [],
+      params: [],
+    });
+  }
 
   const updateEndpointData = (data: RequestVariablesTabsRowsData, endpointId?: string) => {
     if (!endpointId) return;
@@ -97,9 +95,7 @@ const EndpointCustom: React.FC<EndpointCustomProps> = ({
                   { label: "POST", value: "POST" },
                 ]}
                 onSelectionChange={(selection) => {
-                  setEndpointData((ed) => {
-                    return { ...ed, methodType: selection?.value ?? "GET" };
-                  });
+                  endpoint.definedEndpoints[0].methodType = selection?.value ?? "GET";
                 }}
                 defaultValue="GET"
               />
@@ -108,12 +104,11 @@ const EndpointCustom: React.FC<EndpointCustomProps> = ({
               style={{ borderRadius: "0 4px 4px 0" }}
               name="endpointUrl"
               label=""
-              defaultValue={endpointData.path ?? ""}
-              onChange={(event) =>
-                setEndpointData((ed) => {
-                  //TODO change path to url and actual path to path
-                  return { ...ed, path: event.target.value };
-                })
+              defaultValue={endpoint.definedEndpoints[0].url ?? ""}
+              onChange={
+                (event) => {
+                  endpoint.definedEndpoints[0].url = event.target.value;
+                }
               }
               placeholder={t("newService.endpoint.insert") ?? ""}
             />
@@ -124,7 +119,6 @@ const EndpointCustom: React.FC<EndpointCustomProps> = ({
               const errorMsg = endpoint ? undefined : t("newService.endpoint.error");
               setShowContent(!errorMsg);
               setUrlError(errorMsg);
-              endpoint.definedEndpoints.push(endpointData);
             }}
           >
             {t("newService.test")}
@@ -145,7 +139,7 @@ const EndpointCustom: React.FC<EndpointCustomProps> = ({
           requestValues={requestValues}
           updateEndpointData={updateEndpointData}
           isLive={isLive}
-          endpointData={endpointData}
+          endpointData={endpoint.definedEndpoints[0]}
         />
       )}
     </Track>

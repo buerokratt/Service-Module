@@ -4,7 +4,7 @@ export type EndpointData = {
   id: string;
   name: string;
   type?: string;
-  url?: string;
+  openApiUrl?: string;
   testEnvUrl?: string;
   definedEndpoints: EndpointType[];
 };
