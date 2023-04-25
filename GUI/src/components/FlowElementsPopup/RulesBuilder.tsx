@@ -21,7 +21,7 @@ const RulesBuilder: React.FC<RulesBuilderProps> = ({
   setRules,
 }) => {
 
-  const [availableVariables, setAvailableVariables] = useState<string[]>(['eokrkerokerer', 'weijwiejiwje'])
+  const [availableVariables, setAvailableVariables] = useState<string[]>([])
 
   useEffect(() => {
     axios.get(getClientInputAvailableVariables()).then((result) => {
