@@ -34,11 +34,11 @@ import Track from "./Track";
 import ExclamationBadge from "./ExclamationBadge";
 import OutputElementBox from "./OutputElementBox";
 import FlowElementsPopup from './FlowElementsPopup'
-import ApiEndpointCard from "./ApiEndpointCard";
-import EndpointOpenAPI from "./ApiEndpointCard/Endpoints/OpenAPI";
-import EndpointCustom from "./ApiEndpointCard/Endpoints/Custom";
-import EndpointResqlComponent from "./ApiEndpointCard/Endpoints/ResqlComponent";
-import RequestVariables from "./ApiEndpointCard/Endpoints/RequestVariables";
+import ApiEndpointCard from "./APIEndpointCard";
+import EndpointOpenAPI from "./APIEndpointCard/Endpoints/OpenAPI";
+import EndpointCustom from "./APIEndpointCard/Endpoints/Custom";
+import EndpointResqlComponent from "./APIEndpointCard/Endpoints/ResqlComponent";
+import RequestVariables from "./APIEndpointCard/Endpoints/RequestVariables";
 
 export {
   Collapsible,
