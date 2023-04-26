@@ -81,14 +81,14 @@ const ServiceFlowPage: FC = () => {
   const [reactFlowInstance, setReactFlowInstance] = useState<ReactFlowInstance>();
 
   useEffect(() => {
-    const setupEndpoints: EndpointData[] = location.state?.endpoints;
+    const setupEndpoints: EndpointData[] | undefined = location.state?.endpoints;
     const elements: Step[] = [];
-    setupEndpoints.forEach((endpoint) => {
+    setupEndpoints?.forEach((endpoint) => {
       const selectedEndpoint = endpoint.definedEndpoints.find((e) => e.isSelected);
       if (!selectedEndpoint) return;
       elements.push({
         id: elements.length,
-        label: `${selectedEndpoint.methodType.toUpperCase()} ${selectedEndpoint.url}`,
+        label: endpoint.name ?? `${selectedEndpoint.methodType.toUpperCase()} ${selectedEndpoint.url}`,
         type: "user-defined",
       });
     });
@@ -160,7 +160,11 @@ const ServiceFlowPage: FC = () => {
                       <Box
                         key={step.id}
                         color={["finishing-step-end", "finishing-step-redirect"].includes(step.type) ? "red" : "blue"}
-                        onDragStart={(event) => onDragStart(event, step)}
+                        onDragStart={(event) => {
+                          console.log(nodes);
+                          console.log(edges);
+                          onDragStart(event, step)
+                        }}
                         draggable
                       >
                         {step.label}
