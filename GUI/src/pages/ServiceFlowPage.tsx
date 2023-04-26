@@ -1,8 +1,6 @@
 import { CSSProperties, FC, useState } from "react";
 import { MdPlayCircleFilled } from "react-icons/md";
 import { MarkerType, Node, ReactFlowProvider, useEdgesState, useNodesState } from "reactflow";
-import "reactflow/dist/style.css";
-
 import {
   Box,
   Collapsible,
@@ -138,7 +136,6 @@ const ServiceFlowPage: FC = () => {
     <>
       <NewServiceHeader activeStep={3} continueOnClick={() => navigate(ROUTES.OVERVIEW_ROUTE)} />
       <h1 style={{ padding: 16 }}>Teenusvoog "Raamatu laenutus"</h1>
-
       <FlowElementsPopup
         onClose={() => handlePopupClose()}
         onSave={(updatedNode: Node) => {
