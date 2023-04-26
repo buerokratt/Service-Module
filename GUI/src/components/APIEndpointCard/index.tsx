@@ -14,7 +14,7 @@ import {
 import { Option } from "../../types/option";
 import { useTranslation } from "react-i18next";
 import { MdDeleteOutline } from "react-icons/md";
-import "./ApiEndpointCard.scss";
+import "./ApiEndpointCard.scss"
 
 type EndpointCardProps = {
   onDelete: () => void;
@@ -25,7 +25,7 @@ enum EndpointEnv {
   Test = "test",
 }
 
-const APIEndpointCard: FC<EndpointCardProps> = ({ onDelete }) => {
+const ApiEndpointCard: FC<EndpointCardProps> = ({ onDelete }) => {
   const [option, setOption] = useState<Option | null>();
   const [selectedTab, setSelectedTab] = useState<EndpointEnv>(EndpointEnv.Live);
   const [endpointName, setEndpointName] = useState<string>("");
@@ -124,4 +124,4 @@ const APIEndpointCard: FC<EndpointCardProps> = ({ onDelete }) => {
   );
 };
 
-export default APIEndpointCard;
+export default ApiEndpointCard;

@@ -25,8 +25,7 @@ const NewServicePage: React.FC = () => {
     );
   };
   return (
-    <Layout disableMenu customHeader={<NewServiceHeader activeStep={2} continueOnClick={() => navigate(ROUTES.FLOW_ROUTE)}/>}>
-
+    <Layout disableMenu customHeader={<NewServiceHeader activeStep={2} continueOnClick={() => navigate(ROUTES.FLOW_ROUTE)} />}>
       <Track
         style={{ width: 800, alignSelf: "center" }}
         direction="vertical"

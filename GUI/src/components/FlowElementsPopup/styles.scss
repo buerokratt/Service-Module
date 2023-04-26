@@ -1,0 +1,46 @@
+.yellow-tag {
+  padding: 0 .3rem;
+  background: #fff9e8;
+  border: 1px solid #ffde92;
+  border-radius: 1rem;
+}
+
+.popup-top-border-track {
+  padding: 16px;
+  border-top: 1px solid #d2d3d8;
+}
+
+.flow-item-popup-container {
+  max-width: 700;
+  overflow: scroll;
+  max-height: 80vh;
+}
+
+.flow-item-footer {
+  width: 100%
+}
+
+.flow-body-reverse-margin {
+  margin: -16px
+}
+
+.flow-body-padding {
+  padding: 16px
+}
+
+.flow-tags-container {
+  flex-wrap: wrap
+}
+
+.popup-darker-track {
+  background: #f9f9f9
+}
+
+.flow-rule-container {
+  width: 5rem
+}
+
+.flow-darker-container {
+  padding: 0 .5rem;
+  color: grey;
+}

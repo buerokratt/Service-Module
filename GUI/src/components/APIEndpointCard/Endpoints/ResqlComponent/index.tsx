@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { FormSelect, Track } from "../../..";
-import RequestVariables from "../RequestVariables";
+import { FormSelect, RequestVariables, Track } from "../../..";
 import { Option } from "../../../../types/option";
 
 const EndpointResqlComponent: React.FC = () => {

@@ -1,16 +1,26 @@
 import { FC, useState } from "react";
 import { MdPlayCircleFilled } from "react-icons/md";
-import { MarkerType, Node, ReactFlowProvider, useEdgesState, useNodesState } from "reactflow";
-import "reactflow/dist/style.css";
-
-import { Box, Button, Collapsible, FlowBuilder, NewServiceHeader, Track } from "../components";
-import "./ServiceFlowPage.scss";
+import {
+  MarkerType,
+  Node,
+  ReactFlowProvider,
+  useEdgesState,
+  useNodesState
+} from "reactflow";
+import {
+  Box,
+  Collapsible,
+  NewServiceHeader,
+  Track,
+  FlowElementsPopup,
+} from "../components";
 import { Step } from "../types/step";
-import Popup from "../components/Popup";
-import { GRID_UNIT } from "../components/FlowBuilder/FlowBuilder";
+import FlowBuilder, { GRID_UNIT } from "../components/FlowBuilder/FlowBuilder";
 import { CSSProperties } from "react";
 import { useNavigate } from "react-router-dom";
 import { ROUTES } from "../resources/routes-constants";
+import "reactflow/dist/style.css";
+import "./ServiceFlowPage.scss";
 
 const initialPlaceholder = {
   id: "2",
@@ -76,7 +86,7 @@ const ServiceFlowPage: FC = () => {
       type: "finishing-step-redirect",
     },
   ];
-  const [isPopupVisible, setPopupVisible] = useState(false);
+  const [visiblePopupNode, setVisiblePopupNode] = useState<Node | null>(null);
   const [updatedRules, setUpdatedRules] = useState<(string | null)[]>([]);
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState([initialEdge]);
@@ -88,30 +98,21 @@ const ServiceFlowPage: FC = () => {
     event.dataTransfer.effectAllowed = "move";
   };
 
-  const contentStyle: CSSProperties = { overflowY: 'auto', maxHeight: '40vh'};
+  const contentStyle: CSSProperties = { overflowY: 'auto', maxHeight: '40vh' };
 
   return (
     <>
-      <NewServiceHeader activeStep={3} continueOnClick={() => navigate(ROUTES.OVERVIEW_ROUTE)}/>
+      <NewServiceHeader activeStep={3} continueOnClick={() => navigate(ROUTES.OVERVIEW_ROUTE)} />
       <h1 style={{ padding: 16 }}>Teenusvoog "Raamatu laenutus"</h1>
-      {isPopupVisible && (
-        <Popup
-          style={{ maxWidth: 700 }}
-          title={"Hello"}
-          onClose={() => setPopupVisible(false)}
-          footer={
-            <Track gap={16}>
-              <Button appearance="secondary" onClick={() => setPopupVisible(false)}>
-                Discard
-              </Button>
-              <Button onClick={() => setPopupVisible(false)}>Save</Button>
-            </Track>
-          }
-        >
-          <p>hello</p>
-          <Button onClick={() => setUpdatedRules([null, null, null])}>update rule count</Button>
-        </Popup>
-      )}
+      <FlowElementsPopup
+        onClose={() => setVisiblePopupNode(null)}
+        onSave={(rules: any) => {
+          setUpdatedRules(rules)
+          setVisiblePopupNode(null)
+        }}
+        node={visiblePopupNode}
+        oldRules={updatedRules}
+      />
       <ReactFlowProvider>
         <div className="graph">
           <div className="graph__controls">
@@ -151,7 +152,7 @@ const ServiceFlowPage: FC = () => {
             </Track>
           </div>
           <FlowBuilder
-            setPopupVisible={setPopupVisible}
+            setVisiblePopupNode={setVisiblePopupNode}
             updatedRules={updatedRules}
             nodes={nodes}
             setNodes={setNodes}
