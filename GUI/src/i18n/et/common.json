@@ -15,9 +15,9 @@
     "overview": "Ülevaade",
     "flowbuilder": "Flow Builder",
     "services": "Teenused",
-    "intents": "Kavatsus",
     "newService": "Uus teenus",
     "close": "Sulge menüü",
+    "intents": "Kavatsus",
     "followupTraining": "Teemade järeltreenimine",
     "entities": "Üksused"
   },

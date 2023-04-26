@@ -6,7 +6,6 @@ import OverviewPage from './pages/OverviewPage'
 import { ROUTES } from './resources/routes-constants'
 import OldNewServicePage from './pages/OldNewServicePage'
 import IntentsFollowupTraining from './pages/Training/IntentsFollowupTraining'
-import FlowBuilderPage from './pages/FlowBuilderPage'
 import NewServicePage from './pages/NewServicePage'
 import ServiceFlowPage from './pages/ServiceFlowPage'
 import './styles/main.scss'
@@ -19,11 +18,10 @@ const RootComponent: React.FC = () => {
       <Route element={<Layout />}>
         <Route path={ROUTES.OVERVIEW_ROUTE} element={<OverviewPage />} />
         <Route path={ROUTES.FLOW_ROUTE} element={<ServiceFlowPage />} />
-        <Route path={ROUTES.FLOW_ROUTE + "/old"} element={<FlowBuilderPage />} />
         <Route path={ROUTES.FOLLOWUPTRAINING_ROUTE} element={<IntentsFollowupTraining />} />
         <Route path="*" element={<NotFoundPage />} />
-      </Route>
-    </Routes>
+      </Route >
+    </Routes >
   );
 };
 

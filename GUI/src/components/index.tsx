@@ -30,9 +30,10 @@ import Popover from "./Popover";
 import Section from "./Section";
 import Tooltip from "./Tooltip";
 import Track from "./Track";
+import FlowElementsPopup from "./FlowElementsPopup";
 import ApiEndpointCard from "./ApiEndpointCard";
-import RequestVariables from "./ApiEndpointCard/Endpoints/RequestVariables";
 import EndpointResqlComponent from "./ApiEndpointCard/Endpoints/ResqlComponent";
+import RequestVariables from "./ApiEndpointCard/Endpoints/RequestVariables";
 
 export {
   Box,
@@ -68,4 +69,5 @@ export {
   Toast,
   Tooltip,
   Track,
+  FlowElementsPopup,
 };

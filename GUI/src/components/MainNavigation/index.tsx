@@ -139,7 +139,6 @@ const MainNavigation: FC = () => {
       path: "/services",
       children: [
         { path: ROUTES.OVERVIEW_ROUTE, label: t('menu.overview') },
-        { path: ROUTES.FLOW_ROUTE, label: t('menu.flowbuilder') },
         { path: ROUTES.NEWSERVICE_ROUTE, label: t("menu.newService") },
         { path: ROUTES.FOLLOWUPTRAINING_ROUTE, label: t("menu.followupTraining") },
       ],

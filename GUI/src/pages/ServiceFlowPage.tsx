@@ -1,17 +1,26 @@
 import { FC, useState } from "react";
 import { MdPlayCircleFilled } from "react-icons/md";
-import { MarkerType, Node, ReactFlowProvider, useEdgesState, useNodesState } from "reactflow";
-import "reactflow/dist/style.css";
-
-import { Box, Button, Collapsible, FlowBuilder, NewServiceHeader, Track } from "../components";
-import "./ServiceFlowPage.scss";
+import {
+  MarkerType,
+  Node,
+  ReactFlowProvider,
+  useEdgesState,
+  useNodesState
+} from "reactflow";
+import {
+  Box,
+  Collapsible,
+  NewServiceHeader,
+  Track,
+  FlowElementsPopup,
+} from "../components";
 import { Step } from "../types/step";
-import Popup from "../components/Popup";
-import { GRID_UNIT } from "../components/FlowBuilder/FlowBuilder";
+import FlowBuilder, { GRID_UNIT } from "../components/FlowBuilder/FlowBuilder";
 import { CSSProperties } from "react";
 import { useNavigate } from "react-router-dom";
 import { ROUTES } from "../resources/routes-constants";
-import FileGenerateContent from "../components/FlowElementsPopup/FileGenerateContent";
+import "reactflow/dist/style.css";
+import "./ServiceFlowPage.scss";
 
 const initialPlaceholder = {
   id: "2",
@@ -95,33 +104,15 @@ const ServiceFlowPage: FC = () => {
     <>
       <NewServiceHeader activeStep={3} continueOnClick={() => navigate(ROUTES.OVERVIEW_ROUTE)} />
       <h1 style={{ padding: 16 }}>Teenusvoog "Raamatu laenutus"</h1>
-      {visiblePopupNode && (
-        <Popup
-          style={{ maxWidth: 700 }}
-          title={visiblePopupNode?.type === 'file-generate' ? "File Generate" : "Hello"}
-          onClose={() => setVisiblePopupNode(null)}
-          footer={
-            <Track gap={16}>
-              <Button appearance="secondary" onClick={() => setVisiblePopupNode(null)}>
-                Discard
-              </Button>
-              <Button onClick={() => setVisiblePopupNode(null)}>Save</Button>
-            </Track>
-          }
-        >
-          {
-            visiblePopupNode?.type === 'file-generate' &&
-            <FileGenerateContent />
-          }
-          {
-            visiblePopupNode?.type !== 'file-generate' &&
-            <>
-              <p>{visiblePopupNode?.type}</p>
-              <Button onClick={() => setUpdatedRules([null, null, null])}>update rule count</Button>
-            </>
-          }
-        </Popup>
-      )}
+      <FlowElementsPopup
+        onClose={() => setVisiblePopupNode(null)}
+        onSave={(rules: any) => {
+          setUpdatedRules(rules)
+          setVisiblePopupNode(null)
+        }}
+        node={visiblePopupNode}
+        oldRules={updatedRules}
+      />
       <ReactFlowProvider>
         <div className="graph">
           <div className="graph__controls">
