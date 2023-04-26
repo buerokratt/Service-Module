@@ -26,7 +26,7 @@ const nodeTypes = {
 };
 
 type FlowBuilderProps = {
-  setPopupVisible: Dispatch<SetStateAction<boolean>>;
+  setVisiblePopupNode: Dispatch<SetStateAction<Node | null>>;
   updatedRules: (string | null)[];
   nodes: Node[];
   setNodes: Dispatch<SetStateAction<Node[]>>;
@@ -39,7 +39,7 @@ type FlowBuilderProps = {
 };
 
 const FlowBuilder: FC<FlowBuilderProps> = ({
-  setPopupVisible,
+  setVisiblePopupNode,
   updatedRules,
   nodes,
   setNodes,
@@ -137,7 +137,7 @@ const FlowBuilder: FC<FlowBuilderProps> = ({
         data: {
           label,
           onDelete,
-          setPopupVisible,
+          setPopupVisible: () => setVisiblePopupNode(null),
           type: "rule",
           stepType: "rule",
           readonly: true,
@@ -305,7 +305,6 @@ const FlowBuilder: FC<FlowBuilderProps> = ({
         x: event.clientX - reactFlowBounds.left,
         y: event.clientY - reactFlowBounds.top,
       });
-      const inputRuleCount = 2;
 
       const matchingPlaceholder = reactFlowInstance.getNodes().find((node) => {
         if (node.type !== "placeholder") return false;
@@ -346,18 +345,6 @@ const FlowBuilder: FC<FlowBuilderProps> = ({
               })
             );
           }
-          if (type === "input") {
-            // Create edges from input node to rules and from rules to placeholders
-            for (let i = 0; i < inputRuleCount; i++) {
-              newEdges.push(
-                ...buildRuleEdges({
-                  inputId: +newNodeId,
-                  targetId: newPlaceholderId + i * 2,
-                  handleId: i,
-                })
-              );
-            }
-          }
           return newEdges;
         });
 
@@ -371,11 +358,11 @@ const FlowBuilder: FC<FlowBuilderProps> = ({
             data: {
               label,
               onDelete,
-              setPopupVisible,
+              setPopupVisible: () => setVisiblePopupNode({ ...matchingPlaceholder, type }),
               type: ["finishing-step-end", "finishing-step-redirect"].includes(type) ? "finishing-step" : "step",
               stepType: type,
               readonly: type === "finishing-step-end",
-              childrenCount: type === "input" ? inputRuleCount : 1,
+              childrenCount: type === "input" ? 0 : 1,
               setClickedNode,
               update: updateInputRules,
             },
@@ -393,21 +380,6 @@ const FlowBuilder: FC<FlowBuilderProps> = ({
           );
         }
 
-        if (type === "input") {
-          // Add rules below input node and placeholders under each
-          let offsetLeft = nodePositionOffset * Math.floor(inputRuleCount / 2);
-          if (inputRuleCount % 2 === 0) offsetLeft -= nodePositionOffset / 2;
-          for (let i = 0; i < inputRuleCount; i++) {
-            newNodes.push(
-              ...buildRuleWithPlaceholder({
-                id: newPlaceholderId + i * 2,
-                label: `rule ${i}`,
-                offset: -offsetLeft + i * nodePositionOffset,
-                inputNode: matchingPlaceholder,
-              })
-            );
-          }
-        }
         return newNodes;
       });
     },

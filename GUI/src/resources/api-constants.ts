@@ -55,3 +55,5 @@ export const dummyVariableOptions = [
 // Mocks
 export const openApiSpeckMock = (): string => `https://petstore3.swagger.io/api/v3/openapi.json`;
 //   `${baseUrl}/mocks/services/open-api-spec-mock`;
+
+export const getClientInputAvailableVariables = (): string => `${baseUrl}/mocks/client-input-variables`;

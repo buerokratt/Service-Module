@@ -17,7 +17,7 @@ type EndpointCardProps = {
   requestValues: string[];
 };
 
-const APIEndpointCard: FC<EndpointCardProps> = ({
+const ApiEndpointCard: FC<EndpointCardProps> = ({
   onDelete,
   setEndpoints,
   endpoint,
@@ -129,4 +129,4 @@ const APIEndpointCard: FC<EndpointCardProps> = ({
   );
 };
 
-export default APIEndpointCard;
+export default ApiEndpointCard;

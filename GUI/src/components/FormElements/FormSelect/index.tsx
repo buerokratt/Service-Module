@@ -66,7 +66,7 @@ const FormSelect: FC<FormSelectProps> = (
     <div className={selectClasses}>
       {label && !hideLabel && <label htmlFor={id} className='select__label' {...getLabelProps()}>{label}</label>}
       <div className='select__wrapper'>
-        <div className={`select__trigger ${disabled && 'select__trigger--disabled'}`} {...getToggleButtonProps()} style={{color: selectedItem?.label ? '#1A1B1F' :'#5D6071'}} {...rest} >
+        <div className={`select__trigger ${disabled && 'select__trigger--disabled'}`} {...getToggleButtonProps()} style={{ color: selectedItem?.label ? '#1A1B1F' : '#5D6071' }} {...rest} >
           {selectedItem?.label ?? placeholderValue}
           <Icon label='Dropdown icon' size='medium' icon={<MdArrowDropDown color='#5D6071' />} />
         </div>
@@ -74,7 +74,7 @@ const FormSelect: FC<FormSelectProps> = (
           {isOpen && (
             options.map((item, index) => (
               <li className={clsx('select__option', { 'select__option--selected': highlightedIndex === index })}
-                  key={`${item.value}${index}`} {...getItemProps({ item, index })}>
+                key={`${item.value}${index}`} {...getItemProps({ item, index })}>
                 {item.label}
               </li>
             ))
