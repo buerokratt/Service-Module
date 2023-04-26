@@ -57,3 +57,5 @@ export const openApiSpeckMock = (): string => `https://petstore3.swagger.io/api/
 //   `${baseUrl}/mocks/services/open-api-spec-mock`;
 
 export const getClientInputAvailableVariables = (): string => `${baseUrl}/mocks/client-input-variables`;
+
+export const getTaraAuthResponseVariables = (): string => `${baseUrl}/mocks/tim/user-info`;

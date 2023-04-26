@@ -6,6 +6,8 @@ import { v4 as uuid } from "uuid";
 import { ROUTES } from "../resources/routes-constants";
 import { EndpointData } from "../types/endpoint-data";
 import { Node } from "reactflow";
+import axios from "axios";
+import { getTaraAuthResponseVariables } from "../resources/api-constants";
 
 const NewServicePage: React.FC = () => {
   const { t } = useTranslation();
@@ -15,14 +17,33 @@ const NewServicePage: React.FC = () => {
   const onDelete = (id: string) => {
     setEndpoints((prevEndpoints) => prevEndpoints.filter((prevEndpoint) => prevEndpoint.id !== id));
   };
-  const [clientInputs, setClientInputs] = useState<string[]>([]);
+  const [availableVariables, setAvailableVariables] = useState<string[]>([]);
 
   useEffect(() => {
-    const nodes: Node[] = location.state?.flow ? JSON.parse(location.state?.flow)?.nodes : undefined;
-    setClientInputs(
-      nodes.filter((node) => node.data.stepType === "input").map((node) => `{{ClientInput.${node.data.clientInputId}}}`)
-    );
+    const nodes: Node[] | undefined = location.state?.flow ? JSON.parse(location.state?.flow)?.nodes : undefined;
+    const variables: string[] = [];
+    nodes
+      ?.filter((node) => node.data.stepType === "input")
+      .forEach((node) => variables.push(`{{ClientInput.${node.data.clientInputId}}}`));
+    if (nodes?.find((node) => node.data.stepType === "auth")) loadTaraVariables();
+    console.log("setting", variables);
+    setAvailableVariables(variables);
   }, []);
+
+  const loadTaraVariables = () => {
+    axios.post(getTaraAuthResponseVariables()).then((result) => {
+      const data: { [key: string]: any } = result.data?.response?.body ?? {};
+      const taraVariables: string[] = [];
+      Object.keys(data).forEach((key) => taraVariables.push(`{{TARA.${key}}}`));
+      setAvailableVariables((oldVaraibles) => {
+        taraVariables.forEach((tv) => {
+          if (!oldVaraibles.includes(tv)) oldVaraibles.push(tv);
+        });
+        console.log("newVar", oldVaraibles);
+        return oldVaraibles;
+      });
+    });
+  };
 
   const saveDraft = () => {
     console.log(
@@ -33,6 +54,7 @@ const NewServicePage: React.FC = () => {
         };
       })
     );
+    console.log(getAvailableRequestValues(endpoints[0].id))
   };
 
   const getSelectedEndpoints = () => {
@@ -45,7 +67,7 @@ const NewServicePage: React.FC = () => {
   };
 
   const getAvailableRequestValues = (endpointId: string): string[] => {
-    const requestValues: string[] = clientInputs;
+    const requestValues: string[] = availableVariables;
     const otherEndpoints = getSelectedEndpoints().filter((otherEndpoint) => otherEndpoint.id !== endpointId);
     otherEndpoints.forEach((endpoint) => {
       endpoint.selectedEndpoint?.response?.forEach((response) => {
