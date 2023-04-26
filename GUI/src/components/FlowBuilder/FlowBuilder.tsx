@@ -349,6 +349,8 @@ const FlowBuilder: FC<FlowBuilderProps> = ({
         });
 
         // Add new node in place of old placeholder
+        const prevClientInputs = prevNodes.filter((node) => node.data.stepType === "input");
+        const newClientInputId = (prevClientInputs[prevClientInputs.length - 1]?.data.clientInputId ?? 0) + 1;
         const newNodes = [
           ...prevNodes.filter((node) => node.id !== matchingPlaceholder.id),
           {
@@ -356,13 +358,14 @@ const FlowBuilder: FC<FlowBuilderProps> = ({
             position: matchingPlaceholder.position,
             type: "customNode",
             data: {
-              label,
+              label: type === "input" ? `${label} - ${newClientInputId}` : label,
               onDelete,
               setPopupVisible: () => setVisiblePopupNode({ ...matchingPlaceholder, type }),
               type: ["finishing-step-end", "finishing-step-redirect"].includes(type) ? "finishing-step" : "step",
               stepType: type,
               readonly: type === "finishing-step-end",
               childrenCount: type === "input" ? 0 : 1,
+              clientInputId: type === "input" ? newClientInputId : undefined,
               setClickedNode,
               update: updateInputRules,
             },

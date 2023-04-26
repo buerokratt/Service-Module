@@ -1,10 +1,11 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Button, Card, FormInput, ApiEndpointCard, FormTextarea, Layout, NewServiceHeader, Track } from "../components";
 import { v4 as uuid } from "uuid";
 import { ROUTES } from "../resources/routes-constants";
 import { EndpointData } from "../types/endpoint-data";
+import { Node } from "reactflow";
 
 const NewServicePage: React.FC = () => {
   const { t } = useTranslation();
@@ -14,6 +15,14 @@ const NewServicePage: React.FC = () => {
   const onDelete = (id: string) => {
     setEndpoints((prevEndpoints) => prevEndpoints.filter((prevEndpoint) => prevEndpoint.id !== id));
   };
+  const [clientInputs, setClientInputs] = useState<string[]>([]);
+
+  useEffect(() => {
+    const nodes: Node[] = location.state?.flow ? JSON.parse(location.state?.flow)?.nodes : undefined;
+    setClientInputs(
+      nodes.filter((node) => node.data.stepType === "input").map((node) => `{{ClientInput.${node.data.clientInputId}}}`)
+    );
+  }, []);
 
   const saveDraft = () => {
     console.log(
@@ -36,7 +45,7 @@ const NewServicePage: React.FC = () => {
   };
 
   const getAvailableRequestValues = (endpointId: string): string[] => {
-    const requestValues: string[] = [];
+    const requestValues: string[] = clientInputs;
     const otherEndpoints = getSelectedEndpoints().filter((otherEndpoint) => otherEndpoint.id !== endpointId);
     otherEndpoints.forEach((endpoint) => {
       endpoint.selectedEndpoint?.response?.forEach((response) => {

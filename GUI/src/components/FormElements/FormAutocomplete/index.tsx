@@ -29,7 +29,10 @@ const FormAutocomplete: FC<FormAutocompleteProps> = ({
   const onKeyUpHandler = (e: BaseSyntheticEvent<KeyboardEvent>) => {
     const value: string = e.target.value;
     const newSuggestions = data.filter((item: string) =>
-      item.replace(excludeCharacters ?? "", "").includes(value.replace(excludeCharacters ?? "", ""))
+      item
+        .toLocaleLowerCase()
+        .replace(excludeCharacters ?? "", "")
+        .includes(value.toLocaleLowerCase().replace(excludeCharacters ?? "", ""))
     );
     setSugesstions(newSuggestions);
     setIsHideSuggestions(newSuggestions.length > 0 && newSuggestions[0] === value);
