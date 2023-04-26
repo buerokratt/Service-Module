@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react"
 import Button from "../Button"
 import { FormSelect, FormInput } from "../FormElements"
 import Track from "../Track"
@@ -6,6 +7,8 @@ import ConditionInput from "./ConditionInput"
 import VariableAsTag from "./VariableAsTag"
 import { v4 as uuidv4 } from 'uuid';
 import conditionOptions from "./ConditionOptions"
+import axios from "axios"
+import { getClientInputAvailableVariables } from "../../resources/api-constants"
 import './styles.scss'
 
 interface RulesBuilderProps {
@@ -18,18 +21,13 @@ const RulesBuilder: React.FC<RulesBuilderProps> = ({
   setRules,
 }) => {
 
-  const availableVariables = [
-    '{{user.firstname}}',
-    '{{user.lastname}}',
-    '{{user.birthdate}}',
-    '{{user.email}}',
-    '{{invoice.total}}',
-    '{{invoice.subtotal}}',
-    '{{invoice.date}}',
-    '{{address.city}}',
-    '{{address.street}}',
-    '{{address.building}}',
-  ]
+  const [availableVariables, setAvailableVariables] = useState<string[]>([])
+
+  useEffect(() => {
+    axios.get(getClientInputAvailableVariables()).then((result) => {
+      setAvailableVariables(result.data)
+    })
+  }, [])
 
   const addRule = () => {
     setRules([

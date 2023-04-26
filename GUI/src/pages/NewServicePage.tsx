@@ -4,31 +4,28 @@ import { useNavigate } from "react-router-dom";
 import {
   Button,
   Card,
-  EndpointCustom,
-  EndpointOpenAPI,
   FormInput,
-  FormSelect,
+  ApiEndpointCard,
   FormTextarea,
   Layout,
   NewServiceHeader,
   Track,
 } from "../components";
+import { v4 as uuid } from "uuid";
 import { ROUTES } from "../resources/routes-constants";
-import { Option } from "../types/option";
 
 const NewServicePage: React.FC = () => {
-  const [option, setOption] = useState<Option | null>();
-
-  const options: Option[] = [
-    { label: "Open API", value: "openAPI" },
-    { label: "Custom endpoint", value: "custom" },
-  ];
-
+  const [endpoints, setEndpoints] = useState<{ id: string }[]>([]);
   const { t } = useTranslation();
   const navigate = useNavigate();
 
+  const onDelete = (id: string) => {
+    setEndpoints((prevEndpoints) =>
+      prevEndpoints.filter((prevEndpoint) => prevEndpoint.id !== id)
+    );
+  };
   return (
-    <Layout disableMenu customHeader={<NewServiceHeader activeStep={2} continueOnClick={() => navigate(ROUTES.NEWSERVICE_FLOW_ROUTE)} />}>
+    <Layout disableMenu customHeader={<NewServiceHeader activeStep={2} continueOnClick={() => navigate(ROUTES.FLOW_ROUTE)} />}>
       <Track
         style={{ width: 800, alignSelf: "center" }}
         direction="vertical"
@@ -55,23 +52,23 @@ const NewServicePage: React.FC = () => {
             </div>
           </Track>
         </Card>
-        <Card header={<h5>{t("newService.endpoint.api")}</h5>}>
-          <Track direction="vertical" align="stretch" gap={16}>
-            <div>
-              <label htmlFor="service-type">{t("newService.uses")}</label>
-              <FormSelect
-                name="service-type"
-                label={""}
-                options={options}
-                placeholder="Vali.."
-                onSelectionChange={(selection) => setOption(selection)}
-              />
-            </div>
-            {option?.value === "openAPI" && <EndpointOpenAPI />}
-            {option?.value === "custom" && <EndpointCustom />}
-          </Track>
-        </Card>
-        <Button appearance="text">{t("newService.endpoint.add")}</Button>
+
+        {endpoints.map((endpoint) => (
+          <ApiEndpointCard
+            key={endpoint.id}
+            onDelete={() => onDelete(endpoint.id)}
+          />
+        ))}
+        <Button
+          appearance="text"
+          onClick={() =>
+            setEndpoints((endpoints) => {
+              return [...endpoints, { id: uuid() }];
+            })
+          }
+        >
+          {t("newService.endpoint.add")}
+        </Button>
       </Track>
     </Layout>
   );

@@ -6,19 +6,17 @@ import "reactflow/dist/style.css";
 import {
   Box,
   Collapsible,
-  FlowBuilder,
   NewServiceHeader,
   Track,
   FlowElementsPopup,
 } from "../components";
-
-import "./ServiceFlowPage.scss";
 import { Step, StepType } from "../types/step";
 import { useTranslation } from "react-i18next";
-import { GRID_UNIT } from "../components/FlowBuilder/FlowBuilder";
+import FlowBuilder, { GRID_UNIT } from "../components/FlowBuilder/FlowBuilder";
 import { useNavigate } from "react-router-dom";
 import { ROUTES } from "../resources/routes-constants";
 import "reactflow/dist/style.css";
+import "./ServiceFlowPage.scss";
 
 const initialPlaceholder = {
   id: "2",
@@ -146,7 +144,7 @@ const ServiceFlowPage: FC = () => {
         onSave={(updatedNode: Node) => {
           handlePopupSave(updatedNode);
         }}
-        onRulesUpdate={(rules: []) => {
+        onRulesUpdate={(rules) => {
           if (selectedNode?.data.stepType === StepType.Input) setUpdatedRules(rules)
           resetStates();
         }}

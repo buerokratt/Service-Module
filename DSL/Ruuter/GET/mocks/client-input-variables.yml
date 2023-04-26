@@ -1,0 +1,10 @@
+mock_variables:
+  call: reflect.mock
+  args:
+    response:
+      data: ['{{user.firstname}}', '{{user.lastname}}', '{{user.birthdate}}', '{{user.email}}', '{{invoice.total}}', '{{invoice.subtotal}}']
+  result: mock_res
+
+return_result:
+  wrapper: false
+  return: ${mock_res.response.body.data}

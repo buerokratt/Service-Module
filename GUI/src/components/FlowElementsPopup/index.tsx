@@ -20,9 +20,17 @@ import axios from "axios";
 import { servicesRequestsExplain } from "../../resources/api-constants";
 import OpenWebPageContent from "./OpenWebPageContent";
 import OpenWebPageTestContent from "./OpenWebPageTestContent";
+import { Node } from "reactflow";
 
+interface FlowElementsPopupProps {
+  node: any
+  onClose: () => void
+  onSave: (updatedNode: Node) => void
+  onRulesUpdate: (rules: (string | null)[]) => void
+  oldRules: (string | null)[]
+}
 
-const FlowElementsPopup = ({ node, onClose, onSave, oldRules, onRulesUpdate }: any) => {
+const FlowElementsPopup: React.FC<FlowElementsPopupProps> = ({ node, onClose, onSave, oldRules, onRulesUpdate }) => {
   const { t } = useTranslation();
   const [isYesNoQuestion, setIsYesNoQuestion] = useState(node?.isYesNoQuestion ?? false)
   const [rules, setRules] = useState<ConditiobRuleType[]>(node?.rules ?? [])

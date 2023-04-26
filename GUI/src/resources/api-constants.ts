@@ -29,17 +29,17 @@ export const dummyEndpointsData = [
 ];
 
 export const dummyVariablesData = [
-  { variable: "first", value: "1" },
-  { variable: "second", value: "20" },
-  { variable: "third", value: "3000" },
-  { variable: "fourth", value: "4000" },
-  { variable: "fifth", value: "500000" },
-  { variable: "sixth", value: "6000000" },
-  { variable: "seventh", value: "70000000" },
-  { variable: "eight", value: "800000000" },
-  { variable: "ninth", value: "900000000" },
-  { variable: "tenth", value: "10000000000" },
-  { variable: "eleventh", value: "11" },
+  { variable: "first", value: "1", required: true },
+  { variable: "second", value: "20", required: true },
+  { variable: "third", value: "3000", required: false },
+  { variable: "fourth", value: "4000", required: false },
+  { variable: "fifth", value: "500000", required: true },
+  { variable: "sixth", value: "6000000", required: false },
+  { variable: "seventh", value: "70000000", required: false },
+  { variable: "eight", value: "800000000", required: true },
+  { variable: "ninth", value: "900000000", required: true },
+  { variable: "tenth", value: "10000000000", required: false },
+  { variable: "eleventh", value: "11", required: false },
 ];
 
 export const dummyVariableOptions = [
@@ -54,4 +54,8 @@ export const dummyVariableOptions = [
 
 // Mocks
 export const openApiSpeckMock = (): string => `${baseUrl}/mocks/services/open-api-spec-mock`;
+
 export const servicesRequestsExplain = (): string => `${baseUrl}/services/requests/explain`;
+
+export const getClientInputAvailableVariables = (): string => `${baseUrl}/mocks/client-input-variables`;
+

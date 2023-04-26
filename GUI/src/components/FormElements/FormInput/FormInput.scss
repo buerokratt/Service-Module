@@ -1,7 +1,7 @@
-@import 'src/styles/tools/spacing';
-@import 'src/styles/tools/color';
-@import 'src/styles/settings/variables/other';
-@import 'src/styles/settings/variables/typography';
+@import "src/styles/tools/spacing";
+@import "src/styles/tools/color";
+@import "src/styles/settings/variables/other";
+@import "src/styles/settings/variables/typography";
 
 .input {
   $self: &;
@@ -44,7 +44,7 @@
     box-shadow: 0 1px 5px rgba(0, 0, 0, 0.2);
 
     &::before {
-      content: '';
+      content: "";
       display: block;
       background-color: get-color(jasper-3);
       border-left: 16px solid transparent;
@@ -76,15 +76,14 @@
     }
   }
 
+  &--disabled input {
+    background-color: get-color(black-coral-0);
+    pointer-events: none;
+  }
+
   &--error {
     input {
       border-color: get-color(jasper-10);
-    }
-  }
-
-  &--disabled & {
-    input {
-      background-color: get-color(black-coral-0);
     }
   }
 }
