@@ -1,6 +1,6 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Button, FormAutocomplete, FormInput, FormTextarea, Icon, SwitchBox, Tooltip, Track } from "../../..";
+import { Button, FormTextarea, Icon, SwitchBox, Tooltip, Track, ValueCell, VariableCell } from "../../..";
 import * as Tabs from "@radix-ui/react-tabs";
 import DataTable from "../../../DataTable";
 import { createColumnHelper, Row } from "@tanstack/react-table";
@@ -12,9 +12,6 @@ import { RequestVariablesTabsRowsData } from "../../../../types/request-variable
 import { RequestVariablesTabsRawData } from "../../../../types/request-variables-tabs-raw-data";
 import { EndpointVariableData } from "../../../../types/endpoint-variable-data";
 import { RequestVariablesRowData } from "../../../../types/request-variables-row-data";
-import { LastUpdatedRow } from "../../../../types/last-updated-row";
-import ValueCell from "./ValueCell";
-import VariableCell from "./VariableCell";
 
 type RequestVariablesProps = {
   disableRawData?: boolean;

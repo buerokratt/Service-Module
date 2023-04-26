@@ -35,8 +35,9 @@ import FlowElementsPopup from "./FlowElementsPopup";
 import ApiEndpointCard from "./ApiEndpointCard";
 import EndpointOpenAPI from "./ApiEndpointCard/Endpoints/OpenAPI";
 import EndpointCustom from "./ApiEndpointCard/Endpoints/Custom";
-import EndpointResqlComponent from "./ApiEndpointCard/Endpoints/ResqlComponent";
 import RequestVariables from "./ApiEndpointCard/Endpoints/RequestVariables";
+import VariableCell from "./ApiEndpointCard/Endpoints/RequestVariables/VariableCell";
+import ValueCell from "./ApiEndpointCard/Endpoints/RequestVariables/ValueCell";
 
 export {
   Collapsible,
@@ -75,4 +76,6 @@ export {
   Track,
   Toast,
   FlowElementsPopup,
+  VariableCell,
+  ValueCell,
 };
