@@ -327,6 +327,7 @@ const EndpointOpenAPI: React.FC<EndpointOpenAPIProps> = ({
               requestValues={requestValues}
               requestTab={requestTab}
               setRequestTab={setRequestTab}
+              setEndpoints={setEndpoints}
             />
           </>
         ) : (

@@ -13,6 +13,7 @@ import { RequestVariablesTabsRawData } from "../../../../types/request-variables
 import { EndpointVariableData } from "../../../../types/endpoint-variable-data";
 import { RequestVariablesRowData } from "../../../../types/request-variables-row-data";
 import { RequestTab } from "../../../../types/request-tab";
+import { EndpointData } from "../../../../types/endpoint-data";
 
 type RequestVariablesProps = {
   disableRawData?: boolean;
@@ -23,6 +24,7 @@ type RequestVariablesProps = {
   requestValues: string[];
   requestTab: RequestTab;
   setRequestTab: React.Dispatch<React.SetStateAction<RequestTab>>;
+  setEndpoints: React.Dispatch<React.SetStateAction<EndpointData[]>>;
 };
 
 const RequestVariables: React.FC<RequestVariablesProps> = ({
@@ -34,6 +36,7 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
   requestValues,
   requestTab,
   setRequestTab,
+  setEndpoints,
 }) => {
   const { t } = useTranslation();
   const tabs: EndpointTab[] = [EndpointTab.Params, EndpointTab.Headers, EndpointTab.Body];
@@ -57,7 +60,7 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
     };
   };
 
-  const getInitialTabsRowsData = (): RequestVariablesTabsRowsData => {
+  const getTabsRowsData = (): RequestVariablesTabsRowsData => {
     return tabs.reduce((tabsRowsData, tab) => {
       const rows: RequestVariablesRowData[] = [];
       if (endpointData) {
@@ -117,7 +120,7 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
       return { ...tabsRawData, [tab]: endpointData[tab]?.rawData[isLive ? "value" : "testValue"] ?? "" };
     }, {});
   };
-  const [rowsData, setRowsData] = useState<RequestVariablesTabsRowsData>(getInitialTabsRowsData());
+  const [rowsData, setRowsData] = useState<RequestVariablesTabsRowsData>(getTabsRowsData());
   const [tabRawData, setTabRawData] = useState<RequestVariablesTabsRawData>(getInitialTabsRawData());
 
   const getTabTriggerClasses = (tab: EndpointTab) =>
@@ -152,6 +155,48 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
     });
     updateEndpointData(rowsData, endpointData?.id);
     setKey(key + 1);
+  };
+
+  const checkNestedVariables = (rowVariableId: string, variable: EndpointVariableData) => {
+    const variableData = variable.type === "schema" ? variable.schemaData : variable.arrayData;
+    if (variableData instanceof Array) {
+      if (rowVariableId && (variableData as EndpointVariableData[]).map((v) => v.id).includes(rowVariableId)) {
+        variable[variable.type === "schema" ? "schemaData" : "arrayData"] = variableData.filter(
+          (v) => v.id !== rowVariableId
+        );
+        return;
+      }
+      (variableData as EndpointVariableData[]).forEach((v) => {
+        if (["schema", "array"].includes(v.type)) {
+          checkNestedVariables(rowVariableId, v);
+        }
+      });
+    }
+  };
+
+  const deleteVariable = (rowData: RequestVariablesRowData) => {
+    setEndpoints((prevEndpoints: EndpointData[]) => {
+      return prevEndpoints.map((prevEndpoint) => {
+        prevEndpoint.definedEndpoints.map((defEndpoint) => {
+          if (defEndpoint.id !== endpointData.id || !defEndpoint[requestTab.tab]) return defEndpoint;
+          if (
+            rowData.endpointVariableId &&
+            defEndpoint[requestTab.tab]!.variables.map((v) => v.id).includes(rowData.endpointVariableId)
+          ) {
+            defEndpoint[requestTab.tab]!.variables = defEndpoint[requestTab.tab]!.variables.filter(
+              (v) => v.id !== rowData.endpointVariableId
+            );
+          } else {
+            defEndpoint[requestTab.tab]!.variables.forEach((variable) => {
+              if (["schema", "array"].includes(variable.type) && rowData.endpointVariableId) {
+                checkNestedVariables(rowData.endpointVariableId, variable);
+              }
+            });
+          }
+        });
+        return prevEndpoint;
+      });
+    });
   };
 
   const sortRows = (
@@ -217,15 +262,9 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
               <Button
                 appearance="text"
                 onClick={() => {
-                  setRowsData((prevRowsData) => {
-                    prevRowsData[requestTab.tab] = prevRowsData[requestTab.tab]!.filter(
-                      (row) => row.id !== props.row.id
-                    ).map((row, index) => {
-                      return { ...row, id: `${index}` };
-                    });
-                    return prevRowsData;
-                  });
-                  setKey(key + 1);
+                  const rowData = rowsData[requestTab.tab]![+props.row.id];
+                  deleteVariable(rowData);
+                  setRowsData(getTabsRowsData());
                 }}
               >
                 <Icon icon={<MdDeleteOutline />} size="medium" />
@@ -264,7 +303,8 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
           name={`${requestTab.tab}-raw-data`}
           label={""}
           defaultValue={tabRawData[requestTab.tab]}
-          onBlur={() => {
+          onBlurCapture={(e) => {
+            console.log("blur");
             if (updateEndpointRawData) updateEndpointRawData(tabRawData, endpointData.id);
           }}
           onChange={(event) => {

@@ -183,6 +183,7 @@ const EndpointCustom: React.FC<EndpointCustomProps> = ({
           endpointData={endpoint.definedEndpoints[0]}
           requestTab={requestTab}
           setRequestTab={setRequestTab}
+          setEndpoints={setEndpoints}
         />
       )}
     </Track>
