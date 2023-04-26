@@ -9,6 +9,8 @@ import { EndpointType } from "../../../../types/endpoint-type";
 import { EndpointVariableData } from "../../../../types/endpoint-variable-data";
 import { LastUpdatedRow } from "../../../../types/last-updated-row";
 import { Option } from "../../../../types/option";
+import { RequestTab } from "../../../../types/request-tab";
+import { RequestVariablesTabsRawData } from "../../../../types/request-variables-tabs-raw-data";
 import { RequestVariablesTabsRowsData } from "../../../../types/request-variables-tabs-rows-data";
 
 type EndpointCustomProps = {
@@ -16,13 +18,23 @@ type EndpointCustomProps = {
   setEndpoints: React.Dispatch<React.SetStateAction<EndpointData[]>>;
   isLive: boolean;
   requestValues: string[];
+  requestTab: RequestTab;
+  setRequestTab: React.Dispatch<React.SetStateAction<RequestTab>>;
 };
 
-const EndpointCustom: React.FC<EndpointCustomProps> = ({ endpoint, setEndpoints, isLive, requestValues }) => {
+const EndpointCustom: React.FC<EndpointCustomProps> = ({
+  endpoint,
+  setEndpoints,
+  isLive,
+  requestValues,
+  requestTab,
+  setRequestTab,
+}) => {
   const { t } = useTranslation();
   const [urlError, setUrlError] = useState<string>();
-  const [showContent, setShowContent] = useState<boolean>(false);
+  const [showContent, setShowContent] = useState<boolean>(!!endpoint.definedEndpoints[0]?.url);
   const [key, setKey] = useState<number>(0);
+
   // initial endpoint data
   if (endpoint.definedEndpoints.length === 0) {
     endpoint.definedEndpoints.push({
@@ -33,11 +45,22 @@ const EndpointCustom: React.FC<EndpointCustomProps> = ({ endpoint, setEndpoints,
       path: "",
       supported: true,
       isSelected: true,
-      body: [],
-      headers: [],
-      params: [],
+      body: {
+        variables: [],
+        rawData: {},
+      },
+      headers: {
+        variables: [],
+        rawData: {},
+      },
+      params: {
+        variables: [],
+        rawData: {},
+      },
     });
   }
+
+  useEffect(() => setKey(key + 1), [isLive]);
 
   const updateEndpointData = (data: RequestVariablesTabsRowsData, endpointId?: string) => {
     if (!endpointId) return;
@@ -51,7 +74,7 @@ const EndpointCustom: React.FC<EndpointCustomProps> = ({ endpoint, setEndpoints,
               if (
                 !row.endpointVariableId &&
                 row.variable &&
-                !defEndpoint[key as EndpointTab]?.map((e) => e.name).includes(row.variable)
+                !defEndpoint[key as EndpointTab]?.variables.map((e) => e.name).includes(row.variable)
               ) {
                 const newVariable: EndpointVariableData = {
                   id: uuid(),
@@ -60,16 +83,37 @@ const EndpointCustom: React.FC<EndpointCustomProps> = ({ endpoint, setEndpoints,
                   required: false,
                 };
                 newVariable[isLive ? "value" : "testValue"] = row.value;
-                defEndpoint[key as EndpointTab]?.push(newVariable);
+                defEndpoint[key as EndpointTab]?.variables.push(newVariable);
+                console.log("u", defEndpoint[key as EndpointTab]?.variables);
               }
             });
-            defEndpoint[key as EndpointTab]?.forEach((variable) => {
+            defEndpoint[key as EndpointTab]?.variables.forEach((variable) => {
               const updatedVariable = data[key as EndpointTab]!.find(
                 (updated) => updated.endpointVariableId === variable.id
               );
               variable[isLive ? "value" : "testValue"] = updatedVariable?.value;
               variable.name = updatedVariable?.variable ?? variable.name;
             });
+          });
+          return defEndpoint;
+        });
+        return prevEndpoint;
+      });
+    });
+    setKey(key + 1);
+  };
+
+  const updateEndpointRawData = (data: RequestVariablesTabsRawData, endpointId?: string) => {
+    if (!endpointId) return;
+    setEndpoints((prevEndpoints) => {
+      return prevEndpoints.map((prevEndpoint: EndpointData) => {
+        if (prevEndpoint.id !== endpoint.id) return prevEndpoint;
+        prevEndpoint.definedEndpoints.map((defEndpoint) => {
+          if (defEndpoint.id !== endpointId) return defEndpoint;
+          Object.keys(data).forEach((key) => {
+            if (defEndpoint[key as EndpointTab]) {
+              defEndpoint[key as EndpointTab]!.rawData[isLive ? "value" : "testValue"] = data[key as EndpointTab];
+            }
           });
           return defEndpoint;
         });
@@ -105,11 +149,7 @@ const EndpointCustom: React.FC<EndpointCustomProps> = ({ endpoint, setEndpoints,
               name="endpointUrl"
               label=""
               defaultValue={endpoint.definedEndpoints[0].url ?? ""}
-              onChange={
-                (event) => {
-                  endpoint.definedEndpoints[0].url = event.target.value;
-                }
-              }
+              onChange={(event) => (endpoint.definedEndpoints[0].url = event.target.value)}
               placeholder={t("newService.endpoint.insert") ?? ""}
             />
           </Track>
@@ -138,8 +178,11 @@ const EndpointCustom: React.FC<EndpointCustomProps> = ({ endpoint, setEndpoints,
           key={key}
           requestValues={requestValues}
           updateEndpointData={updateEndpointData}
+          updateEndpointRawData={updateEndpointRawData}
           isLive={isLive}
           endpointData={endpoint.definedEndpoints[0]}
+          requestTab={requestTab}
+          setRequestTab={setRequestTab}
         />
       )}
     </Track>

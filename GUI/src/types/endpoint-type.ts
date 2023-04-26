@@ -1,4 +1,5 @@
 import { EndpointVariableData } from "./endpoint-variable-data";
+import { RawData } from "./raw-data";
 
 export type EndpointType = {
   id: string;
@@ -10,8 +11,17 @@ export type EndpointType = {
   isSelected: boolean;
   url?: string;
   description?: string;
-  params?: EndpointVariableData[];
-  headers?: EndpointVariableData[];
-  body?: EndpointVariableData[];
+  params?: {
+    variables: EndpointVariableData[];
+    rawData: RawData;
+  };
+  headers?: {
+    variables: EndpointVariableData[];
+    rawData: RawData;
+  };
+  body?: {
+    variables: EndpointVariableData[];
+    rawData: RawData;
+  };
   response?: EndpointVariableData[];
 };

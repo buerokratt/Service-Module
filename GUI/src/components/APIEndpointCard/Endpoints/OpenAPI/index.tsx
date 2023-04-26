@@ -14,12 +14,15 @@ import { EndpointData } from "../../../../types/endpoint-data";
 import { RequestVariablesRowData } from "../../../../types/request-variables-row-data";
 import { Option } from "../../../../types/option";
 import { LastUpdatedRow } from "../../../../types/last-updated-row";
+import { RequestTab } from "../../../../types/request-tab";
 
 type EndpointOpenAPIProps = {
   endpoint: EndpointData;
   setEndpoints: React.Dispatch<React.SetStateAction<EndpointData[]>>;
   isLive: boolean;
   requestValues: string[];
+  requestTab: RequestTab;
+  setRequestTab: React.Dispatch<React.SetStateAction<RequestTab>>;
 };
 
 const EndpointOpenAPI: React.FC<EndpointOpenAPIProps> = ({
@@ -27,6 +30,8 @@ const EndpointOpenAPI: React.FC<EndpointOpenAPIProps> = ({
   setEndpoints,
   isLive,
   requestValues,
+  requestTab,
+  setRequestTab,
 }) => {
   const [openApiUrl, setOpenApiUrl] = useState<string>(endpoint.openApiUrl ?? "");
   const [selectedEndpoint, setSelectedEndpoint] = useState<EndpointType | undefined>(
@@ -189,9 +194,19 @@ const EndpointOpenAPI: React.FC<EndpointOpenAPIProps> = ({
           isSelected: false,
           description: data.summary ?? data.description,
           url: endpointUrl,
-          body,
+          body: body
+            ? {
+                variables: body,
+                rawData: {},
+              }
+            : undefined,
           headers,
-          params,
+          params: params
+            ? {
+                variables: params,
+                rawData: {},
+              }
+            : undefined,
           response,
         });
       });
@@ -231,7 +246,7 @@ const EndpointOpenAPI: React.FC<EndpointOpenAPIProps> = ({
         prevEndpoint.definedEndpoints.map((openApiEndpoint) => {
           if (openApiEndpoint.id !== openApiEndpointId) return openApiEndpoint;
           Object.keys(data).forEach((key) => {
-            openApiEndpoint[key as EndpointTab]?.forEach((variable) => {
+            openApiEndpoint[key as EndpointTab]?.variables.forEach((variable) => {
               if (["schema", "array"].includes(variable.type)) {
                 checkNestedVariables(variable, data[key as EndpointTab]!);
               }
@@ -310,6 +325,8 @@ const EndpointOpenAPI: React.FC<EndpointOpenAPIProps> = ({
               endpointData={selectedEndpoint}
               updateEndpointData={updateEndpointData}
               requestValues={requestValues}
+              requestTab={requestTab}
+              setRequestTab={setRequestTab}
             />
           </>
         ) : (

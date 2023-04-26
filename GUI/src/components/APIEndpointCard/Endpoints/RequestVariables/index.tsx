@@ -12,27 +12,32 @@ import { RequestVariablesTabsRowsData } from "../../../../types/request-variable
 import { RequestVariablesTabsRawData } from "../../../../types/request-variables-tabs-raw-data";
 import { EndpointVariableData } from "../../../../types/endpoint-variable-data";
 import { RequestVariablesRowData } from "../../../../types/request-variables-row-data";
+import { RequestTab } from "../../../../types/request-tab";
 
 type RequestVariablesProps = {
   disableRawData?: boolean;
   endpointData: EndpointType;
-  updateEndpointData: (data: RequestVariablesTabsRowsData, openApiEndpointId?: string) => void;
+  updateEndpointData: (data: RequestVariablesTabsRowsData, endpointDataId?: string) => void;
+  updateEndpointRawData?: (rawData: RequestVariablesTabsRawData, endpointDataId?: string) => void;
   isLive: boolean;
   requestValues: string[];
+  requestTab: RequestTab;
+  setRequestTab: React.Dispatch<React.SetStateAction<RequestTab>>;
 };
 
 const RequestVariables: React.FC<RequestVariablesProps> = ({
   disableRawData,
   endpointData,
   updateEndpointData,
+  updateEndpointRawData,
   isLive,
   requestValues,
+  requestTab,
+  setRequestTab,
 }) => {
   const { t } = useTranslation();
   const tabs: EndpointTab[] = [EndpointTab.Params, EndpointTab.Headers, EndpointTab.Body];
   const [jsonError, setJsonError] = useState<string>();
-  const [selectedTab, setSelectedTab] = useState<EndpointTab>(tabs[0]);
-  const [showRawData, setShowRawData] = useState<boolean>(false);
   const [key, setKey] = useState<number>(0);
   const columnHelper = createColumnHelper<RequestVariablesTableColumns>();
 
@@ -58,7 +63,7 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
       if (endpointData) {
         if (!endpointData[tab]) return tabsRowsData;
         let rowIdx = 0;
-        endpointData[tab]!.forEach((variable) => {
+        endpointData[tab]!.variables.forEach((variable) => {
           rows.push(constructRow(rowIdx, variable, 0));
           if (["schema", "array"].includes(variable.type)) {
             rowIdx = getRowsFromNestedSchema(variable, rowIdx, rows, 1);
@@ -98,33 +103,37 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
     return rowIdx;
   };
 
+  useEffect(() => {
+    setRequestTab((rt) => {
+      const availableTabs = Object.keys(rowsData);
+      rt.tab = availableTabs.includes(rt.tab) ? rt.tab : (availableTabs[0] as EndpointTab);
+      return rt;
+    });
+    setKey(key + 1);
+  }, []);
+
   const getInitialTabsRawData = (): RequestVariablesTabsRawData => {
     return tabs.reduce((tabsRawData, tab) => {
-      return { ...tabsRawData, [tab]: "" };
+      return { ...tabsRawData, [tab]: endpointData[tab]?.rawData[isLive ? "value" : "testValue"] ?? "" };
     }, {});
   };
   const [rowsData, setRowsData] = useState<RequestVariablesTabsRowsData>(getInitialTabsRowsData());
   const [tabRawData, setTabRawData] = useState<RequestVariablesTabsRawData>(getInitialTabsRawData());
 
-  useEffect(() => {
-    setSelectedTab(Object.keys(rowsData)[0] as EndpointTab);
-    setKey(key + 1);
-  }, [setRowsData]);
-
   const getTabTriggerClasses = (tab: EndpointTab) =>
-    `endpoint-tab-group__tab-btn ${selectedTab === tab ? "active" : ""}`;
+    `endpoint-tab-group__tab-btn ${requestTab.tab === tab ? "active" : ""}`;
 
   const updateRowVariable = (id: string, variable: string) => {
     setRowsData((prevRowsData) => {
-      prevRowsData[selectedTab]!.map((row) => {
+      prevRowsData[requestTab.tab]!.map((row) => {
         if (row.id !== id) return row;
         row.variable = variable;
         return row;
       });
       // if last row name is edited, add a new row
-      if (!rowsData[selectedTab] || id !== `${rowsData[selectedTab]!.length - 1}`) return prevRowsData;
-      prevRowsData[selectedTab]!.push({
-        id: `${rowsData[selectedTab]!.length}`,
+      if (!rowsData[requestTab.tab] || id !== `${rowsData[requestTab.tab]!.length - 1}`) return prevRowsData;
+      prevRowsData[requestTab.tab]!.push({
+        id: `${rowsData[requestTab.tab]!.length}`,
         required: false,
         isNameEditable: true,
         nestedLevel: 0,
@@ -135,8 +144,8 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
   };
 
   const updateRowValue = (id: string, value: string) => {
-    if (!rowsData[selectedTab]) return;
-    rowsData[selectedTab]!.map((row) => {
+    if (!rowsData[requestTab.tab]) return;
+    rowsData[requestTab.tab]!.map((row) => {
       if (row.id !== id) return row;
       row.value = value;
       return row;
@@ -150,9 +159,9 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
     rowB: Row<RequestVariablesTableColumns>,
     type: "variable" | "value"
   ): number => {
-    if (!rowsData[selectedTab]) return 1;
-    const valueA = rowsData[selectedTab]!.find((row) => row.id === rowA.id);
-    const valueB = rowsData[selectedTab]!.find((row) => row.id === rowB.id);
+    if (!rowsData[requestTab.tab]) return 1;
+    const valueA = rowsData[requestTab.tab]!.find((row) => row.id === rowA.id);
+    const valueB = rowsData[requestTab.tab]!.find((row) => row.id === rowB.id);
     if (type === "variable") {
       return (valueA?.variable ?? "") < (valueB?.variable ?? "") ? 1 : -1;
     }
@@ -171,9 +180,9 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
       cell: (props) => (
         <VariableCell
           row={props.row}
-          variable={rowsData[selectedTab]!.find((r) => r.id === props.row.id)?.variable ?? ""}
+          variable={rowsData[requestTab.tab]!.find((r) => r.id === props.row.id)?.variable ?? ""}
           updateRowVariable={updateRowVariable}
-          rowData={rowsData[selectedTab]![+props.row.id]}
+          rowData={rowsData[requestTab.tab]![+props.row.id]}
         />
       ),
     }),
@@ -189,8 +198,8 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
         <ValueCell
           row={props.row}
           requestValues={requestValues}
-          rowData={rowsData[selectedTab]![+props.row.id]}
-          value={rowsData[selectedTab]!.find((r) => r.id === props.row.id)?.value ?? ""}
+          rowData={rowsData[requestTab.tab]![+props.row.id]}
+          value={rowsData[requestTab.tab]!.find((r) => r.id === props.row.id)?.value ?? ""}
           updateRowValue={updateRowValue}
         />
       ),
@@ -209,11 +218,11 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
                 appearance="text"
                 onClick={() => {
                   setRowsData((prevRowsData) => {
-                    prevRowsData[selectedTab] = prevRowsData[selectedTab]!.filter((row) => row.id !== props.row.id).map(
-                      (row, index) => {
-                        return { ...row, id: `${index}` };
-                      }
-                    );
+                    prevRowsData[requestTab.tab] = prevRowsData[requestTab.tab]!.filter(
+                      (row) => row.id !== props.row.id
+                    ).map((row, index) => {
+                      return { ...row, id: `${index}` };
+                    });
                     return prevRowsData;
                   });
                   setKey(key + 1);
@@ -238,7 +247,7 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
             onClick={() => {
               setTabRawData((prevRawData) => {
                 try {
-                  prevRawData[selectedTab] = JSON.stringify(JSON.parse(prevRawData[selectedTab]!), null, 4);
+                  prevRawData[requestTab.tab] = JSON.stringify(JSON.parse(prevRawData[requestTab.tab]!), null, 4);
                 } catch (e: any) {
                   setJsonError(`Unable to format JSON. ${e.message}`);
                 }
@@ -251,16 +260,16 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
           </Button>
         </Track>
         <FormTextarea
-          key={`${selectedTab}-raw-data`}
-          name={`${selectedTab}-raw-data`}
+          key={`${requestTab.tab}-raw-data`}
+          name={`${requestTab.tab}-raw-data`}
           label={""}
-          defaultValue={tabRawData[selectedTab]}
+          defaultValue={tabRawData[requestTab.tab]}
+          onBlur={() => {
+            if (updateEndpointRawData) updateEndpointRawData(tabRawData, endpointData.id);
+          }}
           onChange={(event) => {
             setJsonError(undefined);
-            setTabRawData((prevRawData) => {
-              prevRawData[selectedTab] = event.target.value;
-              return prevRawData;
-            });
+            tabRawData[requestTab.tab] = event.target.value;
           }}
         />
       </>
@@ -269,8 +278,14 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
 
   return (
     <Tabs.Root
-      defaultValue={selectedTab}
-      onValueChange={(value) => setSelectedTab(value as EndpointTab)}
+      defaultValue={requestTab.tab}
+      onValueChange={(value) => {
+        setRequestTab((rt) => {
+          rt.tab = value as EndpointTab;
+          return rt;
+        });
+        setKey(key + 1);
+      }}
       className="endpoint-tab-group"
       key={key}
     >
@@ -290,8 +305,14 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
               style={{ width: "fit-content" }}
               label={""}
               name={"raw-data"}
-              checked={showRawData}
-              onCheckedChange={(checked) => setShowRawData(checked)}
+              checked={requestTab.showRawData}
+              onCheckedChange={(checked) => {
+                setRequestTab((rt) => {
+                  rt.showRawData = checked;
+                  return rt;
+                });
+                setKey(key + 1);
+              }}
             />
             <p style={{ whiteSpace: "nowrap", color: "#34394C" }}>Raw data</p>
           </Track>
@@ -299,7 +320,7 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
       </Track>
       {Object.keys(rowsData).map((tab) => (
         <Tabs.Content className="endpoint-tab-group__tab-content" value={tab} key={tab}>
-          {showRawData ? (
+          {requestTab.showRawData ? (
             buildRawDataView()
           ) : (
             <>

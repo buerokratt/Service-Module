@@ -9,6 +9,8 @@ import "./ApiEndpointCard.scss";
 import { EndpointData } from "../../types/endpoint-data";
 import { EndpointEnv } from "../../types/endpoint-env";
 import { LastUpdatedRow } from "../../types/last-updated-row";
+import { EndpointTab } from "../../types/endpoint-tab.enum";
+import { RequestTab } from "../../types/request-tab";
 
 type EndpointCardProps = {
   onDelete: () => void;
@@ -17,12 +19,7 @@ type EndpointCardProps = {
   requestValues: string[];
 };
 
-const ApiEndpointCard: FC<EndpointCardProps> = ({
-  onDelete,
-  setEndpoints,
-  endpoint,
-  requestValues,
-}) => {
+const ApiEndpointCard: FC<EndpointCardProps> = ({ onDelete, setEndpoints, endpoint, requestValues }) => {
   const [selectedTab, setSelectedTab] = useState<EndpointEnv>(EndpointEnv.Live);
   const [endpointName, setEndpointName] = useState<string>("");
   const [testEnvExists, setTestEnvExists] = useState<boolean>(false);
@@ -31,6 +28,7 @@ const ApiEndpointCard: FC<EndpointCardProps> = ({
     { label: "Custom endpoint", value: "custom", name: "da" },
   ];
   const [option, setOption] = useState<Option | null>(options.find((o) => o.value === endpoint.type) ?? null);
+  const [requestTab, setRequestTab] = useState<RequestTab>({ tab: EndpointTab.Params, showRawData: false });
   const { t } = useTranslation();
 
   const getTabTriggerClasses = (tab: EndpointEnv) => `tab-group__tab-btn ${selectedTab === tab ? "active" : ""}`;
@@ -111,6 +109,8 @@ const ApiEndpointCard: FC<EndpointCardProps> = ({
                   endpoint={endpoint}
                   setEndpoints={setEndpoints}
                   requestValues={requestValues}
+                  requestTab={requestTab}
+                  setRequestTab={setRequestTab}
                 />
               )}
               {option?.value === "custom" && (
@@ -119,6 +119,8 @@ const ApiEndpointCard: FC<EndpointCardProps> = ({
                   setEndpoints={setEndpoints}
                   requestValues={requestValues}
                   isLive={selectedTab === EndpointEnv.Live}
+                  requestTab={requestTab}
+                  setRequestTab={setRequestTab}
                 />
               )}
             </Track>
