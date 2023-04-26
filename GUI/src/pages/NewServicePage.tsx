@@ -67,7 +67,7 @@ const NewServicePage: React.FC = () => {
   };
 
   const getAvailableRequestValues = (endpointId: string): string[] => {
-    const requestValues: string[] = availableVariables;
+    const requestValues: string[] = [...availableVariables];
     const otherEndpoints = getSelectedEndpoints().filter((otherEndpoint) => otherEndpoint.id !== endpointId);
     otherEndpoints.forEach((endpoint) => {
       endpoint.selectedEndpoint?.response?.forEach((response) => {
