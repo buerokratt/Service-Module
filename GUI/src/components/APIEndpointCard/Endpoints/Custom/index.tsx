@@ -1,8 +1,10 @@
+import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { MdErrorOutline } from "react-icons/md";
 import { v4 as uuid } from "uuid";
 import { Button, FormInput, FormSelect, Icon, RequestVariables, Track } from "../../..";
+import { getEndpointValidationMock } from "../../../../resources/api-constants";
 import { EndpointData } from "../../../../types/endpoint-data";
 import { EndpointTab } from "../../../../types/endpoint-tab.enum";
 import { EndpointType } from "../../../../types/endpoint-type";
@@ -141,7 +143,7 @@ const EndpointCustom: React.FC<EndpointCustomProps> = ({
                 onSelectionChange={(selection) => {
                   endpoint.definedEndpoints[0].methodType = selection?.value ?? "GET";
                 }}
-                defaultValue="GET"
+                defaultValue={endpoint.definedEndpoints[0]?.methodType ?? "GET"}
               />
             </div>
             <FormInput
@@ -154,11 +156,20 @@ const EndpointCustom: React.FC<EndpointCustomProps> = ({
             />
           </Track>
           <Button
-            onClick={() => {
-              // TODO check if url is legit
-              const errorMsg = endpoint ? undefined : t("newService.endpoint.error");
-              setShowContent(!errorMsg);
-              setUrlError(errorMsg);
+            onClick={async () => {
+              try {
+                new URL(endpoint.definedEndpoints[0].url ?? "");
+                if (endpoint.definedEndpoints[0].methodType === "GET") {
+                  await axios.get(getEndpointValidationMock());
+                } else {
+                  await axios.post(getEndpointValidationMock());
+                }
+                setUrlError(undefined);
+                setShowContent(true);
+              } catch (e) {
+                setShowContent(false);
+                setUrlError(t("newService.endpoint.error") ?? undefined);
+              }
             }}
           >
             {t("newService.test")}
