@@ -4,8 +4,8 @@ import { useNavigate } from "react-router-dom";
 import {
   Button,
   Card,
-  FormInput,
   ApiEndpointCard,
+  FormInput,
   FormTextarea,
   Layout,
   NewServiceHeader,
@@ -69,8 +69,8 @@ const NewServicePage: React.FC = () => {
         >
           {t("newService.endpoint.add")}
         </Button>
-      </Track>
-    </Layout>
+      </Track >
+    </Layout >
   );
 };
 

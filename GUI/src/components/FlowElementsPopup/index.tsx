@@ -2,11 +2,10 @@ import React, { useState } from "react";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import Popup from "../Popup";
-import { SwitchBox } from "../FormElements";
 import { Button, Track } from "..";
+import FileGenerateContent from "./FileGenerateContent";
+import ConditionBuilderContent from "./ConditionBuilderContent";
 import ConditiobRuleType from "./ConditiobRuleType";
-import YesNoPopupContent from "./YesNoPopupContent";
-import RulesBuilder from "./RulesBuilder";
 import './styles.scss'
 import { useTranslation } from "react-i18next";
 import { StepType } from "../../types/step";
@@ -167,30 +166,18 @@ const FlowElementsPopup: React.FC<FlowElementsPopupProps> = ({ node, onClose, on
                 onWebpageUrlChange={setWebpageUrl}
               ></OpenWebPageContent>
             }
-            {
-              stepType === StepType.Input && <DndProvider backend={HTML5Backend}>
-                <Track direction='vertical' align='stretch'>
-                  <Track gap={16} className="flow-body-padding">
-                    <Track>
-                      <SwitchBox
-                        label=''
-                        name=''
-                        hideLabel
-                        onCheckedChange={setIsYesNoQuestion}
-                        checked={isYesNoQuestion}
-                      />
-                    </Track>
-                    <span>Yes/No Question</span>
-                  </Track>
-                  {isYesNoQuestion && <YesNoPopupContent />}
-                  {
-                    !isYesNoQuestion &&
-                    <RulesBuilder
-                      rules={rules}
-                      setRules={setRules}
-                    />
-                  }
-                </Track>
+            {(stepType === StepType.FileGenerate || stepType === StepType.Input) &&
+              <DndProvider backend={HTML5Backend}>
+                {
+                  stepType === StepType.Input &&
+                  <ConditionBuilderContent
+                    isYesNoQuestion={isYesNoQuestion}
+                    setIsYesNoQuestion={setIsYesNoQuestion}
+                    rules={rules}
+                    setRules={setRules}
+                  />
+                }
+                {stepType === StepType.FileGenerate && <FileGenerateContent />}
               </DndProvider>
             }
             {
@@ -227,6 +214,15 @@ const FlowElementsPopup: React.FC<FlowElementsPopupProps> = ({ node, onClose, on
       </Track>
     </Popup >
   )
+}
+
+function getTitle(type: string) {
+  if (type === 'input')
+    return 'Client Input'
+  else if (type === 'file-generate')
+    return 'File Generate'
+
+  return 'Hello'
 }
 
 export default FlowElementsPopup
