@@ -1,21 +1,7 @@
 import { FC, useCallback, useEffect, useState } from "react";
 import { MdPlayCircleFilled } from "react-icons/md";
-import {
-  Edge,
-  MarkerType,
-  Node,
-  ReactFlowInstance,
-  ReactFlowProvider,
-  useEdgesState,
-  useNodesState
-} from "reactflow";
-import {
-  Box,
-  Collapsible,
-  NewServiceHeader,
-  Track,
-  FlowElementsPopup,
-} from "../components";
+import { Edge, MarkerType, Node, ReactFlowInstance, ReactFlowProvider, useEdgesState, useNodesState } from "reactflow";
+import { Box, Collapsible, NewServiceHeader, Track, FlowElementsPopup } from "../components";
 import { Step } from "../types/step";
 import FlowBuilder, { GRID_UNIT } from "../components/FlowBuilder/FlowBuilder";
 import { CSSProperties } from "react";
@@ -100,7 +86,10 @@ const ServiceFlowPage: FC = () => {
       if (!selectedEndpoint) return;
       elements.push({
         id: elements.length,
-        label: endpoint.name ?? `${selectedEndpoint.methodType.toUpperCase()} ${selectedEndpoint.url}`,
+        label:
+          endpoint.name.trim().length > 0
+            ? endpoint.name
+            : `${selectedEndpoint.methodType.toUpperCase()} ${selectedEndpoint.url}`,
         type: "user-defined",
       });
     });
@@ -130,8 +119,8 @@ const ServiceFlowPage: FC = () => {
       <FlowElementsPopup
         onClose={() => setVisiblePopupNode(null)}
         onSave={(rules: any) => {
-          setUpdatedRules(rules)
-          setVisiblePopupNode(null)
+          setUpdatedRules(rules);
+          setVisiblePopupNode(null);
         }}
         node={visiblePopupNode}
         oldRules={updatedRules}
@@ -166,7 +155,7 @@ const ServiceFlowPage: FC = () => {
                         onDragStart={(event) => {
                           console.log(nodes);
                           console.log(edges);
-                          onDragStart(event, step)
+                          onDragStart(event, step);
                         }}
                         draggable
                       >

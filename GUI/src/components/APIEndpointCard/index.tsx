@@ -21,7 +21,7 @@ type EndpointCardProps = {
 
 const ApiEndpointCard: FC<EndpointCardProps> = ({ onDelete, setEndpoints, endpoint, requestValues }) => {
   const [selectedTab, setSelectedTab] = useState<EndpointEnv>(EndpointEnv.Live);
-  const [endpointName, setEndpointName] = useState<string>("");
+  const [endpointName, setEndpointName] = useState<string>(endpoint.name);
   const [testEnvExists, setTestEnvExists] = useState<boolean>(false);
   const options = [
     { label: "Open API", value: "openAPI", name: "da" },
