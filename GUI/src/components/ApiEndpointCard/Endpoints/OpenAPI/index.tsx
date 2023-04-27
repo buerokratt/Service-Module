@@ -195,10 +195,7 @@ const EndpointOpenAPI: React.FC<EndpointOpenAPIProps> = ({
                 variables: headers,
                 rawData: {},
               }
-            : {
-                variables: [],
-                rawData: {},
-              },
+            : undefined,
           params: params
             ? {
                 variables: params,
@@ -215,7 +212,7 @@ const EndpointOpenAPI: React.FC<EndpointOpenAPIProps> = ({
       prevEndpoints.map((prevEndpoint) => {
         if (prevEndpoint.id !== endpoint.id) return prevEndpoint;
         prevEndpoint.definedEndpoints = paths;
-        prevEndpoint.openApiUrl = url;
+        prevEndpoint.openApiUrl = openApiUrl;
         return prevEndpoint;
       });
       return prevEndpoints;
@@ -259,6 +256,7 @@ const EndpointOpenAPI: React.FC<EndpointOpenAPIProps> = ({
         return prevEndpoint;
       });
     });
+    setKey(key + 1);
   };
 
   const onSelectEndpoint = (selection: Option | null) => {
