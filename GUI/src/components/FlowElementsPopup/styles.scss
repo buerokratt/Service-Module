@@ -5,6 +5,13 @@
   border-radius: 1rem;
 }
 
+.green-tag {
+  padding: 0 .3rem;
+  background: #d9e8de;
+  border: 1px solid #b4d3c0;
+  border-radius: 1rem;
+}
+
 .popup-top-border-track {
   padding: 16px;
   border-top: 1px solid #d2d3d8;
@@ -43,4 +50,18 @@
 .flow-darker-container {
   padding: 0 .5rem;
   color: grey;
+}
+
+.flow-body-label {
+  width: 100%;
+}
+
+.popup-client-text-demo {
+  padding: 10px;
+  background: #f0f0f2;
+  border-radius: 0.5rem;
+  width: 100%;
+  min-height: 4rem;
+  color: #9899a4;
+  user-select: none;
 }

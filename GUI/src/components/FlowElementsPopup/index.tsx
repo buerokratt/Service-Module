@@ -2,13 +2,11 @@ import React, { useState } from "react";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import Popup from "../Popup";
-import { SwitchBox } from "../FormElements";
 import { Button, Track } from "..";
+import FileGenerateContent from "./FileGenerateContent";
+import ConditionBuilderContent from "./ConditionBuilderContent";
 import ConditiobRuleType from "./ConditiobRuleType";
-import YesNoPopupContent from "./YesNoPopupContent";
-import RulesBuilder from "./RulesBuilder";
 import './styles.scss'
-import { Node } from "reactflow";
 
 interface FlowElementsPopupProps {
   node: any
@@ -21,12 +19,10 @@ const FlowElementsPopup: React.FC<FlowElementsPopupProps> = ({ node, onClose, on
   const [isYesNoQuestion, setIsYesNoQuestion] = useState(node?.isYesNoQuestion ?? false)
   const [rules, setRules] = useState<ConditiobRuleType[]>(node?.rules ?? [])
 
-  if (!node) {
-    return <></>
-  }
+  if (!node) return <></>
 
   const type = node.type;
-  const title = type === 'input' ? "Client Input" : type === "file-generate" ? "File Generate" : "Hello";
+  const title = getTitle(type)
 
   const handleSaveClick = () => {
     const count = isYesNoQuestion ? 2 : rules.length
@@ -66,33 +62,28 @@ const FlowElementsPopup: React.FC<FlowElementsPopupProps> = ({ node, onClose, on
       }
     >
       <DndProvider backend={HTML5Backend}>
-        {type === 'input' &&
-          <Track direction='vertical' align='stretch' className="flow-body-reverse-margin">
-            <Track gap={16} className="flow-body-padding">
-              <Track>
-                <SwitchBox
-                  label=''
-                  name=''
-                  hideLabel
-                  onCheckedChange={setIsYesNoQuestion}
-                  checked={isYesNoQuestion}
-                />
-              </Track>
-              <span>Yes/No Question</span>
-            </Track>
-            {isYesNoQuestion && <YesNoPopupContent />}
-            {
-              !isYesNoQuestion &&
-              <RulesBuilder
-                rules={rules}
-                setRules={setRules}
-              />
-            }
-          </Track>
+        {
+          type === 'input' &&
+          <ConditionBuilderContent
+            isYesNoQuestion={isYesNoQuestion}
+            setIsYesNoQuestion={setIsYesNoQuestion}
+            rules={rules}
+            setRules={setRules}
+          />
         }
+        {type === 'file-generate' && <FileGenerateContent />}
       </DndProvider>
     </Popup >
   )
+}
+
+function getTitle(type: string) {
+  if (type === 'input')
+    return 'Client Input'
+  else if (type === 'file-generate')
+    return 'File Generate'
+
+  return 'Hello'
 }
 
 export default FlowElementsPopup

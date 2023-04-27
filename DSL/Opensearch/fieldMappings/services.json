@@ -5,7 +5,7 @@
         "type": "text"
       },
       "usage": {
-        "type": "number"
+        "type": "integer"
       }
     }
   }
