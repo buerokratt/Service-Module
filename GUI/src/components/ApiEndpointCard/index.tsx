@@ -94,9 +94,7 @@ const ApiEndpointCard: FC<EndpointCardProps> = ({ onDelete, setEndpoints, endpoi
                     label=""
                     value={endpointName}
                     disabled={selectedTab === EndpointEnv.Test}
-                    onChange={(e) => {
-                      setEndpointName(e.target.value);
-                    }}
+                    onChange={(e) => setEndpointName(e.target.value)}
                   />
                 </div>
               )}
