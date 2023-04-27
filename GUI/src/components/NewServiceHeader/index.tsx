@@ -1,7 +1,7 @@
 import { t } from "i18next";
 import React, { FC } from "react";
 import { Button, HeaderStepCounter, Track } from "..";
-import { EndpointData } from "../../types/endpoint-data";
+import { EndpointData } from "../../types/endpoint";
 import "../Header/Header.scss";
 
 type NewServiceHeaderProps = {

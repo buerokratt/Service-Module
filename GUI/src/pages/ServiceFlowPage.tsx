@@ -1,5 +1,4 @@
 import { CSSProperties, FC, useEffect, useState } from "react";
-import { MdPlayCircleFilled } from "react-icons/md";
 import { Edge, MarkerType, Node, ReactFlowInstance, ReactFlowProvider, useEdgesState, useNodesState } from "reactflow";
 import {
   Box,
@@ -8,15 +7,15 @@ import {
   Track,
   FlowElementsPopup,
 } from "../components";
-import { Step, StepType } from "../types/step";
 import { useTranslation } from "react-i18next";
 import FlowBuilder, { GRID_UNIT } from "../components/FlowBuilder/FlowBuilder";
 import { useLocation, useNavigate } from "react-router-dom";
 import { ROUTES } from "../resources/routes-constants";
-import { EndpointData } from "../types/endpoint-data";
 import apiIconTag from "../assets/images/api-icon-tag.svg";
 import "reactflow/dist/style.css";
 import "./ServiceFlowPage.scss";
+import { StepType, Step } from "../types";
+import { EndpointData } from "../types/endpoint";
 
 const initialPlaceholder = {
   id: "2",

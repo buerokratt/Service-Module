@@ -5,15 +5,9 @@ import { MdErrorOutline } from "react-icons/md";
 import { v4 as uuid } from "uuid";
 import { Button, FormInput, FormSelect, Icon, RequestVariables, Track } from "../../..";
 import { getEndpointValidationMock } from "../../../../resources/api-constants";
-import { EndpointData } from "../../../../types/endpoint-data";
-import { EndpointTab } from "../../../../types/endpoint-tab.enum";
-import { EndpointType } from "../../../../types/endpoint-type";
-import { EndpointVariableData } from "../../../../types/endpoint-variable-data";
-import { LastUpdatedRow } from "../../../../types/last-updated-row";
-import { Option } from "../../../../types/option";
-import { RequestTab } from "../../../../types/request-tab";
-import { RequestVariablesTabsRawData } from "../../../../types/request-variables-tabs-raw-data";
-import { RequestVariablesTabsRowsData } from "../../../../types/request-variables-tabs-rows-data";
+import { RequestTab } from "../../../../types";
+import { EndpointData, EndpointTab, EndpointVariableData } from "../../../../types/endpoint";
+import { RequestVariablesTabsRowsData, RequestVariablesTabsRawData } from "../../../../types/request-variables";
 
 type EndpointCustomProps = {
   endpoint: EndpointData;

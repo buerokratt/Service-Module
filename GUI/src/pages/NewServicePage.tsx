@@ -4,10 +4,10 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { Button, Card, FormInput, ApiEndpointCard, FormTextarea, Layout, NewServiceHeader, Track } from "../components";
 import { v4 as uuid } from "uuid";
 import { ROUTES } from "../resources/routes-constants";
-import { EndpointData } from "../types/endpoint-data";
 import { Node } from "reactflow";
 import axios from "axios";
 import { getTaraAuthResponseVariables } from "../resources/api-constants";
+import { EndpointData } from "../types/endpoint";
 
 const NewServicePage: React.FC = () => {
   const { t } = useTranslation();
@@ -54,7 +54,7 @@ const NewServicePage: React.FC = () => {
         };
       })
     );
-    console.log(getAvailableRequestValues(endpoints[0].id))
+    console.log(getAvailableRequestValues(endpoints[0].id));
   };
 
   const getSelectedEndpoints = () => {
@@ -133,8 +133,8 @@ const NewServicePage: React.FC = () => {
         >
           {t("newService.endpoint.add")}
         </Button>
-      </Track >
-    </Layout >
+      </Track>
+    </Layout>
   );
 };
 

@@ -6,10 +6,8 @@ import { Option } from "../../types/option";
 import { useTranslation } from "react-i18next";
 import { MdDeleteOutline } from "react-icons/md";
 import "./ApiEndpointCard.scss";
-import { EndpointData } from "../../types/endpoint-data";
-import { EndpointEnv } from "../../types/endpoint-env";
-import { EndpointTab } from "../../types/endpoint-tab.enum";
-import { RequestTab } from "../../types/request-tab";
+import { RequestTab } from "../../types";
+import { EndpointData, EndpointEnv, EndpointTab } from "../../types/endpoint";
 
 type EndpointCardProps = {
   onDelete: () => void;

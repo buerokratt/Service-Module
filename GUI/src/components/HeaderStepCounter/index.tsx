@@ -3,9 +3,9 @@ import { Track } from "..";
 import "./HeaderStepCounter.scss";
 import Step from "./HeaderStep";
 import { useTranslation } from "react-i18next";
-import { EndpointData } from "../../types/endpoint-data";
 import { useNavigate } from "react-router-dom";
 import { ROUTES } from "../../resources/routes-constants";
+import { EndpointData } from "../../types/endpoint";
 
 type StepCounterProps = {
   activeStep: number;

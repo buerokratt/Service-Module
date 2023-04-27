@@ -1,20 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { openApiSpeckMock } from "../../../../resources/api-constants";
-import { Button, FormInput, FormSelect, Track } from "../../..";
+import { Button, FormInput, FormSelect, RequestVariables, Track } from "../../..";
 import { useTranslation } from "react-i18next";
-import RequestVariables from "../RequestVariables";
 import axios from "axios";
-import { EndpointType } from "../../../../types/endpoint-type";
-import { EndpointVariableData } from "../../../../types/endpoint-variable-data";
-import { ApiSpecProperty } from "../../../../types/api-spec-property";
 import { v4 as uuid } from "uuid";
-import { EndpointTab } from "../../../../types/endpoint-tab.enum";
-import { RequestVariablesTabsRowsData } from "../../../../types/request-variables-tabs-rows-data";
-import { EndpointData } from "../../../../types/endpoint-data";
-import { RequestVariablesRowData } from "../../../../types/request-variables-row-data";
-import { Option } from "../../../../types/option";
-import { LastUpdatedRow } from "../../../../types/last-updated-row";
-import { RequestTab } from "../../../../types/request-tab";
+import { RequestTab, Option } from "../../../../types";
+import { ApiSpecProperty } from "../../../../types/api-spec-property";
+import { EndpointData, EndpointType, EndpointVariableData, EndpointTab } from "../../../../types/endpoint";
+import { RequestVariablesRowData, RequestVariablesTabsRowsData } from "../../../../types/request-variables";
 
 type EndpointOpenAPIProps = {
   endpoint: EndpointData;

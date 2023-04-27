@@ -13,10 +13,10 @@ import ReactFlow, {
   XYPosition,
 } from "reactflow";
 import "reactflow/dist/style.css";
+import { StepType } from "../../types/step-type.enum";
 import CustomNode from "../Steps/CustomNode";
 import PlaceholderNode from "../Steps/PlaceholderNode";
 import StartNode from "../Steps/StartNode";
-import { StepType } from "../../types/step";
 
 export const GRID_UNIT = 16;
 
@@ -35,8 +35,8 @@ type FlowBuilderProps = {
   edges: Edge[];
   setEdges: Dispatch<SetStateAction<Edge[]>>;
   onEdgesChange: OnEdgesChange;
-  reactFlowInstance?: ReactFlowInstance,
-  setReactFlowInstance: Dispatch<SetStateAction<ReactFlowInstance | undefined>>
+  reactFlowInstance?: ReactFlowInstance;
+  setReactFlowInstance: Dispatch<SetStateAction<ReactFlowInstance | undefined>>;
 };
 
 const FlowBuilder: FC<FlowBuilderProps> = ({
@@ -204,7 +204,6 @@ const FlowBuilder: FC<FlowBuilderProps> = ({
     };
   };
 
-
   // Move the placeholder together with the node being moved
   const onNodeDrag = useCallback(
     (_event: React.MouseEvent, draggedNode: Node) => {
@@ -362,10 +361,9 @@ const FlowBuilder: FC<FlowBuilderProps> = ({
               label: type === "input" ? `${label} - ${newClientInputId}` : label,
               onDelete,
               onEdit: handleNodeEdit,
-              type: [
-                StepType.FinishingStepEnd,
-                StepType.FinishingStepRedirect
-              ].includes(type) ? "finishing-step" : "step",
+              type: [StepType.FinishingStepEnd, StepType.FinishingStepRedirect].includes(type)
+                ? "finishing-step"
+                : "step",
               stepType: type,
               clientInputId: type === StepType.Input ? newClientInputId : undefined,
               readonly: [
@@ -379,10 +377,9 @@ const FlowBuilder: FC<FlowBuilderProps> = ({
               update: updateInputRules,
               message: setDefaultMessages(type),
             },
-            className: [
-              StepType.FinishingStepEnd,
-              StepType.FinishingStepRedirect
-            ].includes(type) ? "finishing-step" : "step",
+            className: [StepType.FinishingStepEnd, StepType.FinishingStepRedirect].includes(type)
+              ? "finishing-step"
+              : "step",
           },
         ];
 
@@ -405,11 +402,11 @@ const FlowBuilder: FC<FlowBuilderProps> = ({
   const setDefaultMessages = (stepType: StepType) => {
     switch (stepType) {
       case StepType.FinishingStepEnd:
-        return 'Teenus on lõpetatud';
+        return "Teenus on lõpetatud";
       case StepType.FinishingStepRedirect:
-        return 'Vestlus suunatakse klienditeenindajale';
+        return "Vestlus suunatakse klienditeenindajale";
     }
-  }
+  };
 
   const onDelete = useCallback(
     (id: string, shouldAddPlaceholder: boolean) => {
@@ -627,11 +624,14 @@ const FlowBuilder: FC<FlowBuilderProps> = ({
     [edges, nodes]
   );
 
-  const handleNodeEdit = useCallback((selectedNodeId: string) => {
-    if (!reactFlowInstance) return;
-    const node = reactFlowInstance.getNode(selectedNodeId);
-    onNodeEdit(node ?? null);
-  }, [reactFlowInstance]);
+  const handleNodeEdit = useCallback(
+    (selectedNodeId: string) => {
+      if (!reactFlowInstance) return;
+      const node = reactFlowInstance.getNode(selectedNodeId);
+      onNodeEdit(node ?? null);
+    },
+    [reactFlowInstance]
+  );
 
   return (
     <div className="graph__body" ref={reactFlowWrapper}>

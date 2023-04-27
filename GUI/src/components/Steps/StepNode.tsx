@@ -1,7 +1,7 @@
 import { FC, memo } from 'react';
 
 import { ExclamationBadge, Track } from '../';
-import { StepType } from '../../types/step';
+import { StepType } from '../../types';
 
 type NodeDataProps = {
   data: {

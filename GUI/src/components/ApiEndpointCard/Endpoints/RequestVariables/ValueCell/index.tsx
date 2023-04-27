@@ -1,11 +1,8 @@
 import { Row } from "@tanstack/react-table";
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { FormAutocomplete } from "../../../..";
-import { EndpointTab } from "../../../../../types/endpoint-tab.enum";
-import { RequestVariablesRowData } from "../../../../../types/request-variables-row-data";
-import { RequestVariablesTableColumns } from "../../../../../types/request-variables-table-columns";
-import { RequestVariablesTabsRowsData } from "../../../../../types/request-variables-tabs-rows-data";
+import { RequestVariablesRowData, RequestVariablesTableColumns } from "../../../../../types/request-variables";
 
 type ValueCellProps = {
   row: Row<RequestVariablesTableColumns>;

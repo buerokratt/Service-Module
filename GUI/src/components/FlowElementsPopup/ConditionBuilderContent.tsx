@@ -1,16 +1,16 @@
 import React from "react";
 import { SwitchBox } from "../FormElements";
 import { Track } from "..";
-import ConditiobRuleType from "./ConditiobRuleType";
 import YesNoPopupContent from "./YesNoPopupContent";
 import RulesBuilder from "./RulesBuilder";
 import './styles.scss'
+import { ConditionRuleType } from "../../types";
 
 interface ConditionBuilderContentProps {
   isYesNoQuestion: boolean
   setIsYesNoQuestion: (x: boolean) => void
-  rules: ConditiobRuleType[]
-  setRules: (x: ConditiobRuleType[]) => void
+  rules: ConditionRuleType[]
+  setRules: (x: ConditionRuleType[]) => void
 }
 
 const ConditionBuilderContent: React.FC<ConditionBuilderContentProps> = ({

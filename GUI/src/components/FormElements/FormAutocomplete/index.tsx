@@ -1,4 +1,4 @@
-import { BaseSyntheticEvent, ChangeEvent, FC, forwardRef, HTMLAttributes, useState } from "react";
+import { BaseSyntheticEvent, ChangeEvent, FC, useState } from "react";
 import "./FormAutocomplete.scss";
 
 type FormAutocompleteProps = {

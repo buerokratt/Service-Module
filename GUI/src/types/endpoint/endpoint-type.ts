@@ -1,5 +1,5 @@
+import { RawData } from "../raw-data";
 import { EndpointVariableData } from "./endpoint-variable-data";
-import { RawData } from "./raw-data";
 
 export type EndpointType = {
   id: string;

@@ -5,15 +5,14 @@ import * as Tabs from "@radix-ui/react-tabs";
 import DataTable from "../../../DataTable";
 import { createColumnHelper, Row } from "@tanstack/react-table";
 import { MdDeleteOutline } from "react-icons/md";
-import { EndpointType } from "../../../../types/endpoint-type";
-import { EndpointTab } from "../../../../types/endpoint-tab.enum";
-import { RequestVariablesTableColumns } from "../../../../types/request-variables-table-columns";
-import { RequestVariablesTabsRowsData } from "../../../../types/request-variables-tabs-rows-data";
-import { RequestVariablesTabsRawData } from "../../../../types/request-variables-tabs-raw-data";
-import { EndpointVariableData } from "../../../../types/endpoint-variable-data";
-import { RequestVariablesRowData } from "../../../../types/request-variables-row-data";
-import { RequestTab } from "../../../../types/request-tab";
-import { EndpointData } from "../../../../types/endpoint-data";
+import { RequestTab } from "../../../../types";
+import { EndpointType, EndpointData, EndpointTab, EndpointVariableData } from "../../../../types/endpoint";
+import {
+  RequestVariablesTabsRowsData,
+  RequestVariablesTabsRawData,
+  RequestVariablesTableColumns,
+  RequestVariablesRowData,
+} from "../../../../types/request-variables";
 
 type RequestVariablesProps = {
   disableRawData?: boolean;
