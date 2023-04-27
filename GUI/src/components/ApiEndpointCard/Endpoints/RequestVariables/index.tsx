@@ -302,8 +302,7 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
           name={`${requestTab.tab}-raw-data`}
           label={""}
           defaultValue={tabRawData[requestTab.tab]}
-          onBlurCapture={(e) => {
-            console.log("blur");
+          onBlurCapture={() => {
             if (updateEndpointRawData) updateEndpointRawData(tabRawData, endpointData.id);
           }}
           onChange={(event) => {
