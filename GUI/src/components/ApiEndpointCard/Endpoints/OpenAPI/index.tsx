@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { openApiSpeckMock } from "../../../../resources/api-constants";
+import { getOpenApiSpec } from "../../../../resources/api-constants";
 import { Button, FormInput, FormSelect, RequestVariables, Track } from "../../..";
 import { useTranslation } from "react-i18next";
 import axios from "axios";
@@ -146,18 +146,15 @@ const EndpointOpenAPI: React.FC<EndpointOpenAPIProps> = ({
   };
 
   const fetchOpenApiSpecMock = async () => {
-    // const result = await axios.post(openApiSpeckMock());
-    // const apiSpec = result.data.response;
-    const result = await axios.get(openApiSpeckMock());
-    const apiSpec = result.data;
-    const url = "https://petstore3.swagger.io/api/v3/openapi.json";
-    // const url = new URL(openApiUrl).origin + apiSpec.servers[0].url;
+    const result = await axios.post(getOpenApiSpec(), {url: openApiUrl});
+    const apiSpec = result.data.response;
     console.log(apiSpec);
+    const url = new URL(openApiUrl).origin + apiSpec.servers[0].url;
     const paths: EndpointType[] = [];
 
     Object.entries(apiSpec.paths).forEach(([path, endpointData]) => {
       Object.entries(endpointData as ApiSpecProperty).forEach(([method, data]: [string, ApiSpecProperty]) => {
-        const endpointUrl = new URL(url).origin + apiSpec.servers[0].url + path;
+        const endpointUrl = url + path;
         const label = `${method.toUpperCase()} ${path}`;
         if (!["get", "post"].includes(method.toLowerCase())) {
           paths.push({

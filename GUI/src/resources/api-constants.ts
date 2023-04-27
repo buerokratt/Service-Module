@@ -53,8 +53,7 @@ export const dummyVariableOptions = [
 ];
 
 // Mocks
-export const openApiSpeckMock = (): string => `https://petstore3.swagger.io/api/v3/openapi.json`;
-//   `${baseUrl}/mocks/services/open-api-spec-mock`;
+export const getOpenApiSpec = (): string => `${baseUrl}/services/open-api-spec`;
 export const servicesRequestsExplain = (): string => `${baseUrl}/services/requests/explain`;
 export const getClientInputAvailableVariables = (): string => `${baseUrl}/mocks/client-input-variables`;
 export const getTaraAuthResponseVariables = (): string => `${baseUrl}/mocks/tim/user-info`;

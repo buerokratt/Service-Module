@@ -1,12 +1,6 @@
 import { CSSProperties, FC, useEffect, useState } from "react";
 import { Edge, MarkerType, Node, ReactFlowInstance, ReactFlowProvider, useEdgesState, useNodesState } from "reactflow";
-import {
-  Box,
-  Collapsible,
-  NewServiceHeader,
-  Track,
-  FlowElementsPopup,
-} from "../components";
+import { Box, Collapsible, NewServiceHeader, Track, FlowElementsPopup } from "../components";
 import { useTranslation } from "react-i18next";
 import FlowBuilder, { GRID_UNIT } from "../components/FlowBuilder/FlowBuilder";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -42,7 +36,6 @@ const initialEdge = {
   },
 };
 
-
 // TODO: refactoring
 type NodeDataProps = {
   label: string;
@@ -52,7 +45,7 @@ type NodeDataProps = {
   stepType: StepType;
   readonly: boolean;
   message?: string;
-}
+};
 
 const initialNodes: Node[] = [
   {
@@ -73,16 +66,16 @@ const initialNodes: Node[] = [
 const ServiceFlowPage: FC = () => {
   const { t } = useTranslation();
   const allElements: Step[] = [
-    { id: 1, label: t('serviceFlow.element.taraAuthentication'), type: StepType.Auth },
-    { id: 2, label: t('serviceFlow.element.textfield'), type: StepType.Textfield },
-    { id: 3, label: t('serviceFlow.element.clientInput'), type: StepType.Input },
-    { id: 4, label: t('serviceFlow.element.openNewWebpage'), type: StepType.OpenWebpage },
-    { id: 5, label: t('serviceFlow.element.fileGeneration'), type: StepType.FileGenerate },
-    { id: 6, label: t('serviceFlow.element.fileSigning'), type: StepType.FileSign },
-    { id: 7, label: t('serviceFlow.element.conversationEnd'), type: StepType.FinishingStepEnd },
+    { id: 1, label: t("serviceFlow.element.taraAuthentication"), type: StepType.Auth },
+    { id: 2, label: t("serviceFlow.element.textfield"), type: StepType.Textfield },
+    { id: 3, label: t("serviceFlow.element.clientInput"), type: StepType.Input },
+    { id: 4, label: t("serviceFlow.element.openNewWebpage"), type: StepType.OpenWebpage },
+    { id: 5, label: t("serviceFlow.element.fileGeneration"), type: StepType.FileGenerate },
+    { id: 6, label: t("serviceFlow.element.fileSigning"), type: StepType.FileSign },
+    { id: 7, label: t("serviceFlow.element.conversationEnd"), type: StepType.FinishingStepEnd },
     {
       id: 8,
-      label: t('serviceFlow.element.redirectConversationToSupport'),
+      label: t("serviceFlow.element.redirectConversationToSupport"),
       type: StepType.FinishingStepRedirect,
     },
   ];
@@ -136,10 +129,10 @@ const ServiceFlowPage: FC = () => {
           data: {
             ...prevNode.data,
             message: updatedNode.data.message,
-          }
-        }
+          },
+        };
       })
-    )
+    );
   };
 
   const resetStates = () => {
@@ -153,11 +146,7 @@ const ServiceFlowPage: FC = () => {
         saveDraftOnClick={() => {}}
         endpoints={location.state?.endpoints}
         flow={JSON.stringify(reactFlowInstance?.toObject())}
-        continueOnClick={() =>
-          navigate(ROUTES.NEWSERVICE_ROUTE, {
-            state: { endpoints: location.state?.endpoints, flow: JSON.stringify(reactFlowInstance?.toObject()) },
-          })
-        }
+        continueOnClick={() => navigate(ROUTES.OVERVIEW_ROUTE)}
       />
       <h1 style={{ padding: 16 }}>Teenusvoog "Raamatu laenutus"</h1>
       <FlowElementsPopup
@@ -166,7 +155,7 @@ const ServiceFlowPage: FC = () => {
           handlePopupSave(updatedNode);
         }}
         onRulesUpdate={(rules) => {
-          if (selectedNode?.data.stepType === StepType.Input) setUpdatedRules(rules)
+          if (selectedNode?.data.stepType === StepType.Input) setUpdatedRules(rules);
           resetStates();
         }}
         node={selectedNode}
@@ -177,12 +166,16 @@ const ServiceFlowPage: FC = () => {
           <div className="graph__controls">
             <Track direction="vertical" gap={16} align="stretch">
               {setupElements && (
-                <Collapsible title={t('serviceFlow.setupElements')} contentStyle={contentStyle}>
+                <Collapsible title={t("serviceFlow.setupElements")} contentStyle={contentStyle}>
                   <Track direction="vertical" align="stretch" gap={4}>
                     {setupElements.map((step) => (
                       <Box
                         key={step.id}
-                        color={[StepType.FinishingStepEnd, StepType.FinishingStepRedirect].includes(step.type) ? "red" : "blue"}
+                        color={
+                          [StepType.FinishingStepEnd, StepType.FinishingStepRedirect].includes(step.type)
+                            ? "red"
+                            : "blue"
+                        }
                         onDragStart={(event) => onDragStart(event, step)}
                         draggable
                       >
@@ -196,17 +189,17 @@ const ServiceFlowPage: FC = () => {
                 </Collapsible>
               )}
               {allElements && (
-                <Collapsible title={t('serviceFlow.allElements')} contentStyle={contentStyle}>
+                <Collapsible title={t("serviceFlow.allElements")} contentStyle={contentStyle}>
                   <Track direction="vertical" align="stretch" gap={4}>
                     {allElements.map((step) => (
                       <Box
                         key={step.id}
-                        color={[StepType.FinishingStepEnd, StepType.FinishingStepRedirect].includes(step.type) ? "red" : "blue"}
-                        onDragStart={(event) => {
-                          console.log(nodes);
-                          console.log(edges);
-                          onDragStart(event, step);
-                        }}
+                        color={
+                          [StepType.FinishingStepEnd, StepType.FinishingStepRedirect].includes(step.type)
+                            ? "red"
+                            : "blue"
+                        }
+                        onDragStart={(event) => onDragStart(event, step)}
                         draggable
                       >
                         {step.label}

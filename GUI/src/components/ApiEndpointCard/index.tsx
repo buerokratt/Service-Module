@@ -102,21 +102,21 @@ const ApiEndpointCard: FC<EndpointCardProps> = ({ onDelete, setEndpoints, endpoi
               )}
               {option?.value === "openAPI" && (
                 <EndpointOpenAPI
-                  isLive={selectedTab === EndpointEnv.Live}
                   endpoint={endpoint}
-                  setEndpoints={setEndpoints}
-                  requestValues={requestValues}
+                  isLive={selectedTab === EndpointEnv.Live}
                   requestTab={requestTab}
+                  requestValues={requestValues}
+                  setEndpoints={setEndpoints}
                   setRequestTab={setRequestTab}
                 />
               )}
               {option?.value === "custom" && (
                 <EndpointCustom
                   endpoint={endpoint}
-                  setEndpoints={setEndpoints}
-                  requestValues={requestValues}
                   isLive={selectedTab === EndpointEnv.Live}
                   requestTab={requestTab}
+                  requestValues={requestValues}
+                  setEndpoints={setEndpoints}
                   setRequestTab={setRequestTab}
                 />
               )}

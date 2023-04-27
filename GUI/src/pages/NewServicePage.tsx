@@ -26,7 +26,6 @@ const NewServicePage: React.FC = () => {
       ?.filter((node) => node.data.stepType === "input")
       .forEach((node) => variables.push(`{{ClientInput.${node.data.clientInputId}}}`));
     if (nodes?.find((node) => node.data.stepType === "auth")) loadTaraVariables();
-    console.log("setting", variables);
     setAvailableVariables(variables);
   }, []);
 
@@ -39,7 +38,6 @@ const NewServicePage: React.FC = () => {
         taraVariables.forEach((tv) => {
           if (!oldVaraibles.includes(tv)) oldVaraibles.push(tv);
         });
-        console.log("newVar", oldVaraibles);
         return oldVaraibles;
       });
     });
@@ -54,7 +52,6 @@ const NewServicePage: React.FC = () => {
         };
       })
     );
-    console.log(getAvailableRequestValues(endpoints[0].id));
   };
 
   const getSelectedEndpoints = () => {
@@ -86,9 +83,9 @@ const NewServicePage: React.FC = () => {
           saveDraftOnClick={saveDraft}
           endpoints={endpoints}
           flow={location.state?.flow}
-          continueOnClick={() =>
-            navigate(ROUTES.FLOW_ROUTE, { state: { endpoints: endpoints, flow: location.state?.flow } })
-          }
+          continueOnClick={() => {
+            navigate(ROUTES.FLOW_ROUTE, { state: { endpoints: endpoints, flow: location.state?.flow } });
+          }}
         />
       }
     >
