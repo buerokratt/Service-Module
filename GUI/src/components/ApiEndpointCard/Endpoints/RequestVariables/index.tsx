@@ -282,7 +282,7 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
           <p style={{ color: "#d73e3e" }}>{jsonError}</p>
           <Button
             appearance="text"
-            onClick={() => {
+            onMouseDown={() => {
               setTabRawData((prevRawData) => {
                 try {
                   prevRawData[requestTab.tab] = JSON.stringify(JSON.parse(prevRawData[requestTab.tab]!), null, 4);
@@ -302,7 +302,7 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
           name={`${requestTab.tab}-raw-data`}
           label={""}
           defaultValue={tabRawData[requestTab.tab]}
-          onBlurCapture={() => {
+          onBlur={() => {
             if (updateEndpointRawData) updateEndpointRawData(tabRawData, endpointData.id);
           }}
           onChange={(event) => {
