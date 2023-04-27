@@ -200,7 +200,15 @@ const EndpointOpenAPI: React.FC<EndpointOpenAPIProps> = ({
                 rawData: {},
               }
             : undefined,
-          headers,
+          headers: headers
+            ? {
+                variables: headers,
+                rawData: {},
+              }
+            : {
+                variables: [],
+                rawData: {},
+              },
           params: params
             ? {
                 variables: params,
