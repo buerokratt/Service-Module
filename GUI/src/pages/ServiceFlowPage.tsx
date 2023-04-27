@@ -1,5 +1,4 @@
-import { FC, useCallback, useEffect, useState } from "react";
-import { MdPlayCircleFilled } from "react-icons/md";
+import { FC, useEffect, useState } from "react";
 import { Edge, MarkerType, Node, ReactFlowInstance, ReactFlowProvider, useEdgesState, useNodesState } from "reactflow";
 import { Box, Collapsible, NewServiceHeader, Track, FlowElementsPopup } from "../components";
 import { Step } from "../types/step";
@@ -8,6 +7,7 @@ import { CSSProperties } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { ROUTES } from "../resources/routes-constants";
 import { EndpointData } from "../types/endpoint-data";
+import apiIconTag from "../assets/images/api-icon-tag.svg";
 import "reactflow/dist/style.css";
 import "./ServiceFlowPage.scss";
 
@@ -141,7 +141,10 @@ const ServiceFlowPage: FC = () => {
                         onDragStart={(event) => onDragStart(event, step)}
                         draggable
                       >
-                        {step.label}
+                        <Track gap={8} style={{ overflow: "hidden" }}>
+                          {step.type === "user-defined" && <img alt="" src={apiIconTag} />}
+                          {step.label}
+                        </Track>
                       </Box>
                     ))}
                   </Track>
