@@ -1,17 +1,21 @@
 export interface Step {
   readonly id: number;
   label: string;
-  type:
-    | "auth"
-    | "textfield"
-    | "input"
-    | "rule-definition"
-    | "open-webpage"
-    | "file-generate"
-    | "file-sign"
-    | "step"
-    | "rule"
-    | "finishing-step-end"
-    | "finishing-step-redirect";
+  type: StepType;
   action?: string;
+}
+
+
+export enum StepType {
+  Auth = 'auth',
+  Textfield = 'textfield',
+  Input = 'input',
+  RuleDefinition = 'rule-definition',
+  OpenWebpage = 'open-webpage',
+  FileGenerate = 'file-generate',
+  FileSign = 'file-sign',
+  Step = 'step',
+  Rule = 'rule',
+  FinishingStepEnd = 'finishing-step-end',
+  FinishingStepRedirect = 'finising-step-redirect'
 }

@@ -20,7 +20,7 @@ const ConditionBuilderContent: React.FC<ConditionBuilderContentProps> = ({
   setRules,
 }) => {
   return (
-    <Track direction='vertical' align='stretch' className="flow-body-reverse-margin">
+    <Track direction='vertical' align='stretch'>
       <Track gap={16} className="flow-body-padding">
         <Track>
           <SwitchBox

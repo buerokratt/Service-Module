@@ -54,6 +54,5 @@ export const dummyVariableOptions = [
 
 // Mocks
 export const openApiSpeckMock = (): string => `${baseUrl}/mocks/services/open-api-spec-mock`;
-
+export const servicesRequestsExplain = (): string => `${baseUrl}/services/requests/explain`;
 export const getClientInputAvailableVariables = (): string => `${baseUrl}/mocks/client-input-variables`;
-

@@ -79,7 +79,6 @@ services:
       - ./DSL/DMapper/server/controllers:/workspace/app/controllers
       - ./DSL/DMapper/server/js/file:/workspace/app/js/file
       - ./DSL/DMapper/server/js/util:/workspace/app/js/util
-      - ./DSL:/data
     ports:
       - 3005:3005
     networks:
