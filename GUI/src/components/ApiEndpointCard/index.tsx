@@ -8,7 +8,6 @@ import { MdDeleteOutline } from "react-icons/md";
 import "./ApiEndpointCard.scss";
 import { EndpointData } from "../../types/endpoint-data";
 import { EndpointEnv } from "../../types/endpoint-env";
-import { LastUpdatedRow } from "../../types/last-updated-row";
 import { EndpointTab } from "../../types/endpoint-tab.enum";
 import { RequestTab } from "../../types/request-tab";
 

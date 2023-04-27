@@ -1,9 +1,16 @@
-import { FC, useEffect, useState } from "react";
+import { CSSProperties, FC, useEffect, useState } from "react";
+import { MdPlayCircleFilled } from "react-icons/md";
 import { Edge, MarkerType, Node, ReactFlowInstance, ReactFlowProvider, useEdgesState, useNodesState } from "reactflow";
-import { Box, Collapsible, NewServiceHeader, Track, FlowElementsPopup } from "../components";
-import { Step } from "../types/step";
+import {
+  Box,
+  Collapsible,
+  NewServiceHeader,
+  Track,
+  FlowElementsPopup,
+} from "../components";
+import { Step, StepType } from "../types/step";
+import { useTranslation } from "react-i18next";
 import FlowBuilder, { GRID_UNIT } from "../components/FlowBuilder/FlowBuilder";
-import { CSSProperties } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { ROUTES } from "../resources/routes-constants";
 import { EndpointData } from "../types/endpoint-data";
@@ -36,6 +43,18 @@ const initialEdge = {
   },
 };
 
+
+// TODO: refactoring
+type NodeDataProps = {
+  label: string;
+  onDelete: (id: string) => void;
+  onEdit: (id: string) => void;
+  type: string;
+  stepType: StepType;
+  readonly: boolean;
+  message?: string;
+}
+
 const initialNodes: Node[] = [
   {
     id: "1",
@@ -53,25 +72,25 @@ const initialNodes: Node[] = [
 ];
 
 const ServiceFlowPage: FC = () => {
+  const { t } = useTranslation();
   const allElements: Step[] = [
-    { id: 1, label: "TARA auth", type: "auth" },
-    { id: 2, label: "Textfield", type: "textfield" },
-    { id: 3, label: "Client input", type: "input" },
-    { id: 4, label: "Rule definition", type: "rule-definition" },
-    { id: 5, label: "Open webpage", type: "open-webpage" },
-    { id: 6, label: "File generate", type: "file-generate" },
-    { id: 7, label: "File sign", type: "file-sign" },
-    { id: 8, label: "End conversation", type: "finishing-step-end" },
+    { id: 1, label: t('serviceFlow.element.taraAuthentication'), type: StepType.Auth },
+    { id: 2, label: t('serviceFlow.element.textfield'), type: StepType.Textfield },
+    { id: 3, label: t('serviceFlow.element.clientInput'), type: StepType.Input },
+    { id: 4, label: t('serviceFlow.element.openNewWebpage'), type: StepType.OpenWebpage },
+    { id: 5, label: t('serviceFlow.element.fileGeneration'), type: StepType.FileGenerate },
+    { id: 6, label: t('serviceFlow.element.fileSigning'), type: StepType.FileSign },
+    { id: 7, label: t('serviceFlow.element.conversationEnd'), type: StepType.FinishingStepEnd },
     {
-      id: 9,
-      label: "Direct to Customer Support",
-      type: "finishing-step-redirect",
+      id: 8,
+      label: t('serviceFlow.element.redirectConversationToSupport'),
+      type: StepType.FinishingStepRedirect,
     },
   ];
   const [setupElements, setSetupElements] = useState<Step[]>([]);
-  const [visiblePopupNode, setVisiblePopupNode] = useState<Node | null>(null);
-  const [updatedRules, setUpdatedRules] = useState<(string | null)[]>([]);
   const location = useLocation();
+  const [selectedNode, setSelectedNode] = useState<Node<NodeDataProps> | null>(null);
+  const [updatedRules, setUpdatedRules] = useState<(string | null)[]>([]);
   const navigate = useNavigate();
   const flow = location.state?.flow ? JSON.parse(location.state?.flow) : undefined;
   const [nodes, setNodes, onNodesChange] = useNodesState<Node[]>(flow ? flow.nodes : initialNodes);
@@ -90,7 +109,7 @@ const ServiceFlowPage: FC = () => {
           endpoint.name.trim().length > 0
             ? endpoint.name
             : `${selectedEndpoint.methodType.toUpperCase()} ${selectedEndpoint.url}`,
-        type: "user-defined",
+        type: StepType.UserDefined,
       });
     });
     setSetupElements(elements);
@@ -103,6 +122,30 @@ const ServiceFlowPage: FC = () => {
   };
 
   const contentStyle: CSSProperties = { overflowY: "auto", maxHeight: "40vh" };
+
+  const handlePopupClose = () => resetStates();
+
+  const handlePopupSave = (updatedNode: Node<NodeDataProps>) => {
+    resetStates();
+    if (selectedNode?.data.stepType === StepType.FinishingStepEnd) return;
+
+    setNodes((prevNodes) =>
+      prevNodes.map((prevNode) => {
+        if (prevNode.id !== selectedNode!.id) return prevNode;
+        return {
+          ...prevNode,
+          data: {
+            ...prevNode.data,
+            message: updatedNode.data.message,
+          }
+        }
+      })
+    )
+  };
+
+  const resetStates = () => {
+    setSelectedNode(null);
+  };
 
   return (
     <>
@@ -119,12 +162,15 @@ const ServiceFlowPage: FC = () => {
       />
       <h1 style={{ padding: 16 }}>Teenusvoog "Raamatu laenutus"</h1>
       <FlowElementsPopup
-        onClose={() => setVisiblePopupNode(null)}
-        onSave={(rules: any) => {
-          setUpdatedRules(rules);
-          setVisiblePopupNode(null);
+        onClose={() => handlePopupClose()}
+        onSave={(updatedNode: Node) => {
+          handlePopupSave(updatedNode);
         }}
-        node={visiblePopupNode}
+        onRulesUpdate={(rules) => {
+          if (selectedNode?.data.stepType === StepType.Input) setUpdatedRules(rules)
+          resetStates();
+        }}
+        node={selectedNode}
         oldRules={updatedRules}
       />
       <ReactFlowProvider>
@@ -132,12 +178,12 @@ const ServiceFlowPage: FC = () => {
           <div className="graph__controls">
             <Track direction="vertical" gap={16} align="stretch">
               {setupElements && (
-                <Collapsible title="Setup elements" contentStyle={contentStyle}>
+                <Collapsible title={t('serviceFlow.setupElements')} contentStyle={contentStyle}>
                   <Track direction="vertical" align="stretch" gap={4}>
                     {setupElements.map((step) => (
                       <Box
                         key={step.id}
-                        color={["finishing-step-end", "finishing-step-redirect"].includes(step.type) ? "red" : "blue"}
+                        color={[StepType.FinishingStepEnd, StepType.FinishingStepRedirect].includes(step.type) ? "red" : "blue"}
                         onDragStart={(event) => onDragStart(event, step)}
                         draggable
                       >
@@ -151,12 +197,12 @@ const ServiceFlowPage: FC = () => {
                 </Collapsible>
               )}
               {allElements && (
-                <Collapsible title="All elements" contentStyle={contentStyle}>
+                <Collapsible title={t('serviceFlow.allElements')} contentStyle={contentStyle}>
                   <Track direction="vertical" align="stretch" gap={4}>
                     {allElements.map((step) => (
                       <Box
                         key={step.id}
-                        color={["finishing-step-end", "finishing-step-redirect"].includes(step.type) ? "red" : "blue"}
+                        color={[StepType.FinishingStepEnd, StepType.FinishingStepRedirect].includes(step.type) ? "red" : "blue"}
                         onDragStart={(event) => {
                           console.log(nodes);
                           console.log(edges);
@@ -175,7 +221,7 @@ const ServiceFlowPage: FC = () => {
           <FlowBuilder
             reactFlowInstance={reactFlowInstance}
             setReactFlowInstance={setReactFlowInstance}
-            setVisiblePopupNode={setVisiblePopupNode}
+            onNodeEdit={setSelectedNode}
             updatedRules={updatedRules}
             nodes={nodes}
             setNodes={setNodes}

@@ -10,7 +10,7 @@ import { useTranslation } from 'react-i18next';
 import * as RadixToast from '@radix-ui/react-toast';
 
 import { Toast } from '../components';
-import { generateUEID } from '../utils/generateUEID';
+import { v4 as uuid } from 'uuid'
 
 export type ToastType = {
   type: 'info' | 'success' | 'error' | 'warning';
@@ -20,19 +20,21 @@ export type ToastType = {
 
 type ToastTypeWithId = ToastType & { id: string };
 
+const id: string = uuid();
+
 type ToastContextType = {
   open: (toast: ToastType) => void;
 };
 
 export const ToastContext = createContext<ToastContextType>(null!);
 
-export const ToastProvider: FC<PropsWithChildren> = ({ children }) => {
+export const ToastProvider: FC<PropsWithChildren> = ({children}) => {
   const { t } = useTranslation();
   const [toasts, setToasts] = useState<ToastTypeWithId[]>([]);
   const open = (content: ToastType) => {
     setToasts((prevState) => [
       ...prevState,
-      { id: generateUEID(), ...content },
+      { id: id, ...content },
     ]);
   };
   const close = (id: string) => {

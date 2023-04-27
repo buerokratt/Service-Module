@@ -109,7 +109,7 @@ const RulesBuilder: React.FC<RulesBuilderProps> = ({
     >
       <span>Available variables</span>
       <Track gap={7} className="flow-tags-container">
-        {availableVariables.map((x) => <VariableAsTag key={x} value={x} />)}
+        {availableVariables.map((x) => <VariableAsTag key={x} value={x} color='yellow' />)}
       </Track>
     </Track>
   </>;

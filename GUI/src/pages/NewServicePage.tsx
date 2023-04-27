@@ -133,8 +133,8 @@ const NewServicePage: React.FC = () => {
         >
           {t("newService.endpoint.add")}
         </Button>
-      </Track>
-    </Layout>
+      </Track >
+    </Layout >
   );
 };
 

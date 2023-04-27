@@ -9,7 +9,10 @@
     "paginationNavigation": "Navigate",
     "choose": "Choose..",
     "continue": "Continue",
-    "view": "View"
+    "view": "View",
+    "save": "Save",
+    "cancel": "Cancel",
+    "close": "Close"
   },
   "menu": {
     "overview": "Overview",
@@ -88,5 +91,32 @@
     "name": "Name",
     "description": "Description",
     "uses": "Service uses"
+  },
+  "serviceFlow": {
+    "element": {
+      "taraAuthentication": "Tara authorization",
+      "textfield": "Textfield",
+      "clientInput": "Client input",
+      "openNewWebpage": "Open new webpage",
+      "fileGeneration": "File generation",
+      "fileSigning": "File signing",
+      "conversationEnd": "End conversation",
+      "redirectConversationToSupport": "Direct to Customer Support"
+    },
+    "popup": {
+      "messageLabel": "Message",
+      "availableOutputElementsLabel": "Available output elements",
+      "showJsonRequest": "Show JSON request",
+      "hideJsonRequest": "Hide JSON request",
+      "jsonRequestPlaceholder": "JSON request",
+      "openWebpageLabel": "Web page name that is displayed to the user"
+    },
+    "placeholderNode": "Drag the next step into the flow",
+    "allElements": "All elements",
+    "setupElements": "Setup elements",
+    "tabs": {
+      "setup": "Setup",
+      "test": "Test"
+    }
   }
 }

@@ -1,7 +1,9 @@
-import {  FC } from 'react';
+import { FC } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Handle, Position } from 'reactflow';
 
 const PlaceholderNode: FC = () => {
+  const { t } = useTranslation();
 
   return (
     <>
@@ -9,7 +11,7 @@ const PlaceholderNode: FC = () => {
         type='target'
         position={Position.Top}
       />
-      <p style={{textAlign: 'center'}}>Lohista järgmine samm voogu</p>
+      <p style={{ textAlign: 'center' }}>{t('serviceFlow.placeholderNode')}</p>
     </>
   );
 };

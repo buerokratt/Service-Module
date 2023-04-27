@@ -11,9 +11,17 @@ router.get('/list', (req, res) => {
     .filter(filename => filename.endsWith('.yml'))
     .map(path.parse)
     .forEach(({ name, dir }) => {
-      const type = dir.startsWith('/DSL/POST/') ? 'POST' : 'GET';
+      const type = dir.includes('/POST/') ? 'POST' : 'GET';
       const status = dir.endsWith('/inactive') ? 'inactive' : 'active';
-      services[name] = { type, status }
+      if (!services[name]) {
+        services[name] = { type, status }
+      } else {
+        if (services[name].length > 1) {
+          services[name] = [...services[name], { type, status }]
+        } else {
+          services[name] = [{ ...services[name] }, { type, status }]
+        }
+      }
     })
 
   return res.status(200).json(services)
@@ -27,16 +35,24 @@ router.get('/sticky', (req, res) => {
     .filter(filename => filename.endsWith('.yml'))
     .map(path.parse)
     .forEach(({ name, dir }) => {
-      const type = dir.startsWith('/DSL/POST/') ? 'POST' : 'GET';
+      const type = dir.includes('/POST/') ? 'POST' : 'GET';
       const status = dir.endsWith('/inactive') ? 'inactive' : 'active';
-      services[name] = { type, status }
+      if (!services[name]) {
+        services[name] = { type, status }
+      } else {
+        if (services[name].length > 1) {
+          services[name] = [...services[name], { type, status }]
+        } else {
+          services[name] = [{ ...services[name] }, { type, status }]
+        }
+      }
     })
 
   return res.status(200).json(services)
 });
 
-router.get('/sticky/steps', (req, res) => {
-  const name = req.query.name
+router.post('/sticky/steps', (req, res) => {
+  const name = req.body.name
 
   const file_path = getAllFiles('/Ruuter')
     .filter(filename => filename.includes('/sticky/'))
