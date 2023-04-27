@@ -109,6 +109,8 @@ const ServiceFlowPage: FC = () => {
       <NewServiceHeader
         activeStep={3}
         saveDraftOnClick={() => {}}
+        endpoints={location.state?.endpoints}
+        flow={JSON.stringify(reactFlowInstance?.toObject())}
         continueOnClick={() =>
           navigate(ROUTES.NEWSERVICE_ROUTE, {
             state: { endpoints: location.state?.endpoints, flow: JSON.stringify(reactFlowInstance?.toObject()) },

@@ -84,6 +84,8 @@ const NewServicePage: React.FC = () => {
         <NewServiceHeader
           activeStep={2}
           saveDraftOnClick={saveDraft}
+          endpoints={endpoints}
+          flow={location.state?.flow}
           continueOnClick={() =>
             navigate(ROUTES.FLOW_ROUTE, { state: { endpoints: endpoints, flow: location.state?.flow } })
           }
