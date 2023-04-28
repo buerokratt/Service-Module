@@ -62,7 +62,7 @@ const FlowElementsPopup: React.FC<FlowElementsPopupProps> = ({ node, onClose, on
       }
     >
       <DndProvider backend={HTML5Backend}>
-        {
+              {
           type === 'input' &&
           <ConditionBuilderContent
             isYesNoQuestion={isYesNoQuestion}
