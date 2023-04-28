@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import {
   Button,
   Card,
@@ -18,6 +18,8 @@ const NewServicePage: React.FC = () => {
   const [endpoints, setEndpoints] = useState<{ id: string }[]>([]);
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const { intentName } = useParams();
+  const [serviceName, setServiceName] = useState<string | undefined>(intentName);
 
   const onDelete = (id: string) => {
     setEndpoints((prevEndpoints) =>
@@ -37,7 +39,7 @@ const NewServicePage: React.FC = () => {
           <Track direction="vertical" align="stretch" gap={16}>
             <div>
               <label htmlFor="name">{t("newService.name")}</label>
-              <FormInput name="name" label="" />
+              <FormInput name="name" label="" defaultValue={serviceName} />
             </div>
             <div>
               <label htmlFor="description">{t("newService.description")}</label>

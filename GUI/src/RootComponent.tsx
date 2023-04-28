@@ -14,6 +14,7 @@ const RootComponent: React.FC = () => {
   return (
     <Routes>
       <Route path={ROUTES.NEWSERVICE_ROUTE} element={<NewServicePage />} />
+      <Route path={ROUTES.NEWSERVICE_ROUTE_WITH_INTENT_NAME} element={<NewServicePage />} />
       <Route path={ROUTES.FLOW_ROUTE} element={<ServiceFlowPage />} />
       <Route element={<Layout />}>
         <Route path={ROUTES.NEWSERVICE_ROUTE + "/old"} element={<OldNewServicePage />} />
