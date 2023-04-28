@@ -385,6 +385,7 @@ const FlowBuilder: FC<FlowBuilderProps> = ({
                 StepType.FileSign,
                 StepType.FinishingStepEnd,
                 StepType.FinishingStepRedirect,
+                StepType.UserDefined,
               ].includes(type),
               childrenCount: type === StepType.Input ? 0 : 1,
               setClickedNode,
