@@ -7,18 +7,18 @@ const router: Router = express.Router();
 
 router.post("/csv_to_json", multer().array('file'), (req, res) => {
     const file = base64ToText(req.body.file);
-    let result = Papa.parse(file, { skipEmptyLines: true });
+    const result = Papa.parse(file, { skipEmptyLines: true });
     res.send(result.data);
 });
 
-router.post('/yaml_to_json', multer().array('file'), async (req: Request, res: Response) => {
+router.post('/yaml_to_json', multer().array('file'), (req: Request, res: Response) => {
     const file = base64ToText(req.body.file);
-    let result = parse(file);
+    const result = parse(file);
     res.send(result);
 });
 
-router.post('/json_to_yaml', async (req: Request, res: Response) => {
-    let result = stringify(req.body);
+router.post('/json_to_yaml', (req: Request, res: Response) => {
+    const result = stringify(req.body);
     res.send({"json": result});
 });
 

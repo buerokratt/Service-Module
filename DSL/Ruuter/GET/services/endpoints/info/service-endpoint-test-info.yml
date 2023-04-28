@@ -1,0 +1,16 @@
+getConfigs:
+  call: http.get
+  args:
+    url: http://localhost:8085/services/endpoints/configs/service-endpoint-test-configs
+  result: configs
+
+assign_step:
+  assign:
+    info:
+     url: https://httpbin.org/anything
+     user_id: 20    
+     headers: 
+       token: 'htbaslaiscvasjaskasyiuhashbxjhasgdqqysasjdhasd'  
+
+return_value:
+  return: ${[info , configs.response.body]}
