@@ -12,7 +12,7 @@ getUserInputByChatId:
       chatId: ${chatId}
   result: getUserInputResult
 
-fromatUserInput:
+formatUserInput:
   call: http.post
   args:
     url: https://data_mapper:3005/json/v2/format_user_input
@@ -22,7 +22,7 @@ fromatUserInput:
   result: formatedUserInput
 
 convertDataToPDF:
-  call: http.get
+  call: http.post
   args:
     url: http://data_mapper:3005/js/convert/pdf
     body:
