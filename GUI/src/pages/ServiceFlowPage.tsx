@@ -11,7 +11,7 @@ import "./ServiceFlowPage.scss";
 import { StepType, Step, RawData } from "../types";
 import { EndpointData, EndpointEnv, EndpointType, EndpointVariableData } from "../types/endpoint";
 import axios from "axios";
-import { jsonToYml } from "../resources/api-constants";
+import { createNewService, jsonToYml } from "../resources/api-constants";
 
 const initialPlaceholder = {
   id: "2",
@@ -87,7 +87,7 @@ const ServiceFlowPage: FC = () => {
   const [updatedRules, setUpdatedRules] = useState<(string | null)[]>([]);
   const [selectedNode, setSelectedNode] = useState<Node<NodeDataProps> | null>(null);
   const navigate = useNavigate();
-  const serviceName = location.state?.serviceName;
+  const serviceName = (location.state?.serviceName ?? "").replaceAll(" ", "-");
   const serviceDescription = location.state?.serviceDescription;
   const flow = location.state?.flow ? JSON.parse(location.state?.flow) : undefined;
   const [nodes, setNodes, onNodesChange] = useNodesState(flow ? flow.nodes : initialNodes);
@@ -181,7 +181,7 @@ const ServiceFlowPage: FC = () => {
     return {
       call: `http.post`,
       args: {
-        url: `http://ruuter:8085/services/endpoints/${selectedEndpoint.methodType.toLowerCase()}-myService-${
+        url: `http://ruuter:8085/services/endpoints/${selectedEndpoint.methodType.toLowerCase()}-${serviceName}-${
           (endpoint.name.trim().length ?? 0) > 0 ? endpoint.name : endpoint.id
         }`,
         body: {
@@ -365,7 +365,7 @@ const ServiceFlowPage: FC = () => {
     await axios
       .post(
         jsonToYml(),
-        { result },
+        { ...result },
         {
           params: {
             location: `/Ruuter/POST/services/endpoints/configs/${endpointName}-${
@@ -410,7 +410,7 @@ const ServiceFlowPage: FC = () => {
     await axios
       .post(
         jsonToYml(),
-        { result },
+        { ...result },
         {
           params: {
             location: `/Ruuter/POST/services/endpoints/info/${endpointName}-${
@@ -511,7 +511,7 @@ const ServiceFlowPage: FC = () => {
       const selectedEndpointType = endpoint.data.definedEndpoints.find((e) => e.isSelected);
       if (!selectedEndpointType) continue;
       console.log("e", selectedEndpointType, endpoint);
-      const endpointName = `${selectedEndpointType.methodType.toLowerCase()}-myService-${
+      const endpointName = `${selectedEndpointType.methodType.toLowerCase()}-${serviceName}-${
         (endpoint.data.name.trim().length ?? 0) > 0 ? endpoint.data?.name : endpoint.data?.id
       }`;
       for (const env of [EndpointEnv.Live, EndpointEnv.Test]) {
@@ -592,7 +592,7 @@ const ServiceFlowPage: FC = () => {
       await axios
         .post(
           jsonToYml(),
-          { result },
+          { ...result },
           {
             params: {
               location: `/Ruuter/POST/services/endpoints/${endpointName}.yml`,
@@ -688,8 +688,8 @@ const ServiceFlowPage: FC = () => {
     const result = Object.fromEntries(finishedFlow.entries());
     await axios
       .post(
-        jsonToYml(),
-        { result },
+        createNewService(),
+        { name: serviceName, description: serviceDescription, type: "POST", content: result },
         {
           params: {
             location: "/Ruuter/POST/services/tests.yml",

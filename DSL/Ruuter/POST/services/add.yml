@@ -6,7 +6,7 @@ check_for_required_parameters:
 
 extract_request_data:
   assign:
-    name: ${incoming.body.name.replaceAll(/\s+/g, "_")}
+    name: ${incoming.body.name}
     description: ${incoming.body.description}
     type: ${incoming.body.type.toUpperCase()}
     content: ${incoming.body.content}
@@ -25,7 +25,7 @@ service_add:
 convert_json_content_to_yml:
   call: http.post
   args:
-    url: http://node_server:3008/conversion/json_to_yaml2
+    url: http://node_server:3008/conversion/json_to_yaml_data
     body:
       data: ${content}
   result: ymlResult
@@ -42,7 +42,7 @@ add_get_dsl:
     url: http://node_server:3008/file/write
     body:
       file_path: "/Ruuter/GET/services/draft/${name}.tmp"
-      content: ${ymlResult.response.body.json}
+      content: ${ymlResult.response.body.yaml}
   result: results
   next: check_result
 
@@ -52,7 +52,7 @@ add_post_dsl:
     url: http://node_server:3008/file/write
     body:
       file_path: "/Ruuter/POST/services/draft/${name}.tmp"
-      content: ${ymlResult.response.body.json}
+      content: ${ymlResult.response.body.yaml}
   result: results
   next: check_result
 

@@ -1,7 +1,7 @@
 toYml:
   call: http.post
   args:
-    url: http://node_server:3008/conversion/json_to_yaml2
+    url: http://node_server:3008/conversion/json_to_yaml_data
     body:
       data: ${incoming.body}
   result: r
@@ -12,7 +12,7 @@ saveFile:
     url: http://node_server:3008/file/write
     body:
       file_path: ${incoming.params.location}
-      content: ${r.response.body.json}
+      content: ${r.response.body.yaml}
   result: fileResult
 
 resultz:
