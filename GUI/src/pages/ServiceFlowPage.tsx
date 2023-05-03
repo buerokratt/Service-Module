@@ -224,7 +224,7 @@ const ServiceFlowPage: FC = () => {
       (variableData as EndpointVariableData[]).forEach((v) => {
         if (["schema", "array"].includes(v.type)) assignNestedVariable(v, key, env, `${path}__${v.name}`, result);
         if (!v.value) return;
-        
+
         result[`${path}__${v.name}`] = (env === EndpointEnv.Test && v.testValue ? v.testValue : v.value)
           .replace("{{", `\${incoming.body.${key}["`)
           .replace("}}", `"]}`);
@@ -252,17 +252,46 @@ const ServiceFlowPage: FC = () => {
     return result;
   };
 
+  const assignNestedRawVariables = (
+    data: { [key: string]: any },
+    key: string,
+    path: string,
+    result: { [key: string]: string }
+  ) => {
+    Object.keys(data).forEach((k) => {
+      if (typeof data[k] === "object") {
+        return assignNestedRawVariables(data[k], key, `${path}__${k}`, result);
+      }
+      result[`${path}__${k}`] = data[k];
+    });
+  };
+
+  const assignRawVariables = (data: { [key: string]: any }, key: string) => {
+    const result: any = {};
+    Object.keys(data).forEach((k) => {
+      if (typeof data[k] === "object") {
+        return assignNestedRawVariables(data[k], key, k, result);
+      }
+      result[k] = data[k];
+    });
+    return result;
+  };
+
   const rawDataIfVariablesMissing = (
     endpoint: EndpointType,
     key: "headers" | "body" | "params",
     env: EndpointEnv,
     data: { [key: string]: string }
-  ) => {
-    return Object.keys(data).length > 0
-      ? data
-      : endpoint[key]?.rawData[env === EndpointEnv.Live ? "value" : "testValue"] ?? endpoint[key]?.rawData.value ?? "";
+  ): { [key: string]: any } | string => {
+    if (Object.keys(data).length > 0) return data;
+    const rawData =
+      endpoint[key]?.rawData[env === EndpointEnv.Live ? "value" : "testValue"] ?? endpoint[key]?.rawData.value ?? "";
+    try {
+      return assignRawVariables(JSON.parse(rawData), key);
+    } catch (e) {
+      return "";
+    }
   };
-
   const assignValues = (
     data: string | { [key: string]: string },
     key: string,
@@ -302,15 +331,19 @@ const ServiceFlowPage: FC = () => {
         sensitive: `\${new Map([${
           typeof headers === "string"
             ? `["headers", headers]`
-            : `["headers", new Map([${Object.keys(headers ?? {}).map((h) => `["${h.replace("__", ".")}", headers_${h}]`)}])]`
+            : `["headers", new Map([${Object.keys(headers ?? {}).map(
+                (h) => `["${h.replaceAll("__", ".")}", headers_${h}]`
+              )}])]`
         }, ${
           typeof body === "string"
             ? `["body", body]`
-            : `["body", new Map([${Object.keys(body ?? {}).map((b) => `["${b.replace("__", ".")}", body_${b}]`)}])]`
+            : `["body", new Map([${Object.keys(body ?? {}).map((b) => `["${b.replaceAll("__", ".")}", body_${b}]`)}])]`
         }, ${
           typeof params === "string"
             ? `["params", params]`
-            : `["params", new Map([${Object.keys(params ?? {}).map((p) => `["${p.replace("__", ".")}", params_${p}]`)}])]`
+            : `["params", new Map([${Object.keys(params ?? {}).map(
+                (p) => `["${p.replaceAll("__", ".")}", params_${p}]`
+              )}])]`
         }])}`,
       },
     });
@@ -401,6 +434,20 @@ const ServiceFlowPage: FC = () => {
     }
   };
 
+  const getNestedRawData = (
+    data: { [key: string]: any },
+    key: string,
+    path: string,
+    result: { [key: string]: any }
+  ) => {
+    Object.keys(data).forEach((k) => {
+      if (typeof data[k] === "object") {
+        result[k] = {};
+        return getNestedRawData(data[k], key, `${path}.${k}`, result[k]);
+      }
+      result[k] = `\${info.response.body.${key}["${path}.${k}"]}`;
+    });
+  };
 
   const getEndpointVariables = (
     key: string,
@@ -414,8 +461,8 @@ const ServiceFlowPage: FC = () => {
     data.variables.forEach((v) => {
       // TODO missing quotes may fail
       if (["schema", "array"].includes(v.type)) {
-        if (v.type === "array" && v.arrayType !== 'schema') {
-          result[v.name] = `\${[info.response.body.${key}["${v.name}"]]}`
+        if (v.type === "array" && v.arrayType !== "schema") {
+          result[v.name] = `\${[info.response.body.${key}["${v.name}"]]}`;
           return;
         }
         const nestedResult = {};
@@ -425,6 +472,23 @@ const ServiceFlowPage: FC = () => {
       }
       result[v.name] = `\${info.response.body.${key}["${v.name}"]}`;
     });
+    if (Object.keys(result).length === 0) {
+      try {
+        [data.rawData.value, data.rawData.testValue].forEach((rawData) => {
+          if (!rawData) return;
+          const parsedData = JSON.parse(rawData);
+          Object.keys(parsedData).forEach((k) => {
+            if (typeof parsedData[k] === "object") {
+              result[k] = {};
+              return getNestedRawData(parsedData[k], key, k, result[k]);
+            }
+            result[k] = `\${info.response.body.${key}["${k}"]}`;
+          });
+        });
+      } catch (e) {
+        console.log(e);
+      }
+    }
     return result;
   };
 
@@ -491,15 +555,12 @@ const ServiceFlowPage: FC = () => {
           url: selectedEndpointType.url,
           headers: {
             ...getEndpointVariables("headers", selectedEndpointType.headers),
-            note: "raw data doesn't work, since body: {info.response.body.body} fails without defined key",
           },
           body: {
             ...getEndpointVariables("body", selectedEndpointType.body),
-            note: "raw data doesn't work, since body: {info.response.body.body} fails without defined key",
           },
           params: {
             ...getEndpointVariables("params", selectedEndpointType.params),
-            note: "raw data doesn't work, since body: {info.response.body.body} fails without defined key",
           },
         },
         result: "res",
