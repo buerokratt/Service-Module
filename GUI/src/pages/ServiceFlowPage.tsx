@@ -90,9 +90,15 @@ const ServiceFlowPage: FC = () => {
   const serviceName = (location.state?.serviceName ?? "").replaceAll(" ", "-");
   const serviceDescription = location.state?.serviceDescription;
   const flow = location.state?.flow ? JSON.parse(location.state?.flow) : undefined;
-  const [nodes, setNodes, onNodesChange] = useNodesState(flow ? flow.nodes : initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(flow ? flow.edges : [initialEdge]);
   const [reactFlowInstance, setReactFlowInstance] = useState<ReactFlowInstance>();
+  const resetNodes = (): Node[] => {
+    return flow.nodes.map((n: Node) => {
+      if (n.type !== "customNode") return n;
+      return { ...n, selected: false, className: n.data.type };
+    });
+  };
+  const [nodes, setNodes, onNodesChange] = useNodesState(flow ? resetNodes() : initialNodes);
 
   const getTemplateDataFromNode = (
     node: Node
