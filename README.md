@@ -50,6 +50,13 @@ This repo will primarily contain:
 
 - Go to https://localhost:3001
 
+**Training Module GUI setup in Service Module**
+- Clone [Training Module](https://github.com/buerokratt/Training-Module)
+- Training Module `.env` file includes REACT_APP_SERVICE_MODULE_GUI_BASE_URL 
+- In Training Module run: `docker-compose up -d`
+  - Training module uses the same network as Service Module 
+
+
 ### Database setup
 
 - For setting up the users database initially, run
