@@ -1,6 +1,13 @@
 import { CSSProperties, FC, useState } from "react";
 import { MdPlayCircleFilled } from "react-icons/md";
-import { MarkerType, Node, ReactFlowProvider, useEdgesState, useNodesState } from "reactflow";
+
+import {
+  MarkerType,
+  Node,
+  ReactFlowProvider,
+  useEdgesState,
+  useNodesState
+} from "reactflow";
 import {
   Box,
   Collapsible,
@@ -94,10 +101,10 @@ const ServiceFlowPage: FC = () => {
     },
   ];
 
+  const [updatedRules, setUpdatedRules] = useState<(string | null)[]>([]);
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState([initialEdge]);
   const [selectedNode, setSelectedNode] = useState<Node<NodeDataProps> | null>(null);
-  const [updatedRules, setUpdatedRules] = useState<(string | null)[]>([]);
   const navigate = useNavigate();
 
   const onDragStart = (event: React.DragEvent<HTMLDivElement>, step: Step) => {

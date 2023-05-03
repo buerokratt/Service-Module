@@ -30,3 +30,9 @@ curl -L -X POST 'http://localhost:9200/_scripts/regex-with-name' -H 'Content-Typ
 #Examples entities
 curl -H "Content-Type: application/x-ndjson" -X PUT "http://localhost:9200/examples-entities" -ku admin:admin --data-binary "@fieldMappings/examples-entities.json"
 curl -H "Content-Type: application/x-ndjson" -X PUT "http://localhost:9200/examples-entities/_bulk" -ku admin:admin --data-binary "@mock/examples-entities.json"
+
+#logs
+curl -H "Content-Type: application/x-ndjson" -X PUT "http://localhost:9200/logs" -ku admin:admin --data-binary "@fieldMappings/logs.json"
+curl -H "Content-Type: application/x-ndjson" -X PUT "http://localhost:9200/logs/_bulk" -ku admin:admin --data-binary "@mock/logs.json"
+curl -L -X POST 'http://localhost:9200/_scripts/get-log-by-request-id' -H 'Content-Type: application/json' -H 'Cookie: customJwtCookie=test' --data-binary "@templates/get-log-by-request-id.json"
+curl -L -X POST 'http://localhost:9200/_scripts/get-log-by-level' -H 'Content-Type: application/json' -H 'Cookie: customJwtCookie=test' --data-binary "@templates/get-log-by-level.json"
