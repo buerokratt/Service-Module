@@ -188,7 +188,7 @@ const ServiceFlowPage: FC = () => {
     if (node.data.stepType === StepType.UserDefined) {
       return {
         ...getDefinedEndpointStep(node),
-        next: nextStep ?? "end",
+        next: nextStep ?? "service-end",
       };
     }
     return {
@@ -196,7 +196,7 @@ const ServiceFlowPage: FC = () => {
       requestType: "post",
       body: data?.body,
       result: data?.resultName ?? `${stepName}_result`,
-      next: nextStep ?? "end",
+      next: nextStep ?? "service-end",
     };
   };
 
@@ -666,6 +666,10 @@ const ServiceFlowPage: FC = () => {
         getTemplate(parentNode, parentStepName, childNode ? `${childNode.data.stepType}-${childNodeId}` : childNodeId)
       );
     });
+    finishedFlow.set('service-end', {
+      wrapper: false,
+      return: "",
+    })
     console.log(finishedFlow);
     const result = Object.fromEntries(finishedFlow.entries());
     await axios
