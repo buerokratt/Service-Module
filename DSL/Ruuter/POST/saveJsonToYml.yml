@@ -16,5 +16,6 @@ saveFile:
   result: fileResult
 
 resultz:
+  reloadDsl: true
   return: result
   next: end
