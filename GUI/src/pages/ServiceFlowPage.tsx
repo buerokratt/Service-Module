@@ -546,7 +546,7 @@ const ServiceFlowPage: FC = () => {
           },
         },
         result: "info",
-        next: "test_endpoint",
+        next: "execute_endpoint",
       });
       steps.set("get_test_info", {
         call: "http.post",
@@ -559,11 +559,7 @@ const ServiceFlowPage: FC = () => {
           },
         },
         result: "info",
-        next: "test_endpoint",
-      });
-      steps.set("test_endpoint", {
-        return: "${info.response.body}",
-        next: "end",
+        next: "execute_endpoint",
       });
       steps.set("execute_endpoint", {
         call: selectedEndpointType.type.toLowerCase() === "get" ? "http.get" : "http.post",
