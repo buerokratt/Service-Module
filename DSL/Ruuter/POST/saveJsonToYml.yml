@@ -3,7 +3,7 @@ toYml:
   args:
     url: http://node_server:3008/conversion/json_to_yaml_data
     body:
-      data: ${incoming.body}
+      data: ${incoming.body.result}
   result: r
 
 saveFile:

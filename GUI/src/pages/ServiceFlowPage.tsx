@@ -370,7 +370,7 @@ const ServiceFlowPage: FC = () => {
     await axios
       .post(
         jsonToYml(),
-        { ...result },
+        { result },
         {
           params: {
             location: `/Ruuter/POST/services/endpoints/configs/${endpointName}-${
@@ -414,7 +414,7 @@ const ServiceFlowPage: FC = () => {
     await axios
       .post(
         jsonToYml(),
-        { ...result },
+        { result },
         {
           params: {
             location: `/Ruuter/POST/services/endpoints/info/${endpointName}-${
@@ -591,7 +591,7 @@ const ServiceFlowPage: FC = () => {
       await axios
         .post(
           jsonToYml(),
-          { ...result },
+          { result },
           {
             params: {
               location: `/Ruuter/POST/services/endpoints/${endpointName}.yml`,
