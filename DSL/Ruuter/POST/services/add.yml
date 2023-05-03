@@ -6,7 +6,7 @@ check_for_required_parameters:
 
 extract_request_data:
   assign:
-    name: ${incoming.body.name}
+    name: ${incoming.body.name.replaceAll(/\s+/g, "_")}
     description: ${incoming.body.description}
     type: ${incoming.body.type.toUpperCase()}
     content: ${incoming.body.content}
@@ -21,7 +21,14 @@ service_add:
       description: ${description}
       ruuter_type: ${type}
   result: createdService
-  next: check_for_type
+
+convert_json_content_to_yml:
+  call: http.post
+  args:
+    url: http://node_server:3008/conversion/json_to_yaml2
+    body:
+      data: ${content}
+  result: ymlResult
 
 check_for_type:
   switch:
@@ -35,7 +42,7 @@ add_get_dsl:
     url: http://node_server:3008/file/write
     body:
       file_path: "/Ruuter/GET/services/draft/${name}.tmp"
-      content: ${content}
+      content: ${ymlResult.response.body.json}
   result: results
   next: check_result
 
@@ -45,7 +52,7 @@ add_post_dsl:
     url: http://node_server:3008/file/write
     body:
       file_path: "/Ruuter/POST/services/draft/${name}.tmp"
-      content: ${content}
+      content: ${ymlResult.response.body.json}
   result: results
   next: check_result
 
@@ -56,6 +63,7 @@ check_result:
   next: return_bad_request
 
 return_ok:
+  reloadDsl: true
   status: 200
   return: ${results.response.body.message}
   next: end
