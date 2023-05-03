@@ -1,3 +1,4 @@
+import FormAutocomplete from './FormAutocomplete';
 import FormInput from './FormInput';
 import FormTextarea from './FormTextarea';
 import FormSelect from './FormSelect';
@@ -8,4 +9,4 @@ import FormDatepicker from './FormDatepicker';
 import SwitchBox from './SwitchBox';
 import FormRichText from './FormRichText';
 
-export { FormInput, FormTextarea, FormSelect, Switch, FormCheckboxes, FormCheckbox, FormDatepicker, SwitchBox, FormRichText, };
+export { FormAutocomplete, FormInput, FormTextarea, FormSelect, Switch, FormCheckboxes, FormCheckbox, FormDatepicker, SwitchBox, FormRichText, };
