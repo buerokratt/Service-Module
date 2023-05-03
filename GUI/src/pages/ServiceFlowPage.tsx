@@ -395,7 +395,7 @@ const ServiceFlowPage: FC = () => {
           result[v.name] = nestedResult;
           return;
         }
-        result[v.name] = `\${info.response.body.${key}.${path}.${v.name} ?? new Map()}`;
+        result[v.name] = `\${info.response.body.${key}["${path}.${v.name}"]}`;
       });
     }
   };
@@ -414,7 +414,7 @@ const ServiceFlowPage: FC = () => {
       // TODO missing quotes may fail
       if (["schema", "array"].includes(v.type)) {
         if (v.type === "array" && v.arrayType !== 'schema') {
-          result[v.name] = `\${[info.response.body.${key}.${v.name}]}`
+          result[v.name] = `\${[info.response.body.${key}["${v.name}"]]}`
           return;
         }
         const nestedResult = {};
@@ -422,7 +422,7 @@ const ServiceFlowPage: FC = () => {
         result[v.name] = nestedResult;
         return;
       }
-      result[v.name] = `\${info.response.body.${key}.${v.name} ?? new Map()}`;
+      result[v.name] = `\${info.response.body.${key}["${v.name}"]}`;
     });
     return result;
   };
