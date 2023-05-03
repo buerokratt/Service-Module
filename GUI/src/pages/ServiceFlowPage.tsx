@@ -87,6 +87,8 @@ const ServiceFlowPage: FC = () => {
   const [updatedRules, setUpdatedRules] = useState<(string | null)[]>([]);
   const [selectedNode, setSelectedNode] = useState<Node<NodeDataProps> | null>(null);
   const navigate = useNavigate();
+  const serviceName = location.state?.serviceName;
+  const serviceDescription = location.state?.serviceDescription;
   const flow = location.state?.flow ? JSON.parse(location.state?.flow) : undefined;
   const [nodes, setNodes, onNodesChange] = useNodesState(flow ? flow.nodes : initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(flow ? flow.edges : [initialEdge]);
@@ -124,8 +126,8 @@ const ServiceFlowPage: FC = () => {
           country: ``,
           phoneNumber: ``,
         },
-        resultName: "SiGa"
-      }
+        resultName: "SiGa",
+      };
     }
     if (node.data.stepType === StepType.FinishingStepRedirect) {
       return {
@@ -760,9 +762,11 @@ const ServiceFlowPage: FC = () => {
         saveDraftOnClick={saveFlow}
         endpoints={location.state?.endpoints}
         flow={JSON.stringify(reactFlowInstance?.toObject())}
+        serviceName={serviceName}
+        serviceDescription={serviceDescription}
         continueOnClick={() => navigate(ROUTES.OVERVIEW_ROUTE)}
       />
-      <h1 style={{ padding: 16 }}>Teenusvoog "Raamatu laenutus"</h1>
+      <h1 style={{ padding: 16 }}>Teenusvoog "{serviceName}"</h1>
       <FlowElementsPopup
         onClose={() => handlePopupClose()}
         onSave={(updatedNode: Node) => {
