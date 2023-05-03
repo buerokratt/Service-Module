@@ -188,7 +188,7 @@ const ServiceFlowPage: FC = () => {
       args: {
         url: `http://ruuter:8085/services/endpoints/${selectedEndpoint.methodType.toLowerCase()}-${serviceName}-${
           (endpoint.name.trim().length ?? 0) > 0 ? endpoint.name : endpoint.id
-        }`,
+        }?type=prod`,
         body: {
           headers: getPreDefinedEndpointVariables(selectedEndpoint.headers),
           body: getPreDefinedEndpointVariables(selectedEndpoint.body),
@@ -478,7 +478,7 @@ const ServiceFlowPage: FC = () => {
     data.variables.forEach((v) => {
       if (["schema", "array"].includes(v.type)) {
         if (v.type === "array" && v.arrayType !== "schema") {
-          result[v.name] = `\${[info.response.body.${key}["${v.name}"]]}`;
+          if (v.value) result[v.name] = `\${[info.response.body.${key}["${v.name}"]]}`;
           return;
         }
         const nestedResult = {};
@@ -486,7 +486,7 @@ const ServiceFlowPage: FC = () => {
         result[v.name] = nestedResult;
         return;
       }
-      result[v.name] = `\${info.response.body.${key}["${v.name}"]}`;
+      if (v.value) result[v.name] = `\${info.response.body.${key}["${v.name}"]}`;
     });
     if (Object.keys(result).length === 0) {
       try {
@@ -546,10 +546,10 @@ const ServiceFlowPage: FC = () => {
           },
         },
         result: "info",
-        next: "execute_endpoint",
+        next: "assign_endpoint_url",
       });
       steps.set("get_test_info", {
-        call: "http.post",
+        call: `http.${selectedEndpointType.methodType.toLowerCase()}`,
         args: {
           url: `http://ruuter:8085/services/endpoints/info/${endpointName}-test-info`,
           body: {
@@ -559,21 +559,31 @@ const ServiceFlowPage: FC = () => {
           },
         },
         result: "info",
+        next: "assign_endpoint_url",
+      });
+      const endpointParams = getEndpointVariables("params", selectedEndpointType.params);
+      const endpointHeaders = getEndpointVariables("headers", selectedEndpointType.headers);
+      const endpointBody = getEndpointVariables("body", selectedEndpointType.body);
+      let endpointUrl = selectedEndpointType.url;
+      if (endpointUrl?.includes("{")) {
+        const variable = selectedEndpointType.url?.slice(
+          selectedEndpointType.url?.indexOf("{") + 1,
+          selectedEndpointType.url.indexOf("}")
+        );
+        endpointUrl = selectedEndpointType.url?.replace(`{${variable}}` ?? "", endpointParams[variable ?? ""]);
+      }
+      steps.set("assign_endpoint_url", {
+        assign: {
+          endpoint_url: endpointUrl,
+        },
         next: "execute_endpoint",
       });
       steps.set("execute_endpoint", {
-        call: selectedEndpointType.type.toLowerCase() === "get" ? "http.get" : "http.post",
+        call: selectedEndpointType.methodType.toLowerCase() === "get" ? "http.get" : "http.post",
         args: {
-          url: selectedEndpointType.url,
-          headers: {
-            ...getEndpointVariables("headers", selectedEndpointType.headers),
-          },
-          body: {
-            ...getEndpointVariables("body", selectedEndpointType.body),
-          },
-          params: {
-            ...getEndpointVariables("params", selectedEndpointType.params),
-          },
+          url: "${endpoint_url}",
+          headers: Object.keys(endpointHeaders).length > 0 ? endpointHeaders : undefined,
+          body: Object.keys(endpointBody).length > 0 ? endpointBody : undefined,
         },
         result: "res",
         next: "return_result",
