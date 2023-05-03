@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useLocation, useParams, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { Button, Card, FormInput, ApiEndpointCard, FormTextarea, Layout, NewServiceHeader, Track } from "../components";
 import { v4 as uuid } from "uuid";
 import { ROUTES } from "../resources/routes-constants";
@@ -16,7 +16,6 @@ const NewServicePage: React.FC = () => {
   const [endpoints, setEndpoints] = useState<EndpointData[]>(location.state?.endpoints ?? []);
   const { intentName } = useParams();
   const [serviceName, setServiceName] = useState<string | undefined>(intentName);
-
   const onDelete = (id: string) => {
     setEndpoints((prevEndpoints) => prevEndpoints.filter((prevEndpoint) => prevEndpoint.id !== id));
   };
