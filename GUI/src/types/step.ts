@@ -1,17 +1,8 @@
+import { StepType } from "./step-type.enum";
+
 export interface Step {
   readonly id: number;
   label: string;
-  type:
-    | "auth"
-    | "textfield"
-    | "input"
-    | "rule-definition"
-    | "open-webpage"
-    | "file-generate"
-    | "file-sign"
-    | "step"
-    | "rule"
-    | "finishing-step-end"
-    | "finishing-step-redirect";
+  type: StepType;
   action?: string;
 }

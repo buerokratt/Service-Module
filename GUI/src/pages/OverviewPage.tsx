@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { Button, Track } from "../components";
 import { dummyServiceData } from "../resources/api-constants";
 import ServicesTable from "../components/ServicesTable";
-import { Service } from "../types/service";
+import { Service } from "../types";
 import { useNavigate } from "react-router-dom";
 import { ROUTES } from "../resources/routes-constants";
 

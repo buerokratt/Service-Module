@@ -9,7 +9,10 @@
     "paginationNavigation": "Navigeeri",
     "choose": "Vali..",
     "continue": "Jätka",
-    "view": "Vaata"
+    "view": "Vaata",
+    "save": "Salvesta",
+    "cancel": "Tühista",
+    "close": "Sulge"
   },
   "menu": {
     "overview": "Ülevaade",
@@ -89,5 +92,32 @@
     "name": "Nimetus",
     "description": "Kirjeldus",
     "uses": "Teenus kasutab"
+  },
+  "serviceFlow": {
+    "element": {
+      "taraAuthentication": "Tara autoriseerimine",
+      "textfield": "Tekstiväli",
+      "clientInput": "Kliendi sisend",
+      "openNewWebpage": "Uue veebilehe avamine",
+      "fileGeneration": "Faili genereerimine",
+      "fileSigning": "Faili allkirjastamine",
+      "conversationEnd": "Vestluse lõpetamine",
+      "redirectConversationToSupport": "Klienditeenindusse suunamine"
+    },
+    "popup": {
+      "messageLabel": "Sõnum",
+      "availableOutputElementsLabel": "Saadaolevad väljundelemendid",
+      "showJsonRequest": "Vaata JSON päringut",
+      "hideJsonRequest": "Peida JSON päring",
+      "jsonRequestPlaceholder": "JSON päring",
+      "openWebpageLabel": "Veebilehe nimi, mis kuvatakse kliendile"
+    },
+    "placeholderNode": "Lohista järgmine samm voogu",
+    "allElements": "Kõik elemendid",
+    "setupElements": "Seadistatud elemendid",
+    "tabs": {
+      "setup": "Seadistamine",
+      "test": "Testimine"
+    }
   }
 }

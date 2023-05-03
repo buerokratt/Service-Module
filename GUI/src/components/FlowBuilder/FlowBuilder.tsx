@@ -13,18 +13,21 @@ import ReactFlow, {
   XYPosition,
 } from "reactflow";
 import "reactflow/dist/style.css";
+import { StepType } from "../../types/step-type.enum";
 import CustomNode from "../Steps/CustomNode";
 import PlaceholderNode from "../Steps/PlaceholderNode";
+import StartNode from "../Steps/StartNode";
 
 export const GRID_UNIT = 16;
 
 const nodeTypes = {
+  startNode: StartNode,
   customNode: CustomNode,
   placeholder: PlaceholderNode,
 };
 
 type FlowBuilderProps = {
-  setVisiblePopupNode: Dispatch<SetStateAction<Node | null>>;
+  onNodeEdit: (selectedNode: Node | null) => void;
   updatedRules: (string | null)[];
   nodes: Node[];
   setNodes: Dispatch<SetStateAction<Node[]>>;
@@ -32,10 +35,12 @@ type FlowBuilderProps = {
   edges: Edge[];
   setEdges: Dispatch<SetStateAction<Edge[]>>;
   onEdgesChange: OnEdgesChange;
+  reactFlowInstance?: ReactFlowInstance;
+  setReactFlowInstance: Dispatch<SetStateAction<ReactFlowInstance | undefined>>;
 };
 
 const FlowBuilder: FC<FlowBuilderProps> = ({
-  setVisiblePopupNode,
+  onNodeEdit,
   updatedRules,
   nodes,
   setNodes,
@@ -43,14 +48,29 @@ const FlowBuilder: FC<FlowBuilderProps> = ({
   edges,
   setEdges,
   onEdgesChange,
+  reactFlowInstance,
+  setReactFlowInstance,
 }) => {
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
-  const [reactFlowInstance, setReactFlowInstance] = useState<ReactFlowInstance>();
   const [clickedNode, setClickedNode] = useState();
   const nodePositionOffset = 28 * GRID_UNIT;
   const updateNodeInternals = useUpdateNodeInternals();
 
   const getEdgeLength = () => 5 * GRID_UNIT;
+
+  useEffect(() => {
+    setNodes((prevNodes) => prevNodes.map((node) => {
+      if (node.type !== "customNode") return node;
+      node.data = {
+        ...node.data,
+        onDelete,
+        onEdit: handleNodeEdit,
+        setClickedNode,
+        update: updateInputRules,
+      }
+      return node;
+    }));
+  }, [reactFlowInstance])
 
   // Align nodes in case any got overlapped
   const alignNodes = (nodeChanges: NodeChange[]) => {
@@ -132,9 +152,9 @@ const FlowBuilder: FC<FlowBuilderProps> = ({
         data: {
           label,
           onDelete,
-          setPopupVisible: () => setVisiblePopupNode(null),
+          onEdit: handleNodeEdit,
           type: "rule",
-          stepType: "rule",
+          stepType: StepType.Rule,
           readonly: true,
         },
         className: "rule",
@@ -197,7 +217,6 @@ const FlowBuilder: FC<FlowBuilderProps> = ({
       },
     };
   };
-
 
   // Move the placeholder together with the node being moved
   const onNodeDrag = useCallback(
@@ -294,7 +313,7 @@ const FlowBuilder: FC<FlowBuilderProps> = ({
       const reactFlowBounds = reactFlowWrapper.current.getBoundingClientRect();
       const [label, type] = [
         event.dataTransfer.getData("application/reactflow-label"),
-        event.dataTransfer.getData("application/reactflow-type"),
+        event.dataTransfer.getData("application/reactflow-type") as StepType,
       ];
       const position = reactFlowInstance.project({
         x: event.clientX - reactFlowBounds.left,
@@ -329,7 +348,7 @@ const FlowBuilder: FC<FlowBuilderProps> = ({
             }),
           ];
 
-          if (!["input", "finishing-step-end", "finishing-step-redirect"].includes(type)) {
+          if (![StepType.Input, StepType.FinishingStepEnd, StepType.FinishingStepRedirect].includes(type)) {
             // Point edge from new node to new placeholder
             newEdges.push(
               buildEdge({
@@ -344,6 +363,8 @@ const FlowBuilder: FC<FlowBuilderProps> = ({
         });
 
         // Add new node in place of old placeholder
+        const prevClientInputs = prevNodes.filter((node) => node.data.stepType === "input");
+        const newClientInputId = (prevClientInputs[prevClientInputs.length - 1]?.data.clientInputId ?? 0) + 1;
         const newNodes = [
           ...prevNodes.filter((node) => node.id !== matchingPlaceholder.id),
           {
@@ -351,21 +372,33 @@ const FlowBuilder: FC<FlowBuilderProps> = ({
             position: matchingPlaceholder.position,
             type: "customNode",
             data: {
-              label,
+              label: type === "input" ? `${label} - ${newClientInputId}` : label,
               onDelete,
-              setPopupVisible: () => setVisiblePopupNode({ ...matchingPlaceholder, type }),
-              type: ["finishing-step-end", "finishing-step-redirect"].includes(type) ? "finishing-step" : "step",
+              onEdit: handleNodeEdit,
+              type: [StepType.FinishingStepEnd, StepType.FinishingStepRedirect].includes(type)
+                ? "finishing-step"
+                : "step",
               stepType: type,
-              readonly: type === "finishing-step-end",
-              childrenCount: type === "input" ? 0 : 1,
+              clientInputId: type === StepType.Input ? newClientInputId : undefined,
+              readonly: [
+                StepType.Auth,
+                StepType.FileSign,
+                StepType.FinishingStepEnd,
+                StepType.FinishingStepRedirect,
+                StepType.UserDefined,
+              ].includes(type),
+              childrenCount: type === StepType.Input ? 0 : 1,
               setClickedNode,
               update: updateInputRules,
+              message: setDefaultMessages(type),
             },
-            className: ["finishing-step-end", "finishing-step-redirect"].includes(type) ? "finishing-step" : "step",
+            className: [StepType.FinishingStepEnd, StepType.FinishingStepRedirect].includes(type)
+              ? "finishing-step"
+              : "step",
           },
         ];
 
-        if (!["input", "finishing-step-end", "finishing-step-redirect"].includes(type)) {
+        if (![StepType.Input, StepType.FinishingStepEnd, StepType.FinishingStepRedirect].includes(type)) {
           // Add placeholder right below new node
           newNodes.push(
             buildPlaceholder({
@@ -381,6 +414,15 @@ const FlowBuilder: FC<FlowBuilderProps> = ({
     [reactFlowInstance, nodes, edges]
   );
 
+  const setDefaultMessages = (stepType: StepType) => {
+    switch (stepType) {
+      case StepType.FinishingStepEnd:
+        return "Teenus on lõpetatud";
+      case StepType.FinishingStepRedirect:
+        return "Vestlus suunatakse klienditeenindajale";
+    }
+  };
+
   const onDelete = useCallback(
     (id: string, shouldAddPlaceholder: boolean) => {
       if (!reactFlowInstance) return;
@@ -393,7 +435,7 @@ const FlowBuilder: FC<FlowBuilderProps> = ({
       setNodes((prevNodes) => {
         let newNodes: Node[] = [];
 
-        if (deletedNode.data.stepType !== "input") {
+        if (deletedNode.data.stepType !== StepType.Input) {
           // delete only targeted node
           newNodes.push(...prevNodes.filter((node) => node.id !== id));
         } else {
@@ -419,7 +461,7 @@ const FlowBuilder: FC<FlowBuilderProps> = ({
 
       setEdges((prevEdges) => {
         const toRemove = prevEdges.filter((edge) => {
-          if (deletedNode.data.stepType !== "input") {
+          if (deletedNode.data.stepType !== StepType.Input) {
             // remove edges pointing to/from removed node
             return edge.target === id || edge.source === id;
           } else {
@@ -431,7 +473,7 @@ const FlowBuilder: FC<FlowBuilderProps> = ({
         if (toRemove.length === 0) return prevEdges;
         let newEdges = [...prevEdges.filter((edge) => !toRemove.includes(edge))];
         if (
-          deletedNode.data.stepType !== "input" &&
+          deletedNode.data.stepType !== StepType.Input &&
           newEdges.length > 0 &&
           toRemove.length > 1 &&
           shouldAddPlaceholder
@@ -595,6 +637,15 @@ const FlowBuilder: FC<FlowBuilderProps> = ({
       });
     },
     [edges, nodes]
+  );
+
+  const handleNodeEdit = useCallback(
+    (selectedNodeId: string) => {
+      if (!reactFlowInstance) return;
+      const node = reactFlowInstance.getNode(selectedNodeId);
+      onNodeEdit(node ?? null);
+    },
+    [reactFlowInstance]
   );
 
   return (

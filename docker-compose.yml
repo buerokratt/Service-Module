@@ -4,7 +4,7 @@ services:
     container_name: ruuter
     image: ruuter
     environment:
-      - application.cors.allowedOrigins=http://localhost:3006
+      - application.cors.allowedOrigins=http://localhost:3006, http://localhost:3001
       - application.httpCodesAllowList=200,201,202,203,204,205,206,207,208,226
       - application.logging.displayRequestContent=true
       - application.logging.displayResponseContent=true
@@ -76,6 +76,9 @@ services:
       - ./DSL/DMapper/hbs:/workspace/app/views/services
       - ./DSL/DMapper/js:/workspace/app/js/services
       - ./DSL/DMapper/lib:/workspace/app/lib
+      - ./DSL/DMapper/server/controllers:/workspace/app/controllers
+      - ./DSL/DMapper/server/js/file:/workspace/app/js/file
+      - ./DSL/DMapper/server/js/util:/workspace/app/js/util
     ports:
       - 3005:3005
     networks:
@@ -138,6 +141,7 @@ services:
 
 volumes:
   opensearch-data1:
+
 
 networks:
   bykstack:

@@ -2,7 +2,6 @@ import { useEffect, useState } from "react"
 import Button from "../Button"
 import { FormSelect, FormInput } from "../FormElements"
 import Track from "../Track"
-import ConditiobRuleType from "./ConditiobRuleType"
 import ConditionInput from "./ConditionInput"
 import VariableAsTag from "./VariableAsTag"
 import { v4 as uuidv4 } from 'uuid';
@@ -10,10 +9,11 @@ import conditionOptions from "./ConditionOptions"
 import axios from "axios"
 import { getClientInputAvailableVariables } from "../../resources/api-constants"
 import './styles.scss'
+import { ConditionRuleType } from "../../types"
 
 interface RulesBuilderProps {
-  rules: ConditiobRuleType[],
-  setRules: (rules: ConditiobRuleType[]) => void,
+  rules: ConditionRuleType[],
+  setRules: (rules: ConditionRuleType[]) => void,
 }
 
 const RulesBuilder: React.FC<RulesBuilderProps> = ({
@@ -109,7 +109,7 @@ const RulesBuilder: React.FC<RulesBuilderProps> = ({
     >
       <span>Available variables</span>
       <Track gap={7} className="flow-tags-container">
-        {availableVariables.map((x) => <VariableAsTag key={x} value={x} />)}
+        {availableVariables.map((x) => <VariableAsTag key={x} value={x} color='yellow' />)}
       </Track>
     </Track>
   </>;
