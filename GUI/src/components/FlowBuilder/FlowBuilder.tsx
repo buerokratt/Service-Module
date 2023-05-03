@@ -13,10 +13,10 @@ import ReactFlow, {
   XYPosition,
 } from "reactflow";
 import "reactflow/dist/style.css";
-import { StepType } from "../../types/step-type.enum";
 import CustomNode from "../Steps/CustomNode";
 import PlaceholderNode from "../Steps/PlaceholderNode";
 import StartNode from "../Steps/StartNode";
+import { StepType } from "../../types";
 
 export const GRID_UNIT = 16;
 
@@ -375,11 +375,12 @@ const FlowBuilder: FC<FlowBuilderProps> = ({
               label: type === "input" ? `${label} - ${newClientInputId}` : label,
               onDelete,
               onEdit: handleNodeEdit,
-              type: [StepType.FinishingStepEnd, StepType.FinishingStepRedirect].includes(type)
-                ? "finishing-step"
-                : "step",
-              stepType: type,
               clientInputId: type === StepType.Input ? newClientInputId : undefined,
+              type: [
+                StepType.FinishingStepEnd,
+                StepType.FinishingStepRedirect
+              ].includes(type) ? "finishing-step" : "step",
+              stepType: type,
               readonly: [
                 StepType.Auth,
                 StepType.FileSign,
@@ -417,9 +418,9 @@ const FlowBuilder: FC<FlowBuilderProps> = ({
   const setDefaultMessages = (stepType: StepType) => {
     switch (stepType) {
       case StepType.FinishingStepEnd:
-        return "Teenus on lõpetatud";
+        return 'Teenus on lõpetatud';
       case StepType.FinishingStepRedirect:
-        return "Vestlus suunatakse klienditeenindajale";
+        return 'Vestlus suunatakse klienditeenindajale';
     }
   };
 

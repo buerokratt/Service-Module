@@ -10,7 +10,7 @@ const FileGenerateContent: React.FC = () => {
   const availableOutputVariables = ['abc123', 'abc123', 'abc123']
 
   return (
-    <Track direction='vertical' align='stretch' className='flow-body-reverse-margin'>
+    <Track direction='vertical' align='stretch'>
       <Track gap={16} className='flow-body-padding'>
         <label className='flow-body-label'>
           <Track gap={8} direction='vertical' align='left'>
