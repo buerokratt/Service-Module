@@ -3,10 +3,10 @@ export type DropType = 'switch' | 'text-space' | 'auth' | 'rule';
 
 export interface ConditionType {
     id: string,
-    steps: StepType[],
+    steps: FlowStepType[],
 }
 
-export interface StepType {
+export interface FlowStepType {
     id: string,
     type: DropType,
     text?: string,
@@ -15,7 +15,7 @@ export interface StepType {
 }
 
 export interface StepReducer {
-    steps: StepType[]
+    steps: FlowStepType[]
 }
 
 export interface RootReducer {
