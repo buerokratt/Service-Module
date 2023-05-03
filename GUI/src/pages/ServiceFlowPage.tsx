@@ -76,22 +76,23 @@ const ServiceFlowPage: FC = () => {
   const { t } = useTranslation();
 
   const setupElements: Step[] = [
-    { id: 1, label: t('serviceFlow.element.taraAuthentication'), type: StepType.Auth },
-    { id: 3, label: t('serviceFlow.element.clientInput'), type: StepType.Input },
+    { id: 10, label: t('serviceFlow.element.taraAuthentication'), type: StepType.Auth },
+    { id: 30, label: t('serviceFlow.element.clientInput'), type: StepType.Input },
   ];
   const allElements: Step[] = [
-    { id: 1, label: t('serviceFlow.element.taraAuthentication'), type: StepType.Auth },
-    { id: 2, label: t('serviceFlow.element.textfield'), type: StepType.Textfield },
-    { id: 3, label: t('serviceFlow.element.clientInput'), type: StepType.Input },
-    { id: 4, label: t('serviceFlow.element.openNewWebpage'), type: StepType.OpenWebpage },
-    { id: 5, label: t('serviceFlow.element.fileGeneration'), type: StepType.FileGenerate },
-    { id: 6, label: t('serviceFlow.element.fileSigning'), type: StepType.FileSign },
-    { id: 7, label: t('serviceFlow.element.conversationEnd'), type: StepType.FinishingStepEnd },
+    { id: 10, label: t('serviceFlow.element.taraAuthentication'), type: StepType.Auth },
+    { id: 20, label: t('serviceFlow.element.textfield'), type: StepType.Textfield },
+    { id: 30, label: t('serviceFlow.element.clientInput'), type: StepType.Input },
+    { id: 35, label: t('serviceFlow.element.rules'), type: StepType.RasaRules },
+    { id: 40, label: t('serviceFlow.element.openNewWebpage'), type: StepType.OpenWebpage },
+    { id: 50, label: t('serviceFlow.element.fileGeneration'), type: StepType.FileGenerate },
+    { id: 60, label: t('serviceFlow.element.fileSigning'), type: StepType.FileSign },
+    { id: 70, label: t('serviceFlow.element.conversationEnd'), type: StepType.FinishingStepEnd },
     {
-      id: 8,
+      id: 80,
       label: t('serviceFlow.element.redirectConversationToSupport'),
       type: StepType.FinishingStepRedirect,
-    },
+    }
   ];
 
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);

@@ -17,5 +17,6 @@ export enum StepType {
   Step = 'step',
   Rule = 'rule',
   FinishingStepEnd = 'finishing-step-end',
-  FinishingStepRedirect = 'finising-step-redirect'
+  FinishingStepRedirect = 'finising-step-redirect',
+  RasaRules = 'rasa-rules',
 }

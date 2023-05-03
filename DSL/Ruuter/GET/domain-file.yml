@@ -21,4 +21,5 @@ convertYamlToJson:
   result: domainData
 
 return_value:
+  wrapper: false
   return: ${domainData.response.body}

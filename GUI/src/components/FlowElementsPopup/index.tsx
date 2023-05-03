@@ -20,6 +20,7 @@ import { servicesRequestsExplain } from "../../resources/api-constants";
 import OpenWebPageContent from "./OpenWebPageContent";
 import OpenWebPageTestContent from "./OpenWebPageTestContent";
 import { Node } from "reactflow";
+import RasaRulesContent from "./RasaRulesContent";
 
 interface FlowElementsPopupProps {
   node: any
@@ -157,14 +158,14 @@ const FlowElementsPopup: React.FC<FlowElementsPopupProps> = ({ node, onClose, on
                   setTextfieldMessage(message);
                   setTextfieldMessagePlaceholders(placeholders);
                 }}
-              ></TextfieldContent>
+              />
             }
             {
               stepType === StepType.OpenWebpage &&
               <OpenWebPageContent
                 onWebpageNameChange={setWebpageName}
                 onWebpageUrlChange={setWebpageUrl}
-              ></OpenWebPageContent>
+              />
             }
             {(stepType === StepType.FileGenerate || stepType === StepType.Input) &&
               <DndProvider backend={HTML5Backend}>
@@ -182,15 +183,19 @@ const FlowElementsPopup: React.FC<FlowElementsPopupProps> = ({ node, onClose, on
             }
             {
               stepType === StepType.FinishingStepRedirect &&
-              <DefaultMessageContent message='Vestlus suunatakse klienditeenindajale'></DefaultMessageContent>
+              <DefaultMessageContent message='Vestlus suunatakse klienditeenindajale' />
             }
             {
               stepType === StepType.Auth &&
-              <DefaultMessageContent message='Jätkamiseks palun logi sisse läbi TARA'></DefaultMessageContent>
+              <DefaultMessageContent message='Jätkamiseks palun logi sisse läbi TARA' />
             }
             {
               stepType === StepType.FinishingStepEnd &&
-              <EndConversationContent></EndConversationContent>
+              <EndConversationContent />
+            }
+            {
+              stepType === StepType.RasaRules &&
+              <RasaRulesContent />
             }
             <JsonRequestContent isVisible={isJsonRequestVisible} jsonContent={jsonRequestContent}></JsonRequestContent>
           </Tabs.Content>
@@ -200,14 +205,14 @@ const FlowElementsPopup: React.FC<FlowElementsPopupProps> = ({ node, onClose, on
               <TextfieldTestContent
                 placeholders={textfieldMessagePlaceholders}
                 message={textfieldMessage || node.data.message}
-              ></TextfieldTestContent>
+              />
             }
             {
               stepType === StepType.OpenWebpage &&
               <OpenWebPageTestContent
                 websiteUrl={webpageUrl}
                 websiteName={webpageName}
-              ></OpenWebPageTestContent>
+              />
             }
           </Tabs.Content>}
         </Tabs.Root>
@@ -216,13 +221,5 @@ const FlowElementsPopup: React.FC<FlowElementsPopupProps> = ({ node, onClose, on
   )
 }
 
-function getTitle(type: string) {
-  if (type === 'input')
-    return 'Client Input'
-  else if (type === 'file-generate')
-    return 'File Generate'
-
-  return 'Hello'
-}
 
 export default FlowElementsPopup
