@@ -1,6 +1,20 @@
 import { CSSProperties, FC, useEffect, useState } from "react";
-import { Edge, MarkerType, Node, ReactFlowInstance, ReactFlowProvider, useEdgesState, useNodesState } from "reactflow";
-import { Box, Collapsible, NewServiceHeader, Track, FlowElementsPopup } from "../components";
+import { MdPlayCircleFilled } from "react-icons/md";
+import {
+  MarkerType,
+  Node,
+  ReactFlowInstance,
+  ReactFlowProvider,
+  useEdgesState,
+  useNodesState
+} from "reactflow";
+import {
+  Box,
+  Collapsible,
+  NewServiceHeader,
+  Track,
+  FlowElementsPopup,
+} from "../components";
 import { useTranslation } from "react-i18next";
 import FlowBuilder, { GRID_UNIT } from "../components/FlowBuilder/FlowBuilder";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -81,12 +95,12 @@ const ServiceFlowPage: FC = () => {
   ];
   const [setupElements, setSetupElements] = useState<Step[]>([]);
   const location = useLocation();
-  const [selectedNode, setSelectedNode] = useState<Node<NodeDataProps> | null>(null);
   const [updatedRules, setUpdatedRules] = useState<(string | null)[]>([]);
+  const [selectedNode, setSelectedNode] = useState<Node<NodeDataProps> | null>(null);
   const navigate = useNavigate();
   const flow = location.state?.flow ? JSON.parse(location.state?.flow) : undefined;
-  const [nodes, setNodes, onNodesChange] = useNodesState<Node[]>(flow ? flow.nodes : initialNodes);
-  const [edges, setEdges, onEdgesChange] = useEdgesState<Edge[]>(flow ? flow.edges : [initialEdge]);
+  const [nodes, setNodes, onNodesChange] = useNodesState(flow ? flow.nodes : initialNodes);
+  const [edges, setEdges, onEdgesChange] = useEdgesState(flow ? flow.edges : [initialEdge]);
   const [reactFlowInstance, setReactFlowInstance] = useState<ReactFlowInstance>();
 
   useEffect(() => {

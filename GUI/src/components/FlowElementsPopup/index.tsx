@@ -5,7 +5,6 @@ import Popup from "../Popup";
 import { Button, Track } from "..";
 import FileGenerateContent from "./FileGenerateContent";
 import ConditionBuilderContent from "./ConditionBuilderContent";
-import './styles.scss'
 import { useTranslation } from "react-i18next";
 import TextfieldContent from "./TextfieldContent";
 import * as Tabs from '@radix-ui/react-tabs';
@@ -19,6 +18,7 @@ import OpenWebPageContent from "./OpenWebPageContent";
 import OpenWebPageTestContent from "./OpenWebPageTestContent";
 import { Node } from "reactflow";
 import { ConditionRuleType, StepType } from "../../types";
+import './styles.scss'
 
 interface FlowElementsPopupProps {
   node: any
@@ -213,15 +213,6 @@ const FlowElementsPopup: React.FC<FlowElementsPopupProps> = ({ node, onClose, on
       </Track>
     </Popup >
   )
-}
-
-function getTitle(type: string) {
-  if (type === 'input')
-    return 'Client Input'
-  else if (type === 'file-generate')
-    return 'File Generate'
-
-  return 'Hello'
 }
 
 export default FlowElementsPopup
