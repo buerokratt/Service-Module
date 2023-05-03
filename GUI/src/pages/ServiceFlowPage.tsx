@@ -74,9 +74,10 @@ const ServiceFlowPage: FC = () => {
     { id: 4, label: t("serviceFlow.element.openNewWebpage"), type: StepType.OpenWebpage },
     { id: 5, label: t("serviceFlow.element.fileGeneration"), type: StepType.FileGenerate },
     { id: 6, label: t("serviceFlow.element.fileSigning"), type: StepType.FileSign },
-    { id: 7, label: t("serviceFlow.element.conversationEnd"), type: StepType.FinishingStepEnd },
+    { id: 7, label: t("serviceFlow.element.siga"), type: StepType.SiGa },
+    { id: 8, label: t("serviceFlow.element.conversationEnd"), type: StepType.FinishingStepEnd },
     {
-      id: 8,
+      id: 9,
       label: t("serviceFlow.element.redirectConversationToSupport"),
       type: StepType.FinishingStepRedirect,
     },
@@ -94,7 +95,6 @@ const ServiceFlowPage: FC = () => {
   const getTemplateDataFromNode = (
     node: Node
   ): { templateName: string; body?: any; resultName?: string } | undefined => {
-    // TODO add siga type
     if (node.data.stepType === StepType.Auth) {
       return {
         templateName: "tara",
@@ -114,6 +114,18 @@ const ServiceFlowPage: FC = () => {
         templateName: "client-input",
         resultName: `ClientInput.${node.data.clientInputId}`,
       };
+    }
+    if (node.data.stepType === StepType.SiGa) {
+      return {
+        templateName: "siga",
+        body: {
+          type: ``,
+          personIdentifier: ``,
+          country: ``,
+          phoneNumber: ``,
+        },
+        resultName: "SiGa"
+      }
     }
     if (node.data.stepType === StepType.FinishingStepRedirect) {
       return {
@@ -666,10 +678,10 @@ const ServiceFlowPage: FC = () => {
         getTemplate(parentNode, parentStepName, childNode ? `${childNode.data.stepType}-${childNodeId}` : childNodeId)
       );
     });
-    finishedFlow.set('service-end', {
+    finishedFlow.set("service-end", {
       wrapper: false,
       return: "",
-    })
+    });
     console.log(finishedFlow);
     const result = Object.fromEntries(finishedFlow.entries());
     await axios
