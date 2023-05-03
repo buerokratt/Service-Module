@@ -163,7 +163,6 @@ const ServiceFlowPage: FC = () => {
     if (!data) return {};
     const result: { [key: string]: string } = {};
     data.variables.forEach((v) => {
-      // TODO missing quotes may fail
       if (v.value && v.value.startsWith("{{"))
         result[v.value.replace("{{", "").replace("}}", "")] = v.value.replace("{{", "${").replace("}}", "}");
       if (v.testValue && v.testValue.startsWith("{{"))
@@ -387,7 +386,6 @@ const ServiceFlowPage: FC = () => {
     await saveEndpointConfig(selectedEndpoint, env, endpointName);
 
     const steps = new Map();
-    // todo, pass headers, body, params to config
     steps.set("get-configs", {
       call: "http.post",
       args: {
@@ -472,7 +470,6 @@ const ServiceFlowPage: FC = () => {
     if (!data) return {};
     const result: { [key: string]: any } = {};
     data.variables.forEach((v) => {
-      // TODO missing quotes may fail
       if (["schema", "array"].includes(v.type)) {
         if (v.type === "array" && v.arrayType !== "schema") {
           result[v.name] = `\${[info.response.body.${key}["${v.name}"]]}`;

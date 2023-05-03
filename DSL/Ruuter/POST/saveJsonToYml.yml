@@ -15,7 +15,7 @@ saveFile:
       content: ${r.response.body.yaml}
   result: fileResult
 
-resultz:
+saved_seccessfully:
   reloadDsl: true
-  return: result
+  return: ""
   next: end
