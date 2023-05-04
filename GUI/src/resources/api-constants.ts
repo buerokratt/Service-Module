@@ -59,3 +59,4 @@ export const getClientInputAvailableVariables = (): string => `${baseUrl}/mocks/
 export const getTaraAuthResponseVariables = (): string => `${baseUrl}/mocks/tim/user-info`;
 export const getEndpointValidationMock = (): string => `${baseUrl}/mocks/validation-mock`;
 export const jsonToYml = (): string => `${baseUrl}/saveJsonToYml`;
+export const createNewService = (): string => `${baseUrl}/services/add`;

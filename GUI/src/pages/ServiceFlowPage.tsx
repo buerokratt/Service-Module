@@ -11,7 +11,7 @@ import "./ServiceFlowPage.scss";
 import { StepType, Step, RawData } from "../types";
 import { EndpointData, EndpointEnv, EndpointType, EndpointVariableData } from "../types/endpoint";
 import axios from "axios";
-import { jsonToYml } from "../resources/api-constants";
+import { createNewService, jsonToYml } from "../resources/api-constants";
 
 const initialPlaceholder = {
   id: "2",
@@ -75,9 +75,10 @@ const ServiceFlowPage: FC = () => {
     { id: 4, label: t("serviceFlow.element.openNewWebpage"), type: StepType.OpenWebpage },
     { id: 5, label: t("serviceFlow.element.fileGeneration"), type: StepType.FileGenerate },
     { id: 6, label: t("serviceFlow.element.fileSigning"), type: StepType.FileSign },
-    { id: 7, label: t("serviceFlow.element.conversationEnd"), type: StepType.FinishingStepEnd },
+    { id: 7, label: t("serviceFlow.element.siga"), type: StepType.SiGa },
+    { id: 8, label: t("serviceFlow.element.conversationEnd"), type: StepType.FinishingStepEnd },
     {
-      id: 8,
+      id: 9,
       label: t("serviceFlow.element.redirectConversationToSupport"),
       type: StepType.FinishingStepRedirect,
     },
@@ -87,15 +88,22 @@ const ServiceFlowPage: FC = () => {
   const [updatedRules, setUpdatedRules] = useState<(string | null)[]>([]);
   const [selectedNode, setSelectedNode] = useState<Node<NodeDataProps> | null>(null);
   const navigate = useNavigate();
+  const serviceName = (location.state?.serviceName ?? "").replaceAll(" ", "-");
+  const serviceDescription = location.state?.serviceDescription;
   const flow = location.state?.flow ? JSON.parse(location.state?.flow) : undefined;
-  const [nodes, setNodes, onNodesChange] = useNodesState(flow ? flow.nodes : initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(flow ? flow.edges : [initialEdge]);
   const [reactFlowInstance, setReactFlowInstance] = useState<ReactFlowInstance>();
+  const resetNodes = (): Node[] => {
+    return flow.nodes.map((n: Node) => {
+      if (n.type !== "customNode") return n;
+      return { ...n, selected: false, className: n.data.type };
+    });
+  };
+  const [nodes, setNodes, onNodesChange] = useNodesState(flow ? resetNodes() : initialNodes);
 
   const getTemplateDataFromNode = (
     node: Node
   ): { templateName: string; body?: any; resultName?: string } | undefined => {
-    // TODO add siga type
     if (node.data.stepType === StepType.Auth) {
       return {
         templateName: "tara",
@@ -114,6 +122,18 @@ const ServiceFlowPage: FC = () => {
       return {
         templateName: "client-input",
         resultName: `ClientInput.${node.data.clientInputId}`,
+      };
+    }
+    if (node.data.stepType === StepType.SiGa) {
+      return {
+        templateName: "siga",
+        body: {
+          type: ``,
+          personIdentifier: ``,
+          country: ``,
+          phoneNumber: ``,
+        },
+        resultName: "SiGa",
       };
     }
     if (node.data.stepType === StepType.FinishingStepRedirect) {
@@ -150,7 +170,6 @@ const ServiceFlowPage: FC = () => {
     if (!data) return {};
     const result: { [key: string]: string } = {};
     data.variables.forEach((v) => {
-      // TODO missing quotes may fail
       if (v.value && v.value.startsWith("{{"))
         result[v.value.replace("{{", "").replace("}}", "")] = v.value.replace("{{", "${").replace("}}", "}");
       if (v.testValue && v.testValue.startsWith("{{"))
@@ -168,9 +187,9 @@ const ServiceFlowPage: FC = () => {
     return {
       call: `http.post`,
       args: {
-        url: `http://ruuter:8085/services/endpoints/${selectedEndpoint.methodType.toLowerCase()}-myService-${
+        url: `http://ruuter:8085/services/endpoints/${selectedEndpoint.methodType.toLowerCase()}-${serviceName}-${
           (endpoint.name.trim().length ?? 0) > 0 ? endpoint.name : endpoint.id
-        }`,
+        }?type=prod`,
         body: {
           headers: getPreDefinedEndpointVariables(selectedEndpoint.headers),
           body: getPreDefinedEndpointVariables(selectedEndpoint.body),
@@ -374,7 +393,6 @@ const ServiceFlowPage: FC = () => {
     await saveEndpointConfig(selectedEndpoint, env, endpointName);
 
     const steps = new Map();
-    // todo, pass headers, body, params to config
     steps.set("get-configs", {
       call: "http.post",
       args: {
@@ -459,10 +477,9 @@ const ServiceFlowPage: FC = () => {
     if (!data) return {};
     const result: { [key: string]: any } = {};
     data.variables.forEach((v) => {
-      // TODO missing quotes may fail
       if (["schema", "array"].includes(v.type)) {
         if (v.type === "array" && v.arrayType !== "schema") {
-          result[v.name] = `\${[info.response.body.${key}["${v.name}"]]}`;
+          if (v.value) result[v.name] = `\${[info.response.body.${key}["${v.name}"]]}`;
           return;
         }
         const nestedResult = {};
@@ -470,7 +487,7 @@ const ServiceFlowPage: FC = () => {
         result[v.name] = nestedResult;
         return;
       }
-      result[v.name] = `\${info.response.body.${key}["${v.name}"]}`;
+      if (v.value) result[v.name] = `\${info.response.body.${key}["${v.name}"]}`;
     });
     if (Object.keys(result).length === 0) {
       try {
@@ -498,7 +515,7 @@ const ServiceFlowPage: FC = () => {
       const selectedEndpointType = endpoint.data.definedEndpoints.find((e) => e.isSelected);
       if (!selectedEndpointType) continue;
       console.log("e", selectedEndpointType, endpoint);
-      const endpointName = `${selectedEndpointType.methodType.toLowerCase()}-myService-${
+      const endpointName = `${selectedEndpointType.methodType.toLowerCase()}-${serviceName}-${
         (endpoint.data.name.trim().length ?? 0) > 0 ? endpoint.data?.name : endpoint.data?.id
       }`;
       for (const env of [EndpointEnv.Live, EndpointEnv.Test]) {
@@ -530,10 +547,10 @@ const ServiceFlowPage: FC = () => {
           },
         },
         result: "info",
-        next: "test_endpoint",
+        next: "assign_endpoint_url",
       });
       steps.set("get_test_info", {
-        call: "http.post",
+        call: `http.${selectedEndpointType.methodType.toLowerCase()}`,
         args: {
           url: `http://ruuter:8085/services/endpoints/info/${endpointName}-test-info`,
           body: {
@@ -543,25 +560,31 @@ const ServiceFlowPage: FC = () => {
           },
         },
         result: "info",
-        next: "test_endpoint",
+        next: "assign_endpoint_url",
       });
-      steps.set("test_endpoint", {
-        return: "${info.response.body}",
-        next: "end",
+      const endpointParams = getEndpointVariables("params", selectedEndpointType.params);
+      const endpointHeaders = getEndpointVariables("headers", selectedEndpointType.headers);
+      const endpointBody = getEndpointVariables("body", selectedEndpointType.body);
+      let endpointUrl = selectedEndpointType.url;
+      if (endpointUrl?.includes("{")) {
+        const variable = selectedEndpointType.url?.slice(
+          selectedEndpointType.url?.indexOf("{") + 1,
+          selectedEndpointType.url.indexOf("}")
+        );
+        endpointUrl = selectedEndpointType.url?.replace(`{${variable}}` ?? "", endpointParams[variable ?? ""]);
+      }
+      steps.set("assign_endpoint_url", {
+        assign: {
+          endpoint_url: endpointUrl,
+        },
+        next: "execute_endpoint",
       });
       steps.set("execute_endpoint", {
-        call: selectedEndpointType.type.toLowerCase() === "get" ? "http.get" : "http.post",
+        call: selectedEndpointType.methodType.toLowerCase() === "get" ? "http.get" : "http.post",
         args: {
-          url: selectedEndpointType.url,
-          headers: {
-            ...getEndpointVariables("headers", selectedEndpointType.headers),
-          },
-          body: {
-            ...getEndpointVariables("body", selectedEndpointType.body),
-          },
-          params: {
-            ...getEndpointVariables("params", selectedEndpointType.params),
-          },
+          url: "${endpoint_url}",
+          headers: Object.keys(endpointHeaders).length > 0 ? endpointHeaders : undefined,
+          body: Object.keys(endpointBody).length > 0 ? endpointBody : undefined,
         },
         result: "res",
         next: "return_result",
@@ -667,16 +690,16 @@ const ServiceFlowPage: FC = () => {
         getTemplate(parentNode, parentStepName, childNode ? `${childNode.data.stepType}-${childNodeId}` : childNodeId)
       );
     });
-    finishedFlow.set('service-end', {
+    finishedFlow.set("service-end", {
       wrapper: false,
       return: "",
-    })
+    });
     console.log(finishedFlow);
     const result = Object.fromEntries(finishedFlow.entries());
     await axios
       .post(
-        jsonToYml(),
-        { result },
+        createNewService(),
+        { name: serviceName, description: serviceDescription, type: "POST", content: result },
         {
           params: {
             location: "/Ruuter/POST/services/tests.yml",
@@ -749,9 +772,11 @@ const ServiceFlowPage: FC = () => {
         saveDraftOnClick={saveFlow}
         endpoints={location.state?.endpoints}
         flow={JSON.stringify(reactFlowInstance?.toObject())}
+        serviceName={serviceName}
+        serviceDescription={serviceDescription}
         continueOnClick={() => navigate(ROUTES.OVERVIEW_ROUTE)}
       />
-      <h1 style={{ padding: 16 }}>Teenusvoog "Raamatu laenutus"</h1>
+      <h1 style={{ padding: 16 }}>Teenusvoog "{serviceName}"</h1>
       <FlowElementsPopup
         onClose={() => handlePopupClose()}
         onSave={(updatedNode: Node) => {

@@ -26,10 +26,10 @@ router.post("/json_to_yaml", (req: Request, res: Response) => {
   res.send({ json: result });
 });
 
-router.post("/json_to_yaml2", (req: Request, res: Response) => {
+router.post("/json_to_yaml_data", (req: Request, res: Response) => {
   console.log(req.body.data);
-  const result = stringify(req.body.data.result);
-  res.send({ json: result });
+  const result = stringify(req.body.data);
+  res.send({ yaml: result });
 });
 
 export default router;

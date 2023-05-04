@@ -15,7 +15,8 @@ const NewServicePage: React.FC = () => {
   const navigate = useNavigate();
   const [endpoints, setEndpoints] = useState<EndpointData[]>(location.state?.endpoints ?? []);
   const { intentName } = useParams();
-  const [serviceName, setServiceName] = useState<string | undefined>(intentName);
+  const [serviceName, setServiceName] = useState<string>(location.state?.serviceName ?? intentName ?? "");
+  const [description, setDescription] = useState<string>(location.state?.serviceDescription ?? "");
   const onDelete = (id: string) => {
     setEndpoints((prevEndpoints) => prevEndpoints.filter((prevEndpoint) => prevEndpoint.id !== id));
   };
@@ -85,8 +86,17 @@ const NewServicePage: React.FC = () => {
           saveDraftOnClick={saveDraft}
           endpoints={endpoints}
           flow={location.state?.flow}
+          serviceDescription={description}
+          serviceName={serviceName}
           continueOnClick={() => {
-            navigate(ROUTES.FLOW_ROUTE, { state: { endpoints: endpoints, flow: location.state?.flow } });
+            navigate(ROUTES.FLOW_ROUTE, {
+              state: {
+                endpoints: endpoints,
+                flow: location.state?.flow,
+                serviceName: serviceName,
+                serviceDescription: description,
+              },
+            });
           }}
         />
       }
@@ -97,13 +107,15 @@ const NewServicePage: React.FC = () => {
           <Track direction="vertical" align="stretch" gap={16}>
             <div>
               <label htmlFor="name">{t("newService.name")}</label>
-              <FormInput name="name" label="" defaultValue={serviceName} />
+              <FormInput name="name" label="" value={serviceName} onChange={(e) => setServiceName(e.target.value)} />
             </div>
             <div>
               <label htmlFor="description">{t("newService.description")}</label>
               <FormTextarea
                 name="description"
                 label=""
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
                 style={{
                   height: 120,
                   resize: "vertical",

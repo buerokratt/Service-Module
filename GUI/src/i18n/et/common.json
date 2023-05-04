@@ -102,7 +102,8 @@
       "fileGeneration": "Faili genereerimine",
       "fileSigning": "Faili allkirjastamine",
       "conversationEnd": "Vestluse lõpetamine",
-      "redirectConversationToSupport": "Klienditeenindusse suunamine"
+      "redirectConversationToSupport": "Klienditeenindusse suunamine",
+      "siga": "SiGa"
     },
     "popup": {
       "messageLabel": "Sõnum",
