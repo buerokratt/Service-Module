@@ -27,7 +27,7 @@ const NewServicePage: React.FC = () => {
     const variables: string[] = [];
     nodes
       ?.filter((node) => node.data.stepType === "input")
-      .forEach((node) => variables.push(`{{ClientInput.${node.data.clientInputId}}}`));
+      .forEach((node) => variables.push(`{{ClientInput_${node.data.clientInputId}}}`));
     if (nodes?.find((node) => node.data.stepType === "auth")) loadTaraVariables();
     setAvailableVariables(variables);
   }, []);

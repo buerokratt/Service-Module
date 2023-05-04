@@ -121,7 +121,7 @@ const ServiceFlowPage: FC = () => {
     if (node.data.stepType === StepType.Input) {
       return {
         templateName: "client-input",
-        resultName: `ClientInput.${node.data.clientInputId}`,
+        resultName: `ClientInput_${node.data.clientInputId}`,
       };
     }
     if (node.data.stepType === StepType.SiGa) {
@@ -165,7 +165,7 @@ const ServiceFlowPage: FC = () => {
 
   const getMapEntry = (value: string) => {
     const parts = value.replace("{{", "").replace("}}", "").split(".");
-    parts.splice(1, 0, "response", "body");
+    if (!value.includes("ClientInput")) parts.splice(1, 0, "response", "body");
     return `[${value.replace("{{", '"').replace("}}", '"')}, ${parts.join(".")}]`;
   };
 
@@ -241,7 +241,7 @@ const ServiceFlowPage: FC = () => {
       };
     }
     return {
-      template: data?.templateName ? `sticky/${data?.templateName}` : "templateName",
+      template: `sticky/${data?.templateName}`,
       requestType: "post",
       body: data?.body,
       result: data?.resultName ?? `${stepName}_result`,
@@ -308,10 +308,9 @@ const ServiceFlowPage: FC = () => {
   ) => {
     Object.keys(data).forEach((k) => {
       if (typeof data[k] === "object") {
-        return assignNestedRawVariables(data[k], key, `${path}__${k}`, result);
+        return assignNestedRawVariables(data[k], key, path.length === 0 ? k : `${path}__${k}`, result);
       }
-
-      result[`${path}__${k}`] =
+      result[path.length > 0 ? `${path}__${k}` : k] =
         typeof data[k] === "string" && data[k].startsWith("{{")
           ? data[k].replace("{{", `\${incoming.body.${key}["`).replace("}}", `"]}`)
           : data[k];
@@ -455,38 +454,26 @@ const ServiceFlowPage: FC = () => {
       });
   };
 
-  const getNestedVariables = (
-    variable: EndpointVariableData,
-    key: string,
-    path: string,
-    result: { [key: string]: any }
-  ) => {
+  const getNestedVariables = (variable: EndpointVariableData, key: string, path: string, result: string[]) => {
     const variableData = variable.type === "schema" ? variable.schemaData : variable.arrayData;
     if (variableData instanceof Array) {
       (variableData as EndpointVariableData[]).forEach((v) => {
         if (["schema", "array"].includes(v.type)) {
-          const nestedResult = {};
-          getNestedVariables(v, key, `${path}.${v.name}`, nestedResult);
-          result[v.name] = nestedResult;
+          getNestedVariables(v, key, `${path}.${v.name}`, result);
           return;
         }
-        result[v.name] = `\${info.response.body.${key}["${path}.${v.name}"]}`;
+        result.push(`["${path}.${v.name}", info.response.body.${key}["${path}.${v.name}"]]`);
       });
     }
   };
 
-  const getNestedRawData = (
-    data: { [key: string]: any },
-    key: string,
-    path: string,
-    result: { [key: string]: any }
-  ) => {
+  const getNestedRawData = (data: { [key: string]: any }, key: string, path: string, result: string[]) => {
     Object.keys(data).forEach((k) => {
       if (typeof data[k] === "object") {
-        result[k] = {};
-        return getNestedRawData(data[k], key, `${path}.${k}`, result[k]);
+        getNestedRawData(data[k], key, `${path}.${k}`, result);
+        return;
       }
-      result[k] = `\${info.response.body.${key}["${path}.${k}"]}`;
+      result.push(`["${path}.${k}", info.response.body.${key}["${path}.${k}"]]`);
     });
   };
 
@@ -505,9 +492,9 @@ const ServiceFlowPage: FC = () => {
           if (v.value) result[v.name] = `\${[info.response.body.${key}["${v.name}"]]}`;
           return;
         }
-        const nestedResult = {};
+        const nestedResult: string[] = [];
         getNestedVariables(v, key, v.name, nestedResult);
-        result[v.name] = nestedResult;
+        result[v.name] = `\${new Map([${nestedResult}])}`;
         return;
       }
       if (v.value) result[v.name] = `\${info.response.body.${key}["${v.name}"]}`;
@@ -519,8 +506,10 @@ const ServiceFlowPage: FC = () => {
           const parsedData = JSON.parse(rawData);
           Object.keys(parsedData).forEach((k) => {
             if (typeof parsedData[k] === "object") {
-              result[k] = {};
-              return getNestedRawData(parsedData[k], key, k, result[k]);
+              const nestedResult: string[] = [];
+              getNestedRawData(parsedData[k], key, k, nestedResult);
+              result[k] = `\${new Map([${nestedResult}])}`;
+              return;
             }
             result[k] = `\${info.response.body.${key}["${k}"]}`;
           });
@@ -679,7 +668,7 @@ const ServiceFlowPage: FC = () => {
       const childNode = nodes.find((node) => node.id === childNodeId);
       const parentStepName = `${parentNode.data.stepType}-${parentNodeId}`;
       if (parentNode.data.stepType === StepType.Input) {
-        const clientInput = `ClientInput.${parentNode.data.clientInputId}`;
+        const clientInput = `ClientInput_${parentNode.data.clientInputId}`;
         const clientInputName = `${clientInput}-step`;
         finishedFlow.set(parentStepName, getTemplate(parentNode, clientInputName, `${clientInput}-switch`));
         finishedFlow.set(
@@ -700,9 +689,10 @@ const ServiceFlowPage: FC = () => {
                         matchingRule.value
                       }}`
                     : `\${${clientInput} == ${node.data.label === "rule 0" ? '"Yes"' : '"No"'}}`,
-                  nextStep: followingNode
-                    ? `${followingNode.data.stepType}-${followingNode.id}`
-                    : `${node.data.stepType}-${e.target}`,
+                  nextStep:
+                    followingNode?.type === "customNode"
+                      ? `${followingNode.data.stepType}-${followingNode.id}`
+                      : "service-end",
                 };
               })
           )
