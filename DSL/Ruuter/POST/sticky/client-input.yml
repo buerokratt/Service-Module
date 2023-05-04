@@ -1,0 +1,11 @@
+# TODO: replace with correct request to get user input
+request_client_input:
+  call: reflect.mock
+  args:
+    response:
+      input: 'Yes'
+  result: clientInput
+
+return_value:
+  wrapper: false
+  return: ${clientInput.response.body}
