@@ -5,5 +5,5 @@ request_tim_user_info:
   result: result
 
 return_value:
-  wrapper: false
-  return: ${result.response.body.response.body}
+  # wrapper: false
+  return: ${result.response.body}
