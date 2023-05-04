@@ -163,20 +163,49 @@ const ServiceFlowPage: FC = () => {
     }
   };
 
-  const getPreDefinedEndpointVariables = (data?: {
-    variables: EndpointVariableData[];
-    rawData: RawData;
-  }): { [key: string]: string } => {
-    if (!data) return {};
-    const result: { [key: string]: string } = {};
-    data.variables.forEach((v) => {
-      if (v.value && v.value.startsWith("{{"))
-        result[v.value.replace("{{", "").replace("}}", "")] = v.value.replace("{{", "${").replace("}}", "}");
-      if (v.testValue && v.testValue.startsWith("{{"))
-        result[`${v.testValue.replace("{{", "").replace("}}", "")}`] = v.testValue
-          .replace("{{", "${")
-          .replace("}}", "}");
+  const getMapEntry = (value: string) => {
+    const parts = value.replace("{{", "").replace("}}", "").split(".");
+    parts.splice(1, 0, "response", "body");
+    return `[${value.replace("{{", '"').replace("}}", '"')}, ${parts.join(".")}]`;
+  };
+
+  const getNestedPreDefinedRawVariables = (data: { [key: string]: any }, result: string[]) => {
+    Object.keys(data).forEach((k) => {
+      if (typeof data[k] === "object") {
+        return getNestedPreDefinedRawVariables(data[k], result);
+      }
+      if (typeof data[k] === "string" && data[k].startsWith("{{")) {
+        result.push(getMapEntry(data[k]));
+      }
     });
+  };
+
+  const getNestedPreDefinedEndpointVariables = (variable: EndpointVariableData, result: string[]) => {
+    const variableData = variable.type === "schema" ? variable.schemaData : variable.arrayData;
+    if (variableData instanceof Array) {
+      (variableData as EndpointVariableData[]).forEach((v) => {
+        if (["schema", "array"].includes(v.type)) getNestedPreDefinedEndpointVariables(v, result);
+
+        if (v.value && v.value.startsWith("{{")) result.push(getMapEntry(v.value));
+        if (v.testValue && v.testValue.startsWith("{{")) result.push(getMapEntry(v.testValue));
+      });
+    }
+  };
+
+  const getPreDefinedEndpointVariables = (data?: { variables: EndpointVariableData[]; rawData: RawData }): string[] => {
+    if (!data) return [];
+    const result: string[] = [];
+    data.variables.forEach((v) => {
+      if (!v.value) getNestedPreDefinedEndpointVariables(v, result);
+
+      if (v.value && v.value.startsWith("{{")) result.push(getMapEntry(v.value));
+      if (v.testValue && v.testValue.startsWith("{{")) result.push(getMapEntry(v.testValue));
+    });
+    try {
+      getNestedPreDefinedRawVariables(JSON.parse(data.rawData?.value ?? "{}"), result);
+      getNestedPreDefinedRawVariables(JSON.parse(data.rawData?.testValue ?? "{}"), result);
+    } catch (_) {}
+
     return result;
   };
 
@@ -191,9 +220,9 @@ const ServiceFlowPage: FC = () => {
           (endpoint.name.trim().length ?? 0) > 0 ? endpoint.name : endpoint.id
         }?type=prod`,
         body: {
-          headers: getPreDefinedEndpointVariables(selectedEndpoint.headers),
-          body: getPreDefinedEndpointVariables(selectedEndpoint.body),
-          params: getPreDefinedEndpointVariables(selectedEndpoint.params),
+          headers: `\${new Map([${getPreDefinedEndpointVariables(selectedEndpoint.headers)}])}`,
+          body: `\${new Map([${getPreDefinedEndpointVariables(selectedEndpoint.body)}])}`,
+          params: `\${new Map([${getPreDefinedEndpointVariables(selectedEndpoint.params)}])}`,
         },
         params: {
           type: "prod",
@@ -281,19 +310,12 @@ const ServiceFlowPage: FC = () => {
       if (typeof data[k] === "object") {
         return assignNestedRawVariables(data[k], key, `${path}__${k}`, result);
       }
-      result[`${path}__${k}`] = data[k];
-    });
-  };
 
-  const assignRawVariables = (data: { [key: string]: any }, key: string) => {
-    const result: any = {};
-    Object.keys(data).forEach((k) => {
-      if (typeof data[k] === "object") {
-        return assignNestedRawVariables(data[k], key, k, result);
-      }
-      result[k] = data[k];
+      result[`${path}__${k}`] =
+        typeof data[k] === "string" && data[k].startsWith("{{")
+          ? data[k].replace("{{", `\${incoming.body.${key}["`).replace("}}", `"]}`)
+          : data[k];
     });
-    return result;
   };
 
   const rawDataIfVariablesMissing = (
@@ -306,7 +328,8 @@ const ServiceFlowPage: FC = () => {
     const rawData =
       endpoint[key]?.rawData[env === EndpointEnv.Live ? "value" : "testValue"] ?? endpoint[key]?.rawData.value ?? "";
     try {
-      return assignRawVariables(JSON.parse(rawData), key);
+      assignNestedRawVariables(JSON.parse(rawData), key, "", data);
+      return data;
     } catch (e) {
       return "";
     }
@@ -590,6 +613,7 @@ const ServiceFlowPage: FC = () => {
         next: "return_result",
       });
       steps.set("return_result", {
+        wrapper: false,
         return: "${res.response.body}",
         next: "end",
       });
