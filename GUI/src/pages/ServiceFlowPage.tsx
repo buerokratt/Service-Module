@@ -164,7 +164,7 @@ const ServiceFlowPage: FC = () => {
 
   const getMapEntry = (value: string) => {
     const parts = value.replace("{{", "").replace("}}", "").split(".");
-    parts.splice(1, 0, "response", "body");
+    if (!value.includes("ClientInput")) parts.splice(1, 0, "response", "body");
     return `[${value.replace("{{", '"').replace("}}", '"')}, ${parts.join(".")}]`;
   };
 
