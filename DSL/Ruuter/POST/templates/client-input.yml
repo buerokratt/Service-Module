@@ -7,5 +7,4 @@ request_client_input:
   result: clientInput
 
 return_value:
-  wrapper: false
   return: ${clientInput.response.body}

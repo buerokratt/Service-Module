@@ -1,4 +1,4 @@
-# Message to client element
+# Direct to customer support
 check_for_body:
   switch:
     - condition: ${incoming.body == null || incoming.body.message == null || incoming.body.message == ""}
@@ -15,11 +15,10 @@ send_message_to_client:
   args:
     response:
       status: 'OK'
-      message: "Hello, Muki"
+      message: "Teid suunatakse klienditeenindusse"
   result: result
 
 return_value:
-  wrapper: false
   return: ${result.response.body}
   next: end
 
