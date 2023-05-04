@@ -120,7 +120,7 @@ const ServiceFlowPage: FC = () => {
     if (node.data.stepType === StepType.Input) {
       return {
         templateName: "client-input",
-        resultName: `ClientInput.${node.data.clientInputId}`,
+        resultName: `ClientInput_${node.data.clientInputId}`,
       };
     }
     if (node.data.stepType === StepType.SiGa) {
@@ -667,7 +667,7 @@ const ServiceFlowPage: FC = () => {
       const childNode = nodes.find((node) => node.id === childNodeId);
       const parentStepName = `${parentNode.data.stepType}-${parentNodeId}`;
       if (parentNode.data.stepType === StepType.Input) {
-        const clientInput = `ClientInput.${parentNode.data.clientInputId}`;
+        const clientInput = `ClientInput_${parentNode.data.clientInputId}`;
         const clientInputName = `${clientInput}-step`;
         finishedFlow.set(parentStepName, getTemplate(parentNode, clientInputName, `${clientInput}-switch`));
         finishedFlow.set(
@@ -688,9 +688,10 @@ const ServiceFlowPage: FC = () => {
                         matchingRule.value
                       }}`
                     : `\${${clientInput} == ${node.data.label === "rule 0" ? '"Yes"' : '"No"'}}`,
-                  nextStep: followingNode
-                    ? `${followingNode.data.stepType}-${followingNode.id}`
-                    : `${node.data.stepType}-${e.target}`,
+                  nextStep:
+                    followingNode?.type === "customNode"
+                      ? `${followingNode.data.stepType}-${followingNode.id}`
+                      : "service-end",
                 };
               })
           )
