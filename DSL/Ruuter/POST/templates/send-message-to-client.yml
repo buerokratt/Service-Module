@@ -19,7 +19,6 @@ send_message_to_client:
   result: result
 
 return_value:
-  wrapper: false
   return: ${result.response.body}
   next: end
 

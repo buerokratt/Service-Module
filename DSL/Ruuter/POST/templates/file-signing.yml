@@ -9,5 +9,4 @@ siga_template_request:
   result: result
 
 return_result:
-  wrapper: false
-  return: ${result}
+  return: ${result.response.body}

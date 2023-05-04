@@ -20,8 +20,7 @@ generate_pdf_file:
   result: result
 
 return:
-  wrapper: false
-  return: ${result}
+  return: ${result.response.body}
   next: end
 
 missing_body_parameters:
