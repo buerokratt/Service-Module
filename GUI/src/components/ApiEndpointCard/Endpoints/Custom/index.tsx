@@ -80,7 +80,6 @@ const EndpointCustom: React.FC<EndpointCustomProps> = ({
                 };
                 newVariable[isLive ? "value" : "testValue"] = row.value;
                 defEndpoint[key as EndpointTab]?.variables.push(newVariable);
-                console.log("u", defEndpoint[key as EndpointTab]?.variables);
               }
             });
             defEndpoint[key as EndpointTab]?.variables.forEach((variable) => {

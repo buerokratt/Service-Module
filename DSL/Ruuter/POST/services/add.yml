@@ -21,7 +21,14 @@ service_add:
       description: ${description}
       ruuter_type: ${type}
   result: createdService
-  next: check_for_type
+
+convert_json_content_to_yml:
+  call: http.post
+  args:
+    url: http://node_server:3008/conversion/json_to_yaml_data
+    body:
+      data: ${content}
+  result: ymlResult
 
 check_for_type:
   switch:
@@ -34,8 +41,8 @@ add_get_dsl:
   args:
     url: http://node_server:3008/file/write
     body:
-      file_path: "/Ruuter/GET/services/draft/${name}.tmp"
-      content: ${content}
+      file_path: "/Ruuter/GET/services/draft/${name}.yml" # temp fix for now
+      content: ${ymlResult.response.body.yaml}
   result: results
   next: check_result
 
@@ -44,8 +51,8 @@ add_post_dsl:
   args:
     url: http://node_server:3008/file/write
     body:
-      file_path: "/Ruuter/POST/services/draft/${name}.tmp"
-      content: ${content}
+      file_path: "/Ruuter/POST/services/draft/${name}.yml" # temp fix for now
+      content: ${ymlResult.response.body.yaml}
   result: results
   next: check_result
 
@@ -56,6 +63,7 @@ check_result:
   next: return_bad_request
 
 return_ok:
+  reloadDsl: true
   status: 200
   return: ${results.response.body.message}
   next: end

@@ -10,6 +10,8 @@ type NewServiceHeaderProps = {
   saveDraftOnClick: () => void;
   endpoints?: EndpointData[];
   flow?: string;
+  serviceName?: string;
+  serviceDescription?: string;
 };
 
 const NewServiceHeader: FC<NewServiceHeaderProps> = ({
@@ -18,13 +20,21 @@ const NewServiceHeader: FC<NewServiceHeaderProps> = ({
   saveDraftOnClick,
   endpoints,
   flow,
+  serviceDescription,
+  serviceName,
 }) => {
   return (
     <>
       <header className="header" style={{ paddingLeft: 24 }}>
         <Track justify="between" gap={16}>
           <h1 style={{ whiteSpace: "nowrap" }}>{t("menu.newService")}</h1>
-          <HeaderStepCounter activeStep={activeStep} endpoints={endpoints} flow={flow} />
+          <HeaderStepCounter
+            activeStep={activeStep}
+            endpoints={endpoints}
+            flow={flow}
+            serviceDescription={serviceDescription}
+            serviceName={serviceName}
+          />
           <Button onClick={saveDraftOnClick} appearance="secondary">
             {t("newService.saveDraft")}
           </Button>

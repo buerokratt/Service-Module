@@ -96,13 +96,14 @@
   "serviceFlow": {
     "element": {
       "taraAuthentication": "Tara autoriseerimine",
-      "textfield": "Tekstiväli",
+      "textfield": "Sõnum kliendile",
       "clientInput": "Kliendi sisend",
       "openNewWebpage": "Uue veebilehe avamine",
       "fileGeneration": "Faili genereerimine",
       "fileSigning": "Faili allkirjastamine",
       "conversationEnd": "Vestluse lõpetamine",
-      "redirectConversationToSupport": "Klienditeenindusse suunamine"
+      "redirectConversationToSupport": "Klienditeenindusse suunamine",
+      "siga": "SiGa"
     },
     "popup": {
       "messageLabel": "Sõnum",
