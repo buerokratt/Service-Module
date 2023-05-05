@@ -685,7 +685,7 @@ const ServiceFlowPage: FC = () => {
                 const node = nodes.find((node) => node.id === e.target);
                 if (!node) return e.target;
                 const matchingRule = parentNode.data?.rules?.find(
-                  (_: never, i: number) => `rule ${i}` === node.data.label
+                  (_: never, i: number) => `rule ${i + 1}` === node.data.label
                 );
                 const followingNode = nodes.find((n) => n.id === edges.find((edge) => edge.source === node.id)?.target);
                 return {
@@ -693,7 +693,7 @@ const ServiceFlowPage: FC = () => {
                     ? `\${${matchingRule.name.replace("{{", "").replace("}}", "")} ${matchingRule.condition} ${
                         matchingRule.value
                       }}`
-                    : `\${${clientInput} == ${node.data.label === "rule 0" ? '"Yes"' : '"No"'}}`,
+                    : `\${${clientInput} == ${node.data.label === "rule 1" ? '"Yes"' : '"No"'}}`,
                   nextStep:
                     followingNode?.type === "customNode"
                       ? `${followingNode.data.stepType}-${followingNode.id}`
