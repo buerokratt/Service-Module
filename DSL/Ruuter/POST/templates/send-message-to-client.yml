@@ -1,4 +1,4 @@
-# End conversation
+# Message to client element
 check_for_body:
   switch:
     - condition: ${incoming.body == null || incoming.body.message == null || incoming.body.message == ""}
@@ -15,11 +15,10 @@ send_message_to_client:
   args:
     response:
       status: 'OK'
-      message: "Teenus on lõpetatud"
+      message: "Hello, Muki"
   result: result
 
 return_value:
-  wrapper: false
   return: ${result.response.body}
   next: end
 
