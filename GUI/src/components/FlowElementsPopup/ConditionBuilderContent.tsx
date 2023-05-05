@@ -4,7 +4,6 @@ import { Track } from "..";
 import YesNoPopupContent from "./YesNoPopupContent";
 import RulesBuilder from "./RulesBuilder";
 import './styles.scss'
-import './styles.scss'
 import { ConditionRuleType } from "../../types";
 
 interface ConditionBuilderContentProps {
