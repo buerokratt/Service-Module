@@ -120,7 +120,7 @@ const ServiceFlowPage: FC = () => {
     if (node.data.stepType === StepType.Input) {
       return {
         templateName: "client-input",
-        resultName: `ClientInput_${node.data.clientInputId}`,
+        resultName: `ClientInput_${node.data.clientInputId}_result`,
       };
     }
     if (node.data.stepType === StepType.SiGa) {
@@ -669,7 +669,13 @@ const ServiceFlowPage: FC = () => {
       if (parentNode.data.stepType === StepType.Input) {
         const clientInput = `ClientInput_${parentNode.data.clientInputId}`;
         const clientInputName = `${clientInput}-step`;
-        finishedFlow.set(parentStepName, getTemplate(parentNode, clientInputName, `${clientInput}-switch`));
+        finishedFlow.set(parentStepName, getTemplate(parentNode, clientInputName, `${clientInput}-assign`));
+        finishedFlow.set(`${clientInput}-assign`, {
+          assign: {
+            [clientInput]: `\${${clientInput}_result.input}`,
+          },
+          next: `${clientInput}-switch`,
+        });
         finishedFlow.set(
           `${clientInput}-switch`,
           getSwitchCase(

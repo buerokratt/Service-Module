@@ -3,9 +3,8 @@ request_client_input:
   call: reflect.mock
   args:
     response:
-      input: 'Yes'
+      input: "Yes"
   result: clientInput
 
 return_value:
-  wrapper: false
   return: ${clientInput.response.body}
