@@ -95,7 +95,7 @@
   "serviceFlow": {
     "element": {
       "taraAuthentication": "Tara authorization",
-      "textfield": "Textfield",
+      "textfield": "Send message to client",
       "clientInput": "Client input",
       "openNewWebpage": "Open new webpage",
       "fileGeneration": "File generation",
