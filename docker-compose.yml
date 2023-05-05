@@ -83,20 +83,6 @@ services:
       - 3005:3005
     networks:
       - bykstack
-  node_server:
-    container_name: node_server
-    build:
-      context: ./DSL/Node
-      dockerfile: Dockerfile.dev
-    environment:
-      - CONTENT_FOLDER=/data
-    volumes:
-      - ./DSL:/data
-      - ./DSL/Node:/app
-    ports:
-      - 3008:3008
-    networks:
-      - bykstack
   gui_dev:
     container_name: gui_dev
     environment:
