@@ -15,11 +15,13 @@ import ReactFlow, {
 import "reactflow/dist/style.css";
 import CustomNode from "../Steps/CustomNode";
 import PlaceholderNode from "../Steps/PlaceholderNode";
-import { StepType } from "../../types/step";
+import StartNode from "../Steps/StartNode";
+import { StepType } from "../../types";
 
 export const GRID_UNIT = 16;
 
 const nodeTypes = {
+  startNode: StartNode,
   customNode: CustomNode,
   placeholder: PlaceholderNode,
 };
@@ -33,6 +35,8 @@ type FlowBuilderProps = {
   edges: Edge[];
   setEdges: Dispatch<SetStateAction<Edge[]>>;
   onEdgesChange: OnEdgesChange;
+  reactFlowInstance?: ReactFlowInstance;
+  setReactFlowInstance: Dispatch<SetStateAction<ReactFlowInstance | undefined>>;
 };
 
 const FlowBuilder: FC<FlowBuilderProps> = ({
@@ -44,14 +48,29 @@ const FlowBuilder: FC<FlowBuilderProps> = ({
   edges,
   setEdges,
   onEdgesChange,
+  reactFlowInstance,
+  setReactFlowInstance,
 }) => {
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
-  const [reactFlowInstance, setReactFlowInstance] = useState<ReactFlowInstance>();
   const [clickedNode, setClickedNode] = useState();
   const nodePositionOffset = 28 * GRID_UNIT;
   const updateNodeInternals = useUpdateNodeInternals();
 
   const getEdgeLength = () => 5 * GRID_UNIT;
+
+  useEffect(() => {
+    setNodes((prevNodes) => prevNodes.map((node) => {
+      if (node.type !== "customNode") return node;
+      node.data = {
+        ...node.data,
+        onDelete,
+        onEdit: handleNodeEdit,
+        setClickedNode,
+        update: updateInputRules,
+      }
+      return node;
+    }));
+  }, [reactFlowInstance])
 
   // Align nodes in case any got overlapped
   const alignNodes = (nodeChanges: NodeChange[]) => {
@@ -199,7 +218,6 @@ const FlowBuilder: FC<FlowBuilderProps> = ({
     };
   };
 
-
   // Move the placeholder together with the node being moved
   const onNodeDrag = useCallback(
     (_event: React.MouseEvent, draggedNode: Node) => {
@@ -345,6 +363,8 @@ const FlowBuilder: FC<FlowBuilderProps> = ({
         });
 
         // Add new node in place of old placeholder
+        const prevClientInputs = prevNodes.filter((node) => node.data.stepType === "input");
+        const newClientInputId = (prevClientInputs[prevClientInputs.length - 1]?.data.clientInputId ?? 0) + 1;
         const newNodes = [
           ...prevNodes.filter((node) => node.id !== matchingPlaceholder.id),
           {
@@ -352,9 +372,10 @@ const FlowBuilder: FC<FlowBuilderProps> = ({
             position: matchingPlaceholder.position,
             type: "customNode",
             data: {
-              label,
+              label: type === "input" ? `${label} - ${newClientInputId}` : label,
               onDelete,
               onEdit: handleNodeEdit,
+              clientInputId: type === StepType.Input ? newClientInputId : undefined,
               type: [
                 StepType.FinishingStepEnd,
                 StepType.FinishingStepRedirect
@@ -365,16 +386,16 @@ const FlowBuilder: FC<FlowBuilderProps> = ({
                 StepType.FileSign,
                 StepType.FinishingStepEnd,
                 StepType.FinishingStepRedirect,
+                StepType.UserDefined,
               ].includes(type),
               childrenCount: type === StepType.Input ? 0 : 1,
               setClickedNode,
               update: updateInputRules,
               message: setDefaultMessages(type),
             },
-            className: [
-              StepType.FinishingStepEnd,
-              StepType.FinishingStepRedirect
-            ].includes(type) ? "finishing-step" : "step",
+            className: [StepType.FinishingStepEnd, StepType.FinishingStepRedirect].includes(type)
+              ? "finishing-step"
+              : "step",
           },
         ];
 
@@ -619,11 +640,14 @@ const FlowBuilder: FC<FlowBuilderProps> = ({
     [edges, nodes]
   );
 
-  const handleNodeEdit = useCallback((selectedNodeId: string) => {
-    if (!reactFlowInstance) return;
-    const node = reactFlowInstance.getNode(selectedNodeId);
-    onNodeEdit(node ?? null);
-  }, [reactFlowInstance]);
+  const handleNodeEdit = useCallback(
+    (selectedNodeId: string) => {
+      if (!reactFlowInstance) return;
+      const node = reactFlowInstance.getNode(selectedNodeId);
+      onNodeEdit(node ?? null);
+    },
+    [reactFlowInstance]
+  );
 
   return (
     <div className="graph__body" ref={reactFlowWrapper}>

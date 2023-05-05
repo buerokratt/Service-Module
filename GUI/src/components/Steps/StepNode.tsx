@@ -1,7 +1,7 @@
 import { FC, memo } from 'react';
 
 import { ExclamationBadge, Track } from '../';
-import { StepType } from '../../types/step';
+import { StepType } from '../../types';
 
 type NodeDataProps = {
   data: {
@@ -23,7 +23,8 @@ const StepNode: FC<NodeDataProps> = ({ data }) => {
     };
   };
 
-  const isStepValid = () => {
+  const isStepInvalid = () => {
+    if (data.stepType === StepType.UserDefined) return false;
     if (data.stepType === StepType.Input) return data.childrenCount < 2;
 
     return !(data.readonly || !!data.message?.length);
@@ -32,7 +33,7 @@ const StepNode: FC<NodeDataProps> = ({ data }) => {
   return (
     <Track style={{ width: '100%' }} direction='vertical' align='left'>
       <p>
-        {isStepValid() && <ExclamationBadge></ExclamationBadge>}
+        {isStepInvalid() && <ExclamationBadge></ExclamationBadge>}
         {data.label}
       </p>
       <div dangerouslySetInnerHTML={createMarkup(data.message ?? '')}></div>

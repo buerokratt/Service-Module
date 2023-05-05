@@ -1,0 +1,21 @@
+{
+  "mappings": {
+    "properties": {
+      "requestId": {
+        "type": "number"
+      },
+      "timestamp": {
+        "type": "number"
+      },
+      "level": {
+        "type": "text"
+      },
+      "statusCode": {
+        "type": "number"
+      },
+      "content": {
+        "type": "text"
+      }
+    }
+  }
+}

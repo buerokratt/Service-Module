@@ -1,14 +1,15 @@
 import { useEffect, useState } from "react"
 import { useDrop } from "react-dnd"
-import { FormInput } from "../FormElements"
-import ConditiobRuleType from "./ConditiobRuleType"
 
-interface ConditiobInputProps {
-  rule: ConditiobRuleType,
+import { ConditionRuleType } from "../../types"
+import { FormInput } from "../FormElements"
+
+interface ConditionInputProps {
+  rule: ConditionRuleType,
   handleNameChange: (id: string, value: string) => void
 }
 
-const ConditionInput: React.FC<ConditiobInputProps> = ({ rule, handleNameChange }) => {
+const ConditionInput: React.FC<ConditionInputProps> = ({ rule, handleNameChange }) => {
   const [name, setName] = useState(rule.name)
 
   const [_, drop] = useDrop(

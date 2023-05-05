@@ -6,7 +6,7 @@ import { MdDeleteOutline, MdOutlineEdit, MdOutlineRemoveRedEye } from 'react-ico
 import { Box, Button, Icon, Track } from "../";
 import StepNode from "./StepNode";
 import "./Node.scss";
-import { StepType } from '../../types/step';
+import { StepType } from '../../types';
 
 type NodeDataProps = {
   data: {
