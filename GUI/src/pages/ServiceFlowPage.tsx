@@ -240,7 +240,7 @@ const ServiceFlowPage: FC = () => {
       };
     }
     return {
-      template: `sticky/${data?.templateName}`,
+      template: `templates/${data?.templateName}`,
       requestType: "post",
       body: data?.body,
       result: data?.resultName ?? `${stepName}_result`,
