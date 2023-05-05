@@ -5,10 +5,7 @@ import Popup from "../Popup";
 import { Button, Track } from "..";
 import FileGenerateContent from "./FileGenerateContent";
 import ConditionBuilderContent from "./ConditionBuilderContent";
-import ConditiobRuleType from "./ConditiobRuleType";
-import './styles.scss'
 import { useTranslation } from "react-i18next";
-import { StepType } from "../../types/step";
 import TextfieldContent from "./TextfieldContent";
 import * as Tabs from '@radix-ui/react-tabs';
 import TextfieldTestContent from "./TextfieldTestContent";
@@ -21,6 +18,8 @@ import OpenWebPageContent from "./OpenWebPageContent";
 import OpenWebPageTestContent from "./OpenWebPageTestContent";
 import { Node } from "reactflow";
 import RasaRulesContent from "./RasaRulesContent";
+import { ConditionRuleType, StepType } from "../../types";
+import './styles.scss'
 
 interface FlowElementsPopupProps {
   node: any
@@ -33,7 +32,7 @@ interface FlowElementsPopupProps {
 const FlowElementsPopup: React.FC<FlowElementsPopupProps> = ({ node, onClose, onSave, oldRules, onRulesUpdate }) => {
   const { t } = useTranslation();
   const [isYesNoQuestion, setIsYesNoQuestion] = useState(node?.isYesNoQuestion ?? false)
-  const [rules, setRules] = useState<ConditiobRuleType[]>(node?.rules ?? [])
+  const [rules, setRules] = useState<ConditionRuleType[]>(node?.rules ?? [])
   const [selectedTab, setSelectedTab] = useState<string | null>(null);
   const [isJsonRequestVisible, setIsJsonRequestVisible] = useState(false);
   const [jsonRequestContent, setJsonRequestContent] = useState<string | null>(null);
@@ -220,6 +219,5 @@ const FlowElementsPopup: React.FC<FlowElementsPopupProps> = ({ node, onClose, on
     </Popup >
   )
 }
-
 
 export default FlowElementsPopup

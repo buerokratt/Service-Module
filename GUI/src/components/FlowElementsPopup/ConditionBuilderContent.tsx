@@ -1,16 +1,16 @@
 import React from "react";
 import { SwitchBox } from "../FormElements";
 import { Track } from "..";
-import ConditiobRuleType from "./ConditiobRuleType";
 import YesNoPopupContent from "./YesNoPopupContent";
 import RulesBuilder from "./RulesBuilder";
 import './styles.scss'
+import { ConditionRuleType } from "../../types";
 
 interface ConditionBuilderContentProps {
   isYesNoQuestion: boolean
   setIsYesNoQuestion: (x: boolean) => void
-  rules: ConditiobRuleType[]
-  setRules: (x: ConditiobRuleType[]) => void
+  rules: ConditionRuleType[]
+  setRules: (x: ConditionRuleType[]) => void
 }
 
 const ConditionBuilderContent: React.FC<ConditionBuilderContentProps> = ({
@@ -20,7 +20,7 @@ const ConditionBuilderContent: React.FC<ConditionBuilderContentProps> = ({
   setRules,
 }) => {
   return (
-    <Track direction='vertical' align='stretch'>
+    <Track direction='vertical' align='stretch' className="flow-body-reverse-margin">
       <Track gap={16} className="flow-body-padding">
         <Track>
           <SwitchBox

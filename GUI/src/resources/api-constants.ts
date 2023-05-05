@@ -53,10 +53,13 @@ export const dummyVariableOptions = [
 ];
 
 // Mocks
-export const openApiSpeckMock = (): string => `${baseUrl}/mocks/services/open-api-spec-mock`;
+export const getOpenApiSpec = (): string => `${baseUrl}/services/open-api-spec`;
 export const servicesRequestsExplain = (): string => `${baseUrl}/services/requests/explain`;
 export const getClientInputAvailableVariables = (): string => `${baseUrl}/mocks/client-input-variables`;
 
 export const getDomainFile = (): string => `${baseUrl}/domain-file`;
 export const getServiceSettings = (): string => `${baseUrl}/mocks/service-settings`;
 export const saveServiceSettings = (): string => `${baseUrl}/mocks/service-settings`;
+
+export const getTaraAuthResponseVariables = (): string => `${baseUrl}/mocks/tim/user-info`;
+export const getEndpointValidationMock = (): string => `${baseUrl}/mocks/validation-mock`;
