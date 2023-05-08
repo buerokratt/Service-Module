@@ -12,4 +12,5 @@ export enum StepType {
   FinishingStepRedirect = "finising-step-redirect",
   UserDefined = "user-defined",
   RasaRules = "rasa-rules",
+  SiGa = "siga",
 }

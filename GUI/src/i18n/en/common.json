@@ -100,14 +100,15 @@
   "serviceFlow": {
     "element": {
       "taraAuthentication": "Tara authorization",
-      "textfield": "Textfield",
+      "textfield": "Send message to client",
       "clientInput": "Client input",
       "openNewWebpage": "Open new webpage",
       "fileGeneration": "File generation",
       "fileSigning": "File signing",
       "conversationEnd": "End conversation",
       "redirectConversationToSupport": "Direct to Customer Support",
-      "rules": "Rules"
+      "rules": "Rules",
+      "siga": "SiGa"
     },
     "popup": {
       "messageLabel": "Message",

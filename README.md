@@ -97,3 +97,28 @@ To enable handlebars templates to receive a body and return a json
 
 ### DMapper helper functions
 - Add all the helper functions to **DSL/DMapper/lib/helpers.js**
+
+### DMapper problems
+- http://data_mapper:3005/js/generate/pdf 
+  - Docker stops - PDF is not returned
+- **Possible solution- replace Data Mapper Dockerfile content with the following:**
+```
+FROM node:19-alpine
+
+RUN apk add --no-cache chromium
+ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
+
+ENV NODE_ENV development
+WORKDIR /workspace/app/
+
+COPY js js
+COPY views views
+COPY lib lib
+COPY package.json .
+COPY server.js .
+
+RUN npm i -g npm@latest
+RUN npm install
+ENTRYPOINT ["npm","start"]
+```

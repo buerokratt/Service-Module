@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useLocation, useParams, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { Button, Card, FormInput, ApiEndpointCard, FormTextarea, Layout, NewServiceHeader, Track } from "../components";
 import { v4 as uuid } from "uuid";
 import { ROUTES } from "../resources/routes-constants";
@@ -15,8 +15,8 @@ const NewServicePage: React.FC = () => {
   const navigate = useNavigate();
   const [endpoints, setEndpoints] = useState<EndpointData[]>(location.state?.endpoints ?? []);
   const { intentName } = useParams();
-  const [serviceName, setServiceName] = useState<string | undefined>(intentName);
-
+  const [serviceName, setServiceName] = useState<string>(location.state?.serviceName ?? intentName ?? "");
+  const [description, setDescription] = useState<string>(location.state?.serviceDescription ?? "");
   const onDelete = (id: string) => {
     setEndpoints((prevEndpoints) => prevEndpoints.filter((prevEndpoint) => prevEndpoint.id !== id));
   };
@@ -27,7 +27,7 @@ const NewServicePage: React.FC = () => {
     const variables: string[] = [];
     nodes
       ?.filter((node) => node.data.stepType === "input")
-      .forEach((node) => variables.push(`{{ClientInput.${node.data.clientInputId}}}`));
+      .forEach((node) => variables.push(`{{ClientInput_${node.data.clientInputId}}}`));
     if (nodes?.find((node) => node.data.stepType === "auth")) loadTaraVariables();
     setAvailableVariables(variables);
   }, []);
@@ -86,8 +86,17 @@ const NewServicePage: React.FC = () => {
           saveDraftOnClick={saveDraft}
           endpoints={endpoints}
           flow={location.state?.flow}
+          serviceDescription={description}
+          serviceName={serviceName}
           continueOnClick={() => {
-            navigate(ROUTES.FLOW_ROUTE, { state: { endpoints: endpoints, flow: location.state?.flow } });
+            navigate(ROUTES.FLOW_ROUTE, {
+              state: {
+                endpoints: endpoints,
+                flow: location.state?.flow,
+                serviceName: serviceName,
+                serviceDescription: description,
+              },
+            });
           }}
         />
       }
@@ -98,13 +107,15 @@ const NewServicePage: React.FC = () => {
           <Track direction="vertical" align="stretch" gap={16}>
             <div>
               <label htmlFor="name">{t("newService.name")}</label>
-              <FormInput name="name" label="" defaultValue={serviceName} />
+              <FormInput name="name" label="" value={serviceName} onChange={(e) => setServiceName(e.target.value)} />
             </div>
             <div>
               <label htmlFor="description">{t("newService.description")}</label>
               <FormTextarea
                 name="description"
                 label=""
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
                 style={{
                   height: 120,
                   resize: "vertical",
