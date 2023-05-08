@@ -1,10 +1,15 @@
-get_ruuter_services:
-  call: http.get
+# get_ruuter_services:
+#   call: http.get
+#   args:
+#     url: http://node_server:3008/ruuter/list
+#   result: results
+get_services_list:
+  call: http.post
   args:
-    url: http://node_server:3008/ruuter/list
+    url: http://resql:8087/get-services-list
   result: results
 
 return_ok:
   status: 200
-  return: ${results.response.body}
+  return: ${results.response.body[0].servicesList}
   next: end
