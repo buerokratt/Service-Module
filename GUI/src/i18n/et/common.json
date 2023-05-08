@@ -53,7 +53,8 @@
       "state": "Olek",
       "states": {
         "active": "Aktiivne",
-        "inactive": "Mitteaktiivne"
+        "inactive": "Mitteaktiivne",
+        "draft": "Mustand"
       }
     },
     "popup": {
