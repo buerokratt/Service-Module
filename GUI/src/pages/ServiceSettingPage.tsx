@@ -4,7 +4,7 @@ import { Button, FormInput, Track } from "../components";
 import { getServiceSettings, saveServiceSettings } from "../resources/api-constants";
 import axios from "axios";
 
-const SerivceSettingPage: React.FC = () => {
+const ServiceSettingPage: React.FC = () => {
   const [tryCount, setTryCount] = useState(0)
   const [changed, setChanged] = useState(false)
   const [initValue, setInitValue] = useState(0)
@@ -68,4 +68,4 @@ const SerivceSettingPage: React.FC = () => {
   );
 };
 
-export default SerivceSettingPage;
+export default ServiceSettingPage;
