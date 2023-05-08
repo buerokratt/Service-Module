@@ -1,8 +1,10 @@
 import { createColumnHelper, PaginationState } from "@tanstack/react-table";
+import axios from "axios";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { MdDeleteOutline, MdOutlineEdit } from "react-icons/md";
 import { Button, Card, Icon, Label, Modal, Track } from "..";
+import { deleteService } from "../../resources/api-constants";
 import { Service } from "../../types/service";
 import { ServiceState } from "../../types/service-state";
 import DataTable from "../DataTable";
@@ -23,6 +25,7 @@ const ServicesTable = (props: Props) => {
   const [isDeletePopupVisible, setDeletePopupVisible] = useState(false);
   const [isStatePopupVisible, setStatePopupVisible] = useState(false);
   const [popupText, setPopupText] = useState("");
+  const [selectedService, setSelectedService] = useState<Service>();
   const columnHelper = createColumnHelper<Service>();
 
   useEffect(() => {
@@ -95,7 +98,10 @@ const ServicesTable = (props: Props) => {
           <Button
             disabled={props.row.original.state === ServiceState.Active}
             appearance="text"
-            onClick={() => setDeletePopupVisible(true)}
+            onClick={() => {
+              setSelectedService(services.find((s) => s.id === props.row.original.id));
+              setDeletePopupVisible(true);
+            }}
           >
             <Icon icon={<MdDeleteOutline />} size="medium" />
             {t("overview.delete")}
@@ -108,31 +114,40 @@ const ServicesTable = (props: Props) => {
   const setLabelType = (serviceState: ServiceState) => {
     switch (serviceState) {
       case ServiceState.Draft:
-        return 'waring';
+        return "waring";
       case ServiceState.Inactive:
-        return 'error';
+        return "error";
       default:
-        return 'success';
+        return "success";
     }
-  }
+  };
 
   return (
     <Card>
       {isDeletePopupVisible && (
-        <Modal
-          title={t("overview.popup.delete")}
-          onClose={() => setDeletePopupVisible(false)}
-        >
+        <Modal title={t("overview.popup.delete")} onClose={() => setDeletePopupVisible(false)}>
           <Track justify="end" gap={16}>
-            <Button
-              appearance="secondary"
-              onClick={() => setDeletePopupVisible(false)}
-            >
+            <Button appearance="secondary" onClick={() => setDeletePopupVisible(false)}>
               {t("overview.cancel")}
             </Button>
             <Button
               appearance="error"
-              onClick={() => setDeletePopupVisible(false)}
+              onClick={() => {
+                axios
+                  .post(deleteService(), {
+                    id: selectedService?.id,
+                    type: selectedService?.type,
+                  })
+                  .then((r) => {
+                    console.log(r);
+                    setServices((prevServices) => prevServices.filter((s) => s.id !== selectedService?.id));
+                    setSelectedService(undefined);
+                    setDeletePopupVisible(false);
+                  })
+                  .catch((e) => {
+                    console.log(e);
+                  });
+              }}
             >
               {t("overview.delete")}
             </Button>
@@ -142,15 +157,10 @@ const ServicesTable = (props: Props) => {
       {isStatePopupVisible && (
         <Modal title={popupText} onClose={() => setStatePopupVisible(false)}>
           <Track justify="end" gap={16}>
-            <Button
-              appearance="secondary"
-              onClick={() => setStatePopupVisible(false)}
-            >
+            <Button appearance="secondary" onClick={() => setStatePopupVisible(false)}>
               {t("overview.cancel")}
             </Button>
-            <Button onClick={() => setStatePopupVisible(false)}>
-              {t("overview.popup.setState")}
-            </Button>
+            <Button onClick={() => setStatePopupVisible(false)}>{t("overview.popup.setState")}</Button>
           </Track>
         </Modal>
       )}

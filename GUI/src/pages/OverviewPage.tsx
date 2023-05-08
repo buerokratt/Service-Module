@@ -16,31 +16,29 @@ const OverviewPage: React.FC = () => {
 
   useEffect(() => {
     const services: Service[] = [];
-    axios.get(getServicesList()).then(r => {
-      console.log(r.data.response);
-      Object.values(JSON.parse(r.data.response.value)).forEach((value: any )=>{
-        console.log(value);
-        Object.entries(value).forEach(([key,value])=> {
-          // console.log(key);
-          // console.log((value as any).id);
+    axios.get(getServicesList()).then((r) => {
+      console.log(JSON.parse(r.data.response.value));
+      Object.values(JSON.parse(r.data.response.value)).forEach((value: any) => {
+        Object.entries(value).forEach(([key, value]) => {
           const service: Service = {
+            id: (value as any).id,
+            type: (value as any).type,
             name: key,
             usedCount: 0,
-            state: (value as any).state
+            state: (value as any).state,
           };
           services.push(service);
-        })
-      })
+        });
+      });
       setDummyData(services);
-    })
-    // setDummyData(dummyServiceData);
+    });
   }, []);
 
   return (
     <>
       <Track justify="between">
         <h1>{t("overview.services")}</h1>
-        <Button onClick={() => navigate(ROUTES.NEWSERVICE_ROUTE)} >{t("overview.create")}</Button>
+        <Button onClick={() => navigate(ROUTES.NEWSERVICE_ROUTE)}>{t("overview.create")}</Button>
       </Track>
       <ServicesTable dataSource={dummyData} />
     </>
