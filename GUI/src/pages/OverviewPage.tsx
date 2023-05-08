@@ -9,12 +9,12 @@ import { ROUTES } from "../resources/routes-constants";
 import axios from "axios";
 
 type ServicesResponse = {
-  [key: string]: {
-    readonly id: number;
-    readonly state: ServiceState;
-    readonly type: 'GET' | 'POST';
-  }
+  readonly id: number;
+  readonly name: string;
+  readonly state: ServiceState;
+  readonly type: 'GET' | 'POST';
 };
+
 
 const OverviewPage: React.FC = () => {
   const [serviceList, setServiceList] = useState<Service[]>([]);
@@ -23,23 +23,15 @@ const OverviewPage: React.FC = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    axios.get(getServicesList()).then(r => {
-      const data: string[] = r.data.response;
-      const list: ServicesResponse[] = data.map(d => JSON.parse(d));
-
-      const services = list.map((value) => {
-        const result = Object.entries(value).map(([key, value]) => {
-          const service: Service = {
-            id: value.id,
-            name: key,
-            usedCount: 0,
-            state: value.state
-          };
-          return service;
-        })
-        return result;
-      }).flatMap(item => item);
-
+    axios.get<{ response: ServicesResponse[] }>(getServicesList()).then(r => {
+      const services = r.data.response.map(item => {
+        return {
+          id: item.id,
+          name: item.name,
+          usedCount: 0,
+          state: item.state,
+        }
+      });
       setServiceList(services);
     })
   }, [setServiceList]);

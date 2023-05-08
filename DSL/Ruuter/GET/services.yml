@@ -11,5 +11,5 @@ get_services_list:
 
 return_ok:
   status: 200
-  return: ${results.response.body[0].servicesList}
+  return: ${results.response.body}
   next: end
