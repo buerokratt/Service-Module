@@ -65,14 +65,7 @@ const ServicesTable = (props: Props) => {
             )
           }
         >
-          <Label
-            type={
-              props.row.original.state === ServiceState.Active
-                ? "success"
-                : "error"
-            }
-            tooltip={<></>}
-          >
+          <Label type={setLabelType(props.row.original.state)}>
             {t(`overview.service.states.${props.row.original.state}`)}
           </Label>
         </Track>
@@ -111,6 +104,17 @@ const ServicesTable = (props: Props) => {
       ),
     }),
   ];
+
+  const setLabelType = (serviceState: ServiceState) => {
+    switch (serviceState) {
+      case ServiceState.Draft:
+        return 'waring';
+      case ServiceState.Inactive:
+        return 'error';
+      default:
+        return 'success';
+    }
+  }
 
   return (
     <Card>
