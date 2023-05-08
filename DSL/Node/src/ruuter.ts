@@ -1,27 +1,20 @@
 import express, { Router } from 'express';
 import path from 'path';
 import { parse as parseYmlToJson } from 'yaml';
-import { getAllFiles, readFile } from './util';
+import { getAllFiles, getUrl, readFile } from './util';
 const router: Router = express.Router();
 
 router.get('/list', (req, res) => {
-  const services: any = {};
+  const services: any = [];
 
   getAllFiles('/Ruuter')
     .filter(filename => filename.endsWith('.yml'))
     .map(path.parse)
-    .forEach(({ name, dir }) => {
+    .forEach(({ name, dir, }) => {
       const type = dir.includes('/POST/') ? 'POST' : 'GET';
       const status = dir.endsWith('/inactive') ? 'inactive' : 'active';
-      if (!services[name]) {
-        services[name] = { type, status }
-      } else {
-        if (services[name].length > 1) {
-          services[name] = [...services[name], { type, status }]
-        } else {
-          services[name] = [{ ...services[name] }, { type, status }]
-        }
-      }
+      const url = getUrl(dir);
+      services.push({ name, type, status, url })
     })
 
   return res.status(200).json(services)
