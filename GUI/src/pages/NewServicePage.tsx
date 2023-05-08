@@ -17,6 +17,7 @@ const NewServicePage: React.FC = () => {
   const { intentName } = useParams();
   const [serviceName, setServiceName] = useState<string>(location.state?.serviceName ?? intentName ?? "");
   const [description, setDescription] = useState<string>(location.state?.serviceDescription ?? "");
+  const [secrets, setSecrets] = useState<{ [key: string]: any }>(location.state?.secrets ?? {});
   const onDelete = (id: string) => {
     setEndpoints((prevEndpoints) => prevEndpoints.filter((prevEndpoint) => prevEndpoint.id !== id));
   };
@@ -50,8 +51,9 @@ const NewServicePage: React.FC = () => {
 
   const loadSecretVariables = () => {
     axios.get(getSecretVariables()).then((result) => {
-      const data: { [key: string]: any } = result.data?.response;
+      const data: { [key: string]: any } = result.data;
       if (!data) return;
+      if (Object.keys(secrets).length === 0) setSecrets(data);
       const prodVariables: string[] = [];
       const testVariables: string[] = [];
       if (data.prod) getSecrets(data.prod, "", prodVariables);
@@ -111,7 +113,6 @@ const NewServicePage: React.FC = () => {
         if (!availableVariables.prod.includes(variable)) availableVariables.prod.push(variable);
       });
     });
-    console.log(endpointId, availableVariables);
     return availableVariables;
   };
 
@@ -124,14 +125,16 @@ const NewServicePage: React.FC = () => {
           saveDraftOnClick={saveDraft}
           endpoints={endpoints}
           flow={location.state?.flow}
+          secrets={secrets}
           serviceDescription={description}
           serviceName={serviceName}
           continueOnClick={() => {
             navigate(ROUTES.FLOW_ROUTE, {
               state: {
-                endpoints: endpoints,
+                endpoints,
+                secrets,
+                serviceName,
                 flow: location.state?.flow,
-                serviceName: serviceName,
                 serviceDescription: description,
               },
             });

@@ -10,6 +10,7 @@ type NewServiceHeaderProps = {
   saveDraftOnClick: () => void;
   endpoints?: EndpointData[];
   flow?: string;
+  secrets?: { [key: string]: any };
   serviceName?: string;
   serviceDescription?: string;
 };
@@ -20,6 +21,7 @@ const NewServiceHeader: FC<NewServiceHeaderProps> = ({
   saveDraftOnClick,
   endpoints,
   flow,
+  secrets,
   serviceDescription,
   serviceName,
 }) => {
@@ -32,6 +34,7 @@ const NewServiceHeader: FC<NewServiceHeaderProps> = ({
             activeStep={activeStep}
             endpoints={endpoints}
             flow={flow}
+            secrets={secrets}
             serviceDescription={serviceDescription}
             serviceName={serviceName}
           />

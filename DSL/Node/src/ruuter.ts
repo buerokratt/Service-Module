@@ -53,36 +53,71 @@ router.get("/sticky", (req, res) => {
   return res.status(200).json(services);
 });
 
+router.get("/secrets-with-priority", (req, res) => {
+  const priority = req.query.priority;
+  const prodSecrets = mapToJson(getAllFiles("/secrets/prod"));
+  const testSecrets = mapToJson(getAllFiles("/secrets/test"));
+
+  const mergeSecrets = (
+    secrets: { [key: string]: any },
+    result: { [key: string]: any },
+    isProdSecrets: boolean,
+    isProdPriority: boolean
+  ) => {
+    Object.keys(secrets).forEach((k) => {
+      if (typeof secrets[k] === "object") {
+        if (!Object.keys(result).includes(k)) result[k] = {};
+        return mergeSecrets(
+          secrets[k],
+          result[k],
+          isProdSecrets,
+          isProdPriority
+        );
+      }
+      if (
+        !Object.keys(result).includes(k) ||
+        (!isProdSecrets && !isProdPriority)
+      )
+        result[k] = secrets[k];
+    });
+    return result;
+  };
+  const result = {};
+  mergeSecrets(prodSecrets, result, true, priority !== "test");
+  mergeSecrets(testSecrets, result, false, priority !== "test");
+  return res.status(200).send({ ...result });
+});
+
+const assignSecrets = (
+  data: { [key: string]: any },
+  result: { [key: string]: any }
+) => {
+  Object.keys(data).forEach((k) => {
+    if (typeof data[k] === "object") {
+      result[k] = {};
+      return assignSecrets(data[k], result[k]);
+    }
+    result[k] = data[k];
+  });
+};
+
+const mapToJson = (secrets: string[]) => {
+  const result: { [key: string]: any } = {};
+  secrets.forEach((secretPath) => {
+    try {
+      const data = parseYmlToJson(fs.readFileSync(secretPath, "utf-8"));
+      assignSecrets(data, result);
+    } catch (_) {
+      return {};
+    }
+  });
+  return result;
+};
+
 router.get("/secrets", (req, res) => {
   const prodSecrets = getAllFiles("/secrets/prod");
   const testSecrets = getAllFiles("/secrets/test");
 
-  const assignSecrets = (
-    data: { [key: string]: any },
-    result: { [key: string]: any }
-  ) => {
-    Object.keys(data).forEach((k) => {
-      if (typeof data[k] === "object") {
-        result[k] = {};
-        assignSecrets(data[k], result[k]);
-        return;
-      }
-      result[k] = data[k];
-    });
-  };
-
-  const mapToJson = (secrets: string[]) => {
-    const result: { [key: string]: any } = {};
-    secrets.forEach((secretPath) => {
-      try {
-        const data = parseYmlToJson(fs.readFileSync(secretPath, "utf-8"));
-        assignSecrets(data, result);
-      } catch (_) {
-        return {};
-      }
-    });
-    return result;
-  };
   const result = {
     prod: mapToJson(prodSecrets),
     test: mapToJson(testSecrets),
