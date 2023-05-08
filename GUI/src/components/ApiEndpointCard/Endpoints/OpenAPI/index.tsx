@@ -6,14 +6,20 @@ import axios from "axios";
 import { v4 as uuid } from "uuid";
 import { RequestTab, Option } from "../../../../types";
 import { ApiSpecProperty } from "../../../../types/api-spec-property";
-import { EndpointData, EndpointType, EndpointVariableData, EndpointTab } from "../../../../types/endpoint";
+import {
+  EndpointData,
+  EndpointType,
+  EndpointVariableData,
+  EndpointTab,
+  PreDefinedEndpointEnvVariables,
+} from "../../../../types/endpoint";
 import { RequestVariablesRowData, RequestVariablesTabsRowsData } from "../../../../types/request-variables";
 
 type EndpointOpenAPIProps = {
   endpoint: EndpointData;
   setEndpoints: React.Dispatch<React.SetStateAction<EndpointData[]>>;
   isLive: boolean;
-  requestValues: string[];
+  requestValues: PreDefinedEndpointEnvVariables;
   requestTab: RequestTab;
   setRequestTab: React.Dispatch<React.SetStateAction<RequestTab>>;
 };
@@ -146,7 +152,7 @@ const EndpointOpenAPI: React.FC<EndpointOpenAPIProps> = ({
   };
 
   const fetchOpenApiSpecMock = async () => {
-    const result = await axios.post(getOpenApiSpec(), {url: openApiUrl});
+    const result = await axios.post(getOpenApiSpec(), { url: openApiUrl });
     const apiSpec = result.data.response;
     console.log(apiSpec);
     const url = new URL(openApiUrl).origin + apiSpec.servers[0].url;

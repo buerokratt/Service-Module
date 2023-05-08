@@ -2,6 +2,7 @@ import express, { Router } from "express";
 import path from "path";
 import { parse as parseYmlToJson } from "yaml";
 import { getAllFiles, readFile } from "./util";
+import fs from "fs";
 
 const router: Router = express.Router();
 
@@ -50,6 +51,45 @@ router.get("/sticky", (req, res) => {
     });
 
   return res.status(200).json(services);
+});
+
+router.get("/secrets", (req, res) => {
+  const prodSecrets = getAllFiles("/secrets/prod");
+  const testSecrets = getAllFiles("/secrets/test");
+
+  const assignSecrets = (
+    data: { [key: string]: any },
+    result: { [key: string]: any }
+  ) => {
+    Object.keys(data).forEach((k) => {
+      if (typeof data[k] === "object") {
+        result[k] = {};
+        assignSecrets(data[k], result[k]);
+        return;
+      }
+      result[k] = data[k];
+    });
+  };
+
+  const mapToJson = (secrets: string[]) => {
+    const result: { [key: string]: any } = {};
+    secrets.forEach((secretPath) => {
+      try {
+        const data = parseYmlToJson(fs.readFileSync(secretPath, "utf-8"));
+        assignSecrets(data, result);
+      } catch (_) {
+        return {};
+      }
+    });
+    return result;
+  };
+  const result = {
+    prod: mapToJson(prodSecrets),
+    test: mapToJson(testSecrets),
+  };
+
+  res.setHeader("Content-Type", "application/json");
+  return res.status(200).send({ ...result });
 });
 
 router.post("/sticky/steps", (req, res) => {
