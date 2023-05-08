@@ -9,20 +9,6 @@ export const dummyDataApi = (): string => {
 // Services
 export const getServicesAdd = (): string => `${baseUrl}/services/add`;
 
-export const dummyServiceData = [
-  { name: "first", usedCount: 1, state: ServiceState.Inactive },
-  { name: "second", usedCount: 20, state: ServiceState.Draft },
-  { name: "third", usedCount: 3000, state: ServiceState.Inactive },
-  { name: "fourth", usedCount: 4000, state: ServiceState.Active },
-  { name: "fifth", usedCount: 500000, state: ServiceState.Active },
-  { name: "sixth", usedCount: 6000000, state: ServiceState.Active },
-  { name: "seventh", usedCount: 70000000, state: ServiceState.Inactive },
-  { name: "eight", usedCount: 800000000, state: ServiceState.Active },
-  { name: "ninth", usedCount: 900000000, state: ServiceState.Active },
-  { name: "tenth", usedCount: 10000000000, state: ServiceState.Active },
-  { name: "eleventh", usedCount: 11, state: ServiceState.Inactive },
-];
-
 export const dummyEndpointsData = [
   { label: "/me", value: "/me" },
   { label: "/you", value: "/you" },
@@ -59,4 +45,6 @@ export const getClientInputAvailableVariables = (): string => `${baseUrl}/mocks/
 export const getTaraAuthResponseVariables = (): string => `${baseUrl}/mocks/tim/user-info`;
 export const getEndpointValidationMock = (): string => `${baseUrl}/mocks/validation-mock`;
 
+
 export const getServicesList = (): string => `${baseUrl}/services`;
+export const changeServiceStatus = (): string => `${baseUrl}/services/status`
