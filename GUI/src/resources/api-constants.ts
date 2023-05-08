@@ -11,7 +11,7 @@ export const getServicesAdd = (): string => `${baseUrl}/services/add`;
 
 export const dummyServiceData = [
   { name: "first", usedCount: 1, state: ServiceState.Inactive },
-  { name: "second", usedCount: 20, state: ServiceState.Active },
+  { name: "second", usedCount: 20, state: ServiceState.Draft },
   { name: "third", usedCount: 3000, state: ServiceState.Inactive },
   { name: "fourth", usedCount: 4000, state: ServiceState.Active },
   { name: "fifth", usedCount: 500000, state: ServiceState.Active },
@@ -58,3 +58,5 @@ export const servicesRequestsExplain = (): string => `${baseUrl}/services/reques
 export const getClientInputAvailableVariables = (): string => `${baseUrl}/mocks/client-input-variables`;
 export const getTaraAuthResponseVariables = (): string => `${baseUrl}/mocks/tim/user-info`;
 export const getEndpointValidationMock = (): string => `${baseUrl}/mocks/validation-mock`;
+
+export const getServicesList = (): string => `${baseUrl}/services`;
