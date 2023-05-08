@@ -1,14 +1,6 @@
-SELECT array_agg(
-    json_build_object(
-      name,
-      json_build_object(
-        'id',
-        id,
-        'state',
-        current_state,
-        'type',
-        ruuter_type
-      )
-    )
-  ) AS services_list
-FROM services;
+SELECT id,
+  name,
+  current_state AS state,
+  ruuter_type AS type
+FROM services
+ORDER BY id;
