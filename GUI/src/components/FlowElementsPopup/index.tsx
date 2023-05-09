@@ -71,6 +71,8 @@ const FlowElementsPopup: React.FC<FlowElementsPopupProps> = ({ node, onClose, on
       data: {
         ...node.data,
         message: textfieldMessage,
+        link: webpageUrl,
+        linkText: webpageName
       }
     }
     onSave(updatedNode);
@@ -167,6 +169,8 @@ const FlowElementsPopup: React.FC<FlowElementsPopupProps> = ({ node, onClose, on
               <OpenWebPageContent
                 onWebpageNameChange={setWebpageName}
                 onWebpageUrlChange={setWebpageUrl}
+                defaultWebpageUrl={node.data.link ?? (webpageUrl ?? undefined)}
+                defaultWebpageName={node.data.linkText ?? (webpageName ?? undefined)}
               ></OpenWebPageContent>
             }
             {(stepType === StepType.FileGenerate || stepType === StepType.Input) &&

@@ -14,6 +14,8 @@ type NodeDataProps = {
     stepType: StepType;
     readonly: boolean;
     message?: string;
+    link?: string;
+    linkText?: string;
   }
 }
 
@@ -27,6 +29,7 @@ const StepNode: FC<NodeDataProps> = ({ data }) => {
   const isStepInvalid = () => {
     if (data.stepType === StepType.UserDefined) return false;
     if (data.stepType === StepType.Input) return data.childrenCount < 2;
+    if (data.stepType === StepType.OpenWebpage) return !data.link || !data.linkText;
 
     return !(data.readonly || !!data.message?.length);
   }

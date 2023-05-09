@@ -48,6 +48,8 @@ type NodeDataProps = {
   stepType: StepType;
   readonly: boolean;
   message?: string;
+  link?: string;
+  linkText?: string;
 };
 
 const initialNodes: Node[] = [
@@ -370,10 +372,10 @@ const ServiceFlowPage: FC = () => {
     steps.set("combine_step", {
       assign: {
         sensitive: `\${new Map([${typeof headers === "string"
-            ? `["headers", headers]`
-            : `["headers", new Map([${Object.keys(headers ?? {}).map(
-              (h) => `["${h.replaceAll("__", ".")}", headers_${h}]`
-            )}])]`
+          ? `["headers", headers]`
+          : `["headers", new Map([${Object.keys(headers ?? {}).map(
+            (h) => `["${h.replaceAll("__", ".")}", headers_${h}]`
+          )}])]`
           }, ${typeof body === "string"
             ? `["body", body]`
             : `["body", new Map([${Object.keys(body ?? {}).map((b) => `["${b.replaceAll("__", ".")}", body_${b}]`)}])]`
@@ -762,6 +764,8 @@ const ServiceFlowPage: FC = () => {
           data: {
             ...prevNode.data,
             message: updatedNode.data.message,
+            link: updatedNode.data.link,
+            linkText: updatedNode.data.linkText,
           },
         };
       })
@@ -807,6 +811,7 @@ const ServiceFlowPage: FC = () => {
       <FlowElementsPopup
         onClose={() => handlePopupClose()}
         onSave={(updatedNode: Node) => {
+          console.log(updatedNode);
           handlePopupSave(updatedNode);
         }}
         onRulesUpdate={(rules) => {
