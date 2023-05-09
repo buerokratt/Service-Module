@@ -58,6 +58,28 @@
     }
   }
 
+  &--warning-dark {
+    color: #8C630A;
+    border-color: #FFB511;
+
+    #{$self} {
+      &__icon {
+        border-color: #FFB511;
+      }
+    }
+  }
+
+  &--disabled {
+    color: #9799A4;
+    border-color: #9799A4;
+
+    #{$self} {
+      &__icon {
+        border-color: #9799A4;
+      }
+    }
+  }
+
   &__icon {
     display: flex;
     align-items: center;

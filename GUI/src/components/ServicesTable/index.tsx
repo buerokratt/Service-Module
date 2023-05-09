@@ -1,18 +1,20 @@
 import { createColumnHelper, PaginationState } from "@tanstack/react-table";
-import axios from "axios";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { MdDeleteOutline, MdOutlineEdit } from "react-icons/md";
 import { Button, Card, Icon, Label, Modal, Track } from "..";
-import { deleteService } from "../../resources/api-constants";
+import { changeServiceStatus, deleteService } from "../../resources/api-constants";
 import { Service } from "../../types/service";
 import { ServiceState } from "../../types/service-state";
 import DataTable from "../DataTable";
 
 import "./ServicesTable.scss";
+import axios from "axios";
+import { ToastContext } from "../Toast/ToastContext";
 
 type Props = {
   dataSource: Service[];
+  onServiceUpadeCallback: () => Promise<void>;
 };
 
 const ServicesTable = (props: Props) => {
@@ -21,12 +23,13 @@ const ServicesTable = (props: Props) => {
     pageSize: 10,
   });
   const { t } = useTranslation();
+  const toast = useContext(ToastContext);
   const [services, setServices] = useState<Service[]>([]);
   const [isDeletePopupVisible, setDeletePopupVisible] = useState(false);
   const [isStatePopupVisible, setStatePopupVisible] = useState(false);
   const [popupText, setPopupText] = useState("");
-  const [selectedService, setSelectedService] = useState<Service>();
   const columnHelper = createColumnHelper<Service>();
+  const [selectedService, setSelectedService] = useState<Service | undefined>();
 
   useEffect(() => {
     setServices(props.dataSource);
@@ -58,15 +61,16 @@ const ServicesTable = (props: Props) => {
       cell: (props) => (
         <Track
           justify="around"
-          onClick={() =>
+          onClick={() => {
             showStatePopup(
               t(
                 props.row.original.state === ServiceState.Active
                   ? "overview.popup.setInactive"
                   : "overview.popup.setActive"
               )
-            )
-          }
+            );
+            setSelectedService(props.row.original);
+          }}
         >
           <Label type={setLabelType(props.row.original.state)}>
             {t(`overview.service.states.${props.row.original.state}`)}
@@ -114,12 +118,38 @@ const ServicesTable = (props: Props) => {
   const setLabelType = (serviceState: ServiceState) => {
     switch (serviceState) {
       case ServiceState.Draft:
-        return "waring";
+        return "disabled";
       case ServiceState.Inactive:
-        return "error";
+        return "warning-dark";
       default:
-        return "success";
+        return "info";
     }
+  };
+
+  const changeServiceState = async () => {
+    if (!selectedService) return;
+
+    try {
+      await axios.post(changeServiceStatus(), {
+        id: selectedService.id,
+        state: selectedService.state === ServiceState.Active ? ServiceState.Inactive : ServiceState.Active,
+        type: selectedService.type,
+      });
+      toast.open({
+        type: "success",
+        title: t("overview.service.toast.updated"),
+        message: "",
+      });
+      await props.onServiceUpadeCallback();
+    } catch (_) {
+      toast.open({
+        type: "error",
+        title: t("overview.service.toast.failed"),
+        message: "",
+      });
+    }
+    setSelectedService(undefined);
+    setStatePopupVisible(false);
   };
 
   return (
@@ -160,7 +190,7 @@ const ServicesTable = (props: Props) => {
             <Button appearance="secondary" onClick={() => setStatePopupVisible(false)}>
               {t("overview.cancel")}
             </Button>
-            <Button onClick={() => setStatePopupVisible(false)}>{t("overview.popup.setState")}</Button>
+            <Button onClick={changeServiceState}>{t("overview.popup.setState")}</Button>
           </Track>
         </Modal>
       )}

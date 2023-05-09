@@ -1,9 +1,9 @@
 import { ServiceState } from "./service-state";
 
 export interface Service {
-  id: number;
-  name: string;
-  type: string;
+  readonly id: number;
+  readonly name: string;
   usedCount: number;
-  state: ServiceState;
+  readonly state: ServiceState;
+  readonly type: "GET" | "POST";
 }
