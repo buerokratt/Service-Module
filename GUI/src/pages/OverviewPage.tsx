@@ -23,18 +23,24 @@ const OverviewPage: React.FC = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    axios.get<{ response: ServicesResponse[] }>(getServicesList()).then(r => {
-      const services = r.data.response.map(item => {
-        return {
-          id: item.id,
-          name: item.name,
-          usedCount: 0,
-          state: item.state,
-        }
-      });
-      setServiceList(services);
-    })
-  }, [setServiceList]);
+    const fetchServices = async () => {
+      await loadServicesList();
+    }
+    fetchServices();
+  }, []);
+
+  const loadServicesList = async () => {
+    const result = await axios.get<{ response: ServicesResponse[] }>(getServicesList());
+    const services = result.data.response.map(item => {
+      return {
+        id: item.id,
+        name: item.name,
+        usedCount: 0,
+        state: item.state,
+      } as Service;
+    });
+    setServiceList(services);
+  }
 
   return (
     <>
@@ -42,7 +48,9 @@ const OverviewPage: React.FC = () => {
         <h1>{t("overview.services")}</h1>
         <Button onClick={() => navigate(ROUTES.NEWSERVICE_ROUTE)} >{t("overview.create")}</Button>
       </Track>
-      <ServicesTable dataSource={serviceList} />
+      <ServicesTable
+        dataSource={serviceList}
+        onServiceUpadeCallback={loadServicesList} />
     </>
   );
 };
