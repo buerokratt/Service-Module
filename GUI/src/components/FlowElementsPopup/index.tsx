@@ -156,7 +156,6 @@ const FlowElementsPopup: React.FC<FlowElementsPopupProps> = ({ node, onClose, on
             {
               stepType === StepType.Textfield &&
               <TextfieldContent
-                selectedNode={node}
                 defaultMessage={node.data.message ?? (textfieldMessage ?? undefined)}
                 onChange={(message, placeholders) => {
                   setTextfieldMessage(message);

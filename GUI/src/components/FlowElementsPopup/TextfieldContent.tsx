@@ -1,10 +1,9 @@
 import { t } from "i18next";
-import { Button, FormInput, FormRichText, OutputElementBox, Track } from "..";
-import { CSSProperties, FC, useState } from "react";
+import { FormRichText, OutputElementBox, Track } from "..";
+import { CSSProperties, FC } from "react";
 import { Node } from "reactflow";
 
 type TextfieldContentProps = {
-  readonly selectedNode: Node,
   readonly defaultMessage?: string;
   readonly onChange?: (
     message: string | null,
@@ -12,7 +11,7 @@ type TextfieldContentProps = {
   ) => void;
 }
 
-const TextfieldContent: FC<TextfieldContentProps> = ({ selectedNode, defaultMessage, onChange, }) => {
+const TextfieldContent: FC<TextfieldContentProps> = ({ defaultMessage, onChange, }) => {
   const availableOutputElements = [
     '{{otspunktinimetus.idCode}}',
     '{{otspunktinimetus.firstName}}',
