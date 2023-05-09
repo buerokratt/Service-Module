@@ -76,10 +76,9 @@ const ServiceFlowPage: FC = () => {
     { id: 4, label: t("serviceFlow.element.openNewWebpage"), type: StepType.OpenWebpage },
     { id: 5, label: t("serviceFlow.element.fileGeneration"), type: StepType.FileGenerate },
     { id: 6, label: t("serviceFlow.element.fileSigning"), type: StepType.FileSign },
-    { id: 7, label: t("serviceFlow.element.siga"), type: StepType.SiGa },
-    { id: 8, label: t("serviceFlow.element.conversationEnd"), type: StepType.FinishingStepEnd },
+    { id: 7, label: t("serviceFlow.element.conversationEnd"), type: StepType.FinishingStepEnd },
     {
-      id: 9,
+      id: 8,
       label: t("serviceFlow.element.redirectConversationToSupport"),
       type: StepType.FinishingStepRedirect,
     },
@@ -126,7 +125,7 @@ const ServiceFlowPage: FC = () => {
         resultName: `ClientInput_${node.data.clientInputId}`,
       };
     }
-    if (node.data.stepType === StepType.SiGa) {
+    if (node.data.stepType === StepType.FileSign) {
       return {
         templateName: "siga",
         body: {
