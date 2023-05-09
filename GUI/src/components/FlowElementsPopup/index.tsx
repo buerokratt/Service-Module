@@ -192,6 +192,10 @@ const FlowElementsPopup: React.FC<FlowElementsPopupProps> = ({ node, onClose, on
               <DefaultMessageContent message='Jätkamiseks palun logi sisse läbi TARA'></DefaultMessageContent>
             }
             {
+              stepType === StepType.FileSign &&
+              <DefaultMessageContent message='Kas soovid faili allkirjastada? Jah / Ei' />
+            }
+            {
               stepType === StepType.FinishingStepEnd &&
               <EndConversationContent></EndConversationContent>
             }
