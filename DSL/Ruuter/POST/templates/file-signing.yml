@@ -1,0 +1,12 @@
+siga_template_request:
+  template: templates/siga
+  requestType: post
+  body:
+    type: ${incoming.body.type}
+    personIdentifier: ${incoming.body.personIdentifier}
+    country: ${incoming.body.country}
+    phoneNr: ${incoming.body.phoneNr}
+  result: result
+
+return_result:
+  return: ${result.response.body}

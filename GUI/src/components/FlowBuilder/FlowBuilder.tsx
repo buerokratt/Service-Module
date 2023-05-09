@@ -13,10 +13,10 @@ import ReactFlow, {
   XYPosition,
 } from "reactflow";
 import "reactflow/dist/style.css";
-import { StepType } from "../../types/step-type.enum";
 import CustomNode from "../Steps/CustomNode";
 import PlaceholderNode from "../Steps/PlaceholderNode";
 import StartNode from "../Steps/StartNode";
+import { StepType } from "../../types";
 
 export const GRID_UNIT = 16;
 
@@ -59,18 +59,20 @@ const FlowBuilder: FC<FlowBuilderProps> = ({
   const getEdgeLength = () => 5 * GRID_UNIT;
 
   useEffect(() => {
-    setNodes((prevNodes) => prevNodes.map((node) => {
-      if (node.type !== "customNode") return node;
-      node.data = {
-        ...node.data,
-        onDelete,
-        onEdit: handleNodeEdit,
-        setClickedNode,
-        update: updateInputRules,
-      }
-      return node;
-    }));
-  }, [reactFlowInstance])
+    setNodes((prevNodes) =>
+      prevNodes.map((node) => {
+        if (node.type !== "customNode") return node;
+        node.data = {
+          ...node.data,
+          onDelete,
+          onEdit: handleNodeEdit,
+          setClickedNode,
+          update: updateInputRules,
+        };
+        return node;
+      })
+    );
+  }, [reactFlowInstance]);
 
   // Align nodes in case any got overlapped
   const alignNodes = (nodeChanges: NodeChange[]) => {
@@ -421,7 +423,7 @@ const FlowBuilder: FC<FlowBuilderProps> = ({
       case StepType.FinishingStepRedirect:
         return "Vestlus suunatakse klienditeenindajale";
     }
-  };
+  }
 
   const onDelete = useCallback(
     (id: string, shouldAddPlaceholder: boolean) => {
@@ -585,7 +587,7 @@ const FlowBuilder: FC<FlowBuilderProps> = ({
             newNodes.push(
               ...buildRuleWithPlaceholder({
                 id: newRuleId,
-                label: `rule ${i}`,
+                label: `rule ${i + 1}`,
                 offset: offset,
                 inputNode: inputNode,
               })
@@ -595,7 +597,7 @@ const FlowBuilder: FC<FlowBuilderProps> = ({
             // Move existing rule node with following node to keep them in order
             const ruleNode = newNodes.find((node) => node.id === rule);
             if (!ruleNode) return rule;
-            ruleNode.data.label = `rule ${i}`;
+            ruleNode.data.label = `rule ${i + 1}`;
             ruleNode.position.x = inputNode.position.x + offset;
 
             const ruleEdge = edges.find((edge) => edge.source === rule);

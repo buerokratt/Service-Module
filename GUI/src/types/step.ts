@@ -1,3 +1,4 @@
+import { EndpointData } from "./endpoint";
 import { StepType } from "./step-type.enum";
 
 export interface Step {
@@ -5,4 +6,5 @@ export interface Step {
   label: string;
   type: StepType;
   action?: string;
+  data?: EndpointData;
 }
