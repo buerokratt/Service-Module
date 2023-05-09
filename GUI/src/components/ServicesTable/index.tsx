@@ -144,12 +144,37 @@ const ServicesTable = (props: Props) => {
     } catch (_) {
       toast.open({
         type: "error",
-        title: t("overview.service.toast.failed"),
+        title: t("overview.service.toast.failed.state"),
         message: "",
       });
     }
     setSelectedService(undefined);
     setStatePopupVisible(false);
+  };
+
+  const deleteSelectedService = async () => {
+    if (!selectedService) return;
+
+    try {
+      await axios.post(deleteService(), {
+        id: selectedService?.id,
+        type: selectedService?.type,
+      });
+      toast.open({
+        type: "success",
+        title: t("overview.service.toast.deleted"),
+        message: "",
+      });
+    } catch (_) {
+      toast.open({
+        type: "error",
+        title: t("overview.service.toast.failed.delete"),
+        message: "",
+      });
+    }
+    setServices((prevServices) => prevServices.filter((s) => s.id !== selectedService?.id));
+    setSelectedService(undefined);
+    setDeletePopupVisible(false);
   };
 
   return (
@@ -160,25 +185,7 @@ const ServicesTable = (props: Props) => {
             <Button appearance="secondary" onClick={() => setDeletePopupVisible(false)}>
               {t("overview.cancel")}
             </Button>
-            <Button
-              appearance="error"
-              onClick={() => {
-                axios
-                  .post(deleteService(), {
-                    id: selectedService?.id,
-                    type: selectedService?.type,
-                  })
-                  .then((r) => {
-                    console.log(r);
-                    setServices((prevServices) => prevServices.filter((s) => s.id !== selectedService?.id));
-                    setSelectedService(undefined);
-                    setDeletePopupVisible(false);
-                  })
-                  .catch((e) => {
-                    console.log(e);
-                  });
-              }}
-            >
+            <Button appearance="error" onClick={deleteSelectedService}>
               {t("overview.delete")}
             </Button>
           </Track>
