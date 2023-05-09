@@ -60,3 +60,4 @@ export const getTaraAuthResponseVariables = (): string => `${baseUrl}/mocks/tim/
 export const getEndpointValidationMock = (): string => `${baseUrl}/mocks/validation-mock`;
 export const jsonToYml = (): string => `${baseUrl}/saveJsonToYml`;
 export const createNewService = (): string => `${baseUrl}/services/add`;
+export const testDraftService = (serviceName: string): string => `${baseUrl}/services/draft/${serviceName}`

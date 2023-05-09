@@ -9,6 +9,7 @@ services:
       - application.logging.displayRequestContent=true
       - application.logging.displayResponseContent=true
       - server.port=8085
+      - application.DSL.processedFiletypes=.yml,.yaml,.tmp
     volumes:
       - ./DSL/Ruuter:/DSL
     ports:

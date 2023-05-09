@@ -1,4 +1,4 @@
-import { CSSProperties, FC, useEffect, useState } from "react";
+import { CSSProperties, FC, useContext, useEffect, useState } from "react";
 import { MarkerType, Node, ReactFlowInstance, ReactFlowProvider, useEdgesState, useNodesState } from "reactflow";
 import { Box, Collapsible, NewServiceHeader, Track, FlowElementsPopup } from "../components";
 import { useTranslation } from "react-i18next";
@@ -11,7 +11,8 @@ import "./ServiceFlowPage.scss";
 import { StepType, Step, RawData } from "../types";
 import { EndpointData, EndpointEnv, EndpointType, EndpointVariableData } from "../types/endpoint";
 import axios from "axios";
-import { createNewService, jsonToYml } from "../resources/api-constants";
+import { createNewService, jsonToYml, testDraftService } from "../resources/api-constants";
+import { ToastContext } from "../components/Toast/ToastContext";
 
 const initialPlaceholder = {
   id: "2",
@@ -67,7 +68,7 @@ const initialNodes: Node[] = [
 
 const ServiceFlowPage: FC = () => {
   const { t } = useTranslation();
-
+  const toast = useContext(ToastContext)
   const allElements: Step[] = [
     { id: 1, label: t("serviceFlow.element.taraAuthentication"), type: StepType.Auth },
     { id: 2, label: t("serviceFlow.element.textfield"), type: StepType.Textfield },
@@ -100,6 +101,7 @@ const ServiceFlowPage: FC = () => {
     });
   };
   const [nodes, setNodes, onNodesChange] = useNodesState(flow ? resetNodes() : initialNodes);
+  const [isTestButtonVisible, setIsTestButtonVisible] = useState(false);
 
   const getTemplateDataFromNode = (
     node: Node
@@ -204,7 +206,7 @@ const ServiceFlowPage: FC = () => {
     try {
       getNestedPreDefinedRawVariables(JSON.parse(data.rawData?.value ?? "{}"), result);
       getNestedPreDefinedRawVariables(JSON.parse(data.rawData?.testValue ?? "{}"), result);
-    } catch (_) {}
+    } catch (_) { }
 
     return result;
   };
@@ -216,9 +218,8 @@ const ServiceFlowPage: FC = () => {
     return {
       call: `http.post`,
       args: {
-        url: `http://ruuter:8085/services/endpoints/${selectedEndpoint.methodType.toLowerCase()}-${serviceName}-${
-          (endpoint.name.trim().length ?? 0) > 0 ? endpoint.name : endpoint.id
-        }?type=prod`,
+        url: `http://ruuter:8085/services/endpoints/${selectedEndpoint.methodType.toLowerCase()}-${serviceName}-${(endpoint.name.trim().length ?? 0) > 0 ? endpoint.name : endpoint.id
+          }?type=prod`,
         body: {
           headers: `\${new Map([${getPreDefinedEndpointVariables(selectedEndpoint.headers)}])}`,
           body: `\${new Map([${getPreDefinedEndpointVariables(selectedEndpoint.body)}])}`,
@@ -369,23 +370,20 @@ const ServiceFlowPage: FC = () => {
     });
     steps.set("combine_step", {
       assign: {
-        sensitive: `\${new Map([${
-          typeof headers === "string"
+        sensitive: `\${new Map([${typeof headers === "string"
             ? `["headers", headers]`
             : `["headers", new Map([${Object.keys(headers ?? {}).map(
-                (h) => `["${h.replaceAll("__", ".")}", headers_${h}]`
-              )}])]`
-        }, ${
-          typeof body === "string"
+              (h) => `["${h.replaceAll("__", ".")}", headers_${h}]`
+            )}])]`
+          }, ${typeof body === "string"
             ? `["body", body]`
             : `["body", new Map([${Object.keys(body ?? {}).map((b) => `["${b.replaceAll("__", ".")}", body_${b}]`)}])]`
-        }, ${
-          typeof params === "string"
+          }, ${typeof params === "string"
             ? `["params", params]`
             : `["params", new Map([${Object.keys(params ?? {}).map(
-                (p) => `["${p.replaceAll("__", ".")}", params_${p}]`
-              )}])]`
-        }])}`,
+              (p) => `["${p.replaceAll("__", ".")}", params_${p}]`
+            )}])]`
+          }])}`,
       },
     });
     steps.set("return_value", { wrapper: false, return: "${sensitive}" });
@@ -396,9 +394,8 @@ const ServiceFlowPage: FC = () => {
         { result },
         {
           params: {
-            location: `/Ruuter/POST/services/endpoints/configs/${endpointName}-${
-              env === EndpointEnv.Live ? "prod" : "test"
-            }-configs.yml`,
+            location: `/Ruuter/POST/services/endpoints/configs/${endpointName}-${env === EndpointEnv.Live ? "prod" : "test"
+              }-configs.yml`,
           },
         }
       )
@@ -418,9 +415,8 @@ const ServiceFlowPage: FC = () => {
     steps.set("get-configs", {
       call: "http.post",
       args: {
-        url: `http://ruuter:8085/services/endpoints/configs/${endpointName}-${
-          env === EndpointEnv.Live ? "prod" : "test"
-        }-configs`,
+        url: `http://ruuter:8085/services/endpoints/configs/${endpointName}-${env === EndpointEnv.Live ? "prod" : "test"
+          }-configs`,
         body: {
           params: "${incoming.body.params}",
           headers: "${incoming.body.headers}",
@@ -440,9 +436,8 @@ const ServiceFlowPage: FC = () => {
         { result },
         {
           params: {
-            location: `/Ruuter/POST/services/endpoints/info/${endpointName}-${
-              env === EndpointEnv.Live ? "prod" : "test"
-            }-info.yml`,
+            location: `/Ruuter/POST/services/endpoints/info/${endpointName}-${env === EndpointEnv.Live ? "prod" : "test"
+              }-info.yml`,
           },
         }
       )
@@ -527,9 +522,8 @@ const ServiceFlowPage: FC = () => {
       const selectedEndpointType = endpoint.data.definedEndpoints.find((e) => e.isSelected);
       if (!selectedEndpointType) continue;
       console.log("e", selectedEndpointType, endpoint);
-      const endpointName = `${selectedEndpointType.methodType.toLowerCase()}-${serviceName}-${
-        (endpoint.data.name.trim().length ?? 0) > 0 ? endpoint.data?.name : endpoint.data?.id
-      }`;
+      const endpointName = `${selectedEndpointType.methodType.toLowerCase()}-${serviceName}-${(endpoint.data.name.trim().length ?? 0) > 0 ? endpoint.data?.name : endpoint.data?.id
+        }`;
       for (const env of [EndpointEnv.Live, EndpointEnv.Test]) {
         await saveEndpointInfo(selectedEndpointType, env, endpointName);
       }
@@ -685,9 +679,8 @@ const ServiceFlowPage: FC = () => {
                 const followingNode = nodes.find((n) => n.id === edges.find((edge) => edge.source === node.id)?.target);
                 return {
                   case: matchingRule
-                    ? `\${${matchingRule.name.replace("{{", "").replace("}}", "")} ${matchingRule.condition} ${
-                        matchingRule.value
-                      }}`
+                    ? `\${${matchingRule.name.replace("{{", "").replace("}}", "")} ${matchingRule.condition} ${matchingRule.value
+                    }}`
                     : `\${${clientInput} == ${node.data.label === "rule 0" ? '"Yes"' : '"No"'}}`,
                   nextStep:
                     followingNode?.type === "customNode"
@@ -722,6 +715,7 @@ const ServiceFlowPage: FC = () => {
       )
       .then((r) => {
         console.log(r);
+        setIsTestButtonVisible((isVisible) => !isVisible);
       })
       .catch((e) => {
         console.log(e);
@@ -779,6 +773,24 @@ const ServiceFlowPage: FC = () => {
     setSelectedNode(null);
   };
 
+  const runServiceTest = async () => {
+    try {
+      await axios.post(testDraftService(serviceName), {});
+      toast.open({
+        type: 'success',
+        title: "Test result- success",
+        message: ''
+      });
+    } catch (error) {
+      console.log("ERROR: ", error);
+      toast.open({
+        type: 'error',
+        title: 'Test result - error',
+        message: ''
+      });
+    }
+  }
+
   return (
     <>
       <NewServiceHeader
@@ -789,6 +801,8 @@ const ServiceFlowPage: FC = () => {
         serviceName={serviceName}
         serviceDescription={serviceDescription}
         continueOnClick={() => navigate(ROUTES.OVERVIEW_ROUTE)}
+        isTestButtonVisible={isTestButtonVisible}
+        onTestButtonClick={runServiceTest}
       />
       <h1 style={{ padding: 16 }}>Teenusvoog "{serviceName}"</h1>
       <FlowElementsPopup

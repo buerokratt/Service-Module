@@ -12,6 +12,8 @@ type NewServiceHeaderProps = {
   flow?: string;
   serviceName?: string;
   serviceDescription?: string;
+  isTestButtonVisible?: boolean;
+  onTestButtonClick?: () => void;
 };
 
 const NewServiceHeader: FC<NewServiceHeaderProps> = ({
@@ -22,6 +24,8 @@ const NewServiceHeader: FC<NewServiceHeaderProps> = ({
   flow,
   serviceDescription,
   serviceName,
+  isTestButtonVisible = false,
+  onTestButtonClick,
 }) => {
   return (
     <>
@@ -39,6 +43,7 @@ const NewServiceHeader: FC<NewServiceHeaderProps> = ({
             {t("newService.saveDraft")}
           </Button>
           <Button onClick={continueOnClick}>{t("global.continue")}</Button>
+          {isTestButtonVisible && <Button onClick={onTestButtonClick}>Testi teenust</Button>}
         </Track>
       </header>
     </>
