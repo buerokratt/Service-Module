@@ -5,4 +5,5 @@ export interface Service {
   readonly name: string;
   usedCount: number;
   readonly state: ServiceState;
+  readonly type: 'GET' | 'POST';
 }

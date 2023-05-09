@@ -131,7 +131,7 @@ const ServicesTable = (props: Props) => {
       await axios.post(changeServiceStatus(), {
         id: selectedService.id,
         state: selectedService.state === ServiceState.Active ? ServiceState.Inactive : ServiceState.Active,
-        type: "post",
+        type: selectedService.type,
       });
       toast.open({
         type: 'success',

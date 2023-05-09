@@ -37,6 +37,7 @@ const OverviewPage: React.FC = () => {
         name: item.name,
         usedCount: 0,
         state: item.state,
+        type: item.type,
       } as Service;
     });
     setServiceList(services);
