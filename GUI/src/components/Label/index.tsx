@@ -6,7 +6,7 @@ import './Label.scss'
 import Tooltip from '../Tooltip'
 
 type LabelProps = {
-  type?: 'waring' | 'error' | 'info' | 'success'
+  type?: 'waring' | 'error' | 'info' | 'success' | 'warning-dark' | 'disabled'
   tooltip?: ReactNode
 }
 

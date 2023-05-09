@@ -115,11 +115,11 @@ const ServicesTable = (props: Props) => {
   const setLabelType = (serviceState: ServiceState) => {
     switch (serviceState) {
       case ServiceState.Draft:
-        return 'waring';
+        return 'disabled';
       case ServiceState.Inactive:
-        return 'error';
+        return 'warning-dark';
       default:
-        return 'success';
+        return 'info';
     }
   }
 
