@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import Popup from "../Popup";
@@ -31,10 +31,14 @@ interface FlowElementsPopupProps {
 const FlowElementsPopup: React.FC<FlowElementsPopupProps> = ({ node, onClose, onSave, oldRules, onRulesUpdate }) => {
   const { t } = useTranslation();
   const [isYesNoQuestion, setIsYesNoQuestion] = useState(node?.isYesNoQuestion ?? false)
-  const [rules, setRules] = useState<ConditionRuleType[]>(node?.rules ?? [])
+  const [rules, setRules] = useState<ConditionRuleType[]>(node?.data?.rules ?? [])
   const [selectedTab, setSelectedTab] = useState<string | null>(null);
   const [isJsonRequestVisible, setIsJsonRequestVisible] = useState(false);
   const [jsonRequestContent, setJsonRequestContent] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (node) node.data.rules = rules;
+  }, [rules]);
 
   // StepType.Textfield 
   const [textfieldMessage, setTextfieldMessage] = useState<string | null>(null);
