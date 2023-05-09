@@ -128,11 +128,11 @@ const ServicesTable = (props: Props) => {
     if (!selectedService) return;
 
     try {
-      // await axios.post(changeServiceStatus(), {
-      //   id: selectedService.id,
-      //   state: selectedService.state === ServiceState.Active ? ServiceState.Inactive : ServiceState.Active,
-      //   type: "post",
-      // });
+      await axios.post(changeServiceStatus(), {
+        id: selectedService.id,
+        state: selectedService.state === ServiceState.Active ? ServiceState.Inactive : ServiceState.Active,
+        type: "post",
+      });
       toast.open({
         type: 'success',
         title: t('overview.service.toast.updated'),
