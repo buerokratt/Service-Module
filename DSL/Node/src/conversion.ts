@@ -27,7 +27,6 @@ router.post("/json_to_yaml", (req: Request, res: Response) => {
 });
 
 router.post("/json_to_yaml_data", (req: Request, res: Response) => {
-  console.log(req.body.data);
   const result = stringify(req.body.data);
   res.send({ yaml: result });
 });

@@ -585,7 +585,7 @@ const FlowBuilder: FC<FlowBuilderProps> = ({
             newNodes.push(
               ...buildRuleWithPlaceholder({
                 id: newRuleId,
-                label: `rule ${i}`,
+                label: `rule ${i + 1}`,
                 offset: offset,
                 inputNode: inputNode,
               })
@@ -595,7 +595,7 @@ const FlowBuilder: FC<FlowBuilderProps> = ({
             // Move existing rule node with following node to keep them in order
             const ruleNode = newNodes.find((node) => node.id === rule);
             if (!ruleNode) return rule;
-            ruleNode.data.label = `rule ${i}`;
+            ruleNode.data.label = `rule ${i + 1}`;
             ruleNode.position.x = inputNode.position.x + offset;
 
             const ruleEdge = edges.find((edge) => edge.source === rule);

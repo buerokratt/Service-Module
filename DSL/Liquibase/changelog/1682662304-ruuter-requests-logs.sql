@@ -5,5 +5,5 @@ CREATE TABLE request_logs (
   timestamp TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   level TEXT NOT NULL,
   statusCode INT NOT NULL DEFAULT 0,
-  content TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  content TEXT NOT NULL
 );

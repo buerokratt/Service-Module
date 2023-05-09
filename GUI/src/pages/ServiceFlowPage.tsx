@@ -1,4 +1,6 @@
+
 import { CSSProperties, FC, useContext, useEffect, useState } from "react";
+
 import { MarkerType, Node, ReactFlowInstance, ReactFlowProvider, useEdgesState, useNodesState } from "reactflow";
 import { Box, Collapsible, NewServiceHeader, Track, FlowElementsPopup } from "../components";
 import { useTranslation } from "react-i18next";
@@ -13,6 +15,7 @@ import { EndpointData, EndpointEnv, EndpointType, EndpointVariableData } from ".
 import axios from "axios";
 import { createNewService, jsonToYml, testDraftService } from "../resources/api-constants";
 import { ToastContext } from "../components/Toast/ToastContext";
+
 
 const initialPlaceholder = {
   id: "2",
@@ -78,9 +81,10 @@ const ServiceFlowPage: FC = () => {
     { id: 4, label: t("serviceFlow.element.openNewWebpage"), type: StepType.OpenWebpage },
     { id: 5, label: t("serviceFlow.element.fileGeneration"), type: StepType.FileGenerate },
     { id: 6, label: t("serviceFlow.element.fileSigning"), type: StepType.FileSign },
-    { id: 7, label: t("serviceFlow.element.conversationEnd"), type: StepType.FinishingStepEnd },
+    { id: 7, label: t("serviceFlow.element.siga"), type: StepType.SiGa },
+    { id: 8, label: t("serviceFlow.element.conversationEnd"), type: StepType.FinishingStepEnd },
     {
-      id: 8,
+      id: 9,
       label: t("serviceFlow.element.redirectConversationToSupport"),
       type: StepType.FinishingStepRedirect,
     },
@@ -124,7 +128,7 @@ const ServiceFlowPage: FC = () => {
     if (node.data.stepType === StepType.Input) {
       return {
         templateName: "client-input",
-        resultName: `ClientInput_${node.data.clientInputId}`,
+        resultName: `ClientInput_${node.data.clientInputId}_result`,
       };
     }
     if (node.data.stepType === StepType.FileSign) {
@@ -207,7 +211,7 @@ const ServiceFlowPage: FC = () => {
     try {
       getNestedPreDefinedRawVariables(JSON.parse(data.rawData?.value ?? "{}"), result);
       getNestedPreDefinedRawVariables(JSON.parse(data.rawData?.testValue ?? "{}"), result);
-    } catch (_) { }
+    } catch (_) {}
 
     return result;
   };
@@ -219,8 +223,9 @@ const ServiceFlowPage: FC = () => {
     return {
       call: `http.post`,
       args: {
-        url: `http://ruuter:8085/services/endpoints/${selectedEndpoint.methodType.toLowerCase()}-${serviceName}-${(endpoint.name.trim().length ?? 0) > 0 ? endpoint.name : endpoint.id
-          }?type=prod`,
+        url: `http://ruuter:8085/services/endpoints/${selectedEndpoint.methodType.toLowerCase()}-${serviceName}-${
+          (endpoint.name.trim().length ?? 0) > 0 ? endpoint.name : endpoint.id
+        }?type=prod`,
         body: {
           headers: `\${new Map([${getPreDefinedEndpointVariables(selectedEndpoint.headers)}])}`,
           body: `\${new Map([${getPreDefinedEndpointVariables(selectedEndpoint.body)}])}`,
@@ -243,7 +248,7 @@ const ServiceFlowPage: FC = () => {
       };
     }
     return {
-      template: `sticky/${data?.templateName}`,
+      template: `templates/${data?.templateName}`,
       requestType: "post",
       body: data?.body,
       result: data?.resultName ?? `${stepName}_result`,
@@ -371,20 +376,23 @@ const ServiceFlowPage: FC = () => {
     });
     steps.set("combine_step", {
       assign: {
-        sensitive: `\${new Map([${typeof headers === "string"
-          ? `["headers", headers]`
-          : `["headers", new Map([${Object.keys(headers ?? {}).map(
-            (h) => `["${h.replaceAll("__", ".")}", headers_${h}]`
-          )}])]`
-          }, ${typeof body === "string"
+        sensitive: `\${new Map([${
+          typeof headers === "string"
+            ? `["headers", headers]`
+            : `["headers", new Map([${Object.keys(headers ?? {}).map(
+                (h) => `["${h.replaceAll("__", ".")}", headers_${h}]`
+              )}])]`
+        }, ${
+          typeof body === "string"
             ? `["body", body]`
             : `["body", new Map([${Object.keys(body ?? {}).map((b) => `["${b.replaceAll("__", ".")}", body_${b}]`)}])]`
-          }, ${typeof params === "string"
+        }, ${
+          typeof params === "string"
             ? `["params", params]`
             : `["params", new Map([${Object.keys(params ?? {}).map(
-              (p) => `["${p.replaceAll("__", ".")}", params_${p}]`
-            )}])]`
-          }])}`,
+                (p) => `["${p.replaceAll("__", ".")}", params_${p}]`
+              )}])]`
+        }])}`,
       },
     });
     steps.set("return_value", { wrapper: false, return: "${sensitive}" });
@@ -395,8 +403,9 @@ const ServiceFlowPage: FC = () => {
         { result },
         {
           params: {
-            location: `/Ruuter/POST/services/endpoints/configs/${endpointName}-${env === EndpointEnv.Live ? "prod" : "test"
-              }-configs.yml`,
+            location: `/Ruuter/POST/services/endpoints/configs/${endpointName}-${
+              env === EndpointEnv.Live ? "prod" : "test"
+            }-configs.yml`,
           },
         }
       )
@@ -416,8 +425,9 @@ const ServiceFlowPage: FC = () => {
     steps.set("get-configs", {
       call: "http.post",
       args: {
-        url: `http://ruuter:8085/services/endpoints/configs/${endpointName}-${env === EndpointEnv.Live ? "prod" : "test"
-          }-configs`,
+        url: `http://ruuter:8085/services/endpoints/configs/${endpointName}-${
+          env === EndpointEnv.Live ? "prod" : "test"
+        }-configs`,
         body: {
           params: "${incoming.body.params}",
           headers: "${incoming.body.headers}",
@@ -437,8 +447,9 @@ const ServiceFlowPage: FC = () => {
         { result },
         {
           params: {
-            location: `/Ruuter/POST/services/endpoints/info/${endpointName}-${env === EndpointEnv.Live ? "prod" : "test"
-              }-info.yml`,
+            location: `/Ruuter/POST/services/endpoints/info/${endpointName}-${
+              env === EndpointEnv.Live ? "prod" : "test"
+            }-info.yml`,
           },
         }
       )
@@ -523,8 +534,9 @@ const ServiceFlowPage: FC = () => {
       const selectedEndpointType = endpoint.data.definedEndpoints.find((e) => e.isSelected);
       if (!selectedEndpointType) continue;
       console.log("e", selectedEndpointType, endpoint);
-      const endpointName = `${selectedEndpointType.methodType.toLowerCase()}-${serviceName}-${(endpoint.data.name.trim().length ?? 0) > 0 ? endpoint.data?.name : endpoint.data?.id
-        }`;
+      const endpointName = `${selectedEndpointType.methodType.toLowerCase()}-${serviceName}-${
+        (endpoint.data.name.trim().length ?? 0) > 0 ? endpoint.data?.name : endpoint.data?.id
+      }`;
       for (const env of [EndpointEnv.Live, EndpointEnv.Test]) {
         await saveEndpointInfo(selectedEndpointType, env, endpointName);
       }
@@ -665,7 +677,14 @@ const ServiceFlowPage: FC = () => {
       if (parentNode.data.stepType === StepType.Input) {
         const clientInput = `ClientInput_${parentNode.data.clientInputId}`;
         const clientInputName = `${clientInput}-step`;
-        finishedFlow.set(parentStepName, getTemplate(parentNode, clientInputName, `${clientInput}-switch`));
+        finishedFlow.set(parentStepName, getTemplate(parentNode, clientInputName, `${clientInput}-assign`));
+        finishedFlow.set(`${clientInput}-assign`, {
+          assign: {
+            [clientInput]: `\${${clientInput}_result.input}`,
+          },
+          next: `${clientInput}-switch`,
+        });
+
         finishedFlow.set(
           `${clientInput}-switch`,
           getSwitchCase(
@@ -675,14 +694,15 @@ const ServiceFlowPage: FC = () => {
                 const node = nodes.find((node) => node.id === e.target);
                 if (!node) return e.target;
                 const matchingRule = parentNode.data?.rules?.find(
-                  (_: never, i: number) => `rule ${i}` === node.data.label
+                  (_: never, i: number) => `rule ${i + 1}` === node.data.label
                 );
                 const followingNode = nodes.find((n) => n.id === edges.find((edge) => edge.source === node.id)?.target);
                 return {
                   case: matchingRule
-                    ? `\${${matchingRule.name.replace("{{", "").replace("}}", "")} ${matchingRule.condition} ${matchingRule.value
-                    }}`
-                    : `\${${clientInput} == ${node.data.label === "rule 0" ? '"Yes"' : '"No"'}}`,
+                    ? `\${${matchingRule.name.replace("{{", "").replace("}}", "")} ${matchingRule.condition} ${
+                        matchingRule.value
+                      }}`
+                    : `\${${clientInput} == ${node.data.label === "rule 1" ? '"Yes"' : '"No"'}}`,
                   nextStep:
                     followingNode?.type === "customNode"
                       ? `${followingNode.data.stepType}-${followingNode.id}`
