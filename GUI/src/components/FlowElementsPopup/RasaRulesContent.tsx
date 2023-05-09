@@ -14,7 +14,7 @@ const RasaRulesContent: FC = ({ }) => {
 
   useEffect(() => {
     axios.get(getDomainFile())
-      .then(x => setConfig(x.data))
+      .then(x => setConfig(x.data.response))
       .catch(err => console.log(err));
   }, [])
 
