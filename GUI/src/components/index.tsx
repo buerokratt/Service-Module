@@ -17,8 +17,8 @@ import {
   FormTextarea,
   Switch,
   SwitchBox,
-} from './FormElements'
-import Toast from './Toast'
+} from "./FormElements";
+import Toast from "./Toast";
 import Header from "./Header";
 import HeaderStep from "./HeaderStepCounter/HeaderStep";
 import HeaderStepCounter from "./HeaderStepCounter";
@@ -34,7 +34,7 @@ import Tooltip from "./Tooltip";
 import Track from "./Track";
 import ExclamationBadge from "./ExclamationBadge";
 import OutputElementBox from "./OutputElementBox";
-import FlowElementsPopup from './FlowElementsPopup'
+import FlowElementsPopup from "./FlowElementsPopup";
 import ApiEndpointCard from "./ApiEndpointCard";
 import EndpointOpenAPI from "./ApiEndpointCard/Endpoints/OpenAPI";
 import EndpointCustom from "./ApiEndpointCard/Endpoints/Custom";

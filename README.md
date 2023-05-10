@@ -51,11 +51,11 @@ This repo will primarily contain:
 - Go to https://localhost:3001
 
 **Training Module GUI setup in Service Module**
-- Clone [Training Module](https://github.com/buerokratt/Training-Module)
-- Training Module `.env` file includes REACT_APP_SERVICE_MODULE_GUI_BASE_URL 
-- In Training Module run: `docker-compose up -d`
-  - Training module uses the same network as Service Module 
 
+- Clone [Training Module](https://github.com/buerokratt/Training-Module)
+- Training Module `.env` file includes REACT_APP_SERVICE_MODULE_GUI_BASE_URL
+- In Training Module run: `docker-compose up -d`
+  - Training module uses the same network as Service Module
 
 ### Database setup
 
@@ -65,9 +65,11 @@ This repo will primarily contain:
 - When creating new migrations, use the helper `./create-migration.sh name-of-migration` which will create a timestamped file in the correct directory and add the required headers
 
 ### DataMapper
+
 [Changes based on this example](https://github.com/express-handlebars/express-handlebars/tree/master/examples/advanced)
 
 DataMapper directory:
+
 - create new directory: **lib**
 
 **Update server.js**
@@ -80,7 +82,7 @@ import * as helpers from "./lib/helpers.js";
 const hbs = create(); -> const hbs = create({ helpers });
 ```
 
-``` 
+```
 app.post('/hbs/*', (req, res) => {
   res.render(req.params[0], req.body, function (_, response) {
     if (req.get('type') === 'csv') {
@@ -92,16 +94,21 @@ app.post('/hbs/*', (req, res) => {
   });
 });
 ```
+
 To enable handlebars templates to receive a body and return a json
-* When Building a handlebars template make sure to add `layout:false` so that hbs response in the data-mapper will discard the html layout and only return the body data
+
+- When Building a handlebars template make sure to add `layout:false` so that hbs response in the data-mapper will discard the html layout and only return the body data
 
 ### DMapper helper functions
+
 - Add all the helper functions to **DSL/DMapper/lib/helpers.js**
 
 ### DMapper problems
-- http://data_mapper:3005/js/generate/pdf 
+
+- http://data_mapper:3005/js/generate/pdf
   - Docker stops - PDF is not returned
 - **Possible solution- replace Data Mapper Dockerfile content with the following:**
+
 ```
 FROM node:19-alpine
 

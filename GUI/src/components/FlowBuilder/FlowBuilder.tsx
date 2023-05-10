@@ -59,18 +59,20 @@ const FlowBuilder: FC<FlowBuilderProps> = ({
   const getEdgeLength = () => 5 * GRID_UNIT;
 
   useEffect(() => {
-    setNodes((prevNodes) => prevNodes.map((node) => {
-      if (node.type !== "customNode") return node;
-      node.data = {
-        ...node.data,
-        onDelete,
-        onEdit: handleNodeEdit,
-        setClickedNode,
-        update: updateInputRules,
-      }
-      return node;
-    }));
-  }, [reactFlowInstance])
+    setNodes((prevNodes) =>
+      prevNodes.map((node) => {
+        if (node.type !== "customNode") return node;
+        node.data = {
+          ...node.data,
+          onDelete,
+          onEdit: handleNodeEdit,
+          setClickedNode,
+          update: updateInputRules,
+        };
+        return node;
+      })
+    );
+  }, [reactFlowInstance]);
 
   // Align nodes in case any got overlapped
   const alignNodes = (nodeChanges: NodeChange[]) => {
