@@ -62,8 +62,12 @@
         "draft": "Mustand"
       },
       "toast": {
+        "deleted": "Teenus kustutatud",
         "updated": "Teenuse olek uuendatud",
-        "failed": "Teenuse oleku uuendamine ebaõnnestus"
+        "failed": {
+          "delete": "Teenuse kustutamine ebaõnnestus",
+          "state": "Teenuse oleku uuendamine ebaõnnestus"
+        }
       }
     },
     "popup": {
