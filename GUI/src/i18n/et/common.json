@@ -1,7 +1,7 @@
 {
   "global": {
-    "title": "Teenindus moodul",
-    "services": "Teenindus",
+    "title": "Teenused",
+    "services": "Teenused",
     "backhome": "Tagasi avalehele",
     "resultCount": "Kuvan korraga",
     "gotoPage": "Mine leheküljele",
@@ -22,7 +22,8 @@
     "close": "Sulge menüü",
     "intents": "Kavatsus",
     "followupTraining": "Teemade järeltreenimine",
-    "entities": "Üksused"
+    "entities": "Üksused",
+    "settings": "Seaded"
   },
   "intents": {
     "entities": "Üksused",
@@ -40,6 +41,10 @@
     "notificationError": "Viga",
     "entityName": "Nimi",
     "title": "Pealkiri"
+  },
+  "settings": {
+    "title": "Seaded",
+    "maxUserInputTryCount": "Käsitsege kasutaja sisestatud proovide arvu"
   },
   "overview": {
     "services": "Teenused",
@@ -112,6 +117,7 @@
       "fileSigning": "Faili allkirjastamine",
       "conversationEnd": "Vestluse lõpetamine",
       "redirectConversationToSupport": "Klienditeenindusse suunamine",
+      "rules": "Reeglid",
       "siga": "SiGa"
     },
     "popup": {
@@ -120,7 +126,11 @@
       "showJsonRequest": "Vaata JSON päringut",
       "hideJsonRequest": "Peida JSON päring",
       "jsonRequestPlaceholder": "JSON päring",
-      "openWebpageLabel": "Veebilehe nimi, mis kuvatakse kliendile"
+      "openWebpageLabel": "Veebilehe nimi, mis kuvatakse kliendile",
+      "name": "Nimi",
+      "intent": "Kavatsus",
+      "action": "Tegevus",
+      "add": "+ Lisama"
     },
     "placeholderNode": "Lohista järgmine samm voogu",
     "allElements": "Kõik elemendid",

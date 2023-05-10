@@ -141,6 +141,7 @@ const MainNavigation: FC = () => {
         { path: ROUTES.OVERVIEW_ROUTE, label: t('menu.overview') },
         { path: ROUTES.NEWSERVICE_ROUTE, label: t("menu.newService") },
         { path: ROUTES.FOLLOWUPTRAINING_ROUTE, label: t("menu.followupTraining") },
+        { path: ROUTES.SERVICE_SETTINGS, label: t("menu.settings") },
       ],
     },
     {

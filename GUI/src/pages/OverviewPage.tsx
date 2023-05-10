@@ -22,10 +22,7 @@ const OverviewPage: React.FC = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchServices = async () => {
-      await loadServicesList();
-    };
-    fetchServices();
+    loadServicesList();
   }, []);
 
   const loadServicesList = async () => {
@@ -34,9 +31,9 @@ const OverviewPage: React.FC = () => {
       return {
         id: item.id,
         name: item.name,
-        usedCount: 0,
         state: item.state,
         type: item.type,
+        usedCount: 0,
       } as Service;
     });
     setServiceList(services);
