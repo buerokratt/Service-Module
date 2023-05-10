@@ -21,7 +21,8 @@
     "newService": "New Service",
     "intents": "Intents",
     "followupTraining": "Followup Training",
-    "close": "Close menu"
+    "close": "Close menu",
+    "settings": "Settings"
   },
   "intents": {
     "entities": "Entities",
@@ -39,6 +40,10 @@
     "notificationError": "Error",
     "entityName": "Name",
     "title": "Title"
+  },
+  "settings": {
+    "title": "Settings",
+    "maxUserInputTryCount": "Handle user input try count"
   },
   "overview": {
     "services": "Services",
@@ -102,6 +107,7 @@
       "fileSigning": "File signing",
       "conversationEnd": "End conversation",
       "redirectConversationToSupport": "Direct to Customer Support",
+      "rules": "Rules",
       "siga": "SiGa"
     },
     "popup": {
@@ -110,7 +116,11 @@
       "showJsonRequest": "Show JSON request",
       "hideJsonRequest": "Hide JSON request",
       "jsonRequestPlaceholder": "JSON request",
-      "openWebpageLabel": "Web page name that is displayed to the user"
+      "openWebpageLabel": "Web page name that is displayed to the user",
+      "name": "Name",
+      "intent": "Intent",
+      "action": "Action",
+      "add": "+ Add"
     },
     "placeholderNode": "Drag the next step into the flow",
     "allElements": "All elements",
