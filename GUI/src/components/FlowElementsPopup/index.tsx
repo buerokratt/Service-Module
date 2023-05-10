@@ -40,12 +40,16 @@ const FlowElementsPopup: React.FC<FlowElementsPopupProps> = ({ node, onClose, on
   useEffect(() => {
     if (node) node.data.rules = rules;
   }, [rules]);
+
   // StepType.Textfield
   const [textfieldMessage, setTextfieldMessage] = useState<string | null>(null);
   const [textfieldMessagePlaceholders, setTextfieldMessagePlaceholders] = useState<{ [key: string]: string }>({});
   // StepType.OpenWebpage
   const [webpageName, setWebpageName] = useState<string | null>(null);
   const [webpageUrl, setWebpageUrl] = useState<string | null>(null);
+  // StepType.FileGenerate
+  const [fileName, setFileName] = useState<string | null>(null);
+  const [fileContent, setFileContent] = useState<string | null>(null);
 
   if (!node) return <></>;
 
@@ -64,16 +68,17 @@ const FlowElementsPopup: React.FC<FlowElementsPopupProps> = ({ node, onClose, on
       }
       return onRulesUpdate(result);
     }
-
     const updatedNode = {
       ...node,
       data: {
         ...node.data,
-        message: textfieldMessage,
-        link: webpageUrl,
-        linkText: webpageName
-      }
-    }
+        message: textfieldMessage ?? node.data?.message,
+        link: webpageUrl ?? node.data?.link,
+        linkText: webpageName ?? node.data?.linkText,
+        fileName: fileName ?? node.data?.fileName,
+        fileContent: fileContent ?? node.data?.fileContent,
+      },
+    };
     onSave(updatedNode);
   };
 
@@ -91,6 +96,10 @@ const FlowElementsPopup: React.FC<FlowElementsPopupProps> = ({ node, onClose, on
     setIsJsonRequestVisible(false);
     setJsonRequestContent(null);
     setTextfieldMessage(null);
+    setWebpageName(null);
+    setWebpageUrl(null);
+    setFileName(null);
+    setFileContent(null);
     setTextfieldMessagePlaceholders({});
   };
 
@@ -129,7 +138,6 @@ const FlowElementsPopup: React.FC<FlowElementsPopupProps> = ({ node, onClose, on
             </Button>
           </Track>
         </Track>
-
       }
     >
       <Track direction="vertical" align="stretch" gap={16} className="flow-body-reverse-margin">
@@ -153,7 +161,7 @@ const FlowElementsPopup: React.FC<FlowElementsPopupProps> = ({ node, onClose, on
           <Tabs.Content value={t("serviceFlow.tabs.setup")} className="vertical-tabs__body">
             {stepType === StepType.Textfield && (
               <TextfieldContent
-                defaultMessage={node.data.message ?? (textfieldMessage ?? undefined)}
+                defaultMessage={node.data.message ?? textfieldMessage ?? undefined}
                 onChange={(message, placeholders) => {
                   setTextfieldMessage(message);
                   setTextfieldMessagePlaceholders(placeholders);
@@ -164,11 +172,11 @@ const FlowElementsPopup: React.FC<FlowElementsPopupProps> = ({ node, onClose, on
               <OpenWebPageContent
                 onWebpageNameChange={setWebpageName}
                 onWebpageUrlChange={setWebpageUrl}
-                defaultWebpageUrl={node.data.link ?? (webpageUrl ?? undefined)}
-                defaultWebpageName={node.data.linkText ?? (webpageName ?? undefined)}
+                defaultWebpageUrl={node.data.link ?? webpageUrl ?? undefined}
+                defaultWebpageName={node.data.linkText ?? webpageName ?? undefined}
               />
             )}
-            {(stepType === StepType.FileGenerate || stepType === StepType.Input) &&
+            {(stepType === StepType.FileGenerate || stepType === StepType.Input) && (
               <DndProvider backend={HTML5Backend}>
                 {stepType === StepType.Input && (
                   <ConditionBuilderContent
@@ -178,24 +186,24 @@ const FlowElementsPopup: React.FC<FlowElementsPopupProps> = ({ node, onClose, on
                     setRules={setRules}
                   />
                 )}
-                {stepType === StepType.FileGenerate && <FileGenerateContent />}
+                {stepType === StepType.FileGenerate && (
+                  <FileGenerateContent
+                    onFileNameChange={setFileName}
+                    onFileContentChange={setFileContent}
+                    defaultFileName={node?.data?.fileName ?? fileName ?? undefined}
+                    defaultFileContent={node?.data?.fileContent ?? fileContent ?? undefined}
+                  />
+                )}
               </DndProvider>
-            }
-            {
-              stepType === StepType.FinishingStepRedirect &&
-              <DefaultMessageContent message='Vestlus suunatakse klienditeenindajale' />
-            }
-            {
-              stepType === StepType.Auth &&
-              <DefaultMessageContent message='Jätkamiseks palun logi sisse läbi TARA' />
-            }
-            {
-              stepType === StepType.FileSign &&
-              <DefaultMessageContent message='Kas soovid faili allkirjastada? Jah / Ei' />
-            }
-            {
-              stepType === StepType.FinishingStepEnd && <EndConversationContent />
-            }
+            )}
+            {stepType === StepType.FinishingStepRedirect && (
+              <DefaultMessageContent message="Vestlus suunatakse klienditeenindajale" />
+            )}
+            {stepType === StepType.Auth && <DefaultMessageContent message="Jätkamiseks palun logi sisse läbi TARA" />}
+            {stepType === StepType.FileSign && (
+              <DefaultMessageContent message="Kas soovid faili allkirjastada? Jah / Ei" />
+            )}
+            {stepType === StepType.FinishingStepEnd && <EndConversationContent />}
             {stepType === StepType.RasaRules && <RasaRulesContent />}
             <JsonRequestContent isVisible={isJsonRequestVisible} jsonContent={jsonRequestContent} />
           </Tabs.Content>

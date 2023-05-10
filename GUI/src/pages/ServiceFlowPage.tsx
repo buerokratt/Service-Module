@@ -51,6 +51,8 @@ type NodeDataProps = {
   message?: string;
   link?: string;
   linkText?: string;
+  fileName?: string;
+  fileContent?: string;
 };
 
 const initialNodes: Node[] = [
@@ -130,6 +132,15 @@ const ServiceFlowPage: FC = () => {
       return {
         templateName: "client-input",
         resultName: `ClientInput_${node.data.clientInputId}_result`,
+      };
+    }
+    if (node.data.stepType === StepType.FileGenerate) {
+      return {
+        templateName: "file-generate",
+        body: {
+          fileName: node.data.fileName ?? "",
+          fileContent: node.data.fileContent ?? "",
+        },
       };
     }
     if (node.data.stepType === StepType.FileSign) {
@@ -798,6 +809,8 @@ const ServiceFlowPage: FC = () => {
             message: updatedNode.data.message,
             link: updatedNode.data.link,
             linkText: updatedNode.data.linkText,
+            fileName: updatedNode.data.fileName,
+            fileContent: updatedNode.data.fileContent,
           },
         };
       })

@@ -16,6 +16,8 @@ type NodeDataProps = {
     message?: string;
     link?: string;
     linkText?: string;
+    fileName?: string;
+    fileContent?: string
   }
 }
 
@@ -30,6 +32,7 @@ const StepNode: FC<NodeDataProps> = ({ data }) => {
     if (data.stepType === StepType.UserDefined) return false;
     if (data.stepType === StepType.Input) return data.childrenCount < 2;
     if (data.stepType === StepType.OpenWebpage) return !data.link || !data.linkText;
+    if (data.stepType === StepType.FileGenerate) return !data.fileName || !data.fileContent;
 
     return !(data.readonly || !!data.message?.length);
   }
