@@ -48,8 +48,8 @@ export const getServiceSettings = (): string => `${baseUrl}/mocks/service-settin
 export const saveServiceSettings = (): string => `${baseUrl}/mocks/service-settings`;
 export const getTaraAuthResponseVariables = (): string => `${baseUrl}/mocks/tim/user-info`;
 export const getEndpointValidationMock = (): string => `${baseUrl}/mocks/validation-mock`;
-
-export const changeServiceStatus = (): string => `${baseUrl}/services/status`
+export const deleteService = (): string => `${baseUrl}/services/delete`;
+export const changeServiceStatus = (): string => `${baseUrl}/services/status`;
 export const createNewService = (): string => `${baseUrl}/services/add`;
 export const getServicesList = (): string => `${baseUrl}/services`;
 export const jsonToYml = (): string => `${baseUrl}/saveJsonToYml`;

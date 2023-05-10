@@ -3,13 +3,13 @@ import { useContext, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { MdDeleteOutline, MdOutlineEdit } from "react-icons/md";
 import { Button, Card, Icon, Label, Modal, Track } from "..";
+import { changeServiceStatus, deleteService } from "../../resources/api-constants";
 import { Service } from "../../types/service";
 import { ServiceState } from "../../types/service-state";
 import DataTable from "../DataTable";
 
 import "./ServicesTable.scss";
 import axios from "axios";
-import { changeServiceStatus } from "../../resources/api-constants";
 import { ToastContext } from "../Toast/ToastContext";
 
 type Props = {
@@ -23,7 +23,7 @@ const ServicesTable = (props: Props) => {
     pageSize: 10,
   });
   const { t } = useTranslation();
-  const toast = useContext(ToastContext)
+  const toast = useContext(ToastContext);
   const [services, setServices] = useState<Service[]>([]);
   const [isDeletePopupVisible, setDeletePopupVisible] = useState(false);
   const [isStatePopupVisible, setStatePopupVisible] = useState(false);
@@ -70,8 +70,7 @@ const ServicesTable = (props: Props) => {
               )
             );
             setSelectedService(props.row.original);
-          }
-          }
+          }}
         >
           <Label type={setLabelType(props.row.original.state)}>
             {t(`overview.service.states.${props.row.original.state}`)}
@@ -103,7 +102,10 @@ const ServicesTable = (props: Props) => {
           <Button
             disabled={props.row.original.state === ServiceState.Active}
             appearance="text"
-            onClick={() => setDeletePopupVisible(true)}
+            onClick={() => {
+              setSelectedService(services.find((s) => s.id === props.row.original.id));
+              setDeletePopupVisible(true);
+            }}
           >
             <Icon icon={<MdDeleteOutline />} size="medium" />
             {t("overview.delete")}
@@ -116,13 +118,13 @@ const ServicesTable = (props: Props) => {
   const setLabelType = (serviceState: ServiceState) => {
     switch (serviceState) {
       case ServiceState.Draft:
-        return 'disabled';
+        return "disabled";
       case ServiceState.Inactive:
-        return 'warning-dark';
+        return "warning-dark";
       default:
-        return 'info';
+        return "info";
     }
-  }
+  };
 
   const changeServiceState = async () => {
     if (!selectedService) return;
@@ -134,40 +136,56 @@ const ServicesTable = (props: Props) => {
         type: selectedService.type,
       });
       toast.open({
-        type: 'success',
-        title: t('overview.service.toast.updated'),
-        message: '',
-      })
+        type: "success",
+        title: t("overview.service.toast.updated"),
+        message: "",
+      });
       await props.onServiceUpadeCallback();
     } catch (_) {
       toast.open({
-        type: 'error',
-        title: t('overview.service.toast.failed'),
-        message: '',
-      })
+        type: "error",
+        title: t("overview.service.toast.failed.state"),
+        message: "",
+      });
     }
     setSelectedService(undefined);
-    setStatePopupVisible(false)
-  }
+    setStatePopupVisible(false);
+  };
+
+  const deleteSelectedService = async () => {
+    if (!selectedService) return;
+
+    try {
+      await axios.post(deleteService(), {
+        id: selectedService?.id,
+        type: selectedService?.type,
+      });
+      toast.open({
+        type: "success",
+        title: t("overview.service.toast.deleted"),
+        message: "",
+      });
+      setServices((prevServices) => prevServices.filter((s) => s.id !== selectedService?.id));
+    } catch (_) {
+      toast.open({
+        type: "error",
+        title: t("overview.service.toast.failed.delete"),
+        message: "",
+      });
+    }
+    setSelectedService(undefined);
+    setDeletePopupVisible(false);
+  };
 
   return (
     <Card>
       {isDeletePopupVisible && (
-        <Modal
-          title={t("overview.popup.delete")}
-          onClose={() => setDeletePopupVisible(false)}
-        >
+        <Modal title={t("overview.popup.delete")} onClose={() => setDeletePopupVisible(false)}>
           <Track justify="end" gap={16}>
-            <Button
-              appearance="secondary"
-              onClick={() => setDeletePopupVisible(false)}
-            >
+            <Button appearance="secondary" onClick={() => setDeletePopupVisible(false)}>
               {t("overview.cancel")}
             </Button>
-            <Button
-              appearance="error"
-              onClick={() => setDeletePopupVisible(false)}
-            >
+            <Button appearance="error" onClick={deleteSelectedService}>
               {t("overview.delete")}
             </Button>
           </Track>
@@ -176,15 +194,10 @@ const ServicesTable = (props: Props) => {
       {isStatePopupVisible && (
         <Modal title={popupText} onClose={() => setStatePopupVisible(false)}>
           <Track justify="end" gap={16}>
-            <Button
-              appearance="secondary"
-              onClick={() => setStatePopupVisible(false)}
-            >
+            <Button appearance="secondary" onClick={() => setStatePopupVisible(false)}>
               {t("overview.cancel")}
             </Button>
-            <Button onClick={changeServiceState}>
-              {t("overview.popup.setState")}
-            </Button>
+            <Button onClick={changeServiceState}>{t("overview.popup.setState")}</Button>
           </Track>
         </Modal>
       )}
