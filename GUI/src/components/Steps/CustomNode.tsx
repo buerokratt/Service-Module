@@ -1,7 +1,7 @@
-import { Dispatch, FC, SetStateAction } from 'react';
-import { Handle, NodeProps, Position } from 'reactflow';
-import { useTranslation } from 'react-i18next';
-import { MdDeleteOutline, MdOutlineEdit, MdOutlineRemoveRedEye } from 'react-icons/md';
+import { Dispatch, FC, SetStateAction } from "react";
+import { Handle, NodeProps, Position } from "reactflow";
+import { useTranslation } from "react-i18next";
+import { MdDeleteOutline, MdOutlineEdit, MdOutlineRemoveRedEye } from "react-icons/md";
 
 import { Box, Button, Icon, Track } from "../";
 import StepNode from "./StepNode";
