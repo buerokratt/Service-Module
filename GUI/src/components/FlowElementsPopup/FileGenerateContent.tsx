@@ -1,7 +1,6 @@
 import React from "react";
 import { FormInput } from "../FormElements";
-import { Track } from "..";
-import VariableAsTag from "./VariableAsTag";
+import { OutputElementBox, Track } from "..";
 import FormRichText from "../FormElements/FormRichText";
 import "./styles.scss";
 
@@ -18,7 +17,7 @@ const FileGenerateContent: React.FC<FileGenerateContentProps> = ({
   defaultFileName,
   defaultFileContent,
 }) => {
-  const availableOutputVariables = ["abc123", "abc124", "abc125"];
+  const availableOutputVariables = ["{{abc123}}", "{{abc124}}", "{{abc125}}"];
 
   return (
     <Track direction="vertical" align="stretch">
@@ -55,8 +54,8 @@ const FileGenerateContent: React.FC<FileGenerateContentProps> = ({
       <Track direction="vertical" align="left" gap={16} className="popup-top-border-track popup-darker-track">
         <span>Available Output Variables</span>
         <Track gap={7} className="flow-tags-container">
-          {availableOutputVariables.map((x) => (
-            <VariableAsTag key={x} value={x} color="green" />
+          {availableOutputVariables.map((element, i) => (
+            <OutputElementBox key={`${element}-${i}`} text={element}></OutputElementBox>
           ))}
         </Track>
       </Track>
