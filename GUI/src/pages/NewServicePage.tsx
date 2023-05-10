@@ -104,12 +104,22 @@ const NewServicePage: React.FC = () => {
     return availableVariables;
   };
 
+  const onNameChange = (endpointId: string, oldName: string, newName: string) => {
+    availableVariables.prod = availableVariables.prod.filter((v) => v.replace("{{", "").split(".")[0] !== oldName);
+    const endpoint = getSelectedEndpoints().find((otherEndpoint) => otherEndpoint.id === endpointId);
+    endpoint?.selectedEndpoint?.response?.forEach((response) => {
+      const variable = `{{${newName === "" ? endpoint.id : newName}.${response.name}}}`;
+      if (!availableVariables.prod.includes(variable)) availableVariables.prod.push(variable);
+    });
+  };
+
   return (
     <Layout
       disableMenu
       customHeader={
         <NewServiceHeader
           activeStep={2}
+          availableVariables={availableVariables}
           saveDraftOnClick={saveDraft}
           endpoints={endpoints}
           flow={location.state?.flow}
@@ -122,6 +132,7 @@ const NewServicePage: React.FC = () => {
                 endpoints,
                 secrets,
                 serviceName,
+                availableVariables: availableVariables,
                 flow: location.state?.flow,
                 serviceDescription: description,
               },
@@ -161,6 +172,7 @@ const NewServicePage: React.FC = () => {
             endpoint={endpoint}
             setEndpoints={setEndpoints}
             requestValues={getAvailableRequestValues(endpoint.id)}
+            onNameChange={onNameChange}
           />
         ))}
         <Button

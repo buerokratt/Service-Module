@@ -20,16 +20,25 @@ import { Node } from "reactflow";
 import RasaRulesContent from "./RasaRulesContent";
 import { ConditionRuleType, StepType } from "../../types";
 import "./styles.scss";
+import { PreDefinedEndpointEnvVariables } from "../../types/endpoint";
 
 interface FlowElementsPopupProps {
   node: any;
+  availableVariables?: PreDefinedEndpointEnvVariables;
   onClose: () => void;
   onSave: (updatedNode: Node) => void;
   onRulesUpdate: (rules: (string | null)[], rulesData: ConditionRuleType[]) => void;
   oldRules: (string | null)[];
 }
 
-const FlowElementsPopup: React.FC<FlowElementsPopupProps> = ({ node, onClose, onSave, oldRules, onRulesUpdate }) => {
+const FlowElementsPopup: React.FC<FlowElementsPopupProps> = ({
+  node,
+  availableVariables,
+  onClose,
+  onSave,
+  oldRules,
+  onRulesUpdate,
+}) => {
   const { t } = useTranslation();
   const [isYesNoQuestion, setIsYesNoQuestion] = useState(node?.isYesNoQuestion ?? false);
   const [rules, setRules] = useState<ConditionRuleType[]>(node?.data?.rules ?? []);
@@ -162,6 +171,7 @@ const FlowElementsPopup: React.FC<FlowElementsPopupProps> = ({ node, onClose, on
             {stepType === StepType.Textfield && (
               <TextfieldContent
                 defaultMessage={node.data.message ?? textfieldMessage ?? undefined}
+                availableVariables={availableVariables}
                 onChange={(message, placeholders) => {
                   setTextfieldMessage(message);
                   setTextfieldMessagePlaceholders(placeholders);

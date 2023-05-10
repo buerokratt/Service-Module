@@ -108,6 +108,7 @@ const ServiceFlowPage: FC = () => {
   const serviceName = (location.state?.serviceName ?? "").replaceAll(" ", "-");
   const serviceDescription = location.state?.serviceDescription;
   const secrets: PreDefinedEndpointEnvVariables | undefined = location.state?.secrets;
+  const availableVariables: PreDefinedEndpointEnvVariables | undefined = location.state?.availableVariables;
   const flow = location.state?.flow ? JSON.parse(location.state?.flow) : undefined;
   const [edges, setEdges, onEdgesChange] = useEdgesState(flow ? flow.edges : [initialEdge]);
   const [reactFlowInstance, setReactFlowInstance] = useState<ReactFlowInstance>();
@@ -853,6 +854,7 @@ const ServiceFlowPage: FC = () => {
     <>
       <NewServiceHeader
         activeStep={3}
+        availableVariables={availableVariables}
         saveDraftOnClick={saveFlow}
         endpoints={location.state?.endpoints}
         flow={JSON.stringify(reactFlowInstance?.toObject())}
@@ -865,6 +867,7 @@ const ServiceFlowPage: FC = () => {
       />
       <h1 style={{ padding: 16 }}>Teenusvoog "{serviceName}"</h1>
       <FlowElementsPopup
+        availableVariables={availableVariables}
         onClose={() => handlePopupClose()}
         onSave={(updatedNode: Node) => {
           handlePopupSave(updatedNode);
