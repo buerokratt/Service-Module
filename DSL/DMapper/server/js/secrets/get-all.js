@@ -5,8 +5,9 @@ const flattenSecrets = (data, path, result) => {
     const secretPath = path.length > 0 ? `${path}.${k}` : k;
     if (typeof data[k] === "object") {
       flattenSecrets(data[k], secretPath, result);
+    } else {
+      if (!result.includes(secretPath)) result.push(secretPath);
     }
-    if (!result.includes(secretPath)) result.push(secretPath);
   });
 };
 
