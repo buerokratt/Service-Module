@@ -9,20 +9,6 @@ export const dummyDataApi = (): string => {
 // Services
 export const getServicesAdd = (): string => `${baseUrl}/services/add`;
 
-export const dummyServiceData = [
-  { name: "first", usedCount: 1, state: ServiceState.Inactive },
-  { name: "second", usedCount: 20, state: ServiceState.Active },
-  { name: "third", usedCount: 3000, state: ServiceState.Inactive },
-  { name: "fourth", usedCount: 4000, state: ServiceState.Active },
-  { name: "fifth", usedCount: 500000, state: ServiceState.Active },
-  { name: "sixth", usedCount: 6000000, state: ServiceState.Active },
-  { name: "seventh", usedCount: 70000000, state: ServiceState.Inactive },
-  { name: "eight", usedCount: 800000000, state: ServiceState.Active },
-  { name: "ninth", usedCount: 900000000, state: ServiceState.Active },
-  { name: "tenth", usedCount: 10000000000, state: ServiceState.Active },
-  { name: "eleventh", usedCount: 11, state: ServiceState.Inactive },
-];
-
 export const dummyEndpointsData = [
   { label: "/me", value: "/me" },
   { label: "/you", value: "/you" },
@@ -56,7 +42,15 @@ export const dummyVariableOptions = [
 export const getOpenApiSpec = (): string => `${baseUrl}/services/open-api-spec`;
 export const servicesRequestsExplain = (): string => `${baseUrl}/services/requests/explain`;
 export const getClientInputAvailableVariables = (): string => `${baseUrl}/mocks/client-input-variables`;
+
+export const getDomainFile = (): string => `${baseUrl}/domain-file`;
+export const getServiceSettings = (): string => `${baseUrl}/mocks/service-settings`;
+export const saveServiceSettings = (): string => `${baseUrl}/mocks/service-settings`;
+
 export const getTaraAuthResponseVariables = (): string => `${baseUrl}/mocks/tim/user-info`;
 export const getEndpointValidationMock = (): string => `${baseUrl}/mocks/validation-mock`;
-export const jsonToYml = (): string => `${baseUrl}/saveJsonToYml`;
+
+export const changeServiceStatus = (): string => `${baseUrl}/services/status`
 export const createNewService = (): string => `${baseUrl}/services/add`;
+export const getServicesList = (): string => `${baseUrl}/services`;
+export const jsonToYml = (): string => `${baseUrl}/saveJsonToYml`;

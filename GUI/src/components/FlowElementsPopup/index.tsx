@@ -17,6 +17,7 @@ import { servicesRequestsExplain } from "../../resources/api-constants";
 import OpenWebPageContent from "./OpenWebPageContent";
 import OpenWebPageTestContent from "./OpenWebPageTestContent";
 import { Node } from "reactflow";
+import RasaRulesContent from "./RasaRulesContent";
 import { ConditionRuleType, StepType } from "../../types";
 import "./styles.scss";
 
@@ -123,9 +124,9 @@ const FlowElementsPopup: React.FC<FlowElementsPopupProps> = ({ node, onClose, on
               }}
             >
               {t(isReadonly ? "global.close" : "global.save")}
-            </Button >
-          </Track >
-        </Track >
+            </Button>
+          </Track>
+        </Track>
 
       }
     >
@@ -156,13 +157,13 @@ const FlowElementsPopup: React.FC<FlowElementsPopupProps> = ({ node, onClose, on
                   setTextfieldMessage(message);
                   setTextfieldMessagePlaceholders(placeholders);
                 }}
-              ></TextfieldContent>
+              />
             )}
             {stepType === StepType.OpenWebpage && (
               <OpenWebPageContent
                 onWebpageNameChange={setWebpageName}
                 onWebpageUrlChange={setWebpageUrl}
-              ></OpenWebPageContent>
+              />
             )}
             {(stepType === StepType.FileGenerate || stepType === StepType.Input) && (
               <DndProvider backend={HTML5Backend}>
@@ -178,13 +179,13 @@ const FlowElementsPopup: React.FC<FlowElementsPopupProps> = ({ node, onClose, on
               </DndProvider>
             )}
             {stepType === StepType.FinishingStepRedirect && (
-              <DefaultMessageContent message="Vestlus suunatakse klienditeenindajale"></DefaultMessageContent>
+              <DefaultMessageContent message="Vestlus suunatakse klienditeenindajale" />
             )}
             {stepType === StepType.Auth && (
-              <DefaultMessageContent message="Jätkamiseks palun logi sisse läbi TARA"></DefaultMessageContent>
+              <DefaultMessageContent message="Jätkamiseks palun logi sisse läbi TARA" />
             )}
-            {stepType === StepType.FinishingStepEnd && <EndConversationContent></EndConversationContent>}
-            <JsonRequestContent isVisible={isJsonRequestVisible} jsonContent={jsonRequestContent}></JsonRequestContent>
+            {stepType === StepType.FinishingStepEnd && <EndConversationContent />}
+            <JsonRequestContent isVisible={isJsonRequestVisible} jsonContent={jsonRequestContent} />
           </Tabs.Content>
           {!isReadonly && (
             <Tabs.Content value={t("serviceFlow.tabs.test")} className="vertical-tabs__body">
@@ -192,10 +193,10 @@ const FlowElementsPopup: React.FC<FlowElementsPopupProps> = ({ node, onClose, on
                 <TextfieldTestContent
                   placeholders={textfieldMessagePlaceholders}
                   message={textfieldMessage || node.data.message}
-                ></TextfieldTestContent>
+                />
               )}
               {stepType === StepType.OpenWebpage && (
-                <OpenWebPageTestContent websiteUrl={webpageUrl} websiteName={webpageName}></OpenWebPageTestContent>
+                <OpenWebPageTestContent websiteUrl={webpageUrl} websiteName={webpageName} />
               )}
             </Tabs.Content>
           )}
