@@ -153,7 +153,6 @@ const FlowElementsPopup: React.FC<FlowElementsPopupProps> = ({ node, onClose, on
           <Tabs.Content value={t("serviceFlow.tabs.setup")} className="vertical-tabs__body">
             {stepType === StepType.Textfield && (
               <TextfieldContent
-                selectedNode={node}
                 defaultMessage={node.data.message ?? (textfieldMessage ?? undefined)}
                 onChange={(message, placeholders) => {
                   setTextfieldMessage(message);

@@ -17,7 +17,6 @@ import CustomNode from "../Steps/CustomNode";
 import PlaceholderNode from "../Steps/PlaceholderNode";
 import { StepType } from "../../types";
 import StartNode from "../Steps/StartNode";
-import { StepType } from "../../types";
 
 export const GRID_UNIT = 16;
 
