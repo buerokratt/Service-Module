@@ -13,10 +13,10 @@ import ReactFlow, {
   XYPosition,
 } from "reactflow";
 import "reactflow/dist/style.css";
-import { StepType } from "../../types/step-type.enum";
 import CustomNode from "../Steps/CustomNode";
 import PlaceholderNode from "../Steps/PlaceholderNode";
 import StartNode from "../Steps/StartNode";
+import { StepType } from "../../types";
 
 export const GRID_UNIT = 16;
 
