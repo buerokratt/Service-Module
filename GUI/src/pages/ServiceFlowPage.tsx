@@ -92,6 +92,7 @@ const ServiceFlowPage: FC = () => {
   const navigate = useNavigate();
   const serviceName = (location.state?.serviceName ?? "").replaceAll(" ", "-");
   const serviceDescription = location.state?.serviceDescription;
+  const secrets: { [key: string]: any } | undefined = location.state?.secrets;
   const flow = location.state?.flow ? JSON.parse(location.state?.flow) : undefined;
   const [edges, setEdges, onEdgesChange] = useEdgesState(flow ? flow.edges : [initialEdge]);
   const [reactFlowInstance, setReactFlowInstance] = useState<ReactFlowInstance>();
@@ -167,8 +168,12 @@ const ServiceFlowPage: FC = () => {
 
   const getMapEntry = (value: string) => {
     const parts = value.replace("{{", "").replace("}}", "").split(".");
+    const key = value.replace("{{", '"').replace("}}", '"');
+    if ([...Object.keys(secrets?.prod), Object.keys(secrets?.test)].includes(parts[0])) {
+      return `[${key}, secrets.response.body.${parts.join(".")}]`;
+    }
     if (!value.includes("ClientInput")) parts.splice(1, 0, "response", "body");
-    return `[${value.replace("{{", '"').replace("}}", '"')}, ${parts.join(".")}]`;
+    return `[${key}, ${parts.join(".")}]`;
   };
 
   const getNestedPreDefinedRawVariables = (data: { [key: string]: any }, result: string[]) => {
@@ -556,7 +561,7 @@ const ServiceFlowPage: FC = () => {
         next: "assign_endpoint_url",
       });
       steps.set("get_test_info", {
-        call: `http.${selectedEndpointType.methodType.toLowerCase()}`,
+        call: `http.post`,
         args: {
           url: `http://ruuter:8085/services/endpoints/info/${endpointName}-test-info`,
           body: {
@@ -649,6 +654,13 @@ const ServiceFlowPage: FC = () => {
     });
 
     const finishedFlow = new Map();
+    finishedFlow.set("get_secrets", {
+      call: "http.get",
+      args: {
+        url: "http://ruuter:8085/secrets-with-priority",
+      },
+      result: "secrets",
+    });
     allRelations.forEach((r) => {
       const [parentNodeId, childNodeId] = r.split("-");
       const parentNode = nodes.find((node) => node.id === parentNodeId);
@@ -787,6 +799,7 @@ const ServiceFlowPage: FC = () => {
         flow={JSON.stringify(reactFlowInstance?.toObject())}
         serviceName={serviceName}
         serviceDescription={serviceDescription}
+        secrets={secrets}
         continueOnClick={() => navigate(ROUTES.OVERVIEW_ROUTE)}
       />
       <h1 style={{ padding: 16 }}>Teenusvoog "{serviceName}"</h1>
