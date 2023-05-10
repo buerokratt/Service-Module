@@ -165,6 +165,7 @@ const ServicesTable = (props: Props) => {
         title: t("overview.service.toast.deleted"),
         message: "",
       });
+      setServices((prevServices) => prevServices.filter((s) => s.id !== selectedService?.id));
     } catch (_) {
       toast.open({
         type: "error",
@@ -172,7 +173,6 @@ const ServicesTable = (props: Props) => {
         message: "",
       });
     }
-    setServices((prevServices) => prevServices.filter((s) => s.id !== selectedService?.id));
     setSelectedService(undefined);
     setDeletePopupVisible(false);
   };
