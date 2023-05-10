@@ -46,7 +46,22 @@ delete_service:
     body:
       id: ${id}
   result: res
-  next: delete_deactivated_service
+  next: check_service_file_exists
+
+check_service_file_exists:
+  call: http.post
+  args:
+    url: http://node_server:3008/file/check
+    body:
+      file_path: "/Ruuter/${ruuter_type}/services/${old_file_status_path}/${name_res.response.body[0].name}.tmp"
+  result: service_file_exists
+  next: validate_service_file_exists
+
+validate_service_file_exists:
+  switch:
+    - condition: ${!!service_file_exists.response.body}
+      next: delete_deactivated_service
+  next: delete_response
 
 delete_deactivated_service:
   call: http.post
@@ -72,7 +87,22 @@ delete_response:
     body:
       response_name: "utter_service_${name_res.response.body[0].name}"
   result: delete_response_result
-  next: delete_intent
+  next: check_intent_file_exists
+
+check_intent_file_exists:
+  call: http.post
+  args:
+    url: http://node_server:3008/file/check
+    body:
+      file_path: "/mock1/data/nlu/removed/service_${name_res.response.body[0].name}_nlu.tmp"
+  result: intent_file_exists_result
+  next: validate_intent_file_exists
+
+validate_intent_file_exists:
+  switch:
+    - condition: ${!!intent_file_exists_result.response.body}
+      next: delete_intent
+  next: return_ok
 
 delete_intent:
   call: http.post
