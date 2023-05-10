@@ -6,15 +6,18 @@ import RulesBuilder from "./RulesBuilder";
 import "./styles.scss";
 import { ConditionRuleType } from "../../types";
 import { v4 as uuidv4 } from "uuid";
+import { PreDefinedEndpointEnvVariables } from "../../types/endpoint";
 
 interface ConditionBuilderContentProps {
   isYesNoQuestion: boolean;
   setIsYesNoQuestion: (x: boolean) => void;
   rules: ConditionRuleType[];
   setRules: (x: ConditionRuleType[]) => void;
+  availableVariables?: PreDefinedEndpointEnvVariables;
 }
 
 const ConditionBuilderContent: React.FC<ConditionBuilderContentProps> = ({
+  availableVariables,
   setIsYesNoQuestion,
   isYesNoQuestion,
   rules,
@@ -51,7 +54,7 @@ const ConditionBuilderContent: React.FC<ConditionBuilderContentProps> = ({
         <span>Yes/No Question</span>
       </Track>
       {isYesNoQuestion && <YesNoPopupContent />}
-      {!isYesNoQuestion && <RulesBuilder rules={rules} setRules={setRules} />}
+      {!isYesNoQuestion && <RulesBuilder availableVariables={availableVariables} rules={rules} setRules={setRules} />}
     </Track>
   );
 };

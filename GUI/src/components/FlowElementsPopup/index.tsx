@@ -190,6 +190,7 @@ const FlowElementsPopup: React.FC<FlowElementsPopupProps> = ({
               <DndProvider backend={HTML5Backend}>
                 {stepType === StepType.Input && (
                   <ConditionBuilderContent
+                    availableVariables={availableVariables}
                     isYesNoQuestion={isYesNoQuestion}
                     setIsYesNoQuestion={setIsYesNoQuestion}
                     rules={rules}
@@ -198,6 +199,7 @@ const FlowElementsPopup: React.FC<FlowElementsPopupProps> = ({
                 )}
                 {stepType === StepType.FileGenerate && (
                   <FileGenerateContent
+                    availableVariables={availableVariables}
                     onFileNameChange={setFileName}
                     onFileContentChange={setFileContent}
                     defaultFileName={node?.data?.fileName ?? fileName ?? undefined}
