@@ -12,9 +12,8 @@ type ServicesResponse = {
   readonly id: number;
   readonly name: string;
   readonly state: ServiceState;
-  readonly type: 'GET' | 'POST';
+  readonly type: "GET" | "POST";
 };
-
 
 const OverviewPage: React.FC = () => {
   const [serviceList, setServiceList] = useState<Service[]>([]);
@@ -23,35 +22,30 @@ const OverviewPage: React.FC = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchServices = async () => {
-      await loadServicesList();
-    }
-    fetchServices();
+    loadServicesList();
   }, []);
 
   const loadServicesList = async () => {
     const result = await axios.get<{ response: ServicesResponse[] }>(getServicesList());
-    const services = result.data.response.map(item => {
+    const services = result.data.response.map((item) => {
       return {
         id: item.id,
         name: item.name,
-        usedCount: 0,
         state: item.state,
         type: item.type,
+        usedCount: 0,
       } as Service;
     });
     setServiceList(services);
-  }
+  };
 
   return (
     <>
       <Track justify="between">
         <h1>{t("overview.services")}</h1>
-        <Button onClick={() => navigate(ROUTES.NEWSERVICE_ROUTE)} >{t("overview.create")}</Button>
+        <Button onClick={() => navigate(ROUTES.NEWSERVICE_ROUTE)}>{t("overview.create")}</Button>
       </Track>
-      <ServicesTable
-        dataSource={serviceList}
-        onServiceUpadeCallback={loadServicesList} />
+      <ServicesTable dataSource={serviceList} onServiceUpadeCallback={loadServicesList} />
     </>
   );
 };
