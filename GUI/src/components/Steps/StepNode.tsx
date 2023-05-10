@@ -6,6 +6,7 @@ import { StepType } from "../../types";
 type NodeDataProps = {
   data: {
     childrenCount: number;
+    clientInputId: number;
     label: string;
     onDelete: (id: string) => void;
     onEdit: (id: string) => void;
@@ -21,6 +22,9 @@ type NodeDataProps = {
 };
 
 const StepNode: FC<NodeDataProps> = ({ data }) => {
+  const boldText = {
+    fontWeight: 500,
+  };
   const createMarkup = (text: string) => {
     return {
       __html: text,
@@ -46,8 +50,41 @@ const StepNode: FC<NodeDataProps> = ({ data }) => {
         {isStepInvalid() && <ExclamationBadge></ExclamationBadge>}
         {data.label}
       </p>
-      {data.stepType === StepType.Textfield && <div dangerouslySetInnerHTML={createMarkup(data.message ?? "")}></div>}
-      {data.stepType === StepType.Auth && <p style={{ fontWeight: 500 }}>Jätkamiseks palun logi sisse läbi TARA</p>}
+      {data.stepType === StepType.Textfield && (
+        <div style={boldText} dangerouslySetInnerHTML={createMarkup(data.message ?? "")}></div>
+      )}
+      {data.stepType === StepType.Auth && <p style={boldText}>"Jätkamiseks palun logi sisse läbi TARA"</p>}
+      {data.stepType === StepType.Input && (
+        <p>
+          <span style={boldText}>Muutuja</span>
+          <span style={{ marginLeft: 8 }} className="client-input-variable-tag">
+            ClientInput_{data.clientInputId}
+          </span>
+        </p>
+      )}
+      {data.stepType === StepType.OpenWebpage && (
+        <p>
+          <span className="webpage-link-text">{data.linkText}</span>
+          {data.link && (
+            <span className="webpage-link" style={{ marginLeft: 8 }}>
+              ({data.link})
+            </span>
+          )}
+        </p>
+      )}
+      {data.stepType === StepType.FileGenerate && data.fileName && (
+        <p>
+          <span style={boldText}>{data.fileName}</span>
+          <span className="file-name-extension" style={{ marginLeft: 8 }}>
+            {data.fileName}.zip
+          </span>
+        </p>
+      )}
+      {data.stepType === StepType.FileSign && <p style={boldText}>“Kas soovid dokumendi allkirjastada?”</p>}
+      {data.stepType === StepType.FinishingStepEnd && <p style={boldText}>“Teenus on lõpetatud”</p>}
+      {data.stepType === StepType.FinishingStepRedirect && (
+        <p style={boldText}>“Vestlus suunatakse klienditeenindajale”</p>
+      )}
     </Track>
   );
 };
