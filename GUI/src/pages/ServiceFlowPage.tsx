@@ -9,7 +9,7 @@ import { ROUTES } from "../resources/routes-constants";
 import apiIconTag from "../assets/images/api-icon-tag.svg";
 import "reactflow/dist/style.css";
 import "./ServiceFlowPage.scss";
-import { StepType, Step, RawData } from "../types";
+import { StepType, Step, RawData, ConditionRuleType } from "../types";
 import { EndpointData, EndpointEnv, EndpointType, EndpointVariableData } from "../types/endpoint";
 import axios from "axios";
 import { createNewService, jsonToYml, testDraftService } from "../resources/api-constants";
@@ -93,7 +93,10 @@ const ServiceFlowPage: FC = () => {
 
   const [setupElements, setSetupElements] = useState<Step[]>([]);
   const location = useLocation();
-  const [updatedRules, setUpdatedRules] = useState<(string | null)[]>([]);
+  const [updatedRules, setUpdatedRules] = useState<{ rules: (string | null)[]; rulesData: ConditionRuleType[] }>({
+    rules: [],
+    rulesData: [],
+  });
   const [selectedNode, setSelectedNode] = useState<Node<NodeDataProps> | null>(null);
   const navigate = useNavigate();
   const serviceName = (location.state?.serviceName ?? "").replaceAll(" ", "-");
@@ -721,11 +724,12 @@ const ServiceFlowPage: FC = () => {
                 );
                 const followingNode = nodes.find((n) => n.id === edges.find((edge) => edge.source === node.id)?.target);
                 return {
-                  case: matchingRule
-                    ? `\${${matchingRule.name.replace("{{", "").replace("}}", "")} ${matchingRule.condition} ${
-                        matchingRule.value
-                      }}`
-                    : `\${${clientInput} == ${node.data.label === "rule 1" ? '"Yes"' : '"No"'}}`,
+                  case:
+                    matchingRule && !["Yes", "No"].includes(matchingRule?.condition)
+                      ? `\${${matchingRule.name.replace("{{", "").replace("}}", "")} ${matchingRule.condition} "${
+                          matchingRule.value
+                        }"}`
+                      : `\${${clientInput} == ${node.data.label === "rule 1" ? '"Yes"' : '"No"'}}`,
                   nextStep:
                     followingNode?.type === "customNode"
                       ? `${followingNode.data.stepType}-${followingNode.id}`
@@ -759,7 +763,7 @@ const ServiceFlowPage: FC = () => {
       )
       .then((r) => {
         console.log(r);
-        setIsTestButtonVisible((isVisible) => !isVisible);
+        setIsTestButtonVisible(true);
       })
       .catch((e) => {
         console.log(e);
@@ -859,12 +863,12 @@ const ServiceFlowPage: FC = () => {
         onSave={(updatedNode: Node) => {
           handlePopupSave(updatedNode);
         }}
-        onRulesUpdate={(rules) => {
-          if (selectedNode?.data.stepType === StepType.Input) setUpdatedRules(rules);
+        onRulesUpdate={(rules, rulesData) => {
+          if (selectedNode?.data.stepType === StepType.Input) setUpdatedRules({ rules, rulesData });
           resetStates();
         }}
         node={selectedNode}
-        oldRules={updatedRules}
+        oldRules={updatedRules.rules}
       />
       <ReactFlowProvider>
         <div className="graph">

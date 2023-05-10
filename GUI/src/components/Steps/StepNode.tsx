@@ -13,6 +13,9 @@ type NodeDataProps = {
     type: string;
     stepType: StepType;
     readonly: boolean;
+    name?: string;
+    condition?: string;
+    value?: string;
     message?: string;
     link?: string;
     linkText?: string;
@@ -84,6 +87,17 @@ const StepNode: FC<NodeDataProps> = ({ data }) => {
       {data.stepType === StepType.FinishingStepEnd && <p style={boldText}>“Teenus on lõpetatud”</p>}
       {data.stepType === StepType.FinishingStepRedirect && (
         <p style={boldText}>“Vestlus suunatakse klienditeenindajale”</p>
+      )}
+      {data.stepType === StepType.Rule && (
+        <p>
+          {data.name && (
+            <span style={{ marginRight: 8 }} className="client-input-variable-tag">
+              {data.name}
+            </span>
+          )}
+          {data.condition && <span style={boldText}>{data.condition}</span>}
+          {data.value && <span style={{ ...boldText, marginLeft: 8 }}>{data.value}</span>}
+        </p>
       )}
     </Track>
   );

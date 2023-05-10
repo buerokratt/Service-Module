@@ -25,7 +25,7 @@ interface FlowElementsPopupProps {
   node: any;
   onClose: () => void;
   onSave: (updatedNode: Node) => void;
-  onRulesUpdate: (rules: (string | null)[]) => void;
+  onRulesUpdate: (rules: (string | null)[], rulesData: ConditionRuleType[]) => void;
   oldRules: (string | null)[];
 }
 
@@ -66,7 +66,7 @@ const FlowElementsPopup: React.FC<FlowElementsPopupProps> = ({ node, onClose, on
         if (i < oldRules.length) item = oldRules[i];
         result.push(item);
       }
-      return onRulesUpdate(result);
+      return onRulesUpdate(result, rules);
     }
     const updatedNode = {
       ...node,
