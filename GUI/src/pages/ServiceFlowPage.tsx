@@ -10,7 +10,13 @@ import apiIconTag from "../assets/images/api-icon-tag.svg";
 import "reactflow/dist/style.css";
 import "./ServiceFlowPage.scss";
 import { StepType, Step, RawData, ConditionRuleType } from "../types";
-import { EndpointData, EndpointEnv, EndpointType, EndpointVariableData } from "../types/endpoint";
+import {
+  EndpointData,
+  EndpointEnv,
+  EndpointType,
+  EndpointVariableData,
+  PreDefinedEndpointEnvVariables,
+} from "../types/endpoint";
 import axios from "axios";
 import { createNewService, jsonToYml, testDraftService } from "../resources/api-constants";
 import { ToastContext } from "../components/Toast/ToastContext";
@@ -101,7 +107,7 @@ const ServiceFlowPage: FC = () => {
   const navigate = useNavigate();
   const serviceName = (location.state?.serviceName ?? "").replaceAll(" ", "-");
   const serviceDescription = location.state?.serviceDescription;
-  const secrets: { [key: string]: any } | undefined = location.state?.secrets;
+  const secrets: PreDefinedEndpointEnvVariables | undefined = location.state?.secrets;
   const flow = location.state?.flow ? JSON.parse(location.state?.flow) : undefined;
   const [edges, setEdges, onEdgesChange] = useEdgesState(flow ? flow.edges : [initialEdge]);
   const [reactFlowInstance, setReactFlowInstance] = useState<ReactFlowInstance>();
@@ -188,7 +194,7 @@ const ServiceFlowPage: FC = () => {
   const getMapEntry = (value: string) => {
     const parts = value.replace("{{", "").replace("}}", "").split(".");
     const key = value.replace("{{", '"').replace("}}", '"');
-    if ([...Object.keys(secrets?.prod), Object.keys(secrets?.test)].includes(parts[0])) {
+    if ([...(secrets?.prod ?? []), ...(secrets?.test ?? [])].includes(parts[0])) {
       return `[${key}, secrets.response.body.${parts.join(".")}]`;
     }
     if (!value.includes("ClientInput")) parts.splice(1, 0, "response", "body");
