@@ -74,21 +74,24 @@ const initialNodes: Node[] = [
 const ServiceFlowPage: FC = () => {
   const { t } = useTranslation();
   const toast = useContext(ToastContext)
+
   const allElements: Step[] = [
-    { id: 1, label: t("serviceFlow.element.taraAuthentication"), type: StepType.Auth },
-    { id: 2, label: t("serviceFlow.element.textfield"), type: StepType.Textfield },
-    { id: 3, label: t("serviceFlow.element.clientInput"), type: StepType.Input },
-    { id: 4, label: t("serviceFlow.element.openNewWebpage"), type: StepType.OpenWebpage },
-    { id: 5, label: t("serviceFlow.element.fileGeneration"), type: StepType.FileGenerate },
-    { id: 6, label: t("serviceFlow.element.fileSigning"), type: StepType.FileSign },
-    { id: 7, label: t("serviceFlow.element.siga"), type: StepType.SiGa },
-    { id: 8, label: t("serviceFlow.element.conversationEnd"), type: StepType.FinishingStepEnd },
+    { id: 10, label: t("serviceFlow.element.taraAuthentication"), type: StepType.Auth },
+    { id: 20, label: t("serviceFlow.element.textfield"), type: StepType.Textfield },
+    { id: 30, label: t("serviceFlow.element.clientInput"), type: StepType.Input },
+    { id: 40, label: t("serviceFlow.element.rules"), type: StepType.RasaRules },
+    { id: 50, label: t("serviceFlow.element.openNewWebpage"), type: StepType.OpenWebpage },
+    { id: 60, label: t("serviceFlow.element.fileGeneration"), type: StepType.FileGenerate },
+    { id: 70, label: t("serviceFlow.element.fileSigning"), type: StepType.FileSign },
+    { id: 80, label: t("serviceFlow.element.siga"), type: StepType.SiGa },
+    { id: 90, label: t("serviceFlow.element.conversationEnd"), type: StepType.FinishingStepEnd },
     {
-      id: 9,
+      id: 100,
       label: t("serviceFlow.element.redirectConversationToSupport"),
       type: StepType.FinishingStepRedirect,
-    },
+    }
   ];
+
   const [setupElements, setSetupElements] = useState<Step[]>([]);
   const location = useLocation();
   const [updatedRules, setUpdatedRules] = useState<(string | null)[]>([]);
