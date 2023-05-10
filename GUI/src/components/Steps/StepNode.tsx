@@ -1,8 +1,7 @@
-import { FC, memo } from 'react';
+import { FC, memo } from "react";
 
-import { ExclamationBadge, Track } from '../';
-import { StepType } from '../../types';
-
+import { ExclamationBadge, Track } from "../";
+import { StepType } from "../../types";
 
 type NodeDataProps = {
   data: {
@@ -17,14 +16,14 @@ type NodeDataProps = {
     link?: string;
     linkText?: string;
     fileName?: string;
-    fileContent?: string
-  }
-}
+    fileContent?: string;
+  };
+};
 
 const StepNode: FC<NodeDataProps> = ({ data }) => {
   const createMarkup = (text: string) => {
     return {
-      __html: text
+      __html: text,
     };
   };
 
@@ -35,15 +34,20 @@ const StepNode: FC<NodeDataProps> = ({ data }) => {
     if (data.stepType === StepType.FileGenerate) return !data.fileName || !data.fileContent;
 
     return !(data.readonly || !!data.message?.length);
-  }
+  };
 
   return (
-    <Track style={{ width: '100%' }} direction='vertical' align='left'>
+    <Track
+      style={{ overflow: "hidden", whiteSpace: "nowrap", textOverflow: "ellipsis" }}
+      direction="vertical"
+      align="left"
+    >
       <p>
         {isStepInvalid() && <ExclamationBadge></ExclamationBadge>}
         {data.label}
       </p>
-      <div dangerouslySetInnerHTML={createMarkup(data.message ?? '')}></div>
+      {data.stepType === StepType.Textfield && <div dangerouslySetInnerHTML={createMarkup(data.message ?? "")}></div>}
+      {data.stepType === StepType.Auth && <p style={{ fontWeight: 500 }}>Jätkamiseks palun logi sisse läbi TARA</p>}
     </Track>
   );
 };
