@@ -58,7 +58,12 @@
       "state": "Olek",
       "states": {
         "active": "Aktiivne",
-        "inactive": "Mitteaktiivne"
+        "inactive": "Mitteaktiivne",
+        "draft": "Mustand"
+      },
+      "toast": {
+        "updated": "Teenuse olek uuendatud",
+        "failed": "Teenuse oleku uuendamine ebaõnnestus"
       }
     },
     "popup": {

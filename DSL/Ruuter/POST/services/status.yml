@@ -56,7 +56,7 @@ assign_values:
   assign:
     name: ${name_res.response.body[0].name}
     service_name: "service_${name_res.response.body[0].name}"
-  next: check_for_status
+  next: check_file_exists
 
 check_file_exists:
   call: http.post
@@ -64,11 +64,12 @@ check_file_exists:
     url: http://node_server:3008/file/check
     body:
       file_path: "/Ruuter/${ruuter_type}/services/${old_file_status_path}/${name + old_file_end}"
+  result: service_file_exists_result
   next: validate_file_exists
 
 validate_file_exists:
   switch:
-    - condition: ${tmpFileExists.response.body}
+    - condition: ${!!service_file_exists_result.response.body}
       next: check_for_status
   next: return_service_file_missing
 

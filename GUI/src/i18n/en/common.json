@@ -57,7 +57,12 @@
       "state": "State",
       "states": {
         "active": "Active",
-        "inactive": "Inactive"
+        "inactive": "Inactive",
+        "draft": "Draft"
+      },
+      "toast": {
+        "updated": "Service state updated",
+        "failed": "Service state update failed"
       }
     },
     "popup": {
