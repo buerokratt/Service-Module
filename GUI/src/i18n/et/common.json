@@ -52,6 +52,10 @@
     "edit": "Muuda",
     "delete": "Kustuta",
     "cancel": "Tühista",
+    "trainingModuleLink": {
+      "text": "Uute teenuste lõppkasutajatele kättesaadavaks tegemiseks tuleb treenida uus mudel. Mudeli treenimine toimub treeningmooduli alamlehel",
+      "train": "Treeni uus mudel"
+    },
     "service": {
       "name": "Nimetus",
       "usedCount": "Kasutamise arv",
