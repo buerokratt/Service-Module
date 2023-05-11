@@ -1,0 +1,11 @@
+get_services_list:
+  call: http.post
+  args:
+    url: http://resql:8087/get-active-services-list
+  result: results
+
+return_ok:
+  status: 200
+  wrapper: false
+  return: ${results.response.body}
+  next: end
