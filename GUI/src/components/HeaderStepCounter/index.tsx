@@ -11,11 +11,19 @@ type StepCounterProps = {
   activeStep: number;
   endpoints?: EndpointData[];
   flow?: string;
+  secrets?: { [key: string]: any };
   serviceName?: string;
   serviceDescription?: string;
 };
 
-const HeaderStepCounter: FC<StepCounterProps> = ({ activeStep, endpoints, flow, serviceDescription, serviceName }) => {
+const HeaderStepCounter: FC<StepCounterProps> = ({
+  activeStep,
+  endpoints,
+  flow,
+  serviceDescription,
+  secrets,
+  serviceName,
+}) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
 
@@ -29,10 +37,11 @@ const HeaderStepCounter: FC<StepCounterProps> = ({ activeStep, endpoints, flow, 
         onClick={() =>
           navigate(ROUTES.NEWSERVICE_ROUTE, {
             state: {
-              endpoints: endpoints,
-              flow: flow,
-              serviceDescription: serviceDescription,
-              serviceName: serviceName,
+              endpoints,
+              flow,
+              serviceDescription,
+              serviceName,
+              secrets,
             },
           })
         }
@@ -44,10 +53,11 @@ const HeaderStepCounter: FC<StepCounterProps> = ({ activeStep, endpoints, flow, 
         onClick={() =>
           navigate(ROUTES.FLOW_ROUTE, {
             state: {
-              endpoints: endpoints,
-              flow: flow,
-              serviceDescription: serviceDescription,
-              serviceName: serviceName,
+              endpoints,
+              flow,
+              serviceDescription,
+              serviceName,
+              secrets,
             },
           })
         }

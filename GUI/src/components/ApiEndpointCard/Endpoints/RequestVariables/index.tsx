@@ -6,7 +6,13 @@ import DataTable from "../../../DataTable";
 import { createColumnHelper, Row } from "@tanstack/react-table";
 import { MdDeleteOutline } from "react-icons/md";
 import { RequestTab } from "../../../../types";
-import { EndpointType, EndpointData, EndpointTab, EndpointVariableData } from "../../../../types/endpoint";
+import {
+  EndpointType,
+  EndpointData,
+  EndpointTab,
+  EndpointVariableData,
+  PreDefinedEndpointEnvVariables,
+} from "../../../../types/endpoint";
 import {
   RequestVariablesTabsRowsData,
   RequestVariablesTabsRawData,
@@ -20,7 +26,7 @@ type RequestVariablesProps = {
   updateEndpointData: (data: RequestVariablesTabsRowsData, endpointDataId?: string) => void;
   updateEndpointRawData?: (rawData: RequestVariablesTabsRawData, endpointDataId?: string) => void;
   isLive: boolean;
-  requestValues: string[];
+  requestValues: PreDefinedEndpointEnvVariables;
   requestTab: RequestTab;
   setRequestTab: React.Dispatch<React.SetStateAction<RequestTab>>;
   setEndpoints: React.Dispatch<React.SetStateAction<EndpointData[]>>;
@@ -242,6 +248,7 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
         <ValueCell
           row={props.row}
           requestValues={requestValues}
+          isLive={isLive}
           rowData={rowsData[requestTab.tab]![+props.row.id]}
           value={rowsData[requestTab.tab]!.find((r) => r.id === props.row.id)?.value ?? ""}
           updateRowValue={updateRowValue}
