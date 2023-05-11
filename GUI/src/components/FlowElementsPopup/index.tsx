@@ -181,9 +181,7 @@ const FlowElementsPopup: React.FC<FlowElementsPopupProps> = ({ node, onClose, on
             {stepType === StepType.FinishingStepRedirect && (
               <DefaultMessageContent message="Vestlus suunatakse klienditeenindajale" />
             )}
-            {stepType === StepType.Auth && (
-              <DefaultMessageContent message="Jätkamiseks palun logi sisse läbi TARA" />
-            )}
+            {stepType === StepType.Auth && <DefaultMessageContent message="Jätkamiseks palun logi sisse läbi TARA" />}
             {stepType === StepType.FinishingStepEnd && <EndConversationContent />}
             {stepType === StepType.RasaRules && <RasaRulesContent />}
             <JsonRequestContent isVisible={isJsonRequestVisible} jsonContent={jsonRequestContent} />

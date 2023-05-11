@@ -423,7 +423,7 @@ const FlowBuilder: FC<FlowBuilderProps> = ({
       case StepType.FinishingStepRedirect:
         return "Vestlus suunatakse klienditeenindajale";
     }
-  }
+  };
 
   const onDelete = useCallback(
     (id: string, shouldAddPlaceholder: boolean) => {

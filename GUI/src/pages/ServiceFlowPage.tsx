@@ -47,7 +47,7 @@ type NodeDataProps = {
   stepType: StepType;
   readonly: boolean;
   message?: string;
-}
+};
 
 const initialNodes: Node[] = [
   {
