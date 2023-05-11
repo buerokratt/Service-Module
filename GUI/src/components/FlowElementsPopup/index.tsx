@@ -209,12 +209,10 @@ const FlowElementsPopup: React.FC<FlowElementsPopupProps> = ({
               </DndProvider>
             )}
             {stepType === StepType.FinishingStepRedirect && (
-              <DefaultMessageContent message="Vestlus suunatakse klienditeenindajale" />
+              <DefaultMessageContent message={t("serviceFlow.popup.redirectToCustomerSupport")} />
             )}
-            {stepType === StepType.Auth && <DefaultMessageContent message="Jätkamiseks palun logi sisse läbi TARA" />}
-            {stepType === StepType.FileSign && (
-              <DefaultMessageContent message="Kas soovid faili allkirjastada? Jah / Ei" />
-            )}
+            {stepType === StepType.Auth && <DefaultMessageContent message={t("serviceFlow.popup.loginWithTARA")} />}
+            {stepType === StepType.FileSign && <DefaultMessageContent message={t("serviceFlow.popup.fileSignYesNo")} />}
             {stepType === StepType.FinishingStepEnd && <EndConversationContent />}
             {stepType === StepType.RasaRules && <RasaRulesContent />}
             <JsonRequestContent isVisible={isJsonRequestVisible} jsonContent={jsonRequestContent} />

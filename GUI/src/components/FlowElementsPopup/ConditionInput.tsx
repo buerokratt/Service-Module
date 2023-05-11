@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react"
 import { useDrop } from "react-dnd"
+import { useTranslation } from "react-i18next"
 import { ConditionRuleType } from "../../types"
 import { FormInput } from "../FormElements"
 
@@ -9,6 +10,8 @@ interface ConditionInputProps {
 }
 
 const ConditionInput: React.FC<ConditionInputProps> = ({ rule, handleNameChange }) => {
+  const { t } = useTranslation();
+
   const [name, setName] = useState(rule.name)
 
   const [_, drop] = useDrop(
@@ -28,7 +31,7 @@ const ConditionInput: React.FC<ConditionInputProps> = ({ rule, handleNameChange 
     ref={drop}
     name='name'
     label=''
-    placeholder='Enter a variable'
+    placeholder={t("serviceFlow.popup.insertVariable") ?? ""}
     value={name}
     onChange={(value) => {
       setName(value.target.value)

@@ -333,7 +333,7 @@ const EndpointOpenAPI: React.FC<EndpointOpenAPIProps> = ({
             />
           </>
         ) : (
-          <p>Sorry, we currently only support GET and POST requests.</p>
+          <p>{t("newService.endpoint.unsupported")}</p>
         ))}
     </Track>
   );
