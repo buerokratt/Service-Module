@@ -157,10 +157,8 @@ const ServiceFlowPage: FC = () => {
       return {
         templateName: "siga",
         body: {
-          type: ``,
-          personIdentifier: ``,
-          country: ``,
-          phoneNumber: ``,
+          type: "smart_id",
+          country: "EE",
         },
         resultName: "SiGa",
       };
@@ -245,7 +243,11 @@ const ServiceFlowPage: FC = () => {
   const getDefinedEndpointStep = (node: Node) => {
     const endpoint = setupElements.find((e) => e.label === node.data.label)?.data;
     const selectedEndpoint = endpoint?.definedEndpoints.find((e) => e.isSelected);
-    if (!selectedEndpoint || !endpoint) return {};
+    if (!selectedEndpoint || !endpoint) {
+      return {
+        return: "",
+      };
+    }
     return {
       call: `http.post`,
       args: {
