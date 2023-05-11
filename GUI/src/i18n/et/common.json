@@ -1,19 +1,50 @@
 {
   "global": {
-    "title": "Teenindus moodul",
-    "services": "Teenindus",
+    "title": "Teenused",
+    "services": "Teenused",
     "backhome": "Tagasi avalehele",
     "resultCount": "Kuvan korraga",
     "gotoPage": "Mine leheküljele",
     "notification": "Teade",
-    "paginationNavigation": "Navigeeri"
+    "paginationNavigation": "Navigeeri",
+    "choose": "Vali..",
+    "continue": "Jätka",
+    "view": "Vaata",
+    "save": "Salvesta",
+    "cancel": "Tühista",
+    "close": "Sulge"
   },
   "menu": {
     "overview": "Ülevaade",
     "flowbuilder": "Flow Builder",
     "services": "Teenused",
-    "newService": "Uus Teenus",
-    "close": "Sulge menüü"
+    "newService": "Uus teenus",
+    "close": "Sulge menüü",
+    "intents": "Kavatsus",
+    "followupTraining": "Teemade järeltreenimine",
+    "entities": "Üksused",
+    "settings": "Seaded"
+  },
+  "intents": {
+    "entities": "Üksused",
+    "regex": "Regex",
+    "add": "Lisa",
+    "yes": "Jah",
+    "no": "Ei",
+    "removeValidation": "Eemalda valideerimine",
+    "search": "Otsing",
+    "delete": "Kustutada",
+    "edit": "Muuda",
+    "save": "Salvesta",
+    "cancel": "Tühista",
+    "notification": "Teavitus",
+    "notificationError": "Viga",
+    "entityName": "Nimi",
+    "title": "Pealkiri"
+  },
+  "settings": {
+    "title": "Seaded",
+    "maxUserInputTryCount": "Käsitsege kasutaja sisestatud proovide arvu"
   },
   "overview": {
     "services": "Teenused",
@@ -27,7 +58,12 @@
       "state": "Olek",
       "states": {
         "active": "Aktiivne",
-        "inactive": "Mitteaktiivne"
+        "inactive": "Mitteaktiivne",
+        "draft": "Mustand"
+      },
+      "toast": {
+        "updated": "Teenuse olek uuendatud",
+        "failed": "Teenuse oleku uuendamine ebaõnnestus"
       }
     },
     "popup": {
@@ -35,6 +71,69 @@
       "setActive": "Kas oled kindel, et tahad teenuse aktiveerida?",
       "setInactive": "Kas oled kindel, et tahad teenuse deaktiveerida?",
       "setState": "Uuenda olek"
+    }
+  },
+  "newService": {
+    "endpoints": "Otspunktid",
+    "test": "Testi URLi",
+    "endpoint": {
+      "add": "+ Lisa API otspunkt",
+      "addTestEnv": "+ Lisa testkeskkond",
+      "api": "API otspunkt",
+      "ask": "Küsi otspunktid",
+      "body": "Body",
+      "error": "Otspunktiga ei olnud võimalik ühendust saada. Kontrolli URL'i ja proovi uuesti.",
+      "headers": "Headers",
+      "insert": "Sisesta API otspunkt..",
+      "live": "Live otspunkt",
+      "name": "Otspunkti nimetus",
+      "params": "Params",
+      "required": "Muutuja on kohustuslik",
+      "single": "Otspunkt",
+      "testEnv": "Testkeskkond",
+      "url": "API otspunkti URL",
+      "value": "Väärtus",
+      "variable": "Muutuja"
+    },
+    "saveDraft": "Salvesta mustandina",
+    "trainingModuleSetup": "Treenningmooduli seadistamine",
+    "serviceSetup": "Teenuse seadistamine",
+    "serviceFlowCreation": "Teenusvoo loomine",
+    "name": "Nimetus",
+    "description": "Kirjeldus",
+    "uses": "Teenus kasutab"
+  },
+  "serviceFlow": {
+    "element": {
+      "taraAuthentication": "Tara autoriseerimine",
+      "textfield": "Sõnum kliendile",
+      "clientInput": "Kliendi sisend",
+      "openNewWebpage": "Uue veebilehe avamine",
+      "fileGeneration": "Faili genereerimine",
+      "fileSigning": "Faili allkirjastamine",
+      "conversationEnd": "Vestluse lõpetamine",
+      "redirectConversationToSupport": "Klienditeenindusse suunamine",
+      "rules": "Reeglid",
+      "siga": "SiGa"
+    },
+    "popup": {
+      "messageLabel": "Sõnum",
+      "availableOutputElementsLabel": "Saadaolevad väljundelemendid",
+      "showJsonRequest": "Vaata JSON päringut",
+      "hideJsonRequest": "Peida JSON päring",
+      "jsonRequestPlaceholder": "JSON päring",
+      "openWebpageLabel": "Veebilehe nimi, mis kuvatakse kliendile",
+      "name": "Nimi",
+      "intent": "Kavatsus",
+      "action": "Tegevus",
+      "add": "+ Lisama"
+    },
+    "placeholderNode": "Lohista järgmine samm voogu",
+    "allElements": "Kõik elemendid",
+    "setupElements": "Seadistatud elemendid",
+    "tabs": {
+      "setup": "Seadistamine",
+      "test": "Testimine"
     }
   }
 }

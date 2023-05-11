@@ -1,0 +1,35 @@
+@import "src/styles/tools/spacing";
+@import "src/styles/tools/color";
+@import "src/styles/settings/variables/other";
+@import "src/styles/settings/variables/typography";
+
+.tab-group {
+  &__list {
+    display: flex;
+    margin-bottom: -1px;
+    list-style-type: none;
+  }
+  &__tab-btn {
+    padding: get-spacing("haapsalu");
+    font-size: 16px;
+    color: get-color(sapphire-blue-10);
+    border: 1px solid transparent;
+    cursor: pointer;
+
+    &.active {
+      background-color: get-color(white);
+      border-top-left-radius: 5px;
+      border-top-right-radius: 5px;
+      border-color: get-color(black-coral-2);
+      border-bottom-color: transparent;
+      color: get-color(sapphire-blue-20);
+    }
+  }
+
+  &__tab-content {
+    background-color: get-color(white);
+    padding: get-spacing("haapsalu");
+    border: 1px solid get-color(black-coral-2);
+    border-radius: 4px;
+  }
+}

@@ -1,0 +1,16 @@
+.badge__rounded {
+  align-items: center;
+  background-color: red;
+  border-radius: 50%;
+  box-sizing: border-box;
+  display: inline-flex;
+  height: 16px;
+  justify-content: center;
+  margin: 0 5px 0 0;
+  padding: 3px 6px;
+  width: 16px;
+
+  .icon {
+    color: #ffffff !important;
+  }
+}

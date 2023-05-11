@@ -6,7 +6,13 @@
     "resultCount": "Results per page",
     "gotoPage": "Go to page",
     "notification": "Notification",
-    "paginationNavigation": "Navigate"
+    "paginationNavigation": "Navigate",
+    "choose": "Choose..",
+    "continue": "Continue",
+    "view": "View",
+    "save": "Save",
+    "cancel": "Cancel",
+    "close": "Close"
   },
   "menu": {
     "overview": "Overview",
@@ -14,7 +20,31 @@
     "flowbuilder": "Flow Builder",
     "services": "Services",
     "newService": "New Service",
-    "close": "Close menu"
+    "intents": "Intents",
+    "followupTraining": "Followup Training",
+    "close": "Close menu",
+    "settings": "Settings"
+  },
+  "intents": {
+    "entities": "Entities",
+    "regex": "Regex",
+    "add": "Add",
+    "yes": "Yes",
+    "no": "No",
+    "removeValidation": "Remove Validation",
+    "search": "Search",
+    "delete": "Delete",
+    "edit": "Edit",
+    "save": "Save",
+    "cancel": "Cancel",
+    "notification": "Notification",
+    "notificationError": "Error",
+    "entityName": "Name",
+    "title": "Title"
+  },
+  "settings": {
+    "title": "Settings",
+    "maxUserInputTryCount": "Handle user input try count"
   },
   "overview": {
     "services": "Services",
@@ -28,7 +58,12 @@
       "state": "State",
       "states": {
         "active": "Active",
-        "inactive": "Inactive"
+        "inactive": "Inactive",
+        "draft": "Draft"
+      },
+      "toast": {
+        "updated": "Service state updated",
+        "failed": "Service state update failed"
       }
     },
     "popup": {
@@ -36,6 +71,69 @@
       "setActive": "Are you sure you want to activate this service?",
       "setInactive": "Are you sure you want to deactivate this service?",
       "setState": "Update state"
+    }
+  },
+  "newService": {
+    "endpoints": "Endpoints",
+    "test": "Test URL",
+    "endpoint": {
+      "add": "+ Add API endpoint",
+      "addtestEnv": "+ Add test environment",
+      "api": "API endpoint",
+      "ask": "Ask for endpoints",
+      "body": "Body",
+      "error": "No response from endpoint. Please check URL and try again",
+      "headers": "Headers",
+      "insert": "Insert API endpoint..",
+      "live": "Live endpoint",
+      "name": "Endpoint name",
+      "params": "Params",
+      "required": "Variable is required",
+      "single": "Endpoint",
+      "testEnv": "Test environment",
+      "url": "API endpoint URL",
+      "value": "Value",
+      "variable": "Variable"
+    },
+    "saveDraft": "Save draft",
+    "trainingModuleSetup": "Training module setup",
+    "serviceSetup": "Service setup",
+    "serviceFlowCreation": "Service flow creation",
+    "name": "Name",
+    "description": "Description",
+    "uses": "Service uses"
+  },
+  "serviceFlow": {
+    "element": {
+      "taraAuthentication": "Tara authorization",
+      "textfield": "Send message to client",
+      "clientInput": "Client input",
+      "openNewWebpage": "Open new webpage",
+      "fileGeneration": "File generation",
+      "fileSigning": "File signing",
+      "conversationEnd": "End conversation",
+      "redirectConversationToSupport": "Direct to Customer Support",
+      "rules": "Rules",
+      "siga": "SiGa"
+    },
+    "popup": {
+      "messageLabel": "Message",
+      "availableOutputElementsLabel": "Available output elements",
+      "showJsonRequest": "Show JSON request",
+      "hideJsonRequest": "Hide JSON request",
+      "jsonRequestPlaceholder": "JSON request",
+      "openWebpageLabel": "Web page name that is displayed to the user",
+      "name": "Name",
+      "intent": "Intent",
+      "action": "Action",
+      "add": "+ Add"
+    },
+    "placeholderNode": "Drag the next step into the flow",
+    "allElements": "All elements",
+    "setupElements": "Setup elements",
+    "tabs": {
+      "setup": "Setup",
+      "test": "Test"
     }
   }
 }

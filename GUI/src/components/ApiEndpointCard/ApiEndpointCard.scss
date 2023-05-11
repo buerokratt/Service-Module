@@ -1,0 +1,46 @@
+@import "src/styles/tools/spacing";
+@import "src/styles/tools/color";
+@import "src/styles/settings/variables/other";
+@import "src/styles/settings/variables/typography";
+
+.variable-required {
+  align-items: center;
+  border-radius: 50%;
+  border: 2px solid get-color(sapphire-blue-10);
+  color: get-color(sapphire-blue-10);
+  display: flex;
+  font-size: 13px;
+  font-weight: $veera-font-weight-delta;
+  height: 16px;
+  justify-content: center;
+  line-height: 15px;
+  width: 16px;
+}
+
+.endpoint-tab-group {
+  background-color: get-color(black-coral-0);
+
+  &__list {
+    display: flex;
+    list-style-type: none;
+    border-bottom: 1px solid get-color(black-coral-10);
+    margin-bottom: -1px;
+  }
+
+  &__tab-btn {
+    padding: get-spacing("haapsalu");
+    font-size: 16px;
+    color: get-color(sapphire-blue-20);
+    cursor: pointer;
+
+    &.active {
+      background-color: get-color(white);
+      border-color: get-color(black-coral-2);
+      color: get-color(sapphire-blue-10);
+    }
+  }
+
+  &__tab-content {
+    background-color: get-color(white);
+  }
+}

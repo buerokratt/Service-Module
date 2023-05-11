@@ -1,21 +1,28 @@
-import React, { FC } from 'react'
-import { Outlet } from 'react-router-dom'
+import React, { FC, PropsWithChildren, ReactNode } from "react";
+import { Outlet } from "react-router-dom";
 
-import { MainNavigation, Header } from '../../components'
-import './Layout.scss'
+import { MainNavigation, Header } from "../../components";
+import "./Layout.scss";
 
-const Layout: FC = () => {
+type LayoutProps = {
+  disableMenu?: boolean;
+  customHeader?: ReactNode;
+};
+
+const Layout: FC<PropsWithChildren<LayoutProps>> = ({
+  disableMenu,
+  customHeader,
+  children,
+}) => {
   return (
     <div className="layout">
-      <MainNavigation />
+      {!disableMenu && <MainNavigation />}
       <div className="layout__wrapper">
-        <Header />
-        <main className="layout__main">
-          <Outlet />
-        </main>
+        {customHeader ?? <Header />}
+        <main className="layout__main">{children ?? <Outlet />}</main>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default Layout
+export default Layout;

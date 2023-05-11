@@ -1,0 +1,44 @@
+check_for_cookie:
+  switch:
+    - condition: ${incoming.headers.cookie == null || incoming.headers.cookie == ""}
+      next: return_unauthorized
+  next: extract_request_data
+
+extract_request_data:
+  assign:
+    cookie: ${incoming.headers.cookie}
+
+extract_cookie_data:
+  call: http.post
+  args:
+    url: http://ruuter:8080/mocks/mock-custom-jwt-userinfo
+    headers:
+      cookie: ${cookie}
+    body:
+      cookieName: 'customJwtCookie'
+  result: jwtResult
+  next: allow_only_admins
+
+allow_only_admins:
+  switch:
+    - condition: ${jwtResult.response.body.response.authorities.includes("ROLE_ADMIN")}
+      next: get_data
+  next: return_unauthorized
+
+get_data:
+  call: reflect.mock
+  args:
+    response:
+      type: "mock-value"
+      id: 1234567
+  result: reflectedRequest
+  next: return_value
+
+return_value:
+  return: ${reflectedRequest.response.body}
+  next: end
+
+return_unauthorized:
+  status: 401
+  return: 'unauthorized'
+  next: end

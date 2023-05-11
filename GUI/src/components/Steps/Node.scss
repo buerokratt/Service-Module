@@ -1,0 +1,25 @@
+.react-flow__node {
+  .icon {
+    color: rgba(0, 0, 0, 0.54);
+  }
+
+  .btn--text {
+    gap: 0;
+  }
+
+  .selected {
+    .box {
+      margin-top: -20px;
+      margin-left: -23px;
+    }
+    padding-bottom: 2px;
+  }
+
+  .left-handle {
+    margin-left: -26px;
+  }
+
+  .right-handle {
+    margin-left: 26px;
+  }
+}

@@ -1,0 +1,10 @@
+call_mock:
+  call: reflect.mock
+  args:
+    response:
+      maxInputTry: 4
+  result: mock_res
+
+return_result:
+  wrapper: false
+  return: ${mock_res.response.body}

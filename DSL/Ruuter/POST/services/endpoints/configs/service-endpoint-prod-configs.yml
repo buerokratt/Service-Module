@@ -1,0 +1,10 @@
+assign_step:
+  assign:
+    sensitive:
+      api_key: '112218ssQQ212Prod'
+      username: 'User100'
+      password: 'pwd158'
+
+return_value:
+  wrapper: false
+  return: ${sensitive}
