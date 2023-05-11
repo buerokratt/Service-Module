@@ -23,7 +23,8 @@
     "intents": "Kavatsus",
     "followupTraining": "Teemade järeltreenimine",
     "entities": "Üksused",
-    "settings": "Seaded"
+    "settings": "Seaded",
+    "faultyServices": "Probleemsed teenused"
   },
   "intents": {
     "entities": "Üksused",
@@ -135,5 +136,11 @@
       "setup": "Seadistamine",
       "test": "Testimine"
     }
+  },
+  "logs": {
+    "service": "Teenus",
+    "elements": "Probleemsed elemendid",
+    "problems": "Probleemid",
+    "view": "Vaata"
   }
 }

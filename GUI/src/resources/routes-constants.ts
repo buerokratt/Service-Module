@@ -5,5 +5,5 @@ export const ROUTES = {
   NEWSERVICE_ROUTE_WITH_INTENT_NAME: "/services/newService/:intentName",
   FOLLOWUPTRAINING_ROUTE: "/services/followupTraining",
   SERVICE_SETTINGS: "/services/settings",
-  RUUTER_LOGS_ROUTE: "/services/ruuterlogs",
+  FAULTY_SERVICES_ROUTE: "/services/faultyServices",
 };

@@ -16,14 +16,14 @@
   },
   "menu": {
     "overview": "Overview",
-    "ruuterlogs": "Ruuter Logs",
     "flowbuilder": "Flow Builder",
     "services": "Services",
     "newService": "New Service",
     "intents": "Intents",
     "followupTraining": "Followup Training",
     "close": "Close menu",
-    "settings": "Settings"
+    "settings": "Settings",
+    "faultyServices": "Faulty Services"
   },
   "intents": {
     "entities": "Entities",
@@ -135,5 +135,11 @@
       "setup": "Setup",
       "test": "Test"
     }
+  },
+  "logs": {
+    "service": "Service",
+    "elements": "Elements",
+    "problems": "Problems",
+    "view": "View"
   }
 }
