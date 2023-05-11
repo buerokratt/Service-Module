@@ -33,3 +33,14 @@ export const readFile = function (filePath: string): string {
   const data = fs.readFileSync(filePath, { encoding: 'utf8' })
   return Buffer.from(data).toString()
 }
+
+export const getUrl = (dir: string) => {
+  let startIndex;
+  if (dir.includes('/POST')) {
+    startIndex = dir.indexOf('/POST') + '/POST'.length;
+  }
+  else {
+    startIndex = dir.indexOf('/GET') + '/GET'.length;
+  }
+  return dir.substring(startIndex);
+}
