@@ -61,8 +61,12 @@
         "draft": "Draft"
       },
       "toast": {
+        "deleted": "Service has been successfully deleted",
         "updated": "Service state updated",
-        "failed": "Service state update failed"
+        "failed": {
+          "delete": "Service deletion failed",
+          "state": "Service state update failed"
+        }
       }
     },
     "popup": {

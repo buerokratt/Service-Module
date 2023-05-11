@@ -2,17 +2,19 @@ import { Row } from "@tanstack/react-table";
 import React, { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { FormAutocomplete } from "../../../..";
+import { PreDefinedEndpointEnvVariables } from "../../../../../types/endpoint";
 import { RequestVariablesRowData, RequestVariablesTableColumns } from "../../../../../types/request-variables";
 
 type ValueCellProps = {
   row: Row<RequestVariablesTableColumns>;
-  requestValues: string[];
+  requestValues: PreDefinedEndpointEnvVariables;
+  isLive: boolean;
   value: string;
   rowData?: RequestVariablesRowData;
   updateRowValue: (id: string, value: string) => void;
 };
 
-const ValueCell: React.FC<ValueCellProps> = ({ row, requestValues, updateRowValue, rowData, value }) => {
+const ValueCell: React.FC<ValueCellProps> = ({ row, requestValues, updateRowValue, rowData, isLive, value }) => {
   const { t } = useTranslation();
   const [inputValue, setInputValue] = useState(value);
   const ref = useRef<HTMLDivElement>(null);
@@ -37,7 +39,7 @@ const ValueCell: React.FC<ValueCellProps> = ({ row, requestValues, updateRowValu
     <div ref={ref}>
       <FormAutocomplete
         placeholder={t("global.choose")}
-        data={requestValues}
+        data={isLive ? requestValues.prod : [...requestValues.prod, ...requestValues.test]}
         value={inputValue}
         onChange={(v: string) => setInputValue(v)}
         onSelected={(v) => {

@@ -100,6 +100,7 @@ To enable handlebars templates to receive a body and return a json
 - When Building a handlebars template make sure to add `layout:false` so that hbs response in the data-mapper will discard the html layout and only return the body data
 
 ### DMapper helper functions
+
 - Add all the helper functions to **DSL/DMapper/lib/helpers.js**
 
 ### DMapper problems
@@ -128,3 +129,9 @@ RUN npm i -g npm@latest
 RUN npm install
 ENTRYPOINT ["npm","start"]
 ```
+
+### Current dependencies problem
+
+In order for the whole application logic to work, you need to use these specific PRs to support certain functionality until they get merged into main.
+
+- Using pre defined config secrets depends on this [Datamapper PR](https://github.com/buerokratt/DataMapper/pull/11). Secrets under `secrets/` directory are mock data which can be replaced using volumes in docker compose

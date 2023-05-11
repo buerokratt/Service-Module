@@ -7,13 +7,13 @@ import { useTranslation } from "react-i18next";
 import { MdDeleteOutline } from "react-icons/md";
 import "./ApiEndpointCard.scss";
 import { RequestTab } from "../../types";
-import { EndpointData, EndpointEnv, EndpointTab } from "../../types/endpoint";
+import { EndpointData, EndpointEnv, EndpointTab, PreDefinedEndpointEnvVariables } from "../../types/endpoint";
 
 type EndpointCardProps = {
   onDelete: () => void;
   endpoint: EndpointData;
   setEndpoints: React.Dispatch<React.SetStateAction<EndpointData[]>>;
-  requestValues: string[];
+  requestValues: PreDefinedEndpointEnvVariables;
 };
 
 const ApiEndpointCard: FC<EndpointCardProps> = ({ onDelete, setEndpoints, endpoint, requestValues }) => {
