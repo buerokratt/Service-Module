@@ -4,6 +4,9 @@
       "requestId": {
         "type": "number"
       },
+      "serviceId": {
+        "type": "text"
+      },
       "timestamp": {
         "type": "number"
       },
@@ -14,6 +17,9 @@
         "type": "number"
       },
       "content": {
+        "type": "text"
+      },
+      "environment": {
         "type": "text"
       }
     }

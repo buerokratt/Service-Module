@@ -1,8 +1,0 @@
-{"index":{"_id":"1"}}
-{"requestId":123,"timestamp": 1682611070,"level": "INFO", "statusCode":200, "content": "Request to Ruuter successed"}
-{"index":{"_id":"2"}}
-{"requestId":124,"timestamp": 1682611670,"level": "ERROR", "statusCode":404, "content": "Request to Ruuter failed"}
-{"index":{"_id":"3"}}
-{"requestId":125,"timestamp": 1682611970,"level": "ERROR", "statusCode":500, "content": "Request to Ruuter failed"}
-{"index":{"_id":"4"}}
-{"requestId":126,"timestamp": 1682612070,"level": "INFO", "statusCode":0, "content": "Request to Ruuter failed"}

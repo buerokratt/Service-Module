@@ -54,3 +54,5 @@ export const changeServiceStatus = (): string => `${baseUrl}/services/status`
 export const createNewService = (): string => `${baseUrl}/services/add`;
 export const getServicesList = (): string => `${baseUrl}/services`;
 export const jsonToYml = (): string => `${baseUrl}/saveJsonToYml`;
+
+export const getFaultyServices = (): string => `${baseUrl}/mocks/faulty-services`;

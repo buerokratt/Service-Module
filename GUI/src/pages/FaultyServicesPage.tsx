@@ -1,9 +1,11 @@
-import React, { useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Button, Card, DataTable, Icon, Track } from '../components'
 import { PaginationState, createColumnHelper } from '@tanstack/react-table';
 import { MdOutlineRemoveRedEye } from 'react-icons/md';
 import Popup from '../components/Popup';
+import axios from 'axios';
+import { getFaultyServices } from '../resources/api-constants';
 
 interface FaultyService {
   id: string;
@@ -20,7 +22,8 @@ const FaultyServicesPage: React.FC = () => {
     pageIndex: 0,
     pageSize: 10,
   });
-  const [viewFaultyServiceLog, setViewFaultyServiceLog] = useState<FaultyService | null>(null)
+  const [viewFaultyServiceLog, setViewFaultyServiceLog] = useState<FaultyService | null>(null);
+  const [data, setData] = useState<FaultyService[]>([]);
 
   const columns = useMemo(() => {
     const columnHelper = createColumnHelper<FaultyService>();
@@ -58,24 +61,11 @@ const FaultyServicesPage: React.FC = () => {
     ]
   }, []);
 
-  const dummyData = useMemo(() => [
-    { service: 'wewewe', elements: "dfdf", problems: 34, environment: 'test' },
-    { service: 'w', elements: "dfdf", problems: 34, environment: 'production' },
-    {
-      service: 'w123ewewe', elements: "dfdf", problems: 34, logs: [
-        '2022-06-21 12:29:17.742+03:00 INFO [9ec5153c8585c6df,9ec5153c8585c6df]',
-        '2022-06-21 12:29:18.027+03:00 INFO [9ec5153c8585c6df,03f0c4392719216]',
-        '2022-06-21 12:29:18.030+03:00 INFO [9ec5153c8585c6df,57225a41b2cdfle]']
-    },
-    { service: 'wewe3rscf4we', elements: "dfdf", problems: 34 },
-    { service: '---wewewe', elements: "dfdf", problems: 34, environment: 'test' },
-    { service: 'wewewe', elements: "dfdf", problems: 34, environment: 'test' },
-    { service: 'wewsdewe', elements: "dfdf", problems: 34 },
-    { service: 'wewewsddse', elements: "dfdf", problems: 34 },
-    { service: 'wewewe', elements: "dfdf", problems: 34, environment: 'test' },
-    { service: 'wew11111ewe', elements: "dfdf", problems: 34 },
-    { service: 'we', elements: "dfdf", problems: 34 },
-  ], []);
+  useEffect(() => {
+
+    axios.get(getFaultyServices())
+      .then((res) => setData(res.data))
+  }, []);
 
   return (
     <>
@@ -115,7 +105,7 @@ const FaultyServicesPage: React.FC = () => {
             filterable
             pagination={pagination}
             setPagination={setPagination}
-            data={dummyData}
+            data={data}
             columns={columns}
           />
         </Card>
