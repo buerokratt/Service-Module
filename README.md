@@ -135,3 +135,4 @@ ENTRYPOINT ["npm","start"]
 In order for the whole application logic to work, you need to use these specific PRs to support certain functionality until they get merged into main.
 
 - Using pre defined config secrets depends on this [Datamapper PR](https://github.com/buerokratt/DataMapper/pull/11). Secrets under `secrets/` directory are mock data which can be replaced using volumes in docker compose
+- Testing the service flow using .tmp files depends on this [Ruuter PR](https://github.com/buerokratt/Ruuter/pull/153)

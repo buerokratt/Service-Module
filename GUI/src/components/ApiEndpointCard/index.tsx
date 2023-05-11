@@ -11,12 +11,13 @@ import { EndpointData, EndpointEnv, EndpointTab, PreDefinedEndpointEnvVariables 
 
 type EndpointCardProps = {
   onDelete: () => void;
+  onNameChange: (endpointId: string, oldName: string, newName: string) => void;
   endpoint: EndpointData;
   setEndpoints: React.Dispatch<React.SetStateAction<EndpointData[]>>;
   requestValues: PreDefinedEndpointEnvVariables;
 };
 
-const ApiEndpointCard: FC<EndpointCardProps> = ({ onDelete, setEndpoints, endpoint, requestValues }) => {
+const ApiEndpointCard: FC<EndpointCardProps> = ({ onDelete, onNameChange, setEndpoints, endpoint, requestValues }) => {
   const [selectedTab, setSelectedTab] = useState<EndpointEnv>(EndpointEnv.Live);
   const [endpointName, setEndpointName] = useState<string>(endpoint.name);
   const [testEnvExists, setTestEnvExists] = useState<boolean>(false);
@@ -94,7 +95,10 @@ const ApiEndpointCard: FC<EndpointCardProps> = ({ onDelete, setEndpoints, endpoi
                     label=""
                     value={endpointName}
                     disabled={selectedTab === EndpointEnv.Test}
-                    onChange={(e) => setEndpointName(e.target.value)}
+                    onChange={(e) => {
+                      onNameChange(endpoint.id, endpointName, e.target.value);
+                      setEndpointName(e.target.value);
+                    }}
                   />
                 </div>
               )}

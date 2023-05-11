@@ -1,22 +1,26 @@
 import { t } from "i18next";
 import React, { FC } from "react";
 import { Button, HeaderStepCounter, Track } from "..";
-import { EndpointData } from "../../types/endpoint";
+import { EndpointData, PreDefinedEndpointEnvVariables } from "../../types/endpoint";
 import "../Header/Header.scss";
 
 type NewServiceHeaderProps = {
   activeStep: number;
   continueOnClick: () => void;
   saveDraftOnClick: () => void;
+  availableVariables?: PreDefinedEndpointEnvVariables;
   endpoints?: EndpointData[];
   flow?: string;
   secrets?: { [key: string]: any };
   serviceName?: string;
   serviceDescription?: string;
+  isTestButtonVisible?: boolean;
+  onTestButtonClick?: () => void;
 };
 
 const NewServiceHeader: FC<NewServiceHeaderProps> = ({
   activeStep,
+  availableVariables,
   continueOnClick,
   saveDraftOnClick,
   endpoints,
@@ -24,6 +28,8 @@ const NewServiceHeader: FC<NewServiceHeaderProps> = ({
   secrets,
   serviceDescription,
   serviceName,
+  isTestButtonVisible = false,
+  onTestButtonClick,
 }) => {
   return (
     <>
@@ -32,6 +38,7 @@ const NewServiceHeader: FC<NewServiceHeaderProps> = ({
           <h1 style={{ whiteSpace: "nowrap" }}>{t("menu.newService")}</h1>
           <HeaderStepCounter
             activeStep={activeStep}
+            availableVariables={availableVariables}
             endpoints={endpoints}
             flow={flow}
             secrets={secrets}
@@ -42,6 +49,7 @@ const NewServiceHeader: FC<NewServiceHeaderProps> = ({
             {t("newService.saveDraft")}
           </Button>
           <Button onClick={continueOnClick}>{t("global.continue")}</Button>
+          {isTestButtonVisible && <Button onClick={onTestButtonClick}>Testi teenust</Button>}
         </Track>
       </header>
     </>
