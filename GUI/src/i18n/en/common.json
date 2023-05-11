@@ -141,6 +141,7 @@
     "elements": "Elements",
     "problems": "Problems",
     "view": "View",
-    "log": "Log"
+    "log": "Log",
+    "environment": "Environment"
   }
 }

@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Button, Card, DataTable, Icon, Modal, Track } from '../components'
+import { Button, Card, DataTable, Icon, Track } from '../components'
 import { PaginationState, createColumnHelper } from '@tanstack/react-table';
 import { MdOutlineRemoveRedEye } from 'react-icons/md';
 import Popup from '../components/Popup';
@@ -10,6 +10,7 @@ interface FaultyService {
   service: string;
   elements: string;
   problems: number;
+  environment: string;
   logs: string[];
 }
 
@@ -37,6 +38,9 @@ const FaultyServicesPage: React.FC = () => {
       columnHelper.accessor("problems", {
         header: t("logs.problems") ?? "",
       }),
+      columnHelper.accessor("environment", {
+        header: t("logs.environment") ?? "",
+      }),
       columnHelper.display({
         id: "view",
         meta: {
@@ -55,8 +59,8 @@ const FaultyServicesPage: React.FC = () => {
   }, []);
 
   const dummyData = useMemo(() => [
-    { service: 'wewewe', elements: "dfdf", problems: 34 },
-    { service: 'w', elements: "dfdf", problems: 34 },
+    { service: 'wewewe', elements: "dfdf", problems: 34, environment: 'test' },
+    { service: 'w', elements: "dfdf", problems: 34, environment: 'production' },
     {
       service: 'w123ewewe', elements: "dfdf", problems: 34, logs: [
         '2022-06-21 12:29:17.742+03:00 INFO [9ec5153c8585c6df,9ec5153c8585c6df]',
@@ -64,11 +68,11 @@ const FaultyServicesPage: React.FC = () => {
         '2022-06-21 12:29:18.030+03:00 INFO [9ec5153c8585c6df,57225a41b2cdfle]']
     },
     { service: 'wewe3rscf4we', elements: "dfdf", problems: 34 },
-    { service: '---wewewe', elements: "dfdf", problems: 34 },
-    { service: 'wewewe', elements: "dfdf", problems: 34 },
+    { service: '---wewewe', elements: "dfdf", problems: 34, environment: 'test' },
+    { service: 'wewewe', elements: "dfdf", problems: 34, environment: 'test' },
     { service: 'wewsdewe', elements: "dfdf", problems: 34 },
     { service: 'wewewsddse', elements: "dfdf", problems: 34 },
-    { service: 'wewewe', elements: "dfdf", problems: 34 },
+    { service: 'wewewe', elements: "dfdf", problems: 34, environment: 'test' },
     { service: 'wew11111ewe', elements: "dfdf", problems: 34 },
     { service: 'we', elements: "dfdf", problems: 34 },
   ], []);
