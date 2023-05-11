@@ -13,8 +13,8 @@ get_tara_info:
 extract_tara_data:
   assign:
     signType: ${incoming.body.type}
-    identifier: ${TARA.response.body.personIdentifier}
-    country: ${TARA.response.body.country}
+    country: ${incoming.body.country}
+    identifier: ${TARA.response.body.idCode}
     phoneNumber: ${TARA.response.body.phoneNr}
   next: check_for_type
 
