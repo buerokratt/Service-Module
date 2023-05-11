@@ -7,6 +7,7 @@ import { ROUTES } from './resources/routes-constants'
 import IntentsFollowupTraining from './pages/Training/IntentsFollowupTraining'
 import NewServicePage from './pages/NewServicePage'
 import ServiceFlowPage from './pages/ServiceFlowPage'
+import ServiceSettingPage from './pages/ServiceSettingPage'
 import './styles/main.scss'
 
 const RootComponent: React.FC = () => {
@@ -18,6 +19,7 @@ const RootComponent: React.FC = () => {
       <Route element={<Layout />}>
         <Route path={ROUTES.OVERVIEW_ROUTE} element={<OverviewPage />} />
         <Route path={ROUTES.FOLLOWUPTRAINING_ROUTE} element={<IntentsFollowupTraining />} />
+        <Route path={ROUTES.SERVICE_SETTINGS} element={<ServiceSettingPage />} />
         <Route path="*" element={<NotFoundPage />} />
       </Route >
     </Routes >

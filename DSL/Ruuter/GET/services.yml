@@ -1,7 +1,7 @@
-get_ruuter_services:
-  call: http.get
+get_services_list:
+  call: http.post
   args:
-    url: http://node_server:3008/ruuter/list
+    url: http://resql:8087/get-services-list
   result: results
 
 return_ok:

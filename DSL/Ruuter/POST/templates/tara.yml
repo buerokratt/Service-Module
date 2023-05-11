@@ -1,0 +1,8 @@
+request_tim_user_info:
+  call: http.post
+  args:
+    url: http://localhost:8085/mocks/tim/user-info
+  result: result
+
+return_value:
+  return: ${result.response.body}

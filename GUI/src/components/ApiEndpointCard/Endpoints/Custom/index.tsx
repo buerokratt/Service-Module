@@ -6,14 +6,19 @@ import { v4 as uuid } from "uuid";
 import { Button, FormInput, FormSelect, Icon, RequestVariables, Track } from "../../..";
 import { getEndpointValidationMock } from "../../../../resources/api-constants";
 import { RequestTab } from "../../../../types";
-import { EndpointData, EndpointTab, EndpointVariableData } from "../../../../types/endpoint";
+import {
+  EndpointData,
+  EndpointTab,
+  EndpointVariableData,
+  PreDefinedEndpointEnvVariables,
+} from "../../../../types/endpoint";
 import { RequestVariablesTabsRowsData, RequestVariablesTabsRawData } from "../../../../types/request-variables";
 
 type EndpointCustomProps = {
   endpoint: EndpointData;
   setEndpoints: React.Dispatch<React.SetStateAction<EndpointData[]>>;
   isLive: boolean;
-  requestValues: string[];
+  requestValues: PreDefinedEndpointEnvVariables;
   requestTab: RequestTab;
   setRequestTab: React.Dispatch<React.SetStateAction<RequestTab>>;
 };
@@ -80,7 +85,6 @@ const EndpointCustom: React.FC<EndpointCustomProps> = ({
                 };
                 newVariable[isLive ? "value" : "testValue"] = row.value;
                 defEndpoint[key as EndpointTab]?.variables.push(newVariable);
-                console.log("u", defEndpoint[key as EndpointTab]?.variables);
               }
             });
             defEndpoint[key as EndpointTab]?.variables.forEach((variable) => {

@@ -21,7 +21,8 @@
     "newService": "New Service",
     "intents": "Intents",
     "followupTraining": "Followup Training",
-    "close": "Close menu"
+    "close": "Close menu",
+    "settings": "Settings"
   },
   "intents": {
     "entities": "Entities",
@@ -40,6 +41,10 @@
     "entityName": "Name",
     "title": "Title"
   },
+  "settings": {
+    "title": "Settings",
+    "maxUserInputTryCount": "Handle user input try count"
+  },
   "overview": {
     "services": "Services",
     "create": "Create new service",
@@ -52,7 +57,16 @@
       "state": "State",
       "states": {
         "active": "Active",
-        "inactive": "Inactive"
+        "inactive": "Inactive",
+        "draft": "Draft"
+      },
+      "toast": {
+        "deleted": "Service has been successfully deleted",
+        "updated": "Service state updated",
+        "failed": {
+          "delete": "Service deletion failed",
+          "state": "Service state update failed"
+        }
       }
     },
     "popup": {
@@ -95,13 +109,15 @@
   "serviceFlow": {
     "element": {
       "taraAuthentication": "Tara authorization",
-      "textfield": "Textfield",
+      "textfield": "Send message to client",
       "clientInput": "Client input",
       "openNewWebpage": "Open new webpage",
       "fileGeneration": "File generation",
       "fileSigning": "File signing",
       "conversationEnd": "End conversation",
-      "redirectConversationToSupport": "Direct to Customer Support"
+      "redirectConversationToSupport": "Direct to Customer Support",
+      "rules": "Rules",
+      "siga": "SiGa"
     },
     "popup": {
       "messageLabel": "Message",
@@ -109,7 +125,11 @@
       "showJsonRequest": "Show JSON request",
       "hideJsonRequest": "Hide JSON request",
       "jsonRequestPlaceholder": "JSON request",
-      "openWebpageLabel": "Web page name that is displayed to the user"
+      "openWebpageLabel": "Web page name that is displayed to the user",
+      "name": "Name",
+      "intent": "Intent",
+      "action": "Action",
+      "add": "+ Add"
     },
     "placeholderNode": "Drag the next step into the flow",
     "allElements": "All elements",
