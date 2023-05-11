@@ -141,6 +141,7 @@
     "service": "Teenus",
     "elements": "Probleemsed elemendid",
     "problems": "Probleemid",
-    "view": "Vaata"
+    "view": "Vaata",
+    "log": "Logi"
   }
 }

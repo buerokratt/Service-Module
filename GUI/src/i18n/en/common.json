@@ -140,6 +140,7 @@
     "service": "Service",
     "elements": "Elements",
     "problems": "Problems",
-    "view": "View"
+    "view": "View",
+    "log": "Log"
   }
 }
