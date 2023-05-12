@@ -41,7 +41,7 @@ add_get_dsl:
   args:
     url: http://node_server:3008/file/write
     body:
-      file_path: "/Ruuter/GET/services/draft/${name}.yml" # temp fix for now
+      file_path: "/Ruuter/GET/services/draft/${name}.tmp"
       content: ${ymlResult.response.body.yaml}
   result: results
   next: check_result
@@ -51,7 +51,7 @@ add_post_dsl:
   args:
     url: http://node_server:3008/file/write
     body:
-      file_path: "/Ruuter/POST/services/draft/${name}.yml" # temp fix for now
+      file_path: "/Ruuter/POST/services/draft/${name}.tmp"
       content: ${ymlResult.response.body.yaml}
   result: results
   next: check_result

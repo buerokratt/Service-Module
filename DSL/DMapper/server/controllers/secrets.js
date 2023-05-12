@@ -5,9 +5,9 @@ import getSecretsWithPriority from "../js/secrets/get-with-priority.js";
 const router = express.Router();
 
 router.post("/get-all", async (req, res) => {
-  const result = await getAllSecrets();
+  const secrets = await getAllSecrets();
   res.setHeader("Content-Type", "application/json");
-  return res.status(200).json({ ...result });
+  return res.status(200).json({ ...secrets });
 });
 
 router.post("/get-with-priority", async (req, res) => {
