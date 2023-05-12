@@ -24,6 +24,9 @@
       },
       "environment": {
         "type": "text"
+      },
+      "problems": {
+        "type": "number"
       }
     }
   }

@@ -13,7 +13,7 @@ interface FaultyService {
   elements: string[];
   problems: number;
   environment: string;
-  content: string;
+  content: string[];
 }
 
 const FaultyServicesPage: React.FC = () => {
@@ -91,7 +91,7 @@ const FaultyServicesPage: React.FC = () => {
               color: '#4e4f5d',
             }}
           >
-            {viewFaultyServiceLog.content}
+            {viewFaultyServiceLog.content?.map((x: string) => <span key={x}>{x}</span>)}
           </Track>
         </Popup>
       )}
