@@ -1,4 +1,5 @@
-import { CSSProperties, FC, useEffect, useState } from "react";
+import { CSSProperties, FC, useContext, useEffect, useState } from "react";
+
 import { MarkerType, Node, ReactFlowInstance, ReactFlowProvider, useEdgesState, useNodesState } from "reactflow";
 import { Box, Collapsible, NewServiceHeader, Track, FlowElementsPopup } from "../components";
 import { useTranslation } from "react-i18next";
@@ -8,10 +9,17 @@ import { ROUTES } from "../resources/routes-constants";
 import apiIconTag from "../assets/images/api-icon-tag.svg";
 import "reactflow/dist/style.css";
 import "./ServiceFlowPage.scss";
-import { StepType, Step, RawData } from "../types";
-import { EndpointData, EndpointEnv, EndpointType, EndpointVariableData } from "../types/endpoint";
+import { StepType, Step, RawData, ConditionRuleType } from "../types";
+import {
+  EndpointData,
+  EndpointEnv,
+  EndpointType,
+  EndpointVariableData,
+  PreDefinedEndpointEnvVariables,
+} from "../types/endpoint";
 import axios from "axios";
-import { createNewService, jsonToYml } from "../resources/api-constants";
+import { createNewService, jsonToYml, testDraftService } from "../resources/api-constants";
+import { ToastContext } from "../components/Toast/ToastContext";
 
 const initialPlaceholder = {
   id: "2",
@@ -47,6 +55,10 @@ type NodeDataProps = {
   stepType: StepType;
   readonly: boolean;
   message?: string;
+  link?: string;
+  linkText?: string;
+  fileName?: string;
+  fileContent?: string;
 };
 
 const initialNodes: Node[] = [
@@ -67,6 +79,7 @@ const initialNodes: Node[] = [
 
 const ServiceFlowPage: FC = () => {
   const { t } = useTranslation();
+  const toast = useContext(ToastContext);
 
   const allElements: Step[] = [
     { id: 10, label: t("serviceFlow.element.taraAuthentication"), type: StepType.Auth },
@@ -76,23 +89,26 @@ const ServiceFlowPage: FC = () => {
     { id: 50, label: t("serviceFlow.element.openNewWebpage"), type: StepType.OpenWebpage },
     { id: 60, label: t("serviceFlow.element.fileGeneration"), type: StepType.FileGenerate },
     { id: 70, label: t("serviceFlow.element.fileSigning"), type: StepType.FileSign },
-    { id: 80, label: t("serviceFlow.element.siga"), type: StepType.SiGa },
     { id: 90, label: t("serviceFlow.element.conversationEnd"), type: StepType.FinishingStepEnd },
     {
       id: 100,
       label: t("serviceFlow.element.redirectConversationToSupport"),
       type: StepType.FinishingStepRedirect,
-    }
+    },
   ];
 
   const [setupElements, setSetupElements] = useState<Step[]>([]);
   const location = useLocation();
-  const [updatedRules, setUpdatedRules] = useState<(string | null)[]>([]);
+  const [updatedRules, setUpdatedRules] = useState<{ rules: (string | null)[]; rulesData: ConditionRuleType[] }>({
+    rules: [],
+    rulesData: [],
+  });
   const [selectedNode, setSelectedNode] = useState<Node<NodeDataProps> | null>(null);
   const navigate = useNavigate();
   const serviceName = (location.state?.serviceName ?? "").replaceAll(" ", "-");
   const serviceDescription = location.state?.serviceDescription;
-  const secrets: { [key: string]: any } | undefined = location.state?.secrets;
+  const secrets: PreDefinedEndpointEnvVariables | undefined = location.state?.secrets;
+  const availableVariables: PreDefinedEndpointEnvVariables | undefined = location.state?.availableVariables;
   const flow = location.state?.flow ? JSON.parse(location.state?.flow) : undefined;
   const [edges, setEdges, onEdgesChange] = useEdgesState(flow ? flow.edges : [initialEdge]);
   const [reactFlowInstance, setReactFlowInstance] = useState<ReactFlowInstance>();
@@ -103,6 +119,7 @@ const ServiceFlowPage: FC = () => {
     });
   };
   const [nodes, setNodes, onNodesChange] = useNodesState(flow ? resetNodes() : initialNodes);
+  const [isTestButtonVisible, setIsTestButtonVisible] = useState(false);
 
   const getTemplateDataFromNode = (
     node: Node
@@ -127,14 +144,21 @@ const ServiceFlowPage: FC = () => {
         resultName: `ClientInput_${node.data.clientInputId}_result`,
       };
     }
-    if (node.data.stepType === StepType.SiGa) {
+    if (node.data.stepType === StepType.FileGenerate) {
+      return {
+        templateName: "file-generate",
+        body: {
+          fileName: node.data.fileName ?? "",
+          fileContent: node.data.fileContent ?? "",
+        },
+      };
+    }
+    if (node.data.stepType === StepType.FileSign) {
       return {
         templateName: "siga",
         body: {
-          type: ``,
-          personIdentifier: ``,
-          country: ``,
-          phoneNumber: ``,
+          type: "smart_id",
+          country: "EE",
         },
         resultName: "SiGa",
       };
@@ -169,7 +193,7 @@ const ServiceFlowPage: FC = () => {
   const getMapEntry = (value: string) => {
     const parts = value.replace("{{", "").replace("}}", "").split(".");
     const key = value.replace("{{", '"').replace("}}", '"');
-    if ([...Object.keys(secrets?.prod), Object.keys(secrets?.test)].includes(parts[0])) {
+    if ([...(secrets?.prod ?? []), ...(secrets?.test ?? [])].includes(parts[0])) {
       return `[${key}, secrets.response.body.${parts.join(".")}]`;
     }
     if (!value.includes("ClientInput")) parts.splice(1, 0, "response", "body");
@@ -211,7 +235,7 @@ const ServiceFlowPage: FC = () => {
     try {
       getNestedPreDefinedRawVariables(JSON.parse(data.rawData?.value ?? "{}"), result);
       getNestedPreDefinedRawVariables(JSON.parse(data.rawData?.testValue ?? "{}"), result);
-    } catch (_) { }
+    } catch (_) {}
 
     return result;
   };
@@ -219,12 +243,17 @@ const ServiceFlowPage: FC = () => {
   const getDefinedEndpointStep = (node: Node) => {
     const endpoint = setupElements.find((e) => e.label === node.data.label)?.data;
     const selectedEndpoint = endpoint?.definedEndpoints.find((e) => e.isSelected);
-    if (!selectedEndpoint || !endpoint) return {};
+    if (!selectedEndpoint || !endpoint) {
+      return {
+        return: "",
+      };
+    }
     return {
       call: `http.post`,
       args: {
-        url: `http://ruuter:8085/services/endpoints/${selectedEndpoint.methodType.toLowerCase()}-${serviceName}-${(endpoint.name.trim().length ?? 0) > 0 ? endpoint.name : endpoint.id
-          }?type=prod`,
+        url: `http://ruuter:8085/services/endpoints/${selectedEndpoint.methodType.toLowerCase()}-${serviceName}-${
+          (endpoint.name.trim().length ?? 0) > 0 ? endpoint.name : endpoint.id
+        }?type=prod`,
         body: {
           headers: `\${new Map([${getPreDefinedEndpointVariables(selectedEndpoint.headers)}])}`,
           body: `\${new Map([${getPreDefinedEndpointVariables(selectedEndpoint.body)}])}`,
@@ -375,20 +404,23 @@ const ServiceFlowPage: FC = () => {
     });
     steps.set("combine_step", {
       assign: {
-        sensitive: `\${new Map([${typeof headers === "string"
-          ? `["headers", headers]`
-          : `["headers", new Map([${Object.keys(headers ?? {}).map(
-            (h) => `["${h.replaceAll("__", ".")}", headers_${h}]`
-          )}])]`
-          }, ${typeof body === "string"
+        sensitive: `\${new Map([${
+          typeof headers === "string"
+            ? `["headers", headers]`
+            : `["headers", new Map([${Object.keys(headers ?? {}).map(
+                (h) => `["${h.replaceAll("__", ".")}", headers_${h}]`
+              )}])]`
+        }, ${
+          typeof body === "string"
             ? `["body", body]`
             : `["body", new Map([${Object.keys(body ?? {}).map((b) => `["${b.replaceAll("__", ".")}", body_${b}]`)}])]`
-          }, ${typeof params === "string"
+        }, ${
+          typeof params === "string"
             ? `["params", params]`
             : `["params", new Map([${Object.keys(params ?? {}).map(
-              (p) => `["${p.replaceAll("__", ".")}", params_${p}]`
-            )}])]`
-          }])}`,
+                (p) => `["${p.replaceAll("__", ".")}", params_${p}]`
+              )}])]`
+        }])}`,
       },
     });
     steps.set("return_value", { wrapper: false, return: "${sensitive}" });
@@ -399,8 +431,9 @@ const ServiceFlowPage: FC = () => {
         { result },
         {
           params: {
-            location: `/Ruuter/POST/services/endpoints/configs/${endpointName}-${env === EndpointEnv.Live ? "prod" : "test"
-              }-configs.yml`,
+            location: `/Ruuter/POST/services/endpoints/configs/${endpointName}-${
+              env === EndpointEnv.Live ? "prod" : "test"
+            }-configs.yml`,
           },
         }
       )
@@ -420,8 +453,9 @@ const ServiceFlowPage: FC = () => {
     steps.set("get-configs", {
       call: "http.post",
       args: {
-        url: `http://ruuter:8085/services/endpoints/configs/${endpointName}-${env === EndpointEnv.Live ? "prod" : "test"
-          }-configs`,
+        url: `http://ruuter:8085/services/endpoints/configs/${endpointName}-${
+          env === EndpointEnv.Live ? "prod" : "test"
+        }-configs`,
         body: {
           params: "${incoming.body.params}",
           headers: "${incoming.body.headers}",
@@ -441,8 +475,9 @@ const ServiceFlowPage: FC = () => {
         { result },
         {
           params: {
-            location: `/Ruuter/POST/services/endpoints/info/${endpointName}-${env === EndpointEnv.Live ? "prod" : "test"
-              }-info.yml`,
+            location: `/Ruuter/POST/services/endpoints/info/${endpointName}-${
+              env === EndpointEnv.Live ? "prod" : "test"
+            }-info.yml`,
           },
         }
       )
@@ -527,8 +562,9 @@ const ServiceFlowPage: FC = () => {
       const selectedEndpointType = endpoint.data.definedEndpoints.find((e) => e.isSelected);
       if (!selectedEndpointType) continue;
       console.log("e", selectedEndpointType, endpoint);
-      const endpointName = `${selectedEndpointType.methodType.toLowerCase()}-${serviceName}-${(endpoint.data.name.trim().length ?? 0) > 0 ? endpoint.data?.name : endpoint.data?.id
-        }`;
+      const endpointName = `${selectedEndpointType.methodType.toLowerCase()}-${serviceName}-${
+        (endpoint.data.name.trim().length ?? 0) > 0 ? endpoint.data?.name : endpoint.data?.id
+      }`;
       for (const env of [EndpointEnv.Live, EndpointEnv.Test]) {
         await saveEndpointInfo(selectedEndpointType, env, endpointName);
       }
@@ -683,6 +719,7 @@ const ServiceFlowPage: FC = () => {
           },
           next: `${clientInput}-switch`,
         });
+
         finishedFlow.set(
           `${clientInput}-switch`,
           getSwitchCase(
@@ -696,10 +733,12 @@ const ServiceFlowPage: FC = () => {
                 );
                 const followingNode = nodes.find((n) => n.id === edges.find((edge) => edge.source === node.id)?.target);
                 return {
-                  case: matchingRule
-                    ? `\${${matchingRule.name.replace("{{", "").replace("}}", "")} ${matchingRule.condition} ${matchingRule.value
-                    }}`
-                    : `\${${clientInput} == ${node.data.label === "rule 1" ? '"Yes"' : '"No"'}}`,
+                  case:
+                    matchingRule && !["Yes", "No"].includes(matchingRule?.condition)
+                      ? `\${${matchingRule.name.replace("{{", "").replace("}}", "")} ${matchingRule.condition} ${
+                          matchingRule.value
+                        }}`
+                      : `\${${clientInput} == ${node.data.label === "rule 1" ? '"Yes"' : '"No"'}}`,
                   nextStep:
                     followingNode?.type === "customNode"
                       ? `${followingNode.data.stepType}-${followingNode.id}`
@@ -733,6 +772,7 @@ const ServiceFlowPage: FC = () => {
       )
       .then((r) => {
         console.log(r);
+        setIsTestButtonVisible(true);
       })
       .catch((e) => {
         console.log(e);
@@ -780,6 +820,10 @@ const ServiceFlowPage: FC = () => {
           data: {
             ...prevNode.data,
             message: updatedNode.data.message,
+            link: updatedNode.data.link,
+            linkText: updatedNode.data.linkText,
+            fileName: updatedNode.data.fileName,
+            fileContent: updatedNode.data.fileContent,
           },
         };
       })
@@ -790,10 +834,29 @@ const ServiceFlowPage: FC = () => {
     setSelectedNode(null);
   };
 
+  const runServiceTest = async () => {
+    try {
+      await axios.post(testDraftService(serviceName), {});
+      toast.open({
+        type: "success",
+        title: "Test result- success",
+        message: "",
+      });
+    } catch (error) {
+      console.log("ERROR: ", error);
+      toast.open({
+        type: "error",
+        title: "Test result - error",
+        message: "",
+      });
+    }
+  };
+
   return (
     <>
       <NewServiceHeader
         activeStep={3}
+        availableVariables={availableVariables}
         saveDraftOnClick={saveFlow}
         endpoints={location.state?.endpoints}
         flow={JSON.stringify(reactFlowInstance?.toObject())}
@@ -801,19 +864,22 @@ const ServiceFlowPage: FC = () => {
         serviceDescription={serviceDescription}
         secrets={secrets}
         continueOnClick={() => navigate(ROUTES.OVERVIEW_ROUTE)}
+        isTestButtonVisible={isTestButtonVisible}
+        onTestButtonClick={runServiceTest}
       />
       <h1 style={{ padding: 16 }}>Teenusvoog "{serviceName}"</h1>
       <FlowElementsPopup
+        availableVariables={availableVariables}
         onClose={() => handlePopupClose()}
         onSave={(updatedNode: Node) => {
           handlePopupSave(updatedNode);
         }}
-        onRulesUpdate={(rules) => {
-          if (selectedNode?.data.stepType === StepType.Input) setUpdatedRules(rules);
+        onRulesUpdate={(rules, rulesData) => {
+          if (selectedNode?.data.stepType === StepType.Input) setUpdatedRules({ rules, rulesData });
           resetStates();
         }}
         node={selectedNode}
-        oldRules={updatedRules}
+        oldRules={updatedRules.rules}
       />
       <ReactFlowProvider>
         <div className="graph">

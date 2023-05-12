@@ -1,4 +1,3 @@
-import { useEffect, useState } from "react"
 import Button from "../Button"
 import { FormSelect, FormInput } from "../FormElements"
 import Track from "../Track"
@@ -6,28 +5,21 @@ import ConditionInput from "./ConditionInput"
 import VariableAsTag from "./VariableAsTag"
 import { v4 as uuidv4 } from 'uuid';
 import conditionOptions from "./ConditionOptions"
-import axios from "axios"
-import { getClientInputAvailableVariables } from "../../resources/api-constants"
 import './styles.scss'
 import { ConditionRuleType } from "../../types"
+import { PreDefinedEndpointEnvVariables } from "../../types/endpoint"
 
 interface RulesBuilderProps {
   rules: ConditionRuleType[],
   setRules: (rules: ConditionRuleType[]) => void,
+  availableVariables?: PreDefinedEndpointEnvVariables;
 }
 
 const RulesBuilder: React.FC<RulesBuilderProps> = ({
+  availableVariables,
   rules,
   setRules,
 }) => {
-
-  const [availableVariables, setAvailableVariables] = useState<string[]>([])
-
-  useEffect(() => {
-    axios.get(getClientInputAvailableVariables()).then((result) => {
-      setAvailableVariables(result.data)
-    })
-  }, [])
 
   const addRule = () => {
     setRules([
@@ -109,7 +101,9 @@ const RulesBuilder: React.FC<RulesBuilderProps> = ({
     >
       <span>Available variables</span>
       <Track gap={7} className="flow-tags-container">
-        {availableVariables.map((x) => <VariableAsTag key={x} value={x} color='yellow' />)}
+        {[...(availableVariables?.prod ?? []), ...(availableVariables?.test ?? [])].map((x) => 
+          <VariableAsTag key={x} value={x} color='yellow' />
+        )}
       </Track>
     </Track>
   </>;

@@ -1,3 +1,8 @@
+@import "src/styles/tools/spacing";
+@import "src/styles/tools/color";
+@import "src/styles/settings/variables/other";
+@import "src/styles/settings/variables/typography";
+
 .react-flow__node {
   .icon {
     color: rgba(0, 0, 0, 0.54);
@@ -21,5 +26,25 @@
 
   .right-handle {
     margin-left: 26px;
+  }
+
+  .client-input-variable-tag {
+    background-color: get-color(dark-tangerine-0);
+    border-radius: 12px;
+    border: 1px solid get-color(dark-tangerine-4);
+    padding: 1.5px 8px 1.5px 8px;
+  }
+
+  .webpage-link-text {
+    font-weight: 500;
+    color: get-color(sapphire-blue-10);
+  }
+
+  .webpage-link {
+    color: get-color(black-coral-6);
+  }
+
+  .file-name-extension {
+    color: get-color(black-coral-6);
   }
 }

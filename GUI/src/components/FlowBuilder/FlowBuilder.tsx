@@ -15,8 +15,8 @@ import ReactFlow, {
 import "reactflow/dist/style.css";
 import CustomNode from "../Steps/CustomNode";
 import PlaceholderNode from "../Steps/PlaceholderNode";
+import { ConditionRuleType, StepType } from "../../types";
 import StartNode from "../Steps/StartNode";
-import { StepType } from "../../types";
 
 export const GRID_UNIT = 16;
 
@@ -28,7 +28,7 @@ const nodeTypes = {
 
 type FlowBuilderProps = {
   onNodeEdit: (selectedNode: Node | null) => void;
-  updatedRules: (string | null)[];
+  updatedRules: { rules: (string | null)[]; rulesData: ConditionRuleType[] };
   nodes: Node[];
   setNodes: Dispatch<SetStateAction<Node[]>>;
   onNodesChange: OnNodesChange;
@@ -134,11 +134,17 @@ const FlowBuilder: FC<FlowBuilderProps> = ({
     offset,
     inputNode,
     label,
+    name,
+    condition,
+    value,
   }: {
     id: number;
     offset: number;
     inputNode: Node;
     label: string;
+    name?: string;
+    condition?: string;
+    value?: string;
   }): Node[] => {
     const positionX = inputNode.position.x;
     const positionY = getEdgeLength() + inputNode.position.y + (inputNode.height ?? 0);
@@ -158,6 +164,9 @@ const FlowBuilder: FC<FlowBuilderProps> = ({
           type: "rule",
           stepType: StepType.Rule,
           readonly: true,
+          name,
+          condition,
+          value,
         },
         className: "rule",
       },
@@ -537,17 +546,17 @@ const FlowBuilder: FC<FlowBuilderProps> = ({
   );
 
   useEffect(() => {
-    if (updatedRules.length === 0) return;
+    if (updatedRules.rules.length === 0) return;
     updateInputRules(updatedRules);
   }, [updatedRules]);
 
   const updateInputRules = useCallback(
-    (updatedRules: (string | null)[]) => {
+    (updatedRules: { rules: (string | null)[]; rulesData: ConditionRuleType[] }) => {
       if (!clickedNode) return;
       // Find rules not included in updatedRules
       const oldRules = edges.filter((edge) => edge.source === clickedNode).map((edge) => edge.target);
       const nodesToRemove: string[] = nodes
-        .filter((node) => oldRules.includes(node.id) && !updatedRules.includes(node.id))
+        .filter((node) => oldRules.includes(node.id) && !updatedRules.rules.includes(node.id))
         .map((node) => node.id);
       // Find placeholders after rules to be removed
       edges
@@ -566,7 +575,7 @@ const FlowBuilder: FC<FlowBuilderProps> = ({
           .filter((node) => !nodesToRemove.includes(node.id))
           .map((node) => {
             if (node.id !== clickedNode) return node;
-            node.data.childrenCount = updatedRules.length;
+            node.data.childrenCount = updatedRules.rules.length;
             return node;
           });
         updateNodeInternals(clickedNode);
@@ -578,9 +587,10 @@ const FlowBuilder: FC<FlowBuilderProps> = ({
         const newPlaceholderId = Math.max(...nodes.map((node) => +node.id)) + 1;
 
         let placedRuleCount = -1;
-        newRules = updatedRules.map((rule, i) => {
+        newRules = updatedRules.rules.map((rule, i) => {
           placedRuleCount++;
           const offset = -offsetLeft + placedRuleCount * nodePositionOffset;
+          const ruleData = updatedRules.rulesData[i];
           if (rule === null) {
             // Create new rule node with placeholder
             const newRuleId = newPlaceholderId + i * 2;
@@ -588,8 +598,11 @@ const FlowBuilder: FC<FlowBuilderProps> = ({
               ...buildRuleWithPlaceholder({
                 id: newRuleId,
                 label: `rule ${i + 1}`,
-                offset: offset,
-                inputNode: inputNode,
+                offset,
+                inputNode,
+                name: ruleData?.name,
+                condition: ruleData?.condition,
+                value: ruleData?.value,
               })
             );
             return `${newRuleId}`;
@@ -599,6 +612,9 @@ const FlowBuilder: FC<FlowBuilderProps> = ({
             if (!ruleNode) return rule;
             ruleNode.data.label = `rule ${i + 1}`;
             ruleNode.position.x = inputNode.position.x + offset;
+            ruleNode.data.name = ruleData?.name;
+            ruleNode.data.condition = ruleData?.condition;
+            ruleNode.data.value = ruleData?.value;
 
             const ruleEdge = edges.find((edge) => edge.source === rule);
             if (!ruleEdge) return rule;

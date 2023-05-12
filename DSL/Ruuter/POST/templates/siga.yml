@@ -2,14 +2,20 @@ check_for_body:
   switch:
     - condition: ${incoming.body == null}
       next: missing_parameters
-  next: extract_request_data
+  next: get_tara_info
 
-extract_request_data:
+get_tara_info:
+  template: templates/tara
+  requestType: post
+  result: TARA
+  next: extract_tara_data
+
+extract_tara_data:
   assign:
     signType: ${incoming.body.type}
-    identifier: ${incoming.body.personIdentifier}
     country: ${incoming.body.country}
-    phoneNumber: ${incoming.body.phoneNr}
+    identifier: ${TARA.response.body.idCode}
+    phoneNumber: ${TARA.response.body.phoneNr}
   next: check_for_type
 
 check_for_type:

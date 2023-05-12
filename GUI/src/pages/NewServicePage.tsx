@@ -17,7 +17,7 @@ const NewServicePage: React.FC = () => {
   const { intentName } = useParams();
   const [serviceName, setServiceName] = useState<string>(location.state?.serviceName ?? intentName ?? "");
   const [description, setDescription] = useState<string>(location.state?.serviceDescription ?? "");
-  const [secrets, setSecrets] = useState<{ [key: string]: any }>(location.state?.secrets ?? {});
+  const [secrets, setSecrets] = useState<PreDefinedEndpointEnvVariables>(location.state?.secrets ?? {});
   const onDelete = (id: string) => {
     setEndpoints((prevEndpoints) => prevEndpoints.filter((prevEndpoint) => prevEndpoint.id !== id));
   };
@@ -39,32 +39,20 @@ const NewServicePage: React.FC = () => {
     });
   }, []);
 
-  const getSecrets = (data: { [key: string]: any }, path: string, result: string[]) => {
-    Object.keys(data).forEach((k) => {
-      if (typeof data[k] === "object") {
-        getSecrets(data[k], path.length > 0 ? `${path}.${k}` : k, result);
-        return;
-      }
-      result.push(path.length > 0 ? `{{${path}.${k}}}` : `{{${k}}}`);
-    });
-  };
-
   const loadSecretVariables = () => {
     axios.get(getSecretVariables()).then((result) => {
-      const data: { [key: string]: any } = result.data;
+      const data: { prod: string[]; test: string[] } = result.data;
+      data.prod = data.prod.map((v) => `{{${v}}}`);
+      data.test = data.test.map((v) => `{{${v}}}`);
       if (!data) return;
       if (Object.keys(secrets).length === 0) setSecrets(data);
-      const prodVariables: string[] = [];
-      const testVariables: string[] = [];
-      if (data.prod) getSecrets(data.prod, "", prodVariables);
-      if (data.test) getSecrets(data.test, "", testVariables);
 
       setAvailableVariables((prevVariables) => {
-        prodVariables.forEach((v) => {
+        data.prod.forEach((v) => {
           if (!prevVariables.prod.includes(v)) prevVariables.prod.push(v);
         });
-        testVariables.forEach((v) => {
-          if (!prodVariables.includes(v) && !prevVariables.test.includes(v)) prevVariables.test.push(v);
+        data.test.forEach((v) => {
+          if (!data.prod.includes(v) && !prevVariables.test.includes(v)) prevVariables.test.push(v);
         });
         return prevVariables;
       });
@@ -116,12 +104,22 @@ const NewServicePage: React.FC = () => {
     return availableVariables;
   };
 
+  const onNameChange = (endpointId: string, oldName: string, newName: string) => {
+    availableVariables.prod = availableVariables.prod.filter((v) => v.replace("{{", "").split(".")[0] !== oldName);
+    const endpoint = getSelectedEndpoints().find((otherEndpoint) => otherEndpoint.id === endpointId);
+    endpoint?.selectedEndpoint?.response?.forEach((response) => {
+      const variable = `{{${newName === "" ? endpoint.id : newName}.${response.name}}}`;
+      if (!availableVariables.prod.includes(variable)) availableVariables.prod.push(variable);
+    });
+  };
+
   return (
     <Layout
       disableMenu
       customHeader={
         <NewServiceHeader
           activeStep={2}
+          availableVariables={availableVariables}
           saveDraftOnClick={saveDraft}
           endpoints={endpoints}
           flow={location.state?.flow}
@@ -134,6 +132,7 @@ const NewServicePage: React.FC = () => {
                 endpoints,
                 secrets,
                 serviceName,
+                availableVariables: availableVariables,
                 flow: location.state?.flow,
                 serviceDescription: description,
               },
@@ -173,6 +172,7 @@ const NewServicePage: React.FC = () => {
             endpoint={endpoint}
             setEndpoints={setEndpoints}
             requestValues={getAvailableRequestValues(endpoint.id)}
+            onNameChange={onNameChange}
           />
         ))}
         <Button

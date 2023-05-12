@@ -15,6 +15,7 @@ const DefaultMessageContent: FC<{ message: string }> = ({ message }) => {
           style={{
             backgroundColor: '#F0F0F2',
             resize: 'vertical',
+            color: ' #9799A4',
           }}
           readOnly
         >
