@@ -3,7 +3,7 @@ getFaults:
   args:
     url: http://opensearch:9200/faults/_search?size=10000
   result: getFaultsResult
-  
+
 mapFaultsData:
   call: http.post
   args:

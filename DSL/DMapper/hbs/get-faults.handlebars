@@ -1,0 +1,5 @@
+[
+  {{#each hits}}
+    {{_source}}{{#unless @last}},{{/unless}}
+  {{/each}}
+]

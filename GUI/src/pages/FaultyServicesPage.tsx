@@ -10,10 +10,10 @@ import { getFaultyServices } from '../resources/api-constants';
 interface FaultyService {
   id: string;
   service: string;
-  elements: string;
+  elements: string[];
   problems: number;
   environment: string;
-  logs: string[];
+  content: string;
 }
 
 const FaultyServicesPage: React.FC = () => {
@@ -62,7 +62,6 @@ const FaultyServicesPage: React.FC = () => {
   }, []);
 
   useEffect(() => {
-
     axios.get(getFaultyServices())
       .then((res) => setData(res.data))
   }, []);
@@ -92,7 +91,7 @@ const FaultyServicesPage: React.FC = () => {
               color: '#4e4f5d',
             }}
           >
-            {viewFaultyServiceLog.logs?.map((x: string) => <span key={x}>{x}</span>)}
+            {viewFaultyServiceLog.content}
           </Track>
         </Popup>
       )}
