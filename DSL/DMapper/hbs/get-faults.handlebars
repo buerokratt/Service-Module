@@ -1,0 +1,25 @@
+[
+  {{#each hits}}
+    {
+      "id": {{_id}},
+      "content": [
+        {{#each _source.content}}
+          "{{this}}"{{#unless @last}},{{/unless}}
+        {{/each}}
+      ],
+      "elements": [
+        {{#each _source.elements}}
+          "{{this}}"{{#unless @last}},{{/unless}}
+        {{/each}}
+      ],
+      "environment": "{{_source.environment}}",
+      "service": "{{_source.serviceId}}",
+      "problems": {{_source.problems}},
+      "requestId": "{{_source.requestId}}",
+      "timestamp": {{_source.timestamp}}
+    }
+    {{#unless @last}}
+        ,
+    {{/unless}}
+  {{/each}}
+]

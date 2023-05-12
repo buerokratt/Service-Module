@@ -1,0 +1,8 @@
+{"index":{"_id":"1"}}
+{"requestId":123, "serviceId":"service1", "timestamp": 1682611070,"level": "INFO", "statusCode":200, "content": ["Request to Ruuter successed"], "elements":["ABC", "XYZ"],"problems": 3, "environment":"test"}
+{"index":{"_id":"2"}}
+{"requestId":124, "serviceId":"service2", "timestamp": 1682611670,"level": "ERROR", "statusCode":404, "content": ["Request to Ruuter failed", "Request to Resql failed"], "elements":[],"problems": 2, "environment":"test"}
+{"index":{"_id":"3"}}
+{"requestId":125, "serviceId":"service4", "timestamp": 1682611970,"level": "ERROR", "statusCode":500, "content": ["Request to Resql failed"], "elements":["DSL"],"problems": 5, "environment":"production"}
+{"index":{"_id":"4"}}
+{"requestId":126, "serviceId":"service9", "timestamp": 1682612070,"level": "INFO", "statusCode":0, "content": ["DataMapper failed", "Parsing to json failed", "Invalid data type"], "elements":["ABC","DEF"],"problems": 1, "environment":"test"}

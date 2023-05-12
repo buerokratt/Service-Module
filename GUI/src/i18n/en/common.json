@@ -23,6 +23,7 @@
     "close": "Close menu",
     "intents": "Intents",
     "followupTraining": "Followup Training",
+    "faultyServices": "Faulty Services",
     "entities": "Entities",
     "settings": "Settings"
   },
@@ -162,5 +163,13 @@
       "test": "Test"
     },
     "rule": "Rule"
+  },
+  "logs": {
+    "service": "Service",
+    "elements": "Elements",
+    "problems": "Problems",
+    "view": "View",
+    "log": "Log",
+    "environment": "Environment"
   }
 }

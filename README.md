@@ -90,7 +90,6 @@ app.post('/hbs/*', (req, res) => {
     } else if (req.get('type') === 'json') {
       res.json(JSON.parse(response));
     }
-    res.render(req.params[0], req.body);
   });
 });
 ```

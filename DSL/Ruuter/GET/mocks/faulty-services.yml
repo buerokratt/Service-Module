@@ -1,0 +1,14 @@
+mock_data:
+  call: reflect.mock
+  args:
+    response:
+      service: "dummy service"
+      elements: "dummy elements"
+      problems: 1
+      environment: "test"
+      logs: ["placeholder1", "placeholder2", "placeholder3"]
+  result: mock_res
+
+return_result:
+  wrapper: false
+  return: ${[mock_res.response.body, mock_res.response.body, mock_res.response.body]}
