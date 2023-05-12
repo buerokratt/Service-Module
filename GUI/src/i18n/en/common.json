@@ -11,6 +11,7 @@
     "continue": "Continue",
     "view": "View",
     "save": "Save",
+    "testService": "Test service",
     "cancel": "Cancel",
     "close": "Close"
   },
@@ -19,11 +20,12 @@
     "flowbuilder": "Flow Builder",
     "services": "Services",
     "newService": "New Service",
+    "close": "Close menu",
     "intents": "Intents",
     "followupTraining": "Followup Training",
-    "close": "Close menu",
-    "settings": "Settings",
-    "faultyServices": "Faulty Services"
+    "faultyServices": "Faulty Services",
+    "entities": "Entities",
+    "settings": "Settings"
   },
   "intents": {
     "entities": "Entities",
@@ -34,6 +36,7 @@
     "removeValidation": "Remove Validation",
     "search": "Search",
     "delete": "Delete",
+    "deleted": "Deleted",
     "edit": "Edit",
     "save": "Save",
     "cancel": "Cancel",
@@ -52,6 +55,10 @@
     "edit": "Edit",
     "delete": "Delete",
     "cancel": "Cancel",
+    "trainingModuleLink": {
+      "text": "For the service to be accessible to users a new model needs to be trained. Model training happens on the Training Module page",
+      "train": "Train new model"
+    },
     "service": {
       "name": "Name",
       "usedCount": "Times service has been triggered",
@@ -97,7 +104,8 @@
       "testEnv": "Test environment",
       "url": "API endpoint URL",
       "value": "Value",
-      "variable": "Variable"
+      "variable": "Variable",
+      "unsupported": "Sorry, we currently only support GET and POST requests."
     },
     "saveDraft": "Save draft",
     "trainingModuleSetup": "Training module setup",
@@ -130,15 +138,31 @@
       "name": "Name",
       "intent": "Intent",
       "action": "Action",
-      "add": "+ Add"
+      "add": "+ Add",
+      "yesNoQuestion": "Yes/No Question",
+      "insertVariable": "Insert variable",
+      "addRule": "+ Add rule",
+      "availableVariables": "Available variables",
+      "clientSeesMessage": "Client sees message",
+      "redirectToCustomerSupport": "Conversation will be redirected to Customer Support",
+      "loginWithTARA": "To continue please log in with TARA",
+      "endConversation": "This step ends conversation. To continue this step needs to be removed from the flow.",
+      "fileName": "File name",
+      "fileContent": "File content",
+      "fileClientSees": "Text + File link",
+      "fileSign": "Do you want to sign this file?",
+      "fileSignYesNo": "Do you want to sign this file? Yes/No",
+      "serviceEnded": "Service ended"
     },
+    "flow": "Service flow",
     "placeholderNode": "Drag the next step into the flow",
     "allElements": "All elements",
     "setupElements": "Setup elements",
     "tabs": {
       "setup": "Setup",
       "test": "Test"
-    }
+    },
+    "rule": "Rule"
   },
   "logs": {
     "service": "Service",

@@ -4,6 +4,7 @@ import { OutputElementBox, Track } from "..";
 import FormRichText from "../FormElements/FormRichText";
 import "./styles.scss";
 import { PreDefinedEndpointEnvVariables } from "../../types/endpoint";
+import { useTranslation } from "react-i18next";
 
 type FileGenerateContentProps = {
   readonly onFileNameChange: (name: string) => void;
@@ -20,12 +21,14 @@ const FileGenerateContent: React.FC<FileGenerateContentProps> = ({
   defaultFileName,
   defaultFileContent,
 }) => {
+  const { t } = useTranslation();
+
   return (
     <Track direction="vertical" align="stretch">
       <Track gap={16} className="flow-body-padding">
         <label className="flow-body-label">
           <Track gap={8} direction="vertical" align="left">
-            File Name
+            {t("serviceFlow.popup.fileName")}
             <FormInput
               name=""
               label=""
@@ -36,7 +39,7 @@ const FileGenerateContent: React.FC<FileGenerateContentProps> = ({
         </label>
       </Track>
       <Track direction="vertical" align="left" gap={16} className="popup-top-border-track">
-        <span>File contents</span>
+        <span>{t("serviceFlow.popup.fileContent")}</span>
         <FormRichText
           defaultValue={defaultFileContent}
           onChange={(v) => {
@@ -46,14 +49,14 @@ const FileGenerateContent: React.FC<FileGenerateContentProps> = ({
       </Track>
 
       <Track direction="vertical" align="left" gap={16} className="popup-top-border-track">
-        <span>The client sees the message</span>
+        <span>{t("serviceFlow.popup.clientSeesMessage")}</span>
         <Track align="left" className="popup-client-text-demo">
-          text + file name
+          {t("serviceFlow.popup.fileClientSees")}
         </Track>
       </Track>
 
       <Track direction="vertical" align="left" gap={16} className="popup-top-border-track popup-darker-track">
-        <span>Available Output Variables</span>
+        <span>{t("serviceFlow.popup.availableVariables")}</span>
         <Track gap={7} className="flow-tags-container">
           {[...(availableVariables?.prod ?? []), ...(availableVariables?.test ?? [])].map((element, i) => (
             <OutputElementBox key={`${element}-${i}`} text={element}></OutputElementBox>

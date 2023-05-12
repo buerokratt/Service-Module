@@ -1,4 +1,5 @@
 import { FC, memo } from "react";
+import { useTranslation } from "react-i18next";
 
 import { ExclamationBadge, Track } from "../";
 import { StepType } from "../../types";
@@ -25,6 +26,8 @@ type NodeDataProps = {
 };
 
 const StepNode: FC<NodeDataProps> = ({ data }) => {
+  const { t } = useTranslation();
+
   const boldText = {
     fontWeight: 500,
   };
@@ -56,10 +59,10 @@ const StepNode: FC<NodeDataProps> = ({ data }) => {
       {data.stepType === StepType.Textfield && (
         <div style={boldText} dangerouslySetInnerHTML={createMarkup(data.message ?? "")}></div>
       )}
-      {data.stepType === StepType.Auth && <p style={boldText}>"Jätkamiseks palun logi sisse läbi TARA"</p>}
+      {data.stepType === StepType.Auth && <p style={boldText}>"{t("serviceFlow.popup.loginWithTARA")}"</p>}
       {data.stepType === StepType.Input && (
         <p>
-          <span style={boldText}>Muutuja</span>
+          <span style={boldText}>{t("newService.endpoint.variable")}</span>
           <span style={{ marginLeft: 8 }} className="client-input-variable-tag">
             ClientInput_{data.clientInputId}
           </span>
@@ -83,10 +86,10 @@ const StepNode: FC<NodeDataProps> = ({ data }) => {
           </span>
         </p>
       )}
-      {data.stepType === StepType.FileSign && <p style={boldText}>“Kas soovid dokumendi allkirjastada?”</p>}
-      {data.stepType === StepType.FinishingStepEnd && <p style={boldText}>“Teenus on lõpetatud”</p>}
+      {data.stepType === StepType.FileSign && <p style={boldText}>“{t("serviceFlow.popup.fileSign")}”</p>}
+      {data.stepType === StepType.FinishingStepEnd && <p style={boldText}>“{t("serviceFlow.popup.serviceEnded")}”</p>}
       {data.stepType === StepType.FinishingStepRedirect && (
-        <p style={boldText}>“Vestlus suunatakse klienditeenindajale”</p>
+        <p style={boldText}>{t("serviceFlow.popup.redirectToCustomerSupport")}</p>
       )}
       {data.stepType === StepType.Rule && (
         <p>

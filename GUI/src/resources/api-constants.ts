@@ -1,5 +1,6 @@
 
 const baseUrl = process.env.REACT_APP_API_URL;
+const trainingModuleBaseUrl = process.env.REACT_APP_TRAINING_MODULE_GUI_BASE_URL;
 
 export const dummyDataApi = (): string => {
   return baseUrl + "/testing";
@@ -53,3 +54,4 @@ export const testDraftService = (serviceName: string): string => `${baseUrl}/ser
 export const getServicesList = (): string => `${baseUrl}/services`;
 export const jsonToYml = (): string => `${baseUrl}/saveJsonToYml`;
 export const getFaultyServices = (): string => `${baseUrl}/overview/services-detailed/nok`;
+export const trainingModuleTraining = (): string => `${trainingModuleBaseUrl}/treening/treeni-uus-mudel`;
