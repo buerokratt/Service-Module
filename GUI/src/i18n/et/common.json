@@ -11,6 +11,7 @@
     "continue": "Jätka",
     "view": "Vaata",
     "save": "Salvesta",
+    "testService": "Testi teenust",
     "cancel": "Tühista",
     "close": "Sulge"
   },
@@ -34,6 +35,7 @@
     "removeValidation": "Eemalda valideerimine",
     "search": "Otsing",
     "delete": "Kustutada",
+    "deleted": "Kustutatud",
     "edit": "Muuda",
     "save": "Salvesta",
     "cancel": "Tühista",
@@ -52,6 +54,10 @@
     "edit": "Muuda",
     "delete": "Kustuta",
     "cancel": "Tühista",
+    "trainingModuleLink": {
+      "text": "Uute teenuste lõppkasutajatele kättesaadavaks tegemiseks tuleb treenida uus mudel. Mudeli treenimine toimub treeningmooduli alamlehel",
+      "train": "Treeni uus mudel"
+    },
     "service": {
       "name": "Nimetus",
       "usedCount": "Kasutamise arv",
@@ -97,7 +103,8 @@
       "testEnv": "Testkeskkond",
       "url": "API otspunkti URL",
       "value": "Väärtus",
-      "variable": "Muutuja"
+      "variable": "Muutuja",
+      "unsupported": "Vabandust, praegu toetame ainult GET ja POST päringud"
     },
     "saveDraft": "Salvesta mustandina",
     "trainingModuleSetup": "Treenningmooduli seadistamine",
@@ -130,14 +137,30 @@
       "name": "Nimi",
       "intent": "Kavatsus",
       "action": "Tegevus",
-      "add": "+ Lisama"
+      "add": "+ Lisama",
+      "yesNoQuestion": "Jah/Ei Küsimus",
+      "insertVariable": "Sisesta muutuja",
+      "addRule": "+ Lisa reegel",
+      "availableVariables": "Saadavalolevad muutujad",
+      "clientSeesMessage": "Klient näeb sõnumit",
+      "redirectToCustomerSupport": "Vestlus suunatakse klienditeenindajale",
+      "loginWithTARA": "Jätkamiseks palun logi sisse läbi TARA",
+      "endConversation": "Selle sammuga lõpeb suhtlus. Et teenusvoogu jätkata, tuleb vestluse lõpetamine voost eemaldada.",
+      "fileName": "Faili nimi",
+      "fileContent": "Faili sisu",
+      "fileClientSees": "tekst + faili link",
+      "fileSign": "Kas soovid faili allkirjastada?",
+      "fileSignYesNo": "Kas soovid faili allkirjastada? Jah/Ei",
+      "serviceEnded": "Teenus on lõpetatud"
     },
+    "flow": "Teenusvoog",
     "placeholderNode": "Lohista järgmine samm voogu",
     "allElements": "Kõik elemendid",
     "setupElements": "Seadistatud elemendid",
     "tabs": {
       "setup": "Seadistamine",
       "test": "Testimine"
-    }
+    },
+    "rule": "Reegel"
   }
 }

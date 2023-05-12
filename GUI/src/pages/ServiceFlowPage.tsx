@@ -867,7 +867,9 @@ const ServiceFlowPage: FC = () => {
         isTestButtonVisible={isTestButtonVisible}
         onTestButtonClick={runServiceTest}
       />
-      <h1 style={{ padding: 16 }}>Teenusvoog "{serviceName}"</h1>
+      <h1 style={{ padding: 16 }}>
+        {t("serviceFlow.flow")} "{serviceName}"
+      </h1>
       <FlowElementsPopup
         availableVariables={availableVariables}
         onClose={() => handlePopupClose()}

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Button, Track } from "../components";
-import { getServicesList } from "../resources/api-constants";
+import { getServicesList, trainingModuleTraining } from "../resources/api-constants";
 import ServicesTable from "../components/ServicesTable";
 import { Service, ServiceState } from "../types";
 import { useNavigate } from "react-router-dom";
@@ -46,6 +46,10 @@ const OverviewPage: React.FC = () => {
         <Button onClick={() => navigate(ROUTES.NEWSERVICE_ROUTE)}>{t("overview.create")}</Button>
       </Track>
       <ServicesTable dataSource={serviceList} onServiceUpadeCallback={loadServicesList} />
+      <p>
+        {t("overview.trainingModuleLink.text")}{" "}
+        <a href={trainingModuleTraining()}>{t("overview.trainingModuleLink.train")}</a>.
+      </p>
     </>
   );
 };
