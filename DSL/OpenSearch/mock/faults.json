@@ -1,8 +1,8 @@
 {"index":{"_id":"1"}}
-{"requestId":123, "serviceId":"1234", "timestamp": 1682611070,"level": "INFO", "statusCode":200, "content": "Request to Ruuter successed", "environment":"test"}
+{"requestId":123, "serviceId":"1234", "timestamp": 1682611070,"level": "INFO", "statusCode":200, "content": "Request to Ruuter successed", "elements":["ABC", "XYZ"], "environment":"test"}
 {"index":{"_id":"2"}}
-{"requestId":124, "serviceId":"1234", "timestamp": 1682611670,"level": "ERROR", "statusCode":404, "content": "Request to Ruuter failed", "environment":"test"}
+{"requestId":124, "serviceId":"1234", "timestamp": 1682611670,"level": "ERROR", "statusCode":404, "content": "Request to Ruuter failed", "elements":[], "environment":"test"}
 {"index":{"_id":"3"}}
-{"requestId":125, "serviceId":"1234", "timestamp": 1682611970,"level": "ERROR", "statusCode":500, "content": "Request to Ruuter failed", "environment":"production"}
+{"requestId":125, "serviceId":"1234", "timestamp": 1682611970,"level": "ERROR", "statusCode":500, "content": "Request to Ruuter failed", "elements":["DSL"], "environment":"production"}
 {"index":{"_id":"4"}}
-{"requestId":126, "serviceId":"1234", "timestamp": 1682612070,"level": "INFO", "statusCode":0, "content": "Request to Ruuter failed", "environment":"test"}
+{"requestId":126, "serviceId":"1234", "timestamp": 1682612070,"level": "INFO", "statusCode":0, "content": "Request to Ruuter failed", "elements":["ABC","DEF"], "environment":"test"}

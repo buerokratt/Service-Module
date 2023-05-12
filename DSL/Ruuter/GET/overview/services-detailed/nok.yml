@@ -1,0 +1,19 @@
+getLogs:
+  call: http.get
+  args:
+    url: http://opensearch:9200/logs/_search?size=10000
+  result: getLogsResult
+  
+mapLogsData:
+  call: http.post
+  args:
+    url: http://data_mapper:3005/hbs/services/get-logs
+    headers:
+      type: 'json'
+    body:
+      hits: ${getLogsResult.response.body.hits.hits}  
+  result: logsData
+
+returnSuccess:
+  wrapper: false
+  return: ${logsData.response.body}
