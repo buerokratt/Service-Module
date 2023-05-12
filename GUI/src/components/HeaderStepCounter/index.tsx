@@ -5,10 +5,11 @@ import Step from "./HeaderStep";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { ROUTES } from "../../resources/routes-constants";
-import { EndpointData } from "../../types/endpoint";
+import { EndpointData, PreDefinedEndpointEnvVariables } from "../../types/endpoint";
 
 type StepCounterProps = {
   activeStep: number;
+  availableVariables?: PreDefinedEndpointEnvVariables;
   endpoints?: EndpointData[];
   flow?: string;
   secrets?: { [key: string]: any };
@@ -18,6 +19,7 @@ type StepCounterProps = {
 
 const HeaderStepCounter: FC<StepCounterProps> = ({
   activeStep,
+  availableVariables,
   endpoints,
   flow,
   serviceDescription,
@@ -37,6 +39,7 @@ const HeaderStepCounter: FC<StepCounterProps> = ({
         onClick={() =>
           navigate(ROUTES.NEWSERVICE_ROUTE, {
             state: {
+              availableVariables,
               endpoints,
               flow,
               serviceDescription,
@@ -53,6 +56,7 @@ const HeaderStepCounter: FC<StepCounterProps> = ({
         onClick={() =>
           navigate(ROUTES.FLOW_ROUTE, {
             state: {
+              availableVariables,
               endpoints,
               flow,
               serviceDescription,
