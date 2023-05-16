@@ -15,13 +15,21 @@ const ServiceSettingPage: React.FC = () => {
   useEffect(() => {
     axios.get(getServiceSettings())
       .then((x) => {
-        setInitValue(x.data.maxInputTry)
-        setTryCount(x.data.maxInputTry)
+        const settings = x.data.filter((x: any) => x.name === 'maxInputTry')
+        const maxInputTry = settings[0].value
+        setInitValue(maxInputTry)
+        setTryCount(maxInputTry)
       });
   }, []);
 
   const handleSave = async (value: number) => {
-    axios.post(saveServiceSettings(), { maxInputTry: value }).then(() => {
+    axios.post(
+      saveServiceSettings(),
+      {
+        name: 'maxInputTry',
+        value: value,
+      }
+    ).then(() => {
       setInitValue(value)
       setChanged(false)
     })

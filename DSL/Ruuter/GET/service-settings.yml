@@ -1,0 +1,10 @@
+updateSettings:
+  call: http.post
+  args:
+    url: http://resql:8087/get-settings
+  result: results
+
+returnSuccess:
+  wrapper: false
+  status: 200
+  return: ${results.response.body}

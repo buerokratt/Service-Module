@@ -1,0 +1,12 @@
+updateSettings:
+  call: http.post
+  args:
+    url: http://resql:8087/update-settings
+    body:
+      name: ${incoming.body.name}
+      value: ${incoming.body.value}
+  result: getResult
+
+returnSuccess:
+  status: 200
+  return: 'ok'
