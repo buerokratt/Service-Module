@@ -152,7 +152,8 @@
       "fileClientSees": "tekst + faili link",
       "fileSign": "Kas soovid faili allkirjastada?",
       "fileSignYesNo": "Kas soovid faili allkirjastada? Jah/Ei",
-      "serviceEnded": "Teenus on lõpetatud"
+      "serviceEnded": "Teenus on lõpetatud",
+      "rule": "Reegel"
     },
     "flow": "Teenusvoog",
     "placeholderNode": "Lohista järgmine samm voogu",

@@ -152,7 +152,8 @@
       "fileClientSees": "Text + File link",
       "fileSign": "Do you want to sign this file?",
       "fileSignYesNo": "Do you want to sign this file? Yes/No",
-      "serviceEnded": "Service ended"
+      "serviceEnded": "Service ended",
+      "rule": "Rule"
     },
     "flow": "Service flow",
     "placeholderNode": "Drag the next step into the flow",
