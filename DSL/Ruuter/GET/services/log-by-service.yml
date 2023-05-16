@@ -1,0 +1,24 @@
+get_services_stat:
+  call: http.post
+  args:
+    url: http://opensearch:9200/services/_search/template
+    body:
+      id: 'get-log-by-service'
+      params: ${incoming.params}
+  result: results
+
+check_result:
+  switch:
+    - condition: ${results.response.body.found === true}
+      next: return_ok
+  next: return_not_found
+
+return_not_found:
+  status: 404
+  return: 'index not found'
+  next: end
+
+return_ok:
+  status: 200
+  return: ${results.response.body._source}
+  next: end

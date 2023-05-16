@@ -8,6 +8,7 @@ import conditionOptions from "./ConditionOptions"
 import './styles.scss'
 import { ConditionRuleType } from "../../types"
 import { PreDefinedEndpointEnvVariables } from "../../types/endpoint"
+import { useTranslation } from "react-i18next"
 
 interface RulesBuilderProps {
   rules: ConditionRuleType[],
@@ -20,6 +21,7 @@ const RulesBuilder: React.FC<RulesBuilderProps> = ({
   rules,
   setRules,
 }) => {
+  const { t } = useTranslation();
 
   const addRule = () => {
     setRules([
@@ -60,7 +62,7 @@ const RulesBuilder: React.FC<RulesBuilderProps> = ({
       className="popup-top-border-track"
       key={rule.id}>
       <Track justify='between'>
-        <span>Rule {i + 1}</span>
+        <span>{t("serviceFlow.rule")} {i + 1}</span>
         <Button
           appearance='text'
           className=""
@@ -90,7 +92,7 @@ const RulesBuilder: React.FC<RulesBuilderProps> = ({
     </Track>
     )}
     <Track className="popup-top-border-track">
-      <Button appearance='text' onClick={addRule}>+ Add a rule</Button>
+      <Button appearance='text' onClick={addRule}>{t("serviceFlow.popup.addRule")}</Button>
     </Track>
 
     <Track
@@ -99,7 +101,7 @@ const RulesBuilder: React.FC<RulesBuilderProps> = ({
       gap={16}
       className="popup-top-border-track popup-darker-track"
     >
-      <span>Available variables</span>
+      <span>{t("serviceFlow.popup.availableVariables")}</span>
       <Track gap={7} className="flow-tags-container">
         {[...(availableVariables?.prod ?? []), ...(availableVariables?.test ?? [])].map((x) => 
           <VariableAsTag key={x} value={x} color='yellow' />

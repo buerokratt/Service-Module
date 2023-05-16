@@ -7,6 +7,7 @@ import "./styles.scss";
 import { ConditionRuleType } from "../../types";
 import { v4 as uuidv4 } from "uuid";
 import { PreDefinedEndpointEnvVariables } from "../../types/endpoint";
+import { useTranslation } from "react-i18next";
 
 interface ConditionBuilderContentProps {
   isYesNoQuestion: boolean;
@@ -23,6 +24,8 @@ const ConditionBuilderContent: React.FC<ConditionBuilderContentProps> = ({
   rules,
   setRules,
 }) => {
+  const { t } = useTranslation();
+
   const handleCheckedChange = (isChecked: boolean) => {
     if (isChecked) {
       setRules([
@@ -51,7 +54,7 @@ const ConditionBuilderContent: React.FC<ConditionBuilderContentProps> = ({
         <Track>
           <SwitchBox label="" name="" hideLabel onCheckedChange={handleCheckedChange} checked={isYesNoQuestion} />
         </Track>
-        <span>Yes/No Question</span>
+        <span>{t("serviceFlow.popup.yesNoQuestion")}</span>
       </Track>
       {isYesNoQuestion && <YesNoPopupContent />}
       {!isYesNoQuestion && <RulesBuilder availableVariables={availableVariables} rules={rules} setRules={setRules} />}

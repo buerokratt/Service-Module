@@ -17,6 +17,7 @@ import CustomNode from "../Steps/CustomNode";
 import PlaceholderNode from "../Steps/PlaceholderNode";
 import { ConditionRuleType, StepType } from "../../types";
 import StartNode from "../Steps/StartNode";
+import { useTranslation } from "react-i18next";
 
 export const GRID_UNIT = 16;
 
@@ -51,6 +52,8 @@ const FlowBuilder: FC<FlowBuilderProps> = ({
   reactFlowInstance,
   setReactFlowInstance,
 }) => {
+  const { t } = useTranslation();
+
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
   const [clickedNode, setClickedNode] = useState();
   const nodePositionOffset = 28 * GRID_UNIT;
@@ -428,9 +431,9 @@ const FlowBuilder: FC<FlowBuilderProps> = ({
   const setDefaultMessages = (stepType: StepType) => {
     switch (stepType) {
       case StepType.FinishingStepEnd:
-        return "Teenus on lõpetatud";
+        return t("serviceFlow.popup.serviceEnded");
       case StepType.FinishingStepRedirect:
-        return "Vestlus suunatakse klienditeenindajale";
+        return t("serviceFlow.popup.redirectToCustomerSupport");
     }
   };
 

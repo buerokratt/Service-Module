@@ -1,6 +1,6 @@
-import { ServiceState } from "../types/service-state";
 
 const baseUrl = process.env.REACT_APP_API_URL;
+const trainingModuleBaseUrl = process.env.REACT_APP_TRAINING_MODULE_GUI_BASE_URL;
 
 export const dummyDataApi = (): string => {
   return baseUrl + "/testing";
@@ -53,3 +53,5 @@ export const createNewService = (): string => `${baseUrl}/services/add`;
 export const testDraftService = (serviceName: string): string => `${baseUrl}/services/draft/${serviceName}`;
 export const getServicesList = (): string => `${baseUrl}/services`;
 export const jsonToYml = (): string => `${baseUrl}/saveJsonToYml`;
+export const getFaultyServices = (): string => `${baseUrl}/overview/services-detailed/nok`;
+export const trainingModuleTraining = (): string => `${trainingModuleBaseUrl}/treening/treeni-uus-mudel`;

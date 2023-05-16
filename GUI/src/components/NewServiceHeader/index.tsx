@@ -49,7 +49,7 @@ const NewServiceHeader: FC<NewServiceHeaderProps> = ({
             {t("newService.saveDraft")}
           </Button>
           <Button onClick={continueOnClick}>{t("global.continue")}</Button>
-          {isTestButtonVisible && <Button onClick={onTestButtonClick}>Testi teenust</Button>}
+          {isTestButtonVisible && <Button onClick={onTestButtonClick}>{t("global.testService")}</Button>}
         </Track>
       </header>
     </>
