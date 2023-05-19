@@ -6,4 +6,5 @@ export const ROUTES = {
   FOLLOWUPTRAINING_ROUTE: "/services/followupTraining",
   FAULTY_SERVICES_ROUTE: "/services/faultyServices",
   SERVICE_SETTINGS: "/services/settings",
+  FAULTY_SERVICES_ROUTE: "/services/faultyServices",
 };

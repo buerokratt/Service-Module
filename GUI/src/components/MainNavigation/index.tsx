@@ -138,10 +138,10 @@ const MainNavigation: FC = () => {
       label: t("global.services"),
       path: "/services",
       children: [
-        { path: ROUTES.OVERVIEW_ROUTE, label: t('menu.overview') },
+        { path: ROUTES.OVERVIEW_ROUTE, label: t("menu.overview") },
         { path: ROUTES.NEWSERVICE_ROUTE, label: t("menu.newService") },
         { path: ROUTES.FOLLOWUPTRAINING_ROUTE, label: t("menu.followupTraining") },
-        { path: ROUTES.FAULTY_SERVICES_ROUTE, label: t('menu.faultyServices') },
+        { path: ROUTES.FAULTY_SERVICES_ROUTE, label: t("menu.faultyServices") },
         // { path: ROUTES.SERVICE_SETTINGS, label: t("menu.settings") },
       ],
     },
