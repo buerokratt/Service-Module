@@ -11,7 +11,7 @@ extract_request_data:
 extract_cookie_data:
   call: http.post
   args:
-    url: http://ruuter:8080/mocks/mock-custom-jwt-userinfo
+    url: "[#SERVICE_PUBLIC_RUUTER]/mocks/mock-custom-jwt-userinfo"
     headers:
       cookie: ${cookie}
     body:

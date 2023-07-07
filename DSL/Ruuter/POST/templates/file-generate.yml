@@ -13,7 +13,7 @@ extract_request_data:
 generate_pdf_file:
   call: http.post
   args:
-    url: http://data_mapper:3005/js/generate/pdf
+    url: "[#DMAPPER]/js/generate/pdf"
     body:
       filename: ${fileName}
       template: ${fileContent}

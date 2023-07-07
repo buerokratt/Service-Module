@@ -1,7 +1,7 @@
 get_services_stat:
   call: http.post
   args:
-    url: http://opensearch:9200/services/_search/template
+    url: "[#SERVICE_OPENSEARCH]/services/_search/template"
     body:
       id: 'get-log-by-service'
       params: ${incoming.params}

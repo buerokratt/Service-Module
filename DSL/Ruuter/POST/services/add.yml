@@ -15,7 +15,7 @@ extract_request_data:
 service_add:
   call: http.post
   args:
-    url: http://resql:8087/add
+    url: "[#SERVICE_RESQL]/add"
     body:
       name: ${name}
       description: ${description}
@@ -25,7 +25,7 @@ service_add:
 convert_json_content_to_yml:
   call: http.post
   args:
-    url: http://node_server:3008/conversion/json_to_yaml_data
+    url: "[#SERVICE_NODE]/conversion/json_to_yaml_data"
     body:
       data: ${content}
   result: ymlResult
@@ -39,7 +39,7 @@ check_for_type:
 add_get_dsl:
   call: http.post
   args:
-    url: http://node_server:3008/file/write
+    url: "[#SERVICE_NODE]/file/write"
     body:
       file_path: "/Ruuter/GET/services/draft/${name}.tmp"
       content: ${ymlResult.response.body.yaml}
@@ -49,7 +49,7 @@ add_get_dsl:
 add_post_dsl:
   call: http.post
   args:
-    url: http://node_server:3008/file/write
+    url: "[#SERVICE_NODE]/file/write"
     body:
       file_path: "/Ruuter/POST/services/draft/${name}.tmp"
       content: ${ymlResult.response.body.yaml}

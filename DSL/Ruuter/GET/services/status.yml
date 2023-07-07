@@ -1,7 +1,7 @@
 get_status:
   call: http.post
   args:
-    url: http://resql:8087/status
+    url: "[#SERVICE_RESQL]/status"
     body:
       id: ${incoming.body.id}
   result: res

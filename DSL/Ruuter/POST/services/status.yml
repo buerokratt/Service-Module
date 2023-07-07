@@ -15,7 +15,7 @@ check_for_required_parameters:
 get_current_status:
   call: http.post
   args:
-    url: http://resql:8087/status
+    url: "[#SERVICE_RESQL]/status"
     body:
       id: ${id}
   result: status_res
@@ -36,7 +36,7 @@ check_status:
 set_status:
   call: http.post
   args:
-    url: http://resql:8087/set-status
+    url: "[#SERVICE_RESQL]/set-status"
     body:
       id: ${id}
       new_state: ${new_state}
@@ -46,7 +46,7 @@ set_status:
 get_status_name:
   call: http.post
   args:
-    url: http://resql:8087/get-service-name-by-id
+    url: "[#RESQL]/get-service-name-by-id"
     body:
       id: ${id}
   result: name_res
@@ -61,7 +61,7 @@ assign_values:
 check_file_exists:
   call: http.post
   args:
-    url: http://node_server:3008/file/check
+    url: "[#NODE]/file/check"
     body:
       file_path: "/Ruuter/${ruuter_type}/services/${old_file_status_path}/${name + old_file_end}"
   result: service_file_exists_result
@@ -82,7 +82,7 @@ check_for_status:
 activate_service:
   call: http.post
   args:
-    url: http://node_server:3008/file/move
+    url: "[#NODE]/file/move"
     body:
       current_path: "/Ruuter/${ruuter_type}/services/${old_file_status_path}/${name + old_file_end}"
       new_path: "/Ruuter/${ruuter_type}/services/active/${name}.yml"
@@ -91,7 +91,7 @@ activate_service:
 activate_intent_file:
   call: http.post
   args:
-    url: http://node_server:3008/file/move
+    url: "[#NODE]/file/move"
     body:
       current_path: "/mock1/data/nlu/removed/${service_name}_nlu.tmp"
       new_path: "/mock1/data/nlu/${service_name}_nlu.yml"
@@ -100,13 +100,13 @@ activate_intent_file:
 getFileLocations:
   call: http.get
   args:
-    url: http://host.docker.internal:8080/return-file-locations
+    url: "[#DOCKER_INT]/return-file-locations"
   result: fileLocations
 
 getDomainFile:
   call: http.get
   args:
-    url: http://host.docker.internal:8080/domain-file
+    url: "[#DOCKER_INT]/domain-file"
     headers:
       cookie: ""
   result: domainData
@@ -160,7 +160,7 @@ add_rule:
 deactivate_service:
   call: http.post
   args:
-    url: http://node_server:3008/file/move
+    url: "[#NODE]/file/move"
     body:
       current_path: "/Ruuter/${ruuter_type}/services/${old_file_status_path}/${name + old_file_end}"
       new_path: "/Ruuter/${ruuter_type}/services/inactive/${name}.tmp"
@@ -192,7 +192,7 @@ delete_intent:
 rename_intent_to_tmp:
   call: http.post
   args:
-    url: http://node_server:3008/file/move
+    url: "[#NODE]/file/move"
     body:
       current_path: "/mock1/data/nlu/removed/${service_name + '_nlu' + old_file_end}"
       new_path: "/mock1/data/nlu/removed/${service_name}_nlu.tmp"

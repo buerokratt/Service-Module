@@ -7,7 +7,7 @@ getFileLocations:
 getDomainFile:
   call: http.post
   args:
-    url: http://node_server:3008/file/read
+    url: "[#SERVICE_NODE]/file/read"
     body:
       file_path: ${fileLocations.response.body.response.domain_location}
   result: domainFile
@@ -15,7 +15,7 @@ getDomainFile:
 convertYamlToJson:
   call: http.post
   args:
-    url: http://node_server:3008/conversion/yaml_to_json
+    url: "[#SERVICE_NODE]/conversion/yaml_to_json"
     body:
       file: ${domainFile.response.body.file}
   result: domainData

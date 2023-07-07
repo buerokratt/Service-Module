@@ -27,7 +27,7 @@ replaceExistingEntity:
 convertJsonToYaml:
   call: http.post
   args:
-    url: http://node_server:3008/conversion/json_to_yaml
+    url: "[#SERVICE_NODE]/conversion/json_to_yaml"
     body:
       version: ${domainData.response.body.response.version}
       intents: ${domainData.response.body.response.intents}
@@ -48,7 +48,7 @@ getFileLocations:
 saveDomainFile:
   call: http.post
   args:
-    url: http://node_server:3008/file/write
+    url: "[#SERVICE_NODE]/file/write"
     body:
       file_path: ${fileLocations.response.body.response.domain_location}
       content: ${domainYaml.response.body.json}
@@ -63,7 +63,7 @@ switchFileType:
 getRegexFile:
   call: http.post
   args:
-    url: http://node_server:3008/file/read
+    url: "[#SERVICE_NODE]/file/read"
     body:
       file_path: ${fileLocations.response.body.response.regex_location}
   result: intentFile
@@ -72,7 +72,7 @@ getRegexFile:
 getIntentFile:
   call: http.post
   args:
-    url: http://node_server:3008/file/read
+    url: "[#SERVICE_NODE]/file/read"
     body:
       file_path: ${fileLocations.response.body.response.intents_location + parameters.intent + "_nlu.yml"}
   result: intentFile
@@ -80,7 +80,7 @@ getIntentFile:
 convertYamlToJson:
   call: http.post
   args:
-    url: http://node_server:3008/conversion/yaml-to-json
+    url: "[#SERVICE_NODE]/conversion/yaml-to-json"
     body:
       file: ${intentFile.response.body.file}
   result: intentData
@@ -132,7 +132,7 @@ mapIntentsData:
 convertIntentJsonToYaml:
   call: http.post
   args:
-    url: http://node_server:3008/conversion/json-to-yaml
+    url: "[#NODE]/conversion/json-to-yaml"
     body:
       version: "3.0"
       nlu: ${intentFileJson.response.body}
@@ -147,7 +147,7 @@ switchSaveFileType:
 saveRegexFile:
   call: http.post
   args:
-    url: http://node_server:3008/file/write
+    url: "[#NODE]/file/write"
     body:
       file_path: ${fileLocations.response.body.response.regex_location}
       content: ${intentYaml.response.body.json}
@@ -157,7 +157,7 @@ saveRegexFile:
 saveIntentFile:
   call: http.post
   args:
-    url: http://node_server:3008/file/write
+    url: "[#NODE]/file/write"
     body:
       file_path: ${fileLocations.response.body.response.intents_location + parameters.intent + "_nlu.yml"}
       content: ${intentYaml.response.body.json}

@@ -1,7 +1,7 @@
 search_intents:
   call: http.post
   args:
-    url: http://opensearch:9200/intents/_search/template
+    url: "[#SERVICE_OPENSEARCH]/intents/_search/template"
     body:
       id: 'search_intents'
       params: ${incoming.body}

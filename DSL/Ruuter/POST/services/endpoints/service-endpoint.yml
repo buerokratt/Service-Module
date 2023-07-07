@@ -18,14 +18,14 @@ check_for_environment:
 get_prod_info:
   call: http.post
   args:
-    url: http://localhost:8085/services/endpoints/info/service-endpoint-prod-info
+    url: "[#SERVICE_ENDPOINTS]/services/endpoints/info/service-endpoint-prod-info"
   result: info
   next: check_for_endpoint_url
  
 get_test_info:
   call: http.post
   args:
-    url: http://localhost:8085/services/endpoints/info/service-endpoint-test-info
+    url: "[#SERVICE_ENDPOINTS]/services/endpoints/info/service-endpoint-test-info"
   result: info 
   next: check_for_endpoint_url
 

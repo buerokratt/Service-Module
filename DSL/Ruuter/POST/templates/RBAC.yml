@@ -17,7 +17,7 @@ check_for_required_parameters:
 fetch_user_roles_from_db:
   call: http.post
   args:
-    url: http://resql-users:8088/is-user-roles-allowed
+    url: "[#RESQL_USERS]/is-user-roles-allowed"
     body:
       userId: ${userId}
       allowedRoles: ${allowedRoles}
