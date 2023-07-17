@@ -60,7 +60,7 @@
     "defaults",
     "not IE 11"
   ],
-  "homepage": ".",
+  "homepage": "/services/",
   "devDependencies": {
     "@babel/preset-env": "^7.20.2",
     "@types/react": "^18.0.26",
