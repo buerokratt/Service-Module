@@ -1,7 +1,7 @@
 getConfigs:
   call: http.get
   args:
-    url: "[#SERVICE_ENDPOINTS]/services/endpoints/configs/service-endpoint-prod-configs"
+    url: "[#SERVICE_ENDPOINTS]:[#PORT_ENDPOINTS]/services/endpoints/configs/service-endpoint-prod-configs"
   result: configs
 
 assign_step:

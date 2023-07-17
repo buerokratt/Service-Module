@@ -1,7 +1,7 @@
 updateSettings:
   call: http.post
   args:
-    url: "[#SERVICE_RESQL]/get-settings"
+    url: "[#SERVICE_RESQL]:[#PORT_RESQL]/get-settings"
   result: results
 
 returnSuccess:

@@ -22,7 +22,7 @@ missing_parameter:
 add_resql:
   call: http.post
   args:
-    url: "[#NODE]/file/write"
+    url: "[#SERVICE_NODE]:[#PORT_NODE]/file/write"
     body:
       file_path: "/Resql/services/${name}.sql"
       content: ${sql}
