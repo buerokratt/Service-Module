@@ -1,0 +1,2431 @@
+openapi: 3.0.3
+info:
+  title: Service module API OpenApi specification
+  version: 0.1.0
+  license:
+    name: MIT
+    url: 'https://opensource.org/licenses/MIT'
+  description: Component responsible for services in the Bürokratt network.
+servers:
+  - url: 'https://admin.play.buerokratt.ee/service'
+tags:
+  - name: Mocks
+    description: Endpoints that mock responses for testing purposes.
+  - name: Services
+    description: Endpoints related to service configurations, status and statistics.
+  - name: Sticky
+    description: Endpoints for sticky session handling, including active services, domain files, entities, intents and more.
+  - name: Templates
+    description: Endpoints for managing various templates such as client input, end conversation, file generation, etc.
+  - name: Rasa
+    description: Endpoints for Rasa related operations including entity and regex management.
+  - name: File Operations
+    description: Endpoints related to file operations like renaming, CSV and YAML handling.
+  - name: Entities
+    description: Endpoints for entity-related operations.
+  - name: Regex
+    description: Endpoints for regex-related operations.
+  - name: Service Settings
+    description: Endpoints for updating and managing service settings.
+  - name: Others
+    description: Miscellaneous endpoints that do not fit into the other categories.
+paths:
+  /mocks/client-input:
+    get:
+      tags:
+        - Mocks
+      summary: Get client input variables
+      description: Retrieve a list of client input variables including user's first name, last name, birth date, email and invoice details.
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClientInputVariables'
+  /mocks/faulty-services:
+    get:
+      tags:
+        - Mocks
+      summary: Get faulty service details
+      description: Retrieve details of a faulty service, including service name, elements, problem count, environment, and logs.
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FaultyServiceDetails'
+  /mocks/service-settings:
+    get:
+      tags:
+        - Mocks
+      summary: Get service settings details
+      description: Retrieve details of service settings, including maximum input try.
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceSettingsDetails'
+    post:
+      tags:
+        - Mocks
+      summary: Mock service settings operations
+      description: Retrieve service settings.
+      responses:
+        '200':
+          description: Successfully retrieved the service settings.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceSettingsResponse'
+        '400':
+          description: Bad Request. Missing required parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /mocks/validation-mock:
+    get:
+      tags:
+        - Mocks
+      summary: Get validation mock details
+      description: Retrieve details of validation mock, including project name and website.
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationMockDetails'
+    post:
+      tags:
+        - Mocks
+      summary: Mock validation operations
+      description: Retrieve validation details.
+      responses:
+        '200':
+          description: Successfully retrieved the validation details.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationMockResponse'
+        '400':
+          description: Bad Request. Missing required parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /overview/service-detailed/nok:
+    get:
+      tags:
+        - Others
+      summary: Get faulty service details
+      description: Retrieve details of faulty services, including fault data hits.
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FaultServiceDetails'
+  /services/endpoints/configs/service-endpoint-prod-configs:
+    get:
+      tags:
+        - Services
+      summary: Get service endpoint production configurations
+      description: Retrieve details of service endpoint production configurations, including API key, username, and password.
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceEndpointProdConfigs'
+    post:
+      tags:
+        - Services
+      summary: Get production service endpoint configurations
+      responses:
+        '200':
+          description: Production service endpoint configurations were successfully returned.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SensitiveProd'
+  /services/endpoints/configs/service-endpoint-test-configs:
+    get:
+      tags:
+        - Services
+      summary: Get service endpoint test configurations
+      description: Retrieve details of service endpoint test configurations, including API key, username, and password.
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceEndpointTestConfigs'
+    post:
+      tags:
+        - Services
+      summary: Get testing service endpoint configurations
+      responses:
+        '200':
+          description: Testing service endpoint configurations were successfully returned.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SensitiveTest'
+  /services/endpoints/info/service-endpoints-prod-info:
+    get:
+      tags:
+        - Services
+      summary: Get service endpoint production information
+      description: Retrieve information and configurations of the service endpoint for production.
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceEndpointProdInfo'
+  /services/endpoints/info/service-endpoint-test-info:
+    get:
+      tags:
+        - Services
+      summary: Get service endpoint test information
+      description: Retrieve information and configurations of the service endpoint for testing.
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceEndpointTestInfo'
+  /services/endpoints/service-endpoint:
+    get:
+      tags:
+        - Services
+      summary: Get service endpoint information
+      description: Retrieve service endpoint information based on the endpoint type (prod or test) specified in the request body.
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceEndpointResponse'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidRequestResponse'
+    post:
+      tags:
+        - Services
+      summary: Execute service endpoint
+      requestBody:
+        description: Specify the type of the endpoint to execute
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EndpointRequest'
+      responses:
+        '200':
+          description: The response of the service endpoint that was executed.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        '400':
+          description: Bad request. Occurs when the endpoint type is not specified or no URL is provided.
+          content:
+            text/plain:
+              schema:
+                type: string
+  /services/log-by-request:
+    get:
+      tags:
+        - Services
+      summary: Get logs by request
+      description: Retrieve service logs based on the request parameters.
+      parameters:
+        - name: request_id
+          in: query
+          required: true
+          description: The request ID to retrieve logs for.
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceLog'
+        '404':
+          description: Log not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LogNotFoundResponse'
+  /services/log-by-service:
+    get:
+      tags:
+        - Services
+      summary: Get logs by service
+      description: Retrieve service logs based on the service parameters.
+      parameters:
+        - name: service_id
+          in: query
+          required: true
+          description: The service ID to retrieve logs for.
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceLog'
+        '404':
+          description: Log not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LogNotFoundResponse'
+  /services/statistics:
+    get:
+      tags:
+        - Services
+      summary: Get services statistics
+      description: Retrieve statistics for all services.
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ServiceStatistics'
+  /services/status:
+    get:
+      tags:
+        - Services
+      summary: Get service status
+      description: Retrieve the status of a service.
+      parameters:
+        - in: query
+          name: id
+          schema:
+            type: integer
+          description: The ID of the service.
+          required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceStatus'
+    post:
+      tags:
+        - Services
+      summary: Change the status of a service
+      requestBody:
+        description: The ID of the service, the new status to be set, and the type of service.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StatusChange'
+      responses:
+        '200':
+          description: The status of the service was successfully changed.
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: "Status Changed Successfully"
+        '400':
+          description: The request was invalid.
+          content:
+            text/plain:
+              schema:
+                type: string
+                description: Error message
+        '500':
+          description: The service file to update is missing.
+          content:
+            text/plain:
+              schema:
+                type: string
+                description: Error message
+  /sticky/active-services:
+    get:
+      tags:
+        - Sticky
+      summary: Get active services
+      description: Retrieve the list of active services.
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ActiveService'
+  /sticky/domain-file:
+    get:
+      tags:
+        - Sticky
+      summary: Get domain file data
+      description: Retrieve the data of the domain file, after converting it from YAML to JSON.
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DomainData'
+  /sticky/entities:
+    get:
+      tags:
+        - Sticky
+      summary: Get entities data
+      description: Retrieve the data of the entities.
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EntitiesData'
+  /sticky/get-sticky:
+    get:
+      tags:
+        - Sticky
+      summary: Get Sticky Service
+      description: Retrieve the sticky services. If a name parameter is provided, a specific sticky service is returned. If no parameter is provided, all sticky services are returned.
+      parameters:
+        - in: query
+          name: name
+          schema:
+            type: string
+          description: The name of the sticky service.
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StickyServices'
+  /sticky/intents:
+    get:
+      tags:
+        - Sticky
+      summary: Get Sticky Intents
+      description: Retrieve all sticky intents.
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Intents'
+  /sticky/regex:
+    get:
+      tags:
+        - Sticky
+      summary: Get Sticky Regexes
+      description: Retrieve all sticky regexes.
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Regexes'
+  /sticky/return-file-locations:
+    get:
+      tags:
+        - Sticky
+      summary: Get Sticky File Locations
+      description: Retrieve all sticky file locations.
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FileLocations'
+  /sticky/secrets:
+    get:
+      tags:
+        - Sticky
+      summary: Fetch all Secrets
+      description: Retrieve all secrets data.
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+  /sticky/secrets-with-priority:
+    get:
+      tags:
+        - Sticky
+      summary: Fetch all Secrets with priority
+      description: Retrieve all secrets data with priority based on 'type' query parameter. If the type is 'test', then the secrets from the test folder are prioritized over the secrets from the prod folder. In the absence of the 'type' parameter or any other value, prod secrets are prioritized.
+      parameters:
+        - in: query
+          name: type
+          schema:
+            type: string
+            enum:
+              - test
+              - prod
+            default: 'prod'
+          description: Type of the priority. 'test' for testing and any other value or absence of 'type' for production.
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+  /sticky/service-settings:
+    get:
+      tags:
+        - Sticky
+      summary: Fetch Service Settings
+      description: Retrieve service settings from the database. Each setting consists of a name and value.
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                      description: The name of the setting.
+                    value:
+                      type: string
+                      description: The value of the setting.
+  /sticky/services:
+    get:
+      tags:
+        - Sticky
+      summary: Fetch List of Services
+      description: Retrieve a list of services from the database. Each service contains an id, name, current state, and type.
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Service'
+  /dates/calculate-difference:
+    post:
+      tags:
+        - Others
+      summary: Calculate difference between two dates
+      description: Calculates the difference between two dates based on provided start date, end date, and output type.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DateDifferenceInput'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DateDifferenceOutput'
+        '400':
+          description: Bad request. Reasons can be start date greater than end date, invalid output type, or start date not provided.
+          content:
+            text/plain: { }
+  /file/rename:
+    post:
+      tags:
+        - File Operations
+      summary: Rename a file
+      description: Renames a file based on provided current path and new path.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FileRenameInput'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FileRenameOutput'
+        '400':
+          description: Bad request. Reasons can be null body, current_path not provided, or new_path not provided.
+          content:
+            text/plain: { }
+  /mocks/dates/calculate-difference:
+    post:
+      tags:
+        - Mocks
+      summary: Calculate the difference between dates
+      description: Calculates the difference between provided start date and end date (default is current date) in specified output type (default is days).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DateDifferenceInput'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DateDifferenceOutput'
+        '400':
+          description: Bad request. Reasons can be null body, start date not provided, end date is earlier than start date, or output type is invalid.
+          content:
+            text/plain: { }
+  /mocks/services/requests/explain:
+    post:
+      tags:
+        - Mocks
+      summary: Service request explanation
+      description: Mocks a service request explanation and returns a pre-set mock data of request details.
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceRequestExplanation'
+              examples:
+                requestExample:
+                  summary: Example service request explanation
+                  value:
+                    request_headers:
+                      Accept: "*/*"
+                      Accept-Encoding: "gzip, deflate, br"
+                      Accept-Language: "en-GB,en-US;q=0.9,en;q=0.8"
+                      Access-Control-Request-Headers: "content-type"
+                      Access-Control-Request-Method: "POST"
+                      Connection: "keep-alive"
+                      Host: "localhost:8085"
+                      Origin: "http://localhost:3006"
+                      Referer: "http://localhost:3006/"
+                      Sec-Fetch-Dest: "empty"
+                      Sec-Fetch-Mode: "cors"
+                      Sec-Fetch-Site: "same-site"
+                      User-Agent: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36"
+                    request_params: { }
+                    request_body: { }
+                    request_response: { }
+  /mocks/services/add:
+    post:
+      tags:
+        - Mocks
+      summary: Add a new service
+      description: Mocks adding a new service and returns a status code of 201 on success.
+      requestBody:
+        description: The service to be added
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Service2'
+            examples:
+              serviceExample:
+                summary: Example service data
+                value:
+                  name: "Example Service"
+                  description: "This is an example service."
+      responses:
+        '201':
+          description: Successfully created the service.
+        '400':
+          description: Required parameter(s) missing.
+  /mocks/services/open-api-speck-mock:
+    post:
+      tags:
+        - Mocks
+      summary: Fetch OpenAPI specification
+      description: Fetches an OpenAPI specification from an external source and returns it.
+      responses:
+        '200':
+          description: Successfully fetched the OpenAPI specification.
+          content:
+            application/json:
+              schema:
+                type: object
+                description: The OpenAPI specification
+        '400':
+          description: Error fetching the OpenAPI specification.
+  /mocks/tim/user-info:
+    post:
+      tags:
+        - Mocks
+      summary: Fetch mock user information
+      description: Fetches mock user information based on the incoming request.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserRequest'
+      responses:
+        '200':
+          description: Successfully fetched the user information.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserInfo'
+        '401':
+          description: Unauthorized.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorUnauthorized'
+  /mocks/RBAC-mock:
+    post:
+      tags:
+        - Mocks
+      summary: Mock RBAC operations
+      description: Validates user roles based on userId and allowedRoles.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserRolesRequest'
+      responses:
+        '200':
+          description: Successfully validated the user roles.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserRolesResponse'
+        '400':
+          description: Bad Request. Missing required parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /rasa/entities/add:
+    post:
+      tags:
+        - Rasa
+      summary: Add entity to Rasa
+      requestBody:
+        description: An object containing entity to be added.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddEntity'
+      responses:
+        '200':
+          description: Successfully added the entity.
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: "Entity added"
+        '400':
+          description: Bad Request. Missing required parameters.
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: "Bad Request"
+        '409':
+          description: Entity already exists.
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: "Entity exists"
+  /rasa/entities/delete:
+    post:
+      tags:
+        - Rasa
+      summary: Delete entity from Rasa
+      requestBody:
+        description: An object containing entity name to be deleted.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeleteEntity'
+      responses:
+        '200':
+          description: Successfully deleted the entity.
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: "Entity deleted"
+        '400':
+          description: Entity is missing or has dependencies.
+          content:
+            text/plain:
+              schema:
+                type: string
+                example:
+                  entityMissing:
+                    summary: "Entity Missing"
+                    value: "Can't find entity to delete"
+                  entityDomainDependency:
+                    summary: "Entity Domain Dependency"
+                    value: "Deleting an entity is forbidden because it has relation to domain file"
+                  entityRegexDependency:
+                    summary: "Entity Regex Dependency"
+                    value: "Deleting an entity is forbidden because it has relation to regex file"
+                  entityIntentDependency:
+                    summary: "Entity Intent Dependency"
+                    value: "Deleting an entity is forbidden because it has relation to intent"
+  /rasa/entities/update:
+    post:
+      tags:
+        - Rasa
+      summary: Update entity in Rasa
+      requestBody:
+        description: An object containing entity name and new entity data to be updated.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateEntity'
+      responses:
+        '200':
+          description: Successfully updated the entity.
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: "Entity updated"
+        '409':
+          description: Entity is missing or failed to update.
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: "Can't find entity to update"
+  /rasa/regex/delete:
+    post:
+      tags:
+        - Rasa
+      summary: Delete regex from Rasa
+      requestBody:
+        description: An object containing regex name and example to be deleted.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeleteRegex'
+      responses:
+        '200':
+          description: Successfully deleted the regex.
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: "Regex deleted"
+        '404':
+          description: Regex or example is missing or failed to delete.
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: "Can't find regex to delete"
+  /rasa/regex/example:
+    post:
+      tags:
+        - Rasa
+      summary: Get the examples associated with a specific regex
+      requestBody:
+        description: An object containing regex name and example to be retrieved.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegexExample'
+      responses:
+        '200':
+          description: The list of examples for the specified regex.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+  /rasa/regex/update:
+    post:
+      tags:
+        - Rasa
+      summary: Update a specific regex
+      requestBody:
+        description: An object containing the regex to be updated.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegexUpdate'
+      responses:
+        '200':
+          description: The regex was updated successfully.
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: "Regex updated"
+        '409':
+          description: The regex to update was not found.
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: "Can't find regex to update"
+  /services/endpoints/info/service-endpoint-prod-info:
+    post:
+      tags:
+        - Services
+      summary: Get production service endpoint info
+      responses:
+        '200':
+          description: Production service endpoint information and its configurations were successfully returned.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EndpointInfo'
+  /services/requests/explain:
+    post:
+      tags:
+        - Services
+      summary: Explain a service request
+      requestBody:
+        description: The request body is not required for this endpoint.
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: The response of the mock service request that was explained.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+  /services/resql/add:
+    post:
+      tags:
+        - Services
+      summary: Add a new ReSQL
+      requestBody:
+        description: Provide the name and SQL for the new ReSQL.
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: The name of the new ReSQL.
+                sql:
+                  type: string
+                  description: The SQL for the new ReSQL.
+              required:
+                - name
+                - sql
+      responses:
+        '200':
+          description: The ReSQL was successfully added.
+          content:
+            text/plain:
+              schema:
+                type: string
+        '400':
+          description: The provided parameters were not valid.
+          content:
+            text/plain:
+              schema:
+                type: string
+  /services/add:
+    post:
+      tags:
+        - Services
+      summary: Add a new service
+      requestBody:
+        description: Provide the name, description, type, and content for the new service.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ServiceData'
+      responses:
+        '200':
+          description: The service was successfully added.
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ServiceResponseAdded'
+        '400':
+          description: The provided parameters were not valid or required parameter(s) were missing.
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /services/delete:
+    post:
+      tags:
+        - Services
+      summary: Delete an existing service
+      requestBody:
+        description: Provide the id and type of the service to be deleted.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ServiceDeleteData'
+      responses:
+        '200':
+          description: The service was successfully deleted.
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ServiceResponseDeleted'
+        '400':
+          description: The provided parameters were not valid or required parameter(s) were missing or the service is active.
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /services/open-api-spec:
+    post:
+      tags:
+        - Services
+      summary: Fetch an OpenAPI specification
+      requestBody:
+        description: Provide the URL of the OpenAPI specification to be fetched.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OpenApiSpecRequest'
+      responses:
+        '200':
+          description: The OpenAPI specification was successfully fetched.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        '400':
+          description: The provided parameters were not valid or required parameter(s) were missing.
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /services/search-intents:
+    post:
+      tags:
+        - Services
+      summary: Search for intents
+      requestBody:
+        description: Provide the parameters for the intent search.
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true
+      responses:
+        '200':
+          description: The search operation was successfully executed.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        '400':
+          description: The provided parameters were not valid.
+          content:
+            text/plain:
+              schema:
+                type: string
+                description: An error message.
+  /templates/client-input:
+    post:
+      tags:
+        - Templates
+      summary: Get mock client input
+      responses:
+        '200':
+          description: Successfully returned the mock client input.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  input:
+                    type: string
+                    example: "Yes"
+  /templates/direct-to-cs:
+    post:
+      tags:
+        - Templates
+      summary: Send a message to the customer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+              required:
+                - message
+      responses:
+        '200':
+          description: Successfully sent the message to the client.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "OK"
+                  message:
+                    type: string
+                    example: "Teid suunatakse klienditeenindusse"
+        '400':
+          description: Required parameters are missing.
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: 'message - missing'
+  /templates/end-conversation:
+    post:
+      tags:
+        - Templates
+      summary: Send an end conversation message to the customer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+              required:
+                - message
+      responses:
+        '200':
+          description: Successfully sent the end conversation message to the client.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "OK"
+                  message:
+                    type: string
+                    example: "Teenus on lõpetatud"
+        '400':
+          description: Required parameters are missing.
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: 'message - missing'
+  /templates/file-generate:
+    post:
+      tags:
+        - Templates
+      summary: Generate a PDF file
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                fileName:
+                  type: string
+                fileContent:
+                  type: string
+              required:
+                - fileName
+                - fileContent
+      responses:
+        '200':
+          description: Successfully generated the PDF file.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "OK"
+                  message:
+                    type: string
+                    example: "File generated successfully"
+        '400':
+          description: Required parameters are missing.
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: 'fileName, fileContent - missing'
+  /templates/file-signing:
+    post:
+      tags:
+        - Templates
+      summary: Sign a file
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                type:
+                  type: string
+                personIdentifier:
+                  type: string
+                country:
+                  type: string
+                phoneNr:
+                  type: string
+              required:
+                - type
+                - personIdentifier
+                - country
+                - phoneNr
+      responses:
+        '200':
+          description: Successfully signed the file.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "OK"
+                  message:
+                    type: string
+                    example: "File signed successfully"
+  /templates/open-webpage:
+    post:
+      tags:
+        - Templates
+      summary: Open a webpage
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                link:
+                  type: string
+                  format: uri
+                  description: URL of the webpage
+                linkText:
+                  type: string
+                  description: Text to display for the link
+              required:
+                - link
+                - linkText
+      responses:
+        '200':
+          description: Successfully sent the webpage link.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "OK"
+                  link:
+                    type: string
+                    example: "<a href='https://example.com' target='_blank'>Link Text</a>"
+        '400':
+          description: Request parameter(s) missing.
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: "link, linkText - both or one of these fields are missing"
+  /templates/RBAC:
+    post:
+      tags:
+        - Templates
+      summary: Check user access
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                userId:
+                  type: string
+                  description: ID of the user
+                allowedRoles:
+                  type: array
+                  items:
+                    type: string
+                  description: List of roles allowed for access
+              required:
+                - userId
+                - allowedRoles
+      responses:
+        '200':
+          description: Successfully checked the user's access.
+          content:
+            application/json:
+              schema:
+                type: string
+                example: "true"
+        '400':
+          description: Request parameter(s) missing.
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: "userId, allowedRoles - missing"
+  /templates/send-message-to-client:
+    post:
+      tags:
+        - Templates
+      summary: Send a message to the client
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  description: The message to be sent to the client
+              required:
+                - message
+      responses:
+        '200':
+          description: The message was successfully sent.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: 'OK'
+                  message:
+                    type: string
+                    example: 'Hello, Muki'
+        '400':
+          description: Request parameter(s) missing.
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: 'message - missing'
+  /templates/siga:
+    post:
+      tags:
+        - Templates
+      summary: Sign with Smart-ID or Mobile-ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                type:
+                  type: string
+                  description: The type of the signature (smart_id or mobile_sign)
+                country:
+                  type: string
+                  description: The country of the user
+                phoneNr:
+                  type: string
+                  description: The phone number of the user
+              required:
+                - type
+      responses:
+        '200':
+          description: The signature was successful.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: 'OK'
+        '400':
+          description: Request parameter(s) missing.
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: 'Missing Parameters'
+  /templates/tara:
+    post:
+      tags:
+        - Templates
+      summary: Request user info from TIM
+      responses:
+        '200':
+          description: The user info was returned successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserInfo'
+        '401':
+          description: Unauthorized. The token is expired.
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: 'Unauthorized'
+  /templates/validation-template:
+    post:
+      tags:
+        - Templates
+      summary: Validate status code
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                response:
+                  type: object
+                  properties:
+                    statusCodeValue:
+                      type: integer
+                      description: The status code to be validated
+                      example: 200
+      responses:
+        '200':
+          description: The validation result was returned successfully.
+          content:
+            application/json:
+              schema:
+                type: boolean
+                description: The result of the validation (true if status code is in the range 200-299, false otherwise)
+                example: true
+        '400':
+          description: Bad request. The request body is missing or does not have the required 'response' object with 'statusCodeValue'.
+  /csv:
+    post:
+      tags:
+        - File Operations
+      summary: Generate CSV
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  type: array
+                  description: The data to be included in the CSV file
+                  items:
+                    type: object
+                  example:
+                    - Name: "Alice"
+                      Age: 20
+                    - Name: "Bob"
+                      Age: 25
+                del:
+                  type: string
+                  description: The delimiter character for the CSV file
+                  example: ","
+                qul:
+                  type: string
+                  description: The qualifier character for the CSV file
+                  example: '"'
+      responses:
+        '200':
+          description: The CSV file was generated successfully.
+          content:
+            text/csv:
+              schema:
+                type: string
+                description: The generated CSV file content
+                example: '"Name","Age"\n"Alice",20\n"Bob",25'
+          headers:
+            Content-disposition:
+              schema:
+                type: string
+                example: "attachment;filename=result.csv"
+        '400':
+          description: Bad request. The request body is missing or does not have the required properties (data, del, qul).
+  /entities:
+    post:
+      tags:
+        - Entities
+      summary: Get entities
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                script:
+                  type: object
+                  properties:
+                    lang:
+                      type: string
+                      example: "mustache"
+                    source:
+                      type: object
+                      properties:
+                        size:
+                          type: integer
+                          example: 10000
+                        query:
+                          type: object
+                          properties:
+                            bool:
+                              type: object
+                              properties:
+                                must:
+                                  type: array
+                                  items:
+                                    type: object
+                                    properties:
+                                      query_string:
+                                        type: object
+                                        properties:
+                                          query:
+                                            type: string
+                                            example: "*entity1*"
+                                          default_field:
+                                            type: string
+                                            example: "entity"
+                    params:
+                      type: object
+                      properties:
+                        entity:
+                          type: string
+                          example: "entity1"
+              required:
+                - script
+      responses:
+        '200':
+          description: Entities data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  hits:
+                    type: array
+                    items:
+                      type: object
+                    description: An array of entity data
+                    example:
+                      - _source:
+                          entity: "entity1"
+        '400':
+          description: Bad request. The request body is missing or does not have the required properties.
+  /regex:
+    post:
+      tags:
+        - Regex
+      summary: Get regular expressions
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                script:
+                  type: object
+                  properties:
+                    lang:
+                      type: string
+                      example: "mustache"
+                    source:
+                      type: object
+                      properties:
+                        size:
+                          type: integer
+                          example: 10000
+                        query:
+                          type: object
+                          properties:
+                            bool:
+                              type: object
+                              properties:
+                                must:
+                                  type: array
+                                  items:
+                                    type: object
+                                    properties:
+                                      query_string:
+                                        type: object
+                                        properties:
+                                          query:
+                                            type: string
+                                            example: "*regex1*"
+                                          default_field:
+                                            type: string
+                                            example: "regex"
+                    params:
+                      type: object
+                      properties:
+                        regex:
+                          type: string
+                          example: "regex1"
+                examples:
+                  type: array
+                  items:
+                    type: string
+                  example:
+                    - "example1"
+                    - "example2"
+              required:
+                - script
+                - examples
+      responses:
+        '200':
+          description: Regular expressions data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  hits:
+                    type: array
+                    items:
+                      type: object
+                    description: An array of regular expressions data
+                    example:
+                      - _source:
+                          regex: "regex1"
+                          examples:
+                            - "example1"
+                            - "example2"
+        '400':
+          description: Bad request. The request body is missing or does not have the required properties.
+  /saveJsonToYml:
+    post:
+      tags:
+        - File Operations
+      summary: Convert JSON to YML and save it
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                result:
+                  type: object
+                  description: The JSON data to be converted
+                  example:
+                    key1: "value1"
+                    key2: "value2"
+                location:
+                  type: string
+                  description: The file path where to save the converted YML
+                  example: "/path/to/file.yml"
+              required:
+                - result
+                - location
+      responses:
+        '200':
+          description: JSON data was successfully converted to YML and saved.
+        '400':
+          description: Bad request. The request body is missing or does not have the required properties.
+        '500':
+          description: Internal server error. The JSON data could not be converted to YML or the file could not be saved.
+  /service-settings:
+    post:
+      tags:
+        - Service Settings
+      summary: Update Service Settings
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: The name of the service setting to be updated
+                  example: "maxInputTry"
+                value:
+                  type: string
+                  description: The new value for the service setting
+                  example: "4"
+              required:
+                - name
+                - value
+      responses:
+        '200':
+          description: Service setting was successfully updated.
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: "ok"
+        '400':
+          description: Bad request. The request body is missing or does not have the required properties.
+        '500':
+          description: Internal server error. The service setting could not be updated.
+components:
+  schemas:
+    ClientInputVariables:
+      type: object
+      properties:
+        user:
+          $ref: '#/components/schemas/User'
+        invoice:
+          $ref: '#/components/schemas/Invoice'
+    User:
+      type: object
+      properties:
+        firstname:
+          type: string
+          description: First name of the user.
+        lastname:
+          type: string
+          description: Last name of the user.
+        birthdate:
+          type: string
+          format: date
+          description: Birth date of the user.
+        email:
+          type: string
+          format: email
+          description: Email of the user.
+    Invoice:
+      type: object
+      properties:
+        total:
+          type: number
+          format: float
+          description: Total invoice amount.
+        subtotal:
+          type: number
+          format: float
+          description: Subtotal of the invoice.
+    FaultyServiceDetails:
+      type: array
+      items:
+        $ref: '#/components/schemas/ServiceDetails'
+    ServiceDetails:
+      type: object
+      properties:
+        service:
+          type: string
+          description: Name of the faulty service.
+          example: "dummy service"
+        elements:
+          type: string
+          description: Elements related to the service.
+          example: "dummy elements"
+        problems:
+          type: integer
+          format: int32
+          description: Number of problems detected in the service.
+          example: 1
+        environment:
+          type: string
+          description: Environment where the service is running.
+          example: "test"
+        logs:
+          type: array
+          items:
+            type: string
+          description: Logs related to the service.
+          example: [ "placeholder1", "placeholder2", "placeholder3" ]
+    ServiceSettingsDetails:
+      type: object
+      properties:
+        maxInputTry:
+          type: integer
+          format: int32
+          description: Maximum number of input attempts.
+          example: 4
+    ValidationMockDetails:
+      type: object
+      properties:
+        project:
+          type: string
+          description: Name of the project.
+          example: "Bürokratt"
+        website:
+          type: string
+          description: Website of the project.
+          example: "www.kratid.ee"
+    FaultServiceDetails:
+      type: array
+      items:
+        $ref: '#/components/schemas/FaultItem'
+    FaultItem:
+      type: object
+      properties:
+        id:
+          type: string
+          description: ID of the fault.
+        content:
+          type: array
+          items:
+            type: string
+          description: Content related to the fault.
+        elements:
+          type: array
+          items:
+            type: string
+          description: Elements related to the fault.
+        environment:
+          type: string
+          description: Environment where the fault occurred.
+        service:
+          type: string
+          description: Service ID where the fault occurred.
+        problems:
+          type: integer
+          format: int32
+          description: Number of problems detected.
+        requestId:
+          type: string
+          description: Request ID where the fault occurred.
+        timestamp:
+          type: integer
+          format: int64
+          description: Timestamp when the fault occurred.
+    ServiceEndpointProdConfigs:
+      type: object
+      properties:
+        api_key:
+          type: string
+          description: API key for the production service endpoint.
+          example: '112218ssQQ212Prod'
+        username:
+          type: string
+          description: Username for the production service endpoint.
+          example: 'User100'
+        password:
+          type: string
+          description: Password for the production service endpoint.
+          example: 'pwd158'
+    ServiceEndpointTestConfigs:
+      type: object
+      properties:
+        api_key:
+          type: string
+          description: API key for the test service endpoint.
+          example: '112218ssQQ212TEST'
+        username:
+          type: string
+          description: Username for the test service endpoint.
+          example: 'User20'
+        password:
+          type: string
+          description: Password for the test service endpoint.
+          example: 'pwd18'
+    ServiceEndpointProdInfo:
+      type: object
+      properties:
+        info:
+          $ref: '#/components/schemas/AdditionalInfo'
+        configs:
+          $ref: '#/components/schemas/ServiceEndpointProdConfigs'
+    AdditionalInfo:
+      type: object
+      properties:
+        url:
+          type: string
+          description: URL for posting data.
+          example: 'https://httpbin.org/post'
+        user_id:
+          type: integer
+          format: int32
+          description: User ID.
+          example: 10
+        headers:
+          type: object
+          properties:
+            token:
+              type: string
+              description: Token for authentication.
+              example: 'isdfbkajsdhkajsdhjsbckajsgdyasudhqwddasax'
+    ServiceEndpointTestInfo:
+      type: object
+      properties:
+        info:
+          $ref: '#/components/schemas/AdditionalInfoAnything'
+        configs:
+          $ref: '#/components/schemas/ServiceEndpointTestConfigs'
+    AdditionalInfoAnything:
+      type: object
+      properties:
+        url:
+          type: string
+          description: URL for posting data.
+          example: 'https://httpbin.org/anything'
+        user_id:
+          type: integer
+          format: int32
+          description: User ID.
+          example: 20
+        headers:
+          type: object
+          properties:
+            token:
+              type: string
+              description: Token for authentication.
+              example: 'htbaslaiscvasjaskasyiuhashbxjhasgdqqysasjdhasd'
+    ServiceEndpointResponse:
+      type: object
+      description: The service endpoint response based on the executed endpoint.
+    InvalidRequestResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Error message.
+      example:
+        message: "Please Specify Endpoint Type 'Prod' Or 'Test'"
+    ServiceLog:
+      type: object
+      description: The service log object.
+      # Add properties here based on what is included in results.response.body._source
+    LogNotFoundResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Error message.
+          example: 'index not found'
+    ServiceStatistics:
+      type: object
+      description: The service statistics object.
+      # Add properties here based on what is included in results.response.body.hits.hits
+    ServiceStatus:
+      type: object
+      properties:
+        current_state:
+          type: string
+          description: The current state of the service.
+        ruuter_type:
+          type: string
+          description: The type of the router for the service.
+    ActiveService:
+      type: object
+      description: Active Service object
+      properties:
+        id:
+          type: integer
+          description: The ID of the service.
+        name:
+          type: string
+          description: The name of the service.
+        state:
+          type: string
+          description: The current state of the service.
+        type:
+          type: string
+          description: The type of the service.
+    DomainData:
+      type: object
+      description: Domain Data object
+      properties:
+        file:
+          type: object
+          description: The converted JSON object of the domain file.
+          additionalProperties: true
+    EntitiesData:
+      type: array
+      description: An array of entities.
+      items:
+        type: object
+        additionalProperties: true
+    StickyServices:
+      type: array
+      description: An array of sticky services.
+      items:
+        type: object
+        additionalProperties: true
+    Intents:
+      type: array
+      description: An array of sticky intents.
+      items:
+        type: object
+        additionalProperties: true
+    Regexes:
+      type: array
+      description: An array of sticky regexes.
+      items:
+        type: object
+        additionalProperties: true
+    FileLocations:
+      type: object
+      properties:
+        rules_location:
+          type: string
+          description: Location of rules file
+        stories_location:
+          type: string
+          description: Location of stories file
+        domain_location:
+          type: string
+          description: Location of domain file
+        test_stories_location:
+          type: string
+          description: Location of test stories file
+        intents_location:
+          type: string
+          description: Location of intents file
+        regex_location:
+          type: string
+          description: Location of regex file
+        training_result_location:
+          type: string
+          description: Location of training results file
+        config_location:
+          type: string
+          description: Location of config file
+    Service:
+      type: array
+      items:
+        $ref: '#/components/schemas/ServiceItem'
+    ServiceItem:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: The ID of the service.
+        name:
+          type: string
+          description: The name of the service.
+        state:
+          type: string
+          description: The current state of the service.
+        type:
+          type: string
+          description: The type of the service.
+    DateDifferenceInput:
+      type: object
+      required:
+        - startDate
+      properties:
+        startDate:
+          type: string
+          format: date-time
+          description: Start date in ISO 8601 format.
+        endDate:
+          type: string
+          format: date-time
+          description: End date in ISO 8601 format. If not provided, current date and time is considered.
+        outputType:
+          type: string
+          description: The output type of the result. Can be 'years', 'months', 'days', 'hours', 'minutes', or 'seconds'. If not provided, 'days' is considered.
+    DateDifferenceOutput:
+      type: object
+      properties:
+        difference:
+          type: string
+          description: The difference between the start and end dates based on the provided output type.
+    FileRenameInput:
+      type: object
+      required:
+        - current_path
+        - new_path
+      properties:
+        current_path:
+          type: string
+          description: The current path of the file to be renamed.
+        new_path:
+          type: string
+          description: The new path of the file after rename.
+    FileRenameOutput:
+      type: object
+      properties:
+        message:
+          type: string
+          description: The result of the operation.
+    ServiceRequestExplanation:
+      type: object
+      properties:
+        request_headers:
+          type: object
+          additionalProperties:
+            type: string
+        request_params:
+          type: object
+          additionalProperties: { }
+        request_body:
+          type: object
+          additionalProperties: { }
+        request_response:
+          type: object
+          additionalProperties: { }
+    Service2:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The name of the service.
+          example: "Example Service"
+        description:
+          type: string
+          description: A brief description of the service.
+          example: "This is an example service."
+    UserRequest:
+      type: object
+      properties:
+        isTokenExpired:
+          type: boolean
+          description: Token expiration status.
+          example: true
+    UserInfo:
+      type: object
+      properties:
+        sub:
+          type: string
+          example: ""
+        firstName:
+          type: string
+          example: "MARY ÄNN"
+        idCode:
+          type: string
+          example: "EE60001019906"
+        displayName:
+          type: string
+          example: "MARY ÄNN"
+        iss:
+          type: string
+          example: "test.buerokratt.ee"
+        exp:
+          type: integer
+          example: 1670250948
+        login:
+          type: string
+          example: "EE60001019906"
+        iat:
+          type: integer
+          example: 1670243748
+        jti:
+          type: string
+          example: "e14a5084-3b30-4a55-8720-c2ee22f43c2c"
+        authorities:
+          type: array
+          items:
+            type: string
+          example:
+            - "ROLE_ADMINISTRATOR"
+    ErrorUnauthorized:
+      type: object
+      properties:
+        error:
+          type: string
+          example: "Unauthorized"
+    UserRolesRequest:
+      type: object
+      properties:
+        userId:
+          type: string
+          description: User identifier.
+          example: "user123"
+        allowedRoles:
+          type: array
+          items:
+            type: string
+          description: List of roles the user is allowed to have.
+          example:
+            - "ROLE_ADMIN"
+            - "ROLE_USER"
+    UserRolesResponse:
+      type: object
+      properties:
+        isAllowed:
+          type: boolean
+          description: Whether the user roles are valid or not.
+          example: true
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+          example: "userId, allowedRoles - missing"
+    ServiceSettingsResponse:
+      type: object
+      properties:
+        maxInputTry:
+          type: integer
+          description: Maximum number of input tries.
+          example: 4
+    ValidationMockResponse:
+      type: object
+      properties:
+        project:
+          type: string
+          description: Name of the project.
+          example: "Bürokratt"
+        website:
+          type: string
+          description: Website of the project.
+          example: "www.kratid.ee"
+    AddEntity:
+      type: object
+      properties:
+        entity:
+          type: string
+          description: Name of the entity to be added.
+          example: "testEntity"
+    DeleteEntity:
+      type: object
+      properties:
+        entity_name:
+          type: string
+          description: Name of the entity to be deleted.
+          example: "testEntity"
+    UpdateEntity:
+      type: object
+      properties:
+        entity_name:
+          type: string
+          description: Existing name of the entity to be updated.
+          example: "testEntity"
+        entity:
+          type: string
+          description: New entity data to update.
+          example: "newEntityData"
+        intent:
+          type: string
+          description: Intent associated with the entity.
+          example: "testIntent"
+    DeleteRegex:
+      type: object
+      properties:
+        regex_name:
+          type: string
+          description: The name of the regex to be deleted.
+          example: "testRegex"
+        example:
+          type: string
+          description: The example associated with the regex to be deleted.
+          example: "testExample"
+    RegexExample:
+      type: object
+      properties:
+        regex_name:
+          type: string
+          description: The name of the regex for which examples are to be retrieved.
+          example: "testRegex"
+        example:
+          type: string
+          description: The example associated with the regex to be retrieved.
+          example: "testExample"
+    RegexUpdate:
+      type: object
+      properties:
+        regex_name:
+          type: string
+          description: The name of the regex to be updated.
+          example: "testRegex"
+        input:
+          type: object
+          properties:
+            regex:
+              type: string
+              description: The new regex name.
+              example: "updatedRegex"
+            examples:
+              type: array
+              items:
+                type: string
+              description: The examples associated with the new regex.
+              example: [ "example1", "example2" ]
+    SensitiveProd:
+      type: object
+      properties:
+        api_key:
+          type: string
+          description: The API key for the production service.
+          example: "112218ssQQ212Prod"
+        username:
+          type: string
+          description: The username for the production service.
+          example: "User100"
+        password:
+          type: string
+          description: The password for the production service.
+          example: "pwd158"
+    SensitiveTest:
+      type: object
+      properties:
+        api_key:
+          type: string
+          description: The API key for the testing service.
+          example: "112218ssQQ212TEST"
+        username:
+          type: string
+          description: The username for the testing service.
+          example: "User20"
+        password:
+          type: string
+          description: The password for the testing service.
+          example: "pwd18"
+    Sensitive:
+      type: object
+      properties:
+        api_key:
+          type: string
+          description: The API key for the service.
+        username:
+          type: string
+          description: The username for the service.
+        password:
+          type: string
+          description: The password for the service.
+    Info:
+      type: object
+      properties:
+        url:
+          type: string
+          description: The URL of the service endpoint.
+          example: "https://httpbin.org/post"
+        user_id:
+          type: integer
+          description: The user ID for the service.
+          example: 10
+        headers:
+          type: object
+          properties:
+            token:
+              type: string
+              description: The token for the service.
+              example: "isdfbkajsdhkajsdhjsbckajsgdyasudhqwddasax"
+    EndpointInfo:
+      type: object
+      properties:
+        info:
+          $ref: '#/components/schemas/Info'
+        sensitive:
+          $ref: '#/components/schemas/Sensitive'
+      description: Combined schema for service endpoint information and its configurations.
+    EndpointRequest:
+      type: object
+      properties:
+        type:
+          type: string
+          description: The type of the service endpoint to execute. This can either be 'prod' or 'test'.
+          example: "prod"
+    ServiceData:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The name of the new service.
+        description:
+          type: string
+          description: The description of the new service.
+        type:
+          type: string
+          description: The type of the new service (GET or POST).
+        content:
+          type: object
+          description: The content for the new service.
+      required:
+        - name
+        - description
+        - type
+        - content
+    ServiceResponseAdded:
+      type: string
+      description: Response message when service is added successfully.
+    ErrorResponse:
+      type: string
+      description: Response message when there is an error or missing parameters.
+    ServiceDeleteData:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The ID of the service to be deleted.
+        type:
+          type: string
+          description: The type of the service to be deleted (GET or POST).
+      required:
+        - id
+        - type
+    ServiceResponseDeleted:
+      type: string
+      description: Response message when service is deleted successfully.
+    OpenApiSpecRequest:
+      type: object
+      properties:
+        url:
+          type: string
+          format: uri
+          description: The URL of the OpenAPI specification to be fetched.
+      required:
+        - url
+    StatusChange:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The ID of the service.
+        state:
+          type: string
+          description: The new status to be set for the service.
+        type:
+          type: string
+          description: The type of the service.
+      required:
+        - id
+        - state
+        - type
