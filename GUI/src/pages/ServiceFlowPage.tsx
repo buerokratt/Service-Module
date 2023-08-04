@@ -235,7 +235,7 @@ const ServiceFlowPage: FC = () => {
     try {
       getNestedPreDefinedRawVariables(JSON.parse(data.rawData?.value ?? "{}"), result);
       getNestedPreDefinedRawVariables(JSON.parse(data.rawData?.testValue ?? "{}"), result);
-    } catch (_) { }
+    } catch (_) {}
 
     return result;
   };
@@ -251,8 +251,11 @@ const ServiceFlowPage: FC = () => {
     return {
       call: `http.post`,
       args: {
-        url: `http://ruuter:8085/services/endpoints/${selectedEndpoint.methodType.toLowerCase()}-${serviceName}-${(endpoint.name.trim().length ?? 0) > 0 ? endpoint.name : endpoint.id
-          }?type=prod`,
+        url: `${
+          process.env.REACT_APP_API_URL
+        }/services/endpoints/${selectedEndpoint.methodType.toLowerCase()}-${serviceName}-${
+          (endpoint.name.trim().length ?? 0) > 0 ? endpoint.name : endpoint.id
+        }?type=prod`,
         body: {
           headers: `\${new Map([${getPreDefinedEndpointVariables(selectedEndpoint.headers)}])}`,
           body: `\${new Map([${getPreDefinedEndpointVariables(selectedEndpoint.body)}])}`,
@@ -403,20 +406,23 @@ const ServiceFlowPage: FC = () => {
     });
     steps.set("combine_step", {
       assign: {
-        sensitive: `\${new Map([${typeof headers === "string"
+        sensitive: `\${new Map([${
+          typeof headers === "string"
             ? `["headers", headers]`
             : `["headers", new Map([${Object.keys(headers ?? {}).map(
-              (h) => `["${h.replaceAll("__", ".")}", headers_${h}]`
-            )}])]`
-          }, ${typeof body === "string"
+                (h) => `["${h.replaceAll("__", ".")}", headers_${h}]`
+              )}])]`
+        }, ${
+          typeof body === "string"
             ? `["body", body]`
             : `["body", new Map([${Object.keys(body ?? {}).map((b) => `["${b.replaceAll("__", ".")}", body_${b}]`)}])]`
-          }, ${typeof params === "string"
+        }, ${
+          typeof params === "string"
             ? `["params", params]`
             : `["params", new Map([${Object.keys(params ?? {}).map(
-              (p) => `["${p.replaceAll("__", ".")}", params_${p}]`
-            )}])]`
-          }])}`,
+                (p) => `["${p.replaceAll("__", ".")}", params_${p}]`
+              )}])]`
+        }])}`,
       },
     });
     steps.set("return_value", { wrapper: false, return: "${sensitive}" });
@@ -427,8 +433,9 @@ const ServiceFlowPage: FC = () => {
         { result },
         {
           params: {
-            location: `/Ruuter/POST/services/endpoints/configs/${endpointName}-${env === EndpointEnv.Live ? "prod" : "test"
-              }-configs.yml`,
+            location: `/Ruuter/POST/services/endpoints/configs/${endpointName}-${
+              env === EndpointEnv.Live ? "prod" : "test"
+            }-configs.yml`,
           },
         }
       )
@@ -448,8 +455,9 @@ const ServiceFlowPage: FC = () => {
     steps.set("get-configs", {
       call: "http.post",
       args: {
-        url: `http://ruuter:8085/services/endpoints/configs/${endpointName}-${env === EndpointEnv.Live ? "prod" : "test"
-          }-configs`,
+        url: `${process.env.REACT_APP_API_URL}/services/endpoints/configs/${endpointName}-${
+          env === EndpointEnv.Live ? "prod" : "test"
+        }-configs`,
         body: {
           params: "${incoming.body.params}",
           headers: "${incoming.body.headers}",
@@ -469,8 +477,9 @@ const ServiceFlowPage: FC = () => {
         { result },
         {
           params: {
-            location: `/Ruuter/POST/services/endpoints/info/${endpointName}-${env === EndpointEnv.Live ? "prod" : "test"
-              }-info.yml`,
+            location: `/Ruuter/POST/services/endpoints/info/${endpointName}-${
+              env === EndpointEnv.Live ? "prod" : "test"
+            }-info.yml`,
           },
         }
       )
@@ -555,8 +564,9 @@ const ServiceFlowPage: FC = () => {
       const selectedEndpointType = endpoint.data.definedEndpoints.find((e) => e.isSelected);
       if (!selectedEndpointType) continue;
       console.log("e", selectedEndpointType, endpoint);
-      const endpointName = `${selectedEndpointType.methodType.toLowerCase()}-${serviceName}-${(endpoint.data.name.trim().length ?? 0) > 0 ? endpoint.data?.name : endpoint.data?.id
-        }`;
+      const endpointName = `${selectedEndpointType.methodType.toLowerCase()}-${serviceName}-${
+        (endpoint.data.name.trim().length ?? 0) > 0 ? endpoint.data?.name : endpoint.data?.id
+      }`;
       for (const env of [EndpointEnv.Live, EndpointEnv.Test]) {
         await saveEndpointInfo(selectedEndpointType, env, endpointName);
       }
@@ -578,7 +588,7 @@ const ServiceFlowPage: FC = () => {
       steps.set("get_prod_info", {
         call: "http.post",
         args: {
-          url: `http://ruuter:8085/services/endpoints/info/${endpointName}-prod-info`,
+          url: `${process.env.REACT_APP_API_URL}/services/endpoints/info/${endpointName}-prod-info`,
           body: {
             params: "${incoming.body.params ?? new Map()}",
             headers: "${incoming.body.headers ?? new Map()}",
@@ -591,7 +601,7 @@ const ServiceFlowPage: FC = () => {
       steps.set("get_test_info", {
         call: `http.post`,
         args: {
-          url: `http://ruuter:8085/services/endpoints/info/${endpointName}-test-info`,
+          url: `${process.env.REACT_APP_API_URL}/services/endpoints/info/${endpointName}-test-info`,
           body: {
             params: "${incoming.body.params ?? new Map()}",
             headers: "${incoming.body.headers ?? new Map()}",
@@ -685,7 +695,7 @@ const ServiceFlowPage: FC = () => {
     finishedFlow.set("get_secrets", {
       call: "http.get",
       args: {
-        url: "http://ruuter:8085/secrets-with-priority",
+        url: `${process.env.REACT_APP_API_URL}/secrets-with-priority`,
       },
       result: "secrets",
     });
@@ -727,8 +737,9 @@ const ServiceFlowPage: FC = () => {
                 return {
                   case:
                     matchingRule && !["Yes", "No"].includes(matchingRule?.condition)
-                      ? `\${${matchingRule.name.replace("{{", "").replace("}}", "")} ${matchingRule.condition} ${matchingRule.value
-                      }}`
+                      ? `\${${matchingRule.name.replace("{{", "").replace("}}", "")} ${matchingRule.condition} ${
+                          matchingRule.value
+                        }}`
                       : `\${${clientInput} == ${node.data.label === "rule 1" ? '"Yes"' : '"No"'}}`,
                   nextStep:
                     followingNode?.type === "customNode"
