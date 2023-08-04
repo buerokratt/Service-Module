@@ -16,8 +16,6 @@ This repo will primarily contain:
 
 - Clone [Ruuter](https://github.com/buerokratt/Ruuter)
 
-- For Apple Silicon, replace Ruuter's Dockerfile line and add platform specification FROM --platform=linux/amd64 openjdk:17-jdk-alpine
-
 - Ruuter has an unresolved issue with allowing cross-origin credentials to be sent, for now fix this by adding: .allowCredentials(true); to line 24 in CORSConfiguration.java
 
 - Navigate to Ruuter and build the image docker build -t ruuter .
@@ -129,7 +127,7 @@ RUN npm install
 ENTRYPOINT ["npm","start"]
 ```
 
-### Current dependencies problem
+### Current dependencies problem (Merged)
 
 In order for the whole application logic to work, you need to use these specific PRs to support certain functionality until they get merged into main.
 
