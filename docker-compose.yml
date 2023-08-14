@@ -1,4 +1,4 @@
-version: '3.9'
+version: "3.9"
 services:
   ruuter:
     container_name: ruuter
@@ -12,6 +12,7 @@ services:
       - application.DSL.processedFiletypes=.yml,.yaml,.tmp
     volumes:
       - ./DSL/Ruuter:/DSL
+      - ./constants.ini:/app/constants.ini
     ports:
       - 8085:8085
     networks:
@@ -145,7 +146,6 @@ services:
 
 volumes:
   opensearch-data1:
-
 
 networks:
   bykstack:
