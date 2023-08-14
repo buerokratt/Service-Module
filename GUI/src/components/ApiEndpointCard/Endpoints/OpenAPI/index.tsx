@@ -143,10 +143,10 @@ const EndpointOpenAPI: React.FC<EndpointOpenAPIProps> = ({
         required: param.required,
         description: param.description,
         in: param.in,
-        type: param.schema.type,
-        enum: param.schema.enum,
-        default: param.schema.default,
-        integerFormat: param.schema.integerFormat,
+        type: param.type,
+        enum: param.enum,
+        default: param.default,
+        format: param.format,
       };
     });
   };
@@ -154,8 +154,7 @@ const EndpointOpenAPI: React.FC<EndpointOpenAPIProps> = ({
   const fetchOpenApiSpecMock = async () => {
     const result = await axios.post(getOpenApiSpec(), { url: openApiUrl });
     const apiSpec = result.data.response;
-    console.log(apiSpec);
-    const url = new URL(openApiUrl).origin + apiSpec.servers[0].url;
+    const url = new URL(openApiUrl).origin + apiSpec.basePath;
     const paths: EndpointType[] = [];
 
     Object.entries(apiSpec.paths).forEach(([path, endpointData]) => {
@@ -178,7 +177,7 @@ const EndpointOpenAPI: React.FC<EndpointOpenAPIProps> = ({
         const body = getEndpointSchema(apiSpec, data.requestBody?.content["application/json"]?.schema);
         const params = getParams(data.parameters);
         const headers = undefined; // TODO find where to get headers
-        const response = getEndpointResponse(apiSpec, data.responses["200"]?.content["application/json"]?.schema);
+        const response = getEndpointResponse(apiSpec, data.responses["200"]);
 
         paths.push({
           id: uuid(),
@@ -212,7 +211,6 @@ const EndpointOpenAPI: React.FC<EndpointOpenAPIProps> = ({
         });
       });
     });
-
     setOpenApiEndpoints(paths);
     setEndpoints((prevEndpoints) => {
       prevEndpoints.map((prevEndpoint) => {
