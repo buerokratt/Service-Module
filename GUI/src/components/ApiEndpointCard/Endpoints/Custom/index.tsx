@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import { MdErrorOutline } from "react-icons/md";
 import { v4 as uuid } from "uuid";
 import { Button, FormInput, FormSelect, Icon, RequestVariables, Track } from "../../..";
-import { getEndpointValidationMock } from "../../../../resources/api-constants";
+import { getEndpointValidation } from "../../../../resources/api-constants";
 import { RequestTab } from "../../../../types";
 import {
   EndpointData,
@@ -158,9 +158,15 @@ const EndpointCustom: React.FC<EndpointCustomProps> = ({
               try {
                 new URL(endpoint.definedEndpoints[0].url ?? "");
                 if (endpoint.definedEndpoints[0].methodType === "GET") {
-                  await axios.get(getEndpointValidationMock());
+                  await axios.post(getEndpointValidation(), {
+                    url: endpoint.definedEndpoints[0].url ?? "",
+                    type: "GET",
+                  });
                 } else {
-                  await axios.post(getEndpointValidationMock());
+                  await axios.post(getEndpointValidation(), {
+                    url: endpoint.definedEndpoints[0].url ?? "",
+                    type: "POST",
+                  });
                 }
                 setUrlError(undefined);
                 setShowContent(true);
