@@ -5,7 +5,9 @@ import './Header.scss'
 const Header: FC = () => {
   return (
     <>
-      <header className="header"></header>
+      <header className="header">
+          <h2>Hello</h2>
+      </header>
     </>
   )
 }

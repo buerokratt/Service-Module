@@ -1,8 +1,10 @@
-import React, { FC, PropsWithChildren, ReactNode } from "react";
+import React, {FC, PropsWithChildren, ReactNode, useState} from "react";
 import { Outlet } from "react-router-dom";
 
-import { MainNavigation, Header } from "../../components";
+import { Header, MainNavigation } from '@exirain/header/src/index';
 import "./Layout.scss";
+import useUserInfoStore from "../../store/store";
+import {useQuery} from "@tanstack/react-query";
 
 type LayoutProps = {
   disableMenu?: boolean;
@@ -14,11 +16,36 @@ const Layout: FC<PropsWithChildren<LayoutProps>> = ({
   customHeader,
   children,
 }) => {
+  const CACHE_NAME = 'mainmenu-cache';
+
+  const [MainMenuItems, setMainMenuItems] = useState([])
+
+  const  {data, isLoading, status}  = useQuery({
+    queryKey: [import.meta.env.REACT_APP_MENU_PATH,import.meta.env.REACT_APP_MENU_URL],
+    onSuccess: (res: any) => {
+      try {
+        setMainMenuItems(res);
+        localStorage.setItem(CACHE_NAME, JSON.stringify(res));
+      } catch (e) {
+        console.log(e);
+      }
+    },
+    onError: (error: any) => {
+      setMainMenuItems(getCache());
+    }
+
+  });
+
+  function getCache(): any {
+    const cache = localStorage.getItem(CACHE_NAME) || '{}';
+    return JSON.parse(cache);
+  }
+
   return (
     <div className="layout">
-      {!disableMenu && <MainNavigation />}
+      {!disableMenu && <MainNavigation items={[]}/>}
       <div className="layout__wrapper">
-        {customHeader ?? <Header />}
+        {customHeader ?? <Header user={useUserInfoStore.getState()}/>}
         <main className="layout__main">{children ?? <Outlet />}</main>
       </div>
     </div>
