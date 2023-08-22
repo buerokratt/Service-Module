@@ -18,15 +18,15 @@ This repo will primarily contain:
 
 - Ruuter has an unresolved issue with allowing cross-origin credentials to be sent, for now fix this by adding: .allowCredentials(true); to line 24 in CORSConfiguration.java
 
-- Navigate to Ruuter and build the image docker build -t ruuter .
+- Navigate to Ruuter and build the image `docker build -t ruuter .`
 
 - Clone [Resql](https://github.com/buerokratt/Resql)
 
-- Navigate to Resql and build the image docker build -t resql .
+- Navigate to Resql and build the image `docker build -t resql .`
 
 - Clone [Data Mapper](https://github.com/buerokratt/DataMapper)
 
-- Navigate to Data Mapper and build the image docker build -t datamapper-node .
+- Navigate to Data Mapper and build the image `docker build -t datamapper-node .`
 
 - Clone [SiGA](https://github.com/open-eid/SiGa)
 
@@ -126,10 +126,3 @@ RUN npm i -g npm@latest
 RUN npm install
 ENTRYPOINT ["npm","start"]
 ```
-
-### Current dependencies problem (Merged)
-
-In order for the whole application logic to work, you need to use these specific PRs to support certain functionality until they get merged into main.
-
-- Using pre defined config secrets depends on this [Datamapper PR](https://github.com/buerokratt/DataMapper/pull/11). Secrets under `secrets/` directory are mock data which can be replaced using volumes in docker compose
-- Testing the service flow using .tmp files depends on this [Ruuter PR](https://github.com/buerokratt/Ruuter/pull/153)

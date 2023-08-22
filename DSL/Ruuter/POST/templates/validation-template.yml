@@ -1,10 +1,32 @@
 assign_step:
   assign:
     res: ${incoming.body.response}
+    type: ${incoming.body.type}
+  next: check_for_type
+
+check_for_type:
+  switch:
+    - condition: ${type.toLowerCase() === 'get'}
+      next: validate_get_request
+  next: validate_post_request
+
+validate_get_request:
+  call: http.get
+  args:
+    url: ${res}
+  result: results
+  next: validate_status_code
+
+validate_post_request:
+  call: http.post
+  args:
+    url: ${res}
+  result: results
+  next: validate_status_code
 
 validate_status_code:
   switch:
-    - condition: ${res != null && res.statusCodeValue >= 200 && res.statusCodeValue < 300}
+    - condition: ${200 <= results.response.statusCodeValue && results.response.statusCodeValue < 300}
       next: return_true
   next: return_false
 

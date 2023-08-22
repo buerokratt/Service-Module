@@ -75,6 +75,7 @@ const ApiEndpointCard: FC<EndpointCardProps> = ({ onDelete, onNameChange, setEnd
                   placeholder={t("global.choose") ?? ""}
                   onSelectionChange={(selection) => {
                     setOption(selection);
+                    endpoint.definedEndpoints = [];
                     setEndpoints((prevEndpoints) => {
                       prevEndpoints.map((prevEndpoint) => {
                         if (prevEndpoint.id !== endpoint.id) return prevEndpoint;
