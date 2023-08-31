@@ -21,7 +21,7 @@ const Layout: FC<PropsWithChildren<LayoutProps>> = ({
   const [MainMenuItems, setMainMenuItems] = useState([])
 
   const  {data, isLoading, status}  = useQuery({
-    queryKey: [import.meta.env.REACT_APP_MENU_PATH,import.meta.env.REACT_APP_MENU_URL],
+    queryKey: [import.meta.env.REACT_APP_MENU_URL + import.meta.env.REACT_APP_MENU_PATH],
     onSuccess: (res: any) => {
       try {
         setMainMenuItems(res);
@@ -43,9 +43,14 @@ const Layout: FC<PropsWithChildren<LayoutProps>> = ({
 
   return (
     <div className="layout">
-      {!disableMenu && <MainNavigation items={[]}/>}
+      {!disableMenu && <MainNavigation items={MainMenuItems}/>}
       <div className="layout__wrapper">
-        {customHeader ?? <Header user={useUserInfoStore.getState()}/>}
+        {customHeader ?? <Header
+            baseUrlV2={import.meta.env.REACT_APP_RUUTER_V2_PRIVATE_API_URL}
+            baseUrl={import.meta.env.REACT_APP_RUUTER_V1_PRIVATE_API_URL}
+            analticsUrl={import.meta.env.REACT_APP_RUUTER_V2_SERVICE_API_URL}
+            user={useUserInfoStore.getState()}
+        />}
         <main className="layout__main">{children ?? <Outlet />}</main>
       </div>
     </div>

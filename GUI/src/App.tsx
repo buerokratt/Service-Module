@@ -11,8 +11,9 @@ import {UserInfo} from "./types/userInfo";
 const App: React.FC = () => {
     const store = useUserInfoStore();
     const { data: userInfo } = useQuery<UserInfo>({
-        queryKey: ['cs-custom-jwt-userinfo'],
-        onSuccess: (data) => store.setUserInfo(data),
+        queryKey: [import.meta.env.REACT_APP_AUTH_PATH, 'auth'],
+        onSuccess: (data: { data: { custom_jwt_userinfo: UserInfo } }) =>
+            store.setUserInfo(data.data.custom_jwt_userinfo),
     });
 
   return (
