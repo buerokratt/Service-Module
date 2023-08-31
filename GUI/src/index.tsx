@@ -14,7 +14,7 @@ import * as mocks from "./services/mockHandlers";
 mocks
 
 const defaultQueryFn: QueryFunction | undefined = async ({ queryKey }) => {
-    if (import.meta.env.REACT_APP_LOCAL === 'true') {
+    if (import.meta.env.REACT_APP_LOCAL === 'true' && (queryKey[0].includes('cs') || queryKey[0].includes('auth'))) {
         const { data } = await mockApi.get(queryKey[0] as string);
         return data;
     }

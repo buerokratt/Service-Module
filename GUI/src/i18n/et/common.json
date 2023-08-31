@@ -61,6 +61,12 @@
     "settings": "Seaded",
     "faultyServices": "Probleemsed teenused"
   },
+  "mainMenu": {
+    "menuLabel": "Põhinavigatsioon",
+    "closeMenu": "Kitsendan menüü",
+    "openMenuIcon": "Ava menüü ikoon",
+    "closeMenuIcon": "Sulge menüü ikoon"
+  },
   "intents": {
     "entities": "Üksused",
     "regex": "Regex",

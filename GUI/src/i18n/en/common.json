@@ -61,6 +61,12 @@
     "entities": "Entities",
     "settings": "Settings"
   },
+  "mainMenu": {
+    "menuLabel": "Main navigation",
+    "closeMenu": "Close menu",
+    "openIcon": "Open menu icon",
+    "closeIcon": "Close menu icon"
+  },
   "intents": {
     "entities": "Entities",
     "regex": "Regex",
