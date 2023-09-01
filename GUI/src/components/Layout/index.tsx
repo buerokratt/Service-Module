@@ -43,7 +43,7 @@ const Layout: FC<PropsWithChildren<LayoutProps>> = ({
 
   return (
     <div className="layout">
-      {!disableMenu && <MainNavigation items={MainMenuItems}/>}
+      {!disableMenu && <MainNavigation baseUrl={import.meta.env.REACT_APP_MENU_BASE_URL} items={MainMenuItems}/>}
       <div className="layout__wrapper">
         {customHeader ?? <Header
             baseUrlV2={import.meta.env.REACT_APP_RUUTER_V2_PRIVATE_API_URL}
