@@ -21,6 +21,7 @@ import RasaRulesContent from "./RasaRulesContent";
 import { ConditionRuleType, StepType } from "../../types";
 import "./styles.scss";
 import { PreDefinedEndpointEnvVariables } from "../../types/endpoint";
+import ApiContent from "./ApiContent";
 
 interface FlowElementsPopupProps {
   node: any;
@@ -125,6 +126,7 @@ const FlowElementsPopup: React.FC<FlowElementsPopupProps> = ({
           <Button
             appearance="text"
             onClick={async () => {
+              console.log(node);
               await fetchExplainRequestJson();
               setIsJsonRequestVisible(!isJsonRequestVisible);
             }}
@@ -158,7 +160,7 @@ const FlowElementsPopup: React.FC<FlowElementsPopupProps> = ({
         >
           <Tabs.List>
             <Tabs.Trigger className="vertical-tabs__trigger" value={t("serviceFlow.tabs.setup")}>
-              {t("serviceFlow.tabs.setup")}
+              {stepType === StepType.UserDefined ? t("serviceFlow.tabs.information") : t("serviceFlow.tabs.setup")}
             </Tabs.Trigger>
             {!isReadonly && (
               <Tabs.Trigger className="vertical-tabs__trigger" value={t("serviceFlow.tabs.test")}>
@@ -178,6 +180,8 @@ const FlowElementsPopup: React.FC<FlowElementsPopupProps> = ({
                 }}
               />
             )}
+
+            {stepType === StepType.UserDefined && <ApiContent endpoint={node.data} />}
             {stepType === StepType.OpenWebpage && (
               <OpenWebPageContent
                 onWebpageNameChange={setWebpageName}

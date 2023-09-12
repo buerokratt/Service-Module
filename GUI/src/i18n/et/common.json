@@ -153,7 +153,8 @@
       "fileSign": "Kas soovid faili allkirjastada?",
       "fileSignYesNo": "Kas soovid faili allkirjastada? Jah/Ei",
       "serviceEnded": "Teenus on lõpetatud",
-      "rule": "Reegel"
+      "rule": "Reegel",
+      "endpointInformation": "Lõpp-punkti teave"
     },
     "flow": "Teenusvoog",
     "placeholderNode": "Lohista järgmine samm voogu",
@@ -161,7 +162,8 @@
     "setupElements": "Seadistatud elemendid",
     "tabs": {
       "setup": "Seadistamine",
-      "test": "Testimine"
+      "test": "Testimine",
+      "information": "Teave"
     },
     "rule": "Reegel"
   },

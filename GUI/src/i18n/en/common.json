@@ -153,7 +153,8 @@
       "fileSign": "Do you want to sign this file?",
       "fileSignYesNo": "Do you want to sign this file? Yes/No",
       "serviceEnded": "Service ended",
-      "rule": "Rule"
+      "rule": "Rule",
+      "endpointInformation": "Endpoint Information"
     },
     "flow": "Service flow",
     "placeholderNode": "Drag the next step into the flow",
@@ -161,7 +162,8 @@
     "setupElements": "Setup elements",
     "tabs": {
       "setup": "Setup",
-      "test": "Test"
+      "test": "Test",
+      "information": "Information"
     },
     "rule": "Rule"
   },
