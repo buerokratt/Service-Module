@@ -14,6 +14,7 @@ import './styles/main.scss'
 const RootComponent: React.FC = () => {
   return (
     <Routes>
+      <Route index element={<Navigate to={ROUTES.OVERVIEW_ROUTE} />} />
       <Route path={ROUTES.NEWSERVICE_ROUTE} element={<NewServicePage />} />
       <Route path={ROUTES.NEWSERVICE_ROUTE_WITH_INTENT_NAME} element={<NewServicePage />} />
       <Route path={ROUTES.FLOW_ROUTE} element={<ServiceFlowPage />} />
@@ -25,8 +26,8 @@ const RootComponent: React.FC = () => {
         <Route path={ROUTES.SERVICE_SETTINGS} element={<ServiceSettingPage />} />
         <Route path={ROUTES.FAULTY_SERVICES_ROUTE} element={<FaultyServicesPage />} />
         <Route path="*" element={<NotFoundPage />} />
-      </Route >
-    </Routes >
+      </Route>
+    </Routes>
   );
 };
 
