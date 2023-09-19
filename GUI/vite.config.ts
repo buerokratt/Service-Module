@@ -11,7 +11,7 @@ export default ({ mode }) => {
   return defineConfig({
     envPrefix: 'REACT_APP_',
     plugins: [react(), tsconfigPaths(), svgr()],
-    base: '/service',
+    base: '/services/',
     server: {
       watch: {
         usePolling: true,

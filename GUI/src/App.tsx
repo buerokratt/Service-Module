@@ -18,7 +18,7 @@ const App: React.FC = () => {
 
   return (
     <Provider store={reducer}>
-      <BrowserRouter basename={'/'}>
+      <BrowserRouter basename={import.meta.env.BASE_URL}>
         <ToastProvider>
           <RootComponent />
         </ToastProvider>
