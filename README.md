@@ -14,6 +14,8 @@ This repo will primarily contain:
 
 ## Dev setup
 
+- Make sure that env variable REACT_APP_LOCAL is set to true(default).
+
 - Clone [Ruuter](https://github.com/buerokratt/Ruuter)
 
 - Ruuter has an unresolved issue with allowing cross-origin credentials to be sent, for now fix this by adding: .allowCredentials(true); to line 24 in CORSConfiguration.java

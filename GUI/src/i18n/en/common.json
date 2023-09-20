@@ -1,5 +1,39 @@
 {
   "global": {
+    "add": "Add",
+    "modifiedAt": "Last modified at",
+    "addNew": "Add new",
+    "dependencies": "Dependencies",
+    "language": "Language",
+    "search": "Search",
+    "notificationError": "Error",
+    "active": "Active",
+    "activate": "Activate",
+    "deactivate": "Deactivate",
+    "on": "On",
+    "off": "Off",
+    "back": "Back",
+    "from": "From",
+    "to": "To",
+    "name": "Name",
+    "idCode": "ID code",
+    "status": "Status",
+    "statusChangeQuestion": "Would you like to change your status to \"present\"?",
+    "yes": "Yes",
+    "no": "No",
+    "removeValidation": "Are you sure?",
+    "startDate": "Start date",
+    "endDate": "End date",
+    "preview": "Preview",
+    "logout": "Logout",
+    "anonymous": "Anonymous",
+    "csaStatus": "Customer support status",
+    "present": "Present",
+    "away": "Away",
+    "today": "Today",
+    "forward": "Forward",
+    "chosen": "Chosen",
+    "read": "Read",
     "title": "Service Module",
     "services": "Services",
     "backhome": "Back to homepage",
@@ -27,6 +61,12 @@
     "entities": "Entities",
     "settings": "Settings"
   },
+  "mainMenu": {
+    "menuLabel": "Main navigation",
+    "closeMenu": "Close menu",
+    "openIcon": "Open menu icon",
+    "closeIcon": "Close menu icon"
+  },
   "intents": {
     "entities": "Entities",
     "regex": "Regex",
@@ -47,7 +87,30 @@
   },
   "settings": {
     "title": "Settings",
-    "maxUserInputTryCount": "Handle user input try count"
+    "maxUserInputTryCount": "Handle user input try count",
+    "users": {
+      "title": "Users",
+      "name": "Name",
+      "idCode": "ID code",
+      "role": "Role",
+      "displayName": "Display Name",
+      "userTitle": "User title",
+      "email": "E-mail",
+      "addUser": "Add user",
+      "editUser": "Edit user",
+      "deleteUser": "Delete user",
+      "fullName": "First- and lastname",
+      "userRoles": "User role(s)",
+      "autoCorrector": "Auto corrector",
+      "emailNotifications": "Notifications to e-mail",
+      "soundNotifications": "Sound notifications",
+      "popupNotifications": "Popup notifications",
+      "newUnansweredChat": "New unanswered chat",
+      "newForwardedChat": "New forwarded chat",
+      "useAutocorrect": "Text auto corrector",
+      "required": "Required",
+      "invalidemail": "Invalid email"
+    }
   },
   "overview": {
     "services": "Services",
@@ -172,5 +235,17 @@
     "view": "View",
     "log": "Log",
     "environment": "Environment"
+  },
+  "chat": {
+    "forwarder": "Forwarded",
+    "unanswered": "Unanswered"
+  },
+  "roles": {
+    "ROLE_ADMINISTRATOR": "Administrator",
+    "ROLE_SERVICE_MANAGER": "Service manager",
+    "ROLE_CUSTOMER_SUPPORT_AGENT": "Customer support",
+    "ROLE_CHATBOT_TRAINER": "Chatbot trainer",
+    "ROLE_ANALYST": "Analyst",
+    "ROLE_UNAUTHENTICATED": "Unauthenticated"
   }
 }

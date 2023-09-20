@@ -1,5 +1,39 @@
 {
   "global": {
+    "add": "Lisa",
+    "modifiedAt": "Viimati muudetud",
+    "addNew": "Lisa uus",
+    "dependencies": "Sõltuvused",
+    "language": "Keel",
+    "search": "Otsi",
+    "notificationError": "Veateade",
+    "active": "Aktiivne",
+    "activate": "Aktiveeri",
+    "deactivate": "Deaktiveeri",
+    "on": "Sees",
+    "off": "Väljas",
+    "back": "Tagasi",
+    "from": "Alates",
+    "to": "Kuni",
+    "name": "Nimi",
+    "idCode": "Isikukood",
+    "status": "Staatus",
+    "statusChangeQuestion": "Kas soovid muuta staatuseks \"kohal\"?",
+    "yes": "Jah",
+    "no": "Ei",
+    "removeValidation": "Oled sa kindel?",
+    "startDate": "Algus kuupäev",
+    "endDate": "Lõpp kuupäev",
+    "preview": "Eelvaade",
+    "logout": "Logi välja",
+    "anonymous": "Anonüümne",
+    "csaStatus": "Klienditeenindaja",
+    "present": "Kohal",
+    "away": "Eemal",
+    "today": "Täna",
+    "forward": "Suuna",
+    "chosen": "Valitud",
+    "read": "Loetud",
     "title": "Teenused",
     "services": "Teenused",
     "backhome": "Tagasi avalehele",
@@ -27,6 +61,12 @@
     "settings": "Seaded",
     "faultyServices": "Probleemsed teenused"
   },
+  "mainMenu": {
+    "menuLabel": "Põhinavigatsioon",
+    "closeMenu": "Kitsendan menüü",
+    "openMenuIcon": "Ava menüü ikoon",
+    "closeMenuIcon": "Sulge menüü ikoon"
+  },
   "intents": {
     "entities": "Üksused",
     "regex": "Regex",
@@ -47,7 +87,30 @@
   },
   "settings": {
     "title": "Seaded",
-    "maxUserInputTryCount": "Käsitsege kasutaja sisestatud proovide arvu"
+    "maxUserInputTryCount": "Käsitsege kasutaja sisestatud proovide arvu",
+    "users": {
+      "title": "Kasutajad",
+      "name": "Nimi",
+      "idCode": "Isikukood",
+      "role": "Roll",
+      "displayName": "Kuvatav nimi",
+      "userTitle": "Tiitel",
+      "email": "E-post",
+      "addUser": "Lisa kasutaja",
+      "editUser": "Muuda kasutajat",
+      "deleteUser": "Kustuta kasutaja",
+      "fullName": "Ees- ja perekonnanimi",
+      "userRoles": "Kasutaja roll(id)",
+      "autoCorrector": "Autokorrektor",
+      "emailNotifications": "Märguanded e-postile",
+      "soundNotifications": "Häälmärguanded",
+      "popupNotifications": "Pop-up märguanded",
+      "newUnansweredChat": "Uus vastamata vestlus",
+      "newForwardedChat": "Uus suunatud vestlus",
+      "useAutocorrect": "Teksti autokorrektor",
+      "required": "Nõutud",
+      "invalidemail": "Kehtetu e-posti"
+    }
   },
   "overview": {
     "services": "Teenused",
@@ -172,5 +235,17 @@
     "view": "Vaata",
     "log": "Logi",
     "environment": "Keskkond"
+  },
+  "roles": {
+    "ROLE_ADMINISTRATOR": "Administraator",
+    "ROLE_SERVICE_MANAGER": "Teenuse haldur",
+    "ROLE_CUSTOMER_SUPPORT_AGENT": "Nõustaja",
+    "ROLE_CHATBOT_TRAINER": "Vestlusroboti treener",
+    "ROLE_ANALYST": "Analüütik",
+    "ROLE_UNAUTHENTICATED": "Autentimata"
+  },
+  "chat": {
+    "unanswered": "Vastamata",
+    "forwarded": "Suunatud"
   }
 }

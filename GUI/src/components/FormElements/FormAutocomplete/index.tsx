@@ -26,8 +26,8 @@ const FormAutocomplete: FC<FormAutocompleteProps> = ({
   const [isHideSuggestions, setIsHideSuggestions] = useState(shouldHideSuggestions);
   const [selectedVal, setSelectedVal] = useState(value ?? "");
 
-  const onKeyUpHandler = (e: BaseSyntheticEvent<KeyboardEvent>) => {
-    const value: string = e.target.value;
+  const onKeyUpHandler = (e: BaseSyntheticEvent<KeyboardEvent> | null) => {
+    const value: string = e?.target.value ?? "";
     const newSuggestions = data.filter((item: string) =>
       item
         .toLocaleLowerCase()
@@ -56,6 +56,9 @@ const FormAutocomplete: FC<FormAutocompleteProps> = ({
         <input
           placeholder={placeholder}
           value={selectedVal}
+          onFocus={() => {
+            onKeyUpHandler(null);
+          }}
           onChange={(e) => {
             if (onChange) onChange(e.target.value);
             onChangeHandler(e);
