@@ -40,6 +40,7 @@ type FlowBuilderProps = {
   onEdgesChange: OnEdgesChange;
   reactFlowInstance?: ReactFlowInstance;
   setReactFlowInstance: Dispatch<SetStateAction<ReactFlowInstance | undefined>>;
+  description: string;
 };
 
 const FlowBuilder: FC<FlowBuilderProps> = ({
@@ -53,6 +54,7 @@ const FlowBuilder: FC<FlowBuilderProps> = ({
   onEdgesChange,
   reactFlowInstance,
   setReactFlowInstance,
+  description,
 }) => {
   const { t } = useTranslation();
 
@@ -672,7 +674,7 @@ const FlowBuilder: FC<FlowBuilderProps> = ({
   );
 
   return (
-    <div className="graph__body" ref={reactFlowWrapper}>
+    <div className={description.length > 0 ? "graph__bodyWithDescription" : "graph__body"} ref={reactFlowWrapper}>
       <ReactFlow
         nodes={nodes}
         edges={edges}

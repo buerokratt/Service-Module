@@ -869,9 +869,21 @@ const ServiceFlowPage: FC = () => {
         isTestButtonVisible={isTestButtonVisible}
         onTestButtonClick={runServiceTest}
       />
-      <h1 style={{ padding: 16 }}>
+      <h1 style={{ paddingLeft: 16, paddingTop: 16 }}>
         {t("serviceFlow.flow")} "{serviceName}"
       </h1>
+      <h5
+        style={{
+          paddingLeft: 16,
+          paddingBottom: 5,
+          wordBreak: "break-all",
+          textOverflow: "ellipsis",
+          overflow: "hidden",
+          whiteSpace: "nowrap",
+        }}
+      >
+        {serviceDescription}
+      </h5>
       <FlowElementsPopup
         availableVariables={availableVariables}
         onClose={() => handlePopupClose()}
@@ -939,6 +951,7 @@ const ServiceFlowPage: FC = () => {
             setReactFlowInstance={setReactFlowInstance}
             onNodeEdit={setSelectedNode}
             updatedRules={updatedRules}
+            description={serviceDescription}
             nodes={nodes}
             setNodes={setNodes}
             onNodesChange={onNodesChange}
