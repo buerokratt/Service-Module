@@ -1,8 +1,10 @@
 import { Dispatch, FC, SetStateAction, useCallback, useEffect, useRef, useState } from "react";
 import ReactFlow, {
   Background,
+  Controls,
   Edge,
   MarkerType,
+  MiniMap,
   Node,
   NodeChange,
   NodeDimensionChange,
@@ -682,8 +684,7 @@ const FlowBuilder: FC<FlowBuilderProps> = ({
         snapToGrid
         snapGrid={[GRID_UNIT, GRID_UNIT]}
         defaultViewport={{ x: 38 * GRID_UNIT, y: 3 * GRID_UNIT, zoom: 0 }}
-        minZoom={1}
-        maxZoom={1}
+        panOnScroll
         nodeTypes={nodeTypes}
         onInit={setReactFlowInstance}
         onDragOver={onDragOver}
@@ -713,6 +714,8 @@ const FlowBuilder: FC<FlowBuilderProps> = ({
           );
         }}
       >
+        <Controls />
+        <MiniMap />
         <Background color="#D2D3D8" gap={16} lineWidth={2} />
       </ReactFlow>
     </div>
