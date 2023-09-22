@@ -12,3 +12,4 @@
 **/build
 **/.eslintcache
 **/npm-debug.log*
+/.idea/
