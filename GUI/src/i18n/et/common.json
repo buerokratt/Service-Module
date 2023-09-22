@@ -113,7 +113,11 @@
     "serviceFlowCreation": "Teenusvoo loomine",
     "name": "Nimetus",
     "description": "Kirjeldus",
-    "uses": "Teenus kasutab"
+    "uses": "Teenus kasutab",
+    "toast": {
+      "serviceMissingFields": "Nõutav on teenuse nimi ja kirjeldus",
+      "missingFields": "Puuduvad väljad"
+    }
   },
   "serviceFlow": {
     "element": {

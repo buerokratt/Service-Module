@@ -113,7 +113,11 @@
     "serviceFlowCreation": "Service flow creation",
     "name": "Name",
     "description": "Description",
-    "uses": "Service uses"
+    "uses": "Service uses",
+    "toast": {
+      "serviceMissingFields": "Service name and description are required",
+      "missingFields": "Missing Fields"
+    }
   },
   "serviceFlow": {
     "element": {

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { Button, Card, FormInput, ApiEndpointCard, FormTextarea, Layout, NewServiceHeader, Track } from "../components";
@@ -8,6 +8,7 @@ import { Node } from "reactflow";
 import axios from "axios";
 import { getSecretVariables, getTaraAuthResponseVariables } from "../resources/api-constants";
 import { EndpointData, PreDefinedEndpointEnvVariables } from "../types/endpoint";
+import { ToastContext } from "../components/Toast/ToastContext";
 
 const NewServicePage: React.FC = () => {
   const { t } = useTranslation();
@@ -22,6 +23,7 @@ const NewServicePage: React.FC = () => {
     setEndpoints((prevEndpoints) => prevEndpoints.filter((prevEndpoint) => prevEndpoint.id !== id));
   };
   const [availableVariables, setAvailableVariables] = useState<PreDefinedEndpointEnvVariables>({ prod: [], test: [] });
+  const toast = useContext(ToastContext);
 
   useEffect(() => {
     const nodes: Node[] | undefined = location.state?.flow ? JSON.parse(location.state?.flow)?.nodes : undefined;
@@ -74,14 +76,22 @@ const NewServicePage: React.FC = () => {
   };
 
   const saveDraft = () => {
-    console.log(
-      endpoints.map((endpoint) => {
-        return {
-          ...endpoint,
-          selectedEndpoint: endpoint.definedEndpoints.find((definedEndpoint) => definedEndpoint.isSelected),
-        };
-      })
-    );
+    if (serviceName && description) {
+      console.log(
+        endpoints.map((endpoint) => {
+          return {
+            ...endpoint,
+            selectedEndpoint: endpoint.definedEndpoints.find((definedEndpoint) => definedEndpoint.isSelected),
+          };
+        })
+      );
+    } else {
+      toast.open({
+        type: "error",
+        title: t("newService.toast.missingFields"),
+        message: t("newService.toast.serviceMissingFields"),
+      });
+    }
   };
 
   const getSelectedEndpoints = () => {
@@ -127,16 +137,24 @@ const NewServicePage: React.FC = () => {
           serviceDescription={description}
           serviceName={serviceName}
           continueOnClick={() => {
-            navigate(ROUTES.FLOW_ROUTE, {
-              state: {
-                endpoints,
-                secrets,
-                serviceName,
-                availableVariables: availableVariables,
-                flow: location.state?.flow,
-                serviceDescription: description,
-              },
-            });
+            if (serviceName && description) {
+              navigate(ROUTES.FLOW_ROUTE, {
+                state: {
+                  endpoints,
+                  secrets,
+                  serviceName,
+                  availableVariables: availableVariables,
+                  flow: location.state?.flow,
+                  serviceDescription: description,
+                },
+              });
+            } else {
+              toast.open({
+                type: "error",
+                title: t("newService.toast.missingFields"),
+                message: t("newService.toast.serviceMissingFields"),
+              });
+            }
           }}
         />
       }
