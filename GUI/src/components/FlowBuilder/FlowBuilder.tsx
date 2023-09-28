@@ -64,6 +64,7 @@ const FlowBuilder: FC<FlowBuilderProps> = ({
 
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
   const [clickedNode, setClickedNode] = useState();
+  const startDragNode = useRef<Node | undefined>(undefined);
   const nodePositionOffset = 28 * GRID_UNIT;
   const updateNodeInternals = useUpdateNodeInternals();
 
@@ -265,6 +266,16 @@ const FlowBuilder: FC<FlowBuilderProps> = ({
     [edges, nodes]
   );
 
+  const onNodeDragStart = useCallback(
+    (_: any, draggedNode: Node) => {
+      if (!reactFlowInstance || !reactFlowWrapper.current) return;
+      startDragNode.current = draggedNode;
+      // setStartDragNode((draggedNode) => [...startDragNode, ...draggedNode]);
+
+    },
+    [reactFlowInstance, edges]
+  );
+
   // Dragging existing node onto placeholder
   const onNodeDragStop = useCallback(
     (event: any, draggedNode: Node) => {
@@ -275,6 +286,21 @@ const FlowBuilder: FC<FlowBuilderProps> = ({
         x: event.clientX - reactFlowBounds.left,
         y: event.clientY - reactFlowBounds.top,
       });
+      
+      if (reactFlowInstance.getIntersectingNodes(draggedNode).length > 0) {
+        if (startDragNode.current != undefined) {
+        setNodes((prevNodes) =>
+          prevNodes
+            .map((node) => {
+              if (node.id !== draggedNode.id) return node;
+              node.position.x = startDragNode.current?.position.x ?? 0;
+              node.position.y = startDragNode.current?.position.y ?? 0;
+              return node;
+            })
+        );
+       }
+      }
+
       const matchingPlaceholder = reactFlowInstance.getNodes().find((node) => {
         if (node.type !== "placeholder") return false;
         return (
@@ -315,6 +341,7 @@ const FlowBuilder: FC<FlowBuilderProps> = ({
           }),
         ];
       });
+      startDragNode.current = undefined;
     },
     [reactFlowInstance, edges]
   );
@@ -699,6 +726,7 @@ const FlowBuilder: FC<FlowBuilderProps> = ({
         onDrop={onDrop}
         onNodeDrag={onNodeDrag}
         onNodeDragStop={onNodeDragStop}
+        onNodeDragStart={onNodeDragStart}
         onNodeMouseEnter={(_, node) => {
           setNodes((prevNodes) =>
             prevNodes.map((prevNode) => {
