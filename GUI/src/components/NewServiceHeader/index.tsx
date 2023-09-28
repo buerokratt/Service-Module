@@ -14,6 +14,7 @@ type NewServiceHeaderProps = {
   secrets?: { [key: string]: any };
   serviceName?: string;
   serviceDescription?: string;
+  isSaveButtonEnabled?: boolean;
   isTestButtonVisible?: boolean;
   onTestButtonClick?: () => void;
 };
@@ -28,6 +29,7 @@ const NewServiceHeader: FC<NewServiceHeaderProps> = ({
   secrets,
   serviceDescription,
   serviceName,
+  isSaveButtonEnabled = true,
   isTestButtonVisible = false,
   onTestButtonClick,
 }) => {
@@ -45,7 +47,7 @@ const NewServiceHeader: FC<NewServiceHeaderProps> = ({
             serviceDescription={serviceDescription}
             serviceName={serviceName}
           />
-          <Button onClick={saveDraftOnClick} appearance="secondary">
+          <Button onClick={saveDraftOnClick} appearance="secondary" disabled={!isSaveButtonEnabled}>
             {t("newService.saveDraft")}
           </Button>
           <Button onClick={continueOnClick} disabled={activeStep === 3 && !isTestButtonVisible ? true : false}>
