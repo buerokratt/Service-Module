@@ -671,6 +671,7 @@ const ServiceFlowPage: FC = () => {
   const saveFlow = async () => {
     console.log(nodes);
     console.log(edges);
+    try {
     await saveEndpoints();
     const allRelations: any[] = [];
     // find regular edges 1 -> 1
@@ -678,6 +679,24 @@ const ServiceFlowPage: FC = () => {
       const node = nodes.find((node) => node.id === edge.source);
       const followingNode = nodes.find((node) => node.id === edge.target);
       if (!node) return;
+      if (node.data.stepType === StepType.Textfield && node.data.message === undefined) {
+        throw new Error(t('toast.missing-textfield-message') ?? 'Error');
+      }
+      if (
+        node.data.stepType === StepType.OpenWebpage &&
+        (node.data.link === undefined ||
+        node.data.linkText === undefined)
+      ) {
+        throw new Error(t("toast.missing-website") ?? "Error");
+      }
+
+      if (
+        node.data.stepType === StepType.FileGenerate &&
+        (node.data.fileName === undefined || node.data.fileContent === undefined)
+      ) {
+        throw new Error(t("toast.missing-file-generation") ?? "Error");
+      }
+      
       if (node.data.stepType === StepType.Input || followingNode?.type === "placeholder") {
         if (!allRelations.includes(node.id)) allRelations.push(node.id);
         return;
@@ -712,6 +731,10 @@ const ServiceFlowPage: FC = () => {
       const childNode = nodes.find((node) => node.id === childNodeId);
       const parentStepName = `${parentNode.data.stepType}-${parentNodeId}`;
       if (parentNode.data.stepType === StepType.Input) {
+        if (parentNode.data.rules === undefined) {
+          throw new Error(t("toast.missing-client_input-rules") ?? "Error");
+        }
+
         const clientInput = `ClientInput_${parentNode.data.clientInputId}`;
         const clientInputName = `${clientInput}-step`;
         finishedFlow.set(parentStepName, getTemplate(parentNode, clientInputName, `${clientInput}-assign`));
@@ -779,6 +802,13 @@ const ServiceFlowPage: FC = () => {
       .catch((e) => {
         console.log(e);
       });
+    } catch (e: any) {
+      toast.open({
+        type: "error",
+        title: t("toast.cannot-save-flow"),
+        message: e?.message ?? "",
+      });
+    }
   };
 
   useEffect(() => {

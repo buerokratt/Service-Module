@@ -176,5 +176,12 @@
     "view": "View",
     "log": "Log",
     "environment": "Environment"
+  },
+  "toast": {
+    "cannot-save-flow": "Cannot Save Flow",
+    "missing-textfield-message": "Please enter missing message",
+    "missing-website": "Please enter website title and link",
+    "missing-file-generation": "Please enter file name and content",
+    "missing-client_input-rules": "Please enter client input rules"
   }
 }

@@ -176,5 +176,12 @@
     "view": "Vaata",
     "log": "Logi",
     "environment": "Keskkond"
+  },
+  "toast": {
+    "cannot-save-flow": "Voogu ei saa salvestada",
+    "missing-textfield-message": "Palun sisestage puuduv sõnum",
+    "missing-website": "Sisestage veebisaidi pealkiri ja link",
+    "missing-file-generation": "Sisestage faili nimi ja sisu",
+    "missing-client_input-rules": "Sisestage kliendi sisestusreeglid"
   }
 }
