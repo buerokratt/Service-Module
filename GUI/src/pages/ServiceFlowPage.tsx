@@ -120,6 +120,8 @@ const ServiceFlowPage: FC = () => {
   };
   const [nodes, setNodes, onNodesChange] = useNodesState(flow ? resetNodes() : initialNodes);
   const [isTestButtonVisible, setIsTestButtonVisible] = useState(false);
+  const [isTestButtonEnabled, setIsTestButtonEnabled] = useState(true);
+
 
   const getTemplateDataFromNode = (
     node: Node
@@ -798,6 +800,7 @@ const ServiceFlowPage: FC = () => {
       .then((r) => {
         console.log(r);
         setIsTestButtonVisible(true);
+        setIsTestButtonEnabled(true);
       })
       .catch((e) => {
         console.log(e);
@@ -839,14 +842,25 @@ const ServiceFlowPage: FC = () => {
   const contentStyle: CSSProperties = { overflowY: "auto", maxHeight: "40vh" };
 
   const handlePopupClose = () => resetStates();
+  const onNodeDelete = () => setIsTestButtonEnabled(false);
+  const onNodeAdded = () => setIsTestButtonEnabled(false);
 
   const handlePopupSave = (updatedNode: Node<NodeDataProps>) => {
     resetStates();
     if (selectedNode?.data.stepType === StepType.FinishingStepEnd) return;
 
-    setNodes((prevNodes) =>
+    setNodes((prevNodes) => 
       prevNodes.map((prevNode) => {
         if (prevNode.id !== selectedNode!.id) return prevNode;
+        if (
+          prevNode.data.message != updatedNode.data.message ||
+          prevNode.data.link != updatedNode.data.link ||
+          prevNode.data.linkText != updatedNode.data.linkText ||
+          prevNode.data.fileName != updatedNode.data.fileName ||
+          prevNode.data.fileContent != updatedNode.data.fileContent
+        ) {
+          setIsTestButtonEnabled(false);
+        };
         return {
           ...prevNode,
           data: {
@@ -897,6 +911,7 @@ const ServiceFlowPage: FC = () => {
         secrets={secrets}
         continueOnClick={() => navigate(ROUTES.OVERVIEW_ROUTE)}
         isTestButtonVisible={isTestButtonVisible}
+        isTestButtonEnabled={isTestButtonEnabled}
         onTestButtonClick={runServiceTest}
       />
       <h1 style={{ paddingLeft: 16, paddingTop: 16 }}>
@@ -988,6 +1003,8 @@ const ServiceFlowPage: FC = () => {
             edges={edges}
             setEdges={setEdges}
             onEdgesChange={onEdgesChange}
+            onNodeAdded={onNodeAdded}
+            onNodeDelete={onNodeDelete}
           />
         </div>
       </ReactFlowProvider>

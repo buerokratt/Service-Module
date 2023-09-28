@@ -35,6 +35,8 @@ type FlowBuilderProps = {
   nodes: Node[];
   setNodes: Dispatch<SetStateAction<Node[]>>;
   onNodesChange: OnNodesChange;
+  onNodeAdded: () => void;
+  onNodeDelete: () => void;
   edges: Edge[];
   setEdges: Dispatch<SetStateAction<Edge[]>>;
   onEdgesChange: OnEdgesChange;
@@ -52,6 +54,8 @@ const FlowBuilder: FC<FlowBuilderProps> = ({
   edges,
   setEdges,
   onEdgesChange,
+  onNodeAdded,
+  onNodeDelete,
   reactFlowInstance,
   setReactFlowInstance,
   description,
@@ -428,6 +432,7 @@ const FlowBuilder: FC<FlowBuilderProps> = ({
 
         return newNodes;
       });
+      onNodeAdded();
     },
     [reactFlowInstance, nodes, edges]
   );
@@ -548,6 +553,7 @@ const FlowBuilder: FC<FlowBuilderProps> = ({
         );
         return prevEdges;
       });
+      onNodeDelete();
     },
     [reactFlowInstance, nodes, edges]
   );

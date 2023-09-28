@@ -16,6 +16,7 @@ type NewServiceHeaderProps = {
   serviceDescription?: string;
   isSaveButtonEnabled?: boolean;
   isTestButtonVisible?: boolean;
+  isTestButtonEnabled?: boolean;
   onTestButtonClick?: () => void;
 };
 
@@ -31,6 +32,7 @@ const NewServiceHeader: FC<NewServiceHeaderProps> = ({
   serviceName,
   isSaveButtonEnabled = true,
   isTestButtonVisible = false,
+  isTestButtonEnabled = true,
   onTestButtonClick,
 }) => {
   return (
@@ -53,7 +55,11 @@ const NewServiceHeader: FC<NewServiceHeaderProps> = ({
           <Button onClick={continueOnClick} disabled={activeStep === 3 && !isTestButtonVisible ? true : false}>
             {t("global.continue")}
           </Button>
-          {isTestButtonVisible && <Button onClick={onTestButtonClick}>{t("global.testService")}</Button>}
+          {isTestButtonVisible && (
+            <Button onClick={onTestButtonClick} disabled={!isTestButtonEnabled}>
+              {t("global.testService")}
+            </Button>
+          )}
         </Track>
       </header>
     </>
