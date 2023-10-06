@@ -1,6 +1,6 @@
 
-const baseUrl = process.env.REACT_APP_API_URL;
-const trainingModuleBaseUrl = process.env.REACT_APP_TRAINING_MODULE_GUI_BASE_URL;
+const baseUrl = import.meta.env.REACT_APP_API_URL;
+const trainingModuleBaseUrl = import.meta.env.REACT_APP_TRAINING_MODULE_GUI_BASE_URL;
 
 export const dummyDataApi = (): string => {
   return baseUrl + "/testing";

@@ -1,7 +1,7 @@
 import axios, { AxiosError } from 'axios';
 
 const instance = axios.create({
-  baseURL: process.env.REACT_APP_API_URL + '/',
+  baseURL: import.meta.env.REACT_APP_BASE_API_PATH,
   headers: {
     Accept: 'application/json',
     'Content-Type': 'application/json',

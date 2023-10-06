@@ -14,6 +14,8 @@ This repo will primarily contain:
 
 ## Dev setup
 
+- Make sure that env variable REACT_APP_LOCAL is set to true(default).
+
 - Clone [Ruuter](https://github.com/buerokratt/Ruuter)
 
 - Ruuter has an unresolved issue with allowing cross-origin credentials to be sent, for now fix this by adding: .allowCredentials(true); to line 24 in CORSConfiguration.java
@@ -54,6 +56,18 @@ This repo will primarily contain:
 - Training Module `.env` file includes REACT_APP_SERVICE_MODULE_GUI_BASE_URL
 - In Training Module run: `docker-compose up -d`
   - Training module uses the same network as Service Module
+
+### Use external header component.
+
+The external header component and its version is defined in the package.json file located inside GUI folder.
+That line must be updated when header version or location changes.
+```  
+ "@exirain/header": "file:exirain-header-0.0.21.tgz"
+```
+Current solution uses the module from packed file. This means that when building docker image, a line to the docker script needs to be added for copying the file.
+``` 
+COPY ./exirain-header-0.0.21.tgz .
+```
 
 ### Database setup
 

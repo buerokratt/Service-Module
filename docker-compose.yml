@@ -4,7 +4,7 @@ services:
     container_name: ruuter
     image: ruuter
     environment:
-      - application.cors.allowedOrigins=http://localhost:3006, http://localhost:3001
+      - application.cors.allowedOrigins=http://localhost:3006,http://localhost:3001,http://localhost:8085
       - application.httpCodesAllowList=200,201,202,203,204,205,206,207,208,226
       - application.logging.displayRequestContent=true
       - application.logging.displayResponseContent=true
@@ -109,6 +109,17 @@ services:
       - REACT_APP_API_URL=http://localhost:8085
       - REACT_APP_TRAINING_MODULE_GUI_BASE_URL=http://localhost:3001
       - PORT=3006
+      - REACT_APP_APP_PORT=3006
+      - REACT_APP_MENU_BASE_URL=http://localhost:8085
+      - REACT_APP_MENU_URL=https://admin.dev.buerokratt.ee
+      - REACT_APP_RUUTER_V1_PRIVATE_API_URL=http://localhost:8085
+      - REACT_APP_RUUTER_V2_PRIVATE_API_URL=http://localhost:8085
+      - REACT_APP_RUUTER_V2_SERVICE_API_URL=http://localhost:8085
+      - REACT_APP_AUTH_BASE_URL=http://localhost:8085
+      - REACT_APP_AUTH_PATH=/auth
+      - REACT_APP_MENU_PATH=/chat/menu.json
+      - REACT_APP_API_PATH=/
+      - REACT_APP_LOCAL=true
     build:
       context: ./GUI
       dockerfile: Dockerfile.dev
