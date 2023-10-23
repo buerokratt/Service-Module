@@ -12,6 +12,9 @@ export default ({ mode }) => {
     envPrefix: 'REACT_APP_',
     plugins: [react(), tsconfigPaths(), svgr()],
     base: '/services/',
+    define: {
+      "process.env": process.env
+    },
     server: {
       watch: {
         usePolling: true,
