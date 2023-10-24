@@ -5,7 +5,7 @@ ENV PORT=3001
 
 WORKDIR /app
 COPY ./package.json .
-COPY ./exirain-header-0.0.21.tgz .
+COPY ./exirain-header-0.0.22.tgz .
 RUN npm install --legacy-peer-deps
 
 COPY . .
