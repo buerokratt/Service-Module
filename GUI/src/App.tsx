@@ -10,13 +10,22 @@ import {UserInfo} from "./types/userInfo";
 
 const App: React.FC = () => {
     const store = useUserInfoStore();
-    const { data: userInfo } = useQuery<UserInfo>({
-        queryKey: [import.meta.env.REACT_APP_AUTH_PATH, 'auth'],
-        onSuccess: (data: { data: { custom_jwt_userinfo: UserInfo } }) =>
-            store.setUserInfo(data.data.custom_jwt_userinfo),
-    });
+    if(import.meta.env.REACT_APP_LOCAL === 'true') {
 
-  return (
+        const { data } = useQuery<UserInfo>({
+            queryKey: ['cs-custom-jwt-userinfo', 'prod'],
+            onSuccess: (res: any) => store.setUserInfo(res)
+        })
+    } else {
+        const { data: userInfo } = useQuery<UserInfo>({
+            queryKey: [import.meta.env.REACT_APP_AUTH_PATH, 'auth'],
+            onSuccess: (data: { data: { custom_jwt_userinfo: UserInfo } }) =>
+                store.setUserInfo(data.data.custom_jwt_userinfo),
+        });
+    }
+
+
+    return (
     <Provider store={reducer}>
       <BrowserRouter basename={import.meta.env.BASE_URL}>
         <ToastProvider>
