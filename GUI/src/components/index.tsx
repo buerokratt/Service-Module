@@ -19,7 +19,6 @@ import {
   SwitchBox,
 } from "./FormElements";
 import Toast from "./Toast";
-import Header from "./Header";
 import HeaderStep from "./HeaderStepCounter/HeaderStep";
 import HeaderStepCounter from "./HeaderStepCounter";
 import Icon from "./Icon";
@@ -64,7 +63,6 @@ export {
   FormRichText,
   HeaderStep,
   HeaderStepCounter,
-  Header,
   Icon,
   Label,
   Layout,
