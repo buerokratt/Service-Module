@@ -24,7 +24,6 @@ import HeaderStepCounter from "./HeaderStepCounter";
 import Icon from "./Icon";
 import Label from "./Label";
 import Layout from "./Layout";
-import MainNavigation from "./MainNavigation";
 import Modal from "./Modal";
 import NewServiceHeader from "./NewServiceHeader";
 import Popover from "./Popover";
@@ -66,7 +65,6 @@ export {
   Icon,
   Label,
   Layout,
-  MainNavigation,
   Modal,
   NewServiceHeader,
   OutputElementBox,

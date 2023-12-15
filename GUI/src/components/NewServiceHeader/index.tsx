@@ -2,7 +2,7 @@ import { t } from "i18next";
 import React, { FC } from "react";
 import { Button, HeaderStepCounter, Track } from "..";
 import { EndpointData, PreDefinedEndpointEnvVariables } from "../../types/endpoint";
-import "../Header/Header.scss";
+import "@buerokratt-ria/header/src/header/Header.scss";
 
 type NewServiceHeaderProps = {
   activeStep: number;
