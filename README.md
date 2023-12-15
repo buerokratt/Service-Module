@@ -63,7 +63,6 @@ This repo will primarily contain:
 - In Training Module run: `docker-compose up -d`
   - Training module uses the same network as Service Module
 
-### Use external components(Header and Main Navigation).
 
 Currently, Header and Main Navigation used as external components, they are defined as dependency in package.json
 
