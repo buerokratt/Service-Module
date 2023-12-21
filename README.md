@@ -28,7 +28,7 @@ This repo will primarily contain:
 
 - Clone [Data Mapper](https://github.com/buerokratt/DataMapper)
 
-- Navigate to Data Mapper and build the image `docker build -t datamapper-node .`
+- Navigate to Data Mapper and build the image `docker build -t data-mapper .`
 
 - Clone [TIM](https://github.com/buerokratt/TIM)
 
@@ -63,10 +63,9 @@ This repo will primarily contain:
 - In Training Module run: `docker-compose up -d`
   - Training module uses the same network as Service Module
 
-
 Currently, Header and Main Navigation used as external components, they are defined as dependency in package.json
 
-```  
+```
  "@buerokrat-ria/header": "^0.0.1"
  "@buerokrat-ria/menu": "^0.0.1"
  "@buerokrat-ria/styles": "^0.0.1"
@@ -143,10 +142,12 @@ RUN npm i -g npm@latest
 RUN npm install
 ENTRYPOINT ["npm","start"]
 ```
+
 ### TIM
 
 - if you are running `Locally` then you need to curl the login request or run it on postman first to create and store the cookie in TIM and then on the browser create the cookie manully in the browser with name `customJwtCookie` and the value return from the curl
-the curl request is as follows:
+  the curl request is as follows:
+
 ```
 curl -X POST -H "Content-Type: application/json" -d '{
   "login": "EE30303039914",
