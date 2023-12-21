@@ -1,13 +1,13 @@
 getRegexes:
   call: http.get
   args:
-    url: "[#SERVICE_OPENSEARCH]:[#SERVICE_OPENSEARCH_PORT]/regexes/_search?size=10000"
+    url: "[#SERVICE_OPENSEARCH]/regexes/_search?size=10000"
   result: getRegexesResult
 
 mapRegexesData:
   call: http.post
   args:
-    url: "[#SERVICE_DMAPPER]:[#SERVICE_DMAPPER_PORT]/hbs/services/get-regexes"
+    url: "[#SERVICE_DMAPPER]/hbs/services/get-regexes"
     headers:
       type: "json"
     body:

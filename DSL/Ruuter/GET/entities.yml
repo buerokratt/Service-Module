@@ -1,13 +1,13 @@
 getEntities:
   call: http.get
   args:
-    url: "[#SERVICE_OPENSEARCH]:[#SERVICE_OPENSEARCH_PORT]/entities/_search?size=10000"
+    url: "[#SERVICE_OPENSEARCH]/entities/_search?size=10000"
   result: getEntitiesResult
   
 mapEntitiesData:
   call: http.post
   args:
-    url: "[#SERVICE_DMAPPER]:[#SERVICE_DMAPPER_PORT]/hbs/services/get-entities"
+    url: "[#SERVICE_DMAPPER]/hbs/services/get-entities"
     headers:
       type: 'json'
     body:

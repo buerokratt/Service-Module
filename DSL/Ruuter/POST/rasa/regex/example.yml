@@ -5,13 +5,13 @@ assign_values:
 getFileLocations:
   call: http.get
   args:
-    url: "[#TRAINING_RUUTER]:[#TRAINING_RUUTER_PORT]/return-file-locations"
+    url: "[#TRAINING_RUUTER]/return-file-locations"
   result: fileLocations
 
 getRegexFile:
   call: http.post
   args:
-    url: "[#TRAINING_NODE]:[#TRAINING_NODE_PORT]/file/read"
+    url: "[#TRAINING_NODE]/file/read"
     body:
       file_path: ${fileLocations.response.body.response.regex_location}
   result: regexFile
@@ -19,7 +19,7 @@ getRegexFile:
 convertYamlToJson:
   call: http.post
   args:
-    url: "[#TRAINING_NODE]:[#TRAINING_NODE_PORT]/convert/yaml-to-json"
+    url: "[#TRAINING_NODE]/convert/yaml-to-json"
     body:
       file: ${regexFile.response.body.file}
   result: regexData
@@ -27,7 +27,7 @@ convertYamlToJson:
 mapRegexesData:
   call: http.post
   args:
-    url: "[#TRAINING_NODE]:[#TRAINING_NODE_PORT]/dmapper/get-regex-with-regex"
+    url: "[#TRAINING_NODE]/dmapper/get-regex-with-regex"
     body:
       regexes: ${regexData.response.body.nlu}
       regex_name: ${parameters.regex_name}
@@ -36,7 +36,7 @@ mapRegexesData:
 replaceJsonString:
   call: http.post
   args:
-    url: "[#TRAINING_NODE]:[#TRAINING_NODE_PORT]/convert/string/replace"
+    url: "[#TRAINING_NODE]/convert/string/replace"
     body:
       data: ${regexesData.response.body.examples}
       search: "&quot;"
@@ -46,7 +46,7 @@ replaceJsonString:
 replaceString:
   call: http.post
   args:
-    url: "[#TRAINING_NODE]:[#TRAINING_NODE_PORT]/convert/string/replace"
+    url: "[#TRAINING_NODE]/convert/string/replace"
     body:
       data: ${replacedJsonString.response.body}
       search: "- "
@@ -56,7 +56,7 @@ replaceString:
 splitExamples:
   call: http.post
   args:
-    url: "[#TRAINING_NODE]:[#TRAINING_NODE_PORT]/convert/string/split"
+    url: "[#TRAINING_NODE]/convert/string/split"
     body:
       data: ${replacedString.response.body}
       separator: "\n"
@@ -65,7 +65,7 @@ splitExamples:
 mapExamples:
   call: http.post
   args:
-    url: "[#TRAINING_NODE]:[#TRAINING_NODE_PORT]/dmapper/get-regex-with-example"
+    url: "[#TRAINING_NODE]/dmapper/get-regex-with-example"
     body:
       examples: ${splitExamples.response.body}
       example_name: ${parameters.example}

@@ -7,7 +7,7 @@ check_for_required_parameters:
 get_csv:
   call: http.post
   args:
-    url: "[#SERVICE_DMAPPER]:[#SERVICE_DMAPPER_PORT]/hbs/services/get-csv"
+    url: "[#SERVICE_DMAPPER]/hbs/services/get-csv"
     headers:
       type: 'csv'
     body:

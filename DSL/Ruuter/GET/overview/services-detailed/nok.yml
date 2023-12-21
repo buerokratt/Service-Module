@@ -1,13 +1,13 @@
 getFaults:
   call: http.get
   args:
-    url: "[#SERVICE_OPENSEARCH]:[#SERVICE_OPENSEARCH_PORT]/faults/_search?size=10000"
+    url: "[#SERVICE_OPENSEARCH]/faults/_search?size=10000"
   result: getFaultsResult
 
 mapFaultsData:
   call: http.post
   args:
-    url: "[#SERVICE_DMAPPER]:[#SERVICE_DMAPPER_PORT]/hbs/services/get-faults"
+    url: "[#SERVICE_DMAPPER]/hbs/services/get-faults"
     headers:
       type: 'json'
     body:

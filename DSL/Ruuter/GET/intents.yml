@@ -1,13 +1,13 @@
 getIntents:
   call: http.get
   args:
-    url: "[#SERVICE_OPENSEARCH]:[#SERVICE_OPENSEARCH_PORT]/intents/_search?size=10000"
+    url: "[#SERVICE_OPENSEARCH]/intents/_search?size=10000"
   result: getIntentsResult
 
 mapIntentsData:
   call: http.post
   args:
-    url: "[#SERVICE_DMAPPER]:[#SERVICE_DMAPPER_PORT]/hbs/services/get-intents"
+    url: "[#SERVICE_DMAPPER]/hbs/services/get-intents"
     headers:
       type: 'json'
     body:

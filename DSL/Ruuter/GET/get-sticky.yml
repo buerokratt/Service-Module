@@ -7,7 +7,7 @@ check_for_parameters:
 get_single_sticky_service:
   call: http.post
   args:
-    url: "[#SERVICE_NODE]:[#SERVICE_NODE_PORT]/ruuter/sticky/steps"
+    url: "[#SERVICE_NODE]/ruuter/sticky/steps"
     query:
       name: ${incoming.params.name}
   result: results
@@ -16,7 +16,7 @@ get_single_sticky_service:
 get_all_sticky_services:
   call: http.get
   args:
-    url: "[#SERVICE_NODE]:[#SERVICE_NODE_PORT]/ruuter/sticky"
+    url: "[#SERVICE_NODE]/ruuter/sticky"
   result: results
   next: return_ok
 

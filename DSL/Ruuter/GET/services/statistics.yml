@@ -1,7 +1,7 @@
 get_services_stat:
   call: http.post
   args:
-    url: "[#SERVICE_OPENSEARCH]:[#SERVICE_OPENSEARCH_PORT]/services/_search/template"
+    url: "[#SERVICE_OPENSEARCH]/services/_search/template"
     body:
       id: 'get-services-stat'
   result: results

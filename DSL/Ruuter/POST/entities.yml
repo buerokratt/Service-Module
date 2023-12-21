@@ -5,7 +5,7 @@ assign_values:
 getEntitiesWithName:
   call: http.post
   args:
-    url: "[#SERVICE_OPENSEARCH]:[#SERVICE_OPENSEARCH_PORT]/entities/_search/template"
+    url: "[#SERVICE_OPENSEARCH]/entities/_search/template"
     body:
       id: "entity-with-name"
       params: ${params}
@@ -14,7 +14,7 @@ getEntitiesWithName:
 mapEntitiesData:
   call: http.post
   args:
-    url: "[#SERVICE_DMAPPER]:[#SERVICE_DMAPPER_PORT]/hbs/services/get-entity-with-name"
+    url: "[#SERVICE_DMAPPER]/hbs/services/get-entity-with-name"
     headers:
       type: 'json'
     body:

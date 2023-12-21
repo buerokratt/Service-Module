@@ -15,7 +15,7 @@ check_for_required_parameters:
 get_current_status:
   call: http.post
   args:
-    url: "[#SERVICE_RESQL]:[#SERVICE_RESQL_PORT]/status"
+    url: "[#SERVICE_RESQL]/status"
     body:
       id: ${id}
   result: status_res
@@ -36,7 +36,7 @@ check_status:
 set_status:
   call: http.post
   args:
-    url: "[#SERVICE_RESQL]:[#SERVICE_RESQL_PORT]/set-status"
+    url: "[#SERVICE_RESQL]/set-status"
     body:
       id: ${id}
       new_state: ${new_state}
@@ -46,7 +46,7 @@ set_status:
 get_status_name:
   call: http.post
   args:
-    url: "[#SERVICE_RESQL]:[#SERVICE_RESQL_PORT]/get-service-name-by-id"
+    url: "[#SERVICE_RESQL]/get-service-name-by-id"
     body:
       id: ${id}
   result: name_res
@@ -61,7 +61,7 @@ assign_values:
 check_file_exists:
   call: http.post
   args:
-    url: "[#SERVICE_NODE]:[#SERVICE_NODE_PORT]/file/check"
+    url: "[#SERVICE_NODE]/file/check"
     body:
       file_path: "/Ruuter/${ruuter_type}/services/${old_file_status_path}/${name + old_file_end}"
   result: service_file_exists_result
@@ -82,7 +82,7 @@ check_for_status:
 activate_service:
   call: http.post
   args:
-    url: "[#SERVICE_NODE]:[#SERVICE_NODE_PORT]/file/move"
+    url: "[#SERVICE_NODE]/file/move"
     body:
       current_path: "/Ruuter/${ruuter_type}/services/${old_file_status_path}/${name + old_file_end}"
       new_path: "/Ruuter/${ruuter_type}/services/active/${name}.yml"
@@ -91,7 +91,7 @@ activate_service:
 check_intent_file_exists:
   call: http.post
   args:
-    url: "[#SERVICE_NODE]:[#SERVICE_NODE_PORT]/file/check"
+    url: "[#SERVICE_NODE]/file/check"
     body:
       file_path: "/mock1/data/nlu/removed/${service_name}_nlu.tmp"
   result: intent_file_exists_result
@@ -106,7 +106,7 @@ validate_intent_file_exists:
 activate_intent_file:
   call: http.post
   args:
-    url: "[#SERVICE_NODE]:[#SERVICE_NODE_PORT]/file/move"
+    url: "[#SERVICE_NODE]/file/move"
     body:
       current_path: "/mock1/data/nlu/removed/${service_name}_nlu.tmp"
       new_path: "/mock1/data/nlu/${service_name}_nlu.yml"
@@ -115,13 +115,13 @@ activate_intent_file:
 getFileLocations:
   call: http.get
   args:
-    url: "[#SERVICE_DOCKER_INT]:[#SERVICE_DOCKER_INT_PORT]/return-file-locations"
+    url: "[#SERVICE_DOCKER_INT]/return-file-locations"
   result: fileLocations
 
 getDomainFile:
   call: http.get
   args:
-    url: "[#SERVICE_DOCKER_INT]:[#SERVICE_DOCKER_INT_PORT]/domain-file"
+    url: "[#SERVICE_DOCKER_INT]/domain-file"
     headers:
       cookie: ""
   result: domainData
@@ -129,7 +129,7 @@ getDomainFile:
 mergeIntents:
   call: http.post
   args:
-    url: "[#TRAINING_NODE]:[#TRAINING_NODE_PORT]/merge"
+    url: "[#TRAINING_NODE]/merge"
     body:
       array1: ${[service_name]}
       array2: ${domainData.response.body.response.intents}
@@ -138,7 +138,7 @@ mergeIntents:
 convertDomainJsonToYaml:
   call: http.post
   args:
-    url: "[#TRAINING_NODE]:[#TRAINING_NODE_PORT]/convert/json-to-yaml"
+    url: "[#TRAINING_NODE]/convert/json-to-yaml"
     body:
       version: ${domainData.response.body.response.version}
       intents: ${mergedIntents.response.body}
@@ -153,7 +153,7 @@ convertDomainJsonToYaml:
 saveDomainFile:
   call: http.post
   args:
-    url: "[#TRAINING_NODE]:[#TRAINING_NODE_PORT]/file/write"
+    url: "[#TRAINING_NODE]/file/write"
     body:
       file_path: ${fileLocations.response.body.response.domain_location}
       content: ${domainYaml.response.body.json}
@@ -163,7 +163,7 @@ saveDomainFile:
 add_rule:
   call: http.post
   args:
-    url: "[#TRAINING_RUUTER]:[#TRAINING_RUUTER_PORT]/rasa/rules/add"
+    url: "[#TRAINING_RUUTER]/rasa/rules/add"
     headers:
       cookie: ""
     body:
@@ -175,7 +175,7 @@ add_rule:
 deactivate_service:
   call: http.post
   args:
-    url: "[#SERVICE_NODE]:[#SERVICE_NODE_PORT]/file/move"
+    url: "[#SERVICE_NODE]/file/move"
     body:
       current_path: "/Ruuter/${ruuter_type}/services/${old_file_status_path}/${name + old_file_end}"
       new_path: "/Ruuter/${ruuter_type}/services/inactive/${name}.tmp"
@@ -185,7 +185,7 @@ deactivate_service:
 delete_rule:
   call: http.post
   args:
-    url: "[#TRAINING_RUUTER]:[#TRAINING_RUUTER_PORT]/rasa/rules/delete"
+    url: "[#TRAINING_RUUTER]/rasa/rules/delete"
     headers:
       cookie: ""
     body:
@@ -196,7 +196,7 @@ delete_rule:
 delete_intent:
   call: http.post
   args:
-    url: "[#TRAINING_RUUTER]:[#TRAINING_RUUTER_PORT]/rasa/intents/delete"
+    url: "[#TRAINING_RUUTER]/rasa/intents/delete"
     headers:
       cookie: ""
     body:
@@ -207,7 +207,7 @@ delete_intent:
 check_if_intent_file_exists:
   call: http.post
   args:
-    url: "[#SERVICE_NODE]:[#SERVICE_NODE_PORT]/file/check"
+    url: "[#SERVICE_NODE]/file/check"
     body:
       file_path: "/mock1/data/nlu/${service_name + '_nlu' + old_file_end}"
   result: intent_file_exists_res
@@ -222,7 +222,7 @@ validate_if_intent_file_exists:
 rename_intent_to_tmp:
   call: http.post
   args:
-    url: "[#SERVICE_NODE]:[#SERVICE_NODE_PORT]/file/move"
+    url: "[#SERVICE_NODE]/file/move"
     body:
       current_path: "/mock1/data/nlu/${service_name + '_nlu' + old_file_end}"
       new_path: "/mock1/data/nlu/removed/${service_name}_nlu.tmp"

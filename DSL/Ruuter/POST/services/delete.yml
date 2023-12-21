@@ -13,7 +13,7 @@ extract_request_data:
 get_status_name:
   call: http.post
   args:
-    url: "[#SERVICE_RESQL]:[#SERVICE_RESQL_PORT]/get-service-name-by-id"
+    url: "[#SERVICE_RESQL]/get-service-name-by-id"
     body:
       id: ${id}
   result: name_res
@@ -22,7 +22,7 @@ get_status_name:
 get_current_status:
   call: http.post
   args:
-    url: "[#SERVICE_RESQL]:[#SERVICE_RESQL_PORT]/status"
+    url: "[#SERVICE_RESQL]/status"
     body:
       id: ${id}
   result: status_res
@@ -42,7 +42,7 @@ assign_old_path:
 delete_service:
   call: http.post
   args:
-    url: "[#SERVICE_RESQL]:[#SERVICE_RESQL_PORT]/delete-service"
+    url: "[#SERVICE_RESQL]/delete-service"
     body:
       id: ${id}
   result: res
@@ -51,7 +51,7 @@ delete_service:
 check_service_file_exists:
   call: http.post
   args:
-    url: "[#SERVICE_NODE]:[#SERVICE_NODE_PORT]/file/check"
+    url: "[#SERVICE_NODE]/file/check"
     body:
       file_path: "/Ruuter/${ruuter_type}/services/${old_file_status_path}/${name_res.response.body[0].name}.tmp"
   result: service_file_exists
@@ -66,7 +66,7 @@ validate_service_file_exists:
 delete_deactivated_service:
   call: http.post
   args:
-    url: "[#SERVICE_NODE]:[#SERVICE_NODE_PORT]/file/delete"
+    url: "[#SERVICE_NODE]/file/delete"
     body:
       path: "/Ruuter/${ruuter_type}/services/${old_file_status_path}/${name_res.response.body[0].name}.tmp"
   result: results
@@ -81,7 +81,7 @@ check_result:
 delete_response:
   call: http.post
   args:
-    url: "[#TRAINING_RUUTER]:[#TRAINING_RUUTER_PORT]/rasa/responses/delete"
+    url: "[#TRAINING_RUUTER]/rasa/responses/delete"
     headers:
       cookie: ""
     body:
@@ -92,7 +92,7 @@ delete_response:
 check_intent_file_exists:
   call: http.post
   args:
-    url: "[#SERVICE_NODE]:[#SERVICE_NODE_PORT]/file/check"
+    url: "[#SERVICE_NODE]/file/check"
     body:
       file_path: "/mock1/data/nlu/removed/service_${name_res.response.body[0].name}_nlu.tmp"
   result: intent_file_exists_result
@@ -107,7 +107,7 @@ validate_intent_file_exists:
 delete_intent:
   call: http.post
   args:
-    url: "[#SERVICE_NODE]:[#SERVICE_NODE_PORT]/file/delete"
+    url: "[#SERVICE_NODE]/file/delete"
     body:
       path: "/mock1/data/nlu/removed/service_${name_res.response.body[0].name}_nlu.tmp"
   result: delete_intent_result

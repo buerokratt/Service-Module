@@ -1,7 +1,7 @@
 get_services_list:
   call: http.post
   args:
-    url: "[#SERVICE_RESQL]:[#SERVICE_RESQL_PORT]/get-active-services-list"
+    url: "[#SERVICE_RESQL]/get-active-services-list"
   result: results
 
 return_ok:
