@@ -121,8 +121,8 @@ const NewServicePage: React.FC = () => {
       const selectedEndpointType = endpoint.data.definedEndpoints.find((e) => e.isSelected);
       if (!selectedEndpointType) continue;
       console.log("e", selectedEndpointType, endpoint);
-      const endpointName = `${selectedEndpointType.methodType.toLowerCase()}-${serviceName}-${
-        (endpoint.data.name.trim().length ?? 0) > 0 ? endpoint.data?.name : endpoint.data?.id
+      const endpointName = `${serviceName.replaceAll(" ", "_")}-${
+        (endpoint.data.name.trim().length ?? 0) > 0 ? endpoint.data?.name.replaceAll(" ", "_") : endpoint.data?.id
       }`;
       for (const env of [EndpointEnv.Live, EndpointEnv.Test]) {
         await saveEndpointInfo(selectedEndpointType, env, endpointName);
@@ -213,7 +213,7 @@ const NewServicePage: React.FC = () => {
           { result },
           {
             params: {
-              location: `/Ruuter/POST/services/endpoints/${endpointName}.yml`,
+              location: `/Ruuter/${selectedEndpointType.methodType.toUpperCase()}/services/endpoints/${endpointName}.yml`,
             },
           }
         )
