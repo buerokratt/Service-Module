@@ -624,6 +624,7 @@ const NewServicePage: React.FC = () => {
                   onLabel={t("global.yes").toString()}
                   offLabel={t("global.no").toString()}
                   value={isCommon}
+                  checked={isCommon}
                   onCheckedChange={(e) => setIsCommon(e)}
                 />
               </Track>
