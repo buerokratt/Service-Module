@@ -114,6 +114,7 @@
   },
   "overview": {
     "services": "Services",
+    "commonServices": "Common Services",
     "create": "Create new service",
     "edit": "Edit",
     "delete": "Delete",
@@ -150,6 +151,7 @@
   "newService": {
     "endpoints": "Endpoints",
     "test": "Test URL",
+    "isCommon": "Common Service",
     "endpoint": {
       "add": "+ Add API endpoint",
       "addTestEnv": "+ Add test environment",

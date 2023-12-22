@@ -109,6 +109,7 @@ const ServiceFlowPage: FC = () => {
   const serviceName = (location.state?.serviceName ?? "").replaceAll(" ", "-");
   const serviceId = location.state?.serviceId ?? uuid();
   const serviceDescription = location.state?.serviceDescription;
+  const isCommon = location.state?.isCommon;
   const secrets: PreDefinedEndpointEnvVariables | undefined = location.state?.secrets;
   const availableVariables: PreDefinedEndpointEnvVariables | undefined = location.state?.availableVariables;
   const flow = location.state?.flow ? JSON.parse(location.state?.flow) : undefined;
@@ -134,6 +135,7 @@ const ServiceFlowPage: FC = () => {
         availableVariables: availableVariables,
         flow: JSON.stringify(reactFlowInstance?.toObject()),
         serviceDescription: serviceDescription,
+        isCommon: isCommon,
       },
     });
   }, [location.pathname, nodes, isTestButtonVisible, isTestButtonEnabled, edges]);
@@ -806,7 +808,14 @@ const ServiceFlowPage: FC = () => {
       await axios
         .post(
           createNewService(),
-          { name: serviceName, serviceId: serviceId, description: serviceDescription, type: "POST", content: result },
+          {
+            name: serviceName,
+            serviceId: serviceId,
+            description: serviceDescription,
+            type: "POST",
+            content: result,
+            isCommon: isCommon,
+          },
           {
             params: {
               location: "/Ruuter/POST/services/tests.yml",
@@ -934,6 +943,7 @@ const ServiceFlowPage: FC = () => {
         flow={JSON.stringify(reactFlowInstance?.toObject())}
         serviceName={serviceName}
         serviceDescription={serviceDescription}
+        isCommon={isCommon}
         serviceId={serviceId}
         secrets={secrets}
         continueOnClick={() => navigate(ROUTES.OVERVIEW_ROUTE)}

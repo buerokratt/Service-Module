@@ -13,10 +13,12 @@ type ServicesResponse = {
   readonly name: string;
   readonly state: ServiceState;
   readonly type: "GET" | "POST";
+  readonly iscommon: boolean;
 };
 
 const OverviewPage: React.FC = () => {
   const [serviceList, setServiceList] = useState<Service[]>([]);
+  const [commonServiceList, setCommonServiceList] = useState<Service[]>([]);
 
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -27,6 +29,7 @@ const OverviewPage: React.FC = () => {
 
   const loadServicesList = async () => {
     const result = await axios.get<{ response: ServicesResponse[] }>(getServicesList());
+    console.log(result.data.response);
     const services = result.data.response.map((item) => {
       return {
         id: item.id,
@@ -34,9 +37,11 @@ const OverviewPage: React.FC = () => {
         state: item.state,
         type: item.type,
         usedCount: 0,
+        isCommon: item.iscommon,
       } as Service;
     });
-    setServiceList(services);
+    setServiceList(services.filter((e) => e.isCommon === false));
+    setCommonServiceList(services.filter((e) => e.isCommon === true));
   };
 
   return (
@@ -45,7 +50,11 @@ const OverviewPage: React.FC = () => {
         <h1>{t("overview.services")}</h1>
         <Button onClick={() => navigate(ROUTES.NEWSERVICE_ROUTE)}>{t("overview.create")}</Button>
       </Track>
-      <ServicesTable dataSource={serviceList} onServiceUpadeCallback={loadServicesList} />
+      <ServicesTable dataSource={serviceList} onServiceUpadeCallback={loadServicesList} isCommon={false} />
+      <Track justify="between">
+        <h1>{t("overview.commonServices")}</h1>
+      </Track>
+      <ServicesTable dataSource={commonServiceList} onServiceUpadeCallback={loadServicesList} isCommon={true} />
       <p>
         {t("overview.trainingModuleLink.text")}{" "}
         <a href={trainingModuleTraining()}>{t("overview.trainingModuleLink.train")}</a>.

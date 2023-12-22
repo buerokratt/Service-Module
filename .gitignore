@@ -4,6 +4,9 @@
 /DSL/Ruuter/POST/services/active
 /DSL/Ruuter/POST/services/draft
 /DSL/Ruuter/POST/services/endpoints
+/DSL/Ruuter/GET/services/active
+/DSL/Ruuter/GET/services/draft
+/DSL/Ruuter/GET/services/endpoints
 .DS_Store
 .vscode
 .env

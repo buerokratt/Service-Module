@@ -1,7 +1,17 @@
 import React, { useContext, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useLocation, useNavigate, useParams, useNavigation } from "react-router-dom";
-import { Button, Card, FormInput, ApiEndpointCard, FormTextarea, Layout, NewServiceHeader, Track } from "../components";
+import {
+  Button,
+  Card,
+  FormInput,
+  ApiEndpointCard,
+  FormTextarea,
+  Layout,
+  NewServiceHeader,
+  Track,
+  Switch,
+} from "../components";
 import { v4 as uuid } from "uuid";
 import { ROUTES } from "../resources/routes-constants";
 import { Node } from "reactflow";
@@ -18,16 +28,19 @@ import { ToastContext } from "../components/Toast/ToastContext";
 import { Step } from "types/step";
 import { StepType } from "types/step-type.enum";
 import { RawData } from "types";
+import useStore from "store/store";
 
 const NewServicePage: React.FC = () => {
   const { t } = useTranslation();
   const location = useLocation();
   const navigate = useNavigate();
+  const userInfo = useStore((state) => state.userInfo);
   const [endpoints, setEndpoints] = useState<EndpointData[]>(location.state?.endpoints ?? []);
   const { intentName } = useParams();
   const [serviceName, setServiceName] = useState<string>(location.state?.serviceName ?? intentName ?? "");
   const [serviceId] = useState<string>(location.state?.serviceId ?? uuid());
   const [description, setDescription] = useState<string>(location.state?.serviceDescription ?? "");
+  const [isCommon, setIsCommon] = useState<boolean>(location.state?.isCommon ?? false);
   const [secrets, setSecrets] = useState<PreDefinedEndpointEnvVariables>(location.state?.secrets ?? {});
   const onDelete = (id: string) => {
     setEndpoints((prevEndpoints) => prevEndpoints.filter((prevEndpoint) => prevEndpoint.id !== id));
@@ -61,6 +74,7 @@ const NewServicePage: React.FC = () => {
         availableVariables: availableVariables,
         flow: location.state?.flow,
         serviceDescription: description,
+        isCommon: isCommon,
       },
     });
   }, [endpoints, secrets, serviceName, availableVariables, location.state?.flow, description]);
@@ -554,6 +568,7 @@ const NewServicePage: React.FC = () => {
           serviceDescription={description}
           serviceName={serviceName}
           serviceId={serviceId}
+          isCommon={isCommon}
           continueOnClick={() => {
             if (serviceName && description) {
               navigate(ROUTES.FLOW_ROUTE, {
@@ -565,6 +580,7 @@ const NewServicePage: React.FC = () => {
                   availableVariables: availableVariables,
                   flow: location.state?.flow,
                   serviceDescription: description,
+                  isCommon: isCommon,
                 },
               });
             } else {
@@ -599,6 +615,19 @@ const NewServicePage: React.FC = () => {
                 }}
               />
             </div>
+            {userInfo?.authorities.includes("ROLE_ADMINISTRATOR") && (
+              <Track gap={16}>
+                <label htmlFor="isCommon">{t("newService.isCommon")}</label>
+                <Switch
+                  name="isCommon"
+                  label=""
+                  onLabel={t("global.yes").toString()}
+                  offLabel={t("global.no").toString()}
+                  value={isCommon}
+                  onCheckedChange={(e) => setIsCommon(e)}
+                />
+              </Track>
+            )}
           </Track>
         </Card>
 
