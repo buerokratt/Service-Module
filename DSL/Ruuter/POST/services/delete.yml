@@ -61,7 +61,7 @@ validate_service_file_exists:
   switch:
     - condition: ${!!service_file_exists.response.body}
       next: delete_deactivated_service
-  next: delete_response
+  next: delete_endpoints
 
 delete_deactivated_service:
   call: http.post
@@ -75,8 +75,17 @@ delete_deactivated_service:
 check_result:
   switch:
     - condition: ${200 <= results.response.statusCodeValue && results.response.statusCodeValue < 300}
-      next: delete_response
+      next: delete_endpoints
   next: return_bad_request
+
+delete_endpoints:
+  call: http.post
+  args:
+    url: "[#SERVICE_RUUTER]/services/delete-endpoints"
+    body:
+      name: ${name_res.response.body[0].name}
+  result: delete_endpoints_res
+  next: delete_response
 
 delete_response:
   call: http.post

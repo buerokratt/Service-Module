@@ -93,6 +93,68 @@ router.post("/delete", async (req, res) => {
   });
 });
 
+router.post('/delete-all-that-starts-with', async (req, res) => {
+  const folderPath = buildContentFilePath(req.body.path);
+  const keyword = req.body.keyword;
+
+  fs.readdir(folderPath, (err, files) => {
+    if (err) {
+      res.status(500).json({ message: 'Unable to read directory' });
+      return;
+    }
+
+    const filesToDelete = files.filter(file => file.startsWith(keyword));
+
+    if (filesToDelete.length === 0) {
+      res.status(200).json({ message: 'No files found with the specified prefix' });
+      return;
+    }
+
+    filesToDelete.forEach(file => {
+      fs.unlink(path.join(folderPath, file), err => {
+        if (err) {
+          console.error(`Unable to delete file: ${file}`);
+        } else {
+          console.log(`File deleted: ${file}`);
+        }
+      });
+    });
+
+    res.status(201).json({ message: 'Files deleted successfully' });
+  });
+});
+
+router.post('/delete-all-that-contains', async (req, res) => {
+  const folderPath = buildContentFilePath(req.body.path);
+  const keyword = req.body.keyword;
+
+  fs.readdir(folderPath, (err, files) => {
+    if (err) {
+      res.status(500).json({ message: 'Unable to read directory' });
+      return;
+    }
+
+    const filesToDelete = files.filter(file => file.contains(keyword));
+
+    if (filesToDelete.length === 0) {
+      res.status(400).json({ message: 'No files found with the specified prefix' });
+      return;
+    }
+
+    filesToDelete.forEach(file => {
+      fs.unlink(path.join(folderPath, file), err => {
+        if (err) {
+          console.error(`Unable to delete file: ${file}`);
+        } else {
+          console.log(`File deleted: ${file}`);
+        }
+      });
+    });
+
+    res.status(201).json({ message: 'Files deleted successfully' });
+  });
+});
+
 router.post("/check", (req, res) => {
   const filePath = buildContentFilePath(req.body.file_path);
 

@@ -1,0 +1,68 @@
+extract_request_data:
+  assign:
+    name: ${incoming.body.name}
+  next: delete_get_endpoints
+
+delete_get_endpoints:
+  call: http.post
+  args:
+    url: "[#SERVICE_NODE]/file/delete-all-that-starts-with"
+    body:
+      path: "/Ruuter/GET/services/endpoints"
+      keyword: "${name}-"
+  result: results
+  next: delete_get_endpoints_configs
+
+delete_get_endpoints_configs:
+  call: http.post
+  args:
+    url: "[#SERVICE_NODE]/file/delete-all-that-starts-with"
+    body:
+      path: "/Ruuter/GET/services/endpoints/configs"
+      keyword: "${name}-"
+  result: results
+  next: delete_get_endpoints_info
+
+delete_get_endpoints_info:
+  call: http.post
+  args:
+    url: "[#SERVICE_NODE]/file/delete-all-that-starts-with"
+    body:
+      path: "/Ruuter/GET/services/endpoints/info"
+      keyword: "${name}-"
+  result: results
+  next: delete_post_endpoints
+
+delete_post_endpoints:
+  call: http.post
+  args:
+    url: "[#SERVICE_NODE]/file/delete-all-that-starts-with"
+    body:
+      path: "/Ruuter/POST/services/endpoints"
+      keyword: "${name}-"
+  result: results
+  next: delete_post_endpoints_configs
+
+delete_post_endpoints_configs:
+  call: http.post
+  args:
+    url: "[#SERVICE_NODE]/file/delete-all-that-starts-with"
+    body:
+      path: "/Ruuter/POST/services/endpoints/configs"
+      keyword: "${name}-"
+  result: results
+  next: delete_post_endpoints_info
+
+delete_post_endpoints_info:
+  call: http.post
+  args:
+    url: "[#SERVICE_NODE]/file/delete-all-that-starts-with"
+    body:
+      path: "/Ruuter/POST/services/endpoints/info"
+      keyword: "${name}-"
+  result: results
+  next: return_result
+
+return_result:
+  return: "Service Endpoints are deleted successfully"
+  next: end
