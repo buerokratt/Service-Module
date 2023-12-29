@@ -830,7 +830,8 @@ const ServiceFlowPage: FC = () => {
             description: serviceDescription,
             type: "POST",
             content: result,
-            isCommon,
+            isCommon: isCommon,
+            structure: location?.state ?? {},
           },
           {
             params: {

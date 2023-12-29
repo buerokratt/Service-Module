@@ -1,6 +1,6 @@
 check_for_required_parameters:
   switch:
-    - condition: ${incoming.body.name == null || incoming.body.description == null || incoming.body.type == null || incoming.body.content == null || incoming.body.serviceId == null || incoming.body.isCommon == null}
+    - condition: ${incoming.body.name == null || incoming.body.description == null || incoming.body.type == null || incoming.body.content == null || incoming.body.serviceId == null || incoming.body.isCommon == null || incoming.body.structure == null}
       next: return_incorrect_request
   next: extract_request_data
 
@@ -12,6 +12,7 @@ extract_request_data:
     content: ${incoming.body.content}
     serviceId: ${incoming.body.serviceId}
     isCommon: ${incoming.body.isCommon}
+    structure: ${incoming.body.structure}
   next: service_add
 
 service_add:
@@ -24,6 +25,7 @@ service_add:
       ruuter_type: ${type}
       service_id: ${serviceId}
       is_common: ${isCommon}
+      structure: ${structure}
   result: createdService
 
 convert_json_content_to_yml:
