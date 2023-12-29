@@ -17,6 +17,7 @@ type StepCounterProps = {
   serviceName?: string;
   serviceId?: string;
   serviceDescription?: string;
+  isCommon?: boolean;
 };
 
 const HeaderStepCounter: FC<StepCounterProps> = ({
@@ -28,6 +29,7 @@ const HeaderStepCounter: FC<StepCounterProps> = ({
   serviceDescription,
   secrets,
   serviceName,
+  isCommon,
 }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -49,6 +51,7 @@ const HeaderStepCounter: FC<StepCounterProps> = ({
               serviceDescription,
               serviceName,
               serviceId,
+              isCommon: isCommon,
               secrets,
             },
           })
@@ -68,6 +71,7 @@ const HeaderStepCounter: FC<StepCounterProps> = ({
                 serviceDescription,
                 serviceName,
                 serviceId,
+                isCommon: isCommon,
                 secrets,
               },
             });

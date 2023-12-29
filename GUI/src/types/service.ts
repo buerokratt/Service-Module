@@ -6,4 +6,5 @@ export interface Service {
   usedCount: number;
   readonly state: ServiceState;
   readonly type: "GET" | "POST";
+  readonly isCommon: boolean;
 }

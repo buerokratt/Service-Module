@@ -11,9 +11,11 @@ import DataTable from "../DataTable";
 import "./ServicesTable.scss";
 import axios from "axios";
 import { ToastContext } from "../Toast/ToastContext";
+import useStore from "store/store";
 
 type Props = {
   dataSource: Service[];
+  isCommon: boolean;
   onServiceUpadeCallback: () => Promise<void>;
 };
 
@@ -26,7 +28,9 @@ const ServicesTable = (props: Props) => {
   const toast = useContext(ToastContext);
   const [services, setServices] = useState<Service[]>([]);
   const [isDeletePopupVisible, setDeletePopupVisible] = useState(false);
+  const userInfo = useStore((state) => state.userInfo);
   const [isStatePopupVisible, setStatePopupVisible] = useState(false);
+  const [isCommon, setIsCommon] = useState(false);
   const [popupText, setPopupText] = useState("");
   const columnHelper = createColumnHelper<Service>();
   const [selectedService, setSelectedService] = useState<Service | undefined>();
@@ -34,6 +38,10 @@ const ServicesTable = (props: Props) => {
   useEffect(() => {
     setServices(props.dataSource);
   }, [props.dataSource]);
+
+  useEffect(() => {
+    setIsCommon(props.isCommon);
+  }, [props.isCommon]);
 
   const showStatePopup = (text: string) => {
     setPopupText(text);
@@ -85,7 +93,10 @@ const ServicesTable = (props: Props) => {
       },
       cell: (_) => (
         <Track align="right" justify="start">
-          <Button appearance="text">
+          <Button
+            appearance="text"
+            disabled={isCommon === true && !userInfo?.authorities.includes("ROLE_ADMINISTRATOR") ? true : false}
+          >
             <Icon icon={<MdOutlineEdit />} size="medium" />
             {t("overview.edit")}
           </Button>
@@ -100,7 +111,11 @@ const ServicesTable = (props: Props) => {
       cell: (props) => (
         <Track align="right">
           <Button
-            disabled={props.row.original.state === ServiceState.Active}
+            disabled={
+              isCommon === true && !userInfo?.authorities.includes("ROLE_ADMINISTRATOR")
+                ? true
+                : props.row.original.state === ServiceState.Active
+            }
             appearance="text"
             onClick={() => {
               setSelectedService(services.find((s) => s.id === props.row.original.id));

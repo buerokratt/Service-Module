@@ -114,6 +114,7 @@
   },
   "overview": {
     "services": "Teenused",
+    "commonServices": "Ühised Teenused",
     "create": "Loo uus teenus",
     "edit": "Muuda",
     "delete": "Kustuta",
@@ -150,6 +151,7 @@
   "newService": {
     "endpoints": "Otspunktid",
     "test": "Testi URLi",
+    "isCommon": "Ühine teenus",
     "endpoint": {
       "add": "+ Lisa API otspunkt",
       "addTestEnv": "+ Lisa testkeskkond",
