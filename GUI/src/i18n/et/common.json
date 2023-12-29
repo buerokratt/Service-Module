@@ -47,7 +47,8 @@
     "save": "Salvesta",
     "testService": "Testi teenust",
     "cancel": "Tühista",
-    "close": "Sulge"
+    "close": "Sulge",
+    "common": "Levinud"
   },
   "menu": {
     "overview": "Ülevaade",

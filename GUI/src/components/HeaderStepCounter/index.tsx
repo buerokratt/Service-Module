@@ -51,7 +51,7 @@ const HeaderStepCounter: FC<StepCounterProps> = ({
               serviceDescription,
               serviceName,
               serviceId,
-              isCommon: isCommon,
+              isCommon,
               secrets,
             },
           })
@@ -71,7 +71,7 @@ const HeaderStepCounter: FC<StepCounterProps> = ({
                 serviceDescription,
                 serviceName,
                 serviceId,
-                isCommon: isCommon,
+                isCommon,
                 secrets,
               },
             });

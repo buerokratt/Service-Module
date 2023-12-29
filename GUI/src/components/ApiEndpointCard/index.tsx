@@ -1,7 +1,7 @@
 import { FC, useEffect, useState } from "react";
 
 import * as Tabs from "@radix-ui/react-tabs";
-import { Button, EndpointCustom, EndpointOpenAPI, FormInput, FormSelect, Icon, Track } from "..";
+import { Button, EndpointCustom, EndpointOpenAPI, FormInput, FormSelect, Icon, Switch, Track } from "..";
 import { Option } from "../../types/option";
 import { useTranslation } from "react-i18next";
 import { MdDeleteOutline } from "react-icons/md";
@@ -20,6 +20,7 @@ type EndpointCardProps = {
 const ApiEndpointCard: FC<EndpointCardProps> = ({ onDelete, onNameChange, setEndpoints, endpoint, requestValues }) => {
   const [selectedTab, setSelectedTab] = useState<EndpointEnv>(EndpointEnv.Live);
   const [endpointName, setEndpointName] = useState<string>(endpoint.name);
+  const [isEndpointCommon, setIsEndpointCommon] = useState<boolean>(endpoint.isCommon ?? false);
   const [testEnvExists, setTestEnvExists] = useState<boolean>(false);
   const options = [
     { label: "Open API", value: "openAPI", name: "da" },
@@ -35,6 +36,11 @@ const ApiEndpointCard: FC<EndpointCardProps> = ({ onDelete, onNameChange, setEnd
     endpoint.name = endpointName;
     setEndpoints((pe) => [...pe]);
   }, [endpointName]);
+
+  useEffect(() => {
+    endpoint.isCommon = isEndpointCommon;
+    setEndpoints((pe) => [...pe]);
+  }, [isEndpointCommon]);
 
   useEffect(() => {
     if (endpoint.hasTestEnv) setTestEnvExists(true);
@@ -126,6 +132,20 @@ const ApiEndpointCard: FC<EndpointCardProps> = ({ onDelete, onNameChange, setEnd
                   setEndpoints={setEndpoints}
                   setRequestTab={setRequestTab}
                 />
+              )}
+              {option?.value && (
+                <Track gap={16}>
+                  <label htmlFor="isCommon">{t("global.common")}</label>
+                  <Switch
+                    name="isCommon"
+                    label=""
+                    onLabel={t("global.yes").toString()}
+                    offLabel={t("global.no").toString()}
+                    value={isEndpointCommon}
+                    checked={isEndpointCommon}
+                    onCheckedChange={(e) => setIsEndpointCommon(e)}
+                  />
+                </Track>
               )}
             </Track>
           </Tabs.Content>

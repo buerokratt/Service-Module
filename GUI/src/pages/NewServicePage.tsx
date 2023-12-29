@@ -74,7 +74,7 @@ const NewServicePage: React.FC = () => {
         availableVariables: availableVariables,
         flow: location.state?.flow,
         serviceDescription: description,
-        isCommon: isCommon,
+        isCommon,
       },
     });
   }, [endpoints, secrets, serviceName, availableVariables, location.state?.flow, description]);
@@ -139,7 +139,7 @@ const NewServicePage: React.FC = () => {
         (endpoint.data.name.trim().length ?? 0) > 0 ? endpoint.data?.name.replaceAll(" ", "_") : endpoint.data?.id
       }`;
       for (const env of [EndpointEnv.Live, EndpointEnv.Test]) {
-        await saveEndpointInfo(selectedEndpointType, env, endpointName);
+        await saveEndpointInfo(selectedEndpointType, env, endpointName, endpoint.data);
       }
       const steps = new Map();
       steps.set("extract_request_data", {
@@ -159,7 +159,9 @@ const NewServicePage: React.FC = () => {
       steps.set("get_prod_info", {
         call: "http.post",
         args: {
-          url: `${process.env.REACT_APP_API_URL}/services/endpoints/info/${endpointName}-prod-info`,
+          url: `${process.env.REACT_APP_API_URL}/services/endpoints/info/${
+            endpoint.data.isCommon ? "common/" : ""
+          }${endpointName}-prod-info`,
           body: {
             params: "${incoming.body.params ?? new Map()}",
             headers: "${incoming.body.headers ?? new Map()}",
@@ -172,7 +174,9 @@ const NewServicePage: React.FC = () => {
       steps.set("get_test_info", {
         call: `http.post`,
         args: {
-          url: `${process.env.REACT_APP_API_URL}/services/endpoints/info/${endpointName}-test-info`,
+          url: `${process.env.REACT_APP_API_URL}/services/endpoints/info/${
+            endpoint.data.isCommon ? "common/" : ""
+          }${endpointName}-test-info`,
           body: {
             params: "${incoming.body.params ?? new Map()}",
             headers: "${incoming.body.headers ?? new Map()}",
@@ -227,7 +231,9 @@ const NewServicePage: React.FC = () => {
           { result },
           {
             params: {
-              location: `/Ruuter/${selectedEndpointType.methodType.toUpperCase()}/services/endpoints/${endpointName}.yml`,
+              location: `/Ruuter/${selectedEndpointType.methodType.toUpperCase()}/services/endpoints/${
+                endpoint.data.isCommon ? "common/" : ""
+              }${endpointName}.yml`,
             },
           }
         )
@@ -251,16 +257,21 @@ const NewServicePage: React.FC = () => {
   };
 
   // Since we currently cannot mark variables as sensitive from GUI, we set all as sensitive
-  const saveEndpointInfo = async (selectedEndpoint: EndpointType, env: EndpointEnv, endpointName: string) => {
-    await saveEndpointConfig(selectedEndpoint, env, endpointName);
+  const saveEndpointInfo = async (
+    selectedEndpoint: EndpointType,
+    env: EndpointEnv,
+    endpointName: string,
+    endpoint: EndpointData
+  ) => {
+    await saveEndpointConfig(selectedEndpoint, env, endpointName, endpoint);
 
     const steps = new Map();
     steps.set("get-configs", {
       call: "http.post",
       args: {
-        url: `${process.env.REACT_APP_API_URL}/services/endpoints/configs/${endpointName}-${
-          env === EndpointEnv.Live ? "prod" : "test"
-        }-configs`,
+        url: `${process.env.REACT_APP_API_URL}/services/endpoints/configs/${
+          endpoint.isCommon ? "common/" : ""
+        }${endpointName}-${env === EndpointEnv.Live ? "prod" : "test"}-configs`,
         body: {
           params: "${incoming.body.params}",
           headers: "${incoming.body.headers}",
@@ -280,7 +291,7 @@ const NewServicePage: React.FC = () => {
         { result },
         {
           params: {
-            location: `/Ruuter/POST/services/endpoints/info/${endpointName}-${
+            location: `/Ruuter/POST/services/endpoints/info/${endpoint.isCommon ? "common/" : ""}${endpointName}-${
               env === EndpointEnv.Live ? "prod" : "test"
             }-info.yml`,
           },
@@ -361,7 +372,12 @@ const NewServicePage: React.FC = () => {
     });
   };
 
-  const saveEndpointConfig = async (endpoint: EndpointType, env: EndpointEnv, endpointName: string) => {
+  const saveEndpointConfig = async (
+    endpoint: EndpointType,
+    env: EndpointEnv,
+    endpointName: string,
+    data: EndpointData
+  ) => {
     const headers = rawDataIfVariablesMissing(
       endpoint,
       "headers",
@@ -413,7 +429,7 @@ const NewServicePage: React.FC = () => {
         { result },
         {
           params: {
-            location: `/Ruuter/POST/services/endpoints/configs/${endpointName}-${
+            location: `/Ruuter/POST/services/endpoints/configs/${data.isCommon ? "common/" : ""}${endpointName}-${
               env === EndpointEnv.Live ? "prod" : "test"
             }-configs.yml`,
           },
@@ -580,7 +596,7 @@ const NewServicePage: React.FC = () => {
                   availableVariables: availableVariables,
                   flow: location.state?.flow,
                   serviceDescription: description,
-                  isCommon: isCommon,
+                  isCommon,
                 },
               });
             } else {
