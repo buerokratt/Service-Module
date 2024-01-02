@@ -1,5 +1,5 @@
 import { createColumnHelper, PaginationState } from "@tanstack/react-table";
-import { useContext, useEffect, useState } from "react";
+import { FC, useContext, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { MdDeleteOutline, MdOutlineEdit } from "react-icons/md";
 import { Button, Card, Icon, Label, Modal, Track } from "..";
@@ -12,36 +12,27 @@ import "./ServicesTable.scss";
 import axios from "axios";
 import { ToastContext } from "../Toast/ToastContext";
 import useStore from "store/store";
+import useServiceListStore from "store/services.store";
 
-type Props = {
-  dataSource: Service[];
-  isCommon: boolean;
-  onServiceUpadeCallback: () => Promise<void>;
+type ServicesTableProps = {
+  isCommon?: boolean;
 };
 
-const ServicesTable = (props: Props) => {
+const ServicesTable: FC<ServicesTableProps> = ({ isCommon = false }) => {
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
     pageSize: 10,
   });
   const { t } = useTranslation();
   const toast = useContext(ToastContext);
-  const [services, setServices] = useState<Service[]>([]);
   const [isDeletePopupVisible, setDeletePopupVisible] = useState(false);
   const userInfo = useStore((state) => state.userInfo);
   const [isStatePopupVisible, setStatePopupVisible] = useState(false);
-  const [isCommon, setIsCommon] = useState(false);
   const [popupText, setPopupText] = useState("");
   const columnHelper = createColumnHelper<Service>();
   const [selectedService, setSelectedService] = useState<Service | undefined>();
 
-  useEffect(() => {
-    setServices(props.dataSource);
-  }, [props.dataSource]);
-
-  useEffect(() => {
-    setIsCommon(props.isCommon);
-  }, [props.isCommon]);
+  const services = useServiceListStore((state) => state.services.filter(x => x.isCommon === isCommon));
 
   const showStatePopup = (text: string) => {
     setPopupText(text);
@@ -155,7 +146,7 @@ const ServicesTable = (props: Props) => {
         title: t("overview.service.toast.updated"),
         message: "",
       });
-      await props.onServiceUpadeCallback();
+      await useServiceListStore.getState().loadServicesList();
     } catch (_) {
       toast.open({
         type: "error",
@@ -180,7 +171,7 @@ const ServicesTable = (props: Props) => {
         title: t("overview.service.toast.deleted"),
         message: "",
       });
-      setServices((prevServices) => prevServices.filter((s) => s.id !== selectedService?.id));
+      await useServiceListStore.getState().deleteService(selectedService.id);
     } catch (_) {
       toast.open({
         type: "error",
