@@ -1,0 +1,16 @@
+extract_request_data:
+  assign:
+    id: ${incoming.body.serviceId}
+    status: ${incoming.body.status}
+
+get_training_status:
+  call: http.post
+  args:
+    url: "[#SERVICE_RESQL]/set-training-status"
+    body:
+      id: ${id}
+      training_status: ${status}
+  result: status_res
+
+return_result:
+  return: "Training Status Changed Successfully"

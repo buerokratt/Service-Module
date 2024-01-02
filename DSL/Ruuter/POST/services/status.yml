@@ -101,7 +101,7 @@ validate_intent_file_exists:
   switch:
     - condition: ${!!intent_file_exists_result.response.body}
       next: activate_intent_file
-  next: return_ok
+  next: change_training_status
 
 activate_intent_file:
   call: http.post
@@ -170,7 +170,7 @@ add_rule:
       rule: ${service_name}
       steps: ${[new Map([["intent", service_name]]), new Map([["action", "utter_" + service_name]])]}
   result: add_rule_result
-  next: return_ok
+  next: change_training_status
 
 deactivate_service:
   call: http.post
@@ -217,7 +217,7 @@ validate_if_intent_file_exists:
   switch:
     - condition: ${!!intent_file_exists_res.response.body}
       next: rename_intent_to_tmp
-  next: return_ok
+  next: change_training_status
 
 rename_intent_to_tmp:
   call: http.post
@@ -227,7 +227,17 @@ rename_intent_to_tmp:
       current_path: "/mock1/data/nlu/${service_name + '_nlu' + old_file_end}"
       new_path: "/mock1/data/nlu/removed/${service_name}_nlu.tmp"
   result: rename_intent_result
-  next: return_ok
+  next: change_training_status
+
+change_training_status:
+  call: http.post
+  args:
+    url: "[#SERVICE_RUUTER]/training-status"
+    body:
+      serviceId: ${id}
+      status: true
+  result: training_status_res
+  next: return_ok  
 
 return_ok:
   status: 200
