@@ -4,7 +4,7 @@ import { v4 as uuid } from "uuid";
 import { Node } from "reactflow";
 import { EndpointData, PreDefinedEndpointEnvVariables } from 'types/endpoint';
 import { getSecretVariables, getTaraAuthResponseVariables } from 'resources/api-constants';
-import { useParams } from 'react-router-dom';
+import { Step, StepType } from 'types';
 
 interface ServiceState {
   flow: string | undefined;
@@ -33,6 +33,7 @@ interface ServiceState {
   getAvailableRequestValues: (endpointId: string) => PreDefinedEndpointEnvVariables;
   onNameChange: (endpointId: string, oldName: string, newName: string) => void;
   changeServiceEndpointType: (id: string, type: string) => void;
+  mapEndpointsToSetps: () => Step[];
 
   // TODO: remove the following funtions and refactor the code to use more specific functions
   setEndpoints: (callback: (prev: EndpointData[]) => EndpointData[]) => void;
@@ -181,7 +182,22 @@ const useServiceStore = create<ServiceState>((set, get, store) => ({
 
     set({ endpoints });
   },
-
+  mapEndpointsToSetps: (): Step[] => {
+    return get().endpoints.map(x => ({
+        selected: x.definedEndpoints.find((e) => e.isSelected),
+        endpoint: x,
+    }))
+    .filter(x => !!x.selected)
+    .map(({selected, endpoint}, index) => ({
+        id: index + 1,
+        label:
+          endpoint.name.trim().length > 0
+            ? endpoint.name
+            : `${selected!.methodType.toUpperCase()} ${selected!.url}`,
+        type: StepType.UserDefined,
+        data: endpoint,
+      }));
+  },
   setEndpoints: (callback) => {
     set(state => ({
       endpoints: callback(state.endpoints)
