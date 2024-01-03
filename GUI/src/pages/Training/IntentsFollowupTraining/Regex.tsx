@@ -2,7 +2,6 @@ import { FC, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { createColumnHelper } from '@tanstack/react-table';
-import { useNavigate } from 'react-router-dom';
 import { AxiosError } from 'axios';
 import { useForm, Controller } from 'react-hook-form';
 import { MdDeleteOutline, MdOutlineEdit } from 'react-icons/md';
@@ -18,7 +17,6 @@ import useToastStore from 'store/toasts.store';
 const Regex: FC = () => {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
-  const navigate = useNavigate();
   const [filter, setFilter] = useState('');
   const [addFormVisible, setAddFormVisible] = useState(false);
   const [deletableRow, setDeletableRow] = useState<string | number | null>(null);
@@ -112,7 +110,7 @@ const Regex: FC = () => {
         size: '1%',
       },
     }),
-  ], [columnHelper, navigate, t]);
+  ], [columnHelper, t]);
 
   const handleNewRegexSubmit = handleSubmit((data) => {
     newRegexMutation.mutate(data);

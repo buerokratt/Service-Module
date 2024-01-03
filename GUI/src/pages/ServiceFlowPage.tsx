@@ -1,4 +1,4 @@
-import { CSSProperties, FC, useContext, useEffect, useMemo, useState } from "react";
+import { CSSProperties, FC, useEffect, useMemo, useState } from "react";
 
 import { MarkerType, Node, ReactFlowInstance, ReactFlowProvider, useEdgesState, useNodesState } from "reactflow";
 import { Box, Collapsible, NewServiceHeader, Track, FlowElementsPopup } from "../components";
@@ -10,13 +10,11 @@ import apiIconTag from "../assets/images/api-icon-tag.svg";
 import "reactflow/dist/style.css";
 import "./ServiceFlowPage.scss";
 import { StepType, Step, RawData, ConditionRuleType } from "../types";
-import { v4 as uuid } from "uuid";
 import {
   EndpointData,
   EndpointEnv,
   EndpointType,
   EndpointVariableData,
-  PreDefinedEndpointEnvVariables,
 } from "../types/endpoint";
 import axios from "axios";
 import { createNewService, jsonToYml, testDraftService } from "../resources/api-constants";
@@ -82,7 +80,7 @@ const initialNodes: Node[] = [
 const ServiceFlowPage: FC = () => {
   const { t } = useTranslation();
 
-  const allElements: Step[] = [
+  const allElements: Step[] = useMemo(() => [
     { id: 10, label: t("serviceFlow.element.taraAuthentication"), type: StepType.Auth },
     { id: 20, label: t("serviceFlow.element.textfield"), type: StepType.Textfield },
     { id: 30, label: t("serviceFlow.element.clientInput"), type: StepType.Input },
@@ -91,12 +89,8 @@ const ServiceFlowPage: FC = () => {
     { id: 60, label: t("serviceFlow.element.fileGeneration"), type: StepType.FileGenerate },
     { id: 70, label: t("serviceFlow.element.fileSigning"), type: StepType.FileSign },
     { id: 90, label: t("serviceFlow.element.conversationEnd"), type: StepType.FinishingStepEnd },
-    {
-      id: 100,
-      label: t("serviceFlow.element.redirectConversationToSupport"),
-      type: StepType.FinishingStepRedirect,
-    },
-  ];
+    { id: 100, label: t("serviceFlow.element.redirectConversationToSupport"), type: StepType.FinishingStepRedirect },
+  ], []);
 
   const [setupElements, setSetupElements] = useState<Step[]>([]);
   const location = useLocation();
@@ -132,21 +126,6 @@ const ServiceFlowPage: FC = () => {
   useEffect(() => {
     setFlow(JSON.stringify(reactFlowInstance?.toObject()));
   }, [reactFlowInstance]);
-
-  useEffect(() => {
-    navigate(location.pathname, {
-      state: {
-        endpoints,
-        secrets,
-        serviceName,
-        serviceId,
-        availableVariables,
-        flow: JSON.stringify(reactFlowInstance?.toObject()),
-        serviceDescription: description,
-        isCommon,
-      },
-    });
-  }, [location.pathname, nodes, isTestButtonVisible, isTestButtonEnabled, edges]);
 
   const getTemplateDataFromNode = (
     node: Node

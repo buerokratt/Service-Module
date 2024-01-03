@@ -48,6 +48,8 @@ const NewServicePage: React.FC = () => {
     loadFlowData,
   } = useServiceStore();
 
+  const vaildServiceInfo = useServiceStore(state => state.vaildServiceInfo());
+
   const { intentName } = useParams();
   useEffect(() => {
     const name = intentName?.trim();
@@ -498,25 +500,15 @@ const NewServicePage: React.FC = () => {
           serviceId={serviceId}
           isCommon={isCommon}
           continueOnClick={() => {
-            if (serviceName && description) {
-              navigate(ROUTES.FLOW_ROUTE, {
-                state: {
-                  endpoints,
-                  secrets,
-                  serviceName,
-                  serviceId,
-                  availableVariables,
-                  flow,
-                  serviceDescription: description,
-                  isCommon,
-                },
-              });
-            } else {
+            if (!vaildServiceInfo) {
               useToastStore.getState().error({
                 title: t("newService.toast.missingFields"),
                 message: t("newService.toast.serviceMissingFields"),
               });
+              return;
             }
+
+            navigate(ROUTES.FLOW_ROUTE);
           }}
         />
       }

@@ -1,9 +1,9 @@
-import { create } from 'zustand';
-import { EndpointData, PreDefinedEndpointEnvVariables } from 'types/endpoint';
-import { v4 as uuid } from "uuid";
 import axios from 'axios';
-import { getSecretVariables, getTaraAuthResponseVariables } from 'resources/api-constants';
+import { create } from 'zustand';
+import { v4 as uuid } from "uuid";
 import { Node } from "reactflow";
+import { EndpointData, PreDefinedEndpointEnvVariables } from 'types/endpoint';
+import { getSecretVariables, getTaraAuthResponseVariables } from 'resources/api-constants';
 
 interface ServiceState {
   flow: string | undefined;
@@ -12,6 +12,7 @@ interface ServiceState {
   serviceId: string;
   description: string;
   isCommon: boolean,
+  vaildServiceInfo: () => boolean,
   setIsCommon: (isCommon: boolean) => void;
   secrets: PreDefinedEndpointEnvVariables;
   availableVariables: PreDefinedEndpointEnvVariables;
@@ -45,6 +46,7 @@ const useServiceStore = create<ServiceState>((set, get, store) => ({
   description: '',
   secrets: { prod: [], test: [] },
   availableVariables: { prod: [], test: [] },
+  vaildServiceInfo: () => !!get().serviceName && !!get().description,
   serviceNameDashed: () => get().serviceName.replace(" ", "-"),
   deleteEndpoint: (id: string) => {
     const newEndpoints = get().endpoints.filter((x) => x.id !== id);
