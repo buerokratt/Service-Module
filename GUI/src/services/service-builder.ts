@@ -99,6 +99,7 @@ const saveEndpointInfo = async (
     return: "${configs.response.body}",
   });
   const result = Object.fromEntries(steps.entries());
+  
   await axios
     .post(
       jsonToYml(),
@@ -162,7 +163,6 @@ const saveEndpointConfig = async (
   });
   steps.set("return_value", { wrapper: false, return: "${sensitive}" });
   const result = Object.fromEntries(steps.entries());
-  console.log(result);
   await axios
     .post(
       jsonToYml(),
@@ -265,7 +265,7 @@ const assignEndpointVariables = (
   return result;
 };
 
-export async function saveEndpoints(endpoints: EndpointData[], serviceName: string, onSuccess: (e: any) => void, onError: (e: any) => void) {
+export async function saveEndpoints(endpoints: EndpointData[], name: string, onSuccess: (e: any) => void, onError: (e: any) => void) {
   if (endpoints.length === 0) return;
   const setupEndpoints: EndpointData[] | undefined = endpoints;
   const elements: Step[] = [];
@@ -286,8 +286,8 @@ export async function saveEndpoints(endpoints: EndpointData[], serviceName: stri
     if (!endpoint?.data) continue;
     const selectedEndpointType = endpoint.data.definedEndpoints.find((e) => e.isSelected);
     if (!selectedEndpointType) continue;
-    console.log("e", selectedEndpointType, endpoint);
-    const endpointName = `${serviceName.replaceAll(" ", "_")}-${(endpoint.data.name.trim().length ?? 0) > 0 ? endpoint.data?.name.replaceAll(" ", "_") : endpoint.data?.id
+
+    const endpointName = `${name.replaceAll(" ", "_")}-${(endpoint.data.name.trim().length ?? 0) > 0 ? endpoint.data?.name.replaceAll(" ", "_") : endpoint.data?.id
       }`;
     for (const env of [EndpointEnv.Live, EndpointEnv.Test]) {
       await saveEndpointInfo(selectedEndpointType, env, endpointName, endpoint.data);
@@ -375,7 +375,6 @@ export async function saveEndpoints(endpoints: EndpointData[], serviceName: stri
       next: "end",
     });
     const result = Object.fromEntries(steps.entries());
-    console.log(jsonToYml());
     await axios
       .post(
         jsonToYml(),

@@ -1,21 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { Button, Track } from "../components";
-import { getServicesList, trainingModuleTraining } from "../resources/api-constants";
+import { trainingModuleTraining } from "../resources/api-constants";
 import ServicesTable from "../components/ServicesTable";
-import { Service, ServiceState } from "../types";
 import { useNavigate } from "react-router-dom";
 import { ROUTES } from "../resources/routes-constants";
-import axios from "axios";
 import useServiceListStore from "store/services.store";
-
-type ServicesResponse = {
-  readonly id: number;
-  readonly name: string;
-  readonly state: ServiceState;
-  readonly type: "GET" | "POST";
-  readonly iscommon: boolean;
-};
 
 const OverviewPage: React.FC = () => {
   const { loadServicesList } = useServiceListStore();

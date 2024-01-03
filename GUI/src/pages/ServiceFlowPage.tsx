@@ -100,9 +100,10 @@ const ServiceFlowPage: FC = () => {
   });
   const [selectedNode, setSelectedNode] = useState<Node<NodeDataProps> | null>(null);
   const navigate = useNavigate();
-  const { endpoints, serviceId, isCommon, description, secrets, availableVariables, serviceNameDashed, setFlow } = useServiceStore();
+  const { endpoints, serviceId, isCommon, description, secrets, availableVariables, setFlow } = useServiceStore();
 
-  const serviceName = useMemo(() => serviceNameDashed(), [useServiceStore.getState().serviceName]);
+  const name = useServiceStore((state) => state.serviceNameDashed());
+  
   const flow = useMemo(() => {
     const flowStr = useServiceStore.getState().flow;
     if(!flowStr)
@@ -259,7 +260,7 @@ const ServiceFlowPage: FC = () => {
       args: {
         url: `${
           process.env.REACT_APP_API_URL
-        }/services/endpoints/${selectedEndpoint.methodType.toLowerCase()}-${serviceName}-${
+        }/services/endpoints/${selectedEndpoint.methodType.toLowerCase()}-${name}-${
           (endpoint.name.trim().length ?? 0) > 0 ? endpoint.name : endpoint.id
         }?type=prod`,
         body: {
@@ -450,12 +451,8 @@ const ServiceFlowPage: FC = () => {
           },
         }
       )
-      .then((r) => {
-        console.log(r);
-      })
-      .catch((e) => {
-        console.log(e);
-      });
+      .then(console.log)
+      .catch(console.log)
   };
 
   // Since we currently cannot mark variables as sensitive from GUI, we set all as sensitive
@@ -499,12 +496,8 @@ const ServiceFlowPage: FC = () => {
           },
         }
       )
-      .then((r) => {
-        console.log(r);
-      })
-      .catch((e) => {
-        console.log(e);
-      });
+      .then(console.log)
+      .catch(console.log)
   };
 
   const getNestedVariables = (variable: EndpointVariableData, key: string, path: string, result: string[]) => {
@@ -579,8 +572,8 @@ const ServiceFlowPage: FC = () => {
       if (!endpoint?.data) continue;
       const selectedEndpointType = endpoint.data.definedEndpoints.find((e) => e.isSelected);
       if (!selectedEndpointType) continue;
-      console.log("e", selectedEndpointType, endpoint);
-      const endpointName = `${serviceName.replaceAll(" ", "_")}-${
+
+      const endpointName = `${name.replaceAll(" ", "_")}-${
         (endpoint.data.name.trim().length ?? 0) > 0 ? endpoint.data?.name.replaceAll(" ", "_") : endpoint.data?.id
       }`;
       for (const env of [EndpointEnv.Live, EndpointEnv.Test]) {
@@ -681,18 +674,12 @@ const ServiceFlowPage: FC = () => {
             },
           }
         )
-        .then((r) => {
-          console.log(r);
-        })
-        .catch((e) => {
-          console.log(e);
-        });
+        .then(console.log)
+        .catch(console.log)
     }
   };
 
   const saveFlow = async () => {
-    console.log(nodes);
-    console.log(edges);
     try {
       await saveEndpoints();
       const allRelations: any[] = [];
@@ -806,18 +793,17 @@ const ServiceFlowPage: FC = () => {
         wrapper: false,
         return: "",
       });
-      console.log(finishedFlow);
       const result = Object.fromEntries(finishedFlow.entries());
       await axios
         .post(
           createNewService(),
           {
-            name: serviceName,
-            serviceId: serviceId,
+            name,
+            serviceId,
             description,
             type: "POST",
             content: result,
-            isCommon: isCommon,
+            isCommon,
             structure: location?.state ?? {},
           },
           {
@@ -827,7 +813,6 @@ const ServiceFlowPage: FC = () => {
           }
         )
         .then((r) => {
-          console.log(r);
           setIsTestButtonVisible(true);
           setIsTestButtonEnabled(true);
           useToastStore.getState().success({
@@ -917,7 +902,7 @@ const ServiceFlowPage: FC = () => {
 
   const runServiceTest = async () => {
     try {
-      await axios.post(testDraftService(serviceName), {});
+      await axios.post(testDraftService(name), {});
       useToastStore.getState().success({
         title: "Test result- success",
       });
@@ -933,21 +918,16 @@ const ServiceFlowPage: FC = () => {
     <>
       <NewServiceHeader
         activeStep={3}
-        availableVariables={availableVariables}
         saveDraftOnClick={saveFlow}
-        flow={JSON.stringify(reactFlowInstance?.toObject())}
-        serviceName={serviceName}
-        serviceDescription={description}
-        isCommon={isCommon}
+        // flow={JSON.stringify(reactFlowInstance?.toObject())}
         serviceId={serviceId}
-        secrets={secrets}
         continueOnClick={() => navigate(ROUTES.OVERVIEW_ROUTE)}
         isTestButtonVisible={isTestButtonVisible}
         isTestButtonEnabled={isTestButtonEnabled}
         onTestButtonClick={runServiceTest}
       />
       <h1 style={{ paddingLeft: 16, paddingTop: 16 }}>
-        {t("serviceFlow.flow")} "{serviceName}"
+        {t("serviceFlow.flow")} "{name}"
       </h1>
       <h5
         style={{

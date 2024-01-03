@@ -4,11 +4,12 @@ import { v4 as uuid } from "uuid";
 import { Node } from "reactflow";
 import { EndpointData, PreDefinedEndpointEnvVariables } from 'types/endpoint';
 import { getSecretVariables, getTaraAuthResponseVariables } from 'resources/api-constants';
+import { useParams } from 'react-router-dom';
 
 interface ServiceState {
   flow: string | undefined;
   endpoints: EndpointData[];
-  serviceName: string;
+  name: string;
   serviceId: string;
   description: string;
   isCommon: boolean,
@@ -41,18 +42,18 @@ interface ServiceState {
 const useServiceStore = create<ServiceState>((set, get, store) => ({
   flow: undefined,
   endpoints: [],
-  serviceName: '',
+  name: '',
   serviceId: uuid(),
   description: '',
   secrets: { prod: [], test: [] },
   availableVariables: { prod: [], test: [] },
-  vaildServiceInfo: () => !!get().serviceName && !!get().description,
-  serviceNameDashed: () => get().serviceName.replace(" ", "-"),
+  vaildServiceInfo: () => !!get().name && !!get().description,
+  serviceNameDashed: () => get().name.replace(" ", "-"),
   deleteEndpoint: (id: string) => {
     const newEndpoints = get().endpoints.filter((x) => x.id !== id);
     set({ endpoints: newEndpoints });
   },
-  changeServiceName: (name: string) => set({ serviceName: name }),
+  changeServiceName: (name: string) => set({ name }),
   setDescription: (description: string) => set({ description }),
   isCommon: false,
   setIsCommon: (isCommon: boolean) => set({ isCommon }),

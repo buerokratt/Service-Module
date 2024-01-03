@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from "react";
+import React, { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useParams } from "react-router-dom";
 import {
@@ -35,14 +35,11 @@ const NewServicePage: React.FC = () => {
   const { 
     serviceId,
     endpoints,
-    flow,
     isCommon,
     setIsCommon,
     description,
     setDescription,
-    secrets,
-    availableVariables,
-    serviceName,
+    name,
     changeServiceName,
     addEndpoint,
     loadFlowData,
@@ -53,7 +50,9 @@ const NewServicePage: React.FC = () => {
   const { intentName } = useParams();
   useEffect(() => {
     const name = intentName?.trim();
-    if(name) changeServiceName(name);
+    if(name) {
+      changeServiceName(name);
+    }
   }, [intentName])
 
   useEffect(() => {
@@ -81,8 +80,8 @@ const NewServicePage: React.FC = () => {
       if (!endpoint?.data) continue;
       const selectedEndpointType = endpoint.data.definedEndpoints.find((e) => e.isSelected);
       if (!selectedEndpointType) continue;
-      console.log("e", selectedEndpointType, endpoint);
-      const endpointName = `${serviceName.replaceAll(" ", "_")}-${
+
+      const endpointName = `${name.replaceAll(" ", "_")}-${
         (endpoint.data.name.trim().length ?? 0) > 0 ? endpoint.data?.name.replaceAll(" ", "_") : endpoint.data?.id
       }`;
       for (const env of [EndpointEnv.Live, EndpointEnv.Test]) {
@@ -171,7 +170,7 @@ const NewServicePage: React.FC = () => {
         next: "end",
       });
       const result = Object.fromEntries(steps.entries());
-      console.log(jsonToYml());
+
       await axios
         .post(
           jsonToYml(),
@@ -185,14 +184,12 @@ const NewServicePage: React.FC = () => {
           }
         )
         .then((r) => {
-          console.log(r);
           useToastStore.getState().success({
             title: t("newService.toast.success"),
             message: t("newService.toast.savedSuccessfully"),
           });
         })
         .catch((e) => {
-          console.log(e);
           useToastStore.getState().error({
             title: t("newService.toast.failed"),
             message: t("newService.toast.saveFailed"),
@@ -242,12 +239,8 @@ const NewServicePage: React.FC = () => {
           },
         }
       )
-      .then((r) => {
-        console.log(r);
-      })
-      .catch((e) => {
-        console.log(e);
-      });
+      .then(console.log)
+      .catch(console.log)
   };
 
   const getEndpointVariables = (
@@ -367,7 +360,7 @@ const NewServicePage: React.FC = () => {
     });
     steps.set("return_value", { wrapper: false, return: "${sensitive}" });
     const result = Object.fromEntries(steps.entries());
-    console.log(result);
+
     await axios
       .post(
         jsonToYml(),
@@ -380,12 +373,8 @@ const NewServicePage: React.FC = () => {
           },
         }
       )
-      .then((r) => {
-        console.log(r);
-      })
-      .catch((e) => {
-        console.log(e);
-      });
+      .then(console.log)
+      .catch(console.log)
   };
 
   const assignEndpointVariables = (
@@ -474,14 +463,14 @@ const NewServicePage: React.FC = () => {
   };
 
   const saveDraft = async () => {
-    if (serviceName && description) {
-      await saveEndpoints();
-    } else {
+    if (!vaildServiceInfo) {
       useToastStore.getState().error({
         title: t("newService.toast.missingFields"),
         message: t("newService.toast.serviceMissingFields"),
       });
+      return;
     }
+    await saveEndpoints();
   };
 
   return (
@@ -490,15 +479,9 @@ const NewServicePage: React.FC = () => {
       customHeader={
         <NewServiceHeader
           activeStep={2}
-          availableVariables={availableVariables}
           saveDraftOnClick={saveDraft}
           isSaveButtonEnabled={endpoints.length > 0}
-          flow={flow}
-          secrets={secrets}
-          serviceDescription={description}
-          serviceName={serviceName}
           serviceId={serviceId}
-          isCommon={isCommon}
           continueOnClick={() => {
             if (!vaildServiceInfo) {
               useToastStore.getState().error({
@@ -519,7 +502,7 @@ const NewServicePage: React.FC = () => {
           <Track direction="vertical" align="stretch" gap={16}>
             <div>
               <label htmlFor="name">{t("newService.name")}</label>
-              <FormInput name="name" label="" value={serviceName} onChange={(e) => changeServiceName(e.target.value)} />
+              <FormInput name="name" label="" value={name} onChange={(e) => changeServiceName(e.target.value)} />
             </div>
             <div>
               <label htmlFor="description">{t("newService.description")}</label>
