@@ -39,7 +39,7 @@ const Entities: FC = () => {
     mutationFn: (data: { name: string }) => addEntity(data),
     onSuccess: async () => {
       await queryClient.invalidateQueries(['entities']);
-      useToastStore.getState().succes({
+      useToastStore.getState().success({
         title: t('intents.notification'),
         message: 'New Entity Added',
       });
