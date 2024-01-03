@@ -20,14 +20,13 @@ import {
   EndpointEnv,
   EndpointType,
   EndpointVariableData,
-  PreDefinedEndpointEnvVariables,
 } from "../types/endpoint";
-import { ToastContext } from "../components/Toast/ToastContext";
 import { Step } from "types/step";
 import { StepType } from "types/step-type.enum";
 import { RawData } from "types";
 import useStore from "store/store";
 import useServiceStore from "store/new-services.store";
+import useToastStore from "store/toasts.store";
 
 const NewServicePage: React.FC = () => {
   const { t } = useTranslation();
@@ -48,8 +47,6 @@ const NewServicePage: React.FC = () => {
     addEndpoint,
     loadFlowData,
   } = useServiceStore();
-
-  const toast = useContext(ToastContext);
 
   const { intentName } = useParams();
   useEffect(() => {
@@ -187,16 +184,14 @@ const NewServicePage: React.FC = () => {
         )
         .then((r) => {
           console.log(r);
-          toast.open({
-            type: "success",
+          useToastStore.getState().success({
             title: t("newService.toast.success"),
             message: t("newService.toast.savedSuccessfully"),
           });
         })
         .catch((e) => {
           console.log(e);
-          toast.open({
-            type: "error",
+          useToastStore.getState().error({
             title: t("newService.toast.failed"),
             message: t("newService.toast.saveFailed"),
           });
@@ -480,8 +475,7 @@ const NewServicePage: React.FC = () => {
     if (serviceName && description) {
       await saveEndpoints();
     } else {
-      toast.open({
-        type: "error",
+      useToastStore.getState().error({
         title: t("newService.toast.missingFields"),
         message: t("newService.toast.serviceMissingFields"),
       });
@@ -518,8 +512,7 @@ const NewServicePage: React.FC = () => {
                 },
               });
             } else {
-              toast.open({
-                type: "error",
+              useToastStore.getState().error({
                 title: t("newService.toast.missingFields"),
                 message: t("newService.toast.serviceMissingFields"),
               });

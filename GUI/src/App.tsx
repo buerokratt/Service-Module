@@ -1,6 +1,6 @@
 import React from "react";
 import { BrowserRouter } from "react-router-dom";
-import { ToastProvider } from "./components/Toast/ToastContext";
+import { ToastProvider } from "./components/Toast/ToastProvider";
 import RootComponent from "./RootComponent";
 import useStore from "./store/store";
 import { useQuery } from "@tanstack/react-query";

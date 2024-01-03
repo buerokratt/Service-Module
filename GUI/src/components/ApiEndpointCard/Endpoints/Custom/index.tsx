@@ -13,8 +13,8 @@ import {
   PreDefinedEndpointEnvVariables,
 } from "../../../../types/endpoint";
 import { RequestVariablesTabsRowsData, RequestVariablesTabsRawData } from "../../../../types/request-variables";
-import { ToastContext } from "components/Toast/ToastContext";
 import useServiceStore from "store/new-services.store";
+import useToastStore from "store/toasts.store";
 
 type EndpointCustomProps = {
   endpoint: EndpointData;
@@ -34,7 +34,6 @@ const EndpointCustom: React.FC<EndpointCustomProps> = ({
   const { t } = useTranslation();
   const [urlError, setUrlError] = useState<string>();
   const [key, setKey] = useState<number>(0);
-  const toast = useContext(ToastContext);
   const { setEndpoints } = useServiceStore();
 
   // initial endpoint data
@@ -171,10 +170,8 @@ const EndpointCustom: React.FC<EndpointCustomProps> = ({
                   });
                 }
                 setUrlError(undefined);
-                toast.open({
-                  type: "success",
+                useToastStore.getState().success({
                   title: t("newService.endpoint.success"),
-                  message: "",
                 });
               } catch (e) {
                 setUrlError(t("newService.endpoint.error") ?? undefined);

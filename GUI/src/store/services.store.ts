@@ -1,5 +1,4 @@
 import { create } from 'zustand';
-import { v4 as uuid } from "uuid";
 import axios from 'axios';
 import { getServicesList } from 'resources/api-constants';
 import { Service } from 'types';

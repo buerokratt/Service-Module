@@ -6,7 +6,7 @@ import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { ROUTES } from "../../resources/routes-constants";
 import { EndpointData, PreDefinedEndpointEnvVariables } from "../../types/endpoint";
-import { ToastContext } from "components/Toast/ToastContext";
+import useToastStore from "store/toasts.store";
 
 type StepCounterProps = {
   activeStep: number;
@@ -33,7 +33,6 @@ const HeaderStepCounter: FC<StepCounterProps> = ({
 }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const toast = useContext(ToastContext);
 
   return (
     <Track className="header-step-counter" gap={24}>
@@ -76,8 +75,7 @@ const HeaderStepCounter: FC<StepCounterProps> = ({
               },
             });
           } else {
-            toast.open({
-              type: "error",
+            useToastStore.getState().error({
               title: t("newService.toast.missingFields"),
               message: t("newService.toast.serviceMissingFields"),
             });

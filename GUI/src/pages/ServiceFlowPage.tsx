@@ -20,8 +20,8 @@ import {
 } from "../types/endpoint";
 import axios from "axios";
 import { createNewService, jsonToYml, testDraftService } from "../resources/api-constants";
-import { ToastContext } from "../components/Toast/ToastContext";
 import useServiceStore from "store/new-services.store";
+import useToastStore from "store/toasts.store";
 
 const initialPlaceholder = {
   id: "2",
@@ -81,7 +81,6 @@ const initialNodes: Node[] = [
 
 const ServiceFlowPage: FC = () => {
   const { t } = useTranslation();
-  const toast = useContext(ToastContext);
 
   const allElements: Step[] = [
     { id: 10, label: t("serviceFlow.element.taraAuthentication"), type: StepType.Auth },
@@ -852,25 +851,21 @@ const ServiceFlowPage: FC = () => {
           console.log(r);
           setIsTestButtonVisible(true);
           setIsTestButtonEnabled(true);
-          toast.open({
-            type: "success",
+          useToastStore.getState().success({
             title: t("newService.toast.success"),
             message: t("newService.toast.savedSuccessfully"),
           });
         })
         .catch((e) => {
-          console.log(e);
-          toast.open({
-            type: "error",
+          useToastStore.getState().error({
             title: t("toast.cannot-save-flow"),
-            message: e?.message ?? "",
+            message: e?.message,
           });
         });
     } catch (e: any) {
-      toast.open({
-        type: "error",
+      useToastStore.getState().error({
         title: t("toast.cannot-save-flow"),
-        message: e?.message ?? "",
+        message: e?.message,
       });
     }
   };
@@ -944,17 +939,13 @@ const ServiceFlowPage: FC = () => {
   const runServiceTest = async () => {
     try {
       await axios.post(testDraftService(serviceName), {});
-      toast.open({
-        type: "success",
+      useToastStore.getState().success({
         title: "Test result- success",
-        message: "",
       });
     } catch (error) {
       console.log("ERROR: ", error);
-      toast.open({
-        type: "error",
+      useToastStore.getState().error({
         title: "Test result - error",
-        message: "",
       });
     }
   };

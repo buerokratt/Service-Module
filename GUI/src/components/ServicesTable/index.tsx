@@ -10,9 +10,9 @@ import DataTable from "../DataTable";
 
 import "./ServicesTable.scss";
 import axios from "axios";
-import { ToastContext } from "../Toast/ToastContext";
 import useStore from "store/store";
 import useServiceListStore from "store/services.store";
+import useToastStore from "store/toasts.store";
 
 type ServicesTableProps = {
   isCommon?: boolean;
@@ -24,7 +24,6 @@ const ServicesTable: FC<ServicesTableProps> = ({ isCommon = false }) => {
     pageSize: 10,
   });
   const { t } = useTranslation();
-  const toast = useContext(ToastContext);
   const [isDeletePopupVisible, setDeletePopupVisible] = useState(false);
   const userInfo = useStore((state) => state.userInfo);
   const [isStatePopupVisible, setStatePopupVisible] = useState(false);
@@ -141,17 +140,13 @@ const ServicesTable: FC<ServicesTableProps> = ({ isCommon = false }) => {
         state: selectedService.state === ServiceState.Active ? ServiceState.Inactive : ServiceState.Active,
         type: selectedService.type,
       });
-      toast.open({
-        type: "success",
+      useToastStore.getState().success({
         title: t("overview.service.toast.updated"),
-        message: "",
       });
       await useServiceListStore.getState().loadServicesList();
     } catch (_) {
-      toast.open({
-        type: "error",
+      useToastStore.getState().error({
         title: t("overview.service.toast.failed.state"),
-        message: "",
       });
     }
     setSelectedService(undefined);
@@ -166,17 +161,13 @@ const ServicesTable: FC<ServicesTableProps> = ({ isCommon = false }) => {
         id: selectedService?.id,
         type: selectedService?.type,
       });
-      toast.open({
-        type: "success",
+      useToastStore.getState().success({
         title: t("overview.service.toast.deleted"),
-        message: "",
       });
       await useServiceListStore.getState().deleteService(selectedService.id);
     } catch (_) {
-      toast.open({
-        type: "error",
+      useToastStore.getState().error({
         title: t("overview.service.toast.failed.delete"),
-        message: "",
       });
     }
     setSelectedService(undefined);

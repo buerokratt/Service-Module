@@ -8,14 +8,12 @@ import {
   MdErrorOutline,
 } from 'react-icons/md'
 import clsx from 'clsx'
-
+import useToastStore, { ToastTypeWithId } from '../../store/toasts.store'
 import { Icon } from '../../components'
-import type { ToastType } from './ToastContext'
 import './Toast.scss'
 
 type ToastProps = {
-  toast: ToastType
-  close: () => void
+  toast: ToastTypeWithId
 }
 
 const toastIcons = {
@@ -25,10 +23,12 @@ const toastIcons = {
   error: <MdErrorOutline />,
 }
 
-const Toast: FC<ToastProps> = ({ toast, close }) => {
+const Toast: FC<ToastProps> = ({ toast }) => {
   const [open, setOpen] = useState(true)
 
   const toastClasses = clsx('toast', `toast--${toast.type}`)
+
+  const close = () => useToastStore.getState().close(toast.id);
 
   return (
     <RadixToast.Root
