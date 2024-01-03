@@ -3,13 +3,13 @@ import React, { FC } from "react";
 import { Button, HeaderStepCounter, Track } from "..";
 import { EndpointData, PreDefinedEndpointEnvVariables } from "../../types/endpoint";
 import "@buerokratt-ria/header/src/header/Header.scss";
+import useServiceStore from "store/new-services.store";
 
 type NewServiceHeaderProps = {
   activeStep: number;
   continueOnClick: () => void;
   saveDraftOnClick: () => void;
   availableVariables?: PreDefinedEndpointEnvVariables;
-  endpoints?: EndpointData[];
   flow?: string;
   secrets?: { [key: string]: any };
   serviceName?: string;
@@ -27,7 +27,6 @@ const NewServiceHeader: FC<NewServiceHeaderProps> = ({
   availableVariables,
   continueOnClick,
   saveDraftOnClick,
-  endpoints,
   flow,
   secrets,
   serviceDescription,
@@ -39,6 +38,8 @@ const NewServiceHeader: FC<NewServiceHeaderProps> = ({
   isTestButtonEnabled = true,
   onTestButtonClick,
 }) => {
+  const { endpoints } = useServiceStore();
+  
   return (
     <>
       <header className="header" style={{ paddingLeft: 24 }}>

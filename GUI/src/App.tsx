@@ -1,9 +1,7 @@
 import React from "react";
-import { Provider } from "react-redux";
 import { BrowserRouter } from "react-router-dom";
 import { ToastProvider } from "./components/Toast/ToastContext";
 import RootComponent from "./RootComponent";
-import { store as reducer } from "./store/reducers/store";
 import useStore from "./store/store";
 import { useQuery } from "@tanstack/react-query";
 import { UserInfo } from "./types/userInfo";
@@ -25,13 +23,11 @@ const App: React.FC = () => {
   }
 
   return (
-    <Provider store={reducer}>
-      <BrowserRouter basename={import.meta.env.BASE_URL}>
-        <ToastProvider>
-          <RootComponent />
-        </ToastProvider>
-      </BrowserRouter>
-    </Provider>
+    <BrowserRouter basename={import.meta.env.BASE_URL}>
+      <ToastProvider>
+        <RootComponent />
+      </ToastProvider>
+    </BrowserRouter>
   );
 };
 

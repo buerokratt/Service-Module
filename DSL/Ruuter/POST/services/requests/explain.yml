@@ -1,9 +1,38 @@
-request_explain:
+check_for_body:
+  switch:
+    - condition: ${incoming.body == null}
+      next: missing_parameter
+
+check_for_required_parameters:
+  switch:
+    - condition: ${incoming.body.url == null || incoming.body.method == null}
+      next: missing_parameter
+  next: check_method
+
+missing_parameter:
+  status: 400
+  return: "required parameters were not provided"
+  next: end
+
+check_method:
+  switch:
+    - condition: ${incoming.body.method.toLowerCase() == 'post'}
+      next: request_explain_post
+  next: request_explain_get
+
+request_explain_get:
+  call: http.get
+  args:
+    url: ${incoming.body.url}
+  result: result
+  next: return_value
+
+request_explain_post:
   call: http.post
   args:
-    url: "[#SERVICE_RUUTER]/mocks/services/requests/explain"
-    body: {}
+    url: ${incoming.body.url}
   result: result
+  next: return_value
 
 return_value:
   wrapper: false

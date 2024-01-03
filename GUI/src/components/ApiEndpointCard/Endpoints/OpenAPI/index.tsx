@@ -14,10 +14,10 @@ import {
   PreDefinedEndpointEnvVariables,
 } from "../../../../types/endpoint";
 import { RequestVariablesRowData, RequestVariablesTabsRowsData } from "../../../../types/request-variables";
+import useServiceStore from "store/new-services.store";
 
 type EndpointOpenAPIProps = {
   endpoint: EndpointData;
-  setEndpoints: React.Dispatch<React.SetStateAction<EndpointData[]>>;
   isLive: boolean;
   requestValues: PreDefinedEndpointEnvVariables;
   requestTab: RequestTab;
@@ -26,7 +26,6 @@ type EndpointOpenAPIProps = {
 
 const EndpointOpenAPI: React.FC<EndpointOpenAPIProps> = ({
   endpoint,
-  setEndpoints,
   isLive,
   requestValues,
   requestTab,
@@ -39,6 +38,7 @@ const EndpointOpenAPI: React.FC<EndpointOpenAPIProps> = ({
   const [openApiEndpoints, setOpenApiEndpoints] = useState<EndpointType[]>(endpoint.definedEndpoints ?? []);
   const [key, setKey] = useState<number>(0);
   const { t } = useTranslation();
+  const { setEndpoints } = useServiceStore();
 
   useEffect(() => setKey(key + 1), [isLive]);
 
@@ -171,6 +171,7 @@ const EndpointOpenAPI: React.FC<EndpointOpenAPIProps> = ({
             methodType: method,
             supported: false,
             isSelected: false,
+            dataType: 'custom',
           });
           return;
         }
@@ -189,6 +190,7 @@ const EndpointOpenAPI: React.FC<EndpointOpenAPIProps> = ({
           isSelected: false,
           description: data.summary ?? data.description,
           url: endpointUrl,
+          dataType: 'custom',
           body: body
             ? {
                 variables: body,
@@ -327,7 +329,6 @@ const EndpointOpenAPI: React.FC<EndpointOpenAPIProps> = ({
               requestValues={requestValues}
               requestTab={requestTab}
               setRequestTab={setRequestTab}
-              setEndpoints={setEndpoints}
             />
           </>
         ) : (

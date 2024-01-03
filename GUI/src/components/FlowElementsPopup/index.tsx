@@ -20,7 +20,9 @@ import { Node } from "reactflow";
 import RasaRulesContent from "./RasaRulesContent";
 import { ConditionRuleType, StepType } from "../../types";
 import "./styles.scss";
+import { useLocation } from "react-router-dom";
 import { PreDefinedEndpointEnvVariables } from "../../types/endpoint";
+import useServiceStore from "store/new-services.store";
 
 interface FlowElementsPopupProps {
   node: any;
@@ -46,6 +48,10 @@ const FlowElementsPopup: React.FC<FlowElementsPopupProps> = ({
   const [isJsonRequestVisible, setIsJsonRequestVisible] = useState(false);
   const [jsonRequestContent, setJsonRequestContent] = useState<string | null>(null);
 
+  const isUserDefinedNode = node?.data?.stepType === 'user-defined';
+
+  const { endpoints } = useServiceStore();
+
   useEffect(() => {
     if (node) node.data.rules = rules;
   }, [rules]);
@@ -59,6 +65,7 @@ const FlowElementsPopup: React.FC<FlowElementsPopupProps> = ({
   // StepType.FileGenerate
   const [fileName, setFileName] = useState<string | null>(null);
   const [fileContent, setFileContent] = useState<string | null>(null);
+  const location = useLocation();
 
   if (!node) return <></>;
 
@@ -91,14 +98,43 @@ const FlowElementsPopup: React.FC<FlowElementsPopupProps> = ({
     onSave(updatedNode);
   };
 
-  const fetchExplainRequestJson = async () => {
+  const handleJsonRequestClick = async () => {
+    if(isJsonRequestVisible) {
+      setIsJsonRequestVisible(false);
+      return;
+    }
+
     try {
-      const response = await axios.post(servicesRequestsExplain(), {});
+      const finder = (e: any) => e.name === node.data.label || node.data.label.includes(e.name);
+      const endpoint = endpoints.find(finder)?.definedEndpoints[0];
+      
+      if(!endpoint) return;
+      
+      const response = await axios.post(servicesRequestsExplain(), {
+        url: endpoint.url,
+        method: endpoint.methodType,
+        headers: extractMapValues(endpoint.headers),
+        body: extractMapValues(endpoint.body),
+        params: extractMapValues(endpoint.params),
+      });
       setJsonRequestContent(response.data);
+      setIsJsonRequestVisible(true);
     } catch (error) {
-      console.log("Error: ", error);
+      console.error("Error: ", error);
     }
   };
+
+  function extractMapValues(element: any) {
+    if(element.rawData && element.rawData.length > 0) {
+      return element.rawData.value; //  element.rawData.testValue
+    }
+
+    let result: any = {};
+    for (const entry of element.variables) {
+      result = { ...result, [entry.name]: entry.value };
+    }
+    return result;
+  }
 
   const resetStates = () => {
     setSelectedTab(null);
@@ -112,6 +148,14 @@ const FlowElementsPopup: React.FC<FlowElementsPopupProps> = ({
     setTextfieldMessagePlaceholders({});
   };
 
+  const getJsonRequestButtonTitle = () => {
+    if(!isUserDefinedNode || selectedTab === t("serviceFlow.tabs.test")) 
+      return "";
+    if(isJsonRequestVisible) 
+      return t("serviceFlow.popup.hideJsonRequest");
+    return t("serviceFlow.popup.showJsonRequest");
+  }
+
   return (
     <Popup
       style={{ maxWidth: 700 }}
@@ -124,12 +168,9 @@ const FlowElementsPopup: React.FC<FlowElementsPopupProps> = ({
         <Track direction="horizontal" gap={16} justify="between" style={{ width: "100%" }}>
           <Button
             appearance="text"
-            onClick={async () => {
-              await fetchExplainRequestJson();
-              setIsJsonRequestVisible(!isJsonRequestVisible);
-            }}
+            onClick={handleJsonRequestClick}
           >
-            {t(isJsonRequestVisible ? "serviceFlow.popup.hideJsonRequest" : "serviceFlow.popup.showJsonRequest")}
+            {getJsonRequestButtonTitle()}
           </Button>
           <Track gap={16}>
             {!isReadonly && (

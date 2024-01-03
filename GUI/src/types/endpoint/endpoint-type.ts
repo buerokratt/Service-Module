@@ -7,6 +7,7 @@ export type EndpointType = {
   path: string;
   methodType: string;
   type: "openApi" | "custom";
+  dataType: 'raw' | 'custom',
   supported: boolean;
   isSelected: boolean;
   url?: string;

@@ -14,10 +14,10 @@ import {
 } from "../../../../types/endpoint";
 import { RequestVariablesTabsRowsData, RequestVariablesTabsRawData } from "../../../../types/request-variables";
 import { ToastContext } from "components/Toast/ToastContext";
+import useServiceStore from "store/new-services.store";
 
 type EndpointCustomProps = {
   endpoint: EndpointData;
-  setEndpoints: React.Dispatch<React.SetStateAction<EndpointData[]>>;
   isLive: boolean;
   requestValues: PreDefinedEndpointEnvVariables;
   requestTab: RequestTab;
@@ -26,7 +26,6 @@ type EndpointCustomProps = {
 
 const EndpointCustom: React.FC<EndpointCustomProps> = ({
   endpoint,
-  setEndpoints,
   isLive,
   requestValues,
   requestTab,
@@ -36,6 +35,7 @@ const EndpointCustom: React.FC<EndpointCustomProps> = ({
   const [urlError, setUrlError] = useState<string>();
   const [key, setKey] = useState<number>(0);
   const toast = useContext(ToastContext);
+  const { setEndpoints } = useServiceStore();
 
   // initial endpoint data
   if (endpoint.definedEndpoints.length === 0) {
@@ -44,6 +44,7 @@ const EndpointCustom: React.FC<EndpointCustomProps> = ({
       label: "",
       methodType: "GET",
       type: "custom",
+      dataType: "custom",
       path: "",
       supported: true,
       isSelected: true,
@@ -201,7 +202,6 @@ const EndpointCustom: React.FC<EndpointCustomProps> = ({
         endpointData={endpoint.definedEndpoints[0]}
         requestTab={requestTab}
         setRequestTab={setRequestTab}
-        setEndpoints={setEndpoints}
       />
     </Track>
   );

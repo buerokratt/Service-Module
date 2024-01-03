@@ -21,6 +21,7 @@ const JsonRequestContent: FC<JsonRequestContentProps> = ({ isVisible, jsonConten
           label="JSON"
           placeholder={t('serviceFlow.popup.jsonRequestPlaceholder')!}
           hideLabel={true}
+          maxRows={20}
           style={{
             backgroundColor: '#F0F0F2',
             resize: 'vertical',

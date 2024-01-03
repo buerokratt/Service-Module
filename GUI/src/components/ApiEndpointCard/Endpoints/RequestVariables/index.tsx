@@ -19,6 +19,7 @@ import {
   RequestVariablesTableColumns,
   RequestVariablesRowData,
 } from "../../../../types/request-variables";
+import useServiceStore from "store/new-services.store";
 
 type RequestVariablesProps = {
   disableRawData?: boolean;
@@ -29,7 +30,6 @@ type RequestVariablesProps = {
   requestValues: PreDefinedEndpointEnvVariables;
   requestTab: RequestTab;
   setRequestTab: React.Dispatch<React.SetStateAction<RequestTab>>;
-  setEndpoints: React.Dispatch<React.SetStateAction<EndpointData[]>>;
 };
 
 const RequestVariables: React.FC<RequestVariablesProps> = ({
@@ -41,13 +41,13 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
   requestValues,
   requestTab,
   setRequestTab,
-  setEndpoints,
 }) => {
   const { t } = useTranslation();
   const tabs: EndpointTab[] = [EndpointTab.Params, EndpointTab.Headers, EndpointTab.Body];
   const [jsonError, setJsonError] = useState<string>();
   const [key, setKey] = useState<number>(0);
   const columnHelper = createColumnHelper<RequestVariablesTableColumns>();
+  const { setEndpoints } = useServiceStore();
 
   const constructRow = (id: number, data: EndpointVariableData, nestedLevel: number): RequestVariablesRowData => {
     const value = isLive ? data.value : data.testValue;

@@ -282,9 +282,9 @@ const FlowBuilder: FC<FlowBuilderProps> = ({
       if (!reactFlowInstance || !reactFlowWrapper.current) return;
       // Check if node was dropped on a placeholder
       const reactFlowBounds = reactFlowWrapper.current.getBoundingClientRect();
-      const position = reactFlowInstance.project({
-        x: event.clientX - reactFlowBounds.left,
-        y: event.clientY - reactFlowBounds.top,
+      const position = reactFlowInstance.screenToFlowPosition({
+        x: event.clientX,
+        y: event.clientY,
       });
       
       if (reactFlowInstance.getIntersectingNodes(draggedNode).length > 0) {
@@ -364,9 +364,9 @@ const FlowBuilder: FC<FlowBuilderProps> = ({
         event.dataTransfer.getData("application/reactflow-label"),
         event.dataTransfer.getData("application/reactflow-type") as StepType,
       ];
-      const position = reactFlowInstance.project({
-        x: event.clientX - reactFlowBounds.left,
-        y: event.clientY - reactFlowBounds.top,
+      const position = reactFlowInstance.screenToFlowPosition({
+        x: event.clientX,
+        y: event.clientY,
       });
 
       const matchingPlaceholder = reactFlowInstance.getNodes().find((node) => {

@@ -3,7 +3,6 @@ export * from "./entity";
 export * from "./mainNavigation";
 export * from "./option";
 export * from "./raw-data";
-export * from "./reducers";
 export * from "./regexTeaser";
 export * from "./request-tab";
 export * from "./router";
