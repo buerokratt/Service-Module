@@ -8,7 +8,7 @@ import { ROUTES } from "../resources/routes-constants";
 import apiIconTag from "../assets/images/api-icon-tag.svg";
 import "reactflow/dist/style.css";
 import "./ServiceFlowPage.scss";
-import { StepType, Step, RawData, ConditionRuleType } from "../types";
+import { StepType, Step, ConditionRuleType } from "../types";
 import axios from "axios";
 import { testDraftService } from "../resources/api-constants";
 import useServiceStore from "store/new-services.store";
@@ -84,7 +84,7 @@ const ServiceFlowPage: FC = () => {
     { id: 70, label: t("serviceFlow.element.fileSigning"), type: StepType.FileSign },
     { id: 90, label: t("serviceFlow.element.conversationEnd"), type: StepType.FinishingStepEnd },
     { id: 100, label: t("serviceFlow.element.redirectConversationToSupport"), type: StepType.FinishingStepRedirect },
-  ], []);
+  ], [t]);
 
   const [updatedRules, setUpdatedRules] = useState<{ rules: (string | null)[]; rulesData: ConditionRuleType[] }>({
     rules: [],
@@ -94,7 +94,6 @@ const ServiceFlowPage: FC = () => {
   const navigate = useNavigate();
   const { serviceId, description, availableVariables, setFlow, isCommon, } = useServiceStore();
 
-  // const reactFlowInstance = useServiceStore((state) => state.reactFlowInstance);
   const steps = useServiceStore((state) => state.mapEndpointsToSetps());
   const name = useServiceStore((state) => state.serviceNameDashed());
   

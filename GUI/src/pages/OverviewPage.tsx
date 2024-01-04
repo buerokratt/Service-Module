@@ -8,13 +8,11 @@ import { ROUTES } from "../resources/routes-constants";
 import useServiceListStore from "store/services.store";
 
 const OverviewPage: React.FC = () => {
-  const { loadServicesList } = useServiceListStore();
-
   const { t } = useTranslation();
   const navigate = useNavigate();
 
   useEffect(() => {
-    loadServicesList();
+    useServiceListStore.getState().loadServicesList();
   }, []);
 
   return (

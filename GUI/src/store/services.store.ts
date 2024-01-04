@@ -1,17 +1,22 @@
 import { create } from 'zustand';
 import axios from 'axios';
-import { getServicesList } from 'resources/api-constants';
-import { Service } from 'types';
+import { changeServiceStatus, deleteService, getServicesList } from 'resources/api-constants';
+import { Service, ServiceState } from 'types';
+import useToastStore from './toasts.store';
 
-interface ServiceState {
+interface ServiceStoreState {
   services: Service[];
   commonServices: Service[];
   notCommonServices: Service[];
   loadServicesList: () => Promise<void>;
   deleteService: (id: number) => Promise<void>;
+  selectedService: Service | undefined;
+  setSelectedService: (service: Service) => void;
+  changeServiceState: (onEnd: () => void, successMessage: string, errorMessage: string) => Promise<void>;
+  deleteSelectedService: (onEnd: () => void, successMessage: string, errorMessage: string) => Promise<void>;
 }
 
-const useServiceListStore = create<ServiceState>((set, get, store) => ({
+const useServiceListStore = create<ServiceStoreState>((set, get, store) => ({
   services: [],
   commonServices: [],
   notCommonServices: [],
@@ -41,6 +46,52 @@ const useServiceListStore = create<ServiceState>((set, get, store) => ({
       commonServices: services.filter((e: Service) => e.isCommon === true),
       notCommonServices: services.filter((e: Service) => e.isCommon === false),
     })
+  },
+
+  selectedService: undefined,
+  setSelectedService: (service: Service) => {
+    set({
+      selectedService: service,
+    });
+  },
+  changeServiceState: async (onEnd, successMessage, errorMessage) => {
+    const selectedService = get().selectedService;
+    if (!selectedService) return;
+
+    try {
+      await axios.post(changeServiceStatus(), {
+        id: selectedService.id,
+        state: selectedService.state === ServiceState.Active ? ServiceState.Inactive : ServiceState.Active,
+        type: selectedService.type,
+      });
+      useToastStore.getState().success({ title: successMessage });
+      await useServiceListStore.getState().loadServicesList();
+    } catch (_) {
+      useToastStore.getState().error({ title: errorMessage });
+    }
+    set({
+      selectedService: undefined,
+    });
+    onEnd();
+  },
+  deleteSelectedService: async (onEnd, successMessage, errorMessage) => {
+    const selectedService = get().selectedService;
+    if (!selectedService) return;
+
+    try {
+      await axios.post(deleteService(), {
+        id: selectedService?.id,
+        type: selectedService?.type,
+      });
+      useToastStore.getState().success({ title: successMessage});
+      await useServiceListStore.getState().deleteService(selectedService.id);
+    } catch (_) {
+      useToastStore.getState().error({ title: errorMessage });
+    }
+    set({
+      selectedService: undefined,
+    });
+    onEnd();
   },
 }));
 
