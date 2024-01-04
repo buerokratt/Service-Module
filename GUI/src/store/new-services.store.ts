@@ -2,9 +2,10 @@ import axios from 'axios';
 import { create } from 'zustand';
 import { v4 as uuid } from "uuid";
 import { Node } from "reactflow";
-import { EndpointData, PreDefinedEndpointEnvVariables } from 'types/endpoint';
+import { EndpointData, EndpointEnv, EndpointTab, EndpointVariableData, PreDefinedEndpointEnvVariables } from 'types/endpoint';
 import { getSecretVariables, getTaraAuthResponseVariables } from 'resources/api-constants';
 import { Step, StepType } from 'types';
+import { RequestVariablesTabsRawData, RequestVariablesTabsRowsData } from 'types/request-variables';
 
 interface ServiceState {
   flow: string | undefined;
@@ -34,6 +35,11 @@ interface ServiceState {
   onNameChange: (endpointId: string, oldName: string, newName: string) => void;
   changeServiceEndpointType: (id: string, type: string) => void;
   mapEndpointsToSetps: () => Step[];
+  selectedTab: EndpointEnv;
+  setSelectedTab: (tab: EndpointEnv) => void;
+  isLive: () => boolean;
+  updateEndpointRawData: (rawData: RequestVariablesTabsRawData, endpointDataId?: string, parentEndpointId?: string) => void;
+  updateEndpointData: (data: RequestVariablesTabsRowsData, endpointDataId?: string, parentEndpointId?:string) => void;
 
   // TODO: remove the following funtions and refactor the code to use more specific functions
   setEndpoints: (callback: (prev: EndpointData[]) => EndpointData[]) => void;
@@ -204,6 +210,75 @@ const useServiceStore = create<ServiceState>((set, get, store) => ({
     }));
   },
   setFlow: (flow) => set({ flow }),
+
+  selectedTab: EndpointEnv.Live,
+  setSelectedTab: (tab: EndpointEnv) => set({ selectedTab: tab }),
+  isLive: () => get().selectedTab === EndpointEnv.Live,
+  updateEndpointRawData: (data: RequestVariablesTabsRawData, endpointId?: string, parentEndpointId?: string) => {
+    if (!endpointId) return;
+    set(state => {
+      const isLive = state.isLive();
+      const endpoints = state.endpoints.map((prevEndpoint: EndpointData) => {
+        if (prevEndpoint.id !== parentEndpointId) return prevEndpoint;
+        prevEndpoint.definedEndpoints.map((defEndpoint) => {
+          if (defEndpoint.id !== endpointId) return defEndpoint;
+          Object.keys(data).forEach((key) => {
+            if (defEndpoint[key as EndpointTab]) {
+              defEndpoint[key as EndpointTab]!.rawData[isLive ? "value" : "testValue"] = data[key as EndpointTab];
+            }
+          });
+          return defEndpoint;
+        });
+        return prevEndpoint;
+      });
+
+      return {
+        endpoints
+      }
+    });
+  },
+  updateEndpointData: (data: RequestVariablesTabsRowsData, endpointId?: string, parentEndpointId?: string) => {
+    if (!endpointId) return;
+    set((state) => {
+      const endpoints = state.endpoints.map((prevEndpoint: EndpointData) => {
+        if (prevEndpoint.id !== parentEndpointId) return prevEndpoint;
+        prevEndpoint.definedEndpoints.map((defEndpoint) => {
+          if (defEndpoint.id !== endpointId) return defEndpoint;
+          Object.keys(data).forEach((key) => {
+            data[key as EndpointTab]?.forEach((row) => {
+              if (
+                !row.endpointVariableId &&
+                row.variable &&
+                !defEndpoint[key as EndpointTab]?.variables.map((e) => e.name).includes(row.variable)
+              ) {
+                const newVariable: EndpointVariableData = {
+                  id: uuid(),
+                  name: row.variable,
+                  type: "custom",
+                  required: false,
+                };
+                newVariable[state.isLive() ? "value" : "testValue"] = row.value;
+                defEndpoint[key as EndpointTab]?.variables.push(newVariable);
+              }
+            });
+            defEndpoint[key as EndpointTab]?.variables.forEach((variable) => {
+              const updatedVariable = data[key as EndpointTab]!.find(
+                (updated) => updated.endpointVariableId === variable.id
+              );
+              variable[state.isLive() ? "value" : "testValue"] = updatedVariable?.value;
+              variable.name = updatedVariable?.variable ?? variable.name;
+            });
+          });
+          return defEndpoint;
+        });
+        return prevEndpoint;
+      });
+
+      return {
+        endpoints,
+      }
+    });
+  },
 }));
 
 export default useServiceStore;
