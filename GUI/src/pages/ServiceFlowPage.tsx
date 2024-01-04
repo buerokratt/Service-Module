@@ -92,8 +92,9 @@ const ServiceFlowPage: FC = () => {
   });
   const [selectedNode, setSelectedNode] = useState<Node<NodeDataProps> | null>(null);
   const navigate = useNavigate();
-  const { endpoints, serviceId, description, availableVariables, setFlow, isCommon, } = useServiceStore();
+  const { serviceId, description, availableVariables, setFlow, isCommon, } = useServiceStore();
 
+  // const reactFlowInstance = useServiceStore((state) => state.reactFlowInstance);
   const steps = useServiceStore((state) => state.mapEndpointsToSetps());
   const name = useServiceStore((state) => state.serviceNameDashed());
   
@@ -105,7 +106,6 @@ const ServiceFlowPage: FC = () => {
   }, [useServiceStore.getState().flow]);
 
   const [edges, setEdges, onEdgesChange] = useEdgesState(flow ? flow.edges : [initialEdge]);
-  const [reactFlowInstance, setReactFlowInstance] = useState<ReactFlowInstance>();
 
   const resetNodes = (): Node[] => {
     return flow.nodes.map((n: Node) => {
@@ -116,10 +116,6 @@ const ServiceFlowPage: FC = () => {
   const [nodes, setNodes, onNodesChange] = useNodesState(flow ? resetNodes() : initialNodes);
   const [isTestButtonVisible, setIsTestButtonVisible] = useState(false);
   const [isTestButtonEnabled, setIsTestButtonEnabled] = useState(true);
-
-  useEffect(() => {
-    setFlow(JSON.stringify(reactFlowInstance?.toObject()));
-  }, [reactFlowInstance]);
 
   const onDragStart = (event: React.DragEvent<HTMLDivElement>, step: Step) => {
     event.dataTransfer.setData("application/reactflow-label", step.label);
@@ -205,7 +201,6 @@ const ServiceFlowPage: FC = () => {
       <NewServiceHeader
         activeStep={3}
         saveDraftOnClick={saveFlowClick}
-        // flow={JSON.stringify(reactFlowInstance?.toObject())}
         serviceId={serviceId}
         continueOnClick={() => navigate(ROUTES.OVERVIEW_ROUTE)}
         isTestButtonVisible={isTestButtonVisible}
@@ -290,8 +285,6 @@ const ServiceFlowPage: FC = () => {
             </Track>
           </div>
           <FlowBuilder
-            reactFlowInstance={reactFlowInstance}
-            setReactFlowInstance={setReactFlowInstance}
             onNodeEdit={setSelectedNode}
             updatedRules={updatedRules}
             description={description}

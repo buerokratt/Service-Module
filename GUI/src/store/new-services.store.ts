@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { create } from 'zustand';
 import { v4 as uuid } from "uuid";
-import { Node } from "reactflow";
+import { Node, ReactFlowInstance } from "reactflow";
 import { EndpointData, EndpointEnv, EndpointTab, EndpointVariableData, PreDefinedEndpointEnvVariables } from 'types/endpoint';
 import { getSecretVariables, getTaraAuthResponseVariables } from 'resources/api-constants';
 import { Step, StepType } from 'types';
@@ -44,6 +44,8 @@ interface ServiceState {
   // TODO: remove the following funtions and refactor the code to use more specific functions
   setEndpoints: (callback: (prev: EndpointData[]) => EndpointData[]) => void;
   setFlow: (flow: string) => void;
+  reactFlowInstance: ReactFlowInstance | null;
+  setReactFlowInstance: (reactFlowInstance: ReactFlowInstance | null) => void;
 }
 
 const useServiceStore = create<ServiceState>((set, get, store) => ({
@@ -279,6 +281,8 @@ const useServiceStore = create<ServiceState>((set, get, store) => ({
       }
     });
   },
+  reactFlowInstance: null,
+  setReactFlowInstance: (reactFlowInstance: ReactFlowInstance | null) => set({ reactFlowInstance, }),
 }));
 
 export default useServiceStore;

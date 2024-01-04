@@ -6,6 +6,10 @@ import useToastStore from "store/toasts.store";
 import { RawData, Step, StepType } from "types";
 import { EndpointData, EndpointEnv, EndpointType, EndpointVariableData } from "types/endpoint";
 
+//
+// TODO: refactor this file
+//
+
 const getEndpointVariables = (
   key: string,
   data?: {
@@ -381,9 +385,6 @@ export async function saveEndpoints(steps: Step[], name: string, onSuccess: (e: 
       .catch(onError);
   }
 }
-
-
-
 
 export const saveFlow = async (steps:Step[], name: string, edges: Edge<any>[], nodes: Node<any, string | undefined>[], onSuccess: (e: any) => void, onError: (e: any) => void, t: any, serviceId: string, description: string, isCommon: boolean) => {
   try {
