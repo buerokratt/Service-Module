@@ -1,74 +1,17 @@
 import { CSSProperties, FC, useEffect, useMemo, useState } from "react";
-import { MarkerType, Node, ReactFlowInstance, ReactFlowProvider, useEdgesState, useNodesState } from "reactflow";
-import { Box, Collapsible, NewServiceHeader, Track, FlowElementsPopup } from "../components";
+import { Node, ReactFlowProvider, useEdgesState, useNodesState } from "reactflow";
 import { useTranslation } from "react-i18next";
-import FlowBuilder, { GRID_UNIT } from "../components/FlowBuilder/FlowBuilder";
 import { useNavigate, useParams } from "react-router-dom";
+import { Box, Collapsible, NewServiceHeader, Track, FlowElementsPopup } from "../components";
+import FlowBuilder from "../components/FlowBuilder/FlowBuilder";
 import { ROUTES } from "../resources/routes-constants";
 import apiIconTag from "../assets/images/api-icon-tag.svg";
+import { StepType, Step, ConditionRuleType } from "../types";
+import useServiceStore from "store/new-services.store";
+import { NodeDataProps, initialEdge, initialNodes } from "types/service-flow";
+import { runServiceTest, saveFlowClick } from "services/service-builder";
 import "reactflow/dist/style.css";
 import "./ServiceFlowPage.scss";
-import { StepType, Step, ConditionRuleType } from "../types";
-import axios from "axios";
-import useServiceStore from "store/new-services.store";
-import useToastStore from "store/toasts.store";
-import { runServiceTest, saveFlow, saveFlowClick } from "services/service-builder";
-
-const initialPlaceholder = {
-  id: "2",
-  type: "placeholder",
-  position: {
-    x: 3 * GRID_UNIT,
-    y: 8 * GRID_UNIT,
-  },
-  data: {
-    type: "placeholder",
-  },
-  className: "placeholder",
-  selectable: false,
-  draggable: false,
-};
-
-const initialEdge = {
-  type: "smoothstep",
-  id: "edge-1-2",
-  source: "1",
-  target: "2",
-  markerEnd: {
-    type: MarkerType.ArrowClosed,
-  },
-};
-
-// TODO: refactoring
-type NodeDataProps = {
-  label: string;
-  onDelete: (id: string) => void;
-  onEdit: (id: string) => void;
-  type: string;
-  stepType: StepType;
-  readonly: boolean;
-  message?: string;
-  link?: string;
-  linkText?: string;
-  fileName?: string;
-  fileContent?: string;
-};
-
-const initialNodes: Node[] = [
-  {
-    id: "1",
-    type: "startNode",
-    position: {
-      x: 13.5 * GRID_UNIT,
-      y: GRID_UNIT,
-    },
-    data: {},
-    className: "start",
-    selectable: false,
-    draggable: false,
-  },
-  initialPlaceholder,
-];
 
 const ServiceFlowPage: FC = () => {
   const { t } = useTranslation();
