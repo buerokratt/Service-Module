@@ -1,9 +1,8 @@
 import { createColumnHelper, PaginationState } from "@tanstack/react-table";
-import { FC, useContext, useEffect, useState } from "react";
+import { FC, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { MdDeleteOutline, MdOutlineEdit } from "react-icons/md";
 import { Button, Card, Icon, Label, Modal, Track } from "..";
-import { changeServiceStatus, deleteService } from "../../resources/api-constants";
 import { Service } from "../../types/service";
 import { ServiceState } from "../../types/service-state";
 import DataTable from "../DataTable";
@@ -12,33 +11,39 @@ import "./ServicesTable.scss";
 import axios from "axios";
 import useStore from "store/store";
 import useServiceListStore from "store/services.store";
-import useToastStore from "store/toasts.store";
 
 type ServicesTableProps = {
   isCommon?: boolean;
 };
 
+const getLabelType = (serviceState: ServiceState) => {
+  switch (serviceState) {
+    case ServiceState.Draft:
+      return "disabled";
+    case ServiceState.Inactive:
+      return "warning-dark";
+    default:
+      return "info";
+  }
+};
+
 const ServicesTable: FC<ServicesTableProps> = ({ isCommon = false }) => {
-  const [pagination, setPagination] = useState<PaginationState>({
-    pageIndex: 0,
-    pageSize: 10,
-  });
   const { t } = useTranslation();
   const [isDeletePopupVisible, setDeletePopupVisible] = useState(false);
   const userInfo = useStore((state) => state.userInfo);
   const [isStatePopupVisible, setStatePopupVisible] = useState(false);
   const [popupText, setPopupText] = useState("");
-  const columnHelper = createColumnHelper<Service>();
-  const [selectedService, setSelectedService] = useState<Service | undefined>();
-
   const services = useServiceListStore((state) => state.services.filter(x => x.isCommon === isCommon));
+  const columnHelper = createColumnHelper<Service>();
+
+  console.log('==============')
 
   const showStatePopup = (text: string) => {
     setPopupText(text);
     setStatePopupVisible(true);
   };
 
-  const columns = [
+  const columns = useMemo(() => [
     columnHelper.accessor("name", {
       header: t("overview.service.name") ?? "",
       meta: {
@@ -67,10 +72,10 @@ const ServicesTable: FC<ServicesTableProps> = ({ isCommon = false }) => {
                   : "overview.popup.setActive"
               )
             );
-            setSelectedService(props.row.original);
+            useServiceListStore.getState().setSelectedService(props.row.original);
           }}
         >
-          <Label type={setLabelType(props.row.original.state)}>
+          <Label type={getLabelType(props.row.original.state)}>
             {t(`overview.service.states.${props.row.original.state}`)}
           </Label>
         </Track>
@@ -81,11 +86,16 @@ const ServicesTable: FC<ServicesTableProps> = ({ isCommon = false }) => {
       meta: {
         size: 90,
       },
-      cell: (_) => (
+      cell: (props) => (
         <Track align="right" justify="start">
           <Button
             appearance="text"
-            disabled={isCommon === true && !userInfo?.authorities.includes("ROLE_ADMINISTRATOR") ? true : false}
+            disabled={
+              isCommon === true && !userInfo?.authorities.includes("ROLE_ADMINISTRATOR") 
+                ? true 
+                : props.row.original.state === ServiceState.Active
+            }
+            onClick={() => console.log("Not implemented yet")}
           >
             <Icon icon={<MdOutlineEdit />} size="medium" />
             {t("overview.edit")}
@@ -108,7 +118,7 @@ const ServicesTable: FC<ServicesTableProps> = ({ isCommon = false }) => {
             }
             appearance="text"
             onClick={() => {
-              setSelectedService(services.find((s) => s.id === props.row.original.id));
+              useServiceListStore.getState().setSelectedService(props.row.original);
               setDeletePopupVisible(true);
             }}
           >
@@ -118,61 +128,23 @@ const ServicesTable: FC<ServicesTableProps> = ({ isCommon = false }) => {
         </Track>
       ),
     }),
-  ];
+  ], []);
 
-  const setLabelType = (serviceState: ServiceState) => {
-    switch (serviceState) {
-      case ServiceState.Draft:
-        return "disabled";
-      case ServiceState.Inactive:
-        return "warning-dark";
-      default:
-        return "info";
-    }
-  };
+  const changeServiceState = () => {
+    useServiceListStore.getState().changeServiceState(
+      () => setStatePopupVisible(false),
+      t("overview.service.toast.updated"),
+      t("overview.service.toast.failed.state"),
+    );
+  }
 
-  const changeServiceState = async () => {
-    if (!selectedService) return;
-
-    try {
-      await axios.post(changeServiceStatus(), {
-        id: selectedService.id,
-        state: selectedService.state === ServiceState.Active ? ServiceState.Inactive : ServiceState.Active,
-        type: selectedService.type,
-      });
-      useToastStore.getState().success({
-        title: t("overview.service.toast.updated"),
-      });
-      await useServiceListStore.getState().loadServicesList();
-    } catch (_) {
-      useToastStore.getState().error({
-        title: t("overview.service.toast.failed.state"),
-      });
-    }
-    setSelectedService(undefined);
-    setStatePopupVisible(false);
-  };
-
-  const deleteSelectedService = async () => {
-    if (!selectedService) return;
-
-    try {
-      await axios.post(deleteService(), {
-        id: selectedService?.id,
-        type: selectedService?.type,
-      });
-      useToastStore.getState().success({
-        title: t("overview.service.toast.deleted"),
-      });
-      await useServiceListStore.getState().deleteService(selectedService.id);
-    } catch (_) {
-      useToastStore.getState().error({
-        title: t("overview.service.toast.failed.delete"),
-      });
-    }
-    setSelectedService(undefined);
-    setDeletePopupVisible(false);
-  };
+  const deleteSelectedService = () => {
+    useServiceListStore.getState().deleteSelectedService(
+      () => setDeletePopupVisible(false),
+      t("overview.service.toast.deleted"),
+      t("overview.service.toast.failed.delete"),
+    );
+  }
 
   return (
     <Card>
@@ -202,8 +174,6 @@ const ServicesTable: FC<ServicesTableProps> = ({ isCommon = false }) => {
         sortable={true}
         data={services}
         columns={columns}
-        pagination={pagination}
-        setPagination={setPagination}
       />
     </Card>
   );
