@@ -1,5 +1,6 @@
-import { createColumnHelper, PaginationState } from "@tanstack/react-table";
 import { FC, useMemo, useState } from "react";
+import { createColumnHelper } from "@tanstack/react-table";
+import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { MdDeleteOutline, MdOutlineEdit } from "react-icons/md";
 import { Button, Card, Icon, Label, Modal, Track } from "..";
@@ -8,9 +9,9 @@ import { ServiceState } from "../../types/service-state";
 import DataTable from "../DataTable";
 
 import "./ServicesTable.scss";
-import axios from "axios";
 import useStore from "store/store";
 import useServiceListStore from "store/services.store";
+import { ROUTES } from "resources/routes-constants";
 
 type ServicesTableProps = {
   isCommon?: boolean;
@@ -35,9 +36,8 @@ const ServicesTable: FC<ServicesTableProps> = ({ isCommon = false }) => {
   const [popupText, setPopupText] = useState("");
   const services = useServiceListStore((state) => state.services.filter(x => x.isCommon === isCommon));
   const columnHelper = createColumnHelper<Service>();
-
-  console.log('==============')
-
+  const navigate = useNavigate();
+  
   const showStatePopup = (text: string) => {
     setPopupText(text);
     setStatePopupVisible(true);
@@ -95,7 +95,7 @@ const ServicesTable: FC<ServicesTableProps> = ({ isCommon = false }) => {
                 ? true 
                 : props.row.original.state === ServiceState.Active
             }
-            onClick={() => console.log("Not implemented yet")}
+            onClick={() => navigate(`${ROUTES.EDITSERVICE_ROUTE}/${props.row.original.id}`, )}
           >
             <Icon icon={<MdOutlineEdit />} size="medium" />
             {t("overview.edit")}

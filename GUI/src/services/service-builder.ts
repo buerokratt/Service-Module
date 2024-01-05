@@ -273,17 +273,17 @@ const assignEndpointVariables = (
   return result;
 };
 
-export async function saveEndpoints(steps: Step[], name: string, onSuccess: (e: any) => void, onError: (e: any) => void) {
-  for (const endpoint of steps) {
-    if (!endpoint?.data) continue;
-    const selectedEndpointType = endpoint.data.definedEndpoints.find((e) => e.isSelected);
+export async function saveEndpoints(endpoints: EndpointData[], name: string, onSuccess: (e: any) => void, onError: (e: any) => void) {
+  for (const endpoint of endpoints) {
+    if (!endpoint) continue;
+    const selectedEndpointType = endpoint.definedEndpoints.find((e) => e.isSelected);
     if (!selectedEndpointType) continue;
 
     const endpointName = `${name.replaceAll(" ", "_")}-${
-      (endpoint.data.name.trim().length ?? 0) > 0 ? endpoint.data?.name.replaceAll(" ", "_") : endpoint.data?.id
+      (endpoint.name.trim().length ?? 0) > 0 ? endpoint?.name.replaceAll(" ", "_") : endpoint?.id
     }`;
     for (const env of [EndpointEnv.Live, EndpointEnv.Test]) {
-      await saveEndpointInfo(selectedEndpointType, env, endpointName, endpoint.data);
+      await saveEndpointInfo(selectedEndpointType, env, endpointName, endpoint);
     }
     const steps = new Map();
     steps.set("extract_request_data", {
@@ -304,7 +304,7 @@ export async function saveEndpoints(steps: Step[], name: string, onSuccess: (e: 
       call: "http.post",
       args: {
         url: `${process.env.REACT_APP_API_URL}/services/endpoints/info/${
-          endpoint.data.isCommon ? "common/" : ""
+          endpoint.isCommon ? "common/" : ""
         }${endpointName}-prod-info`,
         body: {
           params: "${incoming.body.params ?? new Map()}",
@@ -319,7 +319,7 @@ export async function saveEndpoints(steps: Step[], name: string, onSuccess: (e: 
       call: `http.post`,
       args: {
         url: `${process.env.REACT_APP_API_URL}/services/endpoints/info/${
-          endpoint.data.isCommon ? "common/" : ""
+          endpoint.isCommon ? "common/" : ""
         }${endpointName}-test-info`,
         body: {
           params: "${incoming.body.params ?? new Map()}",
@@ -376,7 +376,7 @@ export async function saveEndpoints(steps: Step[], name: string, onSuccess: (e: 
         {
           params: {
             location: `/Ruuter/${selectedEndpointType.methodType.toUpperCase()}/services/endpoints/${
-              endpoint.data.isCommon ? "common/" : ""
+              endpoint.isCommon ? "common/" : ""
             }${endpointName}.yml`,
           },
         }
@@ -386,9 +386,10 @@ export async function saveEndpoints(steps: Step[], name: string, onSuccess: (e: 
   }
 }
 
-export const saveFlow = async (steps:Step[], name: string, edges: Edge<any>[], nodes: Node<any, string | undefined>[], onSuccess: (e: any) => void, onError: (e: any) => void, t: any, serviceId: string, description: string, isCommon: boolean) => {
+export const saveFlow = async (steps: Step[], name: string, edges: Edge<any>[], nodes: Node<any, string | undefined>[], onSuccess: (e: any) => void, onError: (e: any) => void, t: any, serviceId: string, description: string, isCommon: boolean) => {
   try {
-    await saveEndpoints(steps, name, onSuccess, onError);
+    const endpoints = steps.filter(x => !!x.data).map(x => x.data!);
+    await saveEndpoints(endpoints, name, onSuccess, onError);
     const allRelations: any[] = [];
     // find regular edges 1 -> 1
     edges.forEach((edge) => {

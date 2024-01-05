@@ -37,7 +37,8 @@ const NewServicePage: React.FC = () => {
 
   const vaildServiceInfo = useServiceStore(state => state.vaildServiceInfo());
 
-  const { intentName } = useParams();
+  const { intentName, id } = useParams();
+
   useEffect(() => {
     const name = intentName?.trim();
     if(name) {
