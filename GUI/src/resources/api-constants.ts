@@ -15,6 +15,7 @@ export const getEndpointValidation = (): string => `${baseUrl}/services/endpoint
 export const deleteService = (): string => `${baseUrl}/services/delete`;
 export const changeServiceStatus = (): string => `${baseUrl}/services/status`;
 export const createNewService = (): string => `${baseUrl}/services/add`;
+export const editService = (id: string): string => `${baseUrl}/services/edit?id=${id}`;
 export const testDraftService = (name: string): string => `${baseUrl}/services/draft/${name}`;
 export const getServicesList = (): string => `${baseUrl}/services`;
 export const jsonToYml = (): string => `${baseUrl}/saveJsonToYml`;

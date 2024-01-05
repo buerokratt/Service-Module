@@ -3,7 +3,7 @@ import { MarkerType, Node, ReactFlowInstance, ReactFlowProvider, useEdgesState, 
 import { Box, Collapsible, NewServiceHeader, Track, FlowElementsPopup } from "../components";
 import { useTranslation } from "react-i18next";
 import FlowBuilder, { GRID_UNIT } from "../components/FlowBuilder/FlowBuilder";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { ROUTES } from "../resources/routes-constants";
 import apiIconTag from "../assets/images/api-icon-tag.svg";
 import "reactflow/dist/style.css";
@@ -92,8 +92,14 @@ const ServiceFlowPage: FC = () => {
   });
   const [selectedNode, setSelectedNode] = useState<Node<NodeDataProps> | null>(null);
   const navigate = useNavigate();
-  const { serviceId, description, availableVariables, setFlow, isCommon, } = useServiceStore();
+  const { serviceId, description, availableVariables, isCommon, } = useServiceStore();
+  const { id } = useParams();
 
+  useEffect(() => {
+    if(!id) return;
+    useServiceStore.getState().loadService(id);
+  }, [])
+  
   const steps = useServiceStore((state) => state.mapEndpointsToSetps());
   const name = useServiceStore((state) => state.serviceNameDashed());
   
@@ -192,7 +198,7 @@ const ServiceFlowPage: FC = () => {
           title: t("toast.cannot-save-flow"),
           message: e?.message,
         });
-      }, t, serviceId, description, isCommon);
+      }, t, description, isCommon, serviceId, id);
   }
 
   return (
@@ -200,7 +206,7 @@ const ServiceFlowPage: FC = () => {
       <NewServiceHeader
         activeStep={3}
         saveDraftOnClick={saveFlowClick}
-        serviceId={serviceId}
+        serviceId={id}
         continueOnClick={() => navigate(ROUTES.OVERVIEW_ROUTE)}
         isTestButtonVisible={isTestButtonVisible}
         isTestButtonEnabled={isTestButtonEnabled}

@@ -1,6 +1,6 @@
 import axios from "axios";
 import { Edge, Node } from "reactflow";
-import { createNewService, jsonToYml } from "resources/api-constants";
+import { createNewService, editService, jsonToYml } from "resources/api-constants";
 import useServiceStore from "store/new-services.store";
 import useToastStore from "store/toasts.store";
 import { RawData, Step, StepType } from "types";
@@ -273,7 +273,13 @@ const assignEndpointVariables = (
   return result;
 };
 
-export async function saveEndpoints(endpoints: EndpointData[], name: string, onSuccess: (e: any) => void, onError: (e: any) => void) {
+export async function saveEndpoints(
+    endpoints: EndpointData[],
+    name: string,
+    onSuccess: (e: any) => void,
+    onError: (e: any) => void,
+    id: string | undefined,
+  ) {
   for (const endpoint of endpoints) {
     if (!endpoint) continue;
     const selectedEndpointType = endpoint.definedEndpoints.find((e) => e.isSelected);
@@ -386,10 +392,22 @@ export async function saveEndpoints(endpoints: EndpointData[], name: string, onS
   }
 }
 
-export const saveFlow = async (steps: Step[], name: string, edges: Edge<any>[], nodes: Node<any, string | undefined>[], onSuccess: (e: any) => void, onError: (e: any) => void, t: any, serviceId: string, description: string, isCommon: boolean) => {
+export const saveFlow = async (
+    steps: Step[], 
+    name: string, 
+    edges: Edge<any>[], 
+    nodes: Node<any, string | undefined>[], 
+    onSuccess: (e: any) => void, 
+    onError: (e: any) => void,
+    t: any, 
+    description: string, 
+    isCommon: boolean,
+    serviceId: string,
+    serviceIdToEdit: string | undefined, 
+  ) => {
   try {
     const endpoints = steps.filter(x => !!x.data).map(x => x.data!);
-    await saveEndpoints(endpoints, name, onSuccess, onError);
+    await saveEndpoints(endpoints, name, onSuccess, onError, serviceIdToEdit);
     const allRelations: any[] = [];
     // find regular edges 1 -> 1
     edges.forEach((edge) => {
@@ -501,10 +519,12 @@ export const saveFlow = async (steps: Step[], name: string, edges: Edge<any>[], 
       wrapper: false,
       return: "",
     });
+    
     const result = Object.fromEntries(finishedFlow.entries());
+
     await axios
       .post(
-        createNewService(),
+        serviceIdToEdit ? editService(serviceIdToEdit) : createNewService(),
         {
           name,
           serviceId,

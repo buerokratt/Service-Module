@@ -1,6 +1,6 @@
 export const ROUTES = {
   OVERVIEW_ROUTE: "/overview",
-  FLOW_ROUTE: "/flow",
+  FLOW_ROUTE: "/flow/:id",
   NEWSERVICE_ROUTE: "/newService",
   NEWSERVICE_ROUTE_WITH_INTENT_NAME: "/newService/:intentName",
   EDITSERVICE_ROUTE: "/edit",

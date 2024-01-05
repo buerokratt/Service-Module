@@ -122,7 +122,7 @@ const useServiceStore = create<ServiceState>((set, get, store) => ({
 
     if(id) {
       const service = await axios.get<Service[]>(getServiceById(id));
-      console.log(service)
+
       set({ 
         serviceId: id,
         name: service.data[0].name,

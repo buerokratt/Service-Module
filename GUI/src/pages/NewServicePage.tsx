@@ -23,7 +23,6 @@ const NewServicePage: React.FC = () => {
   const navigate = useNavigate();
   const userInfo = useStore((state) => state.userInfo);
   const { 
-    serviceId,
     endpoints,
     isCommon,
     setIsCommon,
@@ -60,7 +59,7 @@ const NewServicePage: React.FC = () => {
     
     await saveEndpoints(
       endpoints,
-      name, 
+      name,
       () => {
         useToastStore.getState().success({
           title: t("newService.toast.success"),
@@ -73,7 +72,9 @@ const NewServicePage: React.FC = () => {
           title: t("newService.toast.failed"),
           message: t("newService.toast.saveFailed"),
         });
-      });
+      }, 
+      id,
+      );
   };
 
   return (
@@ -84,7 +85,7 @@ const NewServicePage: React.FC = () => {
           activeStep={2}
           saveDraftOnClick={saveDraft}
           isSaveButtonEnabled={endpoints.length > 0}
-          serviceId={serviceId}
+          serviceId={id}
           continueOnClick={() => {
             if (!vaildServiceInfo) {
               useToastStore.getState().error({
@@ -94,7 +95,7 @@ const NewServicePage: React.FC = () => {
               return;
             }
 
-            navigate(ROUTES.FLOW_ROUTE);
+            navigate(`${ROUTES.FLOW_ROUTE}/${id}`);
           }}
         />
       }
