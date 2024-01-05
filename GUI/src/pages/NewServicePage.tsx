@@ -32,7 +32,6 @@ const NewServicePage: React.FC = () => {
     name,
     changeServiceName,
     addEndpoint,
-    loadFlowData,
   } = useServiceStore();
 
   const vaildServiceInfo = useServiceStore(state => state.vaildServiceInfo());
@@ -47,7 +46,7 @@ const NewServicePage: React.FC = () => {
   }, [intentName])
 
   useEffect(() => {
-    loadFlowData();
+    useServiceStore.getState().loadService(id);
   }, []);
 
   const saveDraft = async () => {

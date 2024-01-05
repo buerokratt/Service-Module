@@ -3,8 +3,8 @@ import { create } from 'zustand';
 import { v4 as uuid } from "uuid";
 import { Node, ReactFlowInstance } from "reactflow";
 import { EndpointData, EndpointEnv, EndpointTab, EndpointVariableData, PreDefinedEndpointEnvVariables } from 'types/endpoint';
-import { getSecretVariables, getTaraAuthResponseVariables } from 'resources/api-constants';
-import { Step, StepType } from 'types';
+import { getSecretVariables, getServiceById, getTaraAuthResponseVariables } from 'resources/api-constants';
+import { Service, Step, StepType } from 'types';
 import { RequestVariablesTabsRawData, RequestVariablesTabsRowsData } from 'types/request-variables';
 
 interface ServiceState {
@@ -30,7 +30,7 @@ interface ServiceState {
   addEndpoint: () => void;
   loadSecretVariables: () => Promise<void>;
   loadTaraVariables: () => Promise<void>;
-  loadFlowData: () => Promise<void>;
+  loadService: (id?: string) => Promise<void>;
   getAvailableRequestValues: (endpointId: string) => PreDefinedEndpointEnvVariables;
   onNameChange: (endpointId: string, oldName: string, newName: string) => void;
   changeServiceEndpointType: (id: string, type: string) => void;
@@ -40,6 +40,7 @@ interface ServiceState {
   isLive: () => boolean;
   updateEndpointRawData: (rawData: RequestVariablesTabsRawData, endpointDataId?: string, parentEndpointId?: string) => void;
   updateEndpointData: (data: RequestVariablesTabsRowsData, endpointDataId?: string, parentEndpointId?:string) => void;
+  resetState: () => void;
 
   // TODO: remove the following funtions and refactor the code to use more specific functions
   setEndpoints: (callback: (prev: EndpointData[]) => EndpointData[]) => void;
@@ -102,18 +103,43 @@ const useServiceStore = create<ServiceState>((set, get, store) => ({
     const newEndpoint = { id: uuid(), name: "", definedEndpoints: [] };
     set(state => ({ endpoints:[ ...state.endpoints, newEndpoint] }));
   },
-  loadFlowData: async () => {
-    let nodes: Node[] = [];
-    if(get().flow) {
-      nodes = JSON.parse(get().flow!)?.nodes;
+  resetState: () => {
+    set({
+      name: '',
+      flow: undefined,
+      endpoints: [],
+      serviceId: uuid(),
+      description: '',
+      secrets: { prod: [], test: [] },
+      availableVariables: { prod: [], test: [] },
+      isCommon: false,
+      reactFlowInstance: undefined,
+      selectedTab: EndpointEnv.Live,
+    })
+  },
+  loadService: async (id) => {
+    get().resetState();
+
+    if(id) {
+      const service = await axios.get<Service[]>(getServiceById(id));
+      console.log(service)
+      set({ 
+        serviceId: id,
+        name: service.data[0].name,
+        isCommon : service.data[0].isCommon,
+        description: service.data[0].description,
+      });
     }
 
     await get().loadSecretVariables();
-    
+
+    let nodes: Node[] = [];
+    if(get().flow) {
+      nodes = JSON.parse(get().flow!)?.nodes;
+    }    
     if (nodes?.find((node) => node.data.stepType === "auth")) {
       await get().loadTaraVariables();
     }
-
     const variables = nodes?.filter((node) => node.data.stepType === "input")
       .map((node) => `{{ClientInput_${node.data.clientInputId}}}`);
     get().addProductionVariables(variables);

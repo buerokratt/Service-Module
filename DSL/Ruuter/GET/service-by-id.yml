@@ -1,0 +1,24 @@
+check_for_parameters:
+  switch:
+    - condition: ${incoming.params == null || incoming.params.id == null}
+      next: return_incorrect_request
+  next: get_service_by_id
+
+get_service_by_id:
+  call: http.post
+  args:
+    url: "[#SERVICE_RESQL]/get-service-by-id"
+    body:
+      id: ${incoming.params.id}
+  result: results
+
+return_ok:
+  status: 200
+  wrapper: false
+  return: ${results.response.body}
+  next: end
+
+return_incorrect_request:
+  status: 400
+  return: "Required parameter(s) missing"
+  next: end
