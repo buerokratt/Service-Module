@@ -1,6 +1,8 @@
 import axios from "axios";
+import i18next from 'i18next';
+import { useParams } from "react-router-dom";
 import { Edge, Node } from "reactflow";
-import { createNewService, editService, jsonToYml } from "resources/api-constants";
+import { createNewService, editService, jsonToYml, testDraftService } from "resources/api-constants";
 import useServiceStore from "store/new-services.store";
 import useToastStore from "store/toasts.store";
 import { RawData, Step, StepType } from "types";
@@ -399,7 +401,6 @@ export const saveFlow = async (
     nodes: Node<any, string | undefined>[], 
     onSuccess: (e: any) => void, 
     onError: (e: any) => void,
-    t: any, 
     description: string, 
     isCommon: boolean,
     serviceId: string,
@@ -415,20 +416,20 @@ export const saveFlow = async (
       const followingNode = nodes.find((node) => node.id === edge.target);
       if (!node) return;
       if (node.data.stepType === StepType.Textfield && node.data.message === undefined) {
-        throw new Error(t("toast.missing-textfield-message") ?? "Error");
+        throw new Error(i18next.t("toast.missing-textfield-message") ?? "Error");
       }
       if (
         node.data.stepType === StepType.OpenWebpage &&
         (node.data.link === undefined || node.data.linkText === undefined)
       ) {
-        throw new Error(t("toast.missing-website") ?? "Error");
+        throw new Error(i18next.t("toast.missing-website") ?? "Error");
       }
 
       if (
         node.data.stepType === StepType.FileGenerate &&
         (node.data.fileName === undefined || node.data.fileContent === undefined)
       ) {
-        throw new Error(t("toast.missing-file-generation") ?? "Error");
+        throw new Error(i18next.t("toast.missing-file-generation") ?? "Error");
       }
 
       if (node.data.stepType === StepType.Input || followingNode?.type === "placeholder") {
@@ -466,7 +467,7 @@ export const saveFlow = async (
       const parentStepName = `${parentNode.data.stepType}-${parentNodeId}`;
       if (parentNode.data.stepType === StepType.Input) {
         if (parentNode.data.rules === undefined) {
-          throw new Error(t("toast.missing-client_input-rules") ?? "Error");
+          throw new Error(i18next.t("toast.missing-client_input-rules") ?? "Error");
         }
 
         const clientInput = `ClientInput_${parentNode.data.clientInputId}`;
@@ -545,7 +546,7 @@ export const saveFlow = async (
   } catch (e: any) {
     onError(e);
     useToastStore.getState().error({
-      title: t("toast.cannot-save-flow"),
+      title: i18next.t("toast.cannot-save-flow"),
       message: e?.message,
     });
   }
@@ -725,4 +726,78 @@ const getDefinedEndpointStep = (steps: Step[], node: Node) => {
     },
     result: (endpoint.name.trim().length ?? 0) > 0 ? endpoint.name : endpoint.id,
   };
+};
+
+export const saveDraft = async () => {
+  const vaildServiceInfo = useServiceStore(state => state.vaildServiceInfo());
+  const endpoints = useServiceStore(state => state.endpoints);
+  const name = useServiceStore(state => state.name);
+  const { id } = useParams();
+
+  if (!vaildServiceInfo) {
+    useToastStore.getState().error({
+      title: i18next.t("newService.toast.missingFields"),
+      message: i18next.t("newService.toast.serviceMissingFields"),
+    });
+    return;
+  }
+
+  await saveEndpoints(
+    endpoints,
+    name,
+    () => {
+      useToastStore.getState().success({
+        title: i18next.t("newService.toast.success"),
+        message: i18next.t("newService.toast.savedSuccessfully"),
+      });
+    },
+    (e) => {
+      console.log(e);
+      useToastStore.getState().error({
+        title: i18next.t("newService.toast.failed"),
+        message: i18next.t("newService.toast.saveFailed"),
+      });
+    }, 
+    id,
+    );
+};
+
+export const saveFlowClick = async (edges: Edge[], nodes: Node[], onSuccess: () => void) => {
+  const name = useServiceStore((state) => state.serviceNameDashed());
+  const serviceId = useServiceStore(state => state.serviceId);
+  const description = useServiceStore(state => state.description);
+  const isCommon = useServiceStore(state => state.isCommon);
+  const steps = useServiceStore((state) => state.mapEndpointsToSetps());
+  const { id } = useParams();
+
+  await saveFlow(steps, name, edges, nodes, 
+    () => {
+      onSuccess();
+      useToastStore.getState().success({
+        title: i18next.t("newService.toast.success"),
+        message: i18next.t("newService.toast.savedSuccessfully"),
+      });
+    }, 
+    (e) => {
+      useToastStore.getState().error({
+        title: i18next.t("toast.cannot-save-flow"),
+        message: e?.message,
+      });
+    }, description, isCommon, serviceId, id);
+}
+
+export const runServiceTest = async () => {
+  const name = useServiceStore((state) => state.serviceNameDashed());
+
+  try {
+    await axios.post(testDraftService(name), {});
+    useToastStore.getState().success({
+      title: "Test result- success",
+    });
+  } catch (error) {
+    console.log("ERROR: ", error);
+    useToastStore.getState().error({
+      title: "Test result - error",
+    });
+  }
 };

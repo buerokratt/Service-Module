@@ -10,10 +10,9 @@ import "reactflow/dist/style.css";
 import "./ServiceFlowPage.scss";
 import { StepType, Step, ConditionRuleType } from "../types";
 import axios from "axios";
-import { testDraftService } from "../resources/api-constants";
 import useServiceStore from "store/new-services.store";
 import useToastStore from "store/toasts.store";
-import { saveFlow } from "services/service-builder";
+import { runServiceTest, saveFlow, saveFlowClick } from "services/service-builder";
 
 const initialPlaceholder = {
   id: "2",
@@ -169,43 +168,14 @@ const ServiceFlowPage: FC = () => {
     setSelectedNode(null);
   };
 
-  const runServiceTest = async () => {
-    try {
-      await axios.post(testDraftService(name), {});
-      useToastStore.getState().success({
-        title: "Test result- success",
-      });
-    } catch (error) {
-      console.log("ERROR: ", error);
-      useToastStore.getState().error({
-        title: "Test result - error",
-      });
-    }
-  };
-
-  const saveFlowClick = async () => {
-    await saveFlow(steps, name, edges, nodes, 
-      () => {
-        setIsTestButtonVisible(true);
-        setIsTestButtonEnabled(true);
-        useToastStore.getState().success({
-          title: t("newService.toast.success"),
-          message: t("newService.toast.savedSuccessfully"),
-        });
-      }, 
-      (e) => {
-        useToastStore.getState().error({
-          title: t("toast.cannot-save-flow"),
-          message: e?.message,
-        });
-      }, t, description, isCommon, serviceId, id);
-  }
-
   return (
     <>
       <NewServiceHeader
         activeStep={3}
-        saveDraftOnClick={saveFlowClick}
+        saveDraftOnClick={() => saveFlowClick(edges, nodes, () => { 
+          setIsTestButtonVisible(true);
+          setIsTestButtonEnabled(true);
+        })}
         serviceId={id}
         continueOnClick={() => navigate(ROUTES.OVERVIEW_ROUTE)}
         isTestButtonVisible={isTestButtonVisible}
