@@ -16,9 +16,6 @@ type NewServiceHeaderProps = {
   serviceDescription?: string;
   isCommon?: boolean;
   serviceId?: string;
-  isSaveButtonEnabled?: boolean;
-  isTestButtonVisible?: boolean;
-  isTestButtonEnabled?: boolean;
   onTestButtonClick?: () => void;
 };
 
@@ -33,12 +30,12 @@ const NewServiceHeader: FC<NewServiceHeaderProps> = ({
   serviceName,
   serviceId,
   isCommon = false,
-  isSaveButtonEnabled = true,
-  isTestButtonVisible = false,
-  isTestButtonEnabled = true,
   onTestButtonClick,
 }) => {
-  const { endpoints } = useServiceStore();
+  const endpoints = useServiceStore(state => state.endpoints);
+  const isSaveButtonEnabled = useServiceStore(state => state.isSaveButtonEnabled);
+  const isTestButtonVisible = useServiceStore(state => state.isTestButtonVisible);
+  const isTestButtonEnabled = useServiceStore(state => state.isTestButtonEnabled);
   
   return (
     <>

@@ -100,7 +100,6 @@ const NewServicePage: React.FC = () => {
           activeStep={2}
           availableVariables={availableVariables}
           saveDraftOnClick={saveDraft}
-          isSaveButtonEnabled={endpoints.length > 0}
           flow={flow}
           secrets={secrets}
           serviceDescription={description}

@@ -127,27 +127,6 @@ const ServiceFlowPage: FC = () => {
     });
   };
   const [nodes, setNodes, onNodesChange] = useNodesState(flow ? resetNodes() : initialNodes);
-  const [isTestButtonVisible, setIsTestButtonVisible] = useState(false);
-  const [isTestButtonEnabled, setIsTestButtonEnabled] = useState(true);
-
-  useEffect(() => {
-    setFlow(JSON.stringify(reactFlowInstance?.toObject()));
-  }, [reactFlowInstance]);
-
-  useEffect(() => {
-    navigate(location.pathname, {
-      state: {
-        endpoints,
-        secrets,
-        serviceName,
-        serviceId,
-        availableVariables,
-        flow: JSON.stringify(reactFlowInstance?.toObject()),
-        serviceDescription: description,
-        isCommon,
-      },
-    });
-  }, [location.pathname, nodes, isTestButtonVisible, isTestButtonEnabled, edges]);
 
   const getTemplateDataFromNode = (
     node: Node
@@ -850,8 +829,7 @@ const ServiceFlowPage: FC = () => {
         )
         .then((r) => {
           console.log(r);
-          setIsTestButtonVisible(true);
-          setIsTestButtonEnabled(true);
+          useServiceStore.getState().enableTestButton();
           toast.open({
             type: "success",
             title: t("newService.toast.success"),
@@ -903,8 +881,6 @@ const ServiceFlowPage: FC = () => {
   const contentStyle: CSSProperties = { overflowY: "auto", maxHeight: "40vh" };
 
   const handlePopupClose = () => resetStates();
-  const onNodeDelete = () => setIsTestButtonEnabled(false);
-  const onNodeAdded = () => setIsTestButtonEnabled(false);
 
   const handlePopupSave = (updatedNode: Node<NodeDataProps>) => {
     resetStates();
@@ -920,7 +896,7 @@ const ServiceFlowPage: FC = () => {
           prevNode.data.fileName != updatedNode.data.fileName ||
           prevNode.data.fileContent != updatedNode.data.fileContent
         ) {
-          setIsTestButtonEnabled(false);
+          useServiceStore.getState().disableTestButton();
         }
         return {
           ...prevNode,
@@ -972,8 +948,6 @@ const ServiceFlowPage: FC = () => {
         serviceId={serviceId}
         secrets={secrets}
         continueOnClick={() => navigate(ROUTES.OVERVIEW_ROUTE)}
-        isTestButtonVisible={isTestButtonVisible}
-        isTestButtonEnabled={isTestButtonEnabled}
         onTestButtonClick={runServiceTest}
       />
       <h1 style={{ paddingLeft: 16, paddingTop: 16 }}>
@@ -1065,8 +1039,8 @@ const ServiceFlowPage: FC = () => {
             edges={edges}
             setEdges={setEdges}
             onEdgesChange={onEdgesChange}
-            onNodeAdded={onNodeAdded}
-            onNodeDelete={onNodeDelete}
+            onNodeAdded={useServiceStore.getState().disableTestButton}
+            onNodeDelete={useServiceStore.getState().disableTestButton}
           />
         </div>
       </ReactFlowProvider>
