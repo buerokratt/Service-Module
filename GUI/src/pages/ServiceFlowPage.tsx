@@ -917,24 +917,6 @@ const ServiceFlowPage: FC = () => {
     setSelectedNode(null);
   };
 
-  const runServiceTest = async () => {
-    try {
-      await axios.post(testDraftService(serviceName), {});
-      toast.open({
-        type: "success",
-        title: "Test result- success",
-        message: "",
-      });
-    } catch (error) {
-      console.log("ERROR: ", error);
-      toast.open({
-        type: "error",
-        title: "Test result - error",
-        message: "",
-      });
-    }
-  };
-
   return (
     <>
       <NewServiceHeader
@@ -948,7 +930,6 @@ const ServiceFlowPage: FC = () => {
         serviceId={serviceId}
         secrets={secrets}
         continueOnClick={() => navigate(ROUTES.OVERVIEW_ROUTE)}
-        onTestButtonClick={runServiceTest}
       />
       <h1 style={{ paddingLeft: 16, paddingTop: 16 }}>
         {t("serviceFlow.flow")} "{serviceName}"

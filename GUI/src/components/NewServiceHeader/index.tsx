@@ -4,6 +4,9 @@ import { Button, HeaderStepCounter, Track } from "..";
 import { EndpointData, PreDefinedEndpointEnvVariables } from "../../types/endpoint";
 import "@buerokratt-ria/header/src/header/Header.scss";
 import useServiceStore from "store/new-services.store";
+import { testDraftService } from "resources/api-constants";
+import axios from "axios";
+import { useToast } from "hooks/useToast";
 
 type NewServiceHeaderProps = {
   activeStep: number;
@@ -16,7 +19,6 @@ type NewServiceHeaderProps = {
   serviceDescription?: string;
   isCommon?: boolean;
   serviceId?: string;
-  onTestButtonClick?: () => void;
 };
 
 const NewServiceHeader: FC<NewServiceHeaderProps> = ({
@@ -30,12 +32,31 @@ const NewServiceHeader: FC<NewServiceHeaderProps> = ({
   serviceName,
   serviceId,
   isCommon = false,
-  onTestButtonClick,
 }) => {
   const endpoints = useServiceStore(state => state.endpoints);
   const isSaveButtonEnabled = useServiceStore(state => state.isSaveButtonEnabled());
   const isTestButtonVisible = useServiceStore(state => state.isTestButtonVisible);
   const isTestButtonEnabled = useServiceStore(state => state.isTestButtonEnabled);
+  const toast = useToast();
+
+  const runServiceTest = async () => {
+    try {
+      const serviceName = useServiceStore.getState().serviceName;
+      await axios.post(testDraftService(serviceName), {});
+      toast.open({
+        type: "success",
+        title: "Test result- success",
+        message: "",
+      });
+    } catch (error) {
+      console.log("ERROR: ", error);
+      toast.open({
+        type: "error",
+        title: "Test result - error",
+        message: "",
+      });
+    }
+  };
   
   return (
     <>
@@ -60,7 +81,7 @@ const NewServiceHeader: FC<NewServiceHeaderProps> = ({
             {t("global.continue")}
           </Button>
           {isTestButtonVisible && (
-            <Button onClick={onTestButtonClick} disabled={!isTestButtonEnabled}>
+            <Button onClick={runServiceTest} disabled={!isTestButtonEnabled}>
               {t("global.testService")}
             </Button>
           )}
