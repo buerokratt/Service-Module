@@ -33,7 +33,7 @@ const NewServiceHeader: FC<NewServiceHeaderProps> = ({
   onTestButtonClick,
 }) => {
   const endpoints = useServiceStore(state => state.endpoints);
-  const isSaveButtonEnabled = useServiceStore(state => state.isSaveButtonEnabled);
+  const isSaveButtonEnabled = useServiceStore(state => state.isSaveButtonEnabled());
   const isTestButtonVisible = useServiceStore(state => state.isTestButtonVisible);
   const isTestButtonEnabled = useServiceStore(state => state.isTestButtonEnabled);
   
