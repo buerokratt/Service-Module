@@ -1,12 +1,9 @@
 import { t } from "i18next";
 import React, { FC } from "react";
 import { Button, HeaderStepCounter, Track } from "..";
-import { EndpointData, PreDefinedEndpointEnvVariables } from "../../types/endpoint";
-import "@buerokratt-ria/header/src/header/Header.scss";
+import { PreDefinedEndpointEnvVariables } from "../../types/endpoint";
 import useServiceStore from "store/new-services.store";
-import { testDraftService } from "resources/api-constants";
-import axios from "axios";
-import { useToast } from "hooks/useToast";
+import "@buerokratt-ria/header/src/header/Header.scss";
 
 type NewServiceHeaderProps = {
   activeStep: number;
@@ -15,7 +12,6 @@ type NewServiceHeaderProps = {
   availableVariables?: PreDefinedEndpointEnvVariables;
   flow?: string;
   secrets?: { [key: string]: any };
-  serviceName?: string;
   serviceDescription?: string;
   isCommon?: boolean;
   serviceId?: string;
@@ -29,7 +25,6 @@ const NewServiceHeader: FC<NewServiceHeaderProps> = ({
   flow,
   secrets,
   serviceDescription,
-  serviceName,
   serviceId,
   isCommon = false,
 }) => {
@@ -37,27 +32,12 @@ const NewServiceHeader: FC<NewServiceHeaderProps> = ({
   const isSaveButtonEnabled = useServiceStore(state => state.isSaveButtonEnabled());
   const isTestButtonVisible = useServiceStore(state => state.isTestButtonVisible);
   const isTestButtonEnabled = useServiceStore(state => state.isTestButtonEnabled);
-  const toast = useToast();
+  const serviceName = useServiceStore(state => state.serviceNameDashed());
 
-  const runServiceTest = async () => {
-    try {
-      const serviceName = useServiceStore.getState().serviceName;
-      await axios.post(testDraftService(serviceName), {});
-      toast.open({
-        type: "success",
-        title: "Test result- success",
-        message: "",
-      });
-    } catch (error) {
-      console.log("ERROR: ", error);
-      toast.open({
-        type: "error",
-        title: "Test result - error",
-        message: "",
-      });
-    }
-  };
-  
+  function runServiceTest(event: MouseEvent<HTMLButtonElement, MouseEvent>): void {
+    throw new Error("Function not implemented.");
+  }
+
   return (
     <>
       <header className="header" style={{ paddingLeft: 24 }}>

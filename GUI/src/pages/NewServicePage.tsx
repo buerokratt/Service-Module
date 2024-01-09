@@ -103,7 +103,6 @@ const NewServicePage: React.FC = () => {
           flow={flow}
           secrets={secrets}
           serviceDescription={description}
-          serviceName={serviceName}
           serviceId={serviceId}
           isCommon={isCommon}
           continueOnClick={() => {
