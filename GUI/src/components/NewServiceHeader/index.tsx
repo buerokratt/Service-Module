@@ -4,6 +4,7 @@ import { Button, HeaderStepCounter, Track } from "..";
 import { PreDefinedEndpointEnvVariables } from "../../types/endpoint";
 import useServiceStore from "store/new-services.store";
 import "@buerokratt-ria/header/src/header/Header.scss";
+import { runServiceTest } from "services/service-builder";
 
 type NewServiceHeaderProps = {
   activeStep: number;
@@ -33,10 +34,6 @@ const NewServiceHeader: FC<NewServiceHeaderProps> = ({
   const isTestButtonVisible = useServiceStore(state => state.isTestButtonVisible);
   const isTestButtonEnabled = useServiceStore(state => state.isTestButtonEnabled);
   const serviceName = useServiceStore(state => state.serviceNameDashed());
-
-  function runServiceTest(event: MouseEvent<HTMLButtonElement, MouseEvent>): void {
-    throw new Error("Function not implemented.");
-  }
 
   return (
     <>

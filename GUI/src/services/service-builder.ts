@@ -1,6 +1,7 @@
 import axios from "axios";
 import { jsonToYml, testDraftService } from "resources/api-constants";
 import useServiceStore from "store/new-services.store";
+import useToastStore from "store/toasts.store";
 import { RawData, Step, StepType } from "types";
 import { EndpointData, EndpointEnv, EndpointType, EndpointVariableData } from "types/endpoint";
 
@@ -394,7 +395,7 @@ export async function saveEndpoints(endpoints: EndpointData[], serviceName: stri
   }
 }
 
-const runServiceTest = async () => {
+export const runServiceTest = async () => {
   try {
     const serviceName = useServiceStore.getState().serviceNameDashed();
     await axios.post(testDraftService(serviceName), {});
