@@ -1,0 +1,7 @@
+get_tara_info:
+  template: templates/tara
+  requestType: post
+  result: TARA
+
+return_authorized:
+  return: ${TARA.response.body}

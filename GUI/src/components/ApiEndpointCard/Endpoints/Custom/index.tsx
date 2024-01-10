@@ -8,6 +8,7 @@ import { getEndpointValidation } from "../../../../resources/api-constants";
 import { RequestTab } from "../../../../types";
 import {
   EndpointData,
+  EndpointVariableData,
   PreDefinedEndpointEnvVariables,
 } from "../../../../types/endpoint";
 import useServiceStore from "store/new-services.store";
@@ -60,6 +61,11 @@ const EndpointCustom: React.FC<EndpointCustomProps> = ({
   }
 
   useEffect(() => setKey(key + 1), [isLive]);
+  
+  const refereshEndpoint = () => {
+    setEndpoints((endpoint) => endpoint);
+    setKey((prevKey) => prevKey + 1);
+  };
 
   return (
     <Track direction="vertical" align="stretch" gap={16}>
@@ -87,7 +93,26 @@ const EndpointCustom: React.FC<EndpointCustomProps> = ({
               name="endpointUrl"
               label=""
               defaultValue={endpoint.definedEndpoints[0].url ?? ""}
-              onChange={(event) => (endpoint.definedEndpoints[0].url = event.target.value)}
+              onChange={(event) => {
+                const parsedUrl = parseURL(event.target.value);
+                endpoint.definedEndpoints[0].url = parsedUrl.url;
+                const parameters: EndpointVariableData[] = [];
+                Object.keys(parsedUrl.params).forEach((key) => {
+                  parameters.push({
+                    id: uuid(),
+                    name: key,
+                    type: "custom",
+                    required: false,
+                    value: parsedUrl.params[key],
+                  });
+                });
+
+                endpoint.definedEndpoints[0].params = {
+                  variables: parameters,
+                  rawData: {},
+                };
+                refereshEndpoint();
+              }}
               placeholder={t("newService.endpoint.insert") ?? ""}
             />
           </Track>
@@ -139,5 +164,22 @@ const EndpointCustom: React.FC<EndpointCustomProps> = ({
     </Track>
   );
 };
+
+function parseURL(url: string) {
+  try {
+    const parsedURL = new URL(url);
+    const params: { [key: string]: any } = Object.fromEntries(parsedURL.searchParams);
+
+    return {
+      url: parsedURL.href,
+      params,
+    };
+  } catch (e) {
+    return {
+      url,
+      params: {},
+    };
+  }
+}
 
 export default EndpointCustom;

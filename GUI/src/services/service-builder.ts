@@ -91,9 +91,8 @@ const saveEndpointInfo = async (
   steps.set("get-configs", {
     call: "http.post",
     args: {
-      url: `${process.env.REACT_APP_API_URL}/services/endpoints/configs/${
-        endpoint.isCommon ? "common/" : ""
-      }${endpointName}-${env === EndpointEnv.Live ? "prod" : "test"}-configs`,
+      url: `${process.env.REACT_APP_API_URL}/services/endpoints/configs/${endpoint.isCommon ? "common/" : ""
+        }${endpointName}-${env === EndpointEnv.Live ? "prod" : "test"}-configs`,
       body: {
         params: "${incoming.body.params}",
         headers: "${incoming.body.headers}",
@@ -107,16 +106,15 @@ const saveEndpointInfo = async (
     return: "${configs.response.body}",
   });
   const result = Object.fromEntries(steps.entries());
-  
+
   await axios
     .post(
       jsonToYml(),
       { result },
       {
         params: {
-          location: `/Ruuter/POST/services/endpoints/info/${endpoint.isCommon ? "common/" : ""}${endpointName}-${
-            env === EndpointEnv.Live ? "prod" : "test"
-          }-info.yml`,
+          location: `/Ruuter/POST/services/endpoints/info/${endpoint.isCommon ? "common/" : ""}${endpointName}-${env === EndpointEnv.Live ? "prod" : "test"
+            }-info.yml`,
         },
       }
     )
@@ -124,70 +122,68 @@ const saveEndpointInfo = async (
     .catch(console.log)
 };
 
-  const saveEndpointConfig = async (
-    endpoint: EndpointType,
-    env: EndpointEnv,
-    endpointName: string,
-    data: EndpointData,
-  ) => {
-    const headers = rawDataIfVariablesMissing(
-      endpoint,
-      "headers",
-      env,
-      assignEndpointVariables(env, "headers", endpoint.headers)
-    );
-    const body = rawDataIfVariablesMissing(endpoint, "body", env, assignEndpointVariables(env, "body", endpoint.body));
-    const params = rawDataIfVariablesMissing(
-      endpoint,
-      "params",
-      env,
-      assignEndpointVariables(env, "params", endpoint.params)
-    );
-    const steps = new Map();
-    const variables: { [key: string]: string } = {};
-    assignValues(headers, "headers", variables);
-    assignValues(body, "body", variables);
-    assignValues(params, "params", variables);
-    steps.set("prepare_step", {
-      assign: variables,
-    });
-    steps.set("combine_step", {
-      assign: {
-        sensitive: `\${new Map([${typeof headers === "string"
-            ? `["headers", headers]`
-            : `["headers", new Map([${Object.keys(headers ?? {}).map(
-                (h) => `["${h.replaceAll("__", ".")}", headers_${h}]`
-              )}])]`
-          }, ${typeof body === "string"
-            ? `["body", body]`
-            : `["body", new Map([${Object.keys(body ?? {}).map((b) => `["${b.replaceAll("__", ".")}", body_${b}]`)}])]`
-          }, ${typeof params === "string"
-            ? `["params", params]`
-            : `["params", new Map([${Object.keys(params ?? {}).map(
-              (p) => `["${p.replaceAll("__", ".")}", params_${p}]`
-            )}])]`
-          }])}`,
-      },
-    });
-    steps.set("return_value", { wrapper: false, return: "${sensitive}" });
-    const result = Object.fromEntries(steps.entries());
-    
-    await axios
-      .post(
-        jsonToYml(),
-        { result },
-        {
-          params: {
-            location: `/Ruuter/POST/services/endpoints/configs/${data.isCommon ? "common/" : ""}${endpointName}-${
-              env === EndpointEnv.Live ? "prod" : "test"
-            }-configs.yml`,
-          },
-        }
-      )
-      .then(console.log)
-      .catch(console.log)
-  };
+const saveEndpointConfig = async (
+  endpoint: EndpointType,
+  env: EndpointEnv,
+  endpointName: string,
+  data: EndpointData,
+) => {
+  const headers = rawDataIfVariablesMissing(
+    endpoint,
+    "headers",
+    env,
+    assignEndpointVariables(env, "headers", endpoint.headers)
+  );
+  const body = rawDataIfVariablesMissing(endpoint, "body", env, assignEndpointVariables(env, "body", endpoint.body));
+  const params = rawDataIfVariablesMissing(
+    endpoint,
+    "params",
+    env,
+    assignEndpointVariables(env, "params", endpoint.params)
+  );
+  const steps = new Map();
+  const variables: { [key: string]: string } = {};
+  assignValues(headers, "headers", variables);
+  assignValues(body, "body", variables);
+  assignValues(params, "params", variables);
+  steps.set("prepare_step", {
+    assign: variables,
+  });
+  steps.set("combine_step", {
+    assign: {
+      sensitive: `\${new Map([${typeof headers === "string"
+        ? `["headers", headers]`
+        : `["headers", new Map([${Object.keys(headers ?? {}).map(
+          (h) => `["${h.replaceAll("__", ".")}", headers_${h}]`
+        )}])]`
+        }, ${typeof body === "string"
+          ? `["body", body]`
+          : `["body", new Map([${Object.keys(body ?? {}).map((b) => `["${b.replaceAll("__", ".")}", body_${b}]`)}])]`
+        }, ${typeof params === "string"
+          ? `["params", params]`
+          : `["params", new Map([${Object.keys(params ?? {}).map(
+            (p) => `["${p.replaceAll("__", ".")}", params_${p}]`
+          )}])]`
+        }])}`,
+    },
+  });
+  steps.set("return_value", { wrapper: false, return: "${sensitive}" });
+  const result = Object.fromEntries(steps.entries());
 
+  await axios
+    .post(
+      jsonToYml(),
+      { result },
+      {
+        params: {
+          location: `/Ruuter/POST/services/endpoints/configs/${data.isCommon ? "common/" : ""}${endpointName}-${env === EndpointEnv.Live ? "prod" : "test"
+            }-configs.yml`,
+        },
+      }
+    )
+    .then(console.log)
+    .catch(console.log)
+};
 
 const rawDataIfVariablesMissing = (
   endpoint: EndpointType,
@@ -275,20 +271,19 @@ const assignEndpointVariables = (
 };
 
 export async function saveEndpoints(
-    endpoints: EndpointData[],
-    name: string,
-    onSuccess: (e: any) => void,
-    onError: (e: any) => void,
-    id: string | undefined,
-  ) {
+  endpoints: EndpointData[],
+  name: string,
+  onSuccess: (e: any) => void,
+  onError: (e: any) => void,
+  id: string | undefined,
+) {
   for (const endpoint of endpoints) {
     if (!endpoint) continue;
     const selectedEndpointType = endpoint.definedEndpoints.find((e) => e.isSelected);
     if (!selectedEndpointType) continue;
 
-    const endpointName = `${name.replaceAll(" ", "_")}-${
-      (endpoint.name.trim().length ?? 0) > 0 ? endpoint?.name.replaceAll(" ", "_") : endpoint?.id
-    }`;
+    const endpointName = `${name.replaceAll(" ", "_")}-${(endpoint.name.trim().length ?? 0) > 0 ? endpoint?.name.replaceAll(" ", "_") : endpoint?.id
+      }`;
     for (const env of [EndpointEnv.Live, EndpointEnv.Test]) {
       await saveEndpointInfo(selectedEndpointType, env, endpointName, endpoint);
     }
@@ -310,9 +305,8 @@ export async function saveEndpoints(
     steps.set("get_prod_info", {
       call: "http.post",
       args: {
-        url: `${process.env.REACT_APP_API_URL}/services/endpoints/info/${
-          endpoint.isCommon ? "common/" : ""
-        }${endpointName}-prod-info`,
+        url: `${process.env.REACT_APP_API_URL}/services/endpoints/info/${endpoint.isCommon ? "common/" : ""
+          }${endpointName}-prod-info`,
         body: {
           params: "${incoming.body.params ?? new Map()}",
           headers: "${incoming.body.headers ?? new Map()}",
@@ -325,9 +319,8 @@ export async function saveEndpoints(
     steps.set("get_test_info", {
       call: `http.post`,
       args: {
-        url: `${process.env.REACT_APP_API_URL}/services/endpoints/info/${
-          endpoint.isCommon ? "common/" : ""
-        }${endpointName}-test-info`,
+        url: `${process.env.REACT_APP_API_URL}/services/endpoints/info/${endpoint.isCommon ? "common/" : ""
+          }${endpointName}-test-info`,
         body: {
           params: "${incoming.body.params ?? new Map()}",
           headers: "${incoming.body.headers ?? new Map()}",
@@ -382,9 +375,8 @@ export async function saveEndpoints(
         { result },
         {
           params: {
-            location: `/Ruuter/${selectedEndpointType.methodType.toUpperCase()}/services/endpoints/${
-              endpoint.isCommon ? "common/" : ""
-            }${endpointName}.yml`,
+            location: `/Ruuter/${selectedEndpointType.methodType.toUpperCase()}/services/endpoints/${endpoint.isCommon ? "common/" : ""
+              }${endpointName}.yml`,
           },
         }
       )
@@ -394,17 +386,17 @@ export async function saveEndpoints(
 }
 
 export const saveFlow = async (
-    steps: Step[], 
-    name: string, 
-    edges: Edge<any>[], 
-    nodes: Node<any, string | undefined>[], 
-    onSuccess: (e: any) => void, 
-    onError: (e: any) => void,
-    description: string, 
-    isCommon: boolean,
-    serviceId: string,
-    serviceIdToEdit: string | undefined, 
-  ) => {
+  steps: Step[],
+  name: string,
+  edges: Edge<any>[],
+  nodes: Node<any, string | undefined>[],
+  onSuccess: (e: any) => void,
+  onError: (e: any) => void,
+  description: string,
+  isCommon: boolean,
+  serviceId: string,
+  serviceIdToEdit: string | undefined,
+) => {
   try {
     const endpoints = steps.filter(x => !!x.data).map(x => x.data!);
     await saveEndpoints(endpoints, name, onSuccess, onError, serviceIdToEdit);
@@ -496,9 +488,8 @@ export const saveFlow = async (
                 return {
                   case:
                     matchingRule && !["Yes", "No"].includes(matchingRule?.condition)
-                      ? `\${${matchingRule.name.replace("{{", "").replace("}}", "")} ${matchingRule.condition} ${
-                          matchingRule.value
-                        }}`
+                      ? `\${${matchingRule.name.replace("{{", "").replace("}}", "")} ${matchingRule.condition} ${matchingRule.value
+                      }}`
                       : `\${${clientInput} == ${node.data.label === "rule 1" ? '"Yes"' : '"No"'}}`,
                   nextStep:
                     followingNode?.type === "customNode"
@@ -519,7 +510,7 @@ export const saveFlow = async (
       wrapper: false,
       return: "",
     });
-    
+
     const result = Object.fromEntries(finishedFlow.entries());
 
     await axios
@@ -598,7 +589,7 @@ const getPreDefinedEndpointVariables = (data?: { variables: EndpointVariableData
   try {
     getNestedPreDefinedRawVariables(JSON.parse(data.rawData?.value ?? "{}"), result);
     getNestedPreDefinedRawVariables(JSON.parse(data.rawData?.testValue ?? "{}"), result);
-  } catch (_) {}
+  } catch (_) { }
 
   return result;
 };
@@ -709,11 +700,9 @@ const getDefinedEndpointStep = (steps: Step[], node: Node) => {
   return {
     call: `http.post`,
     args: {
-      url: `${
-        process.env.REACT_APP_API_URL
-      }/services/endpoints/${selectedEndpoint.methodType.toLowerCase()}-${name}-${
-        (endpoint.name.trim().length ?? 0) > 0 ? endpoint.name : endpoint.id
-      }?type=prod`,
+      url: `${process.env.REACT_APP_API_URL
+        }/services/endpoints/${selectedEndpoint.methodType.toLowerCase()}-${name}-${(endpoint.name.trim().length ?? 0) > 0 ? endpoint.name : endpoint.id
+        }?type=prod`,
       body: {
         headers: `\${new Map([${getPreDefinedEndpointVariables(selectedEndpoint.headers)}])}`,
         body: `\${new Map([${getPreDefinedEndpointVariables(selectedEndpoint.body)}])}`,
@@ -755,9 +744,9 @@ export const saveDraft = async (id: string | undefined) => {
         title: i18next.t("newService.toast.failed"),
         message: i18next.t("newService.toast.saveFailed"),
       });
-    }, 
+    },
     id,
-    );
+  );
 };
 
 export const saveFlowClick = async (id: string | undefined, edges: Edge[], nodes: Node[], onSuccess: () => void) => {
@@ -767,14 +756,14 @@ export const saveFlowClick = async (id: string | undefined, edges: Edge[], nodes
   const isCommon = useServiceStore.getState().isCommon;
   const steps = useServiceStore.getState().mapEndpointsToSetps();
 
-  await saveFlow(steps, name, edges, nodes, 
+  await saveFlow(steps, name, edges, nodes,
     () => {
       onSuccess();
       useToastStore.getState().success({
         title: i18next.t("newService.toast.success"),
         message: i18next.t("newService.toast.savedSuccessfully"),
       });
-    }, 
+    },
     (e) => {
       useToastStore.getState().error({
         title: i18next.t("toast.cannot-save-flow"),

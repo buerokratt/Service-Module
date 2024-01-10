@@ -12,9 +12,9 @@ import {
   Track,
   Switch,
 } from "../components";
+import { saveDraft } from "services/service-builder";
 import useStore from "store/store";
 import useServiceStore from "store/new-services.store";
-import { saveDraft } from "services/service-builder";
 
 const NewServicePage: React.FC = () => {
   const { t } = useTranslation();
@@ -36,7 +36,7 @@ const NewServicePage: React.FC = () => {
   useEffect(() => {
     useServiceStore.getState().loadService(id);
   }, []);
-
+  
   return (
     <Layout
       disableMenu
