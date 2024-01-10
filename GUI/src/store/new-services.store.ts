@@ -6,6 +6,10 @@ import { EndpointData, EndpointEnv, EndpointTab, EndpointVariableData, PreDefine
 import { getSecretVariables, getServiceById, getTaraAuthResponseVariables } from 'resources/api-constants';
 import { Service, Step, StepType } from 'types';
 import { RequestVariablesTabsRawData, RequestVariablesTabsRowsData } from 'types/request-variables';
+import useToastStore from './toasts.store';
+import i18next from 'i18next';
+import { ROUTES } from 'resources/routes-constants';
+import { NavigateFunction } from 'react-router-dom';
 
 interface ServiceState {
   flow: string | undefined;
@@ -41,6 +45,7 @@ interface ServiceState {
   updateEndpointRawData: (rawData: RequestVariablesTabsRawData, endpointDataId?: string, parentEndpointId?: string) => void;
   updateEndpointData: (data: RequestVariablesTabsRowsData, endpointDataId?: string, parentEndpointId?:string) => void;
   resetState: () => void;
+  onContinueClick: (id: string | undefined, navigate: NavigateFunction) => void;
 
   // TODO: remove the following funtions and refactor the code to use more specific functions
   setEndpoints: (callback: (prev: EndpointData[]) => EndpointData[]) => void;
@@ -308,7 +313,20 @@ const useServiceStore = create<ServiceState>((set, get, store) => ({
     });
   },
   reactFlowInstance: null,
-  setReactFlowInstance: (reactFlowInstance: ReactFlowInstance | null) => set({ reactFlowInstance, }),
+  setReactFlowInstance: (reactFlowInstance) => set({ reactFlowInstance, }),
+  onContinueClick: (id, navigate) => {
+    const vaildServiceInfo = get().vaildServiceInfo();
+    
+    console.log(id, vaildServiceInfo)
+    if (!vaildServiceInfo) {
+      useToastStore.getState().error({
+        title: i18next.t("newService.toast.missingFields"),
+        message: i18next.t("newService.toast.serviceMissingFields"),
+      });
+      return;
+    }
+    navigate(ROUTES.replaceWithId(ROUTES.FLOW_ROUTE, id));
+  },
 }));
 
 export default useServiceStore;

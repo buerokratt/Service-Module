@@ -40,7 +40,7 @@ const HeaderStepCounter: FC<StepCounterProps> = ({ activeStep, serviceId }) => {
             return;
           }
 
-          navigate(`${ROUTES.FLOW_ROUTE}/${serviceId}`);
+          navigate(ROUTES.replaceWithId(ROUTES.FLOW_ROUTE, serviceId))
         }}
       />
     </Track>

@@ -95,7 +95,7 @@ const ServicesTable: FC<ServicesTableProps> = ({ isCommon = false }) => {
                 ? true 
                 : props.row.original.state === ServiceState.Active
             }
-            onClick={() => navigate(`${ROUTES.EDITSERVICE_ROUTE}/${props.row.original.id}`)}
+            onClick={() => navigate(ROUTES.replaceWithId(ROUTES.EDITSERVICE_ROUTE, props.row.original.id))}
           >
             <Icon icon={<MdOutlineEdit />} size="medium" />
             {t("overview.edit")}

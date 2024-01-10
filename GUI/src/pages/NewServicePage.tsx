@@ -12,10 +12,8 @@ import {
   Track,
   Switch,
 } from "../components";
-import { ROUTES } from "../resources/routes-constants";
 import useStore from "store/store";
 import useServiceStore from "store/new-services.store";
-import useToastStore from "store/toasts.store";
 import { saveDraft } from "services/service-builder";
 
 const NewServicePage: React.FC = () => {
@@ -26,7 +24,6 @@ const NewServicePage: React.FC = () => {
   const isCommon = useServiceStore(state => state.isCommon);
   const description = useServiceStore(state => state.description);
   const name = useServiceStore(state => state.name);
-  const vaildServiceInfo = useServiceStore(state => state.vaildServiceInfo());
   const { intentName, id } = useParams();
 
   useEffect(() => {
@@ -46,20 +43,10 @@ const NewServicePage: React.FC = () => {
       customHeader={
         <NewServiceHeader
           activeStep={2}
-          saveDraftOnClick={saveDraft}
+          saveDraftOnClick={() => saveDraft(id)}
           isSaveButtonEnabled={endpoints.length > 0}
           serviceId={id}
-          continueOnClick={() => {
-            if (!vaildServiceInfo) {
-              useToastStore.getState().error({
-                title: t("newService.toast.missingFields"),
-                message: t("newService.toast.serviceMissingFields"),
-              });
-              return;
-            }
-
-            navigate(`${ROUTES.FLOW_ROUTE}/${id}`);
-          }}
+          continueOnClick={() => useServiceStore.getState().onContinueClick(id, navigate)}
         />
       }
     >

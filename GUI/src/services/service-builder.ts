@@ -1,6 +1,5 @@
 import axios from "axios";
 import i18next from 'i18next';
-import { useParams } from "react-router-dom";
 import { Edge, Node } from "reactflow";
 import { createNewService, editService, jsonToYml, testDraftService } from "resources/api-constants";
 import useServiceStore from "store/new-services.store";
@@ -728,11 +727,10 @@ const getDefinedEndpointStep = (steps: Step[], node: Node) => {
   };
 };
 
-export const saveDraft = async () => {
-  const vaildServiceInfo = useServiceStore(state => state.vaildServiceInfo());
-  const endpoints = useServiceStore(state => state.endpoints);
-  const name = useServiceStore(state => state.name);
-  const { id } = useParams();
+export const saveDraft = async (id: string | undefined) => {
+  const vaildServiceInfo = useServiceStore.getState().vaildServiceInfo();
+  const endpoints = useServiceStore.getState().endpoints;
+  const name = useServiceStore.getState().name;
 
   if (!vaildServiceInfo) {
     useToastStore.getState().error({
@@ -762,13 +760,12 @@ export const saveDraft = async () => {
     );
 };
 
-export const saveFlowClick = async (edges: Edge[], nodes: Node[], onSuccess: () => void) => {
-  const name = useServiceStore((state) => state.serviceNameDashed());
-  const serviceId = useServiceStore(state => state.serviceId);
-  const description = useServiceStore(state => state.description);
-  const isCommon = useServiceStore(state => state.isCommon);
-  const steps = useServiceStore((state) => state.mapEndpointsToSetps());
-  const { id } = useParams();
+export const saveFlowClick = async (id: string | undefined, edges: Edge[], nodes: Node[], onSuccess: () => void) => {
+  const name = useServiceStore.getState().serviceNameDashed();
+  const serviceId = useServiceStore.getState().serviceId;
+  const description = useServiceStore.getState().description;
+  const isCommon = useServiceStore.getState().isCommon;
+  const steps = useServiceStore.getState().mapEndpointsToSetps();
 
   await saveFlow(steps, name, edges, nodes, 
     () => {
@@ -787,7 +784,7 @@ export const saveFlowClick = async (edges: Edge[], nodes: Node[], onSuccess: () 
 }
 
 export const runServiceTest = async () => {
-  const name = useServiceStore((state) => state.serviceNameDashed());
+  const name = useServiceStore.getState().serviceNameDashed();
 
   try {
     await axios.post(testDraftService(name), {});
