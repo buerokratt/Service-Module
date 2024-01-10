@@ -316,8 +316,7 @@ const useServiceStore = create<ServiceState>((set, get, store) => ({
   setReactFlowInstance: (reactFlowInstance) => set({ reactFlowInstance, }),
   onContinueClick: (id, navigate) => {
     const vaildServiceInfo = get().vaildServiceInfo();
-    
-    console.log(id, vaildServiceInfo)
+
     if (!vaildServiceInfo) {
       useToastStore.getState().error({
         title: i18next.t("newService.toast.missingFields"),
@@ -325,6 +324,7 @@ const useServiceStore = create<ServiceState>((set, get, store) => ({
       });
       return;
     }
+    
     navigate(ROUTES.replaceWithId(ROUTES.FLOW_ROUTE, id));
   },
 }));

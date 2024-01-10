@@ -34,7 +34,7 @@ const ServiceFlowPage: FC = () => {
   });
   const [selectedNode, setSelectedNode] = useState<Node<NodeDataProps> | null>(null);
   const navigate = useNavigate();
-  const { serviceId, description, availableVariables, isCommon, } = useServiceStore();
+  const { description, availableVariables, } = useServiceStore();
   const { id } = useParams();
 
   useEffect(() => {
@@ -119,7 +119,6 @@ const ServiceFlowPage: FC = () => {
           setIsTestButtonVisible(true);
           setIsTestButtonEnabled(true);
         })}
-        serviceId={id}
         continueOnClick={() => navigate(ROUTES.OVERVIEW_ROUTE)}
         isTestButtonVisible={isTestButtonVisible}
         isTestButtonEnabled={isTestButtonEnabled}

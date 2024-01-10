@@ -7,7 +7,6 @@ type NewServiceHeaderProps = {
   activeStep: number;
   continueOnClick: () => void;
   saveDraftOnClick: () => void;
-  serviceId?: string;
   isSaveButtonEnabled?: boolean;
   isTestButtonVisible?: boolean;
   isTestButtonEnabled?: boolean;
@@ -18,7 +17,6 @@ const NewServiceHeader: FC<NewServiceHeaderProps> = ({
   activeStep,
   continueOnClick,
   saveDraftOnClick,
-  serviceId,
   isSaveButtonEnabled = true,
   isTestButtonVisible = false,
   isTestButtonEnabled = true,
@@ -29,7 +27,7 @@ const NewServiceHeader: FC<NewServiceHeaderProps> = ({
       <header className="header" style={{ paddingLeft: 24 }}>
         <Track justify="between" gap={16}>
           <h1 style={{ whiteSpace: "nowrap" }}>{t("menu.newService")}</h1>
-          <HeaderStepCounter activeStep={activeStep} serviceId={serviceId} />
+          <HeaderStepCounter activeStep={activeStep} />
           <Button onClick={saveDraftOnClick} appearance="secondary" disabled={!isSaveButtonEnabled}>
             {t("newService.saveDraft")}
           </Button>

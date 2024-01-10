@@ -45,7 +45,6 @@ const NewServicePage: React.FC = () => {
           activeStep={2}
           saveDraftOnClick={() => saveDraft(id)}
           isSaveButtonEnabled={endpoints.length > 0}
-          serviceId={id}
           continueOnClick={() => useServiceStore.getState().onContinueClick(id, navigate)}
         />
       }

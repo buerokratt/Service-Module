@@ -1,22 +1,20 @@
 import React, { FC } from "react";
 import { Track } from "..";
-import "./HeaderStepCounter.scss";
 import Step from "./HeaderStep";
 import { useTranslation } from "react-i18next";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { ROUTES } from "../../resources/routes-constants";
-import useToastStore from "store/toasts.store";
 import useServiceStore from "store/new-services.store";
+import "./HeaderStepCounter.scss";
 
 type StepCounterProps = {
   activeStep: number;
-  serviceId?: string;
 };
 
-const HeaderStepCounter: FC<StepCounterProps> = ({ activeStep, serviceId }) => {
+const HeaderStepCounter: FC<StepCounterProps> = ({ activeStep }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const vaildService = useServiceStore(state => state.vaildServiceInfo());
+  const { id } = useParams();
 
   return (
     <Track className="header-step-counter" gap={24}>
@@ -31,17 +29,7 @@ const HeaderStepCounter: FC<StepCounterProps> = ({ activeStep, serviceId }) => {
         step={3}
         activeStep={activeStep}
         name={t("newService.serviceFlowCreation")}
-        onClick={() => {
-          if (!vaildService) {
-            useToastStore.getState().error({
-              title: t("newService.toast.missingFields"),
-              message: t("newService.toast.serviceMissingFields"),
-            });
-            return;
-          }
-
-          navigate(ROUTES.replaceWithId(ROUTES.FLOW_ROUTE, serviceId))
-        }}
+        onClick={() => useServiceStore.getState().onContinueClick(id, navigate)}
       />
     </Track>
   );
