@@ -23,7 +23,13 @@ const HeaderStepCounter: FC<StepCounterProps> = ({ activeStep }) => {
         step={2}
         activeStep={activeStep}
         name={t("newService.serviceSetup")}
-        onClick={() => navigate(ROUTES.NEWSERVICE_ROUTE)}
+        onClick={() => {
+          if(id) {
+            navigate(ROUTES.replaceWithId(ROUTES.EDITSERVICE_ROUTE, id));
+          } else {
+            navigate(ROUTES.NEWSERVICE_ROUTE);
+          }
+        }}
       />
       <Step
         step={3}

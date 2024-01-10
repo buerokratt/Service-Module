@@ -2,7 +2,6 @@
 const baseUrl = import.meta.env.REACT_APP_API_URL;
 const trainingModuleBaseUrl = import.meta.env.REACT_APP_TRAINING_MODULE_GUI_BASE_URL;
 
-export const getServicesAdd = (): string => `${baseUrl}/services/add`;
 export const getOpenApiSpec = (): string => `${baseUrl}/services/open-api-spec`;
 export const servicesRequestsExplain = (): string => `${baseUrl}/services/requests/explain`;
 export const getSecretVariables = (): string => `${baseUrl}/secrets`;
@@ -16,6 +15,7 @@ export const deleteService = (): string => `${baseUrl}/services/delete`;
 export const changeServiceStatus = (): string => `${baseUrl}/services/status`;
 export const createNewService = (): string => `${baseUrl}/services/add`;
 export const editService = (id: string): string => `${baseUrl}/services/edit?id=${id}`;
+export const editServiceInfoApi = (id: string): string => `${baseUrl}/services/edit?id=${id}`;
 export const testDraftService = (name: string): string => `${baseUrl}/services/draft/${name}`;
 export const getServicesList = (): string => `${baseUrl}/services`;
 export const jsonToYml = (): string => `${baseUrl}/saveJsonToYml`;

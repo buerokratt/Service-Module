@@ -1,2 +1,2 @@
 SELECT name FROM services
-WHERE id = :id;
+WHERE id = cast(:id as int);

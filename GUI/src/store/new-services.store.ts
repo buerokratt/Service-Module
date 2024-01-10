@@ -10,6 +10,7 @@ import useToastStore from './toasts.store';
 import i18next from 'i18next';
 import { ROUTES } from 'resources/routes-constants';
 import { NavigateFunction } from 'react-router-dom';
+import { editServiceInfo, saveDraft } from 'services/service-builder';
 
 interface ServiceState {
   flow: string | undefined;
@@ -45,7 +46,7 @@ interface ServiceState {
   updateEndpointRawData: (rawData: RequestVariablesTabsRawData, endpointDataId?: string, parentEndpointId?: string) => void;
   updateEndpointData: (data: RequestVariablesTabsRowsData, endpointDataId?: string, parentEndpointId?:string) => void;
   resetState: () => void;
-  onContinueClick: (id: string | undefined, navigate: NavigateFunction) => void;
+  onContinueClick: (id: string | undefined, navigate: NavigateFunction) => Promise<void>;
 
   // TODO: remove the following funtions and refactor the code to use more specific functions
   setEndpoints: (callback: (prev: EndpointData[]) => EndpointData[]) => void;
@@ -314,7 +315,7 @@ const useServiceStore = create<ServiceState>((set, get, store) => ({
   },
   reactFlowInstance: null,
   setReactFlowInstance: (reactFlowInstance) => set({ reactFlowInstance, }),
-  onContinueClick: (id, navigate) => {
+  onContinueClick: async (id, navigate) => {
     const vaildServiceInfo = get().vaildServiceInfo();
 
     if (!vaildServiceInfo) {
@@ -324,7 +325,11 @@ const useServiceStore = create<ServiceState>((set, get, store) => ({
       });
       return;
     }
-    
+
+    if(id) {
+      await editServiceInfo(id);
+    }
+
     navigate(ROUTES.replaceWithId(ROUTES.FLOW_ROUTE, id));
   },
 }));

@@ -1,0 +1,74 @@
+extract_request_data:
+  assign:
+    id: ${incoming.params.id}
+    name: ${incoming.body.name}
+    description: ${incoming.body.description}
+    type: ${incoming.body.type}
+
+check_for_required_parameters:
+  switch:
+    - condition: ${id === null || name === null || description === null}
+      next: return_incorrect_request
+    - condition: ${type === null}
+      next: return_incorrect_request
+
+upper_case_type:
+  assign:
+    type: ${type.toUpperCase()}
+
+check_type:
+  switch:
+    - condition: ${type !== 'GET' && type !== 'POST'}
+      next: return_incorrect_request
+
+get_service_name:
+  call: http.post
+  args:
+    url: "[#SERVICE_RESQL]/get-service-name-by-id"
+    body:
+      id: ${id}
+  result: name_res
+
+assign_values:
+  assign:
+    old_name: ${name_res.response.body[0].name}
+
+rename_dsl:
+  call: http.post
+  args:
+    url: "[#SERVICE_NODE]/file/move"
+    body:
+      current_path: "/Ruuter/${type}/services/draft/${old_name}.tmp"
+      new_path: "/Ruuter/${type}/services/draft/${name}.tmp"
+  result: results
+
+check_result:
+  switch:
+    - condition: ${200 <= results.response.statusCodeValue && results.response.statusCodeValue < 300}
+      next: service_edit
+  next: return_bad_request
+
+service_edit:
+  call: http.post
+  args:
+    url: "[#SERVICE_RESQL]/edit"
+    body:
+      id: ${id}
+      name: ${name}
+      description: ${description}
+  result: editedService
+
+return_ok:
+  status: 200
+  return: "Status Changed Successfully"
+  next: end
+
+return_bad_request:
+  status: 400
+  return: ${err_result.response.body.message}
+  next: end
+
+return_incorrect_request:
+  status: 400
+  return: "Required parameter(s) missing"
+  next: end

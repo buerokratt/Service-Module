@@ -8,8 +8,8 @@ export const ROUTES = {
   FAULTY_SERVICES_ROUTE: "/faultyServices",
   SERVICE_SETTINGS: "/services/settings",
   
-  replaceWithId: (route: string, id: string | number | undefined) => {
+  replaceWithId(route: string, id: string | number | undefined) {
     id = id ?? "";
     return route.replace(":id", id.toString());
-  }  
+  },
 };

@@ -1,7 +1,7 @@
 import axios from "axios";
 import i18next from 'i18next';
 import { Edge, Node } from "reactflow";
-import { createNewService, editService, jsonToYml, testDraftService } from "resources/api-constants";
+import { createNewService, editService, editServiceInfoApi, jsonToYml, testDraftService } from "resources/api-constants";
 import useServiceStore from "store/new-services.store";
 import useToastStore from "store/toasts.store";
 import { RawData, Step, StepType } from "types";
@@ -747,6 +747,7 @@ export const saveDraft = async (id: string | undefined) => {
     },
     id,
   );
+  return true;
 };
 
 export const saveFlowClick = async (id: string | undefined, edges: Edge[], nodes: Node[], onSuccess: () => void) => {
@@ -787,3 +788,26 @@ export const runServiceTest = async () => {
     });
   }
 };
+
+export const editServiceInfo = async (id: string) => {
+  const name = useServiceStore.getState().serviceNameDashed();
+  const description = useServiceStore.getState().description;
+
+  await axios.post(editServiceInfoApi(id),
+    {
+      name,
+      description,
+      type: "POST",
+    }
+  )
+  .then(() => useToastStore.getState().success({
+    title: i18next.t("newService.toast.success"),
+    message: i18next.t("newService.toast.savedSuccessfully"),
+  }))
+  .catch((e) => {
+    useToastStore.getState().error({
+      title: i18next.t("newService.toast.saveFailed"),
+      message: e?.message,
+    });
+  });
+}
