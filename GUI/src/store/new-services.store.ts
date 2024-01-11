@@ -159,6 +159,9 @@ const useServiceStore = create<ServiceState>((set, get, store) => ({
       const service = await axios.get<Service[]>(getServiceById(id));
       
       const structure = JSON.parse(service.data[0].structure.value);
+      const endpoints = JSON.parse(service.data[0].endpoints.value);
+
+      console.log(service.data[0].endpoints.value, typeof service.data[0].endpoints.value, endpoints, typeof endpoints);
       
       set({ 
         serviceId: id,
@@ -167,6 +170,7 @@ const useServiceStore = create<ServiceState>((set, get, store) => ({
         description: service.data[0].description,
         edges: structure?.edges ?? [initialEdge],
         nodes: structure?.nodes ?? initialNodes,
+        endpoints
       });
     }
 

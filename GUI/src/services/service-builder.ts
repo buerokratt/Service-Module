@@ -1,7 +1,7 @@
 import axios from "axios";
 import i18next from 'i18next';
 import { Edge, Node } from "reactflow";
-import { createNewService, editService, editServiceInfoApi, jsonToYml, testDraftService } from "resources/api-constants";
+import { createNewService, editService, updateServiceEndpoints, editServiceInfoApi, jsonToYml, testDraftService } from "resources/api-constants";
 import useServiceStore from "store/new-services.store";
 import useToastStore from "store/toasts.store";
 import { RawData, Step, StepType } from "types";
@@ -382,6 +382,16 @@ export async function saveEndpoints(
       )
       .then(onSuccess)
       .catch(onError);
+  }
+
+  if(id) {
+    await axios.post(updateServiceEndpoints(id),
+      {
+        endpoints: JSON.stringify(endpoints),
+      }
+    )
+    .then(onSuccess)
+    .catch(onError)
   }
 }
 

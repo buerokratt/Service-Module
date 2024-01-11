@@ -1,0 +1,28 @@
+extract_request_data:
+  assign:
+    id: ${incoming.params.id}
+    endpoints: ${incoming.body.endpoints}
+
+check_for_type:
+  switch:
+    - condition: ${id == null}
+      next: return_no_type_error
+
+service_edit:
+  call: http.post
+  args:
+    url: "[#SERVICE_RESQL]/update-service-endpoints"
+    body:
+      id: ${id}
+      endpoints: ${endpoints}
+  result: editedService
+
+return_ok:
+  status: 200
+  return: "Saved"
+  next: end
+
+return_no_type_error:
+  status: 400
+  return: "Please Specify Endpoint Type 'Prod' Or 'Test'"
+  next: end

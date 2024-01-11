@@ -9,4 +9,5 @@ export interface Service {
   readonly isCommon: boolean;
   readonly description?: string;
   readonly structure: any;
+  readonly endpoints: any;
 }

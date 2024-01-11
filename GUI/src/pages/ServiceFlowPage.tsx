@@ -1,5 +1,5 @@
-import { CSSProperties, FC, useEffect, useMemo, useState } from "react";
-import { Node, ReactFlowProvider, useEdgesState, useNodesState } from "reactflow";
+import { CSSProperties, FC, useCallback, useEffect, useMemo, useState } from "react";
+import { EdgeChange, Node, NodeChange, ReactFlowProvider, applyEdgeChanges, applyNodeChanges } from "reactflow";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useParams } from "react-router-dom";
 import { Box, Collapsible, NewServiceHeader, Track, FlowElementsPopup } from "../components";
@@ -8,7 +8,7 @@ import { ROUTES } from "../resources/routes-constants";
 import apiIconTag from "../assets/images/api-icon-tag.svg";
 import { StepType, Step, ConditionRuleType } from "../types";
 import useServiceStore from "store/new-services.store";
-import { NodeDataProps, initialEdge, initialNodes } from "types/service-flow";
+import { NodeDataProps } from "types/service-flow";
 import { runServiceTest, saveFlowClick } from "services/service-builder";
 import "reactflow/dist/style.css";
 import "./ServiceFlowPage.scss";
@@ -51,8 +51,8 @@ const ServiceFlowPage: FC = () => {
   const setNodes = useServiceStore((state) => state.setNodes);
   const setEdges = useServiceStore((state) => state.setEdges);
 
-  // const [, , onNodesChange] = useNodesState(initialNodes);
-  // const [, , onEdgesChange] = useEdgesState([initialEdge]);
+  const onNodesChange = useCallback((changes: NodeChange[]) => setNodes((nds) => applyNodeChanges(changes, nds)), []);
+  const onEdgesChange = useCallback((changes: EdgeChange[]) => setEdges((eds) => applyEdgeChanges(changes, eds)), []);
 
   const [isTestButtonVisible, setIsTestButtonVisible] = useState(false);
   const [isTestButtonEnabled, setIsTestButtonEnabled] = useState(true);
@@ -200,10 +200,10 @@ const ServiceFlowPage: FC = () => {
             description={description}
             nodes={nodes}
             setNodes={setNodes}
-            // onNodesChange={onNodesChange}
+            onNodesChange={onNodesChange}
             edges={edges}
             setEdges={setEdges}
-            // onEdgesChange={onEdgesChange}
+            onEdgesChange={onEdgesChange}
             onNodeAdded={onNodeAdded}
             onNodeDelete={onNodeDelete}
           />
