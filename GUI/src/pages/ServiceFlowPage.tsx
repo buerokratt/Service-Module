@@ -144,7 +144,7 @@ const ServiceFlowPage: FC = () => {
       return {
         templateName: "send-message-to-client",
         body: {
-          message: `${node.data.message?.replace("{{", "${").replace("}}", "}")}`,
+          message: `"${node.data.message?.replace("{{", "${").replace("}}", "}")}"`,
         },
       };
     }
