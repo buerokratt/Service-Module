@@ -21,8 +21,7 @@ import { ConditionRuleType, StepType } from "../../types";
 import StartNode from "../Steps/StartNode";
 import { useTranslation } from "react-i18next";
 import useServiceStore from "store/new-services.store";
-
-export const GRID_UNIT = 16;
+import { GRID_UNIT } from "types/service-flow";
 
 const nodeTypes = {
   startNode: StartNode,
@@ -34,13 +33,13 @@ type FlowBuilderProps = {
   onNodeEdit: (selectedNode: Node | null) => void;
   updatedRules: { rules: (string | null)[]; rulesData: ConditionRuleType[] };
   nodes: Node[];
-  setNodes: Dispatch<SetStateAction<Node[]>>;
-  onNodesChange: OnNodesChange;
+  onNodesChange?: OnNodesChange;
   onNodeAdded: () => void;
   onNodeDelete: () => void;
   edges: Edge[];
-  setEdges: Dispatch<SetStateAction<Edge[]>>;
-  onEdgesChange: OnEdgesChange;
+  setEdges: (edges: Edge[] | ((prev: Edge[]) => Edge[])) => void;
+  setNodes: (nodes: Node[] | ((prev: Node[]) => Node[])) => void;
+  onEdgesChange?: OnEdgesChange;
   description: string;
 };
 
@@ -716,7 +715,7 @@ const FlowBuilder: FC<FlowBuilderProps> = ({
         nodes={nodes}
         edges={edges}
         onNodesChange={(changes: NodeChange[]) => {
-          onNodesChange(changes);
+          onNodesChange?.(changes);
           alignNodes(changes);
         }}
         onEdgesChange={onEdgesChange}

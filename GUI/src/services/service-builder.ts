@@ -388,8 +388,8 @@ export async function saveEndpoints(
 export const saveFlow = async (
   steps: Step[],
   name: string,
-  edges: Edge<any>[],
-  nodes: Node<any, string | undefined>[],
+  edges: Edge[],
+  nodes: Node[],
   onSuccess: (e: any) => void,
   onError: (e: any) => void,
   description: string,
@@ -523,7 +523,7 @@ export const saveFlow = async (
           type: "POST",
           content: result,
           isCommon,
-          structure: /* location?.state ?? */ {},
+          structure: serviceIdToEdit ? JSON.stringify({ edges, nodes }) : null,
         },
         {
           params: {

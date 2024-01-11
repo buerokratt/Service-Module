@@ -1,6 +1,7 @@
-import { GRID_UNIT } from "components/FlowBuilder/FlowBuilder";
 import { StepType } from "./step-type.enum";
 import { MarkerType, Node } from "reactflow";
+
+export const GRID_UNIT = 16;
 
 export const initialPlaceholder = {
   id: "2",

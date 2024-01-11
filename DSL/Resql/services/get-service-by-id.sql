@@ -3,7 +3,7 @@ SELECT id,
   current_state AS state,
   ruuter_type AS type,
   is_common AS isCommon,
-  structure,
+  structure::jsonb,
   description
 FROM services
 WHERE deleted = false AND id = cast(:id as int);

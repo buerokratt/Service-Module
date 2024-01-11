@@ -18,7 +18,12 @@ const HeaderStepCounter: FC<StepCounterProps> = ({ activeStep }) => {
 
   return (
     <Track className="header-step-counter" gap={24}>
-      <Step step={1} activeStep={activeStep} name={t("newService.trainingModuleSetup")} />
+      <Step 
+        step={1}
+        activeStep={activeStep}
+        name={t("newService.trainingModuleSetup")} 
+        onClick={() => navigate(ROUTES.OVERVIEW_ROUTE)}
+      />
       <Step
         step={2}
         activeStep={activeStep}

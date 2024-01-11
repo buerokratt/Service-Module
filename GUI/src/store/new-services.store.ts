@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { create } from 'zustand';
 import { v4 as uuid } from "uuid";
-import { Node, ReactFlowInstance } from "reactflow";
+import { Edge, Node, ReactFlowInstance } from "reactflow";
 import { EndpointData, EndpointEnv, EndpointTab, EndpointVariableData, PreDefinedEndpointEnvVariables } from 'types/endpoint';
 import { getSecretVariables, getServiceById, getTaraAuthResponseVariables } from 'resources/api-constants';
 import { Service, Step, StepType } from 'types';
@@ -11,6 +11,7 @@ import i18next from 'i18next';
 import { ROUTES } from 'resources/routes-constants';
 import { NavigateFunction } from 'react-router-dom';
 import { editServiceInfo, saveDraft } from 'services/service-builder';
+import { initialEdge, initialNodes } from 'types/service-flow';
 
 interface ServiceState {
   flow: string | undefined;
@@ -19,6 +20,10 @@ interface ServiceState {
   serviceId: string;
   description: string;
   isCommon: boolean,
+  edges: Edge[],
+  nodes: Node[],
+  setNodes: (nodes: Node[] | ((prev: Node[]) => Node[])) => void;
+  setEdges: (edges: Edge[]| ((prev: Edge[]) => Edge[])) => void;
   vaildServiceInfo: () => boolean,
   setIsCommon: (isCommon: boolean) => void;
   secrets: PreDefinedEndpointEnvVariables;
@@ -61,6 +66,30 @@ const useServiceStore = create<ServiceState>((set, get, store) => ({
   name: '',
   serviceId: uuid(),
   description: '',
+  edges: [],
+  nodes: [],
+  setNodes: (nodes) => {
+    if(nodes instanceof Function) {
+      set(state => {
+        return {
+          nodes: nodes(state.nodes),
+        }
+      })
+    } else {
+      set({ nodes })
+    }
+  },
+  setEdges: (edges) => {
+    if(edges instanceof Function) {
+      set(state => {
+        return {
+          edges: edges(state.edges),
+        }
+      })
+    } else {
+      set({ edges })
+    }
+  },
   secrets: { prod: [], test: [] },
   availableVariables: { prod: [], test: [] },
   vaildServiceInfo: () => !!get().name && !!get().description,
@@ -128,12 +157,16 @@ const useServiceStore = create<ServiceState>((set, get, store) => ({
 
     if(id) {
       const service = await axios.get<Service[]>(getServiceById(id));
-
+      
+      const structure = JSON.parse(service.data[0].structure.value);
+      
       set({ 
         serviceId: id,
         name: service.data[0].name,
         isCommon : service.data[0].isCommon,
         description: service.data[0].description,
+        edges: structure?.edges ?? [initialEdge],
+        nodes: structure?.nodes ?? initialNodes,
       });
     }
 
@@ -148,6 +181,7 @@ const useServiceStore = create<ServiceState>((set, get, store) => ({
     }
     const variables = nodes?.filter((node) => node.data.stepType === "input")
       .map((node) => `{{ClientInput_${node.data.clientInputId}}}`);
+
     get().addProductionVariables(variables);
   },
   loadSecretVariables: async () => {

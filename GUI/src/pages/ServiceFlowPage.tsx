@@ -44,23 +44,16 @@ const ServiceFlowPage: FC = () => {
   
   const steps = useServiceStore((state) => state.mapEndpointsToSetps());
   const name = useServiceStore((state) => state.serviceNameDashed());
+
+  const edges = useServiceStore((state) => state.edges);
+  const nodes = useServiceStore((state) => state.nodes);
   
-  const flow = useMemo(() => {
-    const flowStr = useServiceStore.getState().flow;
-    if(!flowStr)
-      return undefined;
-    return JSON.parse(flowStr);
-  }, [useServiceStore.getState().flow]);
+  const setNodes = useServiceStore((state) => state.setNodes);
+  const setEdges = useServiceStore((state) => state.setEdges);
 
-  const [edges, setEdges, onEdgesChange] = useEdgesState(flow ? flow.edges : [initialEdge]);
+  // const [, , onNodesChange] = useNodesState(initialNodes);
+  // const [, , onEdgesChange] = useEdgesState([initialEdge]);
 
-  const resetNodes = (): Node[] => {
-    return flow.nodes.map((n: Node) => {
-      if (n.type !== "customNode") return n;
-      return { ...n, selected: false, className: n.data.type };
-    });
-  };
-  const [nodes, setNodes, onNodesChange] = useNodesState(flow ? resetNodes() : initialNodes);
   const [isTestButtonVisible, setIsTestButtonVisible] = useState(false);
   const [isTestButtonEnabled, setIsTestButtonEnabled] = useState(true);
 
@@ -207,10 +200,10 @@ const ServiceFlowPage: FC = () => {
             description={description}
             nodes={nodes}
             setNodes={setNodes}
-            onNodesChange={onNodesChange}
+            // onNodesChange={onNodesChange}
             edges={edges}
             setEdges={setEdges}
-            onEdgesChange={onEdgesChange}
+            // onEdgesChange={onEdgesChange}
             onNodeAdded={onNodeAdded}
             onNodeDelete={onNodeDelete}
           />
