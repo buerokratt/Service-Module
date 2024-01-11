@@ -16,10 +16,9 @@ import {
   EndpointEnv,
   EndpointType,
   EndpointVariableData,
-  PreDefinedEndpointEnvVariables,
 } from "../types/endpoint";
 import axios from "axios";
-import { createNewService, jsonToYml, testDraftService } from "../resources/api-constants";
+import { createNewService, jsonToYml } from "../resources/api-constants";
 import { ToastContext } from "../components/Toast/ToastContext";
 import useServiceStore from "store/new-services.store";
 
@@ -127,6 +126,10 @@ const ServiceFlowPage: FC = () => {
     });
   };
   const [nodes, setNodes, onNodesChange] = useNodesState(flow ? resetNodes() : initialNodes);
+
+  useEffect(() => {
+    useServiceStore.getState().loadService(serviceId);
+  },[]);
 
   const getTemplateDataFromNode = (
     node: Node

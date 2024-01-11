@@ -1,9 +1,11 @@
 import { create } from 'zustand';
+import { ServiceState as ServiceActiveState } from 'types/service-state';
 import { EndpointData, PreDefinedEndpointEnvVariables } from 'types/endpoint';
 import { v4 as uuid } from "uuid";
 import axios from 'axios';
-import { getSecretVariables, getTaraAuthResponseVariables } from 'resources/api-constants';
+import { getSecretVariables, getServiceById, getTaraAuthResponseVariables } from 'resources/api-constants';
 import { Node } from "reactflow";
+import { Service } from 'types';
 
 interface ServiceState {
   flow: string | undefined;
@@ -11,8 +13,10 @@ interface ServiceState {
   serviceName: string;
   serviceId: string;
   description: string;
-  isCommon: boolean,
+  isCommon: boolean;
+  serviceState: ServiceActiveState,
   setIsCommon: (isCommon: boolean) => void;
+  loadService: (id: string) => Promise<void>;
   secrets: PreDefinedEndpointEnvVariables;
   availableVariables: PreDefinedEndpointEnvVariables;
   isTestButtonVisible: boolean;
@@ -48,10 +52,17 @@ const useServiceStore = create<ServiceState>((set, get, store) => ({
   serviceName: '',
   serviceId: uuid(),
   description: '',
+  serviceState: ServiceActiveState.Draft,
   secrets: { prod: [], test: [] },
   availableVariables: { prod: [], test: [] },
   isTestButtonVisible: false,
   isTestButtonEnabled: true,
+  loadService: async (id: string) => {
+    const service = await axios.get<Service[]>(getServiceById(id));
+    set({
+      serviceState: service.data[0].state,
+    });
+  },
   disableTestButton: () => set({ isTestButtonEnabled: false }),
   enableTestButton: () => set({ 
     isTestButtonEnabled: true,

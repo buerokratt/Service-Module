@@ -13,19 +13,7 @@ import {
   Switch,
 } from "../components";
 import { ROUTES } from "../resources/routes-constants";
-import axios from "axios";
-import { getSecretVariables as getSecretVariablesApi, getTaraAuthResponseVariables, jsonToYml } from "../resources/api-constants";
-import {
-  EndpointData,
-  EndpointEnv,
-  EndpointType,
-  EndpointVariableData,
-  PreDefinedEndpointEnvVariables,
-} from "../types/endpoint";
 import { ToastContext } from "../components/Toast/ToastContext";
-import { Step } from "types/step";
-import { StepType } from "types/step-type.enum";
-import { RawData } from "types";
 import useStore from "store/store";
 import useServiceStore from "store/new-services.store";
 import { saveEndpoints } from "services/service-builder";
@@ -48,11 +36,12 @@ const NewServicePage: React.FC = () => {
     changeServiceName,
     addEndpoint,
     loadFlowData,
+    loadService,
   } = useServiceStore();
 
   const toast = useContext(ToastContext);
 
-  const { intentName } = useParams();
+  const { intentName, id } = useParams();
   useEffect(() => {
     const name = intentName?.trim();
     if(name) changeServiceName(name);
@@ -60,6 +49,7 @@ const NewServicePage: React.FC = () => {
 
   useEffect(() => {
     loadFlowData();
+    loadService(id!);
   }, []);
 
   const saveDraft = async () => {
