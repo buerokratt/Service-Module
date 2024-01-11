@@ -802,12 +802,29 @@ export const runServiceTest = async () => {
 export const editServiceInfo = async (id: string) => {
   const name = useServiceStore.getState().serviceNameDashed();
   const description = useServiceStore.getState().description;
+  const endpoints = useServiceStore.getState().endpoints;
 
   await axios.post(editServiceInfoApi(id),
     {
       name,
       description,
       type: "POST",
+    }
+  )
+  .then(() => useToastStore.getState().success({
+    title: i18next.t("newService.toast.success"),
+    message: i18next.t("newService.toast.savedSuccessfully"),
+  }))
+  .catch((e) => {
+    useToastStore.getState().error({
+      title: i18next.t("newService.toast.saveFailed"),
+      message: e?.message,
+    });
+  });
+
+  await axios.post(updateServiceEndpoints(id),
+    {
+      endpoints: JSON.stringify(endpoints),
     }
   )
   .then(() => useToastStore.getState().success({
