@@ -8,55 +8,19 @@ import VariableAsTag from "./VariableAsTag"
 import { ConditionRuleType } from "../../types"
 import { PreDefinedEndpointEnvVariables } from "../../types/endpoint"
 import './styles.scss'
+import useFlowStore, { conditionOptions } from 'store/flow.store';
 
 interface RulesBuilderProps {
-  rules: ConditionRuleType[],
-  setRules: (rules: ConditionRuleType[]) => void,
   availableVariables?: PreDefinedEndpointEnvVariables;
 }
 
-const conditionOptions = [ 
-  '==', '!=', '>', '<', '>=', '<='
-].map(x=>({ label: x, value: x }))
-
 const RulesBuilder: React.FC<RulesBuilderProps> = ({
   availableVariables,
-  rules,
-  setRules,
 }) => {
   const { t } = useTranslation();
+  const rules = useFlowStore(x => x.rules);
 
-  const addRule = () => {
-    setRules([
-      ...rules,
-      {
-        id: uuidv4(),
-        name: '',
-        condition: conditionOptions[0].value,
-        value: '',
-      }
-    ])
-  }
-
-  const removeRule = (id: string) => {
-    setRules(rules.filter(x => x.id !== id))
-  }
-
-  const handleNameChange = (id: string, value: string) => {
-    const newRules = rules.map(x => x.id === id ? { ...x, name: value } : x);
-    setRules(newRules);
-  }
-
-  const handleValueChange = (id: string, value: string) => {
-    const newRules = rules.map(x => x.id === id ? { ...x, value: value } : x);
-    setRules(newRules);
-  }
-
-  const handleConditionChange = (id: string, value?: string) => {
-    if (!value) { return; }
-    const newRules = rules.map(x => x.id === id ? { ...x, condition: value } : x);
-    setRules(newRules);
-  }
+  const handleFieldChange = useFlowStore.getState().handleFieldChange;
 
   return <>
     {rules.map((rule, i) => <Track
@@ -69,13 +33,13 @@ const RulesBuilder: React.FC<RulesBuilderProps> = ({
         <Button
           appearance='text'
           className=""
-          onClick={() => removeRule(rule.id)}
+          onClick={() => useFlowStore.getState().removeRule(rule.id)}
         >
           x
         </Button>
       </Track>
       <Track gap={16}>
-        <ConditionInput rule={rule} handleNameChange={handleNameChange} />
+        <ConditionInput rule={rule} />
         <Track className="flow-rule-container">
           <FormSelect
             name='condition'
@@ -83,19 +47,19 @@ const RulesBuilder: React.FC<RulesBuilderProps> = ({
             options={conditionOptions}
             value={rule.condition}
             defaultValue={rule.condition}
-            onSelectionChange={(selection) => handleConditionChange(rule.id, selection?.value)} />
+            onSelectionChange={(selection) => handleFieldChange(rule.id, 'condition', selection?.value)} />
         </Track>
         <FormInput
           name='value'
           label=''
           placeholder='...'
           value={rule.value}
-          onChange={(value) => handleValueChange(rule.id, value.target.value)} />
+          onChange={(value) => handleFieldChange(rule.id, 'value', value.target.value)} />
       </Track>
     </Track>
     )}
     <Track className="popup-top-border-track">
-      <Button appearance='text' onClick={addRule}>{t("serviceFlow.popup.addRule")}</Button>
+      <Button appearance='text' onClick={useFlowStore.getState().addRule}>{t("serviceFlow.popup.addRule")}</Button>
     </Track>
 
     <Track

@@ -23,6 +23,7 @@ import "./styles.scss";
 import { useLocation } from "react-router-dom";
 import { PreDefinedEndpointEnvVariables } from "../../types/endpoint";
 import useServiceStore from "store/new-services.store";
+import useFlowStore from "store/flow.store";
 
 interface FlowElementsPopupProps {
   node: any;
@@ -42,15 +43,17 @@ const FlowElementsPopup: React.FC<FlowElementsPopupProps> = ({
   onRulesUpdate,
 }) => {
   const { t } = useTranslation();
-  const [isYesNoQuestion, setIsYesNoQuestion] = useState(node?.isYesNoQuestion ?? false);
-  const [rules, setRules] = useState<ConditionRuleType[]>(node?.data?.rules ?? []);
+  // const [isYesNoQuestion, setIsYesNoQuestion] = useState(node?.isYesNoQuestion ?? false);
+  // const [rules, setRules] = useState<ConditionRuleType[]>(node?.data?.rules ?? []);
   const [selectedTab, setSelectedTab] = useState<string | null>(null);
   const [isJsonRequestVisible, setIsJsonRequestVisible] = useState(false);
   const [jsonRequestContent, setJsonRequestContent] = useState<string | null>(null);
 
   const isUserDefinedNode = node?.data?.stepType === 'user-defined';
 
-  const { endpoints } = useServiceStore();
+  const endpoints = useServiceStore(state => state.endpoints);
+  const rules = useFlowStore(state => state.rules);
+  const isYesNoQuestion = useFlowStore(state => state.isYesNoQuestion);
 
   useEffect(() => {
     if (node) node.data.rules = rules;
@@ -65,7 +68,6 @@ const FlowElementsPopup: React.FC<FlowElementsPopupProps> = ({
   // StepType.FileGenerate
   const [fileName, setFileName] = useState<string | null>(null);
   const [fileContent, setFileContent] = useState<string | null>(null);
-  const location = useLocation();
 
   if (!node) return <></>;
 
@@ -232,10 +234,8 @@ const FlowElementsPopup: React.FC<FlowElementsPopupProps> = ({
                 {stepType === StepType.Input && (
                   <ConditionBuilderContent
                     availableVariables={availableVariables}
-                    isYesNoQuestion={isYesNoQuestion}
-                    setIsYesNoQuestion={setIsYesNoQuestion}
-                    rules={rules}
-                    setRules={setRules}
+                    // isYesNoQuestion={isYesNoQuestion}
+                    // setIsYesNoQuestion={setIsYesNoQuestion}
                   />
                 )}
                 {stepType === StepType.FileGenerate && (
