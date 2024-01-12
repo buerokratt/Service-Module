@@ -1,20 +1,23 @@
+import { v4 as uuidv4 } from 'uuid';
+import { useTranslation } from "react-i18next"
 import Button from "../Button"
 import { FormSelect, FormInput } from "../FormElements"
 import Track from "../Track"
 import ConditionInput from "./ConditionInput"
 import VariableAsTag from "./VariableAsTag"
-import { v4 as uuidv4 } from 'uuid';
-import conditionOptions from "./ConditionOptions"
-import './styles.scss'
 import { ConditionRuleType } from "../../types"
 import { PreDefinedEndpointEnvVariables } from "../../types/endpoint"
-import { useTranslation } from "react-i18next"
+import './styles.scss'
 
 interface RulesBuilderProps {
   rules: ConditionRuleType[],
   setRules: (rules: ConditionRuleType[]) => void,
   availableVariables?: PreDefinedEndpointEnvVariables;
 }
+
+const conditionOptions = [ 
+  '==', '!=', '>', '<', '>=', '<='
+].map(x=>({ label: x, value: x }))
 
 const RulesBuilder: React.FC<RulesBuilderProps> = ({
   availableVariables,
