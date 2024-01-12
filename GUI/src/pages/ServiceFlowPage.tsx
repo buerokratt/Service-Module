@@ -10,13 +10,11 @@ import apiIconTag from "../assets/images/api-icon-tag.svg";
 import "reactflow/dist/style.css";
 import "./ServiceFlowPage.scss";
 import { StepType, Step, RawData, ConditionRuleType } from "../types";
-import { v4 as uuid } from "uuid";
 import {
   EndpointData,
   EndpointEnv,
   EndpointType,
   EndpointVariableData,
-  PreDefinedEndpointEnvVariables,
 } from "../types/endpoint";
 import axios from "axios";
 import { createNewService, jsonToYml, testDraftService } from "../resources/api-constants";
