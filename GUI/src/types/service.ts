@@ -7,4 +7,7 @@ export interface Service {
   readonly state: ServiceState;
   readonly type: "GET" | "POST";
   readonly isCommon: boolean;
+  readonly description?: string;
+  readonly structure: any;
+  readonly endpoints: any;
 }

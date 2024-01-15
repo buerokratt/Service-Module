@@ -7,7 +7,7 @@ import { useTranslation } from "react-i18next";
 import { MdDeleteOutline } from "react-icons/md";
 import "./ApiEndpointCard.scss";
 import { RequestTab } from "../../types";
-import { EndpointData, EndpointEnv, EndpointTab, PreDefinedEndpointEnvVariables } from "../../types/endpoint";
+import { EndpointData, EndpointEnv, EndpointTab } from "../../types/endpoint";
 import useServiceStore from "store/new-services.store";
 
 type EndpointCardProps = {

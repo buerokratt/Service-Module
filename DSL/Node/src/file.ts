@@ -42,7 +42,6 @@ router.post("/write", (req, res) => {
 router.post("/move", async (req, res) => {
   const currentPath = buildContentFilePath(req.body.current_path);
   const newPath = buildContentFilePath(req.body.new_path);
-
   if (!currentPath || !newPath) {
     res.status(400).json({ message: "current path and new path are required" });
     return;

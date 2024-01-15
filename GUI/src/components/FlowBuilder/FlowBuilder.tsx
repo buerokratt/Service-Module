@@ -20,8 +20,8 @@ import PlaceholderNode from "../Steps/PlaceholderNode";
 import { ConditionRuleType, StepType } from "../../types";
 import StartNode from "../Steps/StartNode";
 import { useTranslation } from "react-i18next";
-
-export const GRID_UNIT = 16;
+import useServiceStore from "store/new-services.store";
+import { GRID_UNIT } from "types/service-flow";
 
 const nodeTypes = {
   startNode: StartNode,
@@ -33,15 +33,13 @@ type FlowBuilderProps = {
   onNodeEdit: (selectedNode: Node | null) => void;
   updatedRules: { rules: (string | null)[]; rulesData: ConditionRuleType[] };
   nodes: Node[];
-  setNodes: Dispatch<SetStateAction<Node[]>>;
-  onNodesChange: OnNodesChange;
+  onNodesChange?: OnNodesChange;
   onNodeAdded: () => void;
   onNodeDelete: () => void;
   edges: Edge[];
-  setEdges: Dispatch<SetStateAction<Edge[]>>;
-  onEdgesChange: OnEdgesChange;
-  reactFlowInstance?: ReactFlowInstance;
-  setReactFlowInstance: Dispatch<SetStateAction<ReactFlowInstance | undefined>>;
+  setEdges: (edges: Edge[] | ((prev: Edge[]) => Edge[])) => void;
+  setNodes: (nodes: Node[] | ((prev: Node[]) => Node[])) => void;
+  onEdgesChange?: OnEdgesChange;
   description: string;
 };
 
@@ -56,8 +54,6 @@ const FlowBuilder: FC<FlowBuilderProps> = ({
   onEdgesChange,
   onNodeAdded,
   onNodeDelete,
-  reactFlowInstance,
-  setReactFlowInstance,
   description,
 }) => {
   const { t } = useTranslation();
@@ -67,6 +63,13 @@ const FlowBuilder: FC<FlowBuilderProps> = ({
   const startDragNode = useRef<Node | undefined>(undefined);
   const nodePositionOffset = 28 * GRID_UNIT;
   const updateNodeInternals = useUpdateNodeInternals();
+
+  const reactFlowInstance = useServiceStore(state => state.reactFlowInstance);
+  const setReactFlowInstance = useServiceStore(state => state.setReactFlowInstance);
+
+  useEffect(() => {
+    useServiceStore.getState().setFlow(JSON.stringify(reactFlowInstance?.toObject()));
+  }, [reactFlowInstance]);
 
   const getEdgeLength = () => 5 * GRID_UNIT;
 
@@ -712,7 +715,7 @@ const FlowBuilder: FC<FlowBuilderProps> = ({
         nodes={nodes}
         edges={edges}
         onNodesChange={(changes: NodeChange[]) => {
-          onNodesChange(changes);
+          onNodesChange?.(changes);
           alignNodes(changes);
         }}
         onEdgesChange={onEdgesChange}

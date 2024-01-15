@@ -1,5 +1,5 @@
 import axios from "axios";
-import React, { useContext, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { MdErrorOutline } from "react-icons/md";
 import { v4 as uuid } from "uuid";
@@ -8,13 +8,11 @@ import { getEndpointValidation } from "../../../../resources/api-constants";
 import { RequestTab } from "../../../../types";
 import {
   EndpointData,
-  EndpointTab,
   EndpointVariableData,
   PreDefinedEndpointEnvVariables,
 } from "../../../../types/endpoint";
-import { RequestVariablesTabsRowsData, RequestVariablesTabsRawData } from "../../../../types/request-variables";
-import { ToastContext } from "components/Toast/ToastContext";
 import useServiceStore from "store/new-services.store";
+import useToastStore from "store/toasts.store";
 
 type EndpointCustomProps = {
   endpoint: EndpointData;
@@ -34,7 +32,6 @@ const EndpointCustom: React.FC<EndpointCustomProps> = ({
   const { t } = useTranslation();
   const [urlError, setUrlError] = useState<string>();
   const [key, setKey] = useState<number>(0);
-  const toast = useContext(ToastContext);
   const { setEndpoints } = useServiceStore();
 
   // initial endpoint data
@@ -64,67 +61,7 @@ const EndpointCustom: React.FC<EndpointCustomProps> = ({
   }
 
   useEffect(() => setKey(key + 1), [isLive]);
-
-  const updateEndpointData = (data: RequestVariablesTabsRowsData, endpointId?: string) => {
-    if (!endpointId) return;
-    setEndpoints((prevEndpoints) => {
-      return prevEndpoints.map((prevEndpoint: EndpointData) => {
-        if (prevEndpoint.id !== endpoint.id) return prevEndpoint;
-        prevEndpoint.definedEndpoints.map((defEndpoint) => {
-          if (defEndpoint.id !== endpointId) return defEndpoint;
-          Object.keys(data).forEach((key) => {
-            data[key as EndpointTab]?.forEach((row) => {
-              if (
-                !row.endpointVariableId &&
-                row.variable &&
-                !defEndpoint[key as EndpointTab]?.variables.map((e) => e.name).includes(row.variable)
-              ) {
-                const newVariable: EndpointVariableData = {
-                  id: uuid(),
-                  name: row.variable,
-                  type: "custom",
-                  required: false,
-                };
-                newVariable[isLive ? "value" : "testValue"] = row.value;
-                defEndpoint[key as EndpointTab]?.variables.push(newVariable);
-              }
-            });
-            defEndpoint[key as EndpointTab]?.variables.forEach((variable) => {
-              const updatedVariable = data[key as EndpointTab]!.find(
-                (updated) => updated.endpointVariableId === variable.id
-              );
-              variable[isLive ? "value" : "testValue"] = updatedVariable?.value;
-              variable.name = updatedVariable?.variable ?? variable.name;
-            });
-          });
-          return defEndpoint;
-        });
-        return prevEndpoint;
-      });
-    });
-    setKey((prevKey) => prevKey + 1);
-  };
-
-  const updateEndpointRawData = (data: RequestVariablesTabsRawData, endpointId?: string) => {
-    if (!endpointId) return;
-    setEndpoints((prevEndpoints) => {
-      return prevEndpoints.map((prevEndpoint: EndpointData) => {
-        if (prevEndpoint.id !== endpoint.id) return prevEndpoint;
-        prevEndpoint.definedEndpoints.map((defEndpoint) => {
-          if (defEndpoint.id !== endpointId) return defEndpoint;
-          Object.keys(data).forEach((key) => {
-            if (defEndpoint[key as EndpointTab]) {
-              defEndpoint[key as EndpointTab]!.rawData[isLive ? "value" : "testValue"] = data[key as EndpointTab];
-            }
-          });
-          return defEndpoint;
-        });
-        return prevEndpoint;
-      });
-    });
-    setKey((prevKey) => prevKey + 1);
-  };
-
+  
   const refereshEndpoint = () => {
     setEndpoints((endpoint) => endpoint);
     setKey((prevKey) => prevKey + 1);
@@ -195,10 +132,8 @@ const EndpointCustom: React.FC<EndpointCustomProps> = ({
                   });
                 }
                 setUrlError(undefined);
-                toast.open({
-                  type: "success",
+                useToastStore.getState().success({
                   title: t("newService.endpoint.success"),
-                  message: "",
                 });
               } catch (e) {
                 setUrlError(t("newService.endpoint.error") ?? undefined);
@@ -220,12 +155,11 @@ const EndpointCustom: React.FC<EndpointCustomProps> = ({
       <RequestVariables
         key={key}
         requestValues={requestValues}
-        updateEndpointData={updateEndpointData}
-        updateEndpointRawData={updateEndpointRawData}
         isLive={isLive}
         endpointData={endpoint.definedEndpoints[0]}
         requestTab={requestTab}
         setRequestTab={setRequestTab}
+        parentEndpointId={endpoint.id}
       />
     </Track>
   );

@@ -17,6 +17,7 @@ const RootComponent: React.FC = () => {
       <Route index element={<Navigate to={ROUTES.OVERVIEW_ROUTE} />} />
       <Route path={ROUTES.NEWSERVICE_ROUTE} element={<NewServicePage />} />
       <Route path={ROUTES.NEWSERVICE_ROUTE_WITH_INTENT_NAME} element={<NewServicePage />} />
+      <Route path={ROUTES.EDITSERVICE_ROUTE} element={<NewServicePage />} />
       <Route path={ROUTES.FLOW_ROUTE} element={<ServiceFlowPage />} />
       <Route element={<Layout />}>
         <Route path={"/service"} element={<Navigate to="/services/overview" />} />

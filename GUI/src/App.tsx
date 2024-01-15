@@ -1,6 +1,6 @@
 import React from "react";
 import { BrowserRouter } from "react-router-dom";
-import { ToastProvider } from "./components/Toast/ToastContext";
+import { ToastProvider } from "./components/Toast/ToastProvider";
 import RootComponent from "./RootComponent";
 import useStore from "./store/store";
 import { useQuery } from "@tanstack/react-query";
@@ -8,9 +8,13 @@ import { UserInfo } from "./types/userInfo";
 
 const App: React.FC = () => {
   if (import.meta.env.REACT_APP_LOCAL === "true") {
-    const { data } = useQuery<UserInfo>({
-      queryKey: ["custom-jwt-userinfo", "prod"],
-      onSuccess: (res: any) => useStore.getState().setUserInfo(res.response),
+    useQuery<{
+      data: { custom_jwt_userinfo: UserInfo };
+    }>({
+      queryKey: ["userinfo", "prod"],
+      onSuccess: (res: any) => {
+        return useStore.getState().setUserInfo(res.data)
+      },
     });
   } else {
     const { data: userInfo } = useQuery<UserInfo>({

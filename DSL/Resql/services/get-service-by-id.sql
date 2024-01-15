@@ -4,6 +4,7 @@ SELECT id,
   ruuter_type AS type,
   is_common AS isCommon,
   structure::json,
-  endpoints::json
+  endpoints::json,
+  description
 FROM services
-ORDER BY id;
+WHERE deleted = false AND id = cast(:id as int);
