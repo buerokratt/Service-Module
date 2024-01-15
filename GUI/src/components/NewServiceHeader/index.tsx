@@ -1,7 +1,6 @@
-import { t } from "i18next";
 import React, { FC } from "react";
+import { t } from "i18next";
 import { Button, HeaderStepCounter, Track } from "..";
-import { EndpointData, PreDefinedEndpointEnvVariables } from "../../types/endpoint";
 import "@buerokratt-ria/header/src/header/Header.scss";
 import useServiceStore from "store/new-services.store";
 
@@ -9,7 +8,6 @@ type NewServiceHeaderProps = {
   activeStep: number;
   continueOnClick: () => void;
   saveDraftOnClick: () => void;
-  availableVariables?: PreDefinedEndpointEnvVariables;
   flow?: string;
   secrets?: { [key: string]: any };
   serviceName?: string;
@@ -24,7 +22,6 @@ type NewServiceHeaderProps = {
 
 const NewServiceHeader: FC<NewServiceHeaderProps> = ({
   activeStep,
-  availableVariables,
   continueOnClick,
   saveDraftOnClick,
   flow,
@@ -47,7 +44,6 @@ const NewServiceHeader: FC<NewServiceHeaderProps> = ({
           <h1 style={{ whiteSpace: "nowrap" }}>{t("menu.newService")}</h1>
           <HeaderStepCounter
             activeStep={activeStep}
-            availableVariables={availableVariables}
             endpoints={endpoints}
             flow={flow}
             secrets={secrets}

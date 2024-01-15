@@ -1,28 +1,22 @@
-import { v4 as uuidv4 } from 'uuid';
 import { useTranslation } from "react-i18next"
 import Button from "../Button"
 import { FormSelect, FormInput } from "../FormElements"
 import Track from "../Track"
 import ConditionInput from "./ConditionInput"
 import VariableAsTag from "./VariableAsTag"
-import { ConditionRuleType } from "../../types"
-import { PreDefinedEndpointEnvVariables } from "../../types/endpoint"
+import useFlowStore, { conditionOptions } from 'store/flow.store'
 import './styles.scss'
-import useFlowStore, { conditionOptions } from 'store/flow.store';
+import useServiceStore from "store/new-services.store"
 
-interface RulesBuilderProps {
-  availableVariables?: PreDefinedEndpointEnvVariables;
-}
-
-const RulesBuilder: React.FC<RulesBuilderProps> = ({
-  availableVariables,
-}) => {
+const RulesBuilder: React.FC = () => {
   const { t } = useTranslation();
   const rules = useFlowStore(x => x.rules);
 
   const handleFieldChange = useFlowStore.getState().handleFieldChange;
+  const variables = useServiceStore(state => state.getFlatVariables());
 
   return <>
+  <h1>ererer</h1>
     {rules.map((rule, i) => <Track
       direction='vertical'
       align='stretch'
@@ -40,21 +34,21 @@ const RulesBuilder: React.FC<RulesBuilderProps> = ({
       </Track>
       <Track gap={16}>
         <ConditionInput rule={rule} />
-        <Track className="flow-rule-container">
-          <FormSelect
-            name='condition'
-            label=''
-            options={conditionOptions}
-            value={rule.condition}
-            defaultValue={rule.condition}
-            onSelectionChange={(selection) => handleFieldChange(rule.id, 'condition', selection?.value)} />
-        </Track>
+        <FormSelect
+          name='condition'
+          label=''
+          options={conditionOptions}
+          value={rule.condition}
+          defaultValue={rule.condition}
+          onSelectionChange={(selection) => handleFieldChange(rule.id, 'condition', selection?.value)}
+        />
         <FormInput
           name='value'
           label=''
           placeholder='...'
           value={rule.value}
-          onChange={(value) => handleFieldChange(rule.id, 'value', value.target.value)} />
+          onChange={(value) => handleFieldChange(rule.id, 'value', value.target.value)} 
+        />
       </Track>
     </Track>
     )}
@@ -70,9 +64,7 @@ const RulesBuilder: React.FC<RulesBuilderProps> = ({
     >
       <span>{t("serviceFlow.popup.availableVariables")}</span>
       <Track gap={7} className="flow-tags-container">
-        {[...(availableVariables?.prod ?? []), ...(availableVariables?.test ?? [])].map((x) => 
-          <VariableAsTag key={x} value={x} color='yellow' />
-        )}
+        {variables.map(x => <VariableAsTag key={x} value={x} color='yellow' />)}
       </Track>
     </Track>
   </>;

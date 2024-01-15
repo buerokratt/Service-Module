@@ -7,10 +7,10 @@ import { useNavigate } from "react-router-dom";
 import { ROUTES } from "../../resources/routes-constants";
 import { EndpointData, PreDefinedEndpointEnvVariables } from "../../types/endpoint";
 import { ToastContext } from "components/Toast/ToastContext";
+import useServiceStore from "store/new-services.store";
 
 type StepCounterProps = {
   activeStep: number;
-  availableVariables?: PreDefinedEndpointEnvVariables;
   endpoints?: EndpointData[];
   flow?: string;
   secrets?: { [key: string]: any };
@@ -22,7 +22,6 @@ type StepCounterProps = {
 
 const HeaderStepCounter: FC<StepCounterProps> = ({
   activeStep,
-  availableVariables,
   endpoints,
   flow,
   serviceId,
@@ -34,6 +33,7 @@ const HeaderStepCounter: FC<StepCounterProps> = ({
   const { t } = useTranslation();
   const navigate = useNavigate();
   const toast = useContext(ToastContext);
+  const availableVariables = useServiceStore(state => state.availableVariables);
 
   return (
     <Track className="header-step-counter" gap={24}>

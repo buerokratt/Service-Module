@@ -8,13 +8,7 @@ import { PreDefinedEndpointEnvVariables } from "../../types/endpoint";
 import useFlowStore from "store/flow.store";
 import "./styles.scss";
 
-interface ConditionBuilderContentProps {
-  availableVariables?: PreDefinedEndpointEnvVariables;
-}
-
-const ConditionBuilderContent: React.FC<ConditionBuilderContentProps> = ({
-  availableVariables,
-}) => {
+const ConditionBuilderContent: React.FC = () => {
   const { t } = useTranslation();
   const isYesNoQuestion = useFlowStore(state => state.isYesNoQuestion);
 
@@ -33,7 +27,7 @@ const ConditionBuilderContent: React.FC<ConditionBuilderContentProps> = ({
         <span>{t("serviceFlow.popup.yesNoQuestion")}</span>
       </Track>
       {isYesNoQuestion && <YesNoPopupContent />}
-      {!isYesNoQuestion && <RulesBuilder availableVariables={availableVariables} />}
+      {!isYesNoQuestion && <RulesBuilder />}
     </Track>
   );
 };

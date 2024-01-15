@@ -20,14 +20,11 @@ import { Node } from "reactflow";
 import RasaRulesContent from "./RasaRulesContent";
 import { ConditionRuleType, StepType } from "../../types";
 import "./styles.scss";
-import { useLocation } from "react-router-dom";
-import { PreDefinedEndpointEnvVariables } from "../../types/endpoint";
 import useServiceStore from "store/new-services.store";
 import useFlowStore from "store/flow.store";
 
 interface FlowElementsPopupProps {
   node: any;
-  availableVariables?: PreDefinedEndpointEnvVariables;
   onClose: () => void;
   onSave: (updatedNode: Node) => void;
   onRulesUpdate: (rules: (string | null)[], rulesData: ConditionRuleType[]) => void;
@@ -36,15 +33,12 @@ interface FlowElementsPopupProps {
 
 const FlowElementsPopup: React.FC<FlowElementsPopupProps> = ({
   node,
-  availableVariables,
   onClose,
   onSave,
   oldRules,
   onRulesUpdate,
 }) => {
   const { t } = useTranslation();
-  // const [isYesNoQuestion, setIsYesNoQuestion] = useState(node?.isYesNoQuestion ?? false);
-  // const [rules, setRules] = useState<ConditionRuleType[]>(node?.data?.rules ?? []);
   const [selectedTab, setSelectedTab] = useState<string | null>(null);
   const [isJsonRequestVisible, setIsJsonRequestVisible] = useState(false);
   const [jsonRequestContent, setJsonRequestContent] = useState<string | null>(null);
@@ -214,7 +208,6 @@ const FlowElementsPopup: React.FC<FlowElementsPopupProps> = ({
             {stepType === StepType.Textfield && (
               <TextfieldContent
                 defaultMessage={node.data.message ?? textfieldMessage ?? undefined}
-                availableVariables={availableVariables}
                 onChange={(message, placeholders) => {
                   setTextfieldMessage(message);
                   setTextfieldMessagePlaceholders(placeholders);
@@ -231,16 +224,9 @@ const FlowElementsPopup: React.FC<FlowElementsPopupProps> = ({
             )}
             {(stepType === StepType.FileGenerate || stepType === StepType.Input) && (
               <DndProvider backend={HTML5Backend}>
-                {stepType === StepType.Input && (
-                  <ConditionBuilderContent
-                    availableVariables={availableVariables}
-                    // isYesNoQuestion={isYesNoQuestion}
-                    // setIsYesNoQuestion={setIsYesNoQuestion}
-                  />
-                )}
+                {stepType === StepType.Input && <ConditionBuilderContent />}
                 {stepType === StepType.FileGenerate && (
                   <FileGenerateContent
-                    availableVariables={availableVariables}
                     onFileNameChange={setFileName}
                     onFileContentChange={setFileContent}
                     defaultFileName={node?.data?.fileName ?? fileName ?? undefined}

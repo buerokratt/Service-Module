@@ -105,7 +105,7 @@ const ServiceFlowPage: FC = () => {
   });
   const [selectedNode, setSelectedNode] = useState<Node<NodeDataProps> | null>(null);
   const navigate = useNavigate();
-  const { endpoints, serviceId, isCommon, description, secrets, availableVariables, serviceNameDashed, setFlow } = useServiceStore();
+  const { endpoints, serviceId, isCommon, description, secrets, serviceNameDashed, setFlow } = useServiceStore();
 
   const serviceName = useMemo(() => serviceNameDashed(), [useServiceStore.getState().serviceName]);
   const flow = useMemo(() => {
@@ -139,7 +139,6 @@ const ServiceFlowPage: FC = () => {
         secrets,
         serviceName,
         serviceId,
-        availableVariables,
         flow: JSON.stringify(reactFlowInstance?.toObject()),
         serviceDescription: description,
         isCommon,
@@ -961,7 +960,6 @@ const ServiceFlowPage: FC = () => {
     <>
       <NewServiceHeader
         activeStep={3}
-        availableVariables={availableVariables}
         saveDraftOnClick={saveFlow}
         flow={JSON.stringify(reactFlowInstance?.toObject())}
         serviceName={serviceName}
@@ -990,7 +988,6 @@ const ServiceFlowPage: FC = () => {
         {description}
       </h5>
       <FlowElementsPopup
-        availableVariables={availableVariables}
         onClose={handlePopupClose}
         onSave={handlePopupSave}
         onRulesUpdate={(rules, rulesData) => {
