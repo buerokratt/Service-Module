@@ -65,3 +65,69 @@
   color: #9899a4;
   user-select: none;
 }
+
+.small-delete-rule-button {
+  padding: 4px 10px;
+  margin: 4px;
+  border-radius: 10px;
+}
+
+.small-rule-button {
+  padding: 4px 10px;
+  margin: 4px;
+  border-radius: 10px;
+}
+
+.rule-action-container {
+  padding: 10px;
+  background: #f001;
+  border-radius: 4px;
+  border: 1px solid #f002;
+}
+
+div>.small-rule-group-button {
+  padding: 4px;
+  min-width: 40px;
+  text-align: center;
+}
+
+div>.small-rule-group-button:first-child {
+  padding: 4px 10px;
+  border-radius: 10px 0 0 10px;
+}
+
+div>.small-rule-group-button:last-child {
+  border-radius: 0 10px 10px 0;
+}
+
+.rule-blue {
+  background: #00f5;
+}
+
+.rule-blue:hover {
+  background: #00f6;
+}
+
+.rule-red {
+  background: #f007;
+}
+
+.rule-red:hover {
+  background: #f008;
+}
+
+.rule-green {
+  background: #0b0;
+}
+
+.rule-green:hover {
+  background: #0b0b;
+}
+
+.rule-gray {
+  background: #0001;
+}
+
+.rule-gray:hover {
+  background: #0002;
+}

@@ -1,7 +1,8 @@
-import React, { useState } from "react";
-import { useTranslation } from "react-i18next";
+import React, { useState } from 'react';
 import { conditionOptions } from 'store/flow.store';
-import { Rule, getInitialRule } from "./types";
+import { Rule, getInitialRule } from './types';
+import { FormInput, FormSelect, Icon, Track } from 'components';
+import { MdDeleteOutline } from 'react-icons/md';
 
 interface RuleElementProps {
   rule: Rule;
@@ -9,37 +10,38 @@ interface RuleElementProps {
 }
 
 const RuleElement: React.FC<RuleElementProps> = ({ rule, onRemove }) => {
-  const { t } = useTranslation();
   const [currentRule, setCurrentRule] = useState(getInitialRule());
 
   return (
-    <div style={{ padding: '10px', display: 'flex', gap: '16px' }}>
-      <div style={{ width: '100%', display: 'flex', gap: '16px'}}>
-        <input
-          type="text"
+    <Track gap={16} isFlex>
+      <Track gap={16} isFlex>
+        <FormInput
           value={currentRule.field}
           name='field'
           onChange={(e) => setCurrentRule({ ...currentRule, field: e.target.value })}
-          style={{ border: '1px solid black', width: '100%' }}
+          label=''
+          hideLabel
         />
-        <select
+        <FormSelect
           value={currentRule.operator}
           name='operator'
           onChange={(e) => setCurrentRule({ ...currentRule, operator: e.target.value })}
-          style={{ border: '1px solid black' }}
-        >
-          {conditionOptions.map(x => <option key={x.value} value={x.value}>{x.label}</option>)}
-        </select>
-        <input
-          type="text"
+          options={conditionOptions}
+          label=''
+          hideLabel
+        />
+        <FormInput
           value={currentRule.value}
           name='value'
           onChange={(e) => setCurrentRule({ ...currentRule, value: e.target.value })}
-          style={{ border: '1px solid black', width: '100%' }}
+          label=''
+          hideLabel
         />
-      </div>
-      <button style={{ padding: '4px', margin: '4px', background: '#f005' }} onClick={() => onRemove(rule.id)}>{t('serviceFlow.popup.remove')}</button>
-    </div>
+      </Track>
+      <button onClick={() => onRemove(rule.id)} className='small-delete-rule-button rule-red'>
+        <Icon icon={<MdDeleteOutline />} />
+      </button>
+    </Track>
   )
 }
 

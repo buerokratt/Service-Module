@@ -6,10 +6,10 @@ export const useRuleBuilder = (config: RuleGroupBuilderProps) => {
   const [elements, setElements] = useState<(Group | Rule)[]>(config.onRemove ? config.group!.children : []);
 
   useEffect(() => {
-    config.onChange({ 
+    config.onChange({
       ...groupInfo,
       children: elements
-     })
+    })
   }, [elements, groupInfo]);
 
   const addRule = () => {
