@@ -216,7 +216,6 @@
       "add": "+ Add",
       "yesNoQuestion": "Yes/No Question",
       "insertVariable": "Insert variable",
-      "addRule": "+ Add rule",
       "availableVariables": "Available variables",
       "clientSeesMessage": "Client sees message",
       "redirectToCustomerSupport": "Conversation will be redirected to Customer Support",
@@ -228,7 +227,13 @@
       "fileSign": "Do you want to sign this file?",
       "fileSignYesNo": "Do you want to sign this file? Yes/No",
       "serviceEnded": "Service ended",
-      "rule": "Rule"
+      "rule": "Rule",
+      "and": "AND",
+      "or": "OR",
+      "not": "NOT",
+      "addRule": "+ Rule",
+      "addGroup": "+ Group",
+      "remove": "Remove"
     },
     "flow": "Service flow",
     "placeholderNode": "Drag the next step into the flow",

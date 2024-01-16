@@ -216,7 +216,6 @@
       "add": "+ Lisama",
       "yesNoQuestion": "Jah/Ei Küsimus",
       "insertVariable": "Sisesta muutuja",
-      "addRule": "+ Lisa reegel",
       "availableVariables": "Saadavalolevad muutujad",
       "clientSeesMessage": "Klient näeb sõnumit",
       "redirectToCustomerSupport": "Vestlus suunatakse klienditeenindajale",
@@ -228,7 +227,13 @@
       "fileSign": "Kas soovid faili allkirjastada?",
       "fileSignYesNo": "Kas soovid faili allkirjastada? Jah/Ei",
       "serviceEnded": "Teenus on lõpetatud",
-      "rule": "Reegel"
+      "rule": "Reegel",
+      "and": "JA",
+      "or": "VÕI",
+      "not": "MITTE",
+      "addRule": "+ Reegel",
+      "addGroup": "+ Grupp",
+      "remove": "Eemalda"
     },
     "flow": "Teenusvoog",
     "placeholderNode": "Lohista järgmine samm voogu",

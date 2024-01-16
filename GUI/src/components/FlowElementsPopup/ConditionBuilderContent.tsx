@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { SwitchBox } from "../FormElements";
 import { Track } from "..";
 import YesNoPopupContent from "./YesNoPopupContent";
-import RulesBuilder from "./RulesBuilder";
+import RuleBuilder from "./RuleBuilder";
 import useFlowStore from "store/flow.store";
 import "./styles.scss";
 
@@ -26,7 +26,7 @@ const ConditionBuilderContent: React.FC = () => {
         <span>{t("serviceFlow.popup.yesNoQuestion")}</span>
       </Track>
       {isYesNoQuestion && <YesNoPopupContent />}
-      {!isYesNoQuestion && <RulesBuilder />}
+      {!isYesNoQuestion && <RuleBuilder />}
     </Track>
   );
 };
