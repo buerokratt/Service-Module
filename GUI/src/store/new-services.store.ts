@@ -14,7 +14,6 @@ import { editServiceInfo, saveDraft } from 'services/service-builder';
 import { initialEdge, initialNodes } from 'types/service-flow';
 
 interface ServiceState {
-  flow: string | undefined;
   endpoints: EndpointData[];
   name: string;
   serviceId: string;
@@ -56,7 +55,6 @@ interface ServiceState {
 
   // TODO: remove the following funtions and refactor the code to use more specific functions
   setEndpoints: (callback: (prev: EndpointData[]) => EndpointData[]) => void;
-  setFlow: (flow: string) => void;
   reactFlowInstance: ReactFlowInstance | null;
   setReactFlowInstance: (reactFlowInstance: ReactFlowInstance | null) => void;
 }
@@ -145,7 +143,6 @@ const useServiceStore = create<ServiceState>((set, get, store) => ({
   resetState: () => {
     set({
       name: '',
-      flow: undefined,
       endpoints: [],
       serviceId: uuid(),
       description: '',
@@ -164,8 +161,6 @@ const useServiceStore = create<ServiceState>((set, get, store) => ({
       
       const structure = JSON.parse(service.data[0].structure.value);
       const endpoints = JSON.parse(service.data[0].endpoints.value);
-
-      console.log(service.data[0].endpoints.value, typeof service.data[0].endpoints.value, endpoints, typeof endpoints);
       
       set({ 
         serviceId: id,
@@ -181,9 +176,9 @@ const useServiceStore = create<ServiceState>((set, get, store) => ({
     await get().loadSecretVariables();
 
     let nodes: Node[] = [];
-    if(get().flow) {
-      nodes = JSON.parse(get().flow!)?.nodes;
-    }    
+    // if(get().flow) {
+    //   nodes = JSON.parse(get().flow!)?.nodes;
+    // }
     if (nodes?.find((node) => node.data.stepType === "auth")) {
       await get().loadTaraVariables();
     }
@@ -285,8 +280,6 @@ const useServiceStore = create<ServiceState>((set, get, store) => ({
       endpoints: callback(state.endpoints)
     }));
   },
-  setFlow: (flow) => set({ flow }),
-
   selectedTab: EndpointEnv.Live,
   setSelectedTab: (tab: EndpointEnv) => set({ selectedTab: tab }),
   isLive: () => get().selectedTab === EndpointEnv.Live,

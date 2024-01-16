@@ -222,17 +222,20 @@ const FlowElementsPopup: React.FC<FlowElementsPopupProps> = ({
                 defaultWebpageName={node.data.linkText ?? webpageName ?? undefined}
               />
             )}
-            {(stepType === StepType.FileGenerate || stepType === StepType.Input) && (
+            {stepType === StepType.Rule && (
+                <DndProvider backend={HTML5Backend}>
+                  <ConditionBuilderContent />
+                </DndProvider>
+              )
+            }
+            {stepType === StepType.FileGenerate && (
               <DndProvider backend={HTML5Backend}>
-                {stepType === StepType.Input && <ConditionBuilderContent />}
-                {stepType === StepType.FileGenerate && (
-                  <FileGenerateContent
-                    onFileNameChange={setFileName}
-                    onFileContentChange={setFileContent}
-                    defaultFileName={node?.data?.fileName ?? fileName ?? undefined}
-                    defaultFileContent={node?.data?.fileContent ?? fileContent ?? undefined}
-                  />
-                )}
+                <FileGenerateContent
+                  onFileNameChange={setFileName}
+                  onFileContentChange={setFileContent}
+                  defaultFileName={node?.data?.fileName ?? fileName ?? undefined}
+                  defaultFileContent={node?.data?.fileContent ?? fileContent ?? undefined}
+                />
               </DndProvider>
             )}
             {stepType === StepType.FinishingStepRedirect && (

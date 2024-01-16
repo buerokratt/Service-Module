@@ -65,5 +65,5 @@ const useFlowStore = create<FlowState>((set, get, store) => ({
 export default useFlowStore;
 
 export const conditionOptions = [ 
-  '==', '!=', '>', '<', '>=', '<='
+  '==', '===', '!=', '!==', '>', '<', '>=', '<='
 ].map(x=>({ label: x, value: x }))

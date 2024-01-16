@@ -4,7 +4,6 @@ import { SwitchBox } from "../FormElements";
 import { Track } from "..";
 import YesNoPopupContent from "./YesNoPopupContent";
 import RulesBuilder from "./RulesBuilder";
-import { PreDefinedEndpointEnvVariables } from "../../types/endpoint";
 import useFlowStore from "store/flow.store";
 import "./styles.scss";
 
