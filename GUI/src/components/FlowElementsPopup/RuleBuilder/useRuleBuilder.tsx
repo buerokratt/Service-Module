@@ -1,9 +1,15 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Group, GroupType, Rule, getInitialGroup, getInitialRule, RuleGroupBuilderProps } from "./types";
 
-export const useRuleBuilder = (config: RuleGroupBuilderProps) => {
-  const [groupInfo, setGroupInfo] = useState<Group>(config.onRemove ? config.group! : getInitialGroup());
-  const [elements, setElements] = useState<(Group | Rule)[]>(config.onRemove ? config.group!.children : []);
+interface UseRuleBuilderProps {
+  group?: Group;
+  root?: boolean;
+  onChange: (group: Group) => void;
+}
+
+export const useRuleBuilder = (config: UseRuleBuilderProps) => {
+  const [groupInfo, setGroupInfo] = useState<Group>(config.root ? getInitialGroup() : config.group!);
+  const [elements, setElements] = useState<(Group | Rule)[]>(config.root ? [] : config.group!.children);
 
   useEffect(() => {
     config.onChange({
@@ -38,5 +44,24 @@ export const useRuleBuilder = (config: RuleGroupBuilderProps) => {
   const changeToAnd = changeType('and');
   const changeToOr = changeType('or');
 
-  return { groupInfo, elements, addRule, addGroup, remove, toggleNot, changeToAnd, changeToOr };
+  const changeRule = (rule: Rule) => {
+    setElements(elements.map(x => {
+      if (x.id === rule.id) {
+        return {...rule};
+      }
+      return x;
+    }));
+  }
+
+  return { 
+    groupInfo, 
+    elements, 
+    addRule, 
+    addGroup, 
+    remove, 
+    toggleNot, 
+    changeToAnd, 
+    changeToOr, 
+    changeRule,
+  };
 }

@@ -7,33 +7,36 @@ import { MdDeleteOutline } from 'react-icons/md';
 interface RuleElementProps {
   rule: Rule;
   onRemove: (id: string) => void;
+  onChange: (rule: Rule) => void;
 }
 
-const RuleElement: React.FC<RuleElementProps> = ({ rule, onRemove }) => {
-  const [currentRule, setCurrentRule] = useState(getInitialRule());
+const RuleElement: React.FC<RuleElementProps> = ({ rule, onRemove, onChange }) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    onChange({ ...rule, [e.target.name]: e.target.value });
+  }
 
   return (
     <Track gap={16} isFlex>
       <Track gap={16} isFlex>
         <FormInput
-          value={currentRule.field}
+          value={rule.field}
           name='field'
-          onChange={(e) => setCurrentRule({ ...currentRule, field: e.target.value })}
+          onChange={handleChange}
           label=''
           hideLabel
         />
         <FormSelect
-          value={currentRule.operator}
+          value={rule.operator}
           name='operator'
-          onChange={(e) => setCurrentRule({ ...currentRule, operator: e.target.value })}
+          onChange={handleChange}
           options={conditionOptions}
           label=''
           hideLabel
         />
         <FormInput
-          value={currentRule.value}
+          value={rule.value}
           name='value'
-          onChange={(e) => setCurrentRule({ ...currentRule, value: e.target.value })}
+          onChange={handleChange}
           label=''
           hideLabel
         />

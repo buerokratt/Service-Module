@@ -17,7 +17,12 @@ const RuleGroupBuilder: React.FC<RuleGroupBuilderProps> = ({ group, onRemove, on
     toggleNot,
     changeToAnd,
     changeToOr,
-  } = useRuleBuilder({ group, onRemove, onChange });
+    changeRule,
+  } = useRuleBuilder({ 
+    group,
+    root: !onRemove,
+    onChange,
+   });
 
   const andButtonClassName = groupInfo.type === 'and' ? 'rule-green' : 'rule-gray';
   const orButtonClassName = groupInfo.type === 'or' ? 'rule-green' : 'rule-gray';
@@ -55,7 +60,7 @@ const RuleGroupBuilder: React.FC<RuleGroupBuilderProps> = ({ group, onRemove, on
       {
         elements.map(element =>
           isInstanceOfRule(element)
-            ? <RuleElement key={element.id} rule={element as Rule} onRemove={remove} />
+            ? <RuleElement key={element.id} rule={element as Rule} onRemove={remove} onChange={changeRule} />
             : <RuleGroupBuilder key={element.id} group={element as Group} onRemove={remove} onChange={onChange} />
         )
       }
