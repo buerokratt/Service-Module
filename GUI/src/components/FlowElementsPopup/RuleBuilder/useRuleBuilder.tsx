@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Group, GroupType, Rule, getInitialGroup, getInitialRule, RuleGroupBuilderProps } from "./types";
+import { Group, GroupType, Rule, getInitialGroup, getInitialRule } from "./types";
 
 interface UseRuleBuilderProps {
   group?: Group;

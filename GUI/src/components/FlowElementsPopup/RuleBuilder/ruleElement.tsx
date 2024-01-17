@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { conditionOptions } from 'store/flow.store';
-import { Rule, getInitialRule } from './types';
+import { Rule } from './types';
 import { FormInput, FormSelect, Icon, Track } from 'components';
 import { MdDeleteOutline } from 'react-icons/md';
 

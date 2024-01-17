@@ -19,9 +19,9 @@ import OpenWebPageTestContent from "./OpenWebPageTestContent";
 import { Node } from "reactflow";
 import RasaRulesContent from "./RasaRulesContent";
 import { ConditionRuleType, StepType } from "../../types";
-import "./styles.scss";
 import useServiceStore from "store/new-services.store";
 import useFlowStore from "store/flow.store";
+import "./styles.scss";
 
 interface FlowElementsPopupProps {
   node: any;

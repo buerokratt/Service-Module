@@ -9,11 +9,25 @@ interface FlowState {
   handleFieldChange: (id: string, field: string, value?: string) => void;
   isYesNoQuestion: boolean;
   setIsYesNoQuestion: (value: boolean) => void;
+  setRules: (rules: ConditionRuleType[], isYesNoQuestion: boolean) => void;
+  reset: () => void;
 }
 
 const useFlowStore = create<FlowState>((set, get, store) => ({
   rules: [],
   isYesNoQuestion: false,
+  setRules: (rules, isYesNoQuestion) => {
+    set({
+      rules,
+      isYesNoQuestion,
+    });
+  },
+  reset: () => {
+    set({
+      rules: [],
+      isYesNoQuestion: false,
+    });
+  },
   addRule: () => {
     set(state => ({
       rules: [
