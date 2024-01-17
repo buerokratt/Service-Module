@@ -3,7 +3,6 @@ SELECT id,
   current_state AS state,
   ruuter_type AS type,
   is_common AS isCommon,
-  structure::json,
-  endpoints::json
+  structure
 FROM services
 ORDER BY id;

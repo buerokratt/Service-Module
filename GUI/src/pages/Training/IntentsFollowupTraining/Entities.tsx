@@ -8,13 +8,14 @@ import { MdDeleteOutline, MdOutlineModeEditOutline, MdOutlineSave } from 'react-
 import { Button, DataTable, Dialog, FormInput, Icon, Tooltip, Track } from '../../../components';
 import { Entity } from '../../../types/entity';
 import useDocumentEscapeListener from '../../../hooks/useDocumentEscapeListener';
+import { useToast } from '../../../hooks/useToast';
 import { getEntities, addEntity, deleteEntity, editEntity } from '../../../services/entities';
 import { Link } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
-import useToastStore from 'store/toasts.store';
 
 const Entities: FC = () => {
   const { t } = useTranslation();
+  const toast = useToast();
   const queryClient = useQueryClient();
   const [filter, setFilter] = useState('');
   const [editableRow, setEditableRow] = useState<{
@@ -39,13 +40,15 @@ const Entities: FC = () => {
     mutationFn: (data: { name: string }) => addEntity(data),
     onSuccess: async () => {
       await queryClient.invalidateQueries(['entities']);
-      useToastStore.getState().success({
+      toast.open({
+        type: 'success',
         title: t('intents.notification'),
         message: 'New Entity Added',
       });
     },
     onError: (error: AxiosError) => {
-      useToastStore.getState().error({
+      toast.open({
+        type: 'error',
         title: t('intents.notificationError'),
         message: error.message,
       });
@@ -57,13 +60,15 @@ const Entities: FC = () => {
     mutationFn: ({ id, data }: { id: string | number, data: { name: string } }) => editEntity(id, data),
     onSuccess: async () => {
       await queryClient.invalidateQueries(['entities']);
-      useToastStore.getState().success({
+      toast.open({
+        type: 'success',
         title: t('intents.notification'),
         message: 'Entity changes saved',
       });
     },
     onError: (error: AxiosError) => {
-      useToastStore.getState().error({
+      toast.open({
+        type: 'error',
         title: t('intents.notificationError'),
         message: error.message,
       });
@@ -75,13 +80,15 @@ const Entities: FC = () => {
     mutationFn: ({ id }: { id: string | number }) => deleteEntity(id),
     onSuccess: async () => {
       await queryClient.invalidateQueries(['entities']);
-      useToastStore.getState().success({
+      toast.open({
+        type: 'success',
         title: t('intents.notification'),
         message: 'Entity deleted',
       });
     },
     onError: (error: AxiosError) => {
-      useToastStore.getState().error({
+      toast.open({
+        type: 'error',
         title: t('intents.notificationError'),
         message: error.message,
       });

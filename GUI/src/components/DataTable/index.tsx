@@ -10,11 +10,11 @@ import {
   getFilteredRowModel,
   VisibilityState,
   getPaginationRowModel,
+  PaginationState,
   TableMeta,
   Row,
   RowData,
   ColumnFiltersState,
-  PaginationState,
 } from '@tanstack/react-table'
 import { RankingInfo, rankItem } from '@tanstack/match-sorter-utils'
 import { MdUnfoldMore, MdExpandMore, MdExpandLess, MdOutlineEast, MdOutlineWest } from 'react-icons/md'
@@ -32,6 +32,8 @@ type DataTableProps = {
   tableBodyPrefix?: ReactNode
   sortable?: boolean
   filterable?: boolean
+  pagination?: PaginationState
+  setPagination?: React.Dispatch<React.SetStateAction<PaginationState>>
   globalFilter?: string
   setGlobalFilter?: React.Dispatch<React.SetStateAction<string>>
   columnVisibility?: VisibilityState
@@ -78,6 +80,8 @@ const DataTable: FC<DataTableProps> = ({
   tableBodyPrefix,
   sortable,
   filterable,
+  pagination,
+  setPagination,
   globalFilter,
   setGlobalFilter,
   columnVisibility,
@@ -90,10 +94,6 @@ const DataTable: FC<DataTableProps> = ({
   const { t } = useTranslation()
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
-  const [pageIndex, setPageIndex] = useState(0);
-  const [pageSize, setPageSize] = useState(10);
-  const pagination = { pageIndex, pageSize };
-  
   const table = useReactTable({
     data,
     columns,
@@ -113,10 +113,7 @@ const DataTable: FC<DataTableProps> = ({
     onColumnVisibilityChange: setColumnVisibility,
     globalFilterFn: fuzzyFilter,
     onSortingChange: setSorting,
-    onPaginationChange: () => (prev: PaginationState) => {
-      setPageIndex(prev.pageIndex);
-      setPageSize(prev.pageSize);
-    },
+    onPaginationChange: setPagination,
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     ...(pagination && { getPaginationRowModel: getPaginationRowModel() }),
@@ -138,6 +135,7 @@ const DataTable: FC<DataTableProps> = ({
 
     return pages;
   };
+
 
   return (
     <div className="data-table__wrapper">

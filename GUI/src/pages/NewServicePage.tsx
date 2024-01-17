@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useContext, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useParams } from "react-router-dom";
 import {
@@ -12,40 +12,123 @@ import {
   Track,
   Switch,
 } from "../components";
-import { saveDraft } from "services/service-builder";
+import { ROUTES } from "../resources/routes-constants";
+import axios from "axios";
+import { getSecretVariables as getSecretVariablesApi, getTaraAuthResponseVariables, jsonToYml } from "../resources/api-constants";
+import {
+  EndpointData,
+  EndpointEnv,
+  EndpointType,
+  EndpointVariableData,
+  PreDefinedEndpointEnvVariables,
+} from "../types/endpoint";
+import { ToastContext } from "../components/Toast/ToastContext";
+import { Step } from "types/step";
+import { StepType } from "types/step-type.enum";
+import { RawData } from "types";
 import useStore from "store/store";
 import useServiceStore from "store/new-services.store";
+import { saveEndpoints } from "services/service-builder";
 
 const NewServicePage: React.FC = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const userInfo = useStore((state) => state.userInfo);
-  const endpoints = useServiceStore(state => state.endpoints);
-  const isCommon = useServiceStore(state => state.isCommon);
-  const description = useServiceStore(state => state.description);
-  const name = useServiceStore(state => state.name);
-  const { intentName, id } = useParams();
+  const { 
+    serviceId,
+    endpoints,
+    flow,
+    isCommon,
+    setIsCommon,
+    description,
+    setDescription,
+    secrets,
+    availableVariables,
+    serviceName,
+    changeServiceName,
+    addEndpoint,
+    loadFlowData,
+  } = useServiceStore();
 
+  const toast = useContext(ToastContext);
+
+  const { intentName } = useParams();
   useEffect(() => {
     const name = intentName?.trim();
-    if(name) {
-      useServiceStore.getState().changeServiceName(name);
-    }
+    if(name) changeServiceName(name);
   }, [intentName])
 
   useEffect(() => {
-    useServiceStore.getState().loadService(id);
+    loadFlowData();
   }, []);
-  
+
+  const saveDraft = async () => {
+    if (serviceName && description) {
+      await saveEndpoints(
+        endpoints,
+        serviceName, 
+        (r) => {
+        console.log(r);
+        toast.open({
+          type: "success",
+          title: t("newService.toast.success"),
+          message: t("newService.toast.savedSuccessfully"),
+        });
+      },
+      (e) => {
+        console.log(e);
+        toast.open({
+          type: "error",
+          title: t("newService.toast.failed"),
+          message: t("newService.toast.saveFailed"),
+        });
+      });
+    } else {
+      toast.open({
+        type: "error",
+        title: t("newService.toast.missingFields"),
+        message: t("newService.toast.serviceMissingFields"),
+      });
+    }
+  };
+
   return (
     <Layout
       disableMenu
       customHeader={
         <NewServiceHeader
           activeStep={2}
-          saveDraftOnClick={() => saveDraft(id)}
+          availableVariables={availableVariables}
+          saveDraftOnClick={saveDraft}
           isSaveButtonEnabled={endpoints.length > 0}
-          continueOnClick={() => useServiceStore.getState().onContinueClick(id, navigate)}
+          flow={flow}
+          secrets={secrets}
+          serviceDescription={description}
+          serviceName={serviceName}
+          serviceId={serviceId}
+          isCommon={isCommon}
+          continueOnClick={() => {
+            if (serviceName && description) {
+              navigate(ROUTES.FLOW_ROUTE, {
+                state: {
+                  endpoints,
+                  secrets,
+                  serviceName,
+                  serviceId,
+                  availableVariables,
+                  flow,
+                  serviceDescription: description,
+                  isCommon,
+                },
+              });
+            } else {
+              toast.open({
+                type: "error",
+                title: t("newService.toast.missingFields"),
+                message: t("newService.toast.serviceMissingFields"),
+              });
+            }
+          }}
         />
       }
     >
@@ -55,7 +138,7 @@ const NewServicePage: React.FC = () => {
           <Track direction="vertical" align="stretch" gap={16}>
             <div>
               <label htmlFor="name">{t("newService.name")}</label>
-              <FormInput name="name" label="" value={name} onChange={(e) => useServiceStore.getState().changeServiceName(e.target.value)} />
+              <FormInput name="name" label="" value={serviceName} onChange={(e) => changeServiceName(e.target.value)} />
             </div>
             <div>
               <label htmlFor="description">{t("newService.description")}</label>
@@ -63,7 +146,7 @@ const NewServicePage: React.FC = () => {
                 name="description"
                 label=""
                 value={description}
-                onChange={(e) => useServiceStore.getState().setDescription(e.target.value)}
+                onChange={(e) => setDescription(e.target.value)}
                 style={{
                   height: 120,
                   resize: "vertical",
@@ -80,7 +163,7 @@ const NewServicePage: React.FC = () => {
                   offLabel={t("global.no").toString()}
                   value={isCommon}
                   checked={isCommon}
-                  onCheckedChange={(e) => useServiceStore.getState().setIsCommon(e)}
+                  onCheckedChange={(e) => setIsCommon(e)}
                 />
               </Track>
             )}
@@ -92,7 +175,7 @@ const NewServicePage: React.FC = () => {
         ))}
         <Button
           appearance="text"
-          onClick={useServiceStore.getState().addEndpoint}
+          onClick={addEndpoint}
         >
           {t("newService.endpoint.add")}
         </Button>
