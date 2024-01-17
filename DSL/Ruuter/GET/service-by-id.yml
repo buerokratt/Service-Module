@@ -2,7 +2,6 @@ check_for_parameters:
   switch:
     - condition: ${incoming.params == null || incoming.params.id == null}
       next: return_incorrect_request
-  next: get_service_by_id
 
 get_service_by_id:
   call: http.post
