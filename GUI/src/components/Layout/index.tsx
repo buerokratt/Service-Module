@@ -1,10 +1,11 @@
 import { FC, useState, ReactNode, PropsWithChildren } from 'react';
 import { Outlet } from 'react-router-dom';
-import useStore from '../../store/store';
 import { MainNavigation } from '@buerokratt-ria/menu';
 import { Header } from '@buerokratt-ria/header'
-import './Layout.scss';
 import {useQuery} from "@tanstack/react-query";
+import useStore from '../../store/store';
+import useToastStore from 'store/toasts.store';
+import './Layout.scss';
 
   type LayoutProps = {
     disableMenu?: boolean;
@@ -49,6 +50,7 @@ import {useQuery} from "@tanstack/react-query";
               <MainNavigation serviceId={import.meta.env.REACT_APP_SERVICE_ID.split(',')} items={MainMenuItems}/>}
           <div className="layout__wrapper">
             {customHeader ?? <Header
+                toastContext={{ open: useToastStore.getState().open }}
                 user={useStore.getState().userInfo}
             />}
             <main className="layout__main">
