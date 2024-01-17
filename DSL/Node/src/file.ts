@@ -49,6 +49,7 @@ router.post("/move", async (req, res) => {
 
   if(newPath === currentPath) {
     res.status(201).json({ message: "File moved successfully" });
+    return;
   }
 
   if (
