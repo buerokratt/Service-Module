@@ -3,4 +3,4 @@ SET
   name = :name, 
   description = :description,
   structure = :structure::json
-WHERE id = cast(:id as int);
+WHERE service_id = :id;

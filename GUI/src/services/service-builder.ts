@@ -1,7 +1,7 @@
 import axios from "axios";
 import i18next from 'i18next';
 import { Edge, Node } from "reactflow";
-import { createNewService, editService, updateServiceEndpoints, editServiceInfoApi, jsonToYml, testDraftService } from "resources/api-constants";
+import { createNewService, editService, updateServiceEndpoints, jsonToYml, testDraftService } from "resources/api-constants";
 import useServiceStore from "store/new-services.store";
 import useToastStore from "store/toasts.store";
 import { RawData, Step, StepType } from "types";
@@ -275,8 +275,10 @@ export async function saveEndpoints(
   name: string,
   onSuccess: (e: any) => void,
   onError: (e: any) => void,
-  id: string | undefined,
+  id: string,
 ) {
+  const tasks: Promise<any>[] = [];
+
   for (const endpoint of endpoints) {
     if (!endpoint) continue;
     const selectedEndpointType = endpoint.definedEndpoints.find((e) => e.isSelected);
@@ -369,8 +371,7 @@ export async function saveEndpoints(
     });
     const result = Object.fromEntries(steps.entries());
 
-    await axios
-      .post(
+    tasks.push(axios.post(
         jsonToYml(),
         { result },
         {
@@ -379,20 +380,14 @@ export async function saveEndpoints(
               }${endpointName}.yml`,
           },
         }
-      )
-      .then(onSuccess)
-      .catch(onError);
+    ));
   }
 
-  if(id) {
-    await axios.post(updateServiceEndpoints(id),
-      {
-        endpoints: JSON.stringify(endpoints),
-      }
-    )
-    .then(onSuccess)
-    .catch(onError)
-  }
+  tasks.push(axios.post(updateServiceEndpoints(id), {
+      endpoints: JSON.stringify(endpoints),
+  }));
+
+  await Promise.all(tasks).then(onSuccess).catch(onError);
 }
 
 export const saveFlow = async (
@@ -405,11 +400,9 @@ export const saveFlow = async (
   description: string,
   isCommon: boolean,
   serviceId: string,
-  serviceIdToEdit: string | undefined,
+  isNewService: boolean,
 ) => {
   try {
-    const endpoints = steps.filter(x => !!x.data).map(x => x.data!);
-    await saveEndpoints(endpoints, name, onSuccess, onError, serviceIdToEdit);
     const allRelations: any[] = [];
     // find regular edges 1 -> 1
     edges.forEach((edge) => {
@@ -525,7 +518,7 @@ export const saveFlow = async (
 
     await axios
       .post(
-        serviceIdToEdit ? editService(serviceIdToEdit) : createNewService(),
+        isNewService ? createNewService() : editService(serviceId) ,
         {
           name,
           serviceId,
@@ -533,7 +526,7 @@ export const saveFlow = async (
           type: "POST",
           content: result,
           isCommon,
-          structure: serviceIdToEdit ? JSON.stringify({ edges, nodes }) : null,
+          structure: JSON.stringify({ edges, nodes }),
         },
         {
           params: {
@@ -543,6 +536,10 @@ export const saveFlow = async (
       )
       .then(onSuccess)
       .catch(onError);
+
+
+    const endpoints = steps.filter(x => !!x.data).map(x => x.data!);
+    await saveEndpoints(endpoints, name, onSuccess, onError, serviceId);
   } catch (e: any) {
     onError(e);
     useToastStore.getState().error({
@@ -726,10 +723,11 @@ const getDefinedEndpointStep = (steps: Step[], node: Node) => {
   };
 };
 
-export const saveDraft = async (id: string | undefined) => {
+export const saveDraft = async () => {
   const vaildServiceInfo = useServiceStore.getState().vaildServiceInfo();
   const endpoints = useServiceStore.getState().endpoints;
   const name = useServiceStore.getState().name;
+  const id = useServiceStore.getState().serviceId;
 
   if (!vaildServiceInfo) {
     useToastStore.getState().error({
@@ -749,7 +747,6 @@ export const saveDraft = async (id: string | undefined) => {
       });
     },
     (e) => {
-      console.log(e);
       useToastStore.getState().error({
         title: i18next.t("newService.toast.failed"),
         message: i18next.t("newService.toast.saveFailed"),
@@ -760,12 +757,13 @@ export const saveDraft = async (id: string | undefined) => {
   return true;
 };
 
-export const saveFlowClick = async (id: string | undefined, edges: Edge[], nodes: Node[], onSuccess: () => void) => {
+export const saveFlowClick = async (edges: Edge[] = [], nodes: Node[] = [], onSuccess: () => void = ()=>{}) => {
   const name = useServiceStore.getState().serviceNameDashed();
   const serviceId = useServiceStore.getState().serviceId;
   const description = useServiceStore.getState().description;
   const isCommon = useServiceStore.getState().isCommon;
   const steps = useServiceStore.getState().mapEndpointsToSetps();
+  const isNewService = useServiceStore.getState().isNewService;
 
   await saveFlow(steps, name, edges, nodes,
     () => {
@@ -780,7 +778,7 @@ export const saveFlowClick = async (id: string | undefined, edges: Edge[], nodes
         title: i18next.t("toast.cannot-save-flow"),
         message: e?.message,
       });
-    }, description, isCommon, serviceId, id);
+    }, description, isCommon, serviceId, isNewService);
 }
 
 export const runServiceTest = async () => {
@@ -799,34 +797,26 @@ export const runServiceTest = async () => {
   }
 };
 
-export const editServiceInfo = async (id: string) => {
+export const editServiceInfo = async () => {
   const name = useServiceStore.getState().serviceNameDashed();
   const description = useServiceStore.getState().description;
   const endpoints = useServiceStore.getState().endpoints;
+  const serviceId = useServiceStore.getState().serviceId;
 
-  await axios.post(editServiceInfoApi(id),
-    {
+  const tasks: Promise<any>[] = [];
+
+  tasks.push(axios.post(editService(serviceId), {
       name,
       description,
       type: "POST",
     }
-  )
-  .then(() => useToastStore.getState().success({
-    title: i18next.t("newService.toast.success"),
-    message: i18next.t("newService.toast.savedSuccessfully"),
-  }))
-  .catch((e) => {
-    useToastStore.getState().error({
-      title: i18next.t("newService.toast.saveFailed"),
-      message: e?.message,
-    });
-  });
+  ));
 
-  await axios.post(updateServiceEndpoints(id),
-    {
+  tasks.push(axios.post(updateServiceEndpoints(serviceId), { /// TODO: edit endpoints dsl as in `saveEndpoints`
       endpoints: JSON.stringify(endpoints),
-    }
-  )
+  }))
+
+  await Promise.all(tasks)
   .then(() => useToastStore.getState().success({
     title: i18next.t("newService.toast.success"),
     message: i18next.t("newService.toast.savedSuccessfully"),

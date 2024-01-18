@@ -5,6 +5,7 @@ SELECT id,
   is_common AS isCommon,
   structure::json,
   endpoints::json,
-  description
+  description,
+  service_id
 FROM services
-WHERE deleted = false AND id = cast(:id as int);
+WHERE deleted = false AND service_id = :id;

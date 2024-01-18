@@ -24,7 +24,7 @@ const NewServicePage: React.FC = () => {
   const isCommon = useServiceStore(state => state.isCommon);
   const description = useServiceStore(state => state.description);
   const name = useServiceStore(state => state.name);
-  const { intentName, id } = useParams();
+  const { intentName, id} = useParams();
 
   useEffect(() => {
     const name = intentName?.trim();
@@ -35,7 +35,7 @@ const NewServicePage: React.FC = () => {
 
   useEffect(() => {
     useServiceStore.getState().loadService(id);
-  }, []);
+  }, [id]);
   
   return (
     <Layout
@@ -43,9 +43,9 @@ const NewServicePage: React.FC = () => {
       customHeader={
         <NewServiceHeader
           activeStep={2}
-          saveDraftOnClick={() => saveDraft(id)}
+          saveDraftOnClick={() => saveDraft()}
           isSaveButtonEnabled={endpoints.length > 0}
-          continueOnClick={() => useServiceStore.getState().onContinueClick(id, navigate)}
+          continueOnClick={() => useServiceStore.getState().onContinueClick(navigate)}
         />
       }
     >
