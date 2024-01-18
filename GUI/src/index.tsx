@@ -19,7 +19,7 @@ const defaultQueryFn: QueryFunction | undefined = async ({ queryKey }) => {
     if (import.meta.env.REACT_APP_LOCAL === 'true') {
         if (queryKey.includes('prod')) {
             const { data } = await apigeneric.get(queryKey[0] as string);
-            return data?.response;
+            return data.response;
         }
     }
     if (queryKey.includes('user-profile-settings')) {
@@ -27,7 +27,7 @@ const defaultQueryFn: QueryFunction | undefined = async ({ queryKey }) => {
         return data;
     }
     if (queryKey.includes('prod')) {
-        if (queryKey.includes('cs-get-all-active-chats')) {
+        if (queryKey.includes('active-chats')) {
             const {data} = await apiDev.get('sse/'+ (queryKey[0] as string), {
                 headers: {
                     "Accept": 'text/event-stream'

@@ -3,7 +3,7 @@ import axios, {AxiosError} from 'axios';
 const testCookie = 'bearer ' + (localStorage.getItem('token') || 'test');
 
 const instance = axios.create({
-    baseURL: import.meta.env.REACT_APP_RUUTER_V1_PRIVATE_API_URL + '/generic/',
+    baseURL: import.meta.env.REACT_APP_RUUTER_API_URL + '/generic/',
     headers: {
         Accept: 'application/json',
         Testcookie: ''
