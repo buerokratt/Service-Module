@@ -3,14 +3,13 @@ import { useTranslation } from "react-i18next";
 import { Button, FormInput, Track } from "../components";
 import { getServiceSettings, saveServiceSettings } from "../resources/api-constants";
 import axios from "axios";
-import { ToastContext } from "components/Toast/ToastContext";
+import useToastStore from "store/toasts.store";
 
 const ServiceSettingPage: React.FC = () => {
   const [tryCount, setTryCount] = useState(0);
   const [changed, setChanged] = useState(false);
   const [initValue, setInitValue] = useState(0);
   const { t } = useTranslation();
-  const toast = useContext(ToastContext);
   const maxLimit = 100;
 
   useEffect(() => {
@@ -23,8 +22,7 @@ const ServiceSettingPage: React.FC = () => {
         setTryCount(maxInputTry);
       })
       .catch(() => {
-        toast.open({
-          type: "error",
+        useToastStore.getState().error({
           title: t("newService.toast.failed"),
           message: t("global.errorMessage"),
         });
