@@ -10,6 +10,8 @@ services:
       - application.logging.displayResponseContent=true
       - server.port=8086
       - application.DSL.processedFiletypes=.yml,.yaml,.tmp
+      - application.openSearchConfiguration.url=http://host.docker.internal:9200
+      - application.openSearchConfiguration.index=ruuterlog
     volumes:
       - ./DSL/Ruuter:/DSL
       - ./constants.ini:/app/constants.ini

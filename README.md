@@ -38,19 +38,19 @@ This repo will primarily contain:
 
 - Clone [SiGA](https://github.com/open-eid/SiGa)
 
-- Set java version to 11
+- Set java version to 17
 
 - Navigate to SiGA & run `./mvnw clean install`
 
-- Navigate to SiGA & run `./mvnw spring-boot:build-image -pl siga-webapp`
+- Navigate to SiGA & run `./mvnw spring-boot:build-image -pl siga-webapp -DskipTests`
 
 - Copy docker folder from SiGA directory & paste it into current repo directory.
 
 - Clone [SiGA Demo](https://github.com/open-eid/SiGa-demo-application)
 
-- Set java version to 17
+- Build demo docker image using `./mvnw spring-boot:build-image -DskipTests`
 
-- Build demo docker image using `./mvnw spring-boot:build-image`
+- Navigate to current repo and run `./docker/tls/generate-certificates.sh`
 
 - Navigate to current repo and run `docker-compose $(find docker-* | sed -e 's/^/-f /') up -d`
 

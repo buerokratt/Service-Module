@@ -34,16 +34,16 @@ const ServiceFlowPage: FC = () => {
   });
   const [selectedNode, setSelectedNode] = useState<Node<NodeDataProps> | null>(null);
   const navigate = useNavigate();
-  const { description, availableVariables, } = useServiceStore();
+  const description = useServiceStore(state => state.description);
+  const availableVariables = useServiceStore(state => state.availableVariables);
+  const steps = useServiceStore(state => state.mapEndpointsToSetps());
+  const name = useServiceStore(state => state.serviceNameDashed());
   const { id } = useParams();
 
   useEffect(() => {
     if(!id) return;
     useServiceStore.getState().loadService(id);
   }, [])
-  
-  const steps = useServiceStore((state) => state.mapEndpointsToSetps());
-  const name = useServiceStore((state) => state.serviceNameDashed());
 
   const edges = useServiceStore((state) => state.edges);
   const nodes = useServiceStore((state) => state.nodes);
@@ -81,7 +81,8 @@ const ServiceFlowPage: FC = () => {
           prevNode.data.link != updatedNode.data.link ||
           prevNode.data.linkText != updatedNode.data.linkText ||
           prevNode.data.fileName != updatedNode.data.fileName ||
-          prevNode.data.fileContent != updatedNode.data.fileContent
+          prevNode.data.fileContent != updatedNode.data.fileContent ||
+          prevNode.data.signOption != updatedNode.data.signOption
         ) {
           setIsTestButtonEnabled(false);
         }
@@ -94,6 +95,7 @@ const ServiceFlowPage: FC = () => {
             linkText: updatedNode.data.linkText,
             fileName: updatedNode.data.fileName,
             fileContent: updatedNode.data.fileContent,
+            signOption: updatedNode.data.signOption,
           },
         };
       })

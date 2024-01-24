@@ -48,7 +48,8 @@
     "testService": "Testi teenust",
     "cancel": "Tühista",
     "close": "Sulge",
-    "common": "Levinud"
+    "common": "Levinud",
+    "errorMessage": "Teenusele puudub ligipääs. Proovi hiljem uuesti."
   },
   "menu": {
     "overview": "Ülevaade",
@@ -187,7 +188,9 @@
       "savedSuccessfully": "Salvestatud edukalt",
       "success": "Edu",
       "failed": "Ebaõnnestunud",
-      "saveFailed": "Salvestamine ebaõnnestus"
+      "saveFailed": "Salvestamine ebaõnnestus",
+      "saveInfoFailed": "Teabe salvestamine ebaõnnestus",
+      "saveConfigFailed": "Konfiguratsiooni salvestamine ebaõnnestus"
     }
   },
   "serviceFlow": {
@@ -228,7 +231,8 @@
       "fileSign": "Kas soovid faili allkirjastada?",
       "fileSignYesNo": "Kas soovid faili allkirjastada? Jah/Ei",
       "serviceEnded": "Teenus on lõpetatud",
-      "rule": "Reegel"
+      "rule": "Reegel",
+      "signType": "Märgi tüüp"
     },
     "flow": "Teenusvoog",
     "placeholderNode": "Lohista järgmine samm voogu",
@@ -246,7 +250,16 @@
     "problems": "Probleemid",
     "view": "Vaata",
     "log": "Logi",
-    "environment": "Keskkond"
+    "environment": "Keskkond",
+    "method": "meetod",
+    "errorCode": "Veakood",
+    "failedStep": "Ebaõnnestunud samm",
+    "failedTime": "Päev ja aeg",
+    "noErrorMessage": "Veateadet pole",
+    "errorMessage": "Veateade",
+    "headers": "Päised",
+    "parameters": "Parameetrid",
+    "body": "Keha"
   },
   "toast": {
     "cannot-save-flow": "Voogu ei saa salvestada",

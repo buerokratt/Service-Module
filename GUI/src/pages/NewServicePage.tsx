@@ -24,7 +24,7 @@ const NewServicePage: React.FC = () => {
   const isCommon = useServiceStore(state => state.isCommon);
   const description = useServiceStore(state => state.description);
   const name = useServiceStore(state => state.name);
-  const { intentName, id} = useParams();
+  const { intentName, id } = useParams();
 
   useEffect(() => {
     const name = intentName?.trim();
@@ -36,7 +36,7 @@ const NewServicePage: React.FC = () => {
   useEffect(() => {
     useServiceStore.getState().loadService(id);
   }, [id]);
-  
+
   return (
     <Layout
       disableMenu
