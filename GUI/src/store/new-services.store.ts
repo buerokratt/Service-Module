@@ -384,7 +384,7 @@ const useServiceStore = create<ServiceState>((set, get, store) => ({
     }
 
     if(get().isNewService) {
-      await saveFlowClick();
+      await saveFlowClick(() => {});
       set({ 
         isNewService: false
       });

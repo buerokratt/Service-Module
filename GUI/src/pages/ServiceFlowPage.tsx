@@ -108,7 +108,7 @@ const ServiceFlowPage: FC = () => {
     <>
       <NewServiceHeader
         activeStep={3}
-        saveDraftOnClick={() => saveFlowClick(id, edges, nodes, () => { 
+        saveDraftOnClick={() => saveFlowClick(() => { 
           setIsTestButtonVisible(true);
           setIsTestButtonEnabled(true);
         })}

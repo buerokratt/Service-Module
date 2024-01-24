@@ -757,13 +757,15 @@ export const saveDraft = async () => {
   return true;
 };
 
-export const saveFlowClick = async (edges: Edge[] = [], nodes: Node[] = [], onSuccess: () => void = ()=>{}) => {
+export const saveFlowClick = async (onSuccess: () => void) => {
   const name = useServiceStore.getState().serviceNameDashed();
   const serviceId = useServiceStore.getState().serviceId;
   const description = useServiceStore.getState().description;
   const isCommon = useServiceStore.getState().isCommon;
   const steps = useServiceStore.getState().mapEndpointsToSetps();
   const isNewService = useServiceStore.getState().isNewService;
+  const edges = useServiceStore.getState().edges;
+  const nodes = useServiceStore.getState().nodes;
 
   await saveFlow(steps, name, edges, nodes,
     () => {
