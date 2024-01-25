@@ -21,6 +21,7 @@ import RasaRulesContent from "./RasaRulesContent";
 import { ConditionRuleType, StepType } from "../../types";
 import useServiceStore from "store/new-services.store";
 import useFlowStore from "store/flow.store";
+import FileSignContent from "./FileSignContent";
 import "./styles.scss";
 
 interface FlowElementsPopupProps {
@@ -43,7 +44,7 @@ const FlowElementsPopup: React.FC<FlowElementsPopupProps> = ({
   const [isJsonRequestVisible, setIsJsonRequestVisible] = useState(false);
   const [jsonRequestContent, setJsonRequestContent] = useState<string | null>(null);
 
-  const isUserDefinedNode = node?.data?.stepType === 'user-defined';
+  const isUserDefinedNode = node?.data?.stepType === "user-defined";
 
   const endpoints = useServiceStore(state => state.endpoints);
   const rules = useFlowStore(state => state.rules);
@@ -62,6 +63,8 @@ const FlowElementsPopup: React.FC<FlowElementsPopupProps> = ({
   // StepType.FileGenerate
   const [fileName, setFileName] = useState<string | null>(null);
   const [fileContent, setFileContent] = useState<string | null>(null);
+  // StepType.FileSign
+  const [signOption, setSignOption] = useState<{ label: string; value: string } | null>(node?.data.signOption ?? null);
 
   if (!node) return <></>;
 
@@ -89,13 +92,14 @@ const FlowElementsPopup: React.FC<FlowElementsPopupProps> = ({
         linkText: webpageName ?? node.data?.linkText,
         fileName: fileName ?? node.data?.fileName,
         fileContent: fileContent ?? node.data?.fileContent,
+        signOption: signOption ?? node.data?.signOption,
       },
     };
     onSave(updatedNode);
   };
 
   const handleJsonRequestClick = async () => {
-    if(isJsonRequestVisible) {
+    if (isJsonRequestVisible) {
       setIsJsonRequestVisible(false);
       return;
     }
@@ -103,9 +107,9 @@ const FlowElementsPopup: React.FC<FlowElementsPopupProps> = ({
     try {
       const finder = (e: any) => e.name === node.data.label || node.data.label.includes(e.name);
       const endpoint = endpoints.find(finder)?.definedEndpoints[0];
-      
-      if(!endpoint) return;
-      
+
+      if (!endpoint) return;
+
       const response = await axios.post(servicesRequestsExplain(), {
         url: endpoint.url,
         method: endpoint.methodType,
@@ -121,7 +125,7 @@ const FlowElementsPopup: React.FC<FlowElementsPopupProps> = ({
   };
 
   function extractMapValues(element: any) {
-    if(element.rawData && element.rawData.length > 0) {
+    if (element.rawData && element.rawData.length > 0) {
       return element.rawData.value; //  element.rawData.testValue
     }
 
@@ -145,12 +149,10 @@ const FlowElementsPopup: React.FC<FlowElementsPopupProps> = ({
   };
 
   const getJsonRequestButtonTitle = () => {
-    if(!isUserDefinedNode || selectedTab === t("serviceFlow.tabs.test")) 
-      return "";
-    if(isJsonRequestVisible) 
-      return t("serviceFlow.popup.hideJsonRequest");
+    if (!isUserDefinedNode || selectedTab === t("serviceFlow.tabs.test")) return "";
+    if (isJsonRequestVisible) return t("serviceFlow.popup.hideJsonRequest");
     return t("serviceFlow.popup.showJsonRequest");
-  }
+  };
 
   return (
     <Popup
@@ -162,10 +164,7 @@ const FlowElementsPopup: React.FC<FlowElementsPopupProps> = ({
       }}
       footer={
         <Track direction="horizontal" gap={16} justify="between" style={{ width: "100%" }}>
-          <Button
-            appearance="text"
-            onClick={handleJsonRequestClick}
-          >
+          <Button appearance="text" onClick={handleJsonRequestClick}>
             {getJsonRequestButtonTitle()}
           </Button>
           <Track gap={16}>
@@ -242,7 +241,9 @@ const FlowElementsPopup: React.FC<FlowElementsPopupProps> = ({
               <DefaultMessageContent message={t("serviceFlow.popup.redirectToCustomerSupport")} />
             )}
             {stepType === StepType.Auth && <DefaultMessageContent message={t("serviceFlow.popup.loginWithTARA")} />}
-            {stepType === StepType.FileSign && <DefaultMessageContent message={t("serviceFlow.popup.fileSignYesNo")} />}
+            {stepType === StepType.FileSign && (
+              <FileSignContent onOptionChange={setSignOption} signOption={signOption} />
+            )}
             {stepType === StepType.FinishingStepEnd && <EndConversationContent />}
             {stepType === StepType.RasaRules && <RasaRulesContent />}
             <JsonRequestContent isVisible={isJsonRequestVisible} jsonContent={jsonRequestContent} />

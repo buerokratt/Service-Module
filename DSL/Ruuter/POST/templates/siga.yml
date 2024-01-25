@@ -1,56 +1,72 @@
-check_for_body:
-  switch:
-    - condition: ${incoming.body == null}
-      next: missing_parameters
+extract_request_data:
+  assign:
+    file: ${incoming.body.file}
+    signType: ${incoming.body.type}
+    country: ${incoming.body.country}
+    phoneNumber: ${incoming.body.phoneNumber}
+    containerType: ${incoming.body.containerType}
   next: get_tara_info
 
 get_tara_info:
   template: templates/tara
   requestType: post
-  result: TARA
+  result: tara_res
   next: extract_tara_data
 
 extract_tara_data:
   assign:
-    signType: ${incoming.body.type}
-    country: ${incoming.body.country}
-    identifier: ${TARA.response.body.idCode}
-    phoneNumber: ${TARA.response.body.phoneNr}
-  next: check_for_type
+    identifier: ${tara_res.response.body.idCode}
+  next: check_for_container_type
 
-check_for_type:
+check_for_container_type:
+  switch:
+    - condition: ${containerType === "ASIC".toLowerCase()}
+      next: create_asic_container
+    - condition: ${containerType === "HASHCODE".toLowerCase()}
+      next: create_hashcode_container
+  next: missing_container_type
+
+create_asic_container:
+  call: http.post
+  args:
+    url: "[#SERVICE_SIGA]/create-container"
+    contentType: formdata
+    body:
+      file:file[0]:uploadedFile.pdf: ${file}
+  return: container_res
+  next: check_if_sign_type_missing
+
+create_hashcode_container:
+  call: http.post
+  args:
+    url: "[#SERVICE_SIGA]/create-hashcode-container"
+    contentType: formdata
+    body:
+      file:file[0]:uploadedFile.pdf: ${file}
+  return: container_res
+  next: check_if_sign_type_missing
+
+check_if_sign_type_missing:
   switch:
     - condition: ${signType === null}
-      next: missing_type
+      next: missing_sign_type
   next: check_for_sign_type
 
 check_for_sign_type:
   switch:
     - condition: ${signType === "smart_id"}
-      next: check_for_smart_id_params
+      next: sign_via_smart_id
     - condition: ${signType === "mobile_sign"}
-      next: check_for_mobile_sign_params
-  next: missing_smart_id_params
-
-check_for_smart_id_params:
-  switch:
-    - condition: ${identifier === null || country === null}
-      next: missing_smart_id_params
-  next: sign_via_smart_id
-
-check_for_mobile_sign_params:
-  switch:
-    - condition: ${phoneNumber === null || identifier === null || country === null}
-      next: missing_mobile_sign_params
-  next: sign_via_mobile
+      next: sign_via_mobile
+  next: missing_sign_type
 
 sign_via_smart_id:
   call: http.post
   args:
-    url: https://siga-demo.localhost:9443/smartid-signing
-    headers:
-      Content-Type: "application/json"
+    url: "[#SERVICE_SIGA]/smartid-signing"
     body:
+      containerId: ${container_res.response.body.id}
+      containerType: ${containerType.toUpperCase()}
       personIdentifier: ${identifier}
       country: ${country}
   return: res
@@ -59,10 +75,10 @@ sign_via_smart_id:
 sign_via_mobile:
   call: http.post
   args:
-    url: https://siga-demo.localhost:9443/mobile-signing
-    headers:
-      Content-Type: "application/json"
+    url: "[#SERVICE_SIGA]/mobile-signing"
     body:
+      containerId: ${container_res.response.body.id}
+      containerType: ${containerType.toUpperCase()}
       phoneNr: ${phoneNumber}
       personIdentifier: ${identifier}
       country: ${country}
@@ -79,12 +95,12 @@ missing_mobile_sign_params:
   return: "Phone number, country - missing"
   next: end
 
-missing_type:
+missing_sign_type:
   status: 400
   return: "Sign type is missing"
   next: end
 
-missing_parameters:
+missing_container_type:
   status: 400
-  return: "Missing Parameters"
+  return: "Container type is missing"
   next: end

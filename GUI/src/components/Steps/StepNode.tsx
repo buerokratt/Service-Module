@@ -22,6 +22,7 @@ type NodeDataProps = {
     linkText?: string;
     fileName?: string;
     fileContent?: string;
+    signOption?: { label: string; value: string };
   };
 };
 
@@ -42,6 +43,7 @@ const StepNode: FC<NodeDataProps> = ({ data }) => {
     if (data.stepType === StepType.Input) return data.childrenCount < 2;
     if (data.stepType === StepType.OpenWebpage) return !data.link || !data.linkText;
     if (data.stepType === StepType.FileGenerate) return !data.fileName || !data.fileContent;
+    if (data.stepType === StepType.FileSign) return !data.signOption;
 
     return !(data.readonly || !!data.message?.length);
   };

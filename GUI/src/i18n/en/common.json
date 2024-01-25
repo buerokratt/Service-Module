@@ -48,7 +48,8 @@
     "testService": "Test service",
     "cancel": "Cancel",
     "close": "Close",
-    "common": "Common"
+    "common": "Common",
+    "errorMessage": "There is no access to the service. Try again later."
   },
   "menu": {
     "overview": "Overview",
@@ -187,7 +188,9 @@
       "savedSuccessfully": "Saved Successfully",
       "success": "Success",
       "failed": "Failed",
-      "saveFailed": "Failed to save"
+      "saveFailed": "Failed to save",
+      "saveInfoFailed": "Failed to save info",
+      "saveConfigFailed": "Failed to save config"
     }
   },
   "serviceFlow": {
@@ -233,7 +236,8 @@
       "not": "NOT",
       "addRule": "+ Rule",
       "addGroup": "+ Group",
-      "remove": "Remove"
+      "remove": "Remove",
+      "signType": "Sign Type"
     },
     "flow": "Service flow",
     "placeholderNode": "Drag the next step into the flow",
@@ -251,7 +255,16 @@
     "problems": "Problems",
     "view": "View",
     "log": "Log",
-    "environment": "Environment"
+    "environment": "Environment",
+    "method": "Method",
+    "errorCode": "Error Code",
+    "failedStep": "Failed Step",
+    "failedTime": "Date and Time",
+    "noErrorMessage": "No error message",
+    "errorMessage": "Error Message",
+    "headers": "Headers",
+    "parameters": "Parameters",
+    "body": "Body"
   },
   "toast": {
     "cannot-save-flow": "Cannot Save Flow",

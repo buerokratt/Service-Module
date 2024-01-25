@@ -46,8 +46,8 @@ const Entities: FC = () => {
     },
     onError: (error: AxiosError) => {
       useToastStore.getState().error({
-        title: t('intents.notificationError'),
-        message: error.message,
+        title: t("newService.toast.failed"),
+        message: t("global.errorMessage"),
       });
     },
     onSettled: () => setNewEntityFormOpen(false),
@@ -64,8 +64,8 @@ const Entities: FC = () => {
     },
     onError: (error: AxiosError) => {
       useToastStore.getState().error({
-        title: t('intents.notificationError'),
-        message: error.message,
+        title: t("newService.toast.failed"),
+        message: t("global.errorMessage"),
       });
     },
     onSettled: () => setEditableRow(null),
@@ -82,8 +82,8 @@ const Entities: FC = () => {
     },
     onError: (error: AxiosError) => {
       useToastStore.getState().error({
-        title: t('intents.notificationError'),
-        message: error.message,
+        title: t("newService.toast.failed"),
+        message: t("global.errorMessage"),
       });
     },
     onSettled: () => setDeletableRow(null),

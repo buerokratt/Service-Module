@@ -10,7 +10,7 @@ import useToastStore from './toasts.store';
 import i18next from 'i18next';
 import { ROUTES } from 'resources/routes-constants';
 import { NavigateFunction } from 'react-router-dom';
-import { editServiceInfo, saveDraft } from 'services/service-builder';
+import { editServiceInfo, saveDraft, saveFlowClick } from 'services/service-builder';
 import { initialEdge, initialNodes } from 'types/service-flow';
 
 interface ServiceState {
@@ -21,6 +21,10 @@ interface ServiceState {
   isCommon: boolean,
   edges: Edge[],
   nodes: Node[],
+  isNewService: boolean,
+  markAsNewService: () => void,
+  unmarkAsNewService: () => void,
+  setServiceId: (id: string) => void,
   setNodes: (nodes: Node[] | ((prev: Node[]) => Node[])) => void;
   setEdges: (edges: Edge[]| ((prev: Edge[]) => Edge[])) => void;
   vaildServiceInfo: () => boolean,
@@ -51,7 +55,7 @@ interface ServiceState {
   updateEndpointRawData: (rawData: RequestVariablesTabsRawData, endpointDataId?: string, parentEndpointId?: string) => void;
   updateEndpointData: (data: RequestVariablesTabsRowsData, endpointDataId?: string, parentEndpointId?:string) => void;
   resetState: () => void;
-  onContinueClick: (id: string | undefined, navigate: NavigateFunction) => Promise<void>;
+  onContinueClick: (navigate: NavigateFunction) => Promise<void>;
 
   // TODO: remove the following funtions and refactor the code to use more specific functions
   setEndpoints: (callback: (prev: EndpointData[]) => EndpointData[]) => void;
@@ -67,6 +71,10 @@ const useServiceStore = create<ServiceState>((set, get, store) => ({
   description: '',
   edges: [],
   nodes: [],
+  isNewService: true,
+  markAsNewService: () => set({ isNewService: true }),
+  unmarkAsNewService: () => set({ isNewService: false }),
+  setServiceId: (id) => set({ serviceId: id }),
   setNodes: (nodes) => {
     if(nodes instanceof Function) {
       set(state => {
@@ -151,6 +159,7 @@ const useServiceStore = create<ServiceState>((set, get, store) => ({
       isCommon: false,
       reactFlowInstance: undefined,
       selectedTab: EndpointEnv.Live,
+      isNewService: true,
     })
   },
   loadService: async (id) => {
@@ -160,16 +169,28 @@ const useServiceStore = create<ServiceState>((set, get, store) => ({
       const service = await axios.get<Service[]>(getServiceById(id));
       
       const structure = JSON.parse(service.data[0].structure.value);
-      const endpoints = JSON.parse(service.data[0].endpoints.value);
-      
+      let endpoints = JSON.parse(service.data[0].endpoints.value);
+      let edges = structure?.edges;
+      let nodes = structure?.nodes;
+
+      if(!edges || edges.length === 0)
+        edges = [initialEdge];
+
+      if(!nodes || nodes.length === 0)
+        nodes = initialNodes;
+
+      if(!endpoints || !(endpoints instanceof Array))
+        endpoints = [];
+
       set({ 
         serviceId: id,
         name: service.data[0].name,
         isCommon : service.data[0].isCommon,
         description: service.data[0].description,
-        edges: structure?.edges ?? [initialEdge],
-        nodes: structure?.nodes ?? initialNodes,
-        endpoints
+        edges,
+        nodes,
+        endpoints,
+        isNewService: false,
       });
     }
 
@@ -350,7 +371,7 @@ const useServiceStore = create<ServiceState>((set, get, store) => ({
   },
   reactFlowInstance: null,
   setReactFlowInstance: (reactFlowInstance) => set({ reactFlowInstance, }),
-  onContinueClick: async (id, navigate) => {
+  onContinueClick: async (navigate) => {
     const vaildServiceInfo = get().vaildServiceInfo();
 
     if (!vaildServiceInfo) {
@@ -361,11 +382,16 @@ const useServiceStore = create<ServiceState>((set, get, store) => ({
       return;
     }
 
-    if(id) {
-      await editServiceInfo(id);
+    if(get().isNewService) {
+      await saveFlowClick(() => {});
+      set({ 
+        isNewService: false
+      });
+    } else {
+      await editServiceInfo();
     }
 
-    navigate(ROUTES.replaceWithId(ROUTES.FLOW_ROUTE, id));
+    navigate(ROUTES.replaceWithId(ROUTES.FLOW_ROUTE, get().serviceId));
   },
 }));
 

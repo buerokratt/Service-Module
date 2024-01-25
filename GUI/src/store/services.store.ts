@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import axios from 'axios';
-import { changeServiceStatus, deleteService, getServicesList } from 'resources/api-constants';
+import { changeServiceStatus, deleteService as deleteServiceApi, getServicesList } from 'resources/api-constants';
 import { Service, ServiceState } from 'types';
 import useToastStore from './toasts.store';
 
@@ -9,7 +9,7 @@ interface ServiceStoreState {
   commonServices: Service[];
   notCommonServices: Service[];
   loadServicesList: () => Promise<void>;
-  deleteService: (id: number) => Promise<void>;
+  deleteService: (id: string) => Promise<void>;
   selectedService: Service | undefined;
   setSelectedService: (service: Service) => void;
   changeServiceState: (onEnd: () => void, successMessage: string, errorMessage: string) => Promise<void>;
@@ -28,6 +28,7 @@ const useServiceListStore = create<ServiceStoreState>((set, get, store) => ({
         state: item.state,
         type: item.type,
         isCommon: item.iscommon,
+        serviceId: item.serviceId,
         usedCount: 0,
       } as Service));
 
@@ -37,17 +38,14 @@ const useServiceListStore = create<ServiceStoreState>((set, get, store) => ({
       notCommonServices: services.filter((e: Service) => e.isCommon === false),
     })
   },
-  deleteService: async (id: number) => {
-    // TODO later:
-    // await axios.delete(`${getServicesList()}/${id}`);
-    const services = get().services.filter((e: Service) => e.id !== id);
+  deleteService: async (id) => {
+    const services = get().services.filter((e: Service) => e.serviceId !== id);
     set({
       services,
       commonServices: services.filter((e: Service) => e.isCommon === true),
       notCommonServices: services.filter((e: Service) => e.isCommon === false),
     })
   },
-
   selectedService: undefined,
   setSelectedService: (service: Service) => {
     set({
@@ -60,7 +58,7 @@ const useServiceListStore = create<ServiceStoreState>((set, get, store) => ({
 
     try {
       await axios.post(changeServiceStatus(), {
-        id: selectedService.id,
+        id: selectedService.serviceId,
         state: selectedService.state === ServiceState.Active ? ServiceState.Inactive : ServiceState.Active,
         type: selectedService.type,
       });
@@ -79,12 +77,12 @@ const useServiceListStore = create<ServiceStoreState>((set, get, store) => ({
     if (!selectedService) return;
 
     try {
-      await axios.post(deleteService(), {
-        id: selectedService?.id,
+      await axios.post(deleteServiceApi(), {
+        id: selectedService?.serviceId,
         type: selectedService?.type,
       });
       useToastStore.getState().success({ title: successMessage});
-      await useServiceListStore.getState().deleteService(selectedService.id);
+      await useServiceListStore.getState().deleteService(selectedService.serviceId);
     } catch (_) {
       useToastStore.getState().error({ title: errorMessage });
     }

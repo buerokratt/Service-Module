@@ -19,11 +19,12 @@ instance.interceptors.response.use(
         return response;
     },
     (error: AxiosError) => {
-        if (error.response?.status === 401) {
-            //TODO: handle unauthorized requests
+        // Add switch case to handle specific error codes
+        if ((error.response?.status ?? 0) > 400 && (error.response?.status ?? 0) < 599) {
+            console.log('Teenusele puudub ligipääs. Proovi hiljem uuesti.');
         }
-        return Promise.reject(error);
-    }
+    return Promise.reject(error);
+  }
 );
 
 export default instance;

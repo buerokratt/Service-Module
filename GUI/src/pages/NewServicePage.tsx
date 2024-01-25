@@ -35,17 +35,17 @@ const NewServicePage: React.FC = () => {
 
   useEffect(() => {
     useServiceStore.getState().loadService(id);
-  }, []);
-  
+  }, [id]);
+
   return (
     <Layout
       disableMenu
       customHeader={
         <NewServiceHeader
           activeStep={2}
-          saveDraftOnClick={() => saveDraft(id)}
+          saveDraftOnClick={() => saveDraft()}
           isSaveButtonEnabled={endpoints.length > 0}
-          continueOnClick={() => useServiceStore.getState().onContinueClick(id, navigate)}
+          continueOnClick={() => useServiceStore.getState().onContinueClick(navigate)}
         />
       }
     >

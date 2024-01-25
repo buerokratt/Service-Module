@@ -267,7 +267,6 @@ const FlowBuilder: FC<FlowBuilderProps> = ({
       if (!reactFlowInstance || !reactFlowWrapper.current) return;
       startDragNode.current = draggedNode;
       // setStartDragNode((draggedNode) => [...startDragNode, ...draggedNode]);
-
     },
     [reactFlowInstance, edges]
   );
@@ -282,19 +281,18 @@ const FlowBuilder: FC<FlowBuilderProps> = ({
         x: event.clientX,
         y: event.clientY,
       });
-      
+
       if (reactFlowInstance.getIntersectingNodes(draggedNode).length > 0) {
         if (startDragNode.current != undefined) {
-        setNodes((prevNodes) =>
-          prevNodes
-            .map((node) => {
+          setNodes((prevNodes) =>
+            prevNodes.map((node) => {
               if (node.id !== draggedNode.id) return node;
               node.position.x = startDragNode.current?.position.x ?? 0;
               node.position.y = startDragNode.current?.position.y ?? 0;
               return node;
             })
-        );
-       }
+          );
+        }
       }
 
       const matchingPlaceholder = reactFlowInstance.getNodes().find((node) => {
@@ -427,7 +425,6 @@ const FlowBuilder: FC<FlowBuilderProps> = ({
               clientInputId: type === StepType.Input ? newClientInputId : undefined,
               readonly: [
                 StepType.Auth,
-                StepType.FileSign,
                 StepType.FinishingStepEnd,
                 StepType.FinishingStepRedirect,
                 StepType.UserDefined,

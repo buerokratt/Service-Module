@@ -1,1 +1,1 @@
-DELETE FROM services WHERE id = :id
+DELETE FROM services WHERE service_id = :id

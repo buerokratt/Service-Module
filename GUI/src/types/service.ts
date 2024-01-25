@@ -10,4 +10,5 @@ export interface Service {
   readonly description?: string;
   readonly structure: any;
   readonly endpoints: any;
+  readonly serviceId: string;
 }

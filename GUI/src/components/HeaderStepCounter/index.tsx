@@ -1,4 +1,4 @@
-import React, { FC } from "react";
+import React, { FC, useEffect } from "react";
 import { Track } from "..";
 import Step from "./HeaderStep";
 import { useTranslation } from "react-i18next";
@@ -15,6 +15,12 @@ const HeaderStepCounter: FC<StepCounterProps> = ({ activeStep }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { id } = useParams();
+
+  useEffect(() => {
+    if(id) {
+      useServiceStore.getState().setServiceId(id);
+    }
+  }, [id]);
 
   return (
     <Track className="header-step-counter" gap={24}>
@@ -40,7 +46,7 @@ const HeaderStepCounter: FC<StepCounterProps> = ({ activeStep }) => {
         step={3}
         activeStep={activeStep}
         name={t("newService.serviceFlowCreation")}
-        onClick={() => useServiceStore.getState().onContinueClick(id, navigate)}
+        onClick={() => useServiceStore.getState().onContinueClick(navigate)}
       />
     </Track>
   );
