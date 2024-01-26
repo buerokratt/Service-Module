@@ -24,8 +24,7 @@ import useServiceStore from "store/new-services.store";
 type RequestVariablesProps = {
   disableRawData?: boolean;
   endpointData: EndpointType;
-  updateEndpointData: (data: RequestVariablesTabsRowsData, endpointDataId?: string) => void;
-  updateEndpointRawData?: (rawData: RequestVariablesTabsRawData, endpointDataId?: string) => void;
+  parentEndpointId?: string;
   isLive: boolean;
   requestValues: PreDefinedEndpointEnvVariables;
   requestTab: RequestTab;
@@ -35,19 +34,18 @@ type RequestVariablesProps = {
 const RequestVariables: React.FC<RequestVariablesProps> = ({
   disableRawData,
   endpointData,
-  updateEndpointData,
-  updateEndpointRawData,
   isLive,
   requestValues,
   requestTab,
   setRequestTab,
+  parentEndpointId,
 }) => {
   const { t } = useTranslation();
   const tabs: EndpointTab[] = [EndpointTab.Params, EndpointTab.Headers, EndpointTab.Body];
   const [jsonError, setJsonError] = useState<string>();
   const [key, setKey] = useState<number>(0);
   const columnHelper = createColumnHelper<RequestVariablesTableColumns>();
-  const { setEndpoints } = useServiceStore();
+  const { setEndpoints, updateEndpointRawData, updateEndpointData } = useServiceStore();
 
   const constructRow = (id: number, data: EndpointVariableData, nestedLevel: number): RequestVariablesRowData => {
     const value = isLive ? data.value : data.testValue;
@@ -309,9 +307,7 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
           name={`${requestTab.tab}-raw-data`}
           label={""}
           defaultValue={tabRawData[requestTab.tab]}
-          onBlur={() => {
-            if (updateEndpointRawData) updateEndpointRawData(tabRawData, endpointData.id);
-          }}
+          onBlur={() => updateEndpointRawData(tabRawData, endpointData.id, parentEndpointId)}
           onChange={(event) => {
             setJsonError(undefined);
             tabRawData[requestTab.tab] = event.target.value;

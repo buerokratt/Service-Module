@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from "react";
+import React, { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useParams } from "react-router-dom";
 import {
@@ -12,75 +12,30 @@ import {
   Track,
   Switch,
 } from "../components";
-import { ROUTES } from "../resources/routes-constants";
-import { ToastContext } from "../components/Toast/ToastContext";
+import { saveDraft } from "services/service-builder";
 import useStore from "store/store";
 import useServiceStore from "store/new-services.store";
-import { saveEndpoints } from "services/service-builder";
 
 const NewServicePage: React.FC = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const userInfo = useStore((state) => state.userInfo);
-  const { 
-    serviceId,
-    endpoints,
-    flow,
-    isCommon,
-    setIsCommon,
-    description,
-    setDescription,
-    secrets,
-    availableVariables,
-    serviceName,
-    changeServiceName,
-    addEndpoint,
-    loadFlowData,
-    loadService,
-  } = useServiceStore();
-
-  const toast = useContext(ToastContext);
-
+  const endpoints = useServiceStore(state => state.endpoints);
+  const isCommon = useServiceStore(state => state.isCommon);
+  const description = useServiceStore(state => state.description);
+  const name = useServiceStore(state => state.name);
   const { intentName, id } = useParams();
+
   useEffect(() => {
     const name = intentName?.trim();
-    if(name) changeServiceName(name);
+    if(name) {
+      useServiceStore.getState().changeServiceName(name);
+    }
   }, [intentName])
 
   useEffect(() => {
-    loadFlowData();
-    loadService(id!);
-  }, []);
-
-  const saveDraft = async () => {
-    if (serviceName && description) {
-      await saveEndpoints(
-        endpoints,
-        serviceName, 
-        (r) => {
-        console.log(r);
-        toast.open({
-          type: "success",
-          title: t("newService.toast.success"),
-          message: t("newService.toast.savedSuccessfully"),
-        });
-      },
-      (e) => {
-        console.log(e);
-        toast.open({
-          type: "error",
-          title: t("newService.toast.failed"),
-          message: t("newService.toast.saveFailed"),
-        });
-      });
-    } else {
-      toast.open({
-        type: "error",
-        title: t("newService.toast.missingFields"),
-        message: t("newService.toast.serviceMissingFields"),
-      });
-    }
-  };
+    useServiceStore.getState().loadService(id);
+  }, [id]);
 
   return (
     <Layout
@@ -88,35 +43,9 @@ const NewServicePage: React.FC = () => {
       customHeader={
         <NewServiceHeader
           activeStep={2}
-          availableVariables={availableVariables}
-          saveDraftOnClick={saveDraft}
-          flow={flow}
-          secrets={secrets}
-          serviceDescription={description}
-          serviceId={serviceId}
-          isCommon={isCommon}
-          continueOnClick={() => {
-            if (serviceName && description) {
-              navigate(ROUTES.FLOW_ROUTE, {
-                state: {
-                  endpoints,
-                  secrets,
-                  serviceName,
-                  serviceId,
-                  availableVariables,
-                  flow,
-                  serviceDescription: description,
-                  isCommon,
-                },
-              });
-            } else {
-              toast.open({
-                type: "error",
-                title: t("newService.toast.missingFields"),
-                message: t("newService.toast.serviceMissingFields"),
-              });
-            }
-          }}
+          saveDraftOnClick={() => saveDraft()}
+          isSaveButtonEnabled={endpoints.length > 0}
+          continueOnClick={() => useServiceStore.getState().onContinueClick(navigate)}
         />
       }
     >
@@ -126,7 +55,7 @@ const NewServicePage: React.FC = () => {
           <Track direction="vertical" align="stretch" gap={16}>
             <div>
               <label htmlFor="name">{t("newService.name")}</label>
-              <FormInput name="name" label="" value={serviceName} onChange={(e) => changeServiceName(e.target.value)} />
+              <FormInput name="name" label="" value={name} onChange={(e) => useServiceStore.getState().changeServiceName(e.target.value)} />
             </div>
             <div>
               <label htmlFor="description">{t("newService.description")}</label>
@@ -134,7 +63,7 @@ const NewServicePage: React.FC = () => {
                 name="description"
                 label=""
                 value={description}
-                onChange={(e) => setDescription(e.target.value)}
+                onChange={(e) => useServiceStore.getState().setDescription(e.target.value)}
                 style={{
                   height: 120,
                   resize: "vertical",
@@ -151,7 +80,7 @@ const NewServicePage: React.FC = () => {
                   offLabel={t("global.no").toString()}
                   value={isCommon}
                   checked={isCommon}
-                  onCheckedChange={(e) => setIsCommon(e)}
+                  onCheckedChange={(e) => useServiceStore.getState().setIsCommon(e)}
                 />
               </Track>
             )}
@@ -163,7 +92,7 @@ const NewServicePage: React.FC = () => {
         ))}
         <Button
           appearance="text"
-          onClick={addEndpoint}
+          onClick={useServiceStore.getState().addEndpoint}
         >
           {t("newService.endpoint.add")}
         </Button>

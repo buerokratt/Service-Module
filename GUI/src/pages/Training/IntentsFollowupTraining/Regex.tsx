@@ -2,24 +2,21 @@ import { FC, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { createColumnHelper } from '@tanstack/react-table';
-import { useNavigate } from 'react-router-dom';
 import { AxiosError } from 'axios';
 import { useForm, Controller } from 'react-hook-form';
 import { MdDeleteOutline, MdOutlineEdit } from 'react-icons/md';
 
 import { Button, DataTable, Dialog, FormInput, FormSelect, Icon, Track } from '../../../components';
-import { useToast } from '../../../hooks/useToast';
 import { addRegex, deleteRegex } from '../../../services/regex';
 import { Entity } from '../../../types/entity';
 import { getEntities } from '../../../services/entities';
 import { getRegexes } from '../../../services/regex';
 import { RegexTeaser } from '../../../types/regexTeaser';
+import useToastStore from 'store/toasts.store';
 
 const Regex: FC = () => {
   const { t } = useTranslation();
-  const toast = useToast();
   const queryClient = useQueryClient();
-  const navigate = useNavigate();
   const [filter, setFilter] = useState('');
   const [addFormVisible, setAddFormVisible] = useState(false);
   const [deletableRow, setDeletableRow] = useState<string | number | null>(null);
@@ -38,17 +35,15 @@ const Regex: FC = () => {
     onSuccess: async () => {
       await queryClient.invalidateQueries(['regex']);
       setAddFormVisible(false);
-      toast.open({
-        type: 'success',
+      useToastStore.getState().success({
         title: t('intents.notification'),
         message: 'New regex added',
       });
     },
     onError: (error: AxiosError) => {
-      toast.open({
-        type: 'error',
-        title: t('intents.notificationError'),
-        message: error.message,
+      useToastStore.getState().error({
+        title: t("newService.toast.failed"),
+        message: t("global.errorMessage"),
       });
     },
     onSettled: () => setAddFormVisible(false),
@@ -62,17 +57,15 @@ const Regex: FC = () => {
     mutationFn: ({ id }: { id: string | number }) => deleteRegex(id),
     onSuccess: async () => {
       await queryClient.invalidateQueries(['regex']);
-      toast.open({
-        type: 'success',
+      useToastStore.getState().success({
         title: t('intents.notification'),
         message: 'REGEX deleted',
       });
     },
     onError: (error: AxiosError) => {
-      toast.open({
-        type: 'error',
-        title: t('intents.notificationError'),
-        message: error.message,
+      useToastStore.getState().error({
+        title: t("newService.toast.failed"),
+        message: t("global.errorMessage"),
       });
     },
     onSettled: () => setDeletableRow(null),
@@ -117,7 +110,7 @@ const Regex: FC = () => {
         size: '1%',
       },
     }),
-  ], [columnHelper, navigate, t]);
+  ], [columnHelper, t]);
 
   const handleNewRegexSubmit = handleSubmit((data) => {
     newRegexMutation.mutate(data);

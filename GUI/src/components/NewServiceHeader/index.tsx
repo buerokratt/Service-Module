@@ -1,10 +1,10 @@
-import { t } from "i18next";
 import React, { FC } from "react";
+import { t } from "i18next";
 import { Button, HeaderStepCounter, Track } from "..";
 import { PreDefinedEndpointEnvVariables } from "../../types/endpoint";
 import useServiceStore from "store/new-services.store";
-import "@buerokratt-ria/header/src/header/Header.scss";
 import { runServiceTest } from "services/service-builder";
+import "@buerokratt-ria/header/src/header/Header.scss";
 
 type NewServiceHeaderProps = {
   activeStep: number;
@@ -16,41 +16,27 @@ type NewServiceHeaderProps = {
   serviceDescription?: string;
   isCommon?: boolean;
   serviceId?: string;
+  isSaveButtonEnabled?: boolean;
+  isTestButtonVisible?: boolean;
+  isTestButtonEnabled?: boolean;
+  onTestButtonClick?: () => void;
 };
 
 const NewServiceHeader: FC<NewServiceHeaderProps> = ({
   activeStep,
-  availableVariables,
   continueOnClick,
   saveDraftOnClick,
-  flow,
-  secrets,
-  serviceDescription,
-  serviceId,
-  isCommon = false,
 }) => {
-  const endpoints = useServiceStore(state => state.endpoints);
   const isSaveButtonEnabled = useServiceStore(state => state.isSaveButtonEnabled());
   const isTestButtonVisible = useServiceStore(state => state.isTestButtonVisible);
   const isTestButtonEnabled = useServiceStore(state => state.isTestButtonEnabled);
-  const serviceName = useServiceStore(state => state.serviceNameDashed());
 
   return (
     <>
       <header className="header" style={{ paddingLeft: 24 }}>
         <Track justify="between" gap={16}>
           <h1 style={{ whiteSpace: "nowrap" }}>{t("menu.newService")}</h1>
-          <HeaderStepCounter
-            activeStep={activeStep}
-            availableVariables={availableVariables}
-            endpoints={endpoints}
-            flow={flow}
-            secrets={secrets}
-            serviceDescription={serviceDescription}
-            serviceName={serviceName}
-            serviceId={serviceId}
-            isCommon={isCommon}
-          />
+          <HeaderStepCounter activeStep={activeStep} />
           <Button onClick={saveDraftOnClick} appearance="secondary" disabled={!isSaveButtonEnabled}>
             {t("newService.saveDraft")}
           </Button>

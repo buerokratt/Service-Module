@@ -8,7 +8,7 @@ import useToastStore from 'store/toasts.store'
 export const ToastProvider: FC<PropsWithChildren> = ({ children }) => {
   const { t } = useTranslation();
   const toasts = useToastStore(state => state.toasts);
-
+  
   return (
     <RadixToast.Provider
       swipeDirection="right"
