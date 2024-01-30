@@ -126,7 +126,6 @@ const ServiceFlowPage: FC = () => {
         {description}
       </h5>
       <FlowElementsPopup
-        availableVariables={availableVariables}
         onClose={handlePopupClose}
         onSave={handlePopupSave}
         onRulesUpdate={(rules, rulesData) => {

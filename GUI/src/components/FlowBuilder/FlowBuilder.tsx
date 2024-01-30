@@ -1,4 +1,4 @@
-import { Dispatch, FC, SetStateAction, useCallback, useEffect, useRef, useState } from "react";
+import { FC, useCallback, useEffect, useRef, useState } from "react";
 import ReactFlow, {
   Background,
   Controls,
@@ -10,7 +10,6 @@ import ReactFlow, {
   NodeDimensionChange,
   OnEdgesChange,
   OnNodesChange,
-  ReactFlowInstance,
   useUpdateNodeInternals,
   XYPosition,
 } from "reactflow";
@@ -21,7 +20,7 @@ import { ConditionRuleType, StepType } from "../../types";
 import StartNode from "../Steps/StartNode";
 import { useTranslation } from "react-i18next";
 import useServiceStore from "store/new-services.store";
-import { GRID_UNIT } from "types/service-flow";
+import { EDGE_LENGTH, GRID_UNIT } from "types/service-flow";
 
 const nodeTypes = {
   startNode: StartNode,
@@ -68,12 +67,6 @@ const FlowBuilder: FC<FlowBuilderProps> = ({
   const setReactFlowInstance = useServiceStore(state => state.setReactFlowInstance);
 
   useEffect(() => {
-    useServiceStore.getState().setFlow(JSON.stringify(reactFlowInstance?.toObject()));
-  }, [reactFlowInstance]);
-
-  const getEdgeLength = () => 5 * GRID_UNIT;
-
-  useEffect(() => {
     setNodes((prevNodes) =>
       prevNodes.map((node) => {
         if (node.type !== "customNode") return node;
@@ -106,7 +99,7 @@ const FlowBuilder: FC<FlowBuilderProps> = ({
         followingNodes.forEach((node) => {
           // If this node is overlapped by the previous one, pull it down
           if (node.position.y <= updatedNode.position.y + (updatedNode.height ?? 0)) {
-            node.position.y = getEdgeLength() + updatedNode.position.y + (updatedNode.height ?? 0);
+            node.position.y = EDGE_LENGTH + updatedNode.position.y + (updatedNode.height ?? 0);
           }
         });
       });
@@ -133,7 +126,7 @@ const FlowBuilder: FC<FlowBuilderProps> = ({
       type: "placeholder",
       position: {
         x: positionX,
-        y: getEdgeLength() + positionY,
+        y: EDGE_LENGTH + positionY,
       },
       data: {
         type: "placeholder",
@@ -162,7 +155,7 @@ const FlowBuilder: FC<FlowBuilderProps> = ({
     value?: string;
   }): Node[] => {
     const positionX = inputNode.position.x;
-    const positionY = getEdgeLength() + inputNode.position.y + (inputNode.height ?? 0);
+    const positionY = EDGE_LENGTH + inputNode.position.y + (inputNode.height ?? 0);
 
     return [
       {
@@ -260,7 +253,7 @@ const FlowBuilder: FC<FlowBuilderProps> = ({
           placeholders.forEach((placeholder) => {
             if (prevNode.id !== placeholder.id) return;
             prevNode.position.x = draggedNode.position.x;
-            prevNode.position.y = getEdgeLength() + draggedNode.position.y + (draggedNode.height ?? 0);
+            prevNode.position.y = EDGE_LENGTH + draggedNode.position.y + (draggedNode.height ?? 0);
           });
           return prevNode;
         })
