@@ -24,6 +24,7 @@
     "date-fns": "^2.29.3",
     "downshift": "^7.2.0",
     "eslint-plugin-prettier": "^4.2.1",
+    "howler": "^2.2.4",
     "i18next": "^22.4.9",
     "i18next-browser-languagedetector": "^7.0.1",
     "moment": "^2.29.4",
@@ -53,8 +54,7 @@
     "vite": "^4.4.9",
     "vite-plugin-svgr": "^3.2.0",
     "vite-tsconfig-paths": "^4.2.0",
-    "yup": "^1.0.0",
-    "howler": "^2.2.4"
+    "yup": "^1.0.0"
   },
   "scripts": {
     "build": "tsc && vite build",
@@ -73,8 +73,8 @@
   ],
   "homepage": "/services/",
   "devDependencies": {
-    "@types/howler": "^2.2.11",
     "@babel/preset-env": "^7.20.2",
+    "@types/howler": "^2.2.11",
     "@types/react": "^18.0.26",
     "@types/react-datepicker": "^4.8.0",
     "@types/react-dom": "^18.0.10",

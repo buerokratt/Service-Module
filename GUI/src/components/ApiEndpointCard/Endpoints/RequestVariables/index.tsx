@@ -365,7 +365,7 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
             buildRawDataView()
           ) : (
             <>
-              <DataTable sortable={true} data={rowsData[tab as EndpointTab]} columns={columns} />
+              <DataTable sortable data={rowsData[tab as EndpointTab]} columns={columns} />
               <hr style={{ margin: 0, borderTop: "1px solid #D2D3D8" }} />
             </>
           )}

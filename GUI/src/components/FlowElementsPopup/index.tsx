@@ -19,15 +19,13 @@ import OpenWebPageTestContent from "./OpenWebPageTestContent";
 import { Node } from "reactflow";
 import RasaRulesContent from "./RasaRulesContent";
 import { ConditionRuleType, StepType } from "../../types";
-import "./styles.scss";
-import { useLocation } from "react-router-dom";
-import { PreDefinedEndpointEnvVariables } from "../../types/endpoint";
 import useServiceStore from "store/new-services.store";
+import useFlowStore from "store/flow.store";
 import FileSignContent from "./FileSignContent";
+import "./styles.scss";
 
 interface FlowElementsPopupProps {
   node: any;
-  availableVariables?: PreDefinedEndpointEnvVariables;
   onClose: () => void;
   onSave: (updatedNode: Node) => void;
   onRulesUpdate: (rules: (string | null)[], rulesData: ConditionRuleType[]) => void;
@@ -36,22 +34,21 @@ interface FlowElementsPopupProps {
 
 const FlowElementsPopup: React.FC<FlowElementsPopupProps> = ({
   node,
-  availableVariables,
   onClose,
   onSave,
   oldRules,
   onRulesUpdate,
 }) => {
   const { t } = useTranslation();
-  const [isYesNoQuestion, setIsYesNoQuestion] = useState(node?.isYesNoQuestion ?? false);
-  const [rules, setRules] = useState<ConditionRuleType[]>(node?.data?.rules ?? []);
   const [selectedTab, setSelectedTab] = useState<string | null>(null);
   const [isJsonRequestVisible, setIsJsonRequestVisible] = useState(false);
   const [jsonRequestContent, setJsonRequestContent] = useState<string | null>(null);
 
   const isUserDefinedNode = node?.data?.stepType === "user-defined";
 
-  const { endpoints } = useServiceStore();
+  const endpoints = useServiceStore(state => state.endpoints);
+  const rules = useFlowStore(state => state.rules);
+  const isYesNoQuestion = useFlowStore(state => state.isYesNoQuestion);
 
   useEffect(() => {
     if (node) node.data.rules = rules;
@@ -68,7 +65,6 @@ const FlowElementsPopup: React.FC<FlowElementsPopupProps> = ({
   const [fileContent, setFileContent] = useState<string | null>(null);
   // StepType.FileSign
   const [signOption, setSignOption] = useState<{ label: string; value: string } | null>(node?.data.signOption ?? null);
-  const location = useLocation();
 
   if (!node) return <></>;
 
@@ -211,7 +207,6 @@ const FlowElementsPopup: React.FC<FlowElementsPopupProps> = ({
             {stepType === StepType.Textfield && (
               <TextfieldContent
                 defaultMessage={node.data.message ?? textfieldMessage ?? undefined}
-                availableVariables={availableVariables}
                 onChange={(message, placeholders) => {
                   setTextfieldMessage(message);
                   setTextfieldMessagePlaceholders(placeholders);
@@ -226,26 +221,20 @@ const FlowElementsPopup: React.FC<FlowElementsPopupProps> = ({
                 defaultWebpageName={node.data.linkText ?? webpageName ?? undefined}
               />
             )}
-            {(stepType === StepType.FileGenerate || stepType === StepType.Input) && (
+            {stepType === StepType.Rule && (
+                <DndProvider backend={HTML5Backend}>
+                  <ConditionBuilderContent />
+                </DndProvider>
+              )
+            }
+            {stepType === StepType.FileGenerate && (
               <DndProvider backend={HTML5Backend}>
-                {stepType === StepType.Input && (
-                  <ConditionBuilderContent
-                    availableVariables={availableVariables}
-                    isYesNoQuestion={isYesNoQuestion}
-                    setIsYesNoQuestion={setIsYesNoQuestion}
-                    rules={rules}
-                    setRules={setRules}
-                  />
-                )}
-                {stepType === StepType.FileGenerate && (
-                  <FileGenerateContent
-                    availableVariables={availableVariables}
-                    onFileNameChange={setFileName}
-                    onFileContentChange={setFileContent}
-                    defaultFileName={node?.data?.fileName ?? fileName ?? undefined}
-                    defaultFileContent={node?.data?.fileContent ?? fileContent ?? undefined}
-                  />
-                )}
+                <FileGenerateContent
+                  onFileNameChange={setFileName}
+                  onFileContentChange={setFileContent}
+                  defaultFileName={node?.data?.fileName ?? fileName ?? undefined}
+                  defaultFileContent={node?.data?.fileContent ?? fileContent ?? undefined}
+                />
               </DndProvider>
             )}
             {stepType === StepType.FinishingStepRedirect && (

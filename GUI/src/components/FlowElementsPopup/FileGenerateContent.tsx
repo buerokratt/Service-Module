@@ -3,25 +3,24 @@ import { FormInput } from "../FormElements";
 import { OutputElementBox, Track } from "..";
 import FormRichText from "../FormElements/FormRichText";
 import "./styles.scss";
-import { PreDefinedEndpointEnvVariables } from "../../types/endpoint";
 import { useTranslation } from "react-i18next";
+import useServiceStore from "store/new-services.store";
 
 type FileGenerateContentProps = {
   readonly onFileNameChange: (name: string) => void;
   readonly onFileContentChange: (content: string) => void;
-  readonly availableVariables?: PreDefinedEndpointEnvVariables;
   readonly defaultFileName?: string;
   readonly defaultFileContent?: string;
 };
 
 const FileGenerateContent: React.FC<FileGenerateContentProps> = ({
-  availableVariables,
   onFileNameChange,
   onFileContentChange,
   defaultFileName,
   defaultFileContent,
 }) => {
   const { t } = useTranslation();
+  const variables = useServiceStore(state => state.getFlatVariables());
 
   return (
     <Track direction="vertical" align="stretch">
@@ -58,7 +57,7 @@ const FileGenerateContent: React.FC<FileGenerateContentProps> = ({
       <Track direction="vertical" align="left" gap={16} className="popup-top-border-track popup-darker-track">
         <span>{t("serviceFlow.popup.availableVariables")}</span>
         <Track gap={7} className="flow-tags-container">
-          {[...(availableVariables?.prod ?? []), ...(availableVariables?.test ?? [])].map((element, i) => (
+          {variables.map((element, i) => (
             <OutputElementBox key={`${element}-${i}`} text={element}></OutputElementBox>
           ))}
         </Track>

@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { create } from 'zustand';
 import { v4 as uuid } from "uuid";
-import { Edge, Node, ReactFlowInstance } from "reactflow";
+import { Edge, EdgeChange, Node, NodeChange, ReactFlowInstance, applyEdgeChanges, applyNodeChanges } from "reactflow";
 import { EndpointData, EndpointEnv, EndpointTab, EndpointVariableData, PreDefinedEndpointEnvVariables } from 'types/endpoint';
 import { getSecretVariables, getServiceById, getTaraAuthResponseVariables } from 'resources/api-constants';
 import { Service, ServiceState, Step, StepType } from 'types';
@@ -11,10 +11,10 @@ import i18next from 'i18next';
 import { ROUTES } from 'resources/routes-constants';
 import { NavigateFunction } from 'react-router-dom';
 import { editServiceInfo, saveFlowClick } from 'services/service-builder';
-import { initialEdge, initialNodes } from 'types/service-flow';
+import { GRID_UNIT, NodeDataProps, initialEdge, initialNodes } from 'types/service-flow';
+import { alignNodesInCaseAnyGotOverlapped, buildEdge, buildPlaceholder, updateFlowInputRules } from 'services/flow-builder';
 
 interface ServiceStoreState {
-  flow: string | undefined;
   endpoints: EndpointData[];
   name: string;
   serviceId: string;
@@ -34,10 +34,8 @@ interface ServiceStoreState {
   secrets: PreDefinedEndpointEnvVariables;
   availableVariables: PreDefinedEndpointEnvVariables;
   isTestButtonVisible: boolean;
-  isTestButtonEnabled: boolean;
-  disableTestButton: () => void;
-  enableTestButton: () => void;
   isSaveButtonEnabled: () => boolean;
+  getFlatVariables: () => string[];
   serviceNameDashed: () => string;
   deleteEndpoint: (id: string) => void;
   isCommonEndpoint: (id: string) => boolean;
@@ -62,16 +60,25 @@ interface ServiceStoreState {
   updateEndpointData: (data: RequestVariablesTabsRowsData, endpointDataId?: string, parentEndpointId?:string) => void;
   resetState: () => void;
   onContinueClick: (navigate: NavigateFunction) => Promise<void>;
+  selectedNode: Node<NodeDataProps> | null;
+  setSelectedNode: (node: Node<NodeDataProps> | null | undefined) => void;
+  handleNodeEdit: (selectedNodeId: string) => void;
+  onDelete: (id: string, shouldAddPlaceholder: boolean) => void;
+  clickedNode: any;
+  setClickedNode: (clickedNode: any) => void;
+  onNodesChange: (changes: NodeChange[]) => void;
+  onEdgesChange: (changes: EdgeChange[]) => void;
+  isTestButtonEnabled: boolean;
+  disableTestButton: () => void;
+  enableTestButton: () => void;
 
   // TODO: remove the following funtions and refactor the code to use more specific functions
   setEndpoints: (callback: (prev: EndpointData[]) => EndpointData[]) => void;
-  setFlow: (flow: string) => void;
   reactFlowInstance: ReactFlowInstance | null;
   setReactFlowInstance: (reactFlowInstance: ReactFlowInstance | null) => void;
 }
 
 const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
-  flow: undefined,
   endpoints: [],
   name: '',
   serviceId: uuid(),
@@ -82,7 +89,9 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
   serviceState: ServiceState.Draft,
   isTestButtonVisible: false,
   isTestButtonEnabled: true,
-  disableTestButton: () => set({ isTestButtonEnabled: false }),
+  disableTestButton: () => set({ 
+    isTestButtonEnabled: false,
+  }),
   enableTestButton: () => set({ 
     isTestButtonEnabled: true,
     isTestButtonVisible: true,
@@ -115,6 +124,9 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
   },
   secrets: { prod: [], test: [] },
   availableVariables: { prod: [], test: [] },
+  getFlatVariables: () => {
+    return [...get().availableVariables.prod, ...get().availableVariables.test];
+  },
   vaildServiceInfo: () => !!get().name && !!get().description,
   serviceNameDashed: () => get().name.replace(" ", "-"),
   deleteEndpoint: (id: string) => {
@@ -164,20 +176,23 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
   resetState: () => {
     set({
       name: '',
-      flow: undefined,
       endpoints: [],
       serviceId: uuid(),
       description: '',
       secrets: { prod: [], test: [] },
       availableVariables: { prod: [], test: [] },
       isCommon: false,
-      reactFlowInstance: undefined,
+      reactFlowInstance: null,
       selectedTab: EndpointEnv.Live,
       isNewService: true,
+      edges: [],
+      nodes: [],
+      isTestButtonEnabled: true,
     })
   },
   loadService: async (id) => {
     get().resetState();
+    let nodes = get().nodes;
 
     if(id) {
       const service = await axios.get<Service[]>(getServiceById(id));
@@ -185,7 +200,7 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
       const structure = JSON.parse(service.data[0].structure.value);
       let endpoints = JSON.parse(service.data[0].endpoints.value);
       let edges = structure?.edges;
-      let nodes = structure?.nodes;
+      nodes = structure?.nodes;
 
       if(!edges || edges.length === 0)
         edges = [initialEdge];
@@ -195,6 +210,18 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
 
       if(!endpoints || !(endpoints instanceof Array))
         endpoints = [];
+
+        nodes = nodes.map((node: any) => {
+        if (node.type !== "customNode") return node;
+        node.data = {
+          ...node.data,
+          onDelete: get().onDelete,
+          setClickedNode: get().setClickedNode,
+          onEdit: get().handleNodeEdit,
+          update: updateFlowInputRules,
+        };
+        return node;
+      });
 
       set({ 
         serviceId: id,
@@ -211,14 +238,11 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
 
     await get().loadSecretVariables();
 
-    let nodes: Node[] = [];
-    if(get().flow) {
-      nodes = JSON.parse(get().flow!)?.nodes;
-    }    
-    if (nodes?.find((node) => node.data.stepType === "auth")) {
+    if (nodes?.find(node => node.data.stepType === "auth")) {
       await get().loadTaraVariables();
     }
-    const variables = nodes?.filter((node) => node.data.stepType === "input")
+
+    const variables = nodes?.filter(node => node.data.stepType === "input")
       .map((node) => `{{ClientInput_${node.data.clientInputId}}}`);
 
     get().addProductionVariables(variables);
@@ -316,8 +340,6 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
       endpoints: callback(state.endpoints)
     }));
   },
-  setFlow: (flow) => set({ flow }),
-
   selectedTab: EndpointEnv.Live,
   setSelectedTab: (tab: EndpointEnv) => set({ selectedTab: tab }),
   isLive: () => get().selectedTab === EndpointEnv.Live,
@@ -409,6 +431,137 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
     }
 
     navigate(ROUTES.replaceWithId(ROUTES.FLOW_ROUTE, get().serviceId));
+  },
+  selectedNode: null,
+  setSelectedNode: (node) => set({ selectedNode: node }),
+  handleNodeEdit: (selectedNodeId: string) => {
+    const reactFlowInstance = get().reactFlowInstance;
+    if (!reactFlowInstance) return;
+    const node = reactFlowInstance.getNode(selectedNodeId);
+    get().setSelectedNode(node);
+   },
+
+  onDelete: (id, shouldAddPlaceholder) => {
+    const reactFlowInstance = get().reactFlowInstance;
+      if (!reactFlowInstance) return;
+      const deletedNode = reactFlowInstance.getNodes().find((node) => node.id === id);
+      const edgeToDeletedNode = reactFlowInstance.getEdges().find((edge) => edge.target === id);
+      if (!deletedNode) return;
+      let updatedNodes: Node[] = [];
+      let currentEdges: Edge[] = [];
+      get().setEdges((prevEdges) => (currentEdges = prevEdges));
+      get().setNodes((prevNodes) => {
+        let newNodes: Node[] = [];
+
+        if (deletedNode.data.stepType !== StepType.Input) {
+          // delete only targeted node
+          newNodes.push(...prevNodes.filter((node) => node.id !== id));
+        } else {
+          // delete input node with it's rules
+          const deletedRules = currentEdges.filter((edge) => edge.source === id).map((edge) => edge.target);
+
+          newNodes.push(...prevNodes.filter((node) => node.id !== id && !deletedRules.includes(node.id)));
+        }
+
+        // cleanup leftover placeholders
+        newNodes = newNodes.filter((node) => {
+          if (node.type !== "placeholder") return true;
+
+          const pointingEdge = currentEdges.find((edge) => edge.target === node.id);
+          const pointingEdgeSource = newNodes.find((newNode) => newNode.id === pointingEdge?.source);
+          if (!pointingEdgeSource) return false;
+          return true;
+        });
+
+        updatedNodes = newNodes;
+        return newNodes;
+      });
+
+      get().setEdges((prevEdges) => {
+        const toRemove = prevEdges.filter((edge) => {
+          if (deletedNode.data.stepType !== StepType.Input) {
+            // remove edges pointing to/from removed node
+            return edge.target === id || edge.source === id;
+          } else {
+            // remove edges not pointing to present nodes
+            return !updatedNodes.map((node) => node.id).includes(edge.target);
+          }
+        });
+
+        if (toRemove.length === 0) return prevEdges;
+        let newEdges = [...prevEdges.filter((edge) => !toRemove.includes(edge))];
+        if (
+          deletedNode.data.stepType !== StepType.Input &&
+          newEdges.length > 0 &&
+          toRemove.length > 1 &&
+          shouldAddPlaceholder
+        ) {
+          // if only 1 node was removed, point edge to whatever it was pointing to
+          newEdges.push(
+            buildEdge({
+              id: `edge-${toRemove[0].source}-${toRemove[toRemove.length - 1].target}`,
+              source: toRemove[0].source,
+              sourceHandle: toRemove[0].sourceHandle,
+              target: toRemove[toRemove.length - 1].target,
+            })
+          );
+        }
+
+        // cleanup possible leftover edges
+        newEdges = newEdges.filter(
+          (edge) =>
+            updatedNodes.find((node) => node.id === edge.source) && updatedNodes.find((node) => node.id === edge.target)
+        );
+
+        return newEdges;
+      });
+
+      if (!edgeToDeletedNode || !shouldAddPlaceholder) return;
+      get().setEdges((prevEdges) => {
+        // check if previous node points to anything
+        if (prevEdges.find((edge) => edge.source === edgeToDeletedNode.source)) {
+          return prevEdges;
+        }
+
+        // Previous node points to nothing -> add placeholder with edge
+        get().setNodes((prevNodes) => {
+          const sourceNode = prevNodes.find((node) => node.id === edgeToDeletedNode.source);
+          if (!sourceNode) return prevNodes;
+          const placeholder = buildPlaceholder({
+            id: deletedNode.id,
+            position: {
+              y: sourceNode.position.y + (sourceNode.height ?? 0),
+              // Green starting node is not aligned with others, thus small offset is needed
+              x: sourceNode.type === "input" ? sourceNode.position.x - 10.5 * GRID_UNIT : sourceNode.position.x,
+            },
+          });
+          return [...prevNodes, placeholder];
+        });
+
+        prevEdges.push(
+          buildEdge({
+            id: `edge-${edgeToDeletedNode.source}-${deletedNode.id}`,
+            source: edgeToDeletedNode.source,
+            sourceHandle: `handle-${edgeToDeletedNode.source}-1`,
+            target: deletedNode.id,
+          })
+        );
+        return prevEdges;
+      });
+      // get().setIsTestButtonEnabled(false); ??????? to do later 
+  },
+  clickedNode: null,
+  setClickedNode: (clickedNode) => set({ clickedNode }),
+
+  onNodesChange: (changes: NodeChange[]) => {
+    get().setNodes((prevNode) => {
+      const changedNodes = applyNodeChanges(changes, prevNode);
+      const newNodes = alignNodesInCaseAnyGotOverlapped(changes, changedNodes, get().edges);
+      return newNodes;
+    })
+  },
+  onEdgesChange: (changes: EdgeChange[]) => {
+    get().setEdges((eds) => applyEdgeChanges(changes, eds))
   },
 }));
 

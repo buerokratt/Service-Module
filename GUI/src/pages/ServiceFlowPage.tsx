@@ -32,12 +32,12 @@ const ServiceFlowPage: FC = () => {
     rules: [],
     rulesData: [],
   });
-  const [selectedNode, setSelectedNode] = useState<Node<NodeDataProps> | null>(null);
   const navigate = useNavigate();
   const description = useServiceStore(state => state.description);
   const availableVariables = useServiceStore(state => state.availableVariables);
   const steps = useServiceStore(state => state.mapEndpointsToSetps());
   const name = useServiceStore(state => state.serviceNameDashed());
+  const selectedNode = useServiceStore(state => state.selectedNode);
   const { id } = useParams();
 
   useEffect(() => {
@@ -53,6 +53,8 @@ const ServiceFlowPage: FC = () => {
 
   const onNodesChange = useCallback((changes: NodeChange[]) => setNodes((nds) => applyNodeChanges(changes, nds)), []);
   const onEdgesChange = useCallback((changes: EdgeChange[]) => setEdges((eds) => applyEdgeChanges(changes, eds)), []);
+  const [isTestButtonVisible, setIsTestButtonVisible] = useState(false);
+  const isTestButtonEnabled = useServiceStore(state => state.isTestButtonEnabled);
 
   const onDragStart = (event: React.DragEvent<HTMLDivElement>, step: Step) => {
     event.dataTransfer.setData("application/reactflow-label", step.label);
@@ -97,9 +99,7 @@ const ServiceFlowPage: FC = () => {
     );
   };
 
-  const resetStates = () => {
-    setSelectedNode(null);
-  };
+  const resetStates = () => useServiceStore.getState().setSelectedNode(null);
 
   return (
     <>
@@ -126,7 +126,6 @@ const ServiceFlowPage: FC = () => {
         {description}
       </h5>
       <FlowElementsPopup
-        availableVariables={availableVariables}
         onClose={handlePopupClose}
         onSave={handlePopupSave}
         onRulesUpdate={(rules, rulesData) => {
@@ -188,17 +187,12 @@ const ServiceFlowPage: FC = () => {
             </Track>
           </div>
           <FlowBuilder
-            onNodeEdit={setSelectedNode}
             updatedRules={updatedRules}
             description={description}
             nodes={nodes}
             setNodes={setNodes}
-            onNodesChange={onNodesChange}
             edges={edges}
             setEdges={setEdges}
-            onEdgesChange={onEdgesChange}
-            onNodeAdded={useServiceStore.getState().disableTestButton}
-            onNodeDelete={useServiceStore.getState().disableTestButton}
           />
         </div>
       </ReactFlowProvider>

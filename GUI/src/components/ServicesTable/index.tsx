@@ -171,7 +171,7 @@ const ServicesTable: FC<ServicesTableProps> = ({ isCommon = false }) => {
         </Modal>
       )}
       <DataTable
-        sortable={true}
+        sortable
         data={services}
         columns={columns}
       />

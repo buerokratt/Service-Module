@@ -2,6 +2,7 @@ import { StepType } from "./step-type.enum";
 import { MarkerType, Node } from "reactflow";
 
 export const GRID_UNIT = 16;
+export const EDGE_LENGTH = 5 * GRID_UNIT;
 
 export const initialPlaceholder = {
   id: "2",
@@ -41,6 +42,7 @@ export type NodeDataProps = {
   linkText?: string;
   fileName?: string;
   fileContent?: string;
+  signOption?: string;
 };
 
 export const initialNodes: Node[] = [

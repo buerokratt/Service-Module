@@ -1,4 +1,4 @@
-# Bürokratt's Service Module
+# Bürokratt's Service Module 
 
 Bürokratt's Service Module is a tool to help primarily product owners in collaboration with customer support agents/service managers to create, edit and otherwise manipulate Bürokratt's e-services via a graphical user interface. This includes setting up Ruuter- and Rasa-based user stories, making X-road / REST / database requests where and when appropriate and so forth.
 

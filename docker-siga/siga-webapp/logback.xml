@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+    ​
+    <property name="COMMON_LOG_FILE" value="${BUILD_FOLDER:-logs}/siga-common.log"/>​
+    <property name="EVENTS_LOG_FILE" value="${BUILD_FOLDER:-logs}/siga-events.log"/>​
+
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>DEBUG</level>
+        </filter>
+        <encoder class="co.elastic.logging.logback.EcsEncoder"/>
+    </appender>
+    <appender name="COMMON_LOG_FILE" class="ch.qos.logback.core.FileAppender">
+        <file>${COMMON_LOG_FILE}</file>
+        <encoder class="co.elastic.logging.logback.EcsEncoder"/>
+        <filter class="ch.qos.logback.core.filter.EvaluatorFilter">
+            <evaluator>
+                <expression>return message.contains("request_uri=/actuator/health") || message.contains("request_uri=/actuator/heartbeat") || message.contains("request_uri=/actuator/version");</expression>
+            </evaluator>
+            <OnMismatch>NEUTRAL</OnMismatch>
+            <OnMatch>DENY</OnMatch>
+        </filter>
+    </appender>
+    <appender name="EVENTS_LOG_FILE" class="ch.qos.logback.core.FileAppender">
+        <file>${EVENTS_LOG_FILE}</file>
+        <encoder class="co.elastic.logging.logback.EcsEncoder"/>
+        <filter class="ch.qos.logback.core.filter.EvaluatorFilter">
+            <evaluator class="ch.qos.logback.classic.boolex.OnMarkerEvaluator">
+                <marker>SIGA_EVENT</marker>
+            </evaluator>
+            <onMismatch>DENY</onMismatch>
+            <onMatch>NEUTRAL</onMatch>
+        </filter>
+        <filter class="ch.qos.logback.core.filter.EvaluatorFilter">
+            <evaluator>
+                <expression>return message.contains("request_uri=/actuator/health") || message.contains("request_uri=/actuator/heartbeat") || message.contains("request_uri=/actuator/version");</expression>
+            </evaluator>
+            <OnMismatch>NEUTRAL</OnMismatch>
+            <OnMatch>DENY</OnMatch>
+        </filter>
+    </appender>
+    <logger name="ee.openeid.siga" level="INFO"/>
+    <logger name="org.digidoc4j" level="INFO"/>
+    <logger name="eu.europa" level="INFO"/>
+    <logger name="org.digidoc4j.impl" level="WARN"/>
+    <logger name="org.digidoc4j.Configuration" level="INFO"/>
+    <logger name="eu.europa.esig.dss.client.http.commons" level="INFO"/>
+    <logger name="ee.sk" level="INFO"/>
+
+    <root level="INFO">
+        <appender-ref ref="COMMON_LOG_FILE"/>
+        <appender-ref ref="EVENTS_LOG_FILE"/>
+        <appender-ref ref="CONSOLE"/>
+    </root>
+</configuration>
