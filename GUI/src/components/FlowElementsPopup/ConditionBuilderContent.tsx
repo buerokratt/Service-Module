@@ -15,12 +15,12 @@ const ConditionBuilderContent: React.FC = () => {
     <Track direction="vertical" align="stretch">
       <Track gap={16} className="flow-body-padding">
         <Track>
-          <SwitchBox 
-            label="" 
-            name="" 
-            hideLabel 
-            onCheckedChange={useFlowStore.getState().setIsYesNoQuestion} 
-            checked={isYesNoQuestion} 
+          <SwitchBox
+            label=""
+            name=""
+            hideLabel
+            onCheckedChange={useFlowStore.getState().setIsYesNoQuestion}
+            checked={isYesNoQuestion}
             />
         </Track>
         <span>{t("serviceFlow.popup.yesNoQuestion")}</span>

@@ -222,11 +222,10 @@ const FlowElementsPopup: React.FC<FlowElementsPopupProps> = ({
               />
             )}
             {stepType === StepType.Rule && (
-                <DndProvider backend={HTML5Backend}>
-                  <ConditionBuilderContent />
-                </DndProvider>
-              )
-            }
+              <DndProvider backend={HTML5Backend}>
+                <ConditionBuilderContent />
+              </DndProvider>
+            )}
             {stepType === StepType.FileGenerate && (
               <DndProvider backend={HTML5Backend}>
                 <FileGenerateContent

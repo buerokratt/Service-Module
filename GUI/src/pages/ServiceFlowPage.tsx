@@ -20,7 +20,8 @@ const ServiceFlowPage: FC = () => {
     { id: 10, label: t("serviceFlow.element.taraAuthentication"), type: StepType.Auth },
     { id: 20, label: t("serviceFlow.element.textfield"), type: StepType.Textfield },
     { id: 30, label: t("serviceFlow.element.clientInput"), type: StepType.Input },
-    { id: 40, label: t("serviceFlow.element.rules"), type: StepType.RasaRules },
+    { id: 35, label: t("serviceFlow.element.rules"), type: StepType.Rule },
+    { id: 40, label: t("serviceFlow.element.rasaRules"), type: StepType.RasaRules },
     { id: 50, label: t("serviceFlow.element.openNewWebpage"), type: StepType.OpenWebpage },
     { id: 60, label: t("serviceFlow.element.fileGeneration"), type: StepType.FileGenerate },
     { id: 70, label: t("serviceFlow.element.fileSigning"), type: StepType.FileSign },
@@ -35,7 +36,6 @@ const ServiceFlowPage: FC = () => {
   const [selectedNode, setSelectedNode] = useState<Node<NodeDataProps> | null>(null);
   const navigate = useNavigate();
   const description = useServiceStore(state => state.description);
-  const availableVariables = useServiceStore(state => state.availableVariables);
   const steps = useServiceStore(state => state.mapEndpointsToSetps());
   const name = useServiceStore(state => state.serviceNameDashed());
   const { id } = useParams();
