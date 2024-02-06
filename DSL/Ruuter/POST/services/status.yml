@@ -1,3 +1,4 @@
+# TODO: Change Service Status on bot so it can be activated or diactivated
 extract_request_data:
   assign:
     id: ${incoming.body.id}
@@ -87,89 +88,6 @@ activate_service:
       current_path: "/Ruuter/${ruuter_type}/services/${old_file_status_path}/${name + old_file_end}"
       new_path: "/Ruuter/${ruuter_type}/services/active/${name}.yml"
   result: activate_service_result
-
-check_intent_file_exists:
-  call: http.post
-  args:
-    url: "[#SERVICE_NODE]/file/check"
-    body:
-      file_path: "/mock1/data/nlu/removed/${service_name}_nlu.tmp"
-  result: intent_file_exists_result
-  next: validate_intent_file_exists  
-
-validate_intent_file_exists:
-  switch:
-    - condition: ${!!intent_file_exists_result.response.body}
-      next: activate_intent_file
-  next: return_ok
-
-activate_intent_file:
-  call: http.post
-  args:
-    url: "[#SERVICE_NODE]/file/move"
-    body:
-      current_path: "/mock1/data/nlu/removed/${service_name}_nlu.tmp"
-      new_path: "/mock1/data/nlu/${service_name}_nlu.yml"
-  result: activate_intent_result
-
-getFileLocations:
-  call: http.get
-  args:
-    url: "[#SERVICE_DOCKER_INT]/return-file-locations"
-  result: fileLocations
-
-getDomainFile:
-  call: http.get
-  args:
-    url: "[#SERVICE_DOCKER_INT]/domain-file"
-    headers:
-      cookie: ""
-  result: domainData
-
-mergeIntents:
-  call: http.post
-  args:
-    url: "[#TRAINING_NODE]/merge"
-    body:
-      array1: ${[service_name]}
-      array2: ${domainData.response.body.response.intents}
-  result: mergedIntents
-
-convertDomainJsonToYaml:
-  call: http.post
-  args:
-    url: "[#TRAINING_NODE]/convert/json-to-yaml"
-    body:
-      version: ${domainData.response.body.response.version}
-      intents: ${mergedIntents.response.body}
-      entities: ${domainData.response.body.response.entities}
-      slots: ${domainData.response.body.response.slots}
-      forms: ${domainData.response.body.response.forms}
-      actions: ${domainData.response.body.response.actions}
-      responses: ${domainData.response.body.response.responses}
-      session_config: ${domainData.response.body.response.session_config}
-  result: domainYaml
-
-saveDomainFile:
-  call: http.post
-  args:
-    url: "[#TRAINING_NODE]/file/write"
-    body:
-      file_path: ${fileLocations.response.body.response.domain_location}
-      content: ${domainYaml.response.body.json}
-  result: fileResult
-  next: add_rule
-
-add_rule:
-  call: http.post
-  args:
-    url: "[#TRAINING_RUUTER]/rasa/rules/add"
-    headers:
-      cookie: ""
-    body:
-      rule: ${service_name}
-      steps: ${[new Map([["intent", service_name]]), new Map([["action", "utter_" + service_name]])]}
-  result: add_rule_result
   next: return_ok
 
 deactivate_service:
@@ -180,53 +98,6 @@ deactivate_service:
       current_path: "/Ruuter/${ruuter_type}/services/${old_file_status_path}/${name + old_file_end}"
       new_path: "/Ruuter/${ruuter_type}/services/inactive/${name}.tmp"
   result: deactivate_service_result
-  next: delete_rule
-
-delete_rule:
-  call: http.post
-  args:
-    url: "[#TRAINING_RUUTER]/rasa/rules/delete"
-    headers:
-      cookie: ""
-    body:
-      rule: ${service_name}
-  result: delete_rule_result
-  next: delete_intent
-
-delete_intent:
-  call: http.post
-  args:
-    url: "[#TRAINING_RUUTER]/rasa/intents/delete"
-    headers:
-      cookie: ""
-    body:
-      name: ${service_name}
-  result: delete_intent_result
-  next: check_if_intent_file_exists
-
-check_if_intent_file_exists:
-  call: http.post
-  args:
-    url: "[#SERVICE_NODE]/file/check"
-    body:
-      file_path: "/mock1/data/nlu/${service_name + '_nlu' + old_file_end}"
-  result: intent_file_exists_res
-  next: validate_if_intent_file_exists  
-
-validate_if_intent_file_exists:
-  switch:
-    - condition: ${!!intent_file_exists_res.response.body}
-      next: rename_intent_to_tmp
-  next: return_ok
-
-rename_intent_to_tmp:
-  call: http.post
-  args:
-    url: "[#SERVICE_NODE]/file/move"
-    body:
-      current_path: "/mock1/data/nlu/${service_name + '_nlu' + old_file_end}"
-      new_path: "/mock1/data/nlu/removed/${service_name}_nlu.tmp"
-  result: rename_intent_result
   next: return_ok
 
 return_ok:

@@ -1,3 +1,4 @@
+# TODO: Remove Service from bot so it won't be available for the user to use
 check_for_required_parameters:
   switch:
     - condition: ${incoming.body.id == null || incoming.body.type == null}
@@ -85,41 +86,6 @@ delete_endpoints:
     body:
       name: ${name_res.response.body[0].name}
   result: delete_endpoints_res
-  next: delete_response
-
-delete_response:
-  call: http.post
-  args:
-    url: "[#TRAINING_RUUTER]/rasa/responses/delete"
-    headers:
-      cookie: ""
-    body:
-      response_name: "utter_service_${name_res.response.body[0].name}"
-  result: delete_response_result
-  next: check_intent_file_exists
-
-check_intent_file_exists:
-  call: http.post
-  args:
-    url: "[#SERVICE_NODE]/file/check"
-    body:
-      file_path: "/mock1/data/nlu/removed/service_${name_res.response.body[0].name}_nlu.tmp"
-  result: intent_file_exists_result
-  next: validate_intent_file_exists
-
-validate_intent_file_exists:
-  switch:
-    - condition: ${!!intent_file_exists_result.response.body}
-      next: delete_intent
-  next: return_ok
-
-delete_intent:
-  call: http.post
-  args:
-    url: "[#SERVICE_NODE]/file/delete"
-    body:
-      path: "/mock1/data/nlu/removed/service_${name_res.response.body[0].name}_nlu.tmp"
-  result: delete_intent_result
   next: return_ok
 
 return_ok:
