@@ -385,8 +385,6 @@ export async function saveEndpoints(
     ));
   }
 
-  console.log(serviceEndpoints)
-  console.log(endpoints)
   tasks.push(axios.post(updateServiceEndpoints(id), {
       endpoints: JSON.stringify(serviceEndpoints),
   }));

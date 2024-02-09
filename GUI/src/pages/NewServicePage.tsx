@@ -35,7 +35,6 @@ const NewServicePage: React.FC = () => {
 
   useEffect(() => {
     useServiceStore.getState().loadService(id);
-    console.log(id);
   }, [id]);
 
   return (
