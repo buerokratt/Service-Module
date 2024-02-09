@@ -278,9 +278,11 @@ export async function saveEndpoints(
   id: string,
 ) {
   const tasks: Promise<any>[] = [];
+  const serviceEndpoints = endpoints.filter(e => e.serviceId === id || !e.hasOwnProperty('serviceId')).map(x => x);
 
-  for (const endpoint of endpoints) {
+  for (const endpoint of serviceEndpoints) {
     if (!endpoint) continue;
+    endpoint.serviceId = id
     const selectedEndpointType = endpoint.definedEndpoints.find((e) => e.isSelected);
     if (!selectedEndpointType) continue;
 
@@ -383,8 +385,10 @@ export async function saveEndpoints(
     ));
   }
 
+  console.log(serviceEndpoints)
+  console.log(endpoints)
   tasks.push(axios.post(updateServiceEndpoints(id), {
-      endpoints: JSON.stringify(endpoints),
+      endpoints: JSON.stringify(serviceEndpoints),
   }));
 
   await Promise.all(tasks).then(onSuccess).catch(onError);
@@ -804,6 +808,7 @@ export const editServiceInfo = async () => {
   const description = useServiceStore.getState().description;
   const endpoints = useServiceStore.getState().endpoints;
   const serviceId = useServiceStore.getState().serviceId;
+  const endPointsName = useServiceStore.getState().name;
 
   const tasks: Promise<any>[] = [];
 
@@ -814,9 +819,7 @@ export const editServiceInfo = async () => {
     }
   ));
 
-  tasks.push(axios.post(updateServiceEndpoints(serviceId), { /// TODO: edit endpoints dsl as in `saveEndpoints`
-      endpoints: JSON.stringify(endpoints),
-  }))
+   await saveEndpoints(endpoints, endPointsName, () => {}, (_) => {}, serviceId);
 
   await Promise.all(tasks)
   .then(() => useToastStore.getState().success({

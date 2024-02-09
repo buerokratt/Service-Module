@@ -1,0 +1,16 @@
+getConfigs:
+  call: http.get
+  args:
+    url: "[#SERVICE_ENDPOINTS]:[#SERVICE_ENDPOINTS_PORT]/services/endpoints/configs/service-endpoint-prod-configs"
+  result: configs
+
+assign_step:
+  assign:
+    info:
+     url: https://httpbin.org/post
+     user_id: 10      
+     headers: 
+       token: 'isdfbkajsdhkajsdhjsbckajsgdyasudhqwddasax'  
+
+return_value:
+  return: ${[info , configs.response.body]}

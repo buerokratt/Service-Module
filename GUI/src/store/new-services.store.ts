@@ -156,7 +156,7 @@ const useServiceStore = create<ServiceState>((set, get, store) => ({
     })
   },
   addEndpoint: () => {
-    const newEndpoint = { id: uuid(), name: "", definedEndpoints: [] };
+    const newEndpoint = { id: uuid(), name: "", definedEndpoints: []};
     set(state => ({ endpoints:[ ...state.endpoints, newEndpoint] }));
   },
   resetState: () => {

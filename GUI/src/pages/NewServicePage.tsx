@@ -20,21 +20,22 @@ const NewServicePage: React.FC = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const userInfo = useStore((state) => state.userInfo);
-  const endpoints = useServiceStore(state => state.endpoints);
-  const isCommon = useServiceStore(state => state.isCommon);
-  const description = useServiceStore(state => state.description);
-  const name = useServiceStore(state => state.name);
+  const endpoints = useServiceStore((state) => state.endpoints);
+  const isCommon = useServiceStore((state) => state.isCommon);
+  const description = useServiceStore((state) => state.description);
+  const name = useServiceStore((state) => state.name);
   const { intentName, id } = useParams();
 
   useEffect(() => {
     const name = intentName?.trim();
-    if(name) {
+    if (name) {
       useServiceStore.getState().changeServiceName(name);
     }
-  }, [intentName])
+  }, [intentName]);
 
   useEffect(() => {
     useServiceStore.getState().loadService(id);
+    console.log(id);
   }, [id]);
 
   return (
@@ -55,7 +56,12 @@ const NewServicePage: React.FC = () => {
           <Track direction="vertical" align="stretch" gap={16}>
             <div>
               <label htmlFor="name">{t("newService.name")}</label>
-              <FormInput name="name" label="" value={name} onChange={(e) => useServiceStore.getState().changeServiceName(e.target.value)} />
+              <FormInput
+                name="name"
+                label=""
+                value={name}
+                onChange={(e) => useServiceStore.getState().changeServiceName(e.target.value)}
+              />
             </div>
             <div>
               <label htmlFor="description">{t("newService.description")}</label>
@@ -87,13 +93,12 @@ const NewServicePage: React.FC = () => {
           </Track>
         </Card>
 
-        {endpoints.map((endpoint) => (
-          <ApiEndpointCard key={endpoint.id} endpoint={endpoint} />
-        ))}
-        <Button
-          appearance="text"
-          onClick={useServiceStore.getState().addEndpoint}
-        >
+        {endpoints
+          .filter((endpoint) => endpoint.serviceId === id)
+          .map((endpoint) => (
+            <ApiEndpointCard key={endpoint.id} endpoint={endpoint} />
+          ))}
+        <Button appearance="text" onClick={useServiceStore.getState().addEndpoint}>
           {t("newService.endpoint.add")}
         </Button>
       </Track>

@@ -1,7 +1,6 @@
 extract_request_data:
   assign:
     name: ${incoming.body.name}
-  next: delete_get_endpoints
 
 delete_get_endpoints:
   call: http.post
@@ -11,7 +10,6 @@ delete_get_endpoints:
       path: "/Ruuter/GET/services/endpoints"
       keyword: "${name}-"
   result: results
-  next: delete_get_endpoints_configs
 
 delete_get_endpoints_configs:
   call: http.post
@@ -21,7 +19,6 @@ delete_get_endpoints_configs:
       path: "/Ruuter/GET/services/endpoints/configs"
       keyword: "${name}-"
   result: results
-  next: delete_get_endpoints_info
 
 delete_get_endpoints_info:
   call: http.post
@@ -31,7 +28,6 @@ delete_get_endpoints_info:
       path: "/Ruuter/GET/services/endpoints/info"
       keyword: "${name}-"
   result: results
-  next: delete_post_endpoints
 
 delete_post_endpoints:
   call: http.post
@@ -41,7 +37,6 @@ delete_post_endpoints:
       path: "/Ruuter/POST/services/endpoints"
       keyword: "${name}-"
   result: results
-  next: delete_post_endpoints_configs
 
 delete_post_endpoints_configs:
   call: http.post
@@ -51,7 +46,6 @@ delete_post_endpoints_configs:
       path: "/Ruuter/POST/services/endpoints/configs"
       keyword: "${name}-"
   result: results
-  next: delete_post_endpoints_info
 
 delete_post_endpoints_info:
   call: http.post
@@ -61,8 +55,60 @@ delete_post_endpoints_info:
       path: "/Ruuter/POST/services/endpoints/info"
       keyword: "${name}-"
   result: results
-  next: return_result
+
+delete_get_common_endpoints:
+  call: http.post
+  args:
+    url: "[#SERVICE_NODE]/file/delete-all-that-starts-with"
+    body:
+      path: "/Ruuter/GET/services/endpoints/common"
+      keyword: "${name}-"
+  result: results
+
+delete_get_common_endpoints_configs:
+  call: http.post
+  args:
+    url: "[#SERVICE_NODE]/file/delete-all-that-starts-with"
+    body:
+      path: "/Ruuter/GET/services/endpoints/configs/common"
+      keyword: "${name}-"
+  result: results
+
+delete_get_common_endpoints_info:
+  call: http.post
+  args:
+    url: "[#SERVICE_NODE]/file/delete-all-that-starts-with"
+    body:
+      path: "/Ruuter/GET/services/endpoints/info/common"
+      keyword: "${name}-"
+  result: results
+
+delete_post_common_endpoints:
+  call: http.post
+  args:
+    url: "[#SERVICE_NODE]/file/delete-all-that-starts-with"
+    body:
+      path: "/Ruuter/POST/services/endpoints/common"
+      keyword: "${name}-"
+  result: results
+
+delete_post_common_endpoints_configs:
+  call: http.post
+  args:
+    url: "[#SERVICE_NODE]/file/delete-all-that-starts-with"
+    body:
+      path: "/Ruuter/POST/services/endpoints/configs/common"
+      keyword: "${name}-"
+  result: results
+
+delete_post_common_endpoints_info:
+  call: http.post
+  args:
+    url: "[#SERVICE_NODE]/file/delete-all-that-starts-with"
+    body:
+      path: "/Ruuter/POST/services/endpoints/info/common"
+      keyword: "${name}-"
+  result: results
 
 return_result:
   return: "Service Endpoints are deleted successfully"
-  next: end

@@ -1,0 +1,16 @@
+getConfigs:
+  call: http.post
+  args:
+    url: "[#SERVICE_ENDPOINTS]:[#SERVICE_ENDPOINTS_PORT]/services/endpoints/configs/service-endpoint-test-configs"
+  result: configs
+
+assign_step:
+  assign:
+    info:
+     url: https://httpbin.org/anything
+     user_id: 20    
+     headers: 
+       token: 'htbaslaiscvasjaskasyiuhashbxjhasgdqqysasjdhasd'  
+
+return_value:
+  return: ${[info , configs.response.body]}
