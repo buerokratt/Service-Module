@@ -94,7 +94,7 @@ const NewServicePage: React.FC = () => {
         </Card>
 
         {endpoints
-          .filter((endpoint) => endpoint.serviceId === id)
+          .filter((endpoint) => endpoint.serviceId === id || !endpoint.hasOwnProperty("serviceId"))
           .map((endpoint) => (
             <ApiEndpointCard key={endpoint.id} endpoint={endpoint} />
           ))}
