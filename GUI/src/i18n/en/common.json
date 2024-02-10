@@ -118,6 +118,7 @@
     "services": "Services",
     "commonServices": "Common Services",
     "create": "Create new service",
+    "descriptionCopiedSuccessfully": "Description copied successfully",
     "edit": "Edit",
     "delete": "Delete",
     "cancel": "Cancel",

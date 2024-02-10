@@ -25,6 +25,7 @@ const useServiceListStore = create<ServiceStoreState>((set, get, store) => ({
     const services = result.data.response.map((item: any) => ({
         id: item.id,
         name: item.name,
+        description: item.description,
         state: item.state,
         type: item.type,
         isCommon: item.iscommon,

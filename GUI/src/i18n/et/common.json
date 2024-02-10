@@ -118,6 +118,7 @@
     "services": "Teenused",
     "commonServices": "Ühised Teenused",
     "create": "Loo uus teenus",
+    "descriptionCopiedSuccessfully": "Kirjeldus kopeeritud edukalt",
     "edit": "Muuda",
     "delete": "Kustuta",
     "cancel": "Tühista",
