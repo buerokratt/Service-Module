@@ -1,10 +1,10 @@
 import axios from 'axios';
 import { create } from 'zustand';
 import { v4 as uuid } from "uuid";
-import { Edge, EdgeChange, Node, NodeChange, NodeDimensionChange, ReactFlowInstance, applyEdgeChanges, applyNodeChanges } from "reactflow";
+import { Edge, EdgeChange, Node, NodeChange, ReactFlowInstance, applyEdgeChanges, applyNodeChanges } from "reactflow";
 import { EndpointData, EndpointEnv, EndpointTab, EndpointVariableData, PreDefinedEndpointEnvVariables } from 'types/endpoint';
 import { getSecretVariables, getServiceById, getTaraAuthResponseVariables } from 'resources/api-constants';
-import { Service, Step, StepType } from 'types';
+import { Service, ServiceState, Step, StepType } from 'types';
 import { RequestVariablesTabsRawData, RequestVariablesTabsRowsData } from 'types/request-variables';
 import useToastStore from './toasts.store';
 import i18next from 'i18next';
@@ -12,9 +12,9 @@ import { ROUTES } from 'resources/routes-constants';
 import { NavigateFunction } from 'react-router-dom';
 import { editServiceInfo, saveFlowClick } from 'services/service-builder';
 import { GRID_UNIT, NodeDataProps, initialEdge, initialNodes } from 'types/service-flow';
-import { UpdateFlowInputRules, alignNodesInCaseAnyGotOverlapped, buildEdge, buildPlaceholder, updateFlowInputRules } from 'services/flow-builder';
+import { alignNodesInCaseAnyGotOverlapped, buildEdge, buildPlaceholder, updateFlowInputRules } from 'services/flow-builder';
 
-interface ServiceState {
+interface ServiceStoreState {
   endpoints: EndpointData[];
   name: string;
   serviceId: string;
@@ -23,6 +23,7 @@ interface ServiceState {
   edges: Edge[],
   nodes: Node[],
   isNewService: boolean,
+  serviceState: ServiceState;
   markAsNewService: () => void,
   unmarkAsNewService: () => void,
   setServiceId: (id: string) => void,
@@ -32,6 +33,8 @@ interface ServiceState {
   setIsCommon: (isCommon: boolean) => void;
   secrets: PreDefinedEndpointEnvVariables;
   availableVariables: PreDefinedEndpointEnvVariables;
+  isTestButtonVisible: boolean;
+  isSaveButtonEnabled: () => boolean;
   getFlatVariables: () => string[];
   serviceNameDashed: () => string;
   deleteEndpoint: (id: string) => void;
@@ -75,7 +78,7 @@ interface ServiceState {
   setReactFlowInstance: (reactFlowInstance: ReactFlowInstance | null) => void;
 }
 
-const useServiceStore = create<ServiceState>((set, get, store) => ({
+const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
   endpoints: [],
   name: '',
   serviceId: uuid(),
@@ -83,6 +86,17 @@ const useServiceStore = create<ServiceState>((set, get, store) => ({
   edges: [],
   nodes: [],
   isNewService: true,
+  serviceState: ServiceState.Draft,
+  isTestButtonVisible: false,
+  isTestButtonEnabled: true,
+  disableTestButton: () => set({ 
+    isTestButtonEnabled: false,
+  }),
+  enableTestButton: () => set({ 
+    isTestButtonEnabled: true,
+    isTestButtonVisible: true,
+   }),
+  isSaveButtonEnabled: () => get().endpoints.length > 0,
   markAsNewService: () => set({ isNewService: true }),
   unmarkAsNewService: () => set({ isNewService: false }),
   setServiceId: (id) => set({ serviceId: id }),
@@ -218,6 +232,7 @@ const useServiceStore = create<ServiceState>((set, get, store) => ({
         nodes,
         endpoints,
         isNewService: false,
+        serviceState: service.data[0].state,
       });
     }
 
@@ -407,7 +422,7 @@ const useServiceStore = create<ServiceState>((set, get, store) => ({
     }
 
     if(get().isNewService) {
-      await saveFlowClick(() => {});
+      await saveFlowClick();
       set({ 
         isNewService: false
       });
@@ -547,13 +562,6 @@ const useServiceStore = create<ServiceState>((set, get, store) => ({
   },
   onEdgesChange: (changes: EdgeChange[]) => {
     get().setEdges((eds) => applyEdgeChanges(changes, eds))
-  },
-  isTestButtonEnabled: true,
-  disableTestButton: () => {
-    set({ isTestButtonEnabled: false });
-  },
-  enableTestButton: () => {
-    set({ isTestButtonEnabled: true });
   },
 }));
 

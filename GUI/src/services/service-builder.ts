@@ -1,7 +1,13 @@
 import axios from "axios";
 import i18next from 'i18next';
 import { Edge, Node } from "reactflow";
-import { createNewService, editService, updateServiceEndpoints, jsonToYml, testDraftService } from "resources/api-constants";
+import { 
+  createNewService, 
+  editService, 
+  updateServiceEndpoints, 
+  jsonToYml, 
+  testService, 
+} from "resources/api-constants";
 import useServiceStore from "store/new-services.store";
 import useToastStore from "store/toasts.store";
 import { RawData, Step, StepType } from "types";
@@ -699,6 +705,7 @@ const getTemplateDataFromNode = (node: Node): { templateName: string; body?: any
 };
 
 const getDefinedEndpointStep = (steps: Step[], node: Node) => {
+  const name = useServiceStore.getState().name;
   const endpoint = steps.find((e) => e.label === node.data.label)?.data;
   const selectedEndpoint = endpoint?.definedEndpoints.find((e) => e.isSelected);
   if (!selectedEndpoint || !endpoint) {
@@ -759,7 +766,7 @@ export const saveDraft = async () => {
   return true;
 };
 
-export const saveFlowClick = async (onSuccess: () => void) => {
+export const saveFlowClick = async () => {
   const name = useServiceStore.getState().serviceNameDashed();
   const serviceId = useServiceStore.getState().serviceId;
   const description = useServiceStore.getState().description;
@@ -771,11 +778,11 @@ export const saveFlowClick = async (onSuccess: () => void) => {
 
   await saveFlow(steps, name, edges, nodes,
     () => {
-      onSuccess();
       useToastStore.getState().success({
         title: i18next.t("newService.toast.success"),
         message: i18next.t("newService.toast.savedSuccessfully"),
       });
+      useServiceStore.getState().enableTestButton();
     },
     (e) => {
       useToastStore.getState().error({
@@ -784,22 +791,6 @@ export const saveFlowClick = async (onSuccess: () => void) => {
       });
     }, description, isCommon, serviceId, isNewService);
 }
-
-export const runServiceTest = async () => {
-  const name = useServiceStore.getState().serviceNameDashed();
-
-  try {
-    await axios.post(testDraftService(name), {});
-    useToastStore.getState().success({
-      title: "Test result- success",
-    });
-  } catch (error) {
-    console.log("ERROR: ", error);
-    useToastStore.getState().error({
-      title: "Test result - error",
-    });
-  }
-};
 
 export const editServiceInfo = async () => {
   const name = useServiceStore.getState().serviceNameDashed();
@@ -831,3 +822,20 @@ export const editServiceInfo = async () => {
     });
   });
 }
+
+export const runServiceTest = async () => {
+  const name = useServiceStore.getState().serviceNameDashed();
+  const state = useServiceStore.getState().serviceState;
+
+  try {
+    await axios.post(testService(state, name), {});
+    useToastStore.getState().success({
+      title: "Test result- success",
+    });
+  } catch (error) {
+    console.log("ERROR: ", error);
+    useToastStore.getState().error({
+      title: "Test result - error",
+    });
+  }
+};

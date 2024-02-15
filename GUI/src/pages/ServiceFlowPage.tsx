@@ -9,7 +9,7 @@ import apiIconTag from "../assets/images/api-icon-tag.svg";
 import { StepType, Step, ConditionRuleType } from "../types";
 import useServiceStore from "store/new-services.store";
 import { NodeDataProps } from "types/service-flow";
-import { runServiceTest, saveFlowClick } from "services/service-builder";
+import { saveFlowClick } from "services/service-builder";
 import "reactflow/dist/style.css";
 import "./ServiceFlowPage.scss";
 
@@ -51,6 +51,8 @@ const ServiceFlowPage: FC = () => {
   const setNodes = useServiceStore((state) => state.setNodes);
   const setEdges = useServiceStore((state) => state.setEdges);
 
+  const onNodesChange = useCallback((changes: NodeChange[]) => setNodes((nds) => applyNodeChanges(changes, nds)), []);
+  const onEdgesChange = useCallback((changes: EdgeChange[]) => setEdges((eds) => applyEdgeChanges(changes, eds)), []);
   const [isTestButtonVisible, setIsTestButtonVisible] = useState(false);
   const isTestButtonEnabled = useServiceStore(state => state.isTestButtonEnabled);
 
@@ -103,14 +105,10 @@ const ServiceFlowPage: FC = () => {
     <>
       <NewServiceHeader
         activeStep={3}
-        saveDraftOnClick={() => saveFlowClick(() => { 
-          setIsTestButtonVisible(true);
-          useServiceStore.getState().enableTestButton();
-        })}
+        availableVariables={availableVariables}
+        serviceDescription={description}
+        saveDraftOnClick={saveFlowClick}
         continueOnClick={() => navigate(ROUTES.OVERVIEW_ROUTE)}
-        isTestButtonVisible={isTestButtonVisible}
-        isTestButtonEnabled={isTestButtonEnabled}
-        onTestButtonClick={runServiceTest}
       />
       <h1 style={{ paddingLeft: 16, paddingTop: 16 }}>
         {t("serviceFlow.flow")} "{name}"

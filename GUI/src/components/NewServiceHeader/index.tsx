@@ -1,12 +1,21 @@
 import React, { FC } from "react";
 import { t } from "i18next";
 import { Button, HeaderStepCounter, Track } from "..";
+import { PreDefinedEndpointEnvVariables } from "../../types/endpoint";
+import useServiceStore from "store/new-services.store";
+import { runServiceTest } from "services/service-builder";
 import "@buerokratt-ria/header/src/header/Header.scss";
 
 type NewServiceHeaderProps = {
   activeStep: number;
   continueOnClick: () => void;
   saveDraftOnClick: () => void;
+  availableVariables?: PreDefinedEndpointEnvVariables;
+  flow?: string;
+  secrets?: { [key: string]: any };
+  serviceDescription?: string;
+  isCommon?: boolean;
+  serviceId?: string;
   isSaveButtonEnabled?: boolean;
   isTestButtonVisible?: boolean;
   isTestButtonEnabled?: boolean;
@@ -17,11 +26,11 @@ const NewServiceHeader: FC<NewServiceHeaderProps> = ({
   activeStep,
   continueOnClick,
   saveDraftOnClick,
-  isSaveButtonEnabled = true,
-  isTestButtonVisible = false,
-  isTestButtonEnabled = true,
-  onTestButtonClick,
 }) => {
+  const isSaveButtonEnabled = useServiceStore(state => state.isSaveButtonEnabled());
+  const isTestButtonVisible = useServiceStore(state => state.isTestButtonVisible);
+  const isTestButtonEnabled = useServiceStore(state => state.isTestButtonEnabled);
+
   return (
     <>
       <header className="header" style={{ paddingLeft: 24 }}>
@@ -35,7 +44,7 @@ const NewServiceHeader: FC<NewServiceHeaderProps> = ({
             {t("global.continue")}
           </Button>
           {isTestButtonVisible && (
-            <Button onClick={onTestButtonClick} disabled={!isTestButtonEnabled}>
+            <Button onClick={runServiceTest} disabled={!isTestButtonEnabled}>
               {t("global.testService")}
             </Button>
           )}

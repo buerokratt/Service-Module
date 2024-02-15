@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 import * as RadixToast from '@radix-ui/react-toast'
 
 import Toast from './index'
-import useToastStore from '../../store/toasts.store'
+import useToastStore from 'store/toasts.store'
 
 export const ToastProvider: FC<PropsWithChildren> = ({ children }) => {
   const { t } = useTranslation();

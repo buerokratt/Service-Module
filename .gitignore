@@ -3,10 +3,12 @@
 /tim-db
 /DSL/Ruuter/POST/services/active
 /DSL/Ruuter/POST/services/draft
+/DSL/Ruuter/POST/services/inactive
 /DSL/Ruuter/POST/services/endpoints
 /DSL/Ruuter/POST/services/inactive
 /DSL/Ruuter/GET/services/active
 /DSL/Ruuter/GET/services/draft
+/DSL/Ruuter/GET/services/inactive
 /DSL/Ruuter/GET/services/endpoints
 /DSL/Ruuter/GET/services/inactive
 .DS_Store
