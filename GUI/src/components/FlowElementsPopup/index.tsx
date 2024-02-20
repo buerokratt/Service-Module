@@ -73,16 +73,6 @@ const FlowElementsPopup: React.FC<FlowElementsPopupProps> = ({
   const isReadonly = node.data.readonly;
 
   const handleSaveClick = () => {
-    if (stepType === StepType.Input) {
-      const count = isYesNoQuestion ? 2 : rules.length;
-      const result = [];
-      for (let i = 0; i < count; i++) {
-        let item = null;
-        if (i < oldRules.length) item = oldRules[i];
-        result.push(item);
-      }
-      return onRulesUpdate(result, rules);
-    }
     const updatedNode = {
       ...node,
       data: {
