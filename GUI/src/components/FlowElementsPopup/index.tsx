@@ -42,7 +42,7 @@ const FlowElementsPopup: React.FC<FlowElementsPopupProps> = ({
   const { t } = useTranslation();
   const [selectedTab, setSelectedTab] = useState<string | null>(null);
   const [isJsonRequestVisible, setIsJsonRequestVisible] = useState(false);
-  const [jsonRequestContent, setJsonRequestContent] = useState<string | null>(null);
+  const [jsonRequestContent, setJsonRequestContent] = useState<any>(null);
 
   const isUserDefinedNode = node?.data?.stepType === "user-defined";
 
@@ -100,14 +100,14 @@ const FlowElementsPopup: React.FC<FlowElementsPopupProps> = ({
 
       if (!endpoint) return;
 
-      const response = await axios.post(servicesRequestsExplain(), {
+      const response = {
         url: endpoint.url,
         method: endpoint.methodType,
         headers: extractMapValues(endpoint.headers),
         body: extractMapValues(endpoint.body),
         params: extractMapValues(endpoint.params),
-      });
-      setJsonRequestContent(response.data);
+      };
+      setJsonRequestContent(response);
       setIsJsonRequestVisible(true);
     } catch (error) {
       console.error("Error: ", error);
