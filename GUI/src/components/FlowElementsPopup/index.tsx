@@ -48,7 +48,6 @@ const FlowElementsPopup: React.FC<FlowElementsPopupProps> = ({
 
   const endpoints = useServiceStore(state => state.endpoints);
   const rules = useFlowStore(state => state.rules);
-  const isYesNoQuestion = useFlowStore(state => state.isYesNoQuestion);
 
   useEffect(() => {
     if (node) node.data.rules = rules;
