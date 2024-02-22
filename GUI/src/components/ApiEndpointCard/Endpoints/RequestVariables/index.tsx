@@ -29,6 +29,7 @@ type RequestVariablesProps = {
   requestValues: PreDefinedEndpointEnvVariables;
   requestTab: RequestTab;
   setRequestTab: React.Dispatch<React.SetStateAction<RequestTab>>;
+  onParametersChange: (params: EndpointVariableData[]) => void;
 };
 
 const RequestVariables: React.FC<RequestVariablesProps> = ({
@@ -39,6 +40,7 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
   requestTab,
   setRequestTab,
   parentEndpointId,
+  onParametersChange,
 }) => {
   const { t } = useTranslation();
   const tabs: EndpointTab[] = [EndpointTab.Params, EndpointTab.Headers, EndpointTab.Body];
@@ -231,6 +233,9 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
           variable={rowsData[requestTab.tab]!.find((r) => r.id === props.row.id)?.variable ?? ""}
           updateRowVariable={updateRowVariable}
           rowData={rowsData[requestTab.tab]![+props.row.id]}
+          onValueChange={(rowId, value) => {
+            updateParams(false, rowId, value);
+          }}
         />
       ),
     }),
@@ -250,6 +255,9 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
           rowData={rowsData[requestTab.tab]![+props.row.id]}
           value={rowsData[requestTab.tab]!.find((r) => r.id === props.row.id)?.value ?? ""}
           updateRowValue={updateRowValue}
+          onValueChange={(rowId, value) => {
+            updateParams(true, rowId, value);
+          }}
         />
       ),
     }),
@@ -279,6 +287,36 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
       },
     }),
   ];
+
+  const updateParams = (isValue: boolean, rowId: string, value: string) => {
+    if (requestTab.tab === "params") {
+      if (!rowsData[requestTab.tab]) return;
+      const newData = rowsData[requestTab.tab]!.map((row) => {
+        if (row.id !== rowId) return row;
+        if (isValue) {
+          row.value = value;
+        } else {
+          row.variable = value;
+        }
+        return row;
+      });
+
+      const parameters: EndpointVariableData[] = [];
+      newData.forEach((row) => {
+        if (!row.value || !row.variable) return;
+
+        parameters.push({
+          id: row.endpointVariableId !== undefined ? row.endpointVariableId : row.id,
+          name: row.variable,
+          type: row.type ?? "custom",
+          required: row.required ?? false,
+          value: row.value,
+        });
+      });
+
+      onParametersChange(parameters);
+    }
+  };
 
   const buildRawDataView = (): JSX.Element => {
     return (

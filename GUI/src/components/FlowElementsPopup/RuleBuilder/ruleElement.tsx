@@ -1,8 +1,11 @@
-import React, { useState } from 'react';
-import { conditionOptions } from 'store/flow.store';
+import React from 'react';
 import { Rule } from './types';
 import { FormInput, FormSelect, Icon, Track } from 'components';
 import { MdDeleteOutline } from 'react-icons/md';
+
+export const conditionOptions = [ 
+  '==', '===', '!=', '!==', '>', '<', '>=', '<='
+].map(x => ({ label: x, value: x }));
 
 interface RuleElementProps {
   rule: Rule;
@@ -11,8 +14,17 @@ interface RuleElementProps {
 }
 
 const RuleElement: React.FC<RuleElementProps> = ({ rule, onRemove, onChange }) => {
+  
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    onChange({ ...rule, [e.target.name]: e.target.value });
+    change(e.target.name, e.target.value);
+  }
+  
+  const handleSelectionChange = (e: { label: string; value: string; } | null) => {
+    change('operator', e?.value);
+  }
+
+  const change = (name: string, value?: string) => {
+    onChange({ ...rule, [name]: value })
   }
 
   return (
@@ -27,8 +39,9 @@ const RuleElement: React.FC<RuleElementProps> = ({ rule, onRemove, onChange }) =
         />
         <FormSelect
           value={rule.operator}
+          defaultValue={rule.operator}
           name='operator'
-          onChange={handleChange}
+          onSelectionChange={handleSelectionChange}
           options={conditionOptions}
           label=''
           hideLabel

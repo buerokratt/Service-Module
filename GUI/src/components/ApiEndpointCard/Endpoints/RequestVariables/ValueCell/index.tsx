@@ -12,9 +12,10 @@ type ValueCellProps = {
   value: string;
   rowData?: RequestVariablesRowData;
   updateRowValue: (id: string, value: string) => void;
+  onValueChange: (rowId: string, value: string) => void;
 };
 
-const ValueCell: React.FC<ValueCellProps> = ({ row, requestValues, updateRowValue, rowData, isLive, value }) => {
+const ValueCell: React.FC<ValueCellProps> = ({ row, requestValues, updateRowValue, rowData, isLive, value, onValueChange }) => {
   const { t } = useTranslation();
   const [inputValue, setInputValue] = useState(value);
   const ref = useRef<HTMLDivElement>(null);
@@ -41,7 +42,10 @@ const ValueCell: React.FC<ValueCellProps> = ({ row, requestValues, updateRowValu
         placeholder={t("global.choose")}
         data={isLive ? requestValues.prod : [...requestValues.prod, ...requestValues.test]}
         value={inputValue}
-        onChange={(v: string) => setInputValue(v)}
+        onChange={(v: string) => {
+          onValueChange(row.id, v);
+          setInputValue(v);
+        }}
         onSelected={(v) => {
           setInputValue(v);
           updateRowValue(row.id, v);

@@ -1,16 +1,12 @@
 import axios from "axios";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { MdErrorOutline } from "react-icons/md";
 import { v4 as uuid } from "uuid";
 import { Button, FormInput, FormSelect, Icon, RequestVariables, Track } from "../../..";
 import { getEndpointValidation } from "../../../../resources/api-constants";
 import { RequestTab } from "../../../../types";
-import {
-  EndpointData,
-  EndpointVariableData,
-  PreDefinedEndpointEnvVariables,
-} from "../../../../types/endpoint";
+import { EndpointData, EndpointVariableData, PreDefinedEndpointEnvVariables } from "../../../../types/endpoint";
 import useServiceStore from "store/new-services.store";
 import useToastStore from "store/toasts.store";
 
@@ -33,6 +29,7 @@ const EndpointCustom: React.FC<EndpointCustomProps> = ({
   const [urlError, setUrlError] = useState<string>();
   const [key, setKey] = useState<number>(0);
   const { setEndpoints } = useServiceStore();
+  const ref = useRef<HTMLInputElement>(null);
 
   // initial endpoint data
   if (endpoint.definedEndpoints.length === 0) {
@@ -61,7 +58,7 @@ const EndpointCustom: React.FC<EndpointCustomProps> = ({
   }
 
   useEffect(() => setKey(key + 1), [isLive]);
-  
+
   const refereshEndpoint = () => {
     setEndpoints((endpoint) => endpoint);
     setKey((prevKey) => prevKey + 1);
@@ -89,10 +86,12 @@ const EndpointCustom: React.FC<EndpointCustomProps> = ({
               />
             </div>
             <FormInput
+              ref={ref}
               style={{ borderRadius: "0 4px 4px 0" }}
               name="endpointUrl"
               label=""
               defaultValue={endpoint.definedEndpoints[0].url ?? ""}
+              value={endpoint.definedEndpoints[0].url ?? ""}
               onChange={(event) => {
                 const parsedUrl = parseURL(event.target.value);
                 endpoint.definedEndpoints[0].url = parsedUrl.url;
@@ -160,6 +159,23 @@ const EndpointCustom: React.FC<EndpointCustomProps> = ({
         requestTab={requestTab}
         setRequestTab={setRequestTab}
         parentEndpointId={endpoint.id}
+        onParametersChange={(parameters) => {
+          const url = new URL(endpoint.definedEndpoints[0].url ?? "");
+          url.searchParams.forEach((_, key) => {
+            url.searchParams.delete(key);
+          });
+          parameters.forEach((param: EndpointVariableData) => {
+            url.searchParams.set(param.name, param.value ?? "");
+          });
+          endpoint.definedEndpoints[0].params = {
+            variables: parameters,
+            rawData: {},
+          };
+          endpoint.definedEndpoints[0].url = url.href ?? "";
+          if (ref?.current) {
+            ref.current.value = url.href ?? "";
+          }
+        }}
       />
     </Track>
   );

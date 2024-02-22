@@ -16,38 +16,23 @@ import axios from "axios";
 import { servicesRequestsExplain } from "../../resources/api-constants";
 import OpenWebPageContent from "./OpenWebPageContent";
 import OpenWebPageTestContent from "./OpenWebPageTestContent";
-import { Node } from "reactflow";
 import RasaRulesContent from "./RasaRulesContent";
-import { ConditionRuleType, StepType } from "../../types";
+import { StepType } from "../../types";
 import useServiceStore from "store/new-services.store";
-import useFlowStore from "store/flow.store";
 import FileSignContent from "./FileSignContent";
 import "./styles.scss";
 
-interface FlowElementsPopupProps {
-  node: any;
-  onClose: () => void;
-  onSave: (updatedNode: Node) => void;
-  onRulesUpdate: (rules: (string | null)[], rulesData: ConditionRuleType[]) => void;
-  oldRules: (string | null)[];
-}
-
-const FlowElementsPopup: React.FC<FlowElementsPopupProps> = ({
-  node,
-  onClose,
-  onSave,
-  oldRules,
-  onRulesUpdate,
-}) => {
+const FlowElementsPopup: React.FC = () => {
   const { t } = useTranslation();
   const [selectedTab, setSelectedTab] = useState<string | null>(null);
   const [isJsonRequestVisible, setIsJsonRequestVisible] = useState(false);
   const [jsonRequestContent, setJsonRequestContent] = useState<any>(null);
+  const node = useServiceStore(state => state.selectedNode);
 
   const isUserDefinedNode = node?.data?.stepType === "user-defined";
 
   const endpoints = useServiceStore(state => state.endpoints);
-  const rules = useFlowStore(state => state.rules);
+  const rules = useServiceStore(state => state.rules);
 
   useEffect(() => {
     if (node) node.data.rules = rules;
@@ -65,11 +50,34 @@ const FlowElementsPopup: React.FC<FlowElementsPopupProps> = ({
   // StepType.FileSign
   const [signOption, setSignOption] = useState<{ label: string; value: string } | null>(node?.data.signOption ?? null);
 
+  const stepType = node?.data.stepType;
+
+  useEffect(() => {
+    if(stepType !== StepType.Input) return;
+    if(!node?.data?.rules) return;
+
+    useServiceStore.getState().changeRulesNode(node.data.rules);
+  }, [stepType === StepType.Input]);
+  
   if (!node) return <></>;
 
-  const stepType = node.data.stepType;
   const title = node.data.label;
   const isReadonly = node.data.readonly;
+
+
+  const onClose = () => {
+    setSelectedTab(null);
+    setIsJsonRequestVisible(false);
+    setJsonRequestContent(null);
+    setTextfieldMessage(null);
+    setWebpageName(null);
+    setWebpageUrl(null);
+    setFileName(null);
+    setFileContent(null);
+    setTextfieldMessagePlaceholders({});
+    useServiceStore.getState().resetSelectedNode();
+    useServiceStore.getState().resetRules();
+  };
 
   const handleSaveClick = () => {
     const updatedNode = {
@@ -84,7 +92,12 @@ const FlowElementsPopup: React.FC<FlowElementsPopupProps> = ({
         signOption: signOption ?? node.data?.signOption,
       },
     };
-    onSave(updatedNode);
+    
+    if (stepType === StepType.Input) {
+      updatedNode.data.rules = rules;
+    }
+
+    useServiceStore.getState().handlePopupSave(updatedNode);
   };
 
   const handleJsonRequestClick = async () => {
@@ -125,18 +138,6 @@ const FlowElementsPopup: React.FC<FlowElementsPopupProps> = ({
     return result;
   }
 
-  const resetStates = () => {
-    setSelectedTab(null);
-    setIsJsonRequestVisible(false);
-    setJsonRequestContent(null);
-    setTextfieldMessage(null);
-    setWebpageName(null);
-    setWebpageUrl(null);
-    setFileName(null);
-    setFileContent(null);
-    setTextfieldMessagePlaceholders({});
-  };
-
   const getJsonRequestButtonTitle = () => {
     if (!isUserDefinedNode || selectedTab === t("serviceFlow.tabs.test")) return "";
     if (isJsonRequestVisible) return t("serviceFlow.popup.hideJsonRequest");
@@ -145,12 +146,9 @@ const FlowElementsPopup: React.FC<FlowElementsPopupProps> = ({
 
   return (
     <Popup
-      style={{ maxWidth: 700 }}
+      style={{ maxWidth: 700, overflow: 'visible' }}
       title={title}
-      onClose={() => {
-        resetStates();
-        onClose();
-      }}
+      onClose={onClose}
       footer={
         <Track direction="horizontal" gap={16} justify="between" style={{ width: "100%" }}>
           <Button appearance="text" onClick={handleJsonRequestClick}>
@@ -162,12 +160,7 @@ const FlowElementsPopup: React.FC<FlowElementsPopupProps> = ({
                 {t("global.cancel")}
               </Button>
             )}
-            <Button
-              onClick={() => {
-                handleSaveClick();
-                resetStates();
-              }}
-            >
+            <Button onClick={handleSaveClick}>
               {t(isReadonly ? "global.close" : "global.save")}
             </Button>
           </Track>

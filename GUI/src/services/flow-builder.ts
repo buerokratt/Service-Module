@@ -308,7 +308,6 @@ export const onDrop = (
   event: React.DragEvent<HTMLDivElement>,
   reactFlowWrapper: React.RefObject<HTMLDivElement>,
   setDefaultMessages: (stepType: StepType) => any,
-  updateInputRules: (rules: UpdateFlowInputRules) => void,
 ) => {
   // Dragging and dropping the element from the list on the left
   // onto the placeholder node adds it to the flow
@@ -397,7 +396,6 @@ export const onDrop = (
           ].includes(type),
           childrenCount: type === StepType.Input ? 0 : 1,
           setClickedNode: useServiceStore.getState().setClickedNode,
-          update: updateInputRules,
           message: setDefaultMessages(type),
         },
         className: [StepType.FinishingStepEnd, StepType.FinishingStepRedirect].includes(type)

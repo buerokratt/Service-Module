@@ -13,6 +13,7 @@ import { NavigateFunction } from 'react-router-dom';
 import { editServiceInfo, saveFlowClick } from 'services/service-builder';
 import { GRID_UNIT, NodeDataProps, initialEdge, initialNodes } from 'types/service-flow';
 import { alignNodesInCaseAnyGotOverlapped, buildEdge, buildPlaceholder, updateFlowInputRules } from 'services/flow-builder';
+import { GroupOrRule } from 'components/FlowElementsPopup/RuleBuilder/types';
 
 interface ServiceStoreState {
   endpoints: EndpointData[];
@@ -24,6 +25,10 @@ interface ServiceStoreState {
   nodes: Node[],
   isNewService: boolean,
   serviceState: ServiceState;
+  rules: GroupOrRule[];
+  isYesNoQuestion: boolean;
+  setIsYesNoQuestion: (value: boolean) => void;
+  changeRulesNode: (rules: GroupOrRule[]) => void;
   markAsNewService: () => void,
   unmarkAsNewService: () => void,
   setServiceId: (id: string) => void,
@@ -59,9 +64,11 @@ interface ServiceStoreState {
   updateEndpointRawData: (rawData: RequestVariablesTabsRawData, endpointDataId?: string, parentEndpointId?: string) => void;
   updateEndpointData: (data: RequestVariablesTabsRowsData, endpointDataId?: string, parentEndpointId?:string) => void;
   resetState: () => void;
+  resetRules: () => void;
   onContinueClick: (navigate: NavigateFunction) => Promise<void>;
   selectedNode: Node<NodeDataProps> | null;
   setSelectedNode: (node: Node<NodeDataProps> | null | undefined) => void;
+  resetSelectedNode: () => void;
   handleNodeEdit: (selectedNodeId: string) => void;
   onDelete: (id: string, shouldAddPlaceholder: boolean) => void;
   clickedNode: any;
@@ -71,6 +78,7 @@ interface ServiceStoreState {
   isTestButtonEnabled: boolean;
   disableTestButton: () => void;
   enableTestButton: () => void;
+  handlePopupSave: (updatedNode: Node<NodeDataProps>) => void;
 
   // TODO: remove the following funtions and refactor the code to use more specific functions
   setEndpoints: (callback: (prev: EndpointData[]) => EndpointData[]) => void;
@@ -83,12 +91,16 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
   name: '',
   serviceId: uuid(),
   description: '',
-  edges: [],
-  nodes: [],
+  edges: [initialEdge],
+  nodes: initialNodes,
   isNewService: true,
   serviceState: ServiceState.Draft,
   isTestButtonVisible: false,
   isTestButtonEnabled: true,
+  rules: [],
+  isYesNoQuestion: false,
+  setIsYesNoQuestion: (value: boolean) => set({ isYesNoQuestion: value }),
+  changeRulesNode: (rules) =>  set({ rules }),
   disableTestButton: () => set({ 
     isTestButtonEnabled: false,
   }),
@@ -185,11 +197,14 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
       reactFlowInstance: null,
       selectedTab: EndpointEnv.Live,
       isNewService: true,
-      edges: [],
-      nodes: [],
+      edges: [initialEdge],
+      nodes: initialNodes,
       isTestButtonEnabled: true,
+      rules: [],
+      isYesNoQuestion: false,
     })
   },
+  resetRules: () => set({ rules: [], isYesNoQuestion: false, }),
   loadService: async (id) => {
     get().resetState();
     let nodes = get().nodes;
@@ -211,7 +226,7 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
       if(!endpoints || !(endpoints instanceof Array))
         endpoints = [];
 
-        nodes = nodes.map((node: any) => {
+      nodes = nodes.map((node: any) => {
         if (node.type !== "customNode") return node;
         node.data = {
           ...node.data,
@@ -563,6 +578,40 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
   onEdgesChange: (changes: EdgeChange[]) => {
     get().setEdges((eds) => applyEdgeChanges(changes, eds))
   },
+  resetSelectedNode: () => set({ selectedNode: null }),
+  handlePopupSave: (updatedNode) => {
+    const selectedNode = get().selectedNode;
+    get().resetSelectedNode();
+    if (selectedNode?.data.stepType === StepType.FinishingStepEnd) return;
+
+    get().setNodes((prevNodes) =>
+      prevNodes.map((prevNode) => {
+        if (prevNode.id !== selectedNode!.id) return prevNode;
+        if (
+          prevNode.data.message != updatedNode.data.message ||
+          prevNode.data.link != updatedNode.data.link ||
+          prevNode.data.linkText != updatedNode.data.linkText ||
+          prevNode.data.fileName != updatedNode.data.fileName ||
+          prevNode.data.fileContent != updatedNode.data.fileContent ||
+          prevNode.data.signOption != updatedNode.data.signOption
+        ) {
+          useServiceStore.getState().disableTestButton();
+        }
+        return {
+          ...prevNode,
+          data: {
+            ...prevNode.data,
+            message: updatedNode.data.message,
+            link: updatedNode.data.link,
+            linkText: updatedNode.data.linkText,
+            fileName: updatedNode.data.fileName,
+            fileContent: updatedNode.data.fileContent,
+            signOption: updatedNode.data.signOption,
+          },
+        };
+      })
+    );
+  }
 }));
 
 export default useServiceStore;

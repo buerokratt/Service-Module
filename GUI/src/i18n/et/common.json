@@ -205,6 +205,7 @@
       "conversationEnd": "Vestluse lõpetamine",
       "redirectConversationToSupport": "Klienditeenindusse suunamine",
       "rules": "Reeglid",
+      "rasaRules": "Rasa reeglid",
       "siga": "SiGa"
     },
     "popup": {

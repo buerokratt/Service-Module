@@ -4,6 +4,7 @@ export interface RuleGroupBuilderProps {
   group?: Group;
   onRemove?: (id: string) => void;
   onChange: (config: any) => void;
+  seedGroup?: any;
 }
 
 export interface Rule {
@@ -17,12 +18,14 @@ export type GroupType = 'and' | 'or';
 
 export interface Group {
   id: string;
-  children: (Rule | Group)[];
+  children: GroupOrRule[];
   type: GroupType;
   not: boolean;
 }
 
-export const isInstanceOfRule = (x: Rule | Group): boolean => 'operator' in x;
+export type GroupOrRule = Group | Rule;
+
+export const isInstanceOfRule = (x: GroupOrRule): boolean => 'operator' in x;
 
 export const getInitialRule = () => {
   return {

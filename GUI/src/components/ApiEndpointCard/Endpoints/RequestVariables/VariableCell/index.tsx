@@ -9,9 +9,10 @@ type VariableCellProps = {
   updateRowVariable: (id: string, variable: string) => void;
   variable: string;
   rowData?: RequestVariablesRowData;
+  onValueChange: (rowId: string, value: string) => void;
 };
 
-const VariableCell: React.FC<VariableCellProps> = ({ row, updateRowVariable, rowData, variable }) => {
+const VariableCell: React.FC<VariableCellProps> = ({ row, updateRowVariable, rowData, variable, onValueChange }) => {
   const { t } = useTranslation();
   const [inputValue, setInputValue] = useState(variable);
   const ref = useRef<HTMLInputElement>(null);
@@ -37,7 +38,10 @@ const VariableCell: React.FC<VariableCellProps> = ({ row, updateRowVariable, row
       style={{ borderRadius: "0 4px 4px 0" }}
       name={`endpoint-variable-${row.id}`}
       label=""
-      onChange={(e) => setInputValue(e.target.value)}
+      onChange={(e) => {
+        onValueChange(row.id, e.target.value);
+        setInputValue(e.target.value);
+      }}
       value={inputValue}
       placeholder={t("newService.endpoint.variable") + ".."}
     />
