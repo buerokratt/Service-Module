@@ -97,7 +97,7 @@ services:
 
   data_mapper:
     container_name: data_mapper
-    image: data-mapper
+    image: datamapper-node
     environment:
       - PORT=3005
       - CONTENT_FOLDER=/data
@@ -109,7 +109,6 @@ services:
       - ./DSL/DMapper/server/controllers:/workspace/app/services/controllers
       - ./DSL/DMapper/server/js/file:/workspace/app/js/services/file
       - ./DSL/DMapper/server/js/secrets:/workspace/app/js/secrets
-      - ./DSL/DMapper/server/js/util:/workspace/app/js/util
       - ./secrets:/data/secrets
     ports:
       - 3005:3005
@@ -131,35 +130,35 @@ services:
     networks:
       - bykstack
 
-  gui_dev:
-    container_name: gui_dev
-    environment:
-      - NODE_ENV=development
-      - CHOKIDAR_USEPOLLING=true
-      - REACT_APP_API_URL=http://localhost:8086
-      - REACT_APP_TRAINING_MODULE_GUI_BASE_URL=http://localhost:3001
-      - PORT=3006
-      - REACT_APP_APP_PORT=3006
-      - REACT_APP_MENU_BASE_URL=http://localhost:8086
-      - REACT_APP_MENU_URL=https://admin.dev.buerokratt.ee
-      - REACT_APP_RUUTER_V2_SERVICE_API_URL=http://localhost:8086
-      - REACT_APP_AUTH_BASE_URL=http://localhost:8086
-      - REACT_APP_AUTH_PATH=/auth
-      - REACT_APP_MENU_PATH=/chat/menu.json
-      - REACT_APP_API_PATH=/
-      - REACT_APP_LOCAL=true
-      - REACT_APP_RUUTER_API_URL=http://localhost:8086
-      - REACT_APP_RUUTER_PRIVATE_API_URL=http://localhost:8086
-    build:
-      context: ./GUI
-      dockerfile: Dockerfile.dev
-    ports:
-      - 3006:3006
-    volumes:
-      - /app/node_modules
-      - ./GUI:/app
-    networks:
-      - bykstack
+  # gui_dev:
+    # container_name: gui_dev
+    # environment:
+    #   - NODE_ENV=development
+    #   - CHOKIDAR_USEPOLLING=true
+    #   - REACT_APP_API_URL=http://localhost:8086
+    #   - REACT_APP_TRAINING_MODULE_GUI_BASE_URL=http://localhost:3001
+    #   - PORT=3006
+    #   - REACT_APP_APP_PORT=3006
+    #   - REACT_APP_MENU_BASE_URL=http://localhost:8086
+    #   - REACT_APP_MENU_URL=https://admin.dev.buerokratt.ee
+    #   - REACT_APP_RUUTER_V2_SERVICE_API_URL=http://localhost:8086
+    #   - REACT_APP_AUTH_BASE_URL=http://localhost:8086
+    #   - REACT_APP_AUTH_PATH=/auth
+    #   - REACT_APP_MENU_PATH=/chat/menu.json
+    #   - REACT_APP_API_PATH=/
+    #   - REACT_APP_LOCAL=true
+    #   - REACT_APP_RUUTER_API_URL=http://localhost:8086
+    #   - REACT_APP_RUUTER_PRIVATE_API_URL=http://localhost:8086
+    # build:
+    #   context: ./GUI
+    #   dockerfile: Dockerfile.dev
+    # ports:
+    #   - 3006:3006
+    # volumes:
+    #   - /app/node_modules
+    #   - ./GUI:/app
+    # networks:
+    #   - bykstack
 
   tim:
     container_name: tim
