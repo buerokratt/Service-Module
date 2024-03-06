@@ -463,8 +463,7 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
       const edgeToDeletedNode = reactFlowInstance.getEdges().find((edge) => edge.target === id);
       if (!deletedNode) return;
       let updatedNodes: Node[] = [];
-      let currentEdges: Edge[] = [];
-      get().setEdges((prevEdges) => (currentEdges = prevEdges));
+      let currentEdges: Edge[] = get().edges;
       get().setNodes((prevNodes) => {
         let newNodes: Node[] = [];
 
@@ -532,6 +531,7 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
       });
 
       if (!edgeToDeletedNode || !shouldAddPlaceholder) return;
+
       get().setEdges((prevEdges) => {
         // check if previous node points to anything
         if (prevEdges.find((edge) => edge.source === edgeToDeletedNode.source)) {
@@ -542,12 +542,18 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
         get().setNodes((prevNodes) => {
           const sourceNode = prevNodes.find((node) => node.id === edgeToDeletedNode.source);
           if (!sourceNode) return prevNodes;
+          let x = sourceNode.position.x;
+          // Green starting node is not aligned with others, thus small offset is needed
+          if(sourceNode.type === 'startNode')
+           x = initialNodes[1].position.x; 
+          if(sourceNode.type === "input")
+            x = sourceNode.position.x - 10.5 * GRID_UNIT;
+
           const placeholder = buildPlaceholder({
             id: deletedNode.id,
             position: {
               y: sourceNode.position.y + (sourceNode.height ?? 0),
-              // Green starting node is not aligned with others, thus small offset is needed
-              x: sourceNode.type === "input" ? sourceNode.position.x - 10.5 * GRID_UNIT : sourceNode.position.x,
+              x,
             },
           });
           return [...prevNodes, placeholder];

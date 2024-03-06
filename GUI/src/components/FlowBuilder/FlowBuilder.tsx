@@ -70,6 +70,32 @@ const FlowBuilder: FC<FlowBuilderProps> = ({
     }
   };
 
+  const onNodeMouseEnter = (event: any, node: Node) => {
+    console.log('-log->onNodeMouseEnter')
+    setNodes((prevNodes) =>
+      prevNodes.map((prevNode) => {
+        if (prevNode.type === "customNode" && prevNode.data === node.data) {
+          prevNode.selected = true;
+          prevNode.className = "selected";
+        }
+        return prevNode;
+      })
+    );
+  }
+
+  const onNodeMouseLeave = (event: any, node: Node) => {
+    console.log('-log->onNodeMouseLeave')
+    setNodes((prevNodes) =>
+      prevNodes.map((prevNode) => {
+        if (prevNode.type === "customNode" && prevNode.data === node.data) {
+          prevNode.selected = false;
+          prevNode.className = prevNode.data.type;
+        }
+        return prevNode;
+      })
+    );
+  }
+
   return (
     <div className={description.length > 0 ? "graph__bodyWithDescription" : "graph__body"} ref={reactFlowWrapper}>
       <ReactFlow
@@ -88,28 +114,8 @@ const FlowBuilder: FC<FlowBuilderProps> = ({
         onNodeDrag={onNodeDrag}
         onNodeDragStop={onNodeDragStop}
         onNodeDragStart={onNodeDragStart}
-        onNodeMouseEnter={(_, node) => {
-          setNodes((prevNodes) =>
-            prevNodes.map((prevNode) => {
-              if (prevNode.type === "customNode" && prevNode.data === node.data) {
-                prevNode.selected = true;
-                prevNode.className = "selected";
-              }
-              return prevNode;
-            })
-          );
-        }}
-        onNodeMouseLeave={(_, node) => {
-          setNodes((prevNodes) =>
-            prevNodes.map((prevNode) => {
-              if (prevNode.type === "customNode" && prevNode.data === node.data) {
-                prevNode.selected = false;
-                prevNode.className = prevNode.data.type;
-              }
-              return prevNode;
-            })
-          );
-        }}
+        onNodeMouseEnter={onNodeMouseEnter}
+        onNodeMouseLeave={onNodeMouseLeave}
       >
         <Controls />
         <MiniMap />

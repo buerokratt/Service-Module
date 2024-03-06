@@ -2,11 +2,10 @@ import { Dispatch, FC, SetStateAction } from "react";
 import { Handle, NodeProps, Position } from "reactflow";
 import { useTranslation } from "react-i18next";
 import { MdDeleteOutline, MdOutlineEdit, MdOutlineRemoveRedEye } from "react-icons/md";
-
-import { Box, Button, Icon, Track } from "../";
 import StepNode from "./StepNode";
-import "./Node.scss";
+import { Box, Button, Icon, Track } from "../";
 import { StepType } from "../../types";
+import "./Node.scss";
 
 type NodeDataProps = {
   data: {
@@ -57,7 +56,17 @@ const CustomNode: FC<NodeProps & NodeDataProps> = (props) => {
     );
   };
 
-  return selected ? (
+  if (!selected) {
+    return (
+      <>
+        <Handle type="target" position={Position.Top} isConnectable={isConnectable} />
+        <StepNode data={data} />
+        {bottomHandles()}
+      </>
+    );
+  }
+
+  return (
     <div className="selected">
       <Handle type="target" position={Position.Top} isConnectable={isConnectable} style={{ display: "none" }} />
 
@@ -84,12 +93,6 @@ const CustomNode: FC<NodeProps & NodeDataProps> = (props) => {
       </Box>
       {bottomHandles()}
     </div>
-  ) : (
-    <>
-      <Handle type="target" position={Position.Top} isConnectable={isConnectable} />
-      <StepNode data={data} />
-      {bottomHandles()}
-    </>
   );
 };
 
