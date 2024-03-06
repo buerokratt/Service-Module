@@ -52,9 +52,9 @@ const FlowBuilder: FC<FlowBuilderProps> = ({
     [reactFlowInstance, edges]
   );
 
-  const onNodeDragStop = useCallback((event: any, draggedNode: Node) => 
-    onFlowNodeDragStop(event, draggedNode, reactFlowWrapper, startDragNode),
-  []);
+  const onNodeDragStop = useCallback((event: any, draggedNode: Node) => {
+    onFlowNodeDragStop(event, draggedNode, reactFlowWrapper, startDragNode)
+  }, []);
 
   const onDragOver = useCallback((event: any) => {
     event.preventDefault();
@@ -71,7 +71,6 @@ const FlowBuilder: FC<FlowBuilderProps> = ({
   };
 
   const onNodeMouseEnter = (event: any, node: Node) => {
-    console.log('-log->onNodeMouseEnter')
     setNodes((prevNodes) =>
       prevNodes.map((prevNode) => {
         if (prevNode.type === "customNode" && prevNode.data === node.data) {
@@ -84,7 +83,6 @@ const FlowBuilder: FC<FlowBuilderProps> = ({
   }
 
   const onNodeMouseLeave = (event: any, node: Node) => {
-    console.log('-log->onNodeMouseLeave')
     setNodes((prevNodes) =>
       prevNodes.map((prevNode) => {
         if (prevNode.type === "customNode" && prevNode.data === node.data) {
