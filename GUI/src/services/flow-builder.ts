@@ -286,22 +286,29 @@ export const onNodeDrag = (_event: React.MouseEvent, draggedNode: Node) => {
 
   const draggedEdges = edges.filter((edge) => edge.source === draggedNode.id);
   if (draggedEdges.length === 0) return;
-  const placeholders = nodes.filter(
-    (node) => draggedEdges.map((edge) => edge.target).includes(node.id) && node.type === "placeholder"
+  const placeholders = nodes.filter((node) => 
+    draggedEdges.map((edge) => edge.target).includes(node.id) && node.type === "placeholder"
   );
   // only drag placeholders following the node
   if (placeholders.length === 0) return;
 
-  useServiceStore.getState().setNodes((prevNodes) =>
+  useServiceStore.getState().setNodes((prevNodes) => 
     prevNodes.map((prevNode) => {
-      placeholders.forEach((placeholder) => {
-        if (prevNode.id !== placeholder.id) return;
-        prevNode.position.x = draggedNode.position.x;
-        prevNode.position.y = EDGE_LENGTH + draggedNode.position.y + (draggedNode.height ?? 0);
-      });
+      if(placeholders.length === 2) {
+        if(prevNode.id === placeholders[0].id) {
+          prevNode.position.y = draggedNode.position.y + EDGE_LENGTH * 2;
+          prevNode.position.x = draggedNode.position.x - (draggedNode.width ?? 0) * 0.75;          
+        }
+        if(prevNode.id === placeholders[1].id) {
+          prevNode.position.y = draggedNode.position.y + EDGE_LENGTH * 2;
+          prevNode.position.x = draggedNode.position.x + (draggedNode.width ?? 0) * 0.75;          
+        }
+      } else if(prevNode.id === placeholders[0].id) {
+          prevNode.position.x = draggedNode.position.x;
+          prevNode.position.y = EDGE_LENGTH + draggedNode.position.y + (draggedNode.height ?? 0);
+      }
       return prevNode;
-    })
-  );
+  }));
 }
 
 export const onDrop = (
@@ -356,7 +363,7 @@ export const onDrop = (
         }),
       ];
 
-      if (![StepType.Input, StepType.FinishingStepEnd, StepType.FinishingStepRedirect].includes(type)) {
+      if (![StepType.FinishingStepEnd, StepType.FinishingStepRedirect].includes(type)) {
         // Point edge from new node to new placeholder
         newEdges.push(
           buildEdge({
@@ -367,6 +374,18 @@ export const onDrop = (
           })
         );
       }
+
+      if(StepType.Input === type) {
+        newEdges.push(
+          buildEdge({
+            id: `edge-${newNodeId}-${newPlaceholderId + 2}`,
+            source: newNodeId,
+            sourceHandle: `handle-${newNodeId}-1`,
+            target: `${newPlaceholderId + 2}`,
+          })
+        );
+      }
+
       return newEdges;
     });
 
@@ -394,7 +413,7 @@ export const onDrop = (
             StepType.FinishingStepRedirect,
             StepType.UserDefined,
           ].includes(type),
-          childrenCount: type === StepType.Input ? 0 : 1,
+          childrenCount: type === StepType.Input ? 2 : 1,
           setClickedNode: useServiceStore.getState().setClickedNode,
           message: setDefaultMessages(type),
         },
@@ -412,6 +431,28 @@ export const onDrop = (
           matchingPlaceholder,
         })
       );
+    }
+
+    if(StepType.Input === type) {
+      newNodes.push(
+        buildPlaceholder({
+          id: `${newPlaceholderId + 1}`,
+          position: {
+            y: matchingPlaceholder.position.y + EDGE_LENGTH,
+            x: matchingPlaceholder.position.x - (matchingPlaceholder.width ?? 0) * 0.75,
+          },
+        })
+      );
+
+      newNodes.push(
+        buildPlaceholder({
+          id: `${newPlaceholderId + 2}`,
+          position: {
+            y: matchingPlaceholder.position.y + EDGE_LENGTH,
+            x: matchingPlaceholder.position.x + (matchingPlaceholder.width ?? 0) * 0.75,
+          },
+        })
+      )
     }
 
     return newNodes;
