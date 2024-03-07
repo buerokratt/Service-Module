@@ -42,7 +42,7 @@ const TextfieldContent: FC<TextfieldContentProps> = ({ defaultMessage, onChange 
       </Track>
       <Track direction="vertical" align="left" style={{ width: "100%", ...popupBodyCss, backgroundColor: "#F9F9F9" }}>
         <label htmlFor="json">{t("serviceFlow.popup.availableOutputElementsLabel")}</label>
-        <Track direction="horizontal" gap={4} justify="start" isMultiline={true}>
+        <Track direction="horizontal" gap={4} justify="start" isMultiline={true} style={{height: '30vh', overflow:'auto'}}>
           {variables.map((element, i) => (
             <OutputElementBox key={`${element}-${i}`} text={element}></OutputElementBox>
           ))}
