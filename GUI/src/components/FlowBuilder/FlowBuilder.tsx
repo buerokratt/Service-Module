@@ -52,9 +52,9 @@ const FlowBuilder: FC<FlowBuilderProps> = ({
     [reactFlowInstance, edges]
   );
 
-  const onNodeDragStop = useCallback((event: any, draggedNode: Node) => 
-    onFlowNodeDragStop(event, draggedNode, reactFlowWrapper, startDragNode),
-  []);
+  const onNodeDragStop = useCallback((event: any, draggedNode: Node) => {
+    onFlowNodeDragStop(event, draggedNode, reactFlowWrapper, startDragNode)
+  }, []);
 
   const onDragOver = useCallback((event: any) => {
     event.preventDefault();
@@ -69,6 +69,30 @@ const FlowBuilder: FC<FlowBuilderProps> = ({
         return t("serviceFlow.popup.redirectToCustomerSupport");
     }
   };
+
+  const onNodeMouseEnter = (event: any, node: Node) => {
+    setNodes((prevNodes) =>
+      prevNodes.map((prevNode) => {
+        if (prevNode.type === "customNode" && prevNode.data === node.data) {
+          prevNode.selected = true;
+          prevNode.className = "selected";
+        }
+        return prevNode;
+      })
+    );
+  }
+
+  const onNodeMouseLeave = (event: any, node: Node) => {
+    setNodes((prevNodes) =>
+      prevNodes.map((prevNode) => {
+        if (prevNode.type === "customNode" && prevNode.data === node.data) {
+          prevNode.selected = false;
+          prevNode.className = prevNode.data.type;
+        }
+        return prevNode;
+      })
+    );
+  }
 
   return (
     <div className={description.length > 0 ? "graph__bodyWithDescription" : "graph__body"} ref={reactFlowWrapper}>
@@ -88,28 +112,8 @@ const FlowBuilder: FC<FlowBuilderProps> = ({
         onNodeDrag={onNodeDrag}
         onNodeDragStop={onNodeDragStop}
         onNodeDragStart={onNodeDragStart}
-        onNodeMouseEnter={(_, node) => {
-          setNodes((prevNodes) =>
-            prevNodes.map((prevNode) => {
-              if (prevNode.type === "customNode" && prevNode.data === node.data) {
-                prevNode.selected = true;
-                prevNode.className = "selected";
-              }
-              return prevNode;
-            })
-          );
-        }}
-        onNodeMouseLeave={(_, node) => {
-          setNodes((prevNodes) =>
-            prevNodes.map((prevNode) => {
-              if (prevNode.type === "customNode" && prevNode.data === node.data) {
-                prevNode.selected = false;
-                prevNode.className = prevNode.data.type;
-              }
-              return prevNode;
-            })
-          );
-        }}
+        onNodeMouseEnter={onNodeMouseEnter}
+        onNodeMouseLeave={onNodeMouseLeave}
       >
         <Controls />
         <MiniMap />
