@@ -31,6 +31,7 @@ import Section from "./Section";
 import Tooltip from "./Tooltip";
 import Track from "./Track";
 import ExclamationBadge from "./ExclamationBadge";
+import CheckBadge from "./CheckBadge";
 import OutputElementBox from "./OutputElementBox";
 import FlowElementsPopup from "./FlowElementsPopup";
 import ApiEndpointCard from "./ApiEndpointCard";
@@ -51,6 +52,7 @@ export {
   EndpointCustom,
   EndpointOpenAPI,
   ExclamationBadge,
+  CheckBadge,
   FlowBuilder,
   FormAutocomplete,
   FormCheckbox,

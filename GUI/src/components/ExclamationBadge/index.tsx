@@ -4,9 +4,13 @@ import Icon from "../Icon";
 
 import './ExclamationBadge.scss';
 
-const ExclamationBadge: FC = () => {
+interface ExclamationBadgeProps { 
+  color?: 'red' | 'purple';
+}
+
+const ExclamationBadge: FC<ExclamationBadgeProps> = ({ color = 'red' }) => {
   return (
-    <span className="badge__rounded">
+    <span className={`badge__rounded badge__${color}`}>
       <Icon className="icon" icon={<AiOutlineExclamation />} size="medium" />
     </span>
   );

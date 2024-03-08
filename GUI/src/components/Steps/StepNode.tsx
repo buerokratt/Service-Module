@@ -1,7 +1,7 @@
 import { FC, memo } from "react";
 import { useTranslation } from "react-i18next";
 
-import { ExclamationBadge, Track } from "../";
+import { ExclamationBadge, CheckBadge, Track } from "../";
 import { StepType } from "../../types";
 
 type NodeDataProps = {
@@ -48,6 +48,12 @@ const StepNode: FC<NodeDataProps> = ({ data }) => {
     return !(data.readonly || !!data.message?.length);
   };
 
+  const isTestedAndPassed = () => {
+    if(isStepInvalid())
+      return false;
+    return true;
+  }
+
   return (
     <Track
       style={{ overflow: "hidden", whiteSpace: "nowrap", textOverflow: "ellipsis" }}
@@ -55,7 +61,12 @@ const StepNode: FC<NodeDataProps> = ({ data }) => {
       align="left"
     >
       <p>
-        {isStepInvalid() && <ExclamationBadge></ExclamationBadge>}
+        {isTestedAndPassed() 
+          ? <CheckBadge /> 
+          : isStepInvalid() 
+            ? <ExclamationBadge /> 
+            : <ExclamationBadge color="purple"/>
+        }
         {data.label}
       </p>
       {data.stepType === StepType.Textfield && (
