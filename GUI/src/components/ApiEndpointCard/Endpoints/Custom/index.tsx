@@ -28,7 +28,7 @@ const EndpointCustom: React.FC<EndpointCustomProps> = ({
   const { t } = useTranslation();
   const [urlError, setUrlError] = useState<string>();
   const [key, setKey] = useState<number>(0);
-  const { setEndpoints } = useServiceStore();
+  const { setEndpoints, testUrl } = useServiceStore();
   const ref = useRef<HTMLInputElement>(null);
 
   // initial endpoint data
@@ -116,28 +116,16 @@ const EndpointCustom: React.FC<EndpointCustomProps> = ({
             />
           </Track>
           <Button
-            onClick={async () => {
-              try {
-                new URL(endpoint.definedEndpoints[0].url ?? "");
-                if (endpoint.definedEndpoints[0].methodType === "GET") {
-                  await axios.post(getEndpointValidation(), {
-                    url: endpoint.definedEndpoints[0].url ?? "",
-                    type: "GET",
-                  });
-                } else {
-                  await axios.post(getEndpointValidation(), {
-                    url: endpoint.definedEndpoints[0].url ?? "",
-                    type: "POST",
-                  });
-                }
+            onClick={() => testUrl(
+              endpoint,
+              () => {
                 setUrlError(undefined);
                 useToastStore.getState().success({
                   title: t("newService.endpoint.success"),
                 });
-              } catch (e) {
-                setUrlError(t("newService.endpoint.error") ?? undefined);
-              }
-            }}
+              },
+              () => setUrlError(t("newService.endpoint.error") ?? undefined),
+            )}
           >
             {t("newService.test")}
           </Button>

@@ -3,7 +3,7 @@ import { create } from 'zustand';
 import { v4 as uuid } from "uuid";
 import { Edge, EdgeChange, Node, NodeChange, ReactFlowInstance, applyEdgeChanges, applyNodeChanges } from "reactflow";
 import { EndpointData, EndpointEnv, EndpointTab, EndpointVariableData, PreDefinedEndpointEnvVariables } from 'types/endpoint';
-import { getSecretVariables, getServiceById, getTaraAuthResponseVariables } from 'resources/api-constants';
+import { getEndpointValidation, getSecretVariables, getServiceById, getTaraAuthResponseVariables } from 'resources/api-constants';
 import { Service, ServiceState, Step, StepType } from 'types';
 import { RequestVariablesTabsRawData, RequestVariablesTabsRowsData } from 'types/request-variables';
 import useToastStore from './toasts.store';
@@ -79,6 +79,7 @@ interface ServiceStoreState {
   disableTestButton: () => void;
   enableTestButton: () => void;
   handlePopupSave: (updatedNode: Node<NodeDataProps>) => void;
+  testUrl: (endpoint: EndpointData, onError: () => void, onSuccess: () => void) => Promise<void>;
 
   // TODO: remove the following funtions and refactor the code to use more specific functions
   setEndpoints: (callback: (prev: EndpointData[]) => EndpointData[]) => void;
@@ -617,6 +618,25 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
         };
       })
     );
+  },
+  testUrl: async (endpoint, onError, onSuccess) => {
+    try {
+      new URL(endpoint.definedEndpoints[0].url ?? "");
+      if (endpoint.definedEndpoints[0].methodType === "GET") {
+        await axios.post(getEndpointValidation(), {
+          url: endpoint.definedEndpoints[0].url ?? "",
+          type: "GET",
+        });
+      } else {
+        await axios.post(getEndpointValidation(), {
+          url: endpoint.definedEndpoints[0].url ?? "",
+          type: "POST",
+        });
+      }
+      onSuccess();
+    } catch (e) {
+      onError();
+    }
   }
 }));
 

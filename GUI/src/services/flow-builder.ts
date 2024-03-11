@@ -326,9 +326,10 @@ export const onDrop = (
   if (!reactFlowInstance || !reactFlowWrapper.current) return;
 
   // const reactFlowBounds = reactFlowWrapper.current.getBoundingClientRect();
-  const [label, type] = [
+  const [label, type, originalDefinedNodeId] = [
     event.dataTransfer.getData("application/reactflow-label"),
     event.dataTransfer.getData("application/reactflow-type") as StepType,
+    event.dataTransfer.getData("application/reactflow-originalDefinedNodeId"),
   ];
   const position = reactFlowInstance.screenToFlowPosition({
     x: event.clientX,
@@ -416,6 +417,7 @@ export const onDrop = (
           childrenCount: type === StepType.Input ? 2 : 1,
           setClickedNode: useServiceStore.getState().setClickedNode,
           message: setDefaultMessages(type),
+          originalDefinedNodeId: type === StepType.UserDefined ? originalDefinedNodeId : undefined,
         },
         className: [StepType.FinishingStepEnd, StepType.FinishingStepRedirect].includes(type)
           ? "finishing-step"
@@ -457,6 +459,7 @@ export const onDrop = (
 
     return newNodes;
   });
+  
   useServiceStore.getState().disableTestButton();
 };
 
