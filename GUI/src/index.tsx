@@ -1,11 +1,9 @@
 import React from 'react'
 import { createRoot } from 'react-dom/client'
-import ReactDOM from 'react-dom/client';
 import './i18n';
 import { QueryClient, QueryClientProvider, QueryFunction } from '@tanstack/react-query';
 import App from './App'
 import api from './services/api';
-import {mockApi} from "./services/mock-apis";
 import apiDev from "./services/api-dev";
 import apiDevV2 from "./services/api-dev-v2";
 import auth from "./services/auth";

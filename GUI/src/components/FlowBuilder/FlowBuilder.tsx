@@ -43,11 +43,9 @@ const FlowBuilder: FC<FlowBuilderProps> = ({
   const reactFlowInstance = useServiceStore(state => state.reactFlowInstance);
   const setReactFlowInstance = useServiceStore(state => state.setReactFlowInstance);
 
-  const onNodeDragStart = useCallback(
-    (_: any, draggedNode: Node) => {
+  const onNodeDragStart = useCallback((event: any, draggedNode: Node) => {
       if (!reactFlowInstance || !reactFlowWrapper.current) return;
       startDragNode.current = draggedNode;
-      // setStartDragNode((draggedNode) => [...startDragNode, ...draggedNode]);
     },
     [reactFlowInstance, edges]
   );
@@ -61,14 +59,14 @@ const FlowBuilder: FC<FlowBuilderProps> = ({
     event.dataTransfer.dropEffect = "move";
   }, []);
 
-  const setDefaultMessages = (stepType: StepType) => {
+  const setDefaultMessages = useCallback((stepType: StepType) => {
     switch (stepType) {
       case StepType.FinishingStepEnd:
         return t("serviceFlow.popup.serviceEnded");
       case StepType.FinishingStepRedirect:
         return t("serviceFlow.popup.redirectToCustomerSupport");
     }
-  };
+  }, [t]);
 
   const onNodeMouseEnter = (event: any, node: Node) => {
     setNodes((prevNodes) =>
