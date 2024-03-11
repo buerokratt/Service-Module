@@ -11,6 +11,7 @@ type FormSelectProps = SelectHTMLAttributes<HTMLSelectElement> & {
   label: string;
   name: string;
   hideLabel?: boolean;
+  placeholder?: string,
   options: {
     label: string;
     value: string;

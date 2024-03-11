@@ -75,10 +75,9 @@ const ApiEndpointCard: FC<EndpointCardProps> = ({ endpoint }) => {
                 <label htmlFor="service-type">{t("newService.uses")}</label>
                 <FormSelect
                   name="service-type"
-                  label={""}
+                  label=""
                   options={options}
                   disabled={selectedTab === EndpointEnv.Test}
-                  placeholder={t("global.choose") ?? ""}
                   onSelectionChange={(selection) => {
                     setOption(selection);
                     changeServiceEndpointType(endpoint.id, selection?.value ?? '');
