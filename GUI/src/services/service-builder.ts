@@ -279,9 +279,9 @@ const assignEndpointVariables = (
 export async function saveEndpoints(
   endpoints: EndpointData[],
   name: string,
-  onSuccess: (e: any) => void,
-  onError: (e: any) => void,
   id: string,
+  onSuccess?: (e: any) => void,
+  onError?: (e: any) => void,
 ) {
   const tasks: Promise<any>[] = [];
   const serviceEndpoints = endpoints.filter(e => e.serviceId === id || !e.hasOwnProperty('serviceId')).map(x => x);
@@ -547,7 +547,7 @@ export const saveFlow = async (
 
 
     const endpoints = steps.filter(x => !!x.data).map(x => x.data!);
-    await saveEndpoints(endpoints, name, onSuccess, onError, serviceId);
+    await saveEndpoints(endpoints, name, serviceId);
   } catch (e: any) {
     onError(e);
     useToastStore.getState().error({
@@ -749,6 +749,7 @@ export const saveDraft = async () => {
   await saveEndpoints(
     endpoints,
     name,
+    id,
     () => {
       useToastStore.getState().success({
         title: i18next.t("newService.toast.success"),
@@ -761,7 +762,6 @@ export const saveDraft = async () => {
         message: i18next.t("newService.toast.saveFailed"),
       });
     },
-    id,
   );
   return true;
 };
@@ -808,7 +808,7 @@ export const editServiceInfo = async () => {
   }
   ));
 
-  await saveEndpoints(endpoints, endPointsName, () => { }, (_) => { }, serviceId);
+  await saveEndpoints(endpoints, endPointsName, serviceId);
 
   await Promise.all(tasks)
     .then(() => useToastStore.getState().success({
