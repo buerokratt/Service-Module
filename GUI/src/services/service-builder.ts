@@ -490,7 +490,7 @@ export const saveFlow = async (
               .map((e) => {
                 const node = nodes.find((node) => node.id === e.target);
                 if (!node) return e.target;
-                const matchingRule = parentNode.data?.rules?.find(
+                const matchingRule = parentNode.data?.rules?.children?.find(
                   (_: never, i: number) => `rule ${i + 1}` === node.data.label
                 );
                 const followingNode = nodes.find(
