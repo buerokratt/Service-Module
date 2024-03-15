@@ -1,0 +1,254 @@
+.chatWrapper {
+  z-index: 99;
+  position: fixed;
+  margin: 1em;
+  right: 250px;
+  bottom: 0;
+  max-width: 350px;
+}
+
+.chat {
+  display: flex;
+  flex-direction: column;
+  background: #ffffff;
+  box-shadow: 0 4px 4px gray;
+  height: 100%;
+  border-radius: 8px;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.header {
+  display: flex;
+  background: blue;
+  border-radius: 8px 8px 0 0;
+  padding: 0.5em;
+  justify-content: space-between;
+  align-items: center;
+  box-sizing: border-box;
+  position: relative;
+  width: calc(100% + 2px);
+  transform: translate(-1px);
+  border-bottom: 1px solid gray;
+  user-select: none;
+  min-width: 300px;
+
+  .title {
+    flex-direction: row;
+    display: flex;
+    margin: 0 1rem;
+    justify-content: center;
+    color: white;
+    font-size: 22px;
+    text-align: center;
+  }
+
+  button {
+    background: transparent;
+    border: transparent;
+    cursor: pointer;
+    padding: 0;
+    height: 32px;
+    width: 32px;
+    margin-left: 0.5em;
+
+    &:focus {
+      outline: 2px solid lightblue;
+      border-radius: 1px;
+    }
+  }
+
+  .actions {
+    display: flex;
+    position: absolute;
+    right: 0.5em;
+  }
+
+  .hidden {
+    opacity: 0;
+  }
+}
+
+.chatContent {
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  overflow-x: hidden;
+  margin-bottom: auto;
+  height: 20em;
+}
+
+.message {
+  margin: 0.4em;
+  margin-bottom: 0;
+
+  &:last-of-type {
+    margin-bottom: 0.4em;
+  }
+
+  border: 1px solid transparent;
+  color: white;
+  align-items: flex-start;
+
+  .content {
+    padding: 0.4em 1em;
+    word-break: break-word;
+    white-space: pre-wrap;
+  }
+
+  .icon {
+    display: flex;
+    width: 2.8em;
+    height: 2.8em;
+    flex-shrink: 0;
+  }
+
+
+  &.client {
+    margin-left: 4em;
+    margin-right: 0.8em;
+    display: flex;
+    flex-direction: row-reverse;
+
+    .content {
+      text-align: right;
+      border-radius: 48px 6px 29px 48px;
+      background-color: #3c0078;
+      margin-right: 0.4em;
+    }
+  }
+
+  &.admin {
+    margin-right: 4em;
+    margin-left: 0.8em;
+    display: flex;
+    flex-direction: column;
+
+    .link {
+      color: white;
+      font-size: 0.95em;
+      text-decoration: underline;
+    }
+
+    .main {
+      display: flex;
+      align-items: flex-start;
+
+      .content {
+        border-radius: 6px 48px 48px 29px;
+        background-color: blue;
+      }
+      
+      .icon {
+        padding-right: 0.5em;
+      }
+    }
+  }
+}
+
+.keypad {
+  display: flex;
+  align-items: center;
+  height: 50px;
+  bottom: 0;
+  padding: 5px;
+  &.disabled {
+    pointer-events: none;
+    user-select: none;
+    path {
+      stroke: #575a5d;
+    }
+  }
+  .input {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    margin: 1em;
+    margin-right: 0.5em;
+    flex: 1;
+    border: 0;
+    outline: none;
+    border-bottom: 1px solid blue;
+    border-radius: 0;
+    padding-bottom: 5px;
+    color: inherit;
+    font: inherit;
+    &::placeholder {
+      color: lightgray;
+    }
+    &:disabled {
+      pointer-events: none;
+      user-select: none;
+      background-color: transparent;
+      border-bottom: 1px solid lightgray;
+    }
+  }
+  .button {
+    cursor: pointer;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0;
+    &:focus {
+      outline: 2px solid gray;
+      border-radius: 1px;
+    }
+  }
+}
+
+.system {
+  padding: 0.25em;
+  margin: 0.4em;
+  text-align: center;
+  font-style: italic;
+
+  &.success {
+    color: rgb(0, 138, 0);
+    background: #0f02;
+  }
+
+  &.error {
+    color: rgb(170, 0, 0);
+    background: #f002;
+  }
+
+  &.info {
+    color: rgb(0, 0, 203);
+    background: #00f2;
+  }
+
+  &.normal {
+    background: #0001;
+  }
+
+  .link {
+    text-decoration: underline;
+    padding-left: 0.1em;
+  }
+}
+
+
+.profile {
+  position: fixed;
+  bottom: 0;
+  right: 250px;
+
+  display: flex;
+  align-items: center;
+  padding: 1rem 1rem;
+  width: 77px;
+  height: 77px;
+  cursor: pointer;
+  background-color: blue;
+  border-radius: 50%;
+  margin: 1rem 1rem;
+  box-sizing: border-box;
+
+  &__wrapper {
+    position: fixed;
+    bottom: 0;
+    right: 0;
+  }
+}
