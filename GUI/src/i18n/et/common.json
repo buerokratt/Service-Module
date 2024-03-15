@@ -320,6 +320,13 @@
   },
   "chat": {
     "unanswered": "Vastamata",
-    "forwarded": "Suunatud"
+    "forwarded": "Suunatud",
+    "incomplete-service-flow" : "Puudulik teenusevoog",
+    "no-start-node" : "Alustamise sõlme ei leitud",
+    "end-of-chat": "Jõuti vestluse lõppu",
+    "loginWithTARA": "Jätkamiseks palun logi sisse läbi TARA",
+    "fileSignYesNo": "Kas soovid faili allkirjastada? Jah/Ei",
+    "redirectToCustomerSupport": "Vestlus suunatakse klienditeenindajale",
+    "waiting-for-user-input": "Ootan kasutaja sisendit"
   }
 }
