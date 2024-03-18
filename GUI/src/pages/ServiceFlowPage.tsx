@@ -11,6 +11,7 @@ import useServiceStore from "store/new-services.store";
 import { saveFlowClick } from "services/service-builder";
 import "reactflow/dist/style.css";
 import "./ServiceFlowPage.scss";
+import Chat from "components/chat/chat";
 
 const ServiceFlowPage: FC = () => {
   const { t } = useTranslation();
@@ -47,6 +48,7 @@ const ServiceFlowPage: FC = () => {
   const onDragStart = (event: React.DragEvent<HTMLDivElement>, step: Step) => {
     event.dataTransfer.setData("application/reactflow-label", step.label);
     event.dataTransfer.setData("application/reactflow-type", step.type);
+    event.dataTransfer.setData("application/reactflow-originalDefinedNodeId", step.data?.id ?? '');
     event.dataTransfer.effectAllowed = "move";
   };
 
@@ -132,6 +134,7 @@ const ServiceFlowPage: FC = () => {
             setNodes={setNodes}
             edges={edges}
           />
+          <Chat />
         </div>
       </ReactFlowProvider>
     </>

@@ -3,7 +3,7 @@ import { create } from 'zustand';
 import { v4 as uuid } from "uuid";
 import { Edge, EdgeChange, Node, NodeChange, ReactFlowInstance, applyEdgeChanges, applyNodeChanges } from "reactflow";
 import { EndpointData, EndpointEnv, EndpointTab, EndpointVariableData, PreDefinedEndpointEnvVariables } from 'types/endpoint';
-import { getSecretVariables, getServiceById, getTaraAuthResponseVariables } from 'resources/api-constants';
+import { getEndpointValidation, getSecretVariables, getServiceById, getTaraAuthResponseVariables } from 'resources/api-constants';
 import { Service, ServiceState, Step, StepType } from 'types';
 import { RequestVariablesTabsRawData, RequestVariablesTabsRowsData } from 'types/request-variables';
 import useToastStore from './toasts.store';
@@ -70,7 +70,7 @@ interface ServiceStoreState {
   setSelectedNode: (node: Node<NodeDataProps> | null | undefined) => void;
   resetSelectedNode: () => void;
   handleNodeEdit: (selectedNodeId: string) => void;
-  onDelete: (id: string, shouldAddPlaceholder: boolean) => void;
+  onDelete: (id: string) => void;
   clickedNode: any;
   setClickedNode: (clickedNode: any) => void;
   onNodesChange: (changes: NodeChange[]) => void;
@@ -79,6 +79,7 @@ interface ServiceStoreState {
   disableTestButton: () => void;
   enableTestButton: () => void;
   handlePopupSave: (updatedNode: Node<NodeDataProps>) => void;
+  testUrl: (endpoint: EndpointData, onError: () => void, onSuccess: () => void) => Promise<void>;
 
   // TODO: remove the following funtions and refactor the code to use more specific functions
   setEndpoints: (callback: (prev: EndpointData[]) => EndpointData[]) => void;
@@ -456,120 +457,46 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
     get().setSelectedNode(node);
    },
 
-  onDelete: (id, shouldAddPlaceholder) => {
+  onDelete: (id) => {
     const reactFlowInstance = get().reactFlowInstance;
-      if (!reactFlowInstance) return;
-      const deletedNode = reactFlowInstance.getNodes().find((node) => node.id === id);
-      const edgeToDeletedNode = reactFlowInstance.getEdges().find((edge) => edge.target === id);
-      if (!deletedNode) return;
-      let updatedNodes: Node[] = [];
-      let currentEdges: Edge[] = get().edges;
-      get().setNodes((prevNodes) => {
-        let newNodes: Node[] = [];
+    if (!reactFlowInstance) return;
 
-        if (deletedNode.data.stepType !== StepType.Input) {
-          // delete only targeted node
-          newNodes.push(...prevNodes.filter((node) => node.id !== id));
-        } else {
-          // delete input node with it's rules
-          const deletedRules = currentEdges.filter((edge) => edge.source === id).map((edge) => edge.target);
+    const edgeFromDeletedNode = reactFlowInstance.getEdges().filter(edge => edge.source === id).map(x => x.target);
+    let children = reactFlowInstance.getNodes().filter(node => edgeFromDeletedNode.includes(node.id));
 
-          newNodes.push(...prevNodes.filter((node) => node.id !== id && !deletedRules.includes(node.id)));
-        }
+    let nodes = get().nodes.filter(x => x.id !== id);
 
-        // cleanup leftover placeholders
-        newNodes = newNodes.filter((node) => {
-          if (node.type !== "placeholder") return true;
+    if(children.length === 2) {
+      if(children[0].type === 'placeholder') {
+        nodes = nodes.filter(x => x.id !== children[0].id);
+        children.shift();
+      }
+      else if(children[1].type === 'placeholder') {
+        nodes = nodes.filter(x => x.id !== children[1].id);
+        children.pop();
+      }
+      else
+        children = [];
+    }
 
-          const pointingEdge = currentEdges.find((edge) => edge.target === node.id);
-          const pointingEdgeSource = newNodes.find((newNode) => newNode.id === pointingEdge?.source);
-          if (!pointingEdgeSource) return false;
-          return true;
-        });
+    let child: Node | undefined;
 
-        updatedNodes = newNodes;
-        return newNodes;
-      });
+    if(children.length === 1)
+      child = children[0];
+    if(children.length === 0) {
+      const deletedNodePosition = reactFlowInstance.getNodes().find(node => node.id === id)?.position;
+      const placeholder = buildPlaceholder({ id, position: deletedNodePosition });
+      nodes.push(placeholder);
+      child = placeholder;
+    }
 
-      get().setEdges((prevEdges) => {
-        const toRemove = prevEdges.filter((edge) => {
-          if (deletedNode.data.stepType !== StepType.Input) {
-            // remove edges pointing to/from removed node
-            return edge.target === id || edge.source === id;
-          } else {
-            // remove edges not pointing to present nodes
-            return !updatedNodes.map((node) => node.id).includes(edge.target);
-          }
-        });
+    const edges = get().edges.filter(x => x.source !== id).map(x => 
+      x.target === id && child ? { ...x, target: child.id } : x
+    );
 
-        if (toRemove.length === 0) return prevEdges;
-        let newEdges = [...prevEdges.filter((edge) => !toRemove.includes(edge))];
-        if (
-          deletedNode.data.stepType !== StepType.Input &&
-          newEdges.length > 0 &&
-          toRemove.length > 1 &&
-          shouldAddPlaceholder
-        ) {
-          // if only 1 node was removed, point edge to whatever it was pointing to
-          newEdges.push(
-            buildEdge({
-              id: `edge-${toRemove[0].source}-${toRemove[toRemove.length - 1].target}`,
-              source: toRemove[0].source,
-              sourceHandle: toRemove[0].sourceHandle,
-              target: toRemove[toRemove.length - 1].target,
-            })
-          );
-        }
+    nodes = nodes.filter(x => edges.find(y => y.target === x.id || y.source === x.id));
 
-        // cleanup possible leftover edges
-        newEdges = newEdges.filter(
-          (edge) =>
-            updatedNodes.find((node) => node.id === edge.source) && updatedNodes.find((node) => node.id === edge.target)
-        );
-
-        return newEdges;
-      });
-
-      if (!edgeToDeletedNode || !shouldAddPlaceholder) return;
-
-      get().setEdges((prevEdges) => {
-        // check if previous node points to anything
-        if (prevEdges.find((edge) => edge.source === edgeToDeletedNode.source)) {
-          return prevEdges;
-        }
-
-        // Previous node points to nothing -> add placeholder with edge
-        get().setNodes((prevNodes) => {
-          const sourceNode = prevNodes.find((node) => node.id === edgeToDeletedNode.source);
-          if (!sourceNode) return prevNodes;
-          let x = sourceNode.position.x;
-          // Green starting node is not aligned with others, thus small offset is needed
-          if(sourceNode.type === 'startNode')
-           x = initialNodes[1].position.x; 
-          if(sourceNode.type === "input")
-            x = sourceNode.position.x - 10.5 * GRID_UNIT;
-
-          const placeholder = buildPlaceholder({
-            id: deletedNode.id,
-            position: {
-              y: sourceNode.position.y + (sourceNode.height ?? 0),
-              x,
-            },
-          });
-          return [...prevNodes, placeholder];
-        });
-
-        prevEdges.push(
-          buildEdge({
-            id: `edge-${edgeToDeletedNode.source}-${deletedNode.id}`,
-            source: edgeToDeletedNode.source,
-            sourceHandle: `handle-${edgeToDeletedNode.source}-1`,
-            target: deletedNode.id,
-          })
-        );
-        return prevEdges;
-      });
-      // get().setIsTestButtonEnabled(false); ??????? to do later 
+    set({ edges, nodes });
   },
   clickedNode: null,
   setClickedNode: (clickedNode) => set({ clickedNode }),
@@ -617,6 +544,25 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
         };
       })
     );
+  },
+  testUrl: async (endpoint, onError, onSuccess) => {
+    try {
+      new URL(endpoint.definedEndpoints[0].url ?? "");
+      if (endpoint.definedEndpoints[0].methodType === "GET") {
+        await axios.post(getEndpointValidation(), {
+          url: endpoint.definedEndpoints[0].url ?? "",
+          type: "GET",
+        });
+      } else {
+        await axios.post(getEndpointValidation(), {
+          url: endpoint.definedEndpoints[0].url ?? "",
+          type: "POST",
+        });
+      }
+      onSuccess();
+    } catch (e) {
+      onError();
+    }
   }
 }));
 

@@ -311,10 +311,6 @@
     "missing-file-generation": "Please enter file name and content",
     "missing-client_input-rules": "Please enter client input rules"
   },
-  "chat": {
-    "forwarder": "Forwarded",
-    "unanswered": "Unanswered"
-  },
   "roles": {
     "ROLE_ADMINISTRATOR": "Administrator",
     "ROLE_SERVICE_MANAGER": "Service manager",
@@ -322,5 +318,16 @@
     "ROLE_CHATBOT_TRAINER": "Chatbot trainer",
     "ROLE_ANALYST": "Analyst",
     "ROLE_UNAUTHENTICATED": "Unauthenticated"
+  },
+  "chat": {
+    "forwarder": "Forwarded",
+    "unanswered": "Unanswered",
+    "incomplete-service-flow" : "Incomplete Service Flow",
+    "no-start-node" : "No Start Node found",
+    "end-of-chat": "Reached end of chat",
+    "loginWithTARA": "To continue please log in with TARA",
+    "fileSignYesNo": "Do you want to sign this file? Yes/No",
+    "redirectToCustomerSupport": "Conversation will be redirected to Customer Support",
+    "waiting-for-user-input": "Waiting for user input"
   }
 }

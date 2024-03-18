@@ -10,7 +10,7 @@ import "./Node.scss";
 type NodeDataProps = {
   data: {
     label: string;
-    onDelete: (id: string, shouldAddPlaceholder: boolean) => void;
+    onDelete: (id: string) => void;
     onEdit: (id: string) => void;
     setClickedNode: Dispatch<SetStateAction<string>>;
     type: string;

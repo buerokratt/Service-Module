@@ -1,8 +1,9 @@
-import { FC, memo } from "react";
+import { FC, memo, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { ExclamationBadge, CheckBadge, Track } from "../";
 import { StepType } from "../../types";
+import useServiceStore from "store/new-services.store";
 
 type NodeDataProps = {
   data: {
@@ -23,11 +24,14 @@ type NodeDataProps = {
     fileName?: string;
     fileContent?: string;
     signOption?: { label: string; value: string };
+    originalDefinedNodeId?: string;
   };
 };
 
 const StepNode: FC<NodeDataProps> = ({ data }) => {
   const { t } = useTranslation();
+  const endpoints = useServiceStore((state) => state.endpoints);
+  const [isTestedAndPassed, setIsTestedAndPassed] = useState<boolean | null>(null)
 
   const boldText = {
     fontWeight: 500,
@@ -39,7 +43,6 @@ const StepNode: FC<NodeDataProps> = ({ data }) => {
   };
 
   const isStepInvalid = () => {
-    if (data.stepType === StepType.UserDefined) return false;
     if (data.stepType === StepType.Input) return data.childrenCount < 2;
     if (data.stepType === StepType.OpenWebpage) return !data.link || !data.linkText;
     if (data.stepType === StepType.FileGenerate) return !data.fileName || !data.fileContent;
@@ -48,11 +51,34 @@ const StepNode: FC<NodeDataProps> = ({ data }) => {
     return !(data.readonly || !!data.message?.length);
   };
 
-  const isTestedAndPassed = () => {
-    if(isStepInvalid())
-      return false;
-    return true;
+  const updateIsTestedAndPassed = async () => {
+    if(isStepInvalid()) {
+      setIsTestedAndPassed(false);
+      return;
+    }
+
+    if (data.stepType !== StepType.UserDefined) {
+      setIsTestedAndPassed(true);
+      return;
+    }
+
+    const endpoint = endpoints.find(x => x.id === data.originalDefinedNodeId);
+    
+    if(!endpoint) {
+      setIsTestedAndPassed(false);
+      return;
+    }
+    
+    await useServiceStore.getState().testUrl(
+      endpoint,
+      () => setIsTestedAndPassed(true),
+      () => setIsTestedAndPassed(false),
+    );
   }
+
+  useEffect(() => {
+    updateIsTestedAndPassed();
+  }, [data]);
 
   return (
     <Track
@@ -61,7 +87,7 @@ const StepNode: FC<NodeDataProps> = ({ data }) => {
       align="left"
     >
       <p>
-        {isTestedAndPassed() 
+        {isTestedAndPassed
           ? <CheckBadge /> 
           : isStepInvalid() 
             ? <ExclamationBadge /> 
