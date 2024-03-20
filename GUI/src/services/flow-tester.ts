@@ -30,7 +30,8 @@ export const testServiceFlow = async () => {
       currentNode = nextNodes[0];
     else {      
       const input = useTestServiceStore.getState().userInput?.toLowerCase().trim() ?? '';
-      if('yes,jah,eks'.split(',').includes(input)){
+      const confirmation = ['yes', 'jah', 'eks', 'yea'].some(x => input.startsWith(x));
+      if(confirmation) {
         currentNode = nextNodes[0];
       } else {
         currentNode = nextNodes[1];
