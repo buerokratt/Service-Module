@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import Close from '../../static/icons/close.svg';
+import Reset from '../../static/icons/reset.svg';
 import styles from './chat.module.scss';
 import useTestServiceStore from 'store/test-services.store';
 
@@ -9,13 +10,13 @@ const ChatHeader = (): JSX.Element => {
   return (
     <div className={styles.header}>
       <div className={styles.title}>
-        {t('widget.title')}
+        {t('chat.title')}
       </div>
       <div className={styles.actions}>
-        <button
-          title={t('header.button.close.label') ?? ''}
-          onClick={useTestServiceStore.getState().closeChat}
-        >
+        <button onClick={useTestServiceStore.getState().restart}>
+          <img src={Reset} />
+        </button>
+        <button onClick={useTestServiceStore.getState().closeChat}>
           <img src={Close} />
         </button>
       </div>

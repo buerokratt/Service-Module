@@ -14,27 +14,28 @@ import { editServiceInfo, saveFlowClick } from 'services/service-builder';
 import { GRID_UNIT, NodeDataProps, initialEdge, initialNodes } from 'types/service-flow';
 import { alignNodesInCaseAnyGotOverlapped, buildEdge, buildPlaceholder, updateFlowInputRules } from 'services/flow-builder';
 import { GroupOrRule } from 'components/FlowElementsPopup/RuleBuilder/types';
+import useTestServiceStore from './test-services.store';
 
 interface ServiceStoreState {
   endpoints: EndpointData[];
   name: string;
   serviceId: string;
   description: string;
-  isCommon: boolean,
-  edges: Edge[],
-  nodes: Node[],
-  isNewService: boolean,
+  isCommon: boolean;
+  edges: Edge[];
+  nodes: Node[];
+  isNewService: boolean;
   serviceState: ServiceState;
   rules: GroupOrRule[];
   isYesNoQuestion: boolean;
   setIsYesNoQuestion: (value: boolean) => void;
   changeRulesNode: (rules: GroupOrRule[]) => void;
-  markAsNewService: () => void,
-  unmarkAsNewService: () => void,
-  setServiceId: (id: string) => void,
+  markAsNewService: () => void;
+  unmarkAsNewService: () => void;
+  setServiceId: (id: string) => void;
   setNodes: (nodes: Node[] | ((prev: Node[]) => Node[])) => void;
   setEdges: (edges: Edge[]| ((prev: Edge[]) => Edge[])) => void;
-  vaildServiceInfo: () => boolean,
+  vaildServiceInfo: () => boolean;
   setIsCommon: (isCommon: boolean) => void;
   secrets: PreDefinedEndpointEnvVariables;
   availableVariables: PreDefinedEndpointEnvVariables;
@@ -47,8 +48,8 @@ interface ServiceStoreState {
   setIsCommonEndpoint: (id: string, isCommon: boolean) => void;
   setDescription: (description: string) => void;
   setSecrets: (newSecrets: PreDefinedEndpointEnvVariables) => void;
-  addProductionVariables: (variables: string[]) => void,
-  addTestVariables: (variables: string[]) => void,
+  addProductionVariables: (variables: string[]) => void;
+  addTestVariables: (variables: string[]) => void;
   changeServiceName: (name: string) => void;
   addEndpoint: () => void;
   loadSecretVariables: () => Promise<void>;
@@ -203,7 +204,12 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
       isTestButtonEnabled: true,
       rules: [],
       isYesNoQuestion: false,
-    })
+      clickedNode: null,
+      isTestButtonVisible: false,
+      selectedNode: null,
+      serviceState: ServiceState.Draft,
+    });
+    useTestServiceStore.getState().reset();
   },
   resetRules: () => set({ rules: [], isYesNoQuestion: false, }),
   loadService: async (id) => {

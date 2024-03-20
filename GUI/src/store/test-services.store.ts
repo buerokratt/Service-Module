@@ -14,9 +14,6 @@ export interface TestingMessage {
 }
 
 interface TestServiceStoreState {
-  isChatEnabled: boolean;
-  enableChat: () => void;
-  disableChat: () => void;
   isChatOpened: boolean;
   openChat: () => void;
   closeChat: () => void;
@@ -31,6 +28,7 @@ interface TestServiceStoreState {
   addInfo: (info: string, payload?: any) => void;
   addSuccess: (succes: string) => void;
   reset: () => void;
+  restart: () => void;
   waitingForInput: boolean;
   userInput: string | null;
   waitForUserInput: () => void;
@@ -38,9 +36,6 @@ interface TestServiceStoreState {
 }
 
 const useTestServiceStore = create<TestServiceStoreState>((set, get) => ({
-  isChatEnabled: false,
-  enableChat: () => set({ isChatEnabled: true }),
-  disableChat: () => set({ isChatEnabled: false }),
   isChatOpened: false,
   openChat: () => {
     testServiceFlow();
@@ -73,10 +68,18 @@ const useTestServiceStore = create<TestServiceStoreState>((set, get) => ({
   addError: (error) => get().pushMessage(error, 'system', 'error'),
   addInfo: (info, payload) => get().pushMessage(info, 'system', 'info', payload),
   addSuccess: (succes) => get().pushMessage(succes, 'system', 'success'),
-  reset: () => set({ 
-    chat: [],
-    currentNodeId: null,
-  }),
+  reset: () => {
+    set({ 
+      chat: [],
+      currentNodeId: null,
+      waitingForInput: false,
+      userInput: null,
+    });
+  },
+  restart: () => {
+    get().reset();
+    testServiceFlow();
+  },
   waitingForInput: false,
   userInput: null,
   waitForUserInput: () => set({ 
