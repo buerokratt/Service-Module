@@ -58,12 +58,11 @@ const FlowElementsPopup: React.FC = () => {
 
     useServiceStore.getState().changeRulesNode(node.data.rules);
   }, [stepType === StepType.Input]);
-  
+
   if (!node) return <></>;
 
   const title = node.data.label;
   const isReadonly = node.data.readonly;
-
 
   const onClose = () => {
     setSelectedTab(null);
@@ -98,6 +97,7 @@ const FlowElementsPopup: React.FC = () => {
     }
 
     useServiceStore.getState().handlePopupSave(updatedNode);
+    onClose();
   };
 
   const handleJsonRequestClick = async () => {

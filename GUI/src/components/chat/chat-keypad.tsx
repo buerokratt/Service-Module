@@ -19,7 +19,7 @@ const ChatKeyPad = (): JSX.Element => {
         <input
           className={styles.input}
           value={userInput}
-          placeholder={t("keypad.input.placeholder") ?? ''}
+          placeholder={t("chat.input-placeholder") ?? ''}
           onChange={(e) => setUserInput(e.target.value)}
           onKeyDown={(event) => {
             if (event.key === "Enter") {
@@ -32,7 +32,6 @@ const ChatKeyPad = (): JSX.Element => {
       <div
         onClick={addNewMessageToState}
         className={styles.button}
-        title={t("keypad.button.label") ?? ''}
         role="button"
         tabIndex={0}
       >

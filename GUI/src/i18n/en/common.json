@@ -328,6 +328,8 @@
     "loginWithTARA": "To continue please log in with TARA",
     "fileSignYesNo": "Do you want to sign this file? Yes/No",
     "redirectToCustomerSupport": "Conversation will be redirected to Customer Support",
-    "waiting-for-user-input": "Waiting for user input"
+    "waiting-for-user-input": "Waiting for user input",
+    "title": "Chat Integration",
+    "input-placeholder": "Enter your message..."
   }
 }

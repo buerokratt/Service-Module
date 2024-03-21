@@ -28,10 +28,14 @@ export const testServiceFlow = async () => {
       break;
     if(nextNodes.length === 1)
       currentNode = nextNodes[0];
-    else {
-      // in case of node with many children choose one of the nodes somehow
-      // for now we will select first one
-      currentNode = nextNodes[0];
+    else {      
+      const input = useTestServiceStore.getState().userInput?.toLowerCase().trim() ?? '';
+      const confirmation = ['yes', 'jah', 'eks', 'yea'].some(x => input.startsWith(x));
+      if(confirmation) {
+        currentNode = nextNodes[0];
+      } else {
+        currentNode = nextNodes[1];
+      }
     }
   }
 
@@ -62,8 +66,7 @@ async function performActionBasedOnNode(node: Node) {
       store.addBotMessage("chat.loginWithTARA"); 
       break;
     case StepType.Textfield:
-      const msg = node.data.message.replace("<p>", "").replace("</p>", "");
-      store.addBotMessage(msg);
+      store.addBotMessage(node.data.message);
       break;
     case StepType.OpenWebpage:
       store.addBotMessage(node.data.linkText, node.data.link); 

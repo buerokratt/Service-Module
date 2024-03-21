@@ -327,6 +327,8 @@
     "loginWithTARA": "Jätkamiseks palun logi sisse läbi TARA",
     "fileSignYesNo": "Kas soovid faili allkirjastada? Jah/Ei",
     "redirectToCustomerSupport": "Vestlus suunatakse klienditeenindajale",
-    "waiting-for-user-input": "Ootan kasutaja sisendit"
+    "waiting-for-user-input": "Ootan kasutaja sisendit",
+    "title": "Chat Integration",
+    "input-placeholder": "Kirjutage oma sõnum..."
   }
 }
