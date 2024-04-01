@@ -11,7 +11,7 @@ add_connection_request:
     body:
       serviceId: ${serviceId}
       intent: ${intent}
-      status: "pending"
+      status: "approved"
       authorRole: "service_manager"
       serviceName: ${serviceName}
   result: res
