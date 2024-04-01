@@ -1,4 +1,4 @@
-# Bürokratt's Service Module 
+# Bürokratt's Service Module
 
 Bürokratt's Service Module is a tool to help primarily product owners in collaboration with customer support agents/service managers to create, edit and otherwise manipulate Bürokratt's e-services via a graphical user interface. This includes setting up Ruuter- and Rasa-based user stories, making X-road / REST / database requests where and when appropriate and so forth.
 
@@ -17,8 +17,6 @@ This repo will primarily contain:
 - Make sure that env variable REACT_APP_LOCAL is set to true(default).
 
 - Clone [Ruuter](https://github.com/buerokratt/Ruuter)
-
-- Ruuter has an unresolved issue with allowing cross-origin credentials to be sent, for now fix this by adding: .allowCredentials(true); to line 24 in CORSConfiguration.java
 
 - Navigate to Ruuter and build the image `docker build -t ruuter .`
 
@@ -77,6 +75,11 @@ Currently, Header and Main Navigation used as external components, they are defi
   `docker run --platform linux/amd64 --network=bykstack riaee/byk-users-db:liquibase20220615 --url=jdbc:postgresql://database:5432/users_db --username=byk --password=01234 --changelog-file=./master.yml update`
 - Run migrations added in this repository by running the helper script `./migrate.sh`
 - When creating new migrations, use the helper `./create-migration.sh name-of-migration` which will create a timestamped file in the correct directory and add the required headers
+
+### Open Search
+
+- To Initialize Open Search run `./deploy-opensearch.sh <URL> <AUTH> <Is Mock Allowed - Default false>`
+- To Use Opensearch locally run `./deploy-opensearch.sh http://localhost:9200 admin:admin true`
 
 ### DataMapper
 
