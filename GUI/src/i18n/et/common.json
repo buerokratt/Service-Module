@@ -22,12 +22,12 @@
     "yes": "Jah",
     "no": "Ei",
     "removeValidation": "Oled sa kindel?",
-    "startDate": "Algus kuupäev",
-    "endDate": "Lõpp kuupäev",
+    "startDate": "Algusaeg",
+    "endDate": "Lõppaeg",
     "preview": "Eelvaade",
     "logout": "Logi välja",
     "anonymous": "Anonüümne",
-    "csaStatus": "Klienditeenindaja",
+    "csaStatus": "Nõustaja",
     "present": "Kohal",
     "away": "Eemal",
     "today": "Täna",
@@ -48,7 +48,7 @@
     "testService": "Testi teenust",
     "cancel": "Tühista",
     "close": "Sulge",
-    "common": "Levinud",
+    "common": "Üldteenus",
     "errorMessage": "Teenusele puudub ligipääs. Proovi hiljem uuesti."
   },
   "menu": {
@@ -57,27 +57,27 @@
     "services": "Teenused",
     "newService": "Uus teenus",
     "close": "Sulge menüü",
-    "intents": "Kavatsus",
-    "auto-services": "Automatic Teenused",
-    "entities": "Üksused",
+    "intents": "Teemad",
+    "auto-services": "Ühendustaotlused",
+    "entities": "Olemid",
     "settings": "Seaded",
     "faultyServices": "Probleemsed teenused"
   },
   "mainMenu": {
-    "menuLabel": "Põhinavigatsioon",
+    "menuLabel": "Peamenüü",
     "closeMenu": "Kitsendan menüü",
     "openMenuIcon": "Ava menüü ikoon",
     "closeMenuIcon": "Sulge menüü ikoon"
   },
   "intents": {
-    "entities": "Üksused",
-    "regex": "Regex",
+    "entities": "Olemid",
+    "regex": "Regulaaravaldis",
     "add": "Lisa",
     "yes": "Jah",
     "no": "Ei",
     "removeValidation": "Eemalda valideerimine",
     "search": "Otsing",
-    "delete": "Kustutada",
+    "delete": "Kustuta",
     "deleted": "Kustutatud",
     "edit": "Muuda",
     "save": "Salvesta",
@@ -89,7 +89,7 @@
   },
   "settings": {
     "title": "Seaded",
-    "maxUserInputTryCount": "Käsitsege kasutaja sisestatud proovide arvu",
+    "maxUserInputTryCount": "Piira kasutaja sisestatud proovide arvu",
     "users": {
       "title": "Kasutajad",
       "name": "Nimi",
@@ -104,21 +104,21 @@
       "fullName": "Ees- ja perekonnanimi",
       "userRoles": "Kasutaja roll(id)",
       "autoCorrector": "Autokorrektor",
-      "emailNotifications": "Märguanded e-postile",
+      "emailNotifications": "Märguanded e-posti",
       "soundNotifications": "Häälmärguanded",
       "popupNotifications": "Pop-up märguanded",
       "newUnansweredChat": "Uus vastamata vestlus",
       "newForwardedChat": "Uus suunatud vestlus",
       "useAutocorrect": "Teksti autokorrektor",
       "required": "Nõutud",
-      "invalidemail": "Kehtetu e-posti"
+      "invalidemail": "Kehtetu e-posti aadress"
     }
   },
   "overview": {
     "services": "Teenused",
-    "commonServices": "Ühised Teenused",
+    "commonServices": "Üldteenused",
     "create": "Loo uus teenus",
-    "descriptionCopiedSuccessfully": "Kirjeldus kopeeritud edukalt",
+    "descriptionCopiedSuccessfully": "Kirjeldus edukalt kopeeritud",
     "edit": "Muuda",
     "delete": "Kustuta",
     "cancel": "Tühista",
@@ -129,7 +129,7 @@
     "service": {
       "name": "Nimetus",
       "usedCount": "Kasutamise arv",
-      "linkedIntent": "Lingitud kavatsus",
+      "linkedIntent": "Ühendatud teema",
       "state": "Olek",
       "states": {
         "active": "Aktiivne",
@@ -143,66 +143,66 @@
         "failed": {
           "delete": "Teenuse kustutamine ebaõnnestus",
           "state": "Teenuse oleku uuendamine ebaõnnestus",
-          "requestConnection": "Ühenduse taotlus ebaõnnestus",
-          "availableIntents": "Saadaolevate kavatsuste toomine ebaõnnestus",
-          "cancelledConnection": "Ühendustaotluse tühistamine ebaõnnestus"
+          "requestConnection": "Ühendamistaotlus ebaõnnestus",
+          "availableIntents": "Saadaolevate teemade päring ebaõnnestus",
+          "cancelledConnection": "Ühendamistaotluse tühistamine ebaõnnestus"
         },
-        "requestedConnection": "Ühendust taotletakse",
-        "cancelledConnection": "Ühenduse taotlus tühistati"
+        "requestedConnection": "Ühendamist taotletakse",
+        "cancelledConnection": "Ühendamistaotlus tühistati"
       }
     },
     "popup": {
-      "delete": "Kas oled kindel, et soovid teenuse kustutada?",
-      "setActive": "Kas oled kindel, et tahad teenuse aktiveerida?",
-      "setReady": "Kas olete kindel, et soovite selle teenuse valmisolekuks märkida?",
-      "setDraft": "Kas olete kindel, et soovite selle teenuse mustandiks märkida?",
-      "setInactive": "Kas oled kindel, et tahad teenuse deaktiveerida?",
+      "delete": "Kas olete kindel, et soovite teenuse kustutada?",
+      "setActive": "Kas olete kindel, et tahate teenuse aktiveerida?",
+      "setReady": "Kas olete kindel, et soovite selle teenuse olekuks märkida Valmis?",
+      "setDraft": "Kas olete kindel, et soovite selle teenuse olekuks märkida Mustand?",
+      "setInactive": "Kas oled kindel, et tahate teenuse deaktiveerida?",
       "setState": "Uuenda olek",
-      "checking": "Kontrollitakse, kas teenus on kavatsusega ühendatud",
+      "checking": "Kontrollitakse, kas teenus on teemaga ühendatud",
       "setToDraft": "Määra mustandiks",
-      "connectToIntent": "Ühendage kavatsusega",
-      "intentNotConnected": "Teenus ei ole kavatsusega ühendatud, kas soovite selle ühendada?",
+      "connectToIntent": "Ühendage teemaga",
+      "intentNotConnected": "Teenus ei ole teemaga ühendatud, kas soovite selle ühendada?",
       "activateService": "Aktiveerige teenus",
-      "setToReady": "Seadke valmisolekusse",
+      "setToReady": "Muutke Valmis olekusse",
       "connect": "Ühendage",
-      "connectServiceToIntent": "Ühendage teenus kavatsusega",
-      "searchIntents": "Otsimise eesmärgid",
-      "intent": "Kavatsus",
-      "connectionPending": "Ühenduse loomine kavatsustaotlusega on ootel. Kas soovite selle tühistada?",
-      "cancelRequest": "Tühista soov",
-      "noIntentsAvailable": "Ühenduse loomiseks pole ühtegi kavatsust",
-      "connectionQuestion": "Kas olete kindel, et soovite selle kavatsusega ühenduse luua?",
+      "connectServiceToIntent": "Ühendage teenus teemaga",
+      "searchIntents": "Otsi teemasid",
+      "intent": "Teema",
+      "connectionPending": "Teenuse teemaga ühendamise taotlus on ootel. Kas soovite selle tühistada?",
+      "cancelRequest": "Tühista taotlus",
+      "noIntentsAvailable": "Ühenduse loomiseks ei ole ühtegi teemat saadaval",
+      "connectionQuestion": "Kas olete kindel, et soovite teenuse selle teemaga ühendada?",
       "activate": "Aktiveerige",
-      "deactivate": "Deaktiveeri"
+      "deactivate": "Deaktiveerige"
     }
   },
   "connectionRequests": {
-    "title": "Ühenduse taotlused",
-    "approvedConnection": "Ühendus kinnitatud",
-    "declinedConnection": "Ühendus tagasi lükatud",
+    "title": "Ühendamistaotlused",
+    "approvedConnection": "Ühendamine kinnitatud",
+    "declinedConnection": "Ühendamine tagasi lükatud",
     "toast": {
       "failed": {
-        "requests": "Ühendustaotluste toomine ebaõnnestus"
+        "requests": "Ühendamistaotluste päring ebaõnnestus"
       }
     }
   },
   "newService": {
     "endpoints": "Otspunktid",
     "test": "Testi URLi",
-    "isCommon": "Ühine teenus",
+    "isCommon": "Üldteenus",
     "endpoint": {
       "add": "+ Lisa API otspunkt",
       "addTestEnv": "+ Lisa testkeskkond",
       "api": "API otspunkt",
-      "ask": "Küsi otspunktid",
-      "body": "Body",
+      "ask": "Küsi otspunkte",
+      "body": "Keha",
       "error": "Otspunktiga ei olnud võimalik ühendust saada. Kontrolli URL'i ja proovi uuesti.",
-      "success": "URL töötab edukalt",
-      "headers": "Headers",
+      "success": "URL ühendus õnnestus",
+      "headers": "Päised",
       "insert": "Sisesta API otspunkt..",
-      "live": "Live otspunkt",
+      "live": "Toodangukeskkonna otspunkt",
       "name": "Otspunkti nimetus",
-      "params": "Params",
+      "params": "Parameetrid",
       "required": "Muutuja on kohustuslik",
       "single": "Otspunkt",
       "testEnv": "Testkeskkond",
@@ -212,7 +212,7 @@
       "unsupported": "Vabandust, praegu toetame ainult GET ja POST päringud"
     },
     "saveDraft": "Salvesta mustandina",
-    "trainingModuleSetup": "Treenningmooduli seadistamine",
+    "trainingModuleSetup": "Avaleht",
     "serviceSetup": "Teenuse seadistamine",
     "serviceFlowCreation": "Teenusvoo loomine",
     "name": "Nimetus",
@@ -221,17 +221,17 @@
     "toast": {
       "serviceMissingFields": "Nõutav on teenuse nimi ja kirjeldus",
       "missingFields": "Puuduvad väljad",
-      "savedSuccessfully": "Salvestatud edukalt",
-      "success": "Edu",
-      "failed": "Ebaõnnestunud",
+      "savedSuccessfully": "Salvestatud",
+      "success": "Õnnestus",
+      "failed": "Ebaõnnestus",
       "saveFailed": "Salvestamine ebaõnnestus",
       "saveInfoFailed": "Teabe salvestamine ebaõnnestus",
-      "saveConfigFailed": "Konfiguratsiooni salvestamine ebaõnnestus"
+      "saveConfigFailed": "Seadete salvestamine ebaõnnestus"
     }
   },
   "serviceFlow": {
     "element": {
-      "taraAuthentication": "Tara autoriseerimine",
+      "taraAuthentication": "TARA autentimine",
       "textfield": "Sõnum kliendile",
       "clientInput": "Kliendi sisend",
       "openNewWebpage": "Uue veebilehe avamine",
@@ -241,7 +241,7 @@
       "redirectConversationToSupport": "Klienditeenindusse suunamine",
       "rules": "Reeglid",
       "rasaRules": "Rasa reeglid",
-      "siga": "SiGa"
+      "siga": "Allkirjastamine"
     },
     "popup": {
       "messageLabel": "Sõnum",
@@ -251,16 +251,16 @@
       "jsonRequestPlaceholder": "JSON päring",
       "openWebpageLabel": "Veebilehe nimi, mis kuvatakse kliendile",
       "name": "Nimi",
-      "intent": "Kavatsus",
+      "intent": "Teema",
       "action": "Tegevus",
-      "add": "+ Lisama",
-      "yesNoQuestion": "Jah/Ei Küsimus",
+      "add": "+ Lisa",
+      "yesNoQuestion": "Jah/Ei küsimus",
       "insertVariable": "Sisesta muutuja",
-      "availableVariables": "Saadavalolevad muutujad",
+      "availableVariables": "Saadaolevad muutujad",
       "clientSeesMessage": "Klient näeb sõnumit",
-      "redirectToCustomerSupport": "Vestlus suunatakse klienditeenindajale",
-      "loginWithTARA": "Jätkamiseks palun logi sisse läbi TARA",
-      "endConversation": "Selle sammuga lõpeb suhtlus. Et teenusvoogu jätkata, tuleb vestluse lõpetamine voost eemaldada.",
+      "redirectToCustomerSupport": "Vestlus suunatakse nõustajale",
+      "loginWithTARA": "Jätkamiseks palun logige sisse",
+      "endConversation": "Selle sammuga lõpeb teenus. Et teenusvoogu jätkata, tuleb vestluse lõpetamine voost eemaldada.",
       "fileName": "Faili nimi",
       "fileContent": "Faili sisu",
       "fileClientSees": "tekst + faili link",
@@ -278,8 +278,8 @@
     },
     "flow": "Teenusvoog",
     "placeholderNode": "Lohista järgmine samm voogu",
-    "allElements": "Kõik elemendid",
-    "setupElements": "Seadistatud elemendid",
+    "allElements": "Üldelemendid",
+    "setupElements": "API elemendid",
     "tabs": {
       "setup": "Seadistamine",
       "test": "Testimine"
@@ -293,7 +293,7 @@
     "view": "Vaata",
     "log": "Logi",
     "environment": "Keskkond",
-    "method": "meetod",
+    "method": "Meetod",
     "errorCode": "Veakood",
     "failedStep": "Ebaõnnestunud samm",
     "failedTime": "Päev ja aeg",
@@ -308,7 +308,7 @@
     "missing-textfield-message": "Palun sisestage puuduv sõnum",
     "missing-website": "Sisestage veebisaidi pealkiri ja link",
     "missing-file-generation": "Sisestage faili nimi ja sisu",
-    "missing-client_input-rules": "Sisestage kliendi sisestusreeglid"
+    "missing-client_input-rules": "Määrake kliendi sisestusreeglid"
   },
   "roles": {
     "ROLE_ADMINISTRATOR": "Administraator",
@@ -321,12 +321,12 @@
   "chat": {
     "unanswered": "Vastamata",
     "forwarded": "Suunatud",
-    "incomplete-service-flow" : "Puudulik teenusevoog",
+    "incomplete-service-flow" : "Puudulik teenusvoog",
     "no-start-node" : "Alustamise sõlme ei leitud",
     "end-of-chat": "Jõuti vestluse lõppu",
-    "loginWithTARA": "Jätkamiseks palun logi sisse läbi TARA",
+    "loginWithTARA": "Jätkamiseks palun logi sisse",
     "fileSignYesNo": "Kas soovid faili allkirjastada? Jah/Ei",
-    "redirectToCustomerSupport": "Vestlus suunatakse klienditeenindajale",
+    "redirectToCustomerSupport": "Vestlus suunatakse nõustajale",
     "waiting-for-user-input": "Ootan kasutaja sisendit",
     "title": "Chat Integration",
     "input-placeholder": "Kirjutage oma sõnum..."
