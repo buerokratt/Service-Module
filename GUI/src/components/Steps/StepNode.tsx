@@ -31,7 +31,7 @@ type NodeDataProps = {
 const StepNode: FC<NodeDataProps> = ({ data }) => {
   const { t } = useTranslation();
   const endpoints = useServiceStore((state) => state.endpoints);
-  const [isTestedAndPassed, setIsTestedAndPassed] = useState<boolean | null>(null)
+  const [isTestedAndPassed, setIsTestedAndPassed] = useState<boolean | null>(null);
 
   const boldText = {
     fontWeight: 500,
@@ -52,7 +52,7 @@ const StepNode: FC<NodeDataProps> = ({ data }) => {
   };
 
   const updateIsTestedAndPassed = async () => {
-    if(isStepInvalid()) {
+    if (isStepInvalid()) {
       setIsTestedAndPassed(false);
       return;
     }
@@ -62,19 +62,19 @@ const StepNode: FC<NodeDataProps> = ({ data }) => {
       return;
     }
 
-    const endpoint = endpoints.find(x => x.id === data.originalDefinedNodeId);
-    
-    if(!endpoint) {
+    const endpoint = endpoints.find((x) => x.id === data.originalDefinedNodeId);
+
+    if (!endpoint) {
       setIsTestedAndPassed(false);
       return;
     }
-    
+
     await useServiceStore.getState().testUrl(
       endpoint,
-      () => setIsTestedAndPassed(true),
       () => setIsTestedAndPassed(false),
+      () => setIsTestedAndPassed(true)
     );
-  }
+  };
 
   useEffect(() => {
     updateIsTestedAndPassed();
@@ -87,12 +87,13 @@ const StepNode: FC<NodeDataProps> = ({ data }) => {
       align="left"
     >
       <p>
-        {isTestedAndPassed
-          ? <CheckBadge /> 
-          : isStepInvalid() 
-            ? <ExclamationBadge /> 
-            : <ExclamationBadge color="purple"/>
-        }
+        {isTestedAndPassed ? (
+          <CheckBadge />
+        ) : isStepInvalid() ? (
+          <ExclamationBadge />
+        ) : (
+          <ExclamationBadge color="purple" />
+        )}
         {data.label}
       </p>
       {data.stepType === StepType.Textfield && (

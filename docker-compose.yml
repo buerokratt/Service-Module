@@ -106,28 +106,9 @@ services:
       - ./DSL/DMapper/hbs:/workspace/app/views/services
       - ./DSL/DMapper/js:/workspace/app/js/services
       - ./DSL/DMapper/lib:/workspace/app/lib
-      - ./DSL/DMapper/server/controllers:/workspace/app/services/controllers
-      - ./DSL/DMapper/server/js/file:/workspace/app/js/services/file
-      - ./DSL/DMapper/server/js/secrets:/workspace/app/js/secrets
-      - ./DSL/DMapper/server/js/util:/workspace/app/js/util
       - ./secrets:/data/secrets
     ports:
       - 3005:3005
-    networks:
-      - bykstack
-  node_server:
-    container_name: node_server
-    build:
-      context: ./DSL/Node
-      dockerfile: Dockerfile.dev
-    environment:
-      - CONTENT_FOLDER=/data
-    volumes:
-      - ./DSL:/data
-      - ./DSL/Node:/app
-      - /app/node_modules
-    ports:
-      - 3008:3008
     networks:
       - bykstack
 
