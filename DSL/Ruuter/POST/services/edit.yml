@@ -56,9 +56,9 @@ use_old_structure:
 rename_dsl:
   call: http.post
   args:
-    url: "[#SERVICE_NODE]/file/move"
+    url: "[#SERVICE_DMAPPER]/file-manager/move"
     body:
-      current_path: "/Ruuter/${type}/services/${old_state}/${old_name}.tmp"
+      file_path: "/Ruuter/${type}/services/${old_state}/${old_name}.tmp"
       new_path: "/Ruuter/${type}/services/${old_state}/${name}.tmp"
   result: results
 

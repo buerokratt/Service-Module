@@ -31,7 +31,7 @@ service_add:
 convert_json_content_to_yml:
   call: http.post
   args:
-    url: "[#SERVICE_NODE]/conversion/json_to_yaml_data"
+    url: "[#SERVICE_DMAPPER]/conversion/json_to_yaml_data"
     body:
       data: ${content}
   result: ymlResult
@@ -45,7 +45,7 @@ check_for_type:
 add_get_dsl:
   call: http.post
   args:
-    url: "[#SERVICE_NODE]/file/write"
+    url: "[#SERVICE_DMAPPER]/file-manager/create"
     body:
       file_path: "/Ruuter/GET/services/draft/${name}.tmp"
       content: ${ymlResult.response.body.yaml}
@@ -55,7 +55,7 @@ add_get_dsl:
 add_post_dsl:
   call: http.post
   args:
-    url: "[#SERVICE_NODE]/file/write"
+    url: "[#SERVICE_DMAPPER]/file-manager/create"
     body:
       file_path: "/Ruuter/POST/services/draft/${name}.tmp"
       content: ${ymlResult.response.body.yaml}

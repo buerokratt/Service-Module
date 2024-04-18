@@ -116,16 +116,18 @@ const EndpointCustom: React.FC<EndpointCustomProps> = ({
             />
           </Track>
           <Button
-            onClick={() => testUrl(
-              endpoint,
-              () => {
-                setUrlError(undefined);
-                useToastStore.getState().success({
-                  title: t("newService.endpoint.success"),
-                });
-              },
-              () => setUrlError(t("newService.endpoint.error") ?? undefined),
-            )}
+            onClick={() =>
+              testUrl(
+                endpoint,
+                () => setUrlError(t("newService.endpoint.error") ?? undefined),
+                () => {
+                  setUrlError(undefined);
+                  useToastStore.getState().success({
+                    title: t("newService.endpoint.success"),
+                  });
+                }
+              )
+            }
           >
             {t("newService.test")}
           </Button>

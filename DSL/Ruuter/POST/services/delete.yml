@@ -52,7 +52,7 @@ delete_service:
 check_service_file_exists:
   call: http.post
   args:
-    url: "[#SERVICE_NODE]/file/check"
+    url: "[#SERVICE_DMAPPER]/file-manager/exists"
     body:
       file_path: "/Ruuter/${ruuter_type}/services/${old_file_status_path}/${name_res.response.body[0].name}.tmp"
   result: service_file_exists
@@ -67,9 +67,9 @@ validate_service_file_exists:
 delete_deactivated_service:
   call: http.post
   args:
-    url: "[#SERVICE_NODE]/file/delete"
+    url: "[#SERVICE_DMAPPER]/file-manager/delete"
     body:
-      path: "/Ruuter/${ruuter_type}/services/${old_file_status_path}/${name_res.response.body[0].name}.tmp"
+      file_path: "/Ruuter/${ruuter_type}/services/${old_file_status_path}/${name_res.response.body[0].name}.tmp"
   result: results
   next: check_result
 
