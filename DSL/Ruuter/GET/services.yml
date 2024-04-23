@@ -4,15 +4,18 @@ get_services_list:
     url: "[#SERVICE_RESQL]/get-services-list"
   result: services_res
 
+assign_services_result:
+  assign: 
+    services: ${services_res.response.body}
+
 get_approved_triggers:
   call: http.post
   args:
     url: "[#SERVICE_TRAINING_RESQL]/get-approved-tiggers"
   result: triggers_res
 
-assign_results:
+assign_training_result:
   assign: 
-    services: ${services_res.response.body}
     triggers: ${triggers_res.response.body}
 
 return_ok:
