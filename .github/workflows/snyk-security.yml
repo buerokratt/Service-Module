@@ -52,11 +52,11 @@ jobs:
 
         # Build the docker image for testing
       - name: Build a Docker image
-        run: cd GUI/ && docker build -f Dockerfile.dev -t analytics-gui .
+        run: cd GUI/ && docker build -f Dockerfile.dev -t gui .
       
       #   # Runs Snyk Container (Container and SCA) analysis and uploads result to Snyk.
       - name: Snyk Container monitor
-        run: snyk container monitor analytics-gui
+        run: snyk container monitor gui
 
         # Push the Snyk Code results into GitHub Code Scanning tab
       - name: Upload result to GitHub Code Scanning
