@@ -62,7 +62,7 @@ const useServiceListStore = create<ServiceStoreState>((set, get, store) => ({
   loadServicesList: async () => {
     const result = await axios.get(getServicesList());
     const triggers = result.data.response[1];
-    const services = result.data.response[0].map(
+    const services = result.data.response[0].map?.(
       (item: any) =>
         ({
           id: item.id,
@@ -75,7 +75,7 @@ const useServiceListStore = create<ServiceStoreState>((set, get, store) => ({
           usedCount: 0,
           linkedIntent: triggers.find((e: Trigger) => e.service === item.serviceId)?.intent || "",
         } as Service)
-    );
+    ) || [];
 
     set({
       services,
