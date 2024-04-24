@@ -25,7 +25,7 @@ export const getServicesList = (): string => `${baseUrl}/services`;
 export const getConnectionRequests = (): string => `${baseUrl}/services/connection-requests`;
 export const getAvailableIntents = (): string => `${baseUrl}/services/available-intents`;
 export const jsonToYml = (): string => `${baseUrl}/saveJsonToYml`;
-export const getFaultyServices = (): string => `${baseUrl}/overview/services-detailed/nok`;
+export const getFaultyServices = (): string => `${baseUrl}/services/services-detailed/nok`;
 export const trainingModuleTraining = (): string => `${trainingModuleBaseUrl}/treening/treeni-uus-mudel`;
 export const getServiceById = (id: string): string => `${baseUrl}/service-by-id?id=${id}`;
 export const updateServiceEndpoints = (id: string): string => `${baseUrl}/services/update-service-endpoints?id=${id}`;
