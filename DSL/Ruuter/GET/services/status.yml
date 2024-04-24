@@ -1,3 +1,10 @@
+declaration:
+  call: declare
+  allowlist:
+    body:
+      - field: id
+        type: string
+
 get_status:
   call: http.post
   args:
