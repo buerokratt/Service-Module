@@ -9,7 +9,7 @@ declaration:
   allowlist:
     body:
       - field: endpoints
-        type: string
+        type: json
         description: "Body field 'endpoints'"
     params:
       - field: id

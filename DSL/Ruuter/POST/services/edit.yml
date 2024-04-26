@@ -15,7 +15,7 @@ declaration:
         type: string
         description: "Body field 'name'"
       - field: structure
-        type: string
+        type: json
         description: "Body field 'structure'"
       - field: type
         type: string

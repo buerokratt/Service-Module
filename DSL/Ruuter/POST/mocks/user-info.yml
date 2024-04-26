@@ -6,6 +6,11 @@ declaration:
   accepts: json
   returns: json
   namespace: service
+  allowlist:
+    body:
+      - field: isTokenExpired
+        type: boolean
+        description: "Body field 'isTokenExpired'"
 
 check_for_body:
   switch:

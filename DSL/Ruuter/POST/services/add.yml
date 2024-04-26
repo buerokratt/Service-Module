@@ -15,7 +15,7 @@ declaration:
         type: string
         description: "Body field 'description'"
       - field: isCommon
-        type: string
+        type: boolean
         description: "Body field 'isCommon'"
       - field: name
         type: string
@@ -24,7 +24,7 @@ declaration:
         type: string
         description: "Body field 'serviceId'"
       - field: structure
-        type: string
+        type: json
         description: "Body field 'structure'"
 
 check_for_required_parameters:

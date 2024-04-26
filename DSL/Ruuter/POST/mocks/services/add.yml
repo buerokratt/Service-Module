@@ -6,6 +6,15 @@ declaration:
   accepts: json
   returns: json
   namespace: service
+  allowlist:
+    body:
+      - field: name
+        type: string
+        description: "Body field 'name'"
+      - field: description
+        type: string
+        description: "Body field 'description'"
+        
 
 check_for_body:
   switch:
