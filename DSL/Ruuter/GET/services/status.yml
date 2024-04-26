@@ -1,9 +1,16 @@
 declaration:
   call: declare
+  version: 0.1
+  description: "Decription placeholder for 'STATUS'"
+  method: get
+  accepts: json
+  returns: json
+  namespace: service
   allowlist:
     body:
       - field: id
         type: string
+        description: "Body field 'id'"
 
 get_status:
   call: http.post

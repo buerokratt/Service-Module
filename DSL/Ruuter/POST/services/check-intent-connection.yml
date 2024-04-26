@@ -1,3 +1,17 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Decription placeholder for 'CHECK-INTENT-CONNECTION'"
+  method: post
+  accepts: json
+  returns: json
+  namespace: service
+  allowlist:
+    body:
+      - field: serviceId
+        type: string
+        description: "Body field 'serviceId'"
+
 extract_request_data:
   assign:
     serviceId: ${incoming.body.serviceId}

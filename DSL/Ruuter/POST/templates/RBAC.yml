@@ -1,3 +1,17 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Decription placeholder for 'RBAC'"
+  method: post
+  accepts: json
+  returns: json
+  namespace: service
+  allowlist:
+    body:
+      - field: userId
+        type: string
+        description: "Body field 'userId'"
+
 check_for_body:
   switch:
     - condition: ${incoming.body == null}

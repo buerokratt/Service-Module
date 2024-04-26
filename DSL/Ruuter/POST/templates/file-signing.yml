@@ -1,3 +1,26 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Decription placeholder for 'FILE-SIGNING'"
+  method: post
+  accepts: json
+  returns: json
+  namespace: service
+  allowlist:
+    body:
+      - field: country
+        type: string
+        description: "Body field 'country'"
+      - field: personIdentifier
+        type: string
+        description: "Body field 'personIdentifier'"
+      - field: phoneNr
+        type: string
+        description: "Body field 'phoneNr'"
+      - field: type
+        type: string
+        description: "Body field 'type'"
+
 siga_template_request:
   template: templates/siga
   requestType: post

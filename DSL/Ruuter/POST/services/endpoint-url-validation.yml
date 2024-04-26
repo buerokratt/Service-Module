@@ -1,3 +1,20 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Decription placeholder for 'ENDPOINT-URL-VALIDATION'"
+  method: post
+  accepts: json
+  returns: json
+  namespace: service
+  allowlist:
+    body:
+      - field: type
+        type: string
+        description: "Body field 'type'"
+      - field: url
+        type: string
+        description: "Body field 'url'"
+
 extract_request_data:
   assign:
     url: ${incoming.body.url}

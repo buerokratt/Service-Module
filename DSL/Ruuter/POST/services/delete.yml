@@ -1,3 +1,17 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Decription placeholder for 'DELETE'"
+  method: post
+  accepts: json
+  returns: json
+  namespace: service
+  allowlist:
+    body:
+      - field: id
+        type: string
+        description: "Body field 'id'"
+
 # TODO: Remove Service from bot so it won't be available for the user to use
 check_for_required_parameters:
   switch:

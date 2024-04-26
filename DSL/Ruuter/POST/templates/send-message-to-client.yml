@@ -1,3 +1,17 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Decription placeholder for 'SEND-MESSAGE-TO-CLIENT'"
+  method: post
+  accepts: json
+  returns: json
+  namespace: service
+  allowlist:
+    body:
+      - field: message
+        type: string
+        description: "Body field 'message'"
+
 # Message to client element
 check_for_body:
   switch:

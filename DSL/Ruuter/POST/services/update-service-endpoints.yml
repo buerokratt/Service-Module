@@ -1,3 +1,21 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Decription placeholder for 'UPDATE-SERVICE-ENDPOINTS'"
+  method: post
+  accepts: json
+  returns: json
+  namespace: service
+  allowlist:
+    body:
+      - field: endpoints
+        type: string
+        description: "Body field 'endpoints'"
+    params:
+      - field: id
+        type: string
+        description: "Parameter 'id'"
+
 extract_request_data:
   assign:
     id: ${incoming.params.id}

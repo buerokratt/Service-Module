@@ -1,3 +1,32 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Decription placeholder for 'ADD'"
+  method: post
+  accepts: json
+  returns: json
+  namespace: service
+  allowlist:
+    body:
+      - field: content
+        type: string
+        description: "Body field 'content'"
+      - field: description
+        type: string
+        description: "Body field 'description'"
+      - field: isCommon
+        type: string
+        description: "Body field 'isCommon'"
+      - field: name
+        type: string
+        description: "Body field 'name'"
+      - field: serviceId
+        type: string
+        description: "Body field 'serviceId'"
+      - field: structure
+        type: string
+        description: "Body field 'structure'"
+
 check_for_required_parameters:
   switch:
     - condition: ${incoming.body.name == null || incoming.body.description == null || incoming.body.type == null || incoming.body.content == null || incoming.body.serviceId == null || incoming.body.isCommon == null || incoming.body.structure == null}

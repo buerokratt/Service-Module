@@ -1,3 +1,17 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Decription placeholder for 'CALCULATE-DIFFERENCE'"
+  method: post
+  accepts: json
+  returns: json
+  namespace: service
+  allowlist:
+    body:
+      - field: startDate
+        type: string
+        description: "Body field 'startDate'"
+
 check_for_body:
   switch:
     - condition: ${incoming.body == null}

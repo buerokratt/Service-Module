@@ -1,3 +1,17 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Decription placeholder for 'DELETE-ENDPOINTS'"
+  method: post
+  accepts: json
+  returns: json
+  namespace: service
+  allowlist:
+    body:
+      - field: name
+        type: string
+        description: "Body field 'name'"
+
 extract_request_data:
   assign:
     name: ${incoming.body.name}

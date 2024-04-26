@@ -1,3 +1,17 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Decription placeholder for 'SERVICE-BY-ID'"
+  method: get
+  accepts: json
+  returns: json
+  namespace: service
+  allowlist:
+    params:
+      - field: id
+        type: string
+        description: "Parameter 'id'"
+
 check_for_parameters:
   switch:
     - condition: ${incoming.params == null || incoming.params.id == null}

@@ -1,3 +1,17 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Decription placeholder for 'COMMON-ENDPOINT'"
+  method: get
+  accepts: json
+  returns: json
+  namespace: service
+  allowlist:
+    body:
+      - field: type
+        type: string
+        description: "Body field 'type'"
+
 extract_request_data:
   assign:
     type: ${incoming.body.type}

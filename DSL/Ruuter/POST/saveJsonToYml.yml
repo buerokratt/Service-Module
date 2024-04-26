@@ -1,3 +1,21 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Decription placeholder for 'SAVEJSONTOYML'"
+  method: post
+  accepts: json
+  returns: json
+  namespace: service
+  allowlist:
+    body:
+      - field: result
+        type: string
+        description: "Body field 'result'"
+    params:
+      - field: location
+        type: string
+        description: "Parameter 'location'"
+
 toYml:
   call: http.post
   args:

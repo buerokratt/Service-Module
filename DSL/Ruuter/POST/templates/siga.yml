@@ -1,3 +1,29 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Decription placeholder for 'SIGA'"
+  method: post
+  accepts: json
+  returns: json
+  namespace: service
+  allowlist:
+    body:
+      - field: containerType
+        type: string
+        description: "Body field 'containerType'"
+      - field: country
+        type: string
+        description: "Body field 'country'"
+      - field: file
+        type: string
+        description: "Body field 'file'"
+      - field: phoneNumber
+        type: string
+        description: "Body field 'phoneNumber'"
+      - field: type
+        type: string
+        description: "Body field 'type'"
+
 extract_request_data:
   assign:
     file: ${incoming.body.file}
