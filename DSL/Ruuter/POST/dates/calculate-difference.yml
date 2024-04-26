@@ -11,6 +11,13 @@ declaration:
       - field: startDate
         type: string
         description: "Body field 'startDate'"
+      - field: endDate
+        type: string
+        description: "Body field 'endDate'"
+    params:
+      - field: outputType
+        type: string
+        description: "Parameter 'outputType'"
 
 check_for_body:
   switch:

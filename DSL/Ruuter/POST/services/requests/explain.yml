@@ -11,6 +11,9 @@ declaration:
       - field: url
         type: string
         description: "Body field 'url'"
+      - field: method
+        type: string
+        description: "Body field 'url'"
 
 check_for_body:
   switch:

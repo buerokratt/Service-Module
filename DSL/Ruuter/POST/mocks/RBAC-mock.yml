@@ -11,6 +11,9 @@ declaration:
       - field: userId
         type: string
         description: "Body field 'userId'"
+      - field: allowedRoles
+        type: array
+        description: "Body field 'allowedRoles'"
 
 check_for_body:
   switch:

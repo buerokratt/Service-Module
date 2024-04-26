@@ -26,6 +26,9 @@ declaration:
       - field: structure
         type: json
         description: "Body field 'structure'"
+      - field: type
+        type: string
+        description: "Body field 'type'"
 
 check_for_required_parameters:
   switch:

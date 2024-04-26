@@ -11,6 +11,9 @@ declaration:
       - field: id
         type: string
         description: "Body field 'id'"
+      - field: type
+        type: string
+        description: "Body field 'type'"
 
 # TODO: Remove Service from bot so it won't be available for the user to use
 check_for_required_parameters:

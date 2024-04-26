@@ -21,7 +21,7 @@ check_for_body:
 do_decision:
   switch:
     - condition: ${incoming.body.isTokenExpired === true}
-    - next: return_unauthorized
+      next: return_unauthorized
   next: return_user_info_mock
 
 return_unauthorized:
