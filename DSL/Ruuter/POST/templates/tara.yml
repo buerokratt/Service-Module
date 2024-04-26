@@ -6,6 +6,12 @@ declaration:
   accepts: json
   returns: json
   namespace: service
+  allowlist:
+    headers:
+      - field: cookie
+        type: string
+        description: "Cookie field"
+
 
 check_for_body:
   switch:
