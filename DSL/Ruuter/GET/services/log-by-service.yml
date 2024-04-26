@@ -1,3 +1,12 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Decription placeholder for 'LOG-BY-SERVICE'"
+  method: get
+  accepts: json
+  returns: json
+  namespace: service
+
 get_services_stat:
   call: http.post
   args:

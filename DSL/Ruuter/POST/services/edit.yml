@@ -1,3 +1,30 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Decription placeholder for 'EDIT'"
+  method: post
+  accepts: json
+  returns: json
+  namespace: service
+  allowlist:
+    body:
+      - field: description
+        type: string
+        description: "Body field 'description'"
+      - field: name
+        type: string
+        description: "Body field 'name'"
+      - field: structure
+        type: json
+        description: "Body field 'structure'"
+      - field: type
+        type: string
+        description: "Body field 'type'"
+    params:
+      - field: id
+        type: string
+        description: "Parameter 'id'"
+
 extract_request_data:
   assign:
     id: ${incoming.params.id}

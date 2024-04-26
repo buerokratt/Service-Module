@@ -1,3 +1,20 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Decription placeholder for 'FILE-GENERATE'"
+  method: post
+  accepts: json
+  returns: json
+  namespace: service
+  allowlist:
+    body:
+      - field: fileContent
+        type: string
+        description: "Body field 'fileContent'"
+      - field: fileName
+        type: string
+        description: "Body field 'fileName'"
+
 check_for_body:
   switch:
     - condition: ${incoming.body == null || incoming.body.fileName == null || incoming.body.fileContent == null}

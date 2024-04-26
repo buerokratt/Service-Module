@@ -1,3 +1,17 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Decription placeholder for 'GET-STICKY'"
+  method: get
+  accepts: json
+  returns: json
+  namespace: service
+  allowlist:
+    params:
+      - field: name
+        type: string
+        description: "Parameter 'name'"
+
 check_for_parameters:
   switch:
     - condition: ${incoming.params == null || incoming.params.name == null}

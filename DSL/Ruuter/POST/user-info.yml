@@ -1,3 +1,12 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Decription placeholder for 'USER-INFO'"
+  method: post
+  accepts: json
+  returns: json
+  namespace: service
+
 get_tara_info:
   template: templates/tara
   requestType: post

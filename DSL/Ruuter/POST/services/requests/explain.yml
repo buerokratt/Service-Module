@@ -1,3 +1,20 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Decription placeholder for 'EXPLAIN'"
+  method: post
+  accepts: json
+  returns: json
+  namespace: service
+  allowlist:
+    body:
+      - field: method
+        type: string
+        description: "Body field 'url'"
+      - field: url
+        type: string
+        description: "Body field 'url'"
+
 check_for_body:
   switch:
     - condition: ${incoming.body == null}

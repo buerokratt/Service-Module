@@ -1,3 +1,20 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Decription placeholder for 'VALIDATION-TEMPLATE'"
+  method: post
+  accepts: json
+  returns: json
+  namespace: service
+  allowlist:
+    body:
+      - field: response
+        type: string
+        description: "Body field 'response'"
+      - field: type
+        type: string
+        description: "Body field 'type'"
+
 assign_step:
   assign:
     res: ${incoming.body.response}

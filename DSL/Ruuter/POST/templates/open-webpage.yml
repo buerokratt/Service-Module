@@ -1,3 +1,20 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Decription placeholder for 'OPEN-WEBPAGE'"
+  method: post
+  accepts: json
+  returns: json
+  namespace: service
+  allowlist:
+    body:
+      - field: link
+        type: string
+        description: "Body field 'link'"
+      - field: linkText
+        type: string
+        description: "Body field 'linkText'"
+
 check_for_body:
   switch:
     - condition: ${incoming.body == null || incoming.body.link == null || incoming.body.link == "" || incoming.body.linkText == null || incoming.body.linkText == ""}

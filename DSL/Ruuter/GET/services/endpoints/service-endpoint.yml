@@ -1,6 +1,20 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Decription placeholder for 'SERVICE-ENDPOINT'"
+  method: get
+  accepts: json
+  returns: json
+  namespace: service
+  allowlist:
+    params:
+      - field: type
+        type: string
+        description: "Parameter 'type'"
+
 extract_request_data:
   assign:
-    type: ${incoming.body.type}
+    type: ${incoming.params.type}
   next: check_for_type
 
 check_for_type:
