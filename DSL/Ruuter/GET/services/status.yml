@@ -7,17 +7,17 @@ declaration:
   returns: json
   namespace: service
   allowlist:
-    body:
+    params:
       - field: id
         type: string
-        description: "Body field 'id'"
+        description: "Parameter 'id'"
 
 get_status:
   call: http.post
   args:
     url: "[#SERVICE_RESQL]/status"
     body:
-      id: ${incoming.body.id}
+      id: ${incoming.params.id}
   result: res
 
 return_value:
