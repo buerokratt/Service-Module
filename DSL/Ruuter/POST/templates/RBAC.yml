@@ -8,12 +8,12 @@ declaration:
   namespace: service
   allowlist:
     body:
-      - field: userId
-        type: string
-        description: "Body field 'userId'"
       - field: allowedRoles
         type: array
         description: "Body field 'allowedRoles'"
+      - field: userId
+        type: string
+        description: "Body field 'userId'"
 
 check_for_body:
   switch:

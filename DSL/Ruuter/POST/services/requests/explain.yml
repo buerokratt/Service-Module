@@ -8,10 +8,10 @@ declaration:
   namespace: service
   allowlist:
     body:
-      - field: url
+      - field: method
         type: string
         description: "Body field 'url'"
-      - field: method
+      - field: url
         type: string
         description: "Body field 'url'"
 

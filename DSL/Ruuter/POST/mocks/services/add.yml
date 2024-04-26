@@ -14,7 +14,6 @@ declaration:
       - field: description
         type: string
         description: "Body field 'description'"
-        
 
 check_for_body:
   switch:
