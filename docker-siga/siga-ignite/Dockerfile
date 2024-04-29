@@ -1,4 +1,4 @@
-FROM openjdk:17-slim-bullseye
+FROM openjdk:23-ea-18-jdk-oraclelinux8
 
 ENV IGNITE_VERSION 2.15.0
 ENV IGNITE_HOME /opt/ignite/apache-ignite-${IGNITE_VERSION}-bin
