@@ -31,6 +31,7 @@ const ChatKeyPad = (): JSX.Element => {
         />
       <div
         onClick={addNewMessageToState}
+        onKeyDown={addNewMessageToState}
         className={styles.button}
         role="button"
         tabIndex={0}

@@ -9,9 +9,6 @@ import apiDevV2 from "./services/api-dev-v2";
 import auth from "./services/auth";
 import apigeneric from "./services/apigeneric";
 import apiAn from './services/analytics-api';
-import * as mocks from "./services/mockHandlers";
-
-mocks
 
 const defaultQueryFn: QueryFunction | undefined = async ({ queryKey }) => {
     if (import.meta.env.REACT_APP_LOCAL === 'true') {
