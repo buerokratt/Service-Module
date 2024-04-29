@@ -245,18 +245,19 @@ const EndpointOpenAPI: React.FC<EndpointOpenAPIProps> = ({
       return prevEndpoints.map((prevEndpoint) => {
         if (prevEndpoint.id !== endpoint.id) return prevEndpoint;
         prevEndpoint.definedEndpoints.map((openApiEndpoint) => {
-          if (openApiEndpoint.id !== openApiEndpointId) return openApiEndpoint;
-          Object.keys(data).forEach((key) => {
-            openApiEndpoint[key as EndpointTab]?.variables.forEach((variable) => {
-              if (["schema", "array"].includes(variable.type)) {
-                checkNestedVariables(variable, data[key as EndpointTab]!);
-              }
-              const updatedVariable = data[key as EndpointTab]!.find(
-                (updated) => updated.endpointVariableId === variable.id
-              );
-              variable[isLive ? "value" : "testValue"] = updatedVariable?.value;
+          if (openApiEndpoint.id === openApiEndpointId) {
+            Object.keys(data).forEach((key) => {
+              openApiEndpoint[key as EndpointTab]?.variables.forEach((variable) => {
+                if (["schema", "array"].includes(variable.type)) {
+                  checkNestedVariables(variable, data[key as EndpointTab]!);
+                }
+                const updatedVariable = data[key as EndpointTab]!.find(
+                  (updated) => updated.endpointVariableId === variable.id
+                );
+                variable[isLive ? "value" : "testValue"] = updatedVariable?.value;
+              });
             });
-          });
+          }
           return openApiEndpoint;
         });
         return prevEndpoint;
