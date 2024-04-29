@@ -10,28 +10,6 @@ let currentState = {
     active: stateSwitch ? 'true' : 'false',
     status: stateSwitch ? 'online' : 'offline'
 }
-export const customJwt =
-    api
-        .onGet(mockPath + import.meta.env.REACT_APP_AUTH_PATH)
-        .reply(200, {
-            data: {
-                custom_jwt_userinfo: {
-                    firstName: "Rasmus",
-                    lastName: "Eimla",
-                    idCode: "EE30303039914",
-                    displayName: "Rasmuss",
-                    JWTCreated: '1691471980000',
-                    login: "EE30303039914",
-                    csaEmail: "rasmus@gmail.com",
-                    authorities: [
-                        "ROLE_ADMINISTRATOR"
-                    ],
-                    csaTitle: "Super User",
-                    JWTExpirationTimestamp: '1691475580000'
-                }
-            },
-            error: null
-        });
 
 export const getUserRole =
     api
