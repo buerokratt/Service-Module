@@ -13,7 +13,12 @@ const Tooltip: FC<PropsWithChildren<TooltipProps>> = ({ content, children }) => 
     <RadixTooltip.Provider delayDuration={100}>
       <RadixTooltip.Root open={open} onOpenChange={setOpen}>
         <RadixTooltip.Trigger asChild>
-          <div style={{ display: "inline-flex" }} onClick={() => setOpen(true)}>
+          <div 
+            style={{ display: "inline-flex" }} 
+            onClick={() => setOpen(true)}
+            onKeyDown={() => setOpen(true)}
+            role="button"
+            tabIndex={0}>
             {children}
           </div>
         </RadixTooltip.Trigger>

@@ -182,7 +182,7 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
   const deleteVariable = (rowData: RequestVariablesRowData) => {
     setEndpoints((prevEndpoints: EndpointData[]) => {
       return prevEndpoints.map((prevEndpoint) => {
-        prevEndpoint.definedEndpoints.map((defEndpoint) => {
+        for (const defEndpoint of prevEndpoint.definedEndpoints) {
           if (defEndpoint.id !== endpointData.id || !defEndpoint[requestTab.tab]) return defEndpoint;
           if (
             rowData.endpointVariableId &&
@@ -192,13 +192,14 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
               (v) => v.id !== rowData.endpointVariableId
             );
           } else {
-            defEndpoint[requestTab.tab]!.variables.forEach((variable) => {
+            for (const variable of defEndpoint[requestTab.tab]!.variables) {
               if (["schema", "array"].includes(variable.type) && rowData.endpointVariableId) {
                 checkNestedVariables(rowData.endpointVariableId, variable);
-              }
-            });
+              }              
+            }
           }
-        });
+        }
+        
         return prevEndpoint;
       });
     });

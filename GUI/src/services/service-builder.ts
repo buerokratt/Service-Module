@@ -349,7 +349,7 @@ export async function saveEndpoints(
         selectedEndpointType.url?.indexOf("{") + 1,
         selectedEndpointType.url.indexOf("}")
       );
-      endpointUrl = selectedEndpointType.url?.replace(`{${variable}}` ?? "", endpointParams[variable ?? ""]);
+      endpointUrl = selectedEndpointType.url?.replace(`{${variable}}`, endpointParams[variable ?? ""]);
     }
     steps.set("assign_endpoint_url", {
       assign: {

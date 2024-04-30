@@ -7,7 +7,7 @@ import Button from "../Button";
 import { v4 as uuidv4 } from 'uuid';
 import { useTranslation } from "react-i18next";
 
-const RasaRulesContent: FC = ({ }) => {
+const RasaRulesContent: FC = () => {
   const [config, setConfig] = useState<any>({})
   const [rules, setRules] = useState<any[]>([])
   const { t } = useTranslation()

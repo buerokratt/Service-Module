@@ -244,43 +244,53 @@ const EndpointOpenAPI: React.FC<EndpointOpenAPIProps> = ({
     setEndpoints((prevEndpoints) => {
       return prevEndpoints.map((prevEndpoint) => {
         if (prevEndpoint.id !== endpoint.id) return prevEndpoint;
-        prevEndpoint.definedEndpoints.map((openApiEndpoint) => {
-          if (openApiEndpoint.id === openApiEndpointId) {
-            Object.keys(data).forEach((key) => {
-              openApiEndpoint[key as EndpointTab]?.variables.forEach((variable) => {
-                if (["schema", "array"].includes(variable.type)) {
-                  checkNestedVariables(variable, data[key as EndpointTab]!);
-                }
-                const updatedVariable = data[key as EndpointTab]!.find(
-                  (updated) => updated.endpointVariableId === variable.id
-                );
-                variable[isLive ? "value" : "testValue"] = updatedVariable?.value;
-              });
-            });
-          }
-          return openApiEndpoint;
-        });
+        updateEndpoint(prevEndpoint, data, openApiEndpointId);
         return prevEndpoint;
       });
     });
     setKey(key + 1);
   };
 
+  const updateEndpoint = (prevEndpoint: EndpointData, data: RequestVariablesTabsRowsData, openApiEndpointId?: string) => {
+    prevEndpoint.definedEndpoints.map((openApiEndpoint) => {
+      if (openApiEndpoint.id === openApiEndpointId) {
+        updateOpenApiEndpoint(data, openApiEndpoint)
+      }
+      return openApiEndpoint;
+    });
+  }
+
+  const updateOpenApiEndpoint = (data: RequestVariablesTabsRowsData, openApiEndpoint: EndpointType) => {
+    for (const key in data) {
+      openApiEndpoint[key as EndpointTab]?.variables.forEach((variable) => {
+        if (["schema", "array"].includes(variable.type)) {
+          checkNestedVariables(variable, data[key as EndpointTab]!);
+        }
+        const updatedVariable = data[key as EndpointTab]!.find((updated) => updated.endpointVariableId === variable.id);
+        variable[isLive ? "value" : "testValue"] = updatedVariable?.value;
+      });
+    }
+  }
+
   const onSelectEndpoint = (selection: Option | null) => {
     const newSelectedEndpoint = openApiEndpoints.find((openApiEndpoint) => openApiEndpoint.label === selection?.label);
     setSelectedEndpoint(newSelectedEndpoint);
     setEndpoints((prevEndpoints) => {
-      return prevEndpoints.map((prevEndpoint) => {
-        if (prevEndpoint.id !== endpoint.id) return prevEndpoint;
-        prevEndpoint.definedEndpoints.map((definedEndpoint) => {
-          definedEndpoint.isSelected = definedEndpoint === newSelectedEndpoint;
-          return definedEndpoint;
-        });
-        return prevEndpoint;
-      });
+      return updateSelectedEndpoint(prevEndpoints, newSelectedEndpoint)
     });
     setKey(key + 1);
   };
+
+  const updateSelectedEndpoint = (prevEndpoints:EndpointData[], newSelectedEndpoint: EndpointType | undefined) => {
+    return prevEndpoints.map((prevEndpoint) => {
+      if (prevEndpoint.id !== endpoint.id) return prevEndpoint;
+      prevEndpoint.definedEndpoints.map((definedEndpoint) => {
+        definedEndpoint.isSelected = definedEndpoint === newSelectedEndpoint;
+        return definedEndpoint;
+      });
+      return prevEndpoint;
+    });
+  }
 
   return (
     <Track direction="vertical" align="stretch" gap={16}>

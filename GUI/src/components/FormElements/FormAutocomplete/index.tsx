@@ -71,7 +71,12 @@ const FormAutocomplete: FC<FormAutocompleteProps> = ({
       {suggestions.length > 0 && (
         <div className="suggestions" style={{ display: isHideSuggestions ? "none" : "block" }}>
           {suggestions.map((item: string, idx: number) => (
-            <div key={`${item}-${idx}`} onClick={() => hideSuggestions(item)}>
+            <div 
+              key={`${item}-${idx}`}
+              onClick={() => hideSuggestions(item)}
+              onKeyDown={() => hideSuggestions(item)}
+              role="button"
+              tabIndex={0}>
               {item}
             </div>
           ))}
