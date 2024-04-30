@@ -1,43 +1,24 @@
 import { FC, useMemo, useState } from "react";
-import { createColumnHelper } from "@tanstack/react-table";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { MdDeleteOutline, MdOutlineDescription, MdOutlineEdit } from "react-icons/md";
-import { IoCopyOutline } from "react-icons/io5";
-import { Button, Card, Icon, Label, Modal, Tooltip, Track } from "..";
-import { Service } from "../../types/service";
-import { ServiceState } from "../../types/service-state";
+import { Button, Card, Modal, Track } from "..";
 import DataTable from "../DataTable";
 
-import "./ServicesTable.scss";
-import useStore from "store/store";
 import useServiceListStore from "store/services.store";
-import { ROUTES } from "resources/routes-constants";
-import useToastStore from "store/toasts.store";
-import "../../styles/main.scss";
 import ConnectServiceToIntentModel from "pages/Integration/ConnectServiceToIntentModel";
 import { Intent } from "types/Intent";
 import { Trigger } from "types/Trigger";
+import { getColumns } from "./columns";
+import "../../styles/main.scss";
+import "./ServicesTable.scss";
 
 type ServicesTableProps = {
   isCommon?: boolean;
 };
 
-const getLabelType = (serviceState: ServiceState) => {
-  switch (serviceState) {
-    case ServiceState.Draft:
-      return "disabled";
-    case ServiceState.Inactive:
-      return "warning-dark";
-    default:
-      return "info";
-  }
-};
-
 const ServicesTable: FC<ServicesTableProps> = ({ isCommon = false }) => {
   const { t } = useTranslation();
   const [isDeletePopupVisible, setIsDeletePopupVisible] = useState(false);
-  const userInfo = useStore((state) => state.userInfo);
   const [isStatePopupVisible, setIsStatePopupVisible] = useState(false);
   const [isReadyPopupVisible, setIsReadyPopupVisible] = useState(false);
   const [isIntentConnectionPopupVisible, setIsIntentConnectionPopupVisible] = useState(false);
@@ -45,155 +26,23 @@ const ServicesTable: FC<ServicesTableProps> = ({ isCommon = false }) => {
   const [readyPopupText, setReadyPopupText] = useState("");
   const [isReadyStatusChecking, setIsReadyStatusChecking] = useState(false);
   const services = useServiceListStore((state) => state.services.filter((x) => x.isCommon === isCommon));
-  const columnHelper = createColumnHelper<Service>();
   const navigate = useNavigate();
   const [selectedConnectionTrigger, setSelectedConnectionTrigger] = useState<Trigger | undefined>();
 
-  const showStatePopup = (text: string) => {
-    setPopupText(text);
-    setIsStatePopupVisible(true);
-  };
-
-  const columns = useMemo(
-    () => [
-      columnHelper.accessor("name", {
-        header: t("overview.service.name") ?? "",
-        meta: {
-          size: 530,
-        },
-        cell: (props) => (
-          <Track align="right" justify="start">
-            <label style={{ paddingRight: 3 }}>{props.cell.getValue()}</label>
-            <Tooltip
-              content={
-                <Track isMultiline={true}>
-                  <label
-                    style={{
-                      fontSize: "15px",
-                      maxWidth: "200px",
-                      maxHeight: "200px",
-                      overflow: "auto",
-                      overflowWrap: "break-word",
-                      wordWrap: "break-word",
-                      wordBreak: "break-word",
-                    }}
-                  >
-                    {props.row.original.description ?? ""}
-                  </label>
-                  <Button
-                    appearance="text"
-                    onClick={() => {
-                      navigator.clipboard.writeText(props.row.original.description ?? "");
-                      useToastStore.getState().success({
-                        title: t("overview.descriptionCopiedSuccessfully"),
-                      });
-                    }}
-                    style={{ paddingLeft: "5px" }}
-                  >
-                    <Icon style={{ color: "black" }} icon={<IoCopyOutline />} size="small" />
-                  </Button>
-                </Track>
-              }
-            >
-              <div style={{ display: "inline-flex" }}>
-                <Icon icon={<MdOutlineDescription />} size="medium" />
-              </div>
-            </Tooltip>
-          </Track>
-        ),
-      }),
-      columnHelper.accessor("usedCount", {
-        header: t("overview.service.usedCount") ?? "",
-        meta: {
-          size: 320,
-        },
-      }),
-      columnHelper.accessor("state", {
-        header: t("overview.service.state") ?? "",
-        meta: {
-          size: 120,
-        },
-        cell: (props) => (
-          <Track
-            justify="around"
-            onClick={() => {
-              useServiceListStore.getState().setSelectedService(props.row.original);
-              if (props.row.original.state === ServiceState.Ready) {
-                checkIntentConnection();
-                setIsReadyStatusChecking(true);
-                setIsReadyPopupVisible(true);
-              } else {
-                showStatePopup(getStatePopupContent(props.row.original.state));
-              }
-            }}
-          >
-            <Label type={getLabelType(props.row.original.state)}>
-              {t(`overview.service.states.${props.row.original.state}`)}
-            </Label>
-          </Track>
-        ),
-      }),
-      columnHelper.accessor("linkedIntent", {
-        header: t("overview.service.linkedIntent") ?? "",
-        meta: {
-          size: 200,
-        },
-        cell: (props) => (
-          <Track justify="center">
-            <label style={{ paddingRight: 40 }}>{props.cell.getValue()}</label>
-          </Track>
-        ),
-      }),
-      columnHelper.display({
-        id: "edit",
-        meta: {
-          size: 90,
-        },
-        cell: (props) => (
-          <Track align="right" justify="start">
-            <Button
-              appearance="text"
-              disabled={
-                isCommon === true && !userInfo?.authorities.includes("ROLE_ADMINISTRATOR")
-                  ? true
-                  : props.row.original.state === ServiceState.Active || props.row.original.state === ServiceState.Ready
-              }
-              onClick={() => navigate(ROUTES.replaceWithId(ROUTES.EDITSERVICE_ROUTE, props.row.original.serviceId))}
-            >
-              <Icon icon={<MdOutlineEdit />} size="medium" />
-              {t("overview.edit")}
-            </Button>
-          </Track>
-        ),
-      }),
-      columnHelper.display({
-        id: "delete",
-        meta: {
-          size: 90,
-        },
-        cell: (props) => (
-          <Track align="right">
-            <Button
-              disabled={
-                isCommon === true && !userInfo?.authorities.includes("ROLE_ADMINISTRATOR")
-                  ? true
-                  : props.row.original.state === ServiceState.Active || props.row.original.state === ServiceState.Ready
-              }
-              appearance="text"
-              onClick={() => {
-                useServiceListStore.getState().setSelectedService(props.row.original);
-                setIsDeletePopupVisible(true);
-              }}
-            >
-              <Icon icon={<MdDeleteOutline />} size="medium" />
-              {t("overview.delete")}
-            </Button>
-          </Track>
-        ),
-      }),
-    ],
-    []
-  );
+  const columns = useMemo(() => getColumns({
+    isCommon,
+    navigate,
+    checkIntentConnection,
+    hideDeletePopup: () => setIsDeletePopupVisible(true),
+    showStatePopup: (text: string) => {
+      setPopupText(text);
+      setIsStatePopupVisible(true);
+    },
+    showReadyPopup: () => {
+      setIsReadyStatusChecking(true);
+      setIsReadyPopupVisible(true);
+    }
+  }), []);
 
   const checkIntentConnection = () => {
     useServiceListStore.getState().checkServiceIntentConnection(
@@ -266,14 +115,6 @@ const ServicesTable: FC<ServicesTableProps> = ({ isCommon = false }) => {
     if(popupText === t("overview.popup.setReady"))
       return t("overview.popup.setState");
     return t("overview.popup.activate");
-  }
-
-  const getStatePopupContent = (state: ServiceState) => {
-    if(state === ServiceState.Draft)
-      return t("overview.popup.setReady");
-    if(state === ServiceState.Active)
-      return t("overview.popup.setInactive");
-    return t("overview.popup.setActive");
   }
 
   const getActiveAndConnectionButton = () => {

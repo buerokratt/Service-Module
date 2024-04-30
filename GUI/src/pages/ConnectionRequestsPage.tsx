@@ -33,69 +33,7 @@ const ConnectionRequestsPage: React.FC = () => {
       );
   };
 
-  const appRequestColumnHelper = createColumnHelper<Trigger>();
-  const appRequestColumns = useMemo(
-    () => [
-      appRequestColumnHelper.accessor("intent", {
-        header: "Intent",
-        cell: (uniqueIdentifier) => uniqueIdentifier.getValue(),
-      }),
-      appRequestColumnHelper.accessor("serviceName", {
-        header: "Service",
-        cell: (uniqueIdentifier) => uniqueIdentifier.getValue(),
-      }),
-      appRequestColumnHelper.accessor("requestedAt", {
-        header: "Requested At",
-        cell: (props) => <span>{format(new Date(props.getValue()), "dd-MM-yyyy HH:mm:ss")}</span>,
-      }),
-      appRequestColumnHelper.display({
-        header: "",
-        cell: (props) => (
-          <Icon
-            icon={
-              <AiFillCheckCircle
-                fontSize={22}
-                color="rgba(34,139,34, 1)"
-                onClick={() => respondToConnectionRequest(true, props.row.original)}
-              />
-            }
-            size="medium"
-          />
-        ),
-        id: "approve",
-        meta: {
-          size: "1%",
-        },
-      }),
-      appRequestColumnHelper.display({
-        header: "",
-        cell: (props) => (
-          <Icon
-            icon={
-              <AiFillCloseCircle
-                fontSize={22}
-                color="rgba(210, 4, 45, 1)"
-                onClick={() => respondToConnectionRequest(false, props.row.original)}
-              />
-            }
-            size="medium"
-          />
-        ),
-        id: "reject",
-        meta: {
-          size: "1%",
-        },
-      }),
-      appRequestColumnHelper.display({
-        header: "",
-        id: "space",
-        meta: {
-          size: "1%",
-        },
-      }),
-    ],
-    [appRequestColumnHelper, t]
-  );
+  const appRequestColumns = useMemo(() => getColumns(respondToConnectionRequest), []);
 
   if (!triggers) return <span>Loading ...</span>;
 
@@ -108,4 +46,69 @@ const ConnectionRequestsPage: React.FC = () => {
     </>
   );
 };
+
+const getColumns = (respondToConnectionRequest: (result: boolean, tigger: Trigger) => void) => {
+  const appRequestColumnHelper = createColumnHelper<Trigger>();
+
+  return [
+    appRequestColumnHelper.accessor("intent", {
+      header: "Intent",
+      cell: (uniqueIdentifier) => uniqueIdentifier.getValue(),
+    }),
+    appRequestColumnHelper.accessor("serviceName", {
+      header: "Service",
+      cell: (uniqueIdentifier) => uniqueIdentifier.getValue(),
+    }),
+    appRequestColumnHelper.accessor("requestedAt", {
+      header: "Requested At",
+      cell: (props) => <span>{format(new Date(props.getValue()), "dd-MM-yyyy HH:mm:ss")}</span>,
+    }),
+    appRequestColumnHelper.display({
+      header: "",
+      cell: (props) => (
+        <Icon
+          icon={
+            <AiFillCheckCircle
+              fontSize={22}
+              color="rgba(34,139,34, 1)"
+              onClick={() => respondToConnectionRequest(true, props.row.original)}
+            />
+          }
+          size="medium"
+        />
+      ),
+      id: "approve",
+      meta: {
+        size: "1%",
+      },
+    }),
+    appRequestColumnHelper.display({
+      header: "",
+      cell: (props) => (
+        <Icon
+          icon={
+            <AiFillCloseCircle
+              fontSize={22}
+              color="rgba(210, 4, 45, 1)"
+              onClick={() => respondToConnectionRequest(false, props.row.original)}
+            />
+          }
+          size="medium"
+        />
+      ),
+      id: "reject",
+      meta: {
+        size: "1%",
+      },
+    }),
+    appRequestColumnHelper.display({
+      header: "",
+      id: "space",
+      meta: {
+        size: "1%",
+      },
+    }),
+  ]
+}
+
 export default ConnectionRequestsPage;

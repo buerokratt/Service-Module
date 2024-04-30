@@ -504,6 +504,12 @@ export const saveFlow = async ({
 
         const clientInputYesOrNo = (label: string) => label === "rule 1" ? '"Yes"' : '"No"';
 
+        const findTargetNodeId = (node: Node) => edges.find((edge) => edge.source === node.id)?.target;
+        const findFollowingNode = (node: Node) => {
+          const target = findTargetNodeId(node);
+          return nodes.find((n) => n.id === target);
+        }
+
         finishedFlow.set(
           `${clientInput}-switch`,
           getSwitchCase(
@@ -515,9 +521,7 @@ export const saveFlow = async ({
                 const matchingRule = parentNode.data?.rules?.children?.find(
                   (_: never, i: number) => `rule ${i + 1}` === node.data.label
                 );
-                const followingNode = nodes.find(
-                  (n) => n.id === edges.find((edge) => edge.source === node.id)?.target
-                );
+                const followingNode = findFollowingNode(node);
                 return {
                   case:
                     matchingRule && !["Yes", "No"].includes(matchingRule?.condition)

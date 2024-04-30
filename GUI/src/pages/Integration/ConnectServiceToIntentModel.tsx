@@ -5,7 +5,7 @@ import { MdOutlineArrowForward } from "react-icons/md";
 import useServiceStore from "store/services.store";
 import { Button, DataTable, Dialog, FormInput, Icon, Modal, Track } from "components";
 import { Intent } from "types/Intent";
-import { set } from "date-fns";
+import i18n from "i18n";
 
 type ConnectServiceToIntentModelProps = {
   onModalClose: () => void;
@@ -36,32 +36,11 @@ const ConnectServiceToIntentModel: FC<ConnectServiceToIntentModelProps> = ({ onM
     loadAvailableIntents();
   }, []);
 
-  const columnHelper = createColumnHelper<Intent>();
-
   const intentColumns = useMemo(
-    () => [
-      columnHelper.accessor("intent", {
-        header: t("overview.popup.intent") || "",
-      }),
-      columnHelper.display({
-        id: "connect",
-        cell: (props) => (
-          <Button
-            appearance="text"
-            onClick={() => {
-              setSetSelectedIntents(props.row.original);
-              setShowConfirmationModal(true);
-            }}
-          >
-            <Icon icon={<MdOutlineArrowForward color="rgba(0, 0, 0, 0.54)" />} />
-            {t("overview.popup.connect")}
-          </Button>
-        ),
-        meta: {
-          size: "1%",
-        },
-      }),
-    ],
+    () => getColumns((intent) => {
+      setSetSelectedIntents(intent);
+      setShowConfirmationModal(true);
+    }),
     []
   );
 
@@ -124,5 +103,30 @@ const ConnectServiceToIntentModel: FC<ConnectServiceToIntentModelProps> = ({ onM
     </Dialog>
   );
 };
+
+const getColumns = (onClick: (intent: Intent) => void) => {
+  const columnHelper = createColumnHelper<Intent>();
+
+  return [
+    columnHelper.accessor("intent", {
+      header: i18n.t("overview.popup.intent") || "",
+    }),
+    columnHelper.display({
+      id: "connect",
+      cell: (props) => (
+        <Button
+          appearance="text"
+          onClick={() => onClick(props.row.original)}
+        >
+          <Icon icon={<MdOutlineArrowForward color="rgba(0, 0, 0, 0.54)" />} />
+          {i18n.t("overview.popup.connect")}
+        </Button>
+      ),
+      meta: {
+        size: "1%",
+      },
+    }),
+  ]
+}
 
 export default ConnectServiceToIntentModel;

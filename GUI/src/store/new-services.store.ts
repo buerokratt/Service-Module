@@ -387,25 +387,27 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
   isLive: () => get().selectedTab === EndpointEnv.Live,
   updateEndpointRawData: (data: RequestVariablesTabsRawData, endpointId?: string, parentEndpointId?: string) => {
     if (!endpointId) return;
-    set((state) => {
-      const isLive = state.isLive();
-      const endpoints = state.endpoints.map((prevEndpoint: EndpointData) => {
-        if (prevEndpoint.id !== parentEndpointId) return prevEndpoint;
-        prevEndpoint.definedEndpoints.map((defEndpoint) => {
-          if (defEndpoint.id !== endpointId) return defEndpoint;
-          Object.keys(data).forEach((key) => {
-            if (defEndpoint[key as EndpointTab]) {
-              defEndpoint[key as EndpointTab]!.rawData[isLive ? "value" : "testValue"] = data[key as EndpointTab];
-            }
-          });
-          return defEndpoint;
-        });
-        return prevEndpoint;
-      });
+    const isLive = get().isLive();
 
-      return {
-        endpoints,
-      };
+    const endpoints: EndpointData[] = [];
+    for (const prevEndpoint of get().endpoints) {
+      if (prevEndpoint.id === parentEndpointId) {     
+        for (const defEndpoint of prevEndpoint.definedEndpoints) {
+          if (defEndpoint.id === endpointId) {
+            for (const key in data) {
+              if (defEndpoint[key as EndpointTab]) {
+                defEndpoint[key as EndpointTab]!.rawData[isLive ? "value" : "testValue"] = data[key as EndpointTab];
+              }
+            }
+          }
+        }     
+      }
+
+      return endpoints.push(prevEndpoint);
+    }
+
+    set({
+      endpoints
     });
   },
   updateEndpointData: (data: RequestVariablesTabsRowsData, endpointId?: string, parentEndpointId?: string) => {

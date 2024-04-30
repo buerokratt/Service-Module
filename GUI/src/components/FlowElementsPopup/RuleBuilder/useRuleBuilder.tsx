@@ -10,7 +10,8 @@ interface UseRuleBuilderProps {
 
 export const useRuleBuilder = (config: UseRuleBuilderProps) => {
   const elementsInitialValue = config.root ? (config.seedGroup?.children ?? []) : config.group!.children;
-  const groupInfoInitialValue = config.root ? (config.seedGroup?.length > 0 ? config.seedGroup: getInitialGroup()) : config.group!
+  const seedGroup = config.seedGroup?.length > 0 ? config.seedGroup: getInitialGroup();
+  const groupInfoInitialValue = config.root ? seedGroup : config.group!
   const [elements, setElements] = useState<GroupOrRule[]>(elementsInitialValue);
   const [groupInfo, setGroupInfo] = useState<Group>(groupInfoInitialValue);
 

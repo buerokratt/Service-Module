@@ -4,13 +4,14 @@ import clsx from 'clsx'
 import { useTranslation } from 'react-i18next'
 import { MdArrowDropDown } from 'react-icons/md'
 
-import { Button, Icon } from '../..'
+import { Icon } from '../..'
 import './FormSelect.scss'
 
 type FormSelectMultipleProps = SelectHTMLAttributes<HTMLSelectElement> & {
   label: string
   name: string
   defaultValue?: string[]
+  placeholder?: string
   options: {
     label: string
     value: string

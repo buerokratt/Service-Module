@@ -80,14 +80,6 @@ const StepNode: FC<NodeDataProps> = ({ data }) => {
     updateIsTestedAndPassed();
   }, [data]);
 
-  const TestStatues = () => {
-    if(isTestedAndPassed) 
-      return <CheckBadge />
-    if(isStepInvalid())
-      return <ExclamationBadge />
-    return <ExclamationBadge color="purple" />
-  }
-
   return (
     <Track
       style={{ overflow: "hidden", whiteSpace: "nowrap", textOverflow: "ellipsis" }}
@@ -95,7 +87,7 @@ const StepNode: FC<NodeDataProps> = ({ data }) => {
       align="left"
     >
       <p>
-        {TestStatues()}
+        <TestStatue isTestedAndPassed={isTestedAndPassed} isStepInvalid={isStepInvalid} />
         {data.label}
       </p>
       {data.stepType === StepType.Textfield && (
@@ -147,5 +139,19 @@ const StepNode: FC<NodeDataProps> = ({ data }) => {
     </Track>
   );
 };
+
+const TestStatue = ({
+  isTestedAndPassed,
+  isStepInvalid,
+}:{
+  isTestedAndPassed: boolean | null,
+  isStepInvalid: () => boolean,
+}) => {
+  if(isTestedAndPassed) 
+    return <CheckBadge />
+  if(isStepInvalid())
+    return <ExclamationBadge />
+  return <ExclamationBadge color="purple" />
+}
 
 export default memo(StepNode);
