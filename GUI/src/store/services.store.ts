@@ -103,20 +103,24 @@ const useServiceListStore = create<ServiceStoreState>((set, get, store) => ({
     if (!selectedService) return;
 
     try {
+
+      let state;
+      if(selectedService.state === ServiceState.Active && !draft)
+        state = ServiceState.Inactive;
+      else if (selectedService.state === ServiceState.Active && draft)
+        state = ServiceState.Draft;
+      else if(selectedService.state === ServiceState.Draft)
+        state = ServiceState.Ready;
+      else if (selectedService.state === ServiceState.Ready && activate)
+        state = ServiceState.Active;
+      else if (selectedService.state === ServiceState.Inactive && !draft)
+        state = ServiceState.Active
+      else 
+        state = ServiceState.Draft;
+
       await axios.post(changeServiceStatus(), {
         id: selectedService.serviceId,
-        state:
-          selectedService.state === ServiceState.Active && !draft
-            ? ServiceState.Inactive
-            : selectedService.state === ServiceState.Active && draft
-            ? ServiceState.Draft
-            : selectedService.state === ServiceState.Draft
-            ? ServiceState.Ready
-            : selectedService.state === ServiceState.Ready && activate
-            ? ServiceState.Active
-            : selectedService.state === ServiceState.Inactive && !draft
-            ? ServiceState.Active
-            : ServiceState.Draft,
+        state,
         type: selectedService.type,
       });
       useToastStore.getState().success({ title: successMessage });

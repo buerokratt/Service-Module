@@ -14,6 +14,6 @@ RUN curl https://archive.apache.org/dist/ignite/${IGNITE_VERSION}/apache-ignite-
     && unzip ignite.zip \
     && rm ignite.zip
 
-CMD $IGNITE_HOME/run.sh
+CMD "$IGNITE_HOME"/run.sh
 
 EXPOSE 11211 47100 47500 49112

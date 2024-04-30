@@ -576,12 +576,12 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
     try {
       new URL(endpoint.definedEndpoints[0].url ?? "");
       if (endpoint.definedEndpoints[0].methodType === "GET") {
-        const result = await axios.post(getEndpointValidation(), {
+        await axios.post(getEndpointValidation(), {
           url: endpoint.definedEndpoints[0].url ?? "",
           type: "GET",
         });
       } else {
-        const result = await axios.post(getEndpointValidation(), {
+        await axios.post(getEndpointValidation(), {
           url: endpoint.definedEndpoints[0].url ?? "",
           type: "POST",
         });

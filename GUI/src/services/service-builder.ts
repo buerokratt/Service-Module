@@ -153,6 +153,7 @@ const saveEndpointConfig = async (
   steps.set("prepare_step", {
     assign: variables,
   });
+  const bodyStr = Object.keys(body ?? {}).map((b) => `["${b.replaceAll("__", ".")}", body_${b}]`);
   steps.set("combine_step", {
     assign: {
       sensitive: `\${new Map([${typeof headers === "string"
@@ -162,7 +163,7 @@ const saveEndpointConfig = async (
         )}])]`
         }, ${typeof body === "string"
           ? `["body", body]`
-          : `["body", new Map([${Object.keys(body ?? {}).map((b) => `["${b.replaceAll("__", ".")}", body_${b}]`)}])]`
+          : `["body", new Map([${bodyStr}])]`
         }, ${typeof params === "string"
           ? `["params", params]`
           : `["params", new Map([${Object.keys(params ?? {}).map(
@@ -396,7 +397,7 @@ export async function saveEndpoints(
   await Promise.all(tasks).then(onSuccess).catch(onError);
 }
 
-export const saveFlow = async (
+interface SaveFlowConfig {
   steps: Step[],
   name: string,
   edges: Edge[],
@@ -407,7 +408,20 @@ export const saveFlow = async (
   isCommon: boolean,
   serviceId: string,
   isNewService: boolean,
-) => {
+}
+
+export const saveFlow = async ({
+  steps,
+  name,
+  edges,
+  nodes,
+  onSuccess,
+  onError,
+  description,
+  isCommon,
+  serviceId,
+  isNewService,
+}: SaveFlowConfig) => {
   try {
     const allRelations: any[] = [];
     // find regular edges 1 -> 1
@@ -488,6 +502,8 @@ export const saveFlow = async (
           next: `${clientInput}-switch`,
         });
 
+        const clientInputYesOrNo = (label: string) => label === "rule 1" ? '"Yes"' : '"No"';
+
         finishedFlow.set(
           `${clientInput}-switch`,
           getSwitchCase(
@@ -507,7 +523,7 @@ export const saveFlow = async (
                     matchingRule && !["Yes", "No"].includes(matchingRule?.condition)
                       ? `\${${matchingRule.name.replace("{{", "").replace("}}", "")} ${matchingRule.condition} ${matchingRule.value
                       }}`
-                      : `\${${clientInput} == ${node.data.label === "rule 1" ? '"Yes"' : '"No"'}}`,
+                      : `\${${clientInput} == ${clientInputYesOrNo(node.data.label)}}`,
                   nextStep:
                     followingNode?.type === "customNode"
                       ? `${followingNode.data.stepType}-${followingNode.id}`
@@ -592,8 +608,8 @@ const getNestedPreDefinedEndpointVariables = (variable: EndpointVariableData, re
     variableData.forEach((v) => {
       if (["schema", "array"].includes(v.type)) getNestedPreDefinedEndpointVariables(v, result);
 
-      if (v.value && v.value.startsWith("{{")) result.push(getMapEntry(v.value));
-      if (v.testValue && v.testValue.startsWith("{{")) result.push(getMapEntry(v.testValue));
+      if (v.value?.startsWith("{{")) result.push(getMapEntry(v.value));
+      if (v.testValue?.startsWith("{{")) result.push(getMapEntry(v.testValue));
     });
   }
 };
@@ -604,8 +620,8 @@ const getPreDefinedEndpointVariables = (data?: { variables: EndpointVariableData
   data.variables.forEach((v) => {
     if (!v.value) getNestedPreDefinedEndpointVariables(v, result);
 
-    if (v.value && v.value.startsWith("{{")) result.push(getMapEntry(v.value));
-    if (v.testValue && v.testValue.startsWith("{{")) result.push(getMapEntry(v.testValue));
+    if (v.value?.startsWith("{{")) result.push(getMapEntry(v.value));
+    if (v.testValue?.startsWith("{{")) result.push(getMapEntry(v.testValue));
   });
   try {
     getNestedPreDefinedRawVariables(JSON.parse(data.rawData?.value ?? "{}"), result);
@@ -782,20 +798,29 @@ export const saveFlowClick = async () => {
   const edges = useServiceStore.getState().edges;
   const nodes = useServiceStore.getState().nodes;
 
-  await saveFlow(steps, name, edges, nodes,
-    () => {
+  await saveFlow({
+    steps,
+    name,
+    edges,
+    nodes,
+    onSuccess: () => {
       useToastStore.getState().success({
         title: i18next.t("newService.toast.success"),
         message: i18next.t("newService.toast.savedSuccessfully"),
       });
       useServiceStore.getState().enableTestButton();
     },
-    (e) => {
+    onError: (e) => {
       useToastStore.getState().error({
         title: i18next.t("toast.cannot-save-flow"),
         message: e?.message,
       });
-    }, description, isCommon, serviceId, isNewService);
+    },
+    description,
+    isCommon,
+    serviceId,
+    isNewService
+  });
 }
 
 export const editServiceInfo = async () => {

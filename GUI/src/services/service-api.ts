@@ -14,9 +14,6 @@ instance.interceptors.response.use(
         return response;
     },
     (error: AxiosError) => {
-        if (error.response?.status === 401) {
-            //TODO: handle unauthorized requests
-        }
         return Promise.reject(error);
     }
 );

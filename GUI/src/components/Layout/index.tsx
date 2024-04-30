@@ -23,7 +23,7 @@ import './Layout.scss';
 
     const [MainMenuItems, setMainMenuItems] = useState([])
 
-    const {data, isLoading, status} = useQuery({
+    useQuery({
       queryKey: [import.meta.env.REACT_APP_MENU_URL + import.meta.env.REACT_APP_MENU_PATH],
       onSuccess: (res: any) => {
         try {

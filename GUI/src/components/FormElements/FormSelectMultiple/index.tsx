@@ -70,7 +70,7 @@ const FormSelectMultiple: FC<FormSelectMultipleProps> = ({
       label: string
       value: string
     }>()
-  const [selectedStateItems, setSelectedStateItems] = useState<{ label: string; value: string }[]>()
+  const [_, setSelectedStateItems] = useState<{ label: string; value: string }[]>()
 
   useEffect(() => {
     if (onSelectionChange) onSelectionChange(selectedItems)

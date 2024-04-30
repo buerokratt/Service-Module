@@ -111,7 +111,7 @@ const FaultyServicesPage: React.FC = () => {
             }}
           >
             {viewFaultyServiceLog.requestHeaders.map((value) => {
-              return <p>{value}</p>;
+              return <p key={value}>{value}</p>;
             })}
           </Track>
           {viewFaultyServiceLog.serviceMethod === "GET" && viewFaultyServiceLog.requestParams.length > 0 && (
@@ -129,7 +129,7 @@ const FaultyServicesPage: React.FC = () => {
               }}
             >
               {viewFaultyServiceLog.requestParams.map((value) => {
-                return <p>{value}</p>;
+                return <p key={value}>{value}</p>;
               })}
             </Track>
           )}
@@ -148,7 +148,7 @@ const FaultyServicesPage: React.FC = () => {
               }}
             >
               {viewFaultyServiceLog.requestBody.map((value) => {
-                return <p>{value}</p>;
+                return <p key={value}>{value}</p>;
               })}
             </Track>
           )}

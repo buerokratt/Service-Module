@@ -323,7 +323,6 @@ export const onDrop = (
   // Find matching placeholder
   if (!reactFlowInstance || !reactFlowWrapper.current) return;
 
-  // const reactFlowBounds = reactFlowWrapper.current.getBoundingClientRect();
   const [label, type, originalDefinedNodeId] = [
     event.dataTransfer.getData("application/reactflow-label"),
     event.dataTransfer.getData("application/reactflow-type") as StepType,
