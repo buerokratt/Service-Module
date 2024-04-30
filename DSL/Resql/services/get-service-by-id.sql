@@ -25,4 +25,4 @@ JOIN (
   ) subquery
 ) subquery ON true
 WHERE deleted = false AND service_id = :id
-ORDER BY id;
+ORDER BY id ASC;
