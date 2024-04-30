@@ -411,12 +411,14 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
   updateEndpointData: (data: RequestVariablesTabsRowsData, endpointId?: string, parentEndpointId?: string) => {
     if (!endpointId) return;
     set((state) => {
-      const endpoints = state.endpoints.map((prevEndpoint: EndpointData) => {
+      const endpoints: EndpointData[] = [];
+      
+      for (const prevEndpoint of state.endpoints) {
         if (prevEndpoint.id !== parentEndpointId) return prevEndpoint;
-        prevEndpoint.definedEndpoints.map((defEndpoint) => {
+        for (const defEndpoint of prevEndpoint.definedEndpoints) {
           if (defEndpoint.id !== endpointId) return defEndpoint;
-          Object.keys(data).forEach((key) => {
-            data[key as EndpointTab]?.forEach((row) => {
+          for (const key in data) {
+            for (const row of data[key as EndpointTab] ?? []) {
               if (
                 !row.endpointVariableId &&
                 row.variable &&
@@ -431,19 +433,19 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
                 newVariable[state.isLive() ? "value" : "testValue"] = row.value;
                 defEndpoint[key as EndpointTab]?.variables.push(newVariable);
               }
-            });
-            defEndpoint[key as EndpointTab]?.variables.forEach((variable) => {
+            }
+            for (const variable of defEndpoint[key as EndpointTab]?.variables ?? []) {
               const updatedVariable = data[key as EndpointTab]!.find(
                 (updated) => updated.endpointVariableId === variable.id
               );
               variable[state.isLive() ? "value" : "testValue"] = updatedVariable?.value;
               variable.name = updatedVariable?.variable ?? variable.name;
-            });
-          });
-          return defEndpoint;
-        });
-        return prevEndpoint;
-      });
+            }
+          }
+        }
+        
+        endpoints.push(prevEndpoint);
+      }
 
       return {
         endpoints,
