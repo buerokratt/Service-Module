@@ -29,15 +29,12 @@ const ChatKeyPad = (): JSX.Element => {
             }
           }
         />
-      <div
+      <button
         onClick={addNewMessageToState}
-        onKeyDown={addNewMessageToState}
         className={styles.button}
-        role="button"
-        tabIndex={0}
       >
         <img src={Send} alt="Send message icon" />
-      </div>
+      </button>
     </div>
     </div>
   );

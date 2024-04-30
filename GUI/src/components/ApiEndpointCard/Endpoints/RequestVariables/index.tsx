@@ -162,7 +162,7 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
   const checkNestedVariables = (rowVariableId: string, variable: EndpointVariableData) => {
     const variableData = variable.type === "schema" ? variable.schemaData : variable.arrayData;
     if (variableData instanceof Array) {
-      if (rowVariableId && (variableData as EndpointVariableData[]).map((v) => v.id).includes(rowVariableId)) {
+      if (rowVariableId && variableData.map((v) => v.id).includes(rowVariableId)) {
         variable[variable.type === "schema" ? "schemaData" : "arrayData"] = variableData.filter(
           (v) => v.id !== rowVariableId
         );
@@ -258,7 +258,8 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
             onMouseDown={() => {
               setTabRawData((prevRawData) => {
                 try {
-                  prevRawData[requestTab.tab] = JSON.stringify(JSON.parse(prevRawData[requestTab.tab]!), null, 4);
+                  const content = prevRawData[requestTab.tab] ?? "";
+                  prevRawData[requestTab.tab] = JSON.stringify(JSON.parse(content), null, 4);
                 } catch (e: any) {
                   setJsonError(`Unable to format JSON. ${e.message}`);
                 }

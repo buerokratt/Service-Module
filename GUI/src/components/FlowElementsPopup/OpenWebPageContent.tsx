@@ -17,31 +17,29 @@ const OpenWebPageContent: FC<OpenWebPageContentProps> = ({
   defaultWebpageName,
 }) => {
   return (
-    <>
-      <Track direction="vertical" gap={16} style={{ padding: 16 }}>
-        <Track direction="vertical" align="left" style={{ width: '100%' }}>
-          <label htmlFor="json">{t('serviceFlow.popup.openWebpageLabel')}</label>
-          <FormInput
-            name={"web-page"}
-            label={"web-page"}
-            defaultValue={defaultWebpageName}
-            onChange={(event) => onWebpageNameChange(event.target.value)}
-            hideLabel
-          ></FormInput>
-        </Track>
-        <Track direction="vertical" align="left" style={{ width: '100%' }}>
-          <label htmlFor="web-page-url">URL</label>
-          <FormInput
-            name={"web-page-url"}
-            label={"web-page-url"}
-            defaultValue={defaultWebpageUrl}
-            placeholder="https://"
-            onChange={(event) => onWebpageUrlChange(event.target.value)}
-            hideLabel
-          ></FormInput>
-        </Track>
+    <Track direction="vertical" gap={16} style={{ padding: 16 }}>
+      <Track direction="vertical" align="left" style={{ width: '100%' }}>
+        <label htmlFor="json">{t('serviceFlow.popup.openWebpageLabel')}</label>
+        <FormInput
+          name={"web-page"}
+          label={"web-page"}
+          defaultValue={defaultWebpageName}
+          onChange={(event) => onWebpageNameChange(event.target.value)}
+          hideLabel
+        />
       </Track>
-    </>
+      <Track direction="vertical" align="left" style={{ width: '100%' }}>
+        <label htmlFor="web-page-url">URL</label>
+        <FormInput
+          name={"web-page-url"}
+          label={"web-page-url"}
+          defaultValue={defaultWebpageUrl}
+          placeholder="https://"
+          onChange={(event) => onWebpageUrlChange(event.target.value)}
+          hideLabel
+        />
+      </Track>
+    </Track>
   );
 }
 

@@ -238,7 +238,7 @@ export const updateFlowInputRules = (
       newEdges.push(
         ...buildRuleEdges({
           inputId: +clickedNode!,
-          targetId: +rule!,
+          targetId: +rule,
           handleId: i,
           placeholderId: nodeAfterNewRule?.id,
         })

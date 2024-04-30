@@ -23,7 +23,7 @@ instance.interceptors.response.use(
         if ((error.response?.status ?? 0) > 400 && (error.response?.status ?? 0) < 599) {
             console.log('Teenusele puudub ligipääs. Proovi hiljem uuesti.');
         }
-    return Promise.reject(error);
+    return Promise.reject(new Error(error.message));
   }
 );
 

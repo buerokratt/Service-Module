@@ -22,10 +22,9 @@ import i18next from "i18next";
 import { ROUTES } from "resources/routes-constants";
 import { NavigateFunction } from "react-router-dom";
 import { editServiceInfo, saveFlowClick } from "services/service-builder";
-import { GRID_UNIT, NodeDataProps, initialEdge, initialNodes } from "types/service-flow";
+import { NodeDataProps, initialEdge, initialNodes } from "types/service-flow";
 import {
   alignNodesInCaseAnyGotOverlapped,
-  buildEdge,
   buildPlaceholder,
   updateFlowInputRules,
 } from "services/flow-builder";
@@ -328,7 +327,7 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
   onNameChange: (endpointId: string, oldName: string, newName: string) => {
     const endpoint = get().endpoints.find((x) => x.id === endpointId);
     const response = endpoint?.definedEndpoints.find((x) => x.isSelected)?.response ?? [];
-    const variables = response.map((x) => `{{${!!newName ? newName : x.id}.${x.name}}}`);
+    const variables = response.map((x) => `{{${newName ?? x.id}.${x.name}}}`);
 
     const oldFilteredVariables = get().availableVariables.prod.filter(
       (v) => v.replace("{{", "").split(".")[0] !== oldName

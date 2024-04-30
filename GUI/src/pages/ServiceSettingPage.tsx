@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Button, FormInput, Track } from "../components";
 import { getServiceSettings, saveServiceSettings } from "../resources/api-constants";

@@ -18,7 +18,7 @@ const FormRichText: FC<FormRichTextProps> = ({ defaultValue, onChange }) => {
     ],
   };
 
-  return <>
+  return (
     <ReactQuill
       defaultValue={defaultValue}
       onChange={(value) => {
@@ -28,7 +28,7 @@ const FormRichText: FC<FormRichTextProps> = ({ defaultValue, onChange }) => {
       modules={modules}
       style={{ width: '100%' }}
     />
-  </>
+  )
 }
 
 export default FormRichText;

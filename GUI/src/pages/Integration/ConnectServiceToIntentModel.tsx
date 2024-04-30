@@ -20,7 +20,7 @@ const ConnectServiceToIntentModel: FC<ConnectServiceToIntentModelProps> = ({ onM
     pageSize: 8,
   });
   const [intents, setIntents] = useState<Intent[] | undefined>(undefined);
-  const [selectedIntent, setSetSelectedIntents] = useState<Intent>();
+  const [selectedIntent, setSelectedIntent] = useState<Intent>();
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
 
   const loadAvailableIntents = () => {
@@ -38,7 +38,7 @@ const ConnectServiceToIntentModel: FC<ConnectServiceToIntentModelProps> = ({ onM
 
   const intentColumns = useMemo(
     () => getColumns((intent) => {
-      setSetSelectedIntents(intent);
+      setSelectedIntent(intent);
       setShowConfirmationModal(true);
     }),
     []

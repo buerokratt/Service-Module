@@ -22,7 +22,7 @@ const FormAutocomplete: FC<FormAutocompleteProps> = ({
   excludeCharacters,
   shouldHideSuggestions,
 }) => {
-  const [suggestions, setSugesstions] = useState<string[]>([]);
+  const [suggestions, setSuggestions] = useState<string[]>([]);
   const [isHideSuggestions, setIsHideSuggestions] = useState(shouldHideSuggestions);
   const [selectedVal, setSelectedVal] = useState(value ?? "");
 
@@ -34,7 +34,7 @@ const FormAutocomplete: FC<FormAutocompleteProps> = ({
         .replace(excludeCharacters ?? "", "")
         .includes(value.toLocaleLowerCase().replace(excludeCharacters ?? "", ""))
     );
-    setSugesstions(newSuggestions);
+    setSuggestions(newSuggestions);
     setIsHideSuggestions(newSuggestions.length > 0 && newSuggestions[0] === value);
   };
 
@@ -71,14 +71,9 @@ const FormAutocomplete: FC<FormAutocompleteProps> = ({
       {suggestions.length > 0 && (
         <div className="suggestions" style={{ display: isHideSuggestions ? "none" : "block" }}>
           {suggestions.map((item: string, idx: number) => (
-            <div 
-              key={`${item}-${idx}`}
-              onClick={() => hideSuggestions(item)}
-              onKeyDown={() => hideSuggestions(item)}
-              role="button"
-              tabIndex={0}>
+            <button key={`${item}-${idx}`} onClick={() => hideSuggestions(item)}>
               {item}
-            </div>
+            </button>
           ))}
         </div>
       )}

@@ -38,14 +38,14 @@
     overflow: auto;
     padding-bottom: 5px;
 
-    > div {
+    > button {
       padding: 15px 25px;
       border-bottom: 1px solid get-color(black-coral-6);
       transition: all 0.1s ease;
       background-color: get-color(white);
     }
 
-    > div:hover {
+    > button:hover {
       background-color: get-color(black-coral-1);
     }
   }
