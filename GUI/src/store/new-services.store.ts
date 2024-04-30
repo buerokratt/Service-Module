@@ -102,7 +102,7 @@ interface ServiceStoreState {
   handlePopupSave: (updatedNode: Node<NodeDataProps>) => void;
   testUrl: (endpoint: EndpointData, onError: () => void, onSuccess: () => void) => Promise<void>;
 
-  // TODO: remove the following funtions and refactor the code to use more specific functions
+  // remove the following funtions and refactor the code to use more specific functions later
   setEndpoints: (callback: (prev: EndpointData[]) => EndpointData[]) => void;
   reactFlowInstance: ReactFlowInstance | null;
   setReactFlowInstance: (reactFlowInstance: ReactFlowInstance | null) => void;

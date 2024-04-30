@@ -13,9 +13,7 @@ import useToastStore from "store/toasts.store";
 import { RawData, Step, StepType } from "types";
 import { EndpointData, EndpointEnv, EndpointType, EndpointVariableData } from "types/endpoint";
 
-//
-// TODO: refactor this file
-//
+// refactor this file later
 
 const getEndpointVariables = (
   key: string,
@@ -64,7 +62,7 @@ const getEndpointVariables = (
 const getNestedVariables = (variable: EndpointVariableData, key: string, path: string, result: string[]) => {
   const variableData = variable.type === "schema" ? variable.schemaData : variable.arrayData;
   if (variableData instanceof Array) {
-    (variableData as EndpointVariableData[]).forEach((v) => {
+    variableData.forEach((v) => {
       if (["schema", "array"].includes(v.type)) {
         getNestedVariables(v, key, `${path}.${v.name}`, result);
         return;
@@ -245,7 +243,7 @@ const assignNestedVariable = (
 ) => {
   const variableData = variable.type === "schema" ? variable.schemaData : variable.arrayData;
   if (variableData instanceof Array) {
-    (variableData as EndpointVariableData[]).forEach((v) => {
+    variableData.forEach((v) => {
       if (["schema", "array"].includes(v.type)) assignNestedVariable(v, key, env, `${path}__${v.name}`, result);
       if (!v.value) return;
 
@@ -445,7 +443,7 @@ export const saveFlow = async (
       if(error) {
         throw new Error(error);
       }
-      
+
       allRelations.push(`${edge.source}-${edge.target}`);
     });
     // find finishing nodes
@@ -591,7 +589,7 @@ const getNestedPreDefinedRawVariables = (data: { [key: string]: any }, result: s
 const getNestedPreDefinedEndpointVariables = (variable: EndpointVariableData, result: string[]) => {
   const variableData = variable.type === "schema" ? variable.schemaData : variable.arrayData;
   if (variableData instanceof Array) {
-    (variableData as EndpointVariableData[]).forEach((v) => {
+    variableData.forEach((v) => {
       if (["schema", "array"].includes(v.type)) getNestedPreDefinedEndpointVariables(v, result);
 
       if (v.value && v.value.startsWith("{{")) result.push(getMapEntry(v.value));

@@ -100,7 +100,7 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
     let rowIdx = oldRowIdx;
     const variableData = variable.type === "schema" ? variable.schemaData : variable.arrayData;
     if (variableData instanceof Array) {
-      (variableData as EndpointVariableData[]).forEach((data) => {
+      variableData.forEach((data) => {
         rowIdx++;
         rows.push(constructRow(rowIdx, data, nestedLevel));
         if (["schema", "array"].includes(data.type)) {
@@ -171,7 +171,7 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
         );
         return;
       }
-      (variableData as EndpointVariableData[]).forEach((v) => {
+      variableData.forEach((v) => {
         if (["schema", "array"].includes(v.type)) {
           checkNestedVariables(rowVariableId, v);
         }

@@ -177,7 +177,7 @@ const EndpointOpenAPI: React.FC<EndpointOpenAPIProps> = ({
         }
         const body = getEndpointSchema(apiSpec, data.requestBody?.content["application/json"]?.schema);
         const params = getParams(data.parameters);
-        const headers = undefined; // TODO find where to get headers
+        const headers = undefined; // where to get headers ?
         const response = getEndpointResponse(apiSpec, data.responses["200"]);
 
         paths.push({
@@ -229,7 +229,7 @@ const EndpointOpenAPI: React.FC<EndpointOpenAPIProps> = ({
   const checkNestedVariables = (variable: EndpointVariableData, data: RequestVariablesRowData[]) => {
     const variableData = variable.type === "schema" ? variable.schemaData : variable.arrayData;
     if (variableData instanceof Array) {
-      (variableData as EndpointVariableData[]).forEach((variableData) => {
+      variableData.forEach((variableData) => {
         const updatedVariable = data.find((updated) => updated.endpointVariableId === variableData.id);
         variableData[isLive ? "value" : "testValue"] = updatedVariable?.value;
         if (["schema", "array"].includes(variableData.type)) {

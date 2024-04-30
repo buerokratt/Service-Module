@@ -3,9 +3,7 @@ import useServiceStore from "store/new-services.store";
 import { ConditionRuleType, StepType } from "types";
 import { GRID_UNIT, EDGE_LENGTH } from "types/service-flow";
 
-//
-// TODO: refactor this file
-//
+// refactor this file later
 
 export const buildPlaceholder = ({
   id,

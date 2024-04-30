@@ -29,7 +29,6 @@ export const initialEdge = {
   },
 };
 
-// TODO: refactoring
 export type NodeDataProps = {
   label: string;
   onDelete: (id: string) => void;
