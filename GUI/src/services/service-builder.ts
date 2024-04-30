@@ -417,27 +417,35 @@ export const saveFlow = async (
       const node = nodes.find((node) => node.id === edge.source);
       const followingNode = nodes.find((node) => node.id === edge.target);
       if (!node) return;
-      if (node.data.stepType === StepType.Textfield && node.data.message === undefined) {
-        throw new Error(i18next.t("toast.missing-textfield-message") ?? "Error");
-      }
-      if (
-        node.data.stepType === StepType.OpenWebpage &&
-        (node.data.link === undefined || node.data.linkText === undefined)
-      ) {
-        throw new Error(i18next.t("toast.missing-website") ?? "Error");
+      let error;
+      switch(node.data.stepType) {
+        case StepType.Textfield:
+            if (node.data.message === undefined) {
+              error = i18next.t("toast.missing-textfield-message");
+            }
+            break;
+        case StepType.OpenWebpage:
+          if(node.data.link === undefined || node.data.linkText === undefined) {
+            error = i18next.t("toast.missing-website");
+          }
+          break;
+        case StepType.FileGenerate:
+          if (node.data.fileName === undefined || node.data.fileContent === undefined) {
+            error = i18next.t("toast.missing-file-generation");
+          }
+          break;
+        case StepType.Input:
+          if(followingNode?.type === "placeholder" && !allRelations.includes(node.id)) {
+            allRelations.push(node.id);
+            return;
+          }
+          break;
       }
 
-      if (
-        node.data.stepType === StepType.FileGenerate &&
-        (node.data.fileName === undefined || node.data.fileContent === undefined)
-      ) {
-        throw new Error(i18next.t("toast.missing-file-generation") ?? "Error");
+      if(error) {
+        throw new Error(error);
       }
-
-      if (node.data.stepType === StepType.Input || followingNode?.type === "placeholder") {
-        if (!allRelations.includes(node.id)) allRelations.push(node.id);
-        return;
-      }
+      
       allRelations.push(`${edge.source}-${edge.target}`);
     });
     // find finishing nodes
