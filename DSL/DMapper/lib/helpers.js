@@ -6,22 +6,17 @@ export function calculateDateDifference(value) {
 
   switch (outputType?.toLowerCase()) {
     case 'years':
-      const differenceInYears = eDate.getFullYear() - sDate.getFullYear();
-      return differenceInYears;
+      return eDate.getFullYear() - sDate.getFullYear();
     case 'months':
-      const differenceInMonths = eDate.getMonth() - sDate.getMonth() +
+      return eDate.getMonth() - sDate.getMonth() +
         (12 * (eDate.getFullYear() - sDate.getFullYear()))
-      return differenceInMonths;
     case 'hours':
-      const differenceInHours = Math.round(Math.abs(eDate - sDate) / 36e5);
-      return differenceInHours;
+      return Math.round(Math.abs(eDate - sDate) / 36e5);
     case 'minutes':
-      const differenceInMinutes = Math.floor(timeDifferenceInSeconds / 60);
-      return differenceInMinutes;
+      return Math.floor(timeDifferenceInSeconds / 60);
     case 'seconds':
       return timeDifferenceInSeconds;
     default:
-      const differenceInDays = Math.round(timeDifferenceInSeconds / (3600 * 24));
-      return differenceInDays;
+      return Math.round(timeDifferenceInSeconds / (3600 * 24));
   }
 }

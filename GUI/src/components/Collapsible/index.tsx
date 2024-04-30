@@ -1,10 +1,9 @@
-import { FC, PropsWithChildren, useState } from 'react';
+import { FC, PropsWithChildren, useState, CSSProperties } from 'react';
 import * as RadixCollapsible from '@radix-ui/react-collapsible';
 import { MdOutlineAddBox, MdOutlineIndeterminateCheckBox } from 'react-icons/md';
 
 import { Icon } from '../';
 import './Collapsible.scss';
-import { CSSProperties } from 'react';
 
 type CollapsibleProps = {
   title: string;

@@ -181,9 +181,12 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
 
   const deleteVariable = (rowData: RequestVariablesRowData) => {
     setEndpoints((prevEndpoints: EndpointData[]) => {
-      return prevEndpoints.map((prevEndpoint) => {
+      const newEndpoints : EndpointData[] = [];
+      for (const prevEndpoint of prevEndpoints) {
         for (const defEndpoint of prevEndpoint.definedEndpoints) {
-          if (defEndpoint.id !== endpointData.id || !defEndpoint[requestTab.tab]) return defEndpoint;
+          if (defEndpoint.id !== endpointData.id || !defEndpoint[requestTab.tab]) {
+            continue;
+          }
           if (
             rowData.endpointVariableId &&
             defEndpoint[requestTab.tab]!.variables.map((v) => v.id).includes(rowData.endpointVariableId)
@@ -199,9 +202,9 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
             }
           }
         }
-        
-        return prevEndpoint;
-      });
+        newEndpoints.push(prevEndpoint);
+      }
+      return newEndpoints;
     });
   };
 
