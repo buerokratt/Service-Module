@@ -6,7 +6,6 @@ import {
   EndpointData,
   EndpointEnv,
   EndpointTab,
-  EndpointVariableData,
   PreDefinedEndpointEnvVariables,
 } from "types/endpoint";
 import {
@@ -386,23 +385,15 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
   isLive: () => get().selectedTab === EndpointEnv.Live,
   updateEndpointRawData: (data: RequestVariablesTabsRawData, endpointId?: string, parentEndpointId?: string) => {
     if (!endpointId) return;
-    const isLive = get().isLive();
+    const live = get().isLive() ? "value" : "testValue";
 
-    const endpoints: EndpointData[] = [];
-    for (const prevEndpoint of get().endpoints) {
-      if (prevEndpoint.id === parentEndpointId) {     
-        for (const defEndpoint of prevEndpoint.definedEndpoints) {
-          if (defEndpoint.id === endpointId) {
-            for (const key in data) {
-              if (defEndpoint[key as EndpointTab]) {
-                defEndpoint[key as EndpointTab]!.rawData[isLive ? "value" : "testValue"] = data[key as EndpointTab];
-              }
-            }
-          }
-        }     
+    const endpoints = JSON.parse(JSON.stringify(get().endpoints)) as EndpointData[];
+    const defEndpoint = endpoints.find(x => x.id === parentEndpointId)?.definedEndpoints.find(x => x.id === endpointId);
+
+    for (const key in data) {
+      if (defEndpoint?.[key as EndpointTab]) {
+        defEndpoint[key as EndpointTab]!.rawData[live] = data[key as EndpointTab];
       }
-
-      return endpoints.push(prevEndpoint);
     }
 
     set({
@@ -411,46 +402,40 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
   },
   updateEndpointData: (data: RequestVariablesTabsRowsData, endpointId?: string, parentEndpointId?: string) => {
     if (!endpointId) return;
-    set((state) => {
-      const endpoints: EndpointData[] = [];
-      
-      for (const prevEndpoint of state.endpoints) {
-        if (prevEndpoint.id !== parentEndpointId) return prevEndpoint;
-        for (const defEndpoint of prevEndpoint.definedEndpoints) {
-          if (defEndpoint.id !== endpointId) return defEndpoint;
-          for (const key in data) {
-            for (const row of data[key as EndpointTab] ?? []) {
-              if (
-                !row.endpointVariableId &&
-                row.variable &&
-                !defEndpoint[key as EndpointTab]?.variables.map((e) => e.name).includes(row.variable)
-              ) {
-                const newVariable: EndpointVariableData = {
-                  id: uuid(),
-                  name: row.variable,
-                  type: "custom",
-                  required: false,
-                };
-                newVariable[state.isLive() ? "value" : "testValue"] = row.value;
-                defEndpoint[key as EndpointTab]?.variables.push(newVariable);
-              }
-            }
-            for (const variable of defEndpoint[key as EndpointTab]?.variables ?? []) {
-              const updatedVariable = data[key as EndpointTab]!.find(
-                (updated) => updated.endpointVariableId === variable.id
-              );
-              variable[state.isLive() ? "value" : "testValue"] = updatedVariable?.value;
-              variable.name = updatedVariable?.variable ?? variable.name;
-            }
-          }
-        }
-        
-        endpoints.push(prevEndpoint);
-      }
 
-      return {
+    const live = get().isLive() ? "value" : "testValue"
+    const endpoints = JSON.parse(JSON.stringify(get().endpoints)) as EndpointData[];
+    const defEndpoint = endpoints.find(x => x.id === parentEndpointId)?.definedEndpoints.find(x => x.id === endpointId);
+
+    if(!defEndpoint) return;
+
+    for (const key in data) {
+      const keyedDefEndpoint = defEndpoint[key as EndpointTab];
+      for (const row of data[key as EndpointTab] ?? []) {
+        if (
+          !row.endpointVariableId &&
+          row.variable &&
+          !keyedDefEndpoint?.variables.map((e) => e.name).includes(row.variable)
+        ) {
+          keyedDefEndpoint?.variables.push({
+            id: uuid(),
+            name: row.variable,
+            type: "custom",
+            required: false,
+            [live]: row.value,
+          });
+        }
+      }
+      
+      for (const variable of keyedDefEndpoint?.variables ?? []) {
+        const updatedVariable = data[key as EndpointTab]!.find((updated) => updated.endpointVariableId === variable.id);
+        variable[live] = updatedVariable?.value;
+        variable.name = updatedVariable?.variable ?? variable.name;
+      }
+    }
+
+    set({
         endpoints,
-      };
     });
   },
   reactFlowInstance: null,

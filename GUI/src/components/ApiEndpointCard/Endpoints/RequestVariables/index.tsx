@@ -180,25 +180,19 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
     setEndpoints((prevEndpoints: EndpointData[]) => {
       const newEndpoints : EndpointData[] = [];
       for (const prevEndpoint of prevEndpoints) {
-        for (const defEndpoint of prevEndpoint.definedEndpoints) {
-          if (defEndpoint.id !== endpointData.id || !defEndpoint[requestTab.tab]) {
-            continue;
-          }
-          if (
-            rowData.endpointVariableId &&
-            defEndpoint[requestTab.tab]!.variables.map((v) => v.id).includes(rowData.endpointVariableId)
-          ) {
-            defEndpoint[requestTab.tab]!.variables = defEndpoint[requestTab.tab]!.variables.filter(
-              (v) => v.id !== rowData.endpointVariableId
-            );
+        const defEndpoint = prevEndpoint.definedEndpoints.find(x => x.id === endpointData.id);
+        const endpoint = defEndpoint?.[requestTab.tab];
+
+        if(defEndpoint && endpoint) {
+          if (rowData.endpointVariableId && endpoint.variables.map((v) => v.id).includes(rowData.endpointVariableId)) {
+            endpoint.variables = endpoint.variables.filter((v) => v.id !== rowData.endpointVariableId);
           } else {
-            for (const variable of defEndpoint[requestTab.tab]!.variables) {
-              if (["schema", "array"].includes(variable.type) && rowData.endpointVariableId) {
-                checkNestedVariables(rowData.endpointVariableId, variable);
-              }              
-            }
+            endpoint.variables
+              .filter(variable => ["schema", "array"].includes(variable.type))
+              .forEach(variable => checkNestedVariables(rowData.endpointVariableId!, variable));
           }
         }
+        
         newEndpoints.push(prevEndpoint);
       }
       return newEndpoints;
