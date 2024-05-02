@@ -16,7 +16,7 @@ const FormCheckboxes: FC<FormCheckboxesType> = ({ label, name, hideLabel, items 
   const id = useId();
 
   return (
-    <fieldset className='checkboxes'>
+    <div className='checkboxes'>
       {label && !hideLabel && <label className='checkboxes__label'>{label}</label>}
       <div className='checkboxes__wrapper'>
         {items.map((item, index) => (
@@ -26,7 +26,7 @@ const FormCheckboxes: FC<FormCheckboxesType> = ({ label, name, hideLabel, items 
           </div>
         ))}
       </div>
-    </fieldset>
+    </div>
   );
 };
 
