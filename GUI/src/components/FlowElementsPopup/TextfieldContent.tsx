@@ -19,7 +19,7 @@ const TextfieldContent: FC<TextfieldContentProps> = ({ defaultMessage, onChange 
   const findMessagePlaceholders = (text: string | null): { [key: string]: string } => {
     if (!text) return {};
 
-    const pattern = /\{\{(.+?)\}\}/g;
+    const pattern = /\{\{(.{1,512}?)\}\}/g;
     const placeholders: { [key: string]: string } = {};
     let match;
 
