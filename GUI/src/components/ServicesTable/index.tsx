@@ -29,21 +29,6 @@ const ServicesTable: FC<ServicesTableProps> = ({ isCommon = false }) => {
   const navigate = useNavigate();
   const [selectedConnectionTrigger, setSelectedConnectionTrigger] = useState<Trigger | undefined>();
 
-  const columns = useMemo(() => getColumns({
-    isCommon,
-    navigate,
-    checkIntentConnection,
-    hideDeletePopup: () => setIsDeletePopupVisible(true),
-    showStatePopup: (text: string) => {
-      setPopupText(text);
-      setIsStatePopupVisible(true);
-    },
-    showReadyPopup: () => {
-      setIsReadyStatusChecking(true);
-      setIsReadyPopupVisible(true);
-    }
-  }), []);
-
   const checkIntentConnection = () => {
     useServiceListStore.getState().checkServiceIntentConnection(
       (response) => {
@@ -61,6 +46,21 @@ const ServicesTable: FC<ServicesTableProps> = ({ isCommon = false }) => {
       }
     );
   };
+  
+  const columns = useMemo(() => getColumns({
+    isCommon,
+    navigate,
+    checkIntentConnection,
+    hideDeletePopup: () => setIsDeletePopupVisible(true),
+    showStatePopup: (text: string) => {
+      setPopupText(text);
+      setIsStatePopupVisible(true);
+    },
+    showReadyPopup: () => {
+      setIsReadyStatusChecking(true);
+      setIsReadyPopupVisible(true);
+    }
+  }), []);
 
   const changeServiceState = (activate: boolean = false, draft: boolean = false) => {
     useServiceListStore.getState().changeServiceState(
@@ -90,8 +90,8 @@ const ServicesTable: FC<ServicesTableProps> = ({ isCommon = false }) => {
       .getState()
       .requestServiceIntentConnection(
         () => setIsIntentConnectionPopupVisible(false),
-        t("overview.service.toast.requestedConnection"),
-        t("overview.service.toast.failed.requestConnection"),
+        t("overview.service.toast.connectedToIntentSuccessfully"),
+        t("overview.service.toast.failed.failedToConnectToIntent"),
         intent
       );
   };
