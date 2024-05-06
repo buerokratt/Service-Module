@@ -3,9 +3,7 @@ import useServiceStore from "store/new-services.store";
 import { ConditionRuleType, StepType } from "types";
 import { GRID_UNIT, EDGE_LENGTH } from "types/service-flow";
 
-//
-// TODO: refactor this file
-//
+// refactor this file later
 
 export const buildPlaceholder = ({
   id,
@@ -240,7 +238,7 @@ export const updateFlowInputRules = (
       newEdges.push(
         ...buildRuleEdges({
           inputId: +clickedNode!,
-          targetId: +rule!,
+          targetId: +rule,
           handleId: i,
           placeholderId: nodeAfterNewRule?.id,
         })
@@ -325,7 +323,6 @@ export const onDrop = (
   // Find matching placeholder
   if (!reactFlowInstance || !reactFlowWrapper.current) return;
 
-  // const reactFlowBounds = reactFlowWrapper.current.getBoundingClientRect();
   const [label, type, originalDefinedNodeId] = [
     event.dataTransfer.getData("application/reactflow-label"),
     event.dataTransfer.getData("application/reactflow-type") as StepType,

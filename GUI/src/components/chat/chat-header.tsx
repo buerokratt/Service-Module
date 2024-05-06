@@ -14,10 +14,10 @@ const ChatHeader = (): JSX.Element => {
       </div>
       <div className={styles.actions}>
         <button onClick={useTestServiceStore.getState().restart}>
-          <img src={Reset} />
+          <img src={Reset} alt='Reset'/>
         </button>
         <button onClick={useTestServiceStore.getState().closeChat}>
-          <img src={Close} />
+          <img src={Close} alt='Close'/>
         </button>
       </div>
     </div>

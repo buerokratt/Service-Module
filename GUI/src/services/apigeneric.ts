@@ -1,6 +1,6 @@
 import axios, {AxiosError} from 'axios';
 
-const testCookie = 'bearer ' + (localStorage.getItem('token') || 'test');
+const testCookie = 'bearer ' + (localStorage.getItem('token') ?? 'test');
 
 const instance = axios.create({
     baseURL: import.meta.env.REACT_APP_RUUTER_API_URL + '/generic/',
@@ -21,10 +21,7 @@ instance.interceptors.response.use(
         return response;
     },
     (error: AxiosError) => {
-        if (error.response?.status === 401) {
-
-        }
-        return Promise.reject(error);
+        return Promise.reject(new Error(error.message));
     },
 );
 

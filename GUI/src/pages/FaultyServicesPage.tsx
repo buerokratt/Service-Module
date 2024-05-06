@@ -1,12 +1,13 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Button, Card, DataTable, Icon, Track } from "../components";
-import { PaginationState, Row, createColumnHelper } from "@tanstack/react-table";
+import { Row, createColumnHelper } from "@tanstack/react-table";
 import { MdOutlineRemoveRedEye } from "react-icons/md";
 import Popup from "../components/Popup";
 import axios from "axios";
 import { getFaultyServices } from "../resources/api-constants";
 import { format } from "date-fns";
+import i18n from "i18n";
 
 interface FaultyService {
   id: string;
@@ -26,48 +27,7 @@ const FaultyServicesPage: React.FC = () => {
   const [viewFaultyServiceLog, setViewFaultyServiceLog] = useState<FaultyService | null>(null);
   const [data, setData] = useState<FaultyService[]>([]);
 
-  const columns = useMemo(() => {
-    const columnHelper = createColumnHelper<FaultyService>();
-
-    return [
-      columnHelper.accessor("service", {
-        header: t("logs.service") ?? "",
-        cell: (props) => <span>{props.getValue().split("/").pop()}</span>,
-      }),
-      columnHelper.accessor("serviceMethod", {
-        header: t("logs.method") ?? "",
-      }),
-      columnHelper.accessor("errorCode", {
-        header: t("logs.errorCode") ?? "",
-      }),
-      columnHelper.accessor("stepName", {
-        header: t("logs.failedStep") ?? "",
-      }),
-      columnHelper.accessor("timestamp", {
-        header: t("logs.failedTime") ?? "",
-        cell: (props) => <span>{format(new Date(parseInt(props.getValue() ?? "0")), "dd-MM-yyyy HH:mm:ss")}</span>,
-        filterFn: (row: Row<FaultyService>, _, filterValue) => {
-          return format(new Date(parseInt(row.original.timestamp ?? "0")), "dd-MM-yyyy HH:mm:ss")
-            .toLowerCase()
-            .includes(filterValue.toLowerCase());
-        },
-      }),
-      columnHelper.display({
-        id: "view",
-        meta: {
-          size: 90,
-        },
-        cell: (props) => (
-          <Track align="right" justify="start">
-            <Button appearance="text" onClick={() => setViewFaultyServiceLog(props.row.original)}>
-              <Icon icon={<MdOutlineRemoveRedEye />} size="medium" />
-              {t("logs.view")}
-            </Button>
-          </Track>
-        ),
-      }),
-    ];
-  }, []);
+  const columns = useMemo(() => getColumns(setViewFaultyServiceLog), []);
 
   useEffect(() => {
     axios.get(getFaultyServices()).then((res) => setData(res.data));
@@ -111,7 +71,7 @@ const FaultyServicesPage: React.FC = () => {
             }}
           >
             {viewFaultyServiceLog.requestHeaders.map((value) => {
-              return <p>{value}</p>;
+              return <p key={value}>{value}</p>;
             })}
           </Track>
           {viewFaultyServiceLog.serviceMethod === "GET" && viewFaultyServiceLog.requestParams.length > 0 && (
@@ -129,7 +89,7 @@ const FaultyServicesPage: React.FC = () => {
               }}
             >
               {viewFaultyServiceLog.requestParams.map((value) => {
-                return <p>{value}</p>;
+                return <p key={value}>{value}</p>;
               })}
             </Track>
           )}
@@ -148,7 +108,7 @@ const FaultyServicesPage: React.FC = () => {
               }}
             >
               {viewFaultyServiceLog.requestBody.map((value) => {
-                return <p>{value}</p>;
+                return <p key={value}>{value}</p>;
               })}
             </Track>
           )}
@@ -169,5 +129,48 @@ const FaultyServicesPage: React.FC = () => {
     </>
   );
 };
+
+const getColumns = (setViewFaultyServiceLog: (data: FaultyService) => void) => {
+  const columnHelper = createColumnHelper<FaultyService>();
+
+    return [
+      columnHelper.accessor("service", {
+        header: i18n.t("logs.service") ?? "",
+        cell: (props) => <span>{props.getValue().split("/").pop()}</span>,
+      }),
+      columnHelper.accessor("serviceMethod", {
+        header: i18n.t("logs.method") ?? "",
+      }),
+      columnHelper.accessor("errorCode", {
+        header: i18n.t("logs.errorCode") ?? "",
+      }),
+      columnHelper.accessor("stepName", {
+        header: i18n.t("logs.failedStep") ?? "",
+      }),
+      columnHelper.accessor("timestamp", {
+        header: i18n.t("logs.failedTime") ?? "",
+        cell: (props) => <span>{format(new Date(parseInt(props.getValue() ?? "0")), "dd-MM-yyyy HH:mm:ss")}</span>,
+        filterFn: (row: Row<FaultyService>, _, filterValue) => {
+          return format(new Date(parseInt(row.original.timestamp ?? "0")), "dd-MM-yyyy HH:mm:ss")
+            .toLowerCase()
+            .includes(filterValue.toLowerCase());
+        },
+      }),
+      columnHelper.display({
+        id: "view",
+        meta: {
+          size: 90,
+        },
+        cell: (props) => (
+          <Track align="right" justify="start">
+            <Button appearance="text" onClick={() => setViewFaultyServiceLog(props.row.original)}>
+              <Icon icon={<MdOutlineRemoveRedEye />} size="medium" />
+              {i18n.t("logs.view")}
+            </Button>
+          </Track>
+        ),
+      }),
+    ];
+}
 
 export default FaultyServicesPage;

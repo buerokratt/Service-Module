@@ -1,10 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Button, FormTextarea, Icon, SwitchBox, Tooltip, Track, ValueCell, VariableCell } from "../../..";
+import { Button, FormTextarea, SwitchBox, Track } from "../../..";
 import * as Tabs from "@radix-ui/react-tabs";
 import DataTable from "../../../DataTable";
-import { createColumnHelper, Row } from "@tanstack/react-table";
-import { MdDeleteOutline } from "react-icons/md";
 import { RequestTab } from "../../../../types";
 import {
   EndpointType,
@@ -16,10 +14,10 @@ import {
 import {
   RequestVariablesTabsRowsData,
   RequestVariablesTabsRawData,
-  RequestVariablesTableColumns,
   RequestVariablesRowData,
 } from "../../../../types/request-variables";
 import useServiceStore from "store/new-services.store";
+import { getColumns } from "./columns";
 
 type RequestVariablesProps = {
   disableRawData?: boolean;
@@ -46,7 +44,6 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
   const tabs: EndpointTab[] = [EndpointTab.Params, EndpointTab.Headers, EndpointTab.Body];
   const [jsonError, setJsonError] = useState<string>();
   const [key, setKey] = useState<number>(0);
-  const columnHelper = createColumnHelper<RequestVariablesTableColumns>();
   const { setEndpoints, updateEndpointRawData, updateEndpointData } = useServiceStore();
 
   const constructRow = (id: number, data: EndpointVariableData, nestedLevel: number): RequestVariablesRowData => {
@@ -100,7 +97,7 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
     let rowIdx = oldRowIdx;
     const variableData = variable.type === "schema" ? variable.schemaData : variable.arrayData;
     if (variableData instanceof Array) {
-      (variableData as EndpointVariableData[]).forEach((data) => {
+      variableData.forEach((data) => {
         rowIdx++;
         rows.push(constructRow(rowIdx, data, nestedLevel));
         if (["schema", "array"].includes(data.type)) {
@@ -165,13 +162,13 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
   const checkNestedVariables = (rowVariableId: string, variable: EndpointVariableData) => {
     const variableData = variable.type === "schema" ? variable.schemaData : variable.arrayData;
     if (variableData instanceof Array) {
-      if (rowVariableId && (variableData as EndpointVariableData[]).map((v) => v.id).includes(rowVariableId)) {
+      if (rowVariableId && variableData.map((v) => v.id).includes(rowVariableId)) {
         variable[variable.type === "schema" ? "schemaData" : "arrayData"] = variableData.filter(
           (v) => v.id !== rowVariableId
         );
         return;
       }
-      (variableData as EndpointVariableData[]).forEach((v) => {
+      variableData.forEach((v) => {
         if (["schema", "array"].includes(v.type)) {
           checkNestedVariables(rowVariableId, v);
         }
@@ -181,112 +178,26 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
 
   const deleteVariable = (rowData: RequestVariablesRowData) => {
     setEndpoints((prevEndpoints: EndpointData[]) => {
-      return prevEndpoints.map((prevEndpoint) => {
-        prevEndpoint.definedEndpoints.map((defEndpoint) => {
-          if (defEndpoint.id !== endpointData.id || !defEndpoint[requestTab.tab]) return defEndpoint;
-          if (
-            rowData.endpointVariableId &&
-            defEndpoint[requestTab.tab]!.variables.map((v) => v.id).includes(rowData.endpointVariableId)
-          ) {
-            defEndpoint[requestTab.tab]!.variables = defEndpoint[requestTab.tab]!.variables.filter(
-              (v) => v.id !== rowData.endpointVariableId
-            );
+      const newEndpoints : EndpointData[] = [];
+      for (const prevEndpoint of prevEndpoints) {
+        const defEndpoint = prevEndpoint.definedEndpoints.find(x => x.id === endpointData.id);
+        const endpoint = defEndpoint?.[requestTab.tab];
+
+        if(defEndpoint && endpoint) {
+          if (rowData.endpointVariableId && endpoint.variables.map((v) => v.id).includes(rowData.endpointVariableId)) {
+            endpoint.variables = endpoint.variables.filter((v) => v.id !== rowData.endpointVariableId);
           } else {
-            defEndpoint[requestTab.tab]!.variables.forEach((variable) => {
-              if (["schema", "array"].includes(variable.type) && rowData.endpointVariableId) {
-                checkNestedVariables(rowData.endpointVariableId, variable);
-              }
-            });
+            endpoint.variables
+              .filter(variable => ["schema", "array"].includes(variable.type))
+              .forEach(variable => checkNestedVariables(rowData.endpointVariableId!, variable));
           }
-        });
-        return prevEndpoint;
-      });
+        }
+        
+        newEndpoints.push(prevEndpoint);
+      }
+      return newEndpoints;
     });
   };
-
-  const sortRows = (
-    rowA: Row<RequestVariablesTableColumns>,
-    rowB: Row<RequestVariablesTableColumns>,
-    type: "variable" | "value"
-  ): number => {
-    if (!rowsData[requestTab.tab]) return 1;
-    const valueA = rowsData[requestTab.tab]!.find((row) => row.id === rowA.id);
-    const valueB = rowsData[requestTab.tab]!.find((row) => row.id === rowB.id);
-    if (type === "variable") {
-      return (valueA?.variable ?? "") < (valueB?.variable ?? "") ? 1 : -1;
-    }
-    return (valueA?.value ?? "") < (valueB?.value ?? "") ? 1 : -1;
-  };
-
-  const columns = [
-    columnHelper.accessor("variable", {
-      header: t("newService.endpoint.variable") ?? "",
-      meta: {
-        size: "50%",
-      },
-      sortingFn: (rowA: Row<RequestVariablesTableColumns>, rowB: Row<RequestVariablesTableColumns>) => {
-        return sortRows(rowA, rowB, "variable");
-      },
-      cell: (props) => (
-        <VariableCell
-          row={props.row}
-          variable={rowsData[requestTab.tab]!.find((r) => r.id === props.row.id)?.variable ?? ""}
-          updateRowVariable={updateRowVariable}
-          rowData={rowsData[requestTab.tab]![+props.row.id]}
-          onValueChange={(rowId, value) => {
-            updateParams(false, rowId, value);
-          }}
-        />
-      ),
-    }),
-    columnHelper.accessor("value", {
-      header: t("newService.endpoint.value") ?? "",
-      meta: {
-        size: "50%",
-      },
-      sortingFn: (rowA: Row<RequestVariablesTableColumns>, rowB: Row<RequestVariablesTableColumns>) => {
-        return sortRows(rowA, rowB, "value");
-      },
-      cell: (props) => (
-        <ValueCell
-          row={props.row}
-          requestValues={requestValues}
-          isLive={isLive}
-          rowData={rowsData[requestTab.tab]![+props.row.id]}
-          value={rowsData[requestTab.tab]!.find((r) => r.id === props.row.id)?.value ?? ""}
-          updateRowValue={updateRowValue}
-          onValueChange={(rowId, value) => {
-            updateParams(true, rowId, value);
-          }}
-        />
-      ),
-    }),
-    columnHelper.display({
-      id: "delete",
-      cell: (props) => {
-        return (
-          <Track justify="center" style={{ paddingRight: 8 }}>
-            {props.row.original.required ? (
-              <Tooltip content={t("newService.endpoint.required")}>
-                <span className="variable-required">!</span>
-              </Tooltip>
-            ) : (
-              <Button
-                appearance="text"
-                onClick={() => {
-                  const rowData = rowsData[requestTab.tab]![+props.row.id];
-                  deleteVariable(rowData);
-                  setRowsData(getTabsRowsData());
-                }}
-              >
-                <Icon icon={<MdDeleteOutline />} size="medium" />
-              </Button>
-            )}
-          </Track>
-        );
-      },
-    }),
-  ];
 
   const updateParams = (isValue: boolean, rowId: string, value: string) => {
     if (requestTab.tab === "params") {
@@ -317,6 +228,19 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
       onParametersChange(parameters);
     }
   };
+  
+  const columns = useMemo(() => getColumns({
+    rowsData,
+    updateParams,
+    requestTab,
+    deleteVariable,
+    setRowsData,
+    updateRowVariable,
+    requestValues,
+    isLive,
+    updateRowValue,
+    getTabsRowsData,
+  }), []);
 
   const buildRawDataView = (): JSX.Element => {
     return (
@@ -328,7 +252,8 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
             onMouseDown={() => {
               setTabRawData((prevRawData) => {
                 try {
-                  prevRawData[requestTab.tab] = JSON.stringify(JSON.parse(prevRawData[requestTab.tab]!), null, 4);
+                  const content = prevRawData[requestTab.tab] ?? "";
+                  prevRawData[requestTab.tab] = JSON.stringify(JSON.parse(content), null, 4);
                 } catch (e: any) {
                   setJsonError(`Unable to format JSON. ${e.message}`);
                 }

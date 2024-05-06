@@ -14,17 +14,15 @@ const OpenWebPageTestContent: FC<OpenWebPageTestContentProps> = ({ websiteUrl, w
   }
 
   return (
-    <>
-      <Track direction="vertical" align="left" style={{ ...popupBodyCss }} gap={16}>
-        {websiteName && websiteUrl && <a href={websiteUrl} target="_blank">{websiteName}</a>}
-        <Button
-          disabled={!(!!(websiteUrl && websiteName))}
-          onClick={() => window.open(websiteUrl!, "_blank")}
-        >
-          Testi
-        </Button>
-      </Track>
-    </>
+    <Track direction="vertical" align="left" style={{ ...popupBodyCss }} gap={16}>
+      {websiteName && websiteUrl && <a href={websiteUrl} target="_blank">{websiteName}</a>}
+      <Button
+        disabled={!(websiteUrl && websiteName)}
+        onClick={() => window.open(websiteUrl ?? "", "_blank")}
+      >
+        Testi
+      </Button>
+    </Track>
   );
 }
 

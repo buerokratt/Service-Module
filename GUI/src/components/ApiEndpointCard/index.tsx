@@ -1,5 +1,4 @@
 import { FC, useEffect, useMemo, useState } from "react";
-
 import * as Tabs from "@radix-ui/react-tabs";
 import { Button, EndpointCustom, EndpointOpenAPI, FormInput, FormSelect, Icon, Switch, Track } from "..";
 import { Option } from "../../types/option";
@@ -60,12 +59,10 @@ const ApiEndpointCard: FC<EndpointCardProps> = ({ endpoint }) => {
             {t(testEnvExists ? "newService.endpoint.testEnv" : "newService.endpoint.addTestEnv")}
           </Tabs.Trigger>
         </Tabs.List>
-        <>
-          <Button appearance="text" onClick={() => deleteEndpoint(endpoint.id)} style={{ color: "#9799A4" }}>
-            <Icon icon={<MdDeleteOutline />} size="medium" />
-            {t("overview.delete")}
-          </Button>
-        </>
+        <Button appearance="text" onClick={() => deleteEndpoint(endpoint.id)} style={{ color: "#9799A4" }}>
+          <Icon icon={<MdDeleteOutline />} size="medium" />
+          {t("overview.delete")}
+        </Button>
       </Track>
       {[EndpointEnv.Live, EndpointEnv.Test].map((env) => {
         return (

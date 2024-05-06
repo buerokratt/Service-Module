@@ -6,7 +6,6 @@ import {
   EndpointData,
   EndpointEnv,
   EndpointTab,
-  EndpointVariableData,
   PreDefinedEndpointEnvVariables,
 } from "types/endpoint";
 import {
@@ -22,10 +21,9 @@ import i18next from "i18next";
 import { ROUTES } from "resources/routes-constants";
 import { NavigateFunction } from "react-router-dom";
 import { editServiceInfo, saveFlowClick } from "services/service-builder";
-import { GRID_UNIT, NodeDataProps, initialEdge, initialNodes } from "types/service-flow";
+import { NodeDataProps, initialEdge, initialNodes } from "types/service-flow";
 import {
   alignNodesInCaseAnyGotOverlapped,
-  buildEdge,
   buildPlaceholder,
   updateFlowInputRules,
 } from "services/flow-builder";
@@ -102,7 +100,7 @@ interface ServiceStoreState {
   handlePopupSave: (updatedNode: Node<NodeDataProps>) => void;
   testUrl: (endpoint: EndpointData, onError: () => void, onSuccess: () => void) => Promise<void>;
 
-  // TODO: remove the following funtions and refactor the code to use more specific functions
+  // remove the following funtions and refactor the code to use more specific functions later
   setEndpoints: (callback: (prev: EndpointData[]) => EndpointData[]) => void;
   reactFlowInstance: ReactFlowInstance | null;
   setReactFlowInstance: (reactFlowInstance: ReactFlowInstance | null) => void;
@@ -328,7 +326,7 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
   onNameChange: (endpointId: string, oldName: string, newName: string) => {
     const endpoint = get().endpoints.find((x) => x.id === endpointId);
     const response = endpoint?.definedEndpoints.find((x) => x.isSelected)?.response ?? [];
-    const variables = response.map((x) => `{{${!!newName ? newName : x.id}.${x.name}}}`);
+    const variables = response.map((x) => `{{${newName ?? x.id}.${x.name}}}`);
 
     const oldFilteredVariables = get().availableVariables.prod.filter(
       (v) => v.replace("{{", "").split(".")[0] !== oldName
@@ -387,67 +385,57 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
   isLive: () => get().selectedTab === EndpointEnv.Live,
   updateEndpointRawData: (data: RequestVariablesTabsRawData, endpointId?: string, parentEndpointId?: string) => {
     if (!endpointId) return;
-    set((state) => {
-      const isLive = state.isLive();
-      const endpoints = state.endpoints.map((prevEndpoint: EndpointData) => {
-        if (prevEndpoint.id !== parentEndpointId) return prevEndpoint;
-        prevEndpoint.definedEndpoints.map((defEndpoint) => {
-          if (defEndpoint.id !== endpointId) return defEndpoint;
-          Object.keys(data).forEach((key) => {
-            if (defEndpoint[key as EndpointTab]) {
-              defEndpoint[key as EndpointTab]!.rawData[isLive ? "value" : "testValue"] = data[key as EndpointTab];
-            }
-          });
-          return defEndpoint;
-        });
-        return prevEndpoint;
-      });
+    const live = get().isLive() ? "value" : "testValue";
 
-      return {
-        endpoints,
-      };
+    const endpoints = JSON.parse(JSON.stringify(get().endpoints)) as EndpointData[];
+    const defEndpoint = endpoints.find(x => x.id === parentEndpointId)?.definedEndpoints.find(x => x.id === endpointId);
+
+    for (const key in data) {
+      if (defEndpoint?.[key as EndpointTab]) {
+        defEndpoint[key as EndpointTab]!.rawData[live] = data[key as EndpointTab];
+      }
+    }
+
+    set({
+      endpoints
     });
   },
   updateEndpointData: (data: RequestVariablesTabsRowsData, endpointId?: string, parentEndpointId?: string) => {
     if (!endpointId) return;
-    set((state) => {
-      const endpoints = state.endpoints.map((prevEndpoint: EndpointData) => {
-        if (prevEndpoint.id !== parentEndpointId) return prevEndpoint;
-        prevEndpoint.definedEndpoints.map((defEndpoint) => {
-          if (defEndpoint.id !== endpointId) return defEndpoint;
-          Object.keys(data).forEach((key) => {
-            data[key as EndpointTab]?.forEach((row) => {
-              if (
-                !row.endpointVariableId &&
-                row.variable &&
-                !defEndpoint[key as EndpointTab]?.variables.map((e) => e.name).includes(row.variable)
-              ) {
-                const newVariable: EndpointVariableData = {
-                  id: uuid(),
-                  name: row.variable,
-                  type: "custom",
-                  required: false,
-                };
-                newVariable[state.isLive() ? "value" : "testValue"] = row.value;
-                defEndpoint[key as EndpointTab]?.variables.push(newVariable);
-              }
-            });
-            defEndpoint[key as EndpointTab]?.variables.forEach((variable) => {
-              const updatedVariable = data[key as EndpointTab]!.find(
-                (updated) => updated.endpointVariableId === variable.id
-              );
-              variable[state.isLive() ? "value" : "testValue"] = updatedVariable?.value;
-              variable.name = updatedVariable?.variable ?? variable.name;
-            });
-          });
-          return defEndpoint;
-        });
-        return prevEndpoint;
-      });
 
-      return {
+    const live = get().isLive() ? "value" : "testValue"
+    const endpoints = JSON.parse(JSON.stringify(get().endpoints)) as EndpointData[];
+    const defEndpoint = endpoints.find(x => x.id === parentEndpointId)?.definedEndpoints.find(x => x.id === endpointId);
+
+    if(!defEndpoint) return;
+
+    for (const key in data) {
+      const keyedDefEndpoint = defEndpoint[key as EndpointTab];
+      for (const row of data[key as EndpointTab] ?? []) {
+        if (
+          !row.endpointVariableId &&
+          row.variable &&
+          !keyedDefEndpoint?.variables.map((e) => e.name).includes(row.variable)
+        ) {
+          keyedDefEndpoint?.variables.push({
+            id: uuid(),
+            name: row.variable,
+            type: "custom",
+            required: false,
+            [live]: row.value,
+          });
+        }
+      }
+      
+      for (const variable of keyedDefEndpoint?.variables ?? []) {
+        const updatedVariable = data[key as EndpointTab]!.find((updated) => updated.endpointVariableId === variable.id);
+        variable[live] = updatedVariable?.value;
+        variable.name = updatedVariable?.variable ?? variable.name;
+      }
+    }
+
+    set({
         endpoints,
-      };
     });
   },
   reactFlowInstance: null,
@@ -574,12 +562,12 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
     try {
       new URL(endpoint.definedEndpoints[0].url ?? "");
       if (endpoint.definedEndpoints[0].methodType === "GET") {
-        const result = await axios.post(getEndpointValidation(), {
+        await axios.post(getEndpointValidation(), {
           url: endpoint.definedEndpoints[0].url ?? "",
           type: "GET",
         });
       } else {
-        const result = await axios.post(getEndpointValidation(), {
+        await axios.post(getEndpointValidation(), {
           url: endpoint.definedEndpoints[0].url ?? "",
           type: "POST",
         });

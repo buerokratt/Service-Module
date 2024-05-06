@@ -21,7 +21,6 @@ const ValueCell: React.FC<ValueCellProps> = ({ row, requestValues, updateRowValu
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    // TODO figure out a way to support tabs
     const handleClickOutside = (event: MouseEvent) => {
       if (ref.current && !ref.current.contains(event.target as any)) {
         if (value !== inputValue) updateRowValue(row.id, inputValue);

@@ -18,6 +18,10 @@ $veera-spacing-patterns: (
   @each $name, $size in $veera-spacing-patterns {
     --veera-spacing-#{'' + $name}: #{$size};
   }
+  --cvi-spacing-unit: #{$cvi-spacing-unit};
+  @each $name, $size in $cvi-spacing-patterns {
+    --cvi-spacing-#{'' + $name}: #{$size};
+  }
 }
 
 $cvi-spacing-unit: 4px;
@@ -34,10 +38,3 @@ $cvi-spacing-patterns: (
         'parnu': 48px,
         'narva': 60px,
 );
-
-:root {
-  --cvi-spacing-unit: #{$cvi-spacing-unit};
-  @each $name, $size in $cvi-spacing-patterns {
-    --cvi-spacing-#{'' + $name}: #{$size};
-  }
-}

@@ -16,4 +16,4 @@ JOIN (
     ) AS combined_endpoints
   ) subquery
 ) subquery ON true
-ORDER BY id;
+ORDER BY id ASC;

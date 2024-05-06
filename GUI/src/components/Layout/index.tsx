@@ -21,9 +21,9 @@ import './Layout.scss';
 
     const CACHE_NAME = 'mainmenu-cache';
 
-    const [MainMenuItems, setMainMenuItems] = useState([])
+    const [mainMenuItems, setMainMenuItems] = useState([])
 
-    const {data, isLoading, status} = useQuery({
+    useQuery({
       queryKey: [import.meta.env.REACT_APP_MENU_URL + import.meta.env.REACT_APP_MENU_PATH],
       onSuccess: (res: any) => {
         try {
@@ -40,14 +40,14 @@ import './Layout.scss';
     });
 
     function getCache(): any {
-      const cache = localStorage.getItem(CACHE_NAME) || '{}';
+      const cache = localStorage.getItem(CACHE_NAME) ?? '{}';
       return JSON.parse(cache);
     }
 
     return (
         <div className="layout">
           {!disableMenu &&
-              <MainNavigation serviceId={import.meta.env.REACT_APP_SERVICE_ID.split(',')} items={MainMenuItems}/>}
+              <MainNavigation serviceId={import.meta.env.REACT_APP_SERVICE_ID.split(',')} items={mainMenuItems}/>}
           <div className="layout__wrapper">
             {customHeader ?? <Header
                 toastContext={{ open: useToastStore.getState().open }}

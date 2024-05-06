@@ -5,21 +5,24 @@ import Buerokratt from "../../static/icons/buerokratt.svg";
 
 const Profile = () => (
   <div className={styles.profile__wrapper}>
-    <motion.div
-      className={`${styles.profile}`}
-      initial="initial"
-      animate="animate"
-      role="button"
+    <button
+      className={styles.profile}
       onClick={useTestServiceStore.getState().openChat}
     >
-      <img
-        src={Buerokratt}
-        alt="Buerokratt logo"
-        width={45}
-        style={{ filter: "brightness(0) invert(1)", imageRendering: "auto" }}
-        loading="eager"
-      />
-    </motion.div>
+      <motion.div
+        className={styles.profile}
+        initial="initial"
+        animate="animate"
+      >
+        <img
+          src={Buerokratt}
+          alt="Buerokratt logo"
+          width={45}
+          style={{ filter: "brightness(0) invert(1)", imageRendering: "auto" }}
+          loading="eager"
+        />
+      </motion.div>
+    </button>
   </div>
 );
 

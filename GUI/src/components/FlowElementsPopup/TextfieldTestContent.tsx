@@ -19,7 +19,7 @@ const TextfieldTestContent: FC<TextfieldTextContentProps> = ({ placeholders, mes
   }
 
   const onTestClick = () => {
-    const regex = /{{(.*?)}}/g;
+    const regex = /{{(.{0,512}?)}}/g;
     const result = message?.replace(regex, (match, _) => messageTestInputFields[match.trim()] || match);
     if (result) setMessageTestOutput(result);
   }

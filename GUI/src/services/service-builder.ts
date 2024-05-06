@@ -13,9 +13,7 @@ import useToastStore from "store/toasts.store";
 import { RawData, Step, StepType } from "types";
 import { EndpointData, EndpointEnv, EndpointType, EndpointVariableData } from "types/endpoint";
 
-//
-// TODO: refactor this file
-//
+// refactor this file later
 
 const getEndpointVariables = (
   key: string,
@@ -64,7 +62,7 @@ const getEndpointVariables = (
 const getNestedVariables = (variable: EndpointVariableData, key: string, path: string, result: string[]) => {
   const variableData = variable.type === "schema" ? variable.schemaData : variable.arrayData;
   if (variableData instanceof Array) {
-    (variableData as EndpointVariableData[]).forEach((v) => {
+    variableData.forEach((v) => {
       if (["schema", "array"].includes(v.type)) {
         getNestedVariables(v, key, `${path}.${v.name}`, result);
         return;
@@ -155,6 +153,7 @@ const saveEndpointConfig = async (
   steps.set("prepare_step", {
     assign: variables,
   });
+  const bodyStr = Object.keys(body ?? {}).map((b) => `["${b.replaceAll("__", ".")}", body_${b}]`);
   steps.set("combine_step", {
     assign: {
       sensitive: `\${new Map([${typeof headers === "string"
@@ -164,7 +163,7 @@ const saveEndpointConfig = async (
         )}])]`
         }, ${typeof body === "string"
           ? `["body", body]`
-          : `["body", new Map([${Object.keys(body ?? {}).map((b) => `["${b.replaceAll("__", ".")}", body_${b}]`)}])]`
+          : `["body", new Map([${bodyStr}])]`
         }, ${typeof params === "string"
           ? `["params", params]`
           : `["params", new Map([${Object.keys(params ?? {}).map(
@@ -245,7 +244,7 @@ const assignNestedVariable = (
 ) => {
   const variableData = variable.type === "schema" ? variable.schemaData : variable.arrayData;
   if (variableData instanceof Array) {
-    (variableData as EndpointVariableData[]).forEach((v) => {
+    variableData.forEach((v) => {
       if (["schema", "array"].includes(v.type)) assignNestedVariable(v, key, env, `${path}__${v.name}`, result);
       if (!v.value) return;
 
@@ -287,105 +286,26 @@ export async function saveEndpoints(
   const serviceEndpoints = endpoints.filter(e => e.serviceId === id || !e.hasOwnProperty('serviceId')).map(x => x);
 
   for (const endpoint of serviceEndpoints) {
-    if (!endpoint) continue;
+    if (!endpoint) continue;            
     endpoint.serviceId = id
     const selectedEndpointType = endpoint.definedEndpoints.find((e) => e.isSelected);
     if (!selectedEndpointType) continue;
 
-    const endpointName = `${name.replaceAll(" ", "_")}-${(endpoint.name.trim().length ?? 0) > 0 ? endpoint?.name.replaceAll(" ", "_") : endpoint?.id
-      }`;
+    const endpointName = `${name.replaceAll(" ", "_")}-${(endpoint.name.trim().length ?? 0) > 0 ? endpoint?.name.replaceAll(" ", "_") : endpoint?.id}`;
     for (const env of [EndpointEnv.Live, EndpointEnv.Test]) {
       await saveEndpointInfo(selectedEndpointType, env, endpointName, endpoint);
     }
-    const steps = new Map();
-    steps.set("extract_request_data", {
-      assign: {
-        type: "${incoming.params.type}",
-      },
-      next: "check_for_type",
-    });
-    steps.set("check_for_type", {
-      switch: [{ condition: "${type == null}", next: "return_no_type_error" }],
-      next: "check_for_environment",
-    });
-    steps.set("check_for_environment", {
-      switch: [{ condition: "${type.toLowerCase() == 'prod'}", next: "get_prod_info" }],
-      next: "get_test_info",
-    });
-    steps.set("get_prod_info", {
-      call: "http.post",
-      args: {
-        url: `${process.env.REACT_APP_API_URL}/services/endpoints/info/${endpoint.isCommon ? "common/" : ""
-          }${endpointName}-prod-info`,
-        body: {
-          params: "${incoming.body.params ?? new Map()}",
-          headers: "${incoming.body.headers ?? new Map()}",
-          body: "${incoming.body.body ?? new Map()}",
-        },
-      },
-      result: "info",
-      next: "assign_endpoint_url",
-    });
-    steps.set("get_test_info", {
-      call: `http.post`,
-      args: {
-        url: `${process.env.REACT_APP_API_URL}/services/endpoints/info/${endpoint.isCommon ? "common/" : ""
-          }${endpointName}-test-info`,
-        body: {
-          params: "${incoming.body.params ?? new Map()}",
-          headers: "${incoming.body.headers ?? new Map()}",
-          body: "${incoming.body.body ?? new Map()}",
-        },
-      },
-      result: "info",
-      next: "assign_endpoint_url",
-    });
-    const endpointParams = getEndpointVariables("params", selectedEndpointType.params);
-    const endpointHeaders = getEndpointVariables("headers", selectedEndpointType.headers);
-    const endpointBody = getEndpointVariables("body", selectedEndpointType.body);
-    let endpointUrl = selectedEndpointType.url;
-    if (endpointUrl?.includes("{")) {
-      const variable = selectedEndpointType.url?.slice(
-        selectedEndpointType.url?.indexOf("{") + 1,
-        selectedEndpointType.url.indexOf("}")
-      );
-      endpointUrl = selectedEndpointType.url?.replace(`{${variable}}` ?? "", endpointParams[variable ?? ""]);
-    }
-    steps.set("assign_endpoint_url", {
-      assign: {
-        endpoint_url: endpointUrl,
-      },
-      next: "execute_endpoint",
-    });
-    steps.set("execute_endpoint", {
-      call: selectedEndpointType.methodType.toLowerCase() === "get" ? "http.get" : "http.post",
-      args: {
-        url: "${endpoint_url}",
-        headers: Object.keys(endpointHeaders).length > 0 ? endpointHeaders : undefined,
-        body: Object.keys(endpointBody).length > 0 ? endpointBody : undefined,
-      },
-      result: "res",
-      next: "return_result",
-    });
-    steps.set("return_result", {
-      wrapper: false,
-      return: "${res.response.body}",
-      next: "end",
-    });
-    steps.set("return_no_type_error", {
-      status: "400",
-      return: "Please Specify Endpoint Type 'prod' Or 'test'",
-      next: "end",
-    });
+    const steps = buildSteps(endpointName, endpoint, selectedEndpointType);
     const result = Object.fromEntries(steps.entries());
+
+    const isCommonPath = endpoint.isCommon ? "common/" : "";
 
     tasks.push(axios.post(
       jsonToYml(),
       { result },
       {
         params: {
-          location: `/Ruuter/${selectedEndpointType.methodType.toUpperCase()}/services/endpoints/${endpoint.isCommon ? "common/" : ""
-            }${endpointName}.yml`,
+          location: `/Ruuter/${selectedEndpointType.methodType.toUpperCase()}/services/endpoints/${isCommonPath}${endpointName}.yml`,
         },
       }
     ));
@@ -398,7 +318,95 @@ export async function saveEndpoints(
   await Promise.all(tasks).then(onSuccess).catch(onError);
 }
 
-export const saveFlow = async (
+const buildSteps = (endpointName: string, endpoint: EndpointData, selectedEndpointType: EndpointType) => {
+  const steps = new Map();
+  steps.set("extract_request_data", {
+    assign: {
+      type: "${incoming.params.type}",
+    },
+    next: "check_for_type",
+  });
+  steps.set("check_for_type", {
+    switch: [{ condition: "${type == null}", next: "return_no_type_error" }],
+    next: "check_for_environment",
+  });
+  steps.set("check_for_environment", {
+    switch: [{ condition: "${type.toLowerCase() == 'prod'}", next: "get_prod_info" }],
+    next: "get_test_info",
+  });
+  steps.set("get_prod_info", {
+    call: "http.post",
+    args: {
+      url: `${process.env.REACT_APP_API_URL}/services/endpoints/info/${endpoint.isCommon ? "common/" : ""
+        }${endpointName}-prod-info`,
+      body: {
+        params: "${incoming.body.params ?? new Map()}",
+        headers: "${incoming.body.headers ?? new Map()}",
+        body: "${incoming.body.body ?? new Map()}",
+      },
+    },
+    result: "info",
+    next: "assign_endpoint_url",
+  });
+  steps.set("get_test_info", {
+    call: `http.post`,
+    args: {
+      url: `${process.env.REACT_APP_API_URL}/services/endpoints/info/${endpoint.isCommon ? "common/" : ""
+        }${endpointName}-test-info`,
+      body: {
+        params: "${incoming.body.params ?? new Map()}",
+        headers: "${incoming.body.headers ?? new Map()}",
+        body: "${incoming.body.body ?? new Map()}",
+      },
+    },
+    result: "info",
+    next: "assign_endpoint_url",
+  });
+  const endpointParams = getEndpointVariables("params", selectedEndpointType.params);
+  const endpointHeaders = getEndpointVariables("headers", selectedEndpointType.headers);
+  const endpointBody = getEndpointVariables("body", selectedEndpointType.body);
+  const headers = Object.keys(endpointHeaders).length > 0 ? endpointHeaders : undefined;
+  const body = Object.keys(endpointBody).length > 0 ? endpointBody : undefined;
+
+  let endpointUrl = selectedEndpointType.url;
+  if (endpointUrl?.includes("{")) {
+    const variable = selectedEndpointType.url?.slice(
+      selectedEndpointType.url?.indexOf("{") + 1,
+      selectedEndpointType.url.indexOf("}")
+    );
+    endpointUrl = selectedEndpointType.url?.replace(`{${variable}}`, endpointParams[variable ?? ""]);
+  }
+  steps.set("assign_endpoint_url", {
+    assign: {
+      endpoint_url: endpointUrl,
+    },
+    next: "execute_endpoint",
+  });
+  steps.set("execute_endpoint", {
+    call: selectedEndpointType.methodType.toLowerCase() === "get" ? "http.get" : "http.post",
+    args: {
+      url: "${endpoint_url}",
+      headers,
+      body
+    },
+    result: "res",
+    next: "return_result",
+  });
+  steps.set("return_result", {
+    wrapper: false,
+    return: "${res.response.body}",
+    next: "end",
+  });
+  steps.set("return_no_type_error", {
+    status: "400",
+    return: "Please Specify Endpoint Type 'prod' Or 'test'",
+    next: "end",
+  });
+
+  return steps;
+}
+
+interface SaveFlowConfig {
   steps: Step[],
   name: string,
   edges: Edge[],
@@ -409,7 +417,20 @@ export const saveFlow = async (
   isCommon: boolean,
   serviceId: string,
   isNewService: boolean,
-) => {
+}
+
+export const saveFlow = async ({
+  steps,
+  name,
+  edges,
+  nodes,
+  onSuccess,
+  onError,
+  description,
+  isCommon,
+  serviceId,
+  isNewService,
+}: SaveFlowConfig) => {
   try {
     const allRelations: any[] = [];
     // find regular edges 1 -> 1
@@ -417,27 +438,35 @@ export const saveFlow = async (
       const node = nodes.find((node) => node.id === edge.source);
       const followingNode = nodes.find((node) => node.id === edge.target);
       if (!node) return;
-      if (node.data.stepType === StepType.Textfield && node.data.message === undefined) {
-        throw new Error(i18next.t("toast.missing-textfield-message") ?? "Error");
-      }
-      if (
-        node.data.stepType === StepType.OpenWebpage &&
-        (node.data.link === undefined || node.data.linkText === undefined)
-      ) {
-        throw new Error(i18next.t("toast.missing-website") ?? "Error");
+      let error;
+      switch(node.data.stepType) {
+        case StepType.Textfield:
+            if (node.data.message === undefined) {
+              error = i18next.t("toast.missing-textfield-message");
+            }
+            break;
+        case StepType.OpenWebpage:
+          if(node.data.link === undefined || node.data.linkText === undefined) {
+            error = i18next.t("toast.missing-website");
+          }
+          break;
+        case StepType.FileGenerate:
+          if (node.data.fileName === undefined || node.data.fileContent === undefined) {
+            error = i18next.t("toast.missing-file-generation");
+          }
+          break;
+        case StepType.Input:
+          if(followingNode?.type === "placeholder" && !allRelations.includes(node.id)) {
+            allRelations.push(node.id);
+            return;
+          }
+          break;
       }
 
-      if (
-        node.data.stepType === StepType.FileGenerate &&
-        (node.data.fileName === undefined || node.data.fileContent === undefined)
-      ) {
-        throw new Error(i18next.t("toast.missing-file-generation") ?? "Error");
+      if(error) {
+        throw new Error(error);
       }
 
-      if (node.data.stepType === StepType.Input || followingNode?.type === "placeholder") {
-        if (!allRelations.includes(node.id)) allRelations.push(node.id);
-        return;
-      }
       allRelations.push(`${edge.source}-${edge.target}`);
     });
     // find finishing nodes
@@ -482,6 +511,14 @@ export const saveFlow = async (
           next: `${clientInput}-switch`,
         });
 
+        const clientInputYesOrNo = (label: string) => label === "rule 1" ? '"Yes"' : '"No"';
+
+        const findTargetNodeId = (node: Node) => edges.find((edge) => edge.source === node.id)?.target;
+        const findFollowingNode = (node: Node) => {
+          const target = findTargetNodeId(node);
+          return nodes.find((n) => n.id === target);
+        }
+
         finishedFlow.set(
           `${clientInput}-switch`,
           getSwitchCase(
@@ -493,15 +530,13 @@ export const saveFlow = async (
                 const matchingRule = parentNode.data?.rules?.children?.find(
                   (_: never, i: number) => `rule ${i + 1}` === node.data.label
                 );
-                const followingNode = nodes.find(
-                  (n) => n.id === edges.find((edge) => edge.source === node.id)?.target
-                );
+                const followingNode = findFollowingNode(node);
                 return {
                   case:
                     matchingRule && !["Yes", "No"].includes(matchingRule?.condition)
                       ? `\${${matchingRule.name.replace("{{", "").replace("}}", "")} ${matchingRule.condition} ${matchingRule.value
                       }}`
-                      : `\${${clientInput} == ${node.data.label === "rule 1" ? '"Yes"' : '"No"'}}`,
+                      : `\${${clientInput} == ${clientInputYesOrNo(node.data.label)}}`,
                   nextStep:
                     followingNode?.type === "customNode"
                       ? `${followingNode.data.stepType}-${followingNode.id}`
@@ -583,11 +618,11 @@ const getNestedPreDefinedRawVariables = (data: { [key: string]: any }, result: s
 const getNestedPreDefinedEndpointVariables = (variable: EndpointVariableData, result: string[]) => {
   const variableData = variable.type === "schema" ? variable.schemaData : variable.arrayData;
   if (variableData instanceof Array) {
-    (variableData as EndpointVariableData[]).forEach((v) => {
+    variableData.forEach((v) => {
       if (["schema", "array"].includes(v.type)) getNestedPreDefinedEndpointVariables(v, result);
 
-      if (v.value && v.value.startsWith("{{")) result.push(getMapEntry(v.value));
-      if (v.testValue && v.testValue.startsWith("{{")) result.push(getMapEntry(v.testValue));
+      if (v.value?.startsWith("{{")) result.push(getMapEntry(v.value));
+      if (v.testValue?.startsWith("{{")) result.push(getMapEntry(v.testValue));
     });
   }
 };
@@ -598,8 +633,8 @@ const getPreDefinedEndpointVariables = (data?: { variables: EndpointVariableData
   data.variables.forEach((v) => {
     if (!v.value) getNestedPreDefinedEndpointVariables(v, result);
 
-    if (v.value && v.value.startsWith("{{")) result.push(getMapEntry(v.value));
-    if (v.testValue && v.testValue.startsWith("{{")) result.push(getMapEntry(v.testValue));
+    if (v.value?.startsWith("{{")) result.push(getMapEntry(v.value));
+    if (v.testValue?.startsWith("{{")) result.push(getMapEntry(v.testValue));
   });
   try {
     getNestedPreDefinedRawVariables(JSON.parse(data.rawData?.value ?? "{}"), result);
@@ -776,20 +811,29 @@ export const saveFlowClick = async () => {
   const edges = useServiceStore.getState().edges;
   const nodes = useServiceStore.getState().nodes;
 
-  await saveFlow(steps, name, edges, nodes,
-    () => {
+  await saveFlow({
+    steps,
+    name,
+    edges,
+    nodes,
+    onSuccess: () => {
       useToastStore.getState().success({
         title: i18next.t("newService.toast.success"),
         message: i18next.t("newService.toast.savedSuccessfully"),
       });
       useServiceStore.getState().enableTestButton();
     },
-    (e) => {
+    onError: (e) => {
       useToastStore.getState().error({
         title: i18next.t("toast.cannot-save-flow"),
         message: e?.message,
       });
-    }, description, isCommon, serviceId, isNewService);
+    },
+    description,
+    isCommon,
+    serviceId,
+    isNewService
+  });
 }
 
 export const editServiceInfo = async () => {

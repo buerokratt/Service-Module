@@ -13,25 +13,23 @@ const JsonRequestContent: FC<JsonRequestContentProps> = ({ isVisible, jsonConten
   if (!isVisible) return <></>;
 
   return (
-    <>
-      <Track direction='vertical' align="left" style={{ width: '100%', padding: 16 }}>
-        <label htmlFor="json">JSON</label>
-        <FormTextarea
-          name="json"
-          label="JSON"
-          placeholder={t('serviceFlow.popup.jsonRequestPlaceholder')!}
-          hideLabel={true}
-          maxRows={20}
-          style={{
-            backgroundColor: '#F0F0F2',
-            resize: 'vertical',
-          }}
-          defaultValue={JSON.stringify(jsonContent, undefined, 4)}
-          readOnly
-        >
-        </FormTextarea>
-      </Track>
-    </>
+    <Track direction='vertical' align="left" style={{ width: '100%', padding: 16 }}>
+      <label htmlFor="json">JSON</label>
+      <FormTextarea
+        name="json"
+        label="JSON"
+        placeholder={t('serviceFlow.popup.jsonRequestPlaceholder')!}
+        hideLabel={true}
+        maxRows={20}
+        style={{
+          backgroundColor: '#F0F0F2',
+          resize: 'vertical',
+        }}
+        defaultValue={JSON.stringify(jsonContent, undefined, 4)}
+        readOnly
+      >
+      </FormTextarea>
+    </Track>
   );
 }
 

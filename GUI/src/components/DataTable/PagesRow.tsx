@@ -24,7 +24,7 @@ const PagesRow: React.FC<PagesRowProps> = ({
 
     pages.push(current);
 
-    for (; pages.length < Math.min(pagesShown, table.getPageCount());) {
+    while (pages.length < Math.min(pagesShown, table.getPageCount())) {
       if (pages[0] > 0) pages.unshift(pages[0] - 1);
       if (pages[pages.length - 1] + 1 < lastShownPage) {
         pages.push(pages[pages.length - 1] + 1);

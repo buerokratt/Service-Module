@@ -1,4 +1,4 @@
-import React, { FC, useMemo, useState, MouseEvent } from 'react'
+import React, { FC, useState, MouseEvent } from 'react'
 import { Column, Table } from '@tanstack/react-table'
 import { useTranslation } from 'react-i18next'
 import { MdOutlineSearch } from 'react-icons/md'

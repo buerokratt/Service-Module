@@ -16,7 +16,7 @@ const FormCheckboxes: FC<FormCheckboxesType> = ({ label, name, hideLabel, items 
   const id = useId();
 
   return (
-    <div className='checkboxes' role='group'>
+    <div className='checkboxes'>
       {label && !hideLabel && <label className='checkboxes__label'>{label}</label>}
       <div className='checkboxes__wrapper'>
         {items.map((item, index) => (

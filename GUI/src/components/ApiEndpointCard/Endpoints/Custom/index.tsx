@@ -1,10 +1,8 @@
-import axios from "axios";
 import React, { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { MdErrorOutline } from "react-icons/md";
 import { v4 as uuid } from "uuid";
 import { Button, FormInput, FormSelect, Icon, RequestVariables, Track } from "../../..";
-import { getEndpointValidation } from "../../../../resources/api-constants";
 import { RequestTab } from "../../../../types";
 import { EndpointData, EndpointVariableData, PreDefinedEndpointEnvVariables } from "../../../../types/endpoint";
 import useServiceStore from "store/new-services.store";

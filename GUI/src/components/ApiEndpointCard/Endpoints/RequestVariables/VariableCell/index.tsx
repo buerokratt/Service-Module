@@ -18,7 +18,6 @@ const VariableCell: React.FC<VariableCellProps> = ({ row, updateRowVariable, row
   const ref = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    // TODO figure out a way to support tabs
     const handleClickOutside = (event: MouseEvent) => {
       if (ref.current && !ref.current.contains(event.target as any)) {
         if (variable !== inputValue) updateRowVariable(row.id, inputValue);
