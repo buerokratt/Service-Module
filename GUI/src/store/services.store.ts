@@ -62,20 +62,21 @@ const useServiceListStore = create<ServiceStoreState>((set, get, store) => ({
   loadServicesList: async () => {
     const result = await axios.get(getServicesList());
     const triggers = result.data.response[1];
-    const services = result.data.response[0].map?.(
-      (item: any) =>
-        ({
-          id: item.id,
-          name: item.name,
-          description: item.description,
-          state: item.state,
-          type: item.type,
-          isCommon: item.iscommon,
-          serviceId: item.serviceId,
-          usedCount: 0,
-          linkedIntent: triggers.find((e: Trigger) => e.service === item.serviceId)?.intent || "",
-        } as Service)
-    ) || [];
+    const services =
+      result.data.response[0].map?.(
+        (item: any) =>
+          ({
+            id: item.id,
+            name: item.name,
+            description: item.description,
+            state: item.state,
+            type: item.type,
+            isCommon: item.iscommon,
+            serviceId: item.serviceId,
+            usedCount: 0,
+            linkedIntent: triggers.find((e: Trigger) => e.service === item.serviceId)?.intent || "",
+          } as Service)
+      ) || [];
 
     set({
       services,
@@ -103,20 +104,16 @@ const useServiceListStore = create<ServiceStoreState>((set, get, store) => ({
     if (!selectedService) return;
 
     try {
-
       let state;
-      if(selectedService.state === ServiceState.Active && !draft)
-        state = ServiceState.Inactive;
-      else if (selectedService.state === ServiceState.Active && draft)
-        state = ServiceState.Draft;
-      else if(selectedService.state === ServiceState.Draft)
-        state = ServiceState.Ready;
-      else if (selectedService.state === ServiceState.Ready && activate)
+      if (selectedService.state === ServiceState.Active && !draft) state = ServiceState.Inactive;
+      else if (selectedService.state === ServiceState.Active && draft) state = ServiceState.Draft;
+      else if (selectedService.state === ServiceState.Draft) state = ServiceState.Ready;
+      else if (
+        (selectedService.state === ServiceState.Ready && activate) ||
+        (selectedService.state === ServiceState.Inactive && !draft)
+      )
         state = ServiceState.Active;
-      else if (selectedService.state === ServiceState.Inactive && !draft)
-        state = ServiceState.Active
-      else 
-        state = ServiceState.Draft;
+      else state = ServiceState.Draft;
 
       await axios.post(changeServiceStatus(), {
         id: selectedService.serviceId,
@@ -180,6 +177,7 @@ const useServiceListStore = create<ServiceStoreState>((set, get, store) => ({
         intent: intent,
       });
       useToastStore.getState().success({ title: successMessage });
+      await useServiceListStore.getState().loadServicesList();
     } catch (_) {
       useToastStore.getState().error({ title: errorMessage });
     }

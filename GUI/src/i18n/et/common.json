@@ -145,10 +145,12 @@
           "state": "Teenuse oleku uuendamine ebaõnnestus",
           "requestConnection": "Ühendamistaotlus ebaõnnestus",
           "availableIntents": "Saadaolevate teemade päring ebaõnnestus",
-          "cancelledConnection": "Ühendamistaotluse tühistamine ebaõnnestus"
+          "cancelledConnection": "Ühendamistaotluse tühistamine ebaõnnestus",
+          "failedToConnectToIntent": "Kavatsusega ühenduse loomine ebaõnnestus"
         },
         "requestedConnection": "Ühendamist taotletakse",
-        "cancelledConnection": "Ühendamistaotlus tühistati"
+        "cancelledConnection": "Ühendamistaotlus tühistati",
+        "connectedToIntentSuccessfully": "Kavatsusega ühendamine õnnestus"
       }
     },
     "popup": {
@@ -321,8 +323,8 @@
   "chat": {
     "unanswered": "Vastamata",
     "forwarded": "Suunatud",
-    "incomplete-service-flow" : "Puudulik teenusvoog",
-    "no-start-node" : "Alustamise sõlme ei leitud",
+    "incomplete-service-flow": "Puudulik teenusvoog",
+    "no-start-node": "Alustamise sõlme ei leitud",
     "end-of-chat": "Jõuti vestluse lõppu",
     "loginWithTARA": "Jätkamiseks palun logi sisse",
     "fileSignYesNo": "Kas soovid faili allkirjastada? Jah/Ei",

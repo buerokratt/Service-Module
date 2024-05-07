@@ -145,11 +145,12 @@
           "state": "Service state update failed",
           "requestConnection": "Connection Request failed",
           "availableIntents": "Failed to retrieve available intents",
-          "cancelledConnection": "Connection Request Cancellation failed"
+          "cancelledConnection": "Connection Request Cancellation failed",
+          "failedToConnectToIntent": "Failed to connect to intent"
         },
         "requestedConnection": "Connection Requested",
-        "cancelledConnection": "Connection Request Cancelled"
-
+        "cancelledConnection": "Connection Request Cancelled",
+        "connectedToIntentSuccessfully": "Connected to intent successfully"
       }
     },
     "popup": {
@@ -322,8 +323,8 @@
   "chat": {
     "forwarder": "Forwarded",
     "unanswered": "Unanswered",
-    "incomplete-service-flow" : "Incomplete Service Flow",
-    "no-start-node" : "No Start Node found",
+    "incomplete-service-flow": "Incomplete Service Flow",
+    "no-start-node": "No Start Node found",
     "end-of-chat": "Reached end of chat",
     "loginWithTARA": "To continue please log in with TARA",
     "fileSignYesNo": "Do you want to sign this file? Yes/No",

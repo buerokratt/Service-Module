@@ -174,7 +174,7 @@ services:
       - bykstack
 
   opensearch:
-    image: opensearchproject/opensearch:latest
+    image: opensearchproject/opensearch:2.11.1
     container_name: opensearch
     environment:
       - node.name=opensearch
