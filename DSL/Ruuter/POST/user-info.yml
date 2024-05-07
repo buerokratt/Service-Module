@@ -8,8 +8,8 @@ declaration:
   namespace: service
 
 get_tara_info:
-  template: templates/tara
-  requestType: post
+  template: tara
+  requestType: templates
   result: TARA
 
 return_authorized:
