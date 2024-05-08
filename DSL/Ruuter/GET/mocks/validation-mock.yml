@@ -16,8 +16,8 @@ call_mock:
   result: mock_res
 
 call_template:
-  template: templates/validation-template
-  requestType: post
+  template: validation-template
+  requestType: templates
   body:
     response: ${mock_res.response}
   result: templateResult

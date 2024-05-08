@@ -34,8 +34,8 @@ extract_request_data:
   next: get_tara_info
 
 get_tara_info:
-  template: templates/tara
-  requestType: post
+  template: tara
+  requestType: templates
   result: tara_res
   next: extract_tara_data
 

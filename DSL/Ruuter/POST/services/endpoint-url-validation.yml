@@ -21,8 +21,8 @@ extract_request_data:
     type: ${incoming.body.type}
 
 call_template:
-  template: templates/validation-template
-  requestType: post
+  template: validation-template
+  requestType: templates
   body:
     response: ${url}
     type: ${type}
