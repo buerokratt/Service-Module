@@ -157,9 +157,3 @@ curl -X POST -H "Content-Type: application/json" -d '{
   "password": ""
 }' http://localhost:8086/login-user
 ```
-
-### Notes
-
-##### Content Security Policy (CSP)
-
-- In Case you change ruuter or tim URL's, then please change it in csp configs in `/GUI/index.html` & `/GUI/vite.config.ts`
