@@ -1,4 +1,4 @@
-guard_success:
+guard_allow_all:
   return: "success"
   status: 200
   next: end
