@@ -131,6 +131,7 @@ services:
       - REACT_APP_LOCAL=true
       - REACT_APP_RUUTER_API_URL=http://localhost:8086
       - REACT_APP_RUUTER_PRIVATE_API_URL=http://localhost:8086
+      - REACT_APP_CSP=upgrade-insecure-requests; default-src 'self'; font-src 'self' data:; img-src 'self' data:; script-src 'self' 'unsafe-eval' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; object-src 'none'; connect-src 'self' http://localhost:8086 http://localhost:8085 https://admin.dev.buerokratt.ee/chat/menu.json;
     build:
       context: ./GUI
       dockerfile: Dockerfile.dev
