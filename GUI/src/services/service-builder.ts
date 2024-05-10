@@ -664,8 +664,8 @@ const getTemplate = (steps: Step[], node: Node, stepName: string, nextStep?: str
     };
   }
   return {
-    template: `templates/${data?.templateName}`,
-    requestType: "post",
+    template: `${data?.templateName}`,
+    requestType: "templates",
     body: data?.body,
     result: data?.resultName ?? `${stepName}_result`,
     next: nextStep ?? "service-end",

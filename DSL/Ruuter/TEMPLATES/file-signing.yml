@@ -22,8 +22,8 @@ declaration:
         description: "Body field 'type'"
 
 siga_template_request:
-  template: templates/siga
-  requestType: post
+  template: siga
+  requestType: templates
   body:
     type: ${incoming.body.type}
     personIdentifier: ${incoming.body.personIdentifier}
