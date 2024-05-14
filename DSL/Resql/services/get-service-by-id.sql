@@ -1,12 +1,12 @@
 SELECT
   id,
   name,
+  description,
   current_state AS state,
   ruuter_type AS type,
   is_common AS isCommon,
   structure::json,
   subquery.endpoints::json AS endpoints,
-  description,
   service_id
 FROM services
 JOIN (
@@ -24,5 +24,5 @@ JOIN (
     ) AS combined_endpoints
   ) subquery
 ) subquery ON true
-WHERE deleted = false AND service_id = :id
+WHERE NOT deleted AND service_id = :id
 ORDER BY id ASC;
