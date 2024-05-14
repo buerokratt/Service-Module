@@ -1,3 +1,8 @@
+WITH MaxServices AS (
+  SELECT MAX(id) AS maxId
+  FROM services
+  GROUP BY service_id
+)
 SELECT
   id,
   name,
@@ -9,6 +14,7 @@ SELECT
   subquery.endpoints::json AS endpoints,
   service_id
 FROM services
+JOIN MaxServices ON id = maxId
 JOIN (
   SELECT jsonb_agg(endpoint) AS endpoints
   FROM (
@@ -19,8 +25,10 @@ JOIN (
       WHERE (endpoint->>'isCommon')::boolean = true
       UNION
       SELECT endpoint::jsonb
-      FROM services, json_array_elements(endpoints) AS endpoint
+      FROM services, json_array_elements(endpoints) AS endpoint, MaxServices
+      WHERE id = maxId
     ) AS combined_endpoints
   ) subquery
 ) subquery ON true
+WHERE NOT deleted
 ORDER BY id ASC;
