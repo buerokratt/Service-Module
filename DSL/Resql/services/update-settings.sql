@@ -1,3 +1,2 @@
-UPDATE services_settings
-SET value = :value
-WHERE name = :name;
+INSERT INTO services_settings(name, value)
+VALUES(:name, :value);
