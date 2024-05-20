@@ -15,6 +15,7 @@ import {
 import { saveDraft } from "services/service-builder";
 import useStore from "store/store";
 import useServiceStore from "store/new-services.store";
+import withAuthorization, { ROLES } from "hoc/with-authorization";
 
 const NewServicePage: React.FC = () => {
   const { t } = useTranslation();
@@ -105,4 +106,7 @@ const NewServicePage: React.FC = () => {
   );
 };
 
-export default NewServicePage;
+export default withAuthorization(NewServicePage, [
+  ROLES.ROLE_ADMINISTRATOR,
+  ROLES.ROLE_SERVICE_MANAGER,
+]);

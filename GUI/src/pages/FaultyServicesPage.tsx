@@ -8,6 +8,7 @@ import axios from "axios";
 import { getFaultyServices } from "../resources/api-constants";
 import { format } from "date-fns";
 import i18n from "i18n";
+import withAuthorization, { ROLES } from "hoc/with-authorization";
 
 interface FaultyService {
   id: string;
@@ -173,4 +174,7 @@ const getColumns = (setViewFaultyServiceLog: (data: FaultyService) => void) => {
     ];
 }
 
-export default FaultyServicesPage;
+export default withAuthorization(FaultyServicesPage, [
+  ROLES.ROLE_ADMINISTRATOR,
+  ROLES.ROLE_SERVICE_MANAGER,
+]);

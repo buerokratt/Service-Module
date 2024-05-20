@@ -6,6 +6,7 @@ import { AiFillCheckCircle, AiFillCloseCircle } from "react-icons/ai";
 import { Card, DataTable, Icon } from "components";
 import { Trigger } from "types/Trigger";
 import useServiceStore from "store/services.store";
+import withAuthorization, { ROLES } from "hoc/with-authorization";
 
 const ConnectionRequestsPage: React.FC = () => {
   const { t } = useTranslation();
@@ -111,4 +112,7 @@ const getColumns = (respondToConnectionRequest: (result: boolean, tigger: Trigge
   ]
 }
 
-export default ConnectionRequestsPage;
+export default withAuthorization(ConnectionRequestsPage, [
+  ROLES.ROLE_ADMINISTRATOR,
+  ROLES.ROLE_SERVICE_MANAGER,
+]);
