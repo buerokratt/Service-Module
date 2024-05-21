@@ -11,7 +11,7 @@ export default ({ mode }) => {
   return defineConfig({
     envPrefix: "REACT_APP_",
     plugins: [react(), tsconfigPaths(), svgr()],
-    base: "/services/",
+    base: "/services",
     define: {
       "process.env": process.env,
     },
