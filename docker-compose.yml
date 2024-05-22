@@ -137,7 +137,7 @@ services:
       dockerfile: Dockerfile.dev
     ports:
       - 3006:3006
-    volumes:
+    volumes: # Comment the volumes if you want to use this in production
       - /app/node_modules
       - ./GUI:/app
     networks:

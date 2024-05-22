@@ -14,6 +14,7 @@ import ConnectionRequestsPage from 'pages/ConnectionRequestsPage'
 const RootComponent: React.FC = () => {
   return (
     <Routes>
+      <Route path={"/"} element={<Navigate to={ROUTES.OVERVIEW_ROUTE} />} />
       <Route index element={<Navigate to={ROUTES.OVERVIEW_ROUTE} />} />
       <Route path={ROUTES.NEWSERVICE_ROUTE} element={<NewServicePage />} />
       <Route path={ROUTES.NEWSERVICE_ROUTE_WITH_INTENT_NAME} element={<NewServicePage />} />
