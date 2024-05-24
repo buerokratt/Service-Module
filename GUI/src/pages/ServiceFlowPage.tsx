@@ -12,6 +12,7 @@ import { saveFlowClick } from "services/service-builder";
 import "reactflow/dist/style.css";
 import "./ServiceFlowPage.scss";
 import Chat from "components/chat/chat";
+import withAuthorization, { ROLES } from "hoc/with-authorization";
 
 const ServiceFlowPage: FC = () => {
   const { t } = useTranslation();
@@ -141,4 +142,7 @@ const ServiceFlowPage: FC = () => {
   );
 };
 
-export default ServiceFlowPage;
+export default withAuthorization(ServiceFlowPage, [
+  ROLES.ROLE_ADMINISTRATOR,
+  ROLES.ROLE_SERVICE_MANAGER,
+]);

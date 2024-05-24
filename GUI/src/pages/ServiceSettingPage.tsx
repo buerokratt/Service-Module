@@ -4,6 +4,7 @@ import { Button, FormInput, Track } from "../components";
 import { getServiceSettings, saveServiceSettings } from "../resources/api-constants";
 import axios from "axios";
 import useToastStore from "store/toasts.store";
+import withAuthorization, { ROLES } from "hoc/with-authorization";
 
 const ServiceSettingPage: React.FC = () => {
   const [tryCount, setTryCount] = useState(0);
@@ -76,4 +77,7 @@ const ServiceSettingPage: React.FC = () => {
   );
 };
 
-export default ServiceSettingPage;
+export default withAuthorization(ServiceSettingPage, [
+  ROLES.ROLE_ADMINISTRATOR,
+  ROLES.ROLE_SERVICE_MANAGER,
+]);

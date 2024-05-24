@@ -6,6 +6,7 @@ import ServicesTable from "../components/ServicesTable";
 import { useNavigate } from "react-router-dom";
 import { ROUTES } from "../resources/routes-constants";
 import useServiceListStore from "store/services.store";
+import withAuthorization, { ROLES } from "hoc/with-authorization";
 
 const OverviewPage: React.FC = () => {
   const { t } = useTranslation();
@@ -34,4 +35,7 @@ const OverviewPage: React.FC = () => {
   );
 };
 
-export default OverviewPage;
+export default withAuthorization(OverviewPage, [
+  ROLES.ROLE_ADMINISTRATOR,
+  ROLES.ROLE_SERVICE_MANAGER,
+]);
