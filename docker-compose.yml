@@ -141,12 +141,12 @@ services:
       - REACT_APP_SERVICE_ID=services
     build:
       context: ./GUI
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.dev
     ports:
       - 3006:3006
-    # volumes: # Comment the volumes if you want to use this in production
-    #   - /app/node_modules
-    #   - ./GUI:/app
+    volumes: # Comment the volumes if you want to use this in production
+      - /app/node_modules
+      - ./GUI:/app
     networks:
       - bykstack
 
