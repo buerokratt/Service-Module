@@ -1,14 +1,22 @@
+WITH MaxService AS (
+  SELECT id AS maxId
+  FROM services
+  WHERE service_id = :id
+  ORDER BY id
+  LIMIT 1
+)
 SELECT
   id,
   name,
+  description,
   current_state AS state,
   ruuter_type AS type,
   is_common AS isCommon,
   structure::json,
   subquery.endpoints::json AS endpoints,
-  description,
   service_id
 FROM services
+JOIN MaxService ON id = maxId
 JOIN (
   SELECT jsonb_agg(endpoint) AS endpoints
   FROM (
@@ -19,10 +27,10 @@ JOIN (
       WHERE (endpoint->>'isCommon')::boolean = true
       UNION
       SELECT endpoint::jsonb
-      FROM services, json_array_elements(endpoints) AS endpoint
-      WHERE service_id = :id
+      FROM services, json_array_elements(endpoints) AS endpoint, MaxService
+      WHERE id = maxId
     ) AS combined_endpoints
   ) subquery
 ) subquery ON true
-WHERE deleted = false AND service_id = :id
+WHERE NOT deleted 
 ORDER BY id ASC;
