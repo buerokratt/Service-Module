@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { createColumnHelper } from "@tanstack/react-table";
+import { PaginationState, SortingState, createColumnHelper } from "@tanstack/react-table";
 import { format } from "date-fns";
 import { AiFillCheckCircle, AiFillCloseCircle } from "react-icons/ai";
 import { Card, DataTable, Icon } from "components";
@@ -11,6 +11,12 @@ import withAuthorization, { ROLES } from "hoc/with-authorization";
 const ConnectionRequestsPage: React.FC = () => {
   const { t } = useTranslation();
   const [triggers, setTriggers] = useState<Trigger[] | undefined>(undefined);
+  const [pagination, setPagination] = useState<PaginationState>({
+    pageIndex: 0,
+    pageSize: 10,
+  });
+
+  const [sorting, setSorting] = useState<SortingState>([]);
 
   const loadConnectionRequests = () => {
     useServiceStore
@@ -42,7 +48,15 @@ const ConnectionRequestsPage: React.FC = () => {
     <>
       <h1>{t("connectionRequests.title")}</h1>
       <Card>
-        <DataTable data={triggers} columns={appRequestColumns} sortable />
+        <DataTable
+          data={triggers}
+          columns={appRequestColumns}
+          sortable
+          sorting={sorting}
+          pagination={pagination}
+          setPagination={setPagination}
+          setSorting={setSorting}
+        />
       </Card>
     </>
   );
@@ -109,10 +123,7 @@ const getColumns = (respondToConnectionRequest: (result: boolean, tigger: Trigge
         size: "1%",
       },
     }),
-  ]
-}
+  ];
+};
 
-export default withAuthorization(ConnectionRequestsPage, [
-  ROLES.ROLE_ADMINISTRATOR,
-  ROLES.ROLE_SERVICE_MANAGER,
-]);
+export default withAuthorization(ConnectionRequestsPage, [ROLES.ROLE_ADMINISTRATOR, ROLES.ROLE_SERVICE_MANAGER]);

@@ -18,6 +18,7 @@ import {
 } from "../../../../types/request-variables";
 import useServiceStore from "store/new-services.store";
 import { getColumns } from "./columns";
+import { PaginationState, SortingState } from "@tanstack/react-table";
 
 type RequestVariablesProps = {
   disableRawData?: boolean;
@@ -45,6 +46,12 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
   const [jsonError, setJsonError] = useState<string>();
   const [key, setKey] = useState<number>(0);
   const { setEndpoints, updateEndpointRawData, updateEndpointData } = useServiceStore();
+  const [pagination, setPagination] = useState<PaginationState>({
+    pageIndex: 0,
+    pageSize: 10,
+  });
+
+  const [sorting, setSorting] = useState<SortingState>([]);
 
   const constructRow = (id: number, data: EndpointVariableData, nestedLevel: number): RequestVariablesRowData => {
     const value = isLive ? data.value : data.testValue;
@@ -178,21 +185,21 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
 
   const deleteVariable = (rowData: RequestVariablesRowData) => {
     setEndpoints((prevEndpoints: EndpointData[]) => {
-      const newEndpoints : EndpointData[] = [];
+      const newEndpoints: EndpointData[] = [];
       for (const prevEndpoint of prevEndpoints) {
-        const defEndpoint = prevEndpoint.definedEndpoints.find(x => x.id === endpointData.id);
+        const defEndpoint = prevEndpoint.definedEndpoints.find((x) => x.id === endpointData.id);
         const endpoint = defEndpoint?.[requestTab.tab];
 
-        if(defEndpoint && endpoint) {
+        if (defEndpoint && endpoint) {
           if (rowData.endpointVariableId && endpoint.variables.map((v) => v.id).includes(rowData.endpointVariableId)) {
             endpoint.variables = endpoint.variables.filter((v) => v.id !== rowData.endpointVariableId);
           } else {
             endpoint.variables
-              .filter(variable => ["schema", "array"].includes(variable.type))
-              .forEach(variable => checkNestedVariables(rowData.endpointVariableId!, variable));
+              .filter((variable) => ["schema", "array"].includes(variable.type))
+              .forEach((variable) => checkNestedVariables(rowData.endpointVariableId!, variable));
           }
         }
-        
+
         newEndpoints.push(prevEndpoint);
       }
       return newEndpoints;
@@ -228,19 +235,23 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
       onParametersChange(parameters);
     }
   };
-  
-  const columns = useMemo(() => getColumns({
-    rowsData,
-    updateParams,
-    requestTab,
-    deleteVariable,
-    setRowsData,
-    updateRowVariable,
-    requestValues,
-    isLive,
-    updateRowValue,
-    getTabsRowsData,
-  }), []);
+
+  const columns = useMemo(
+    () =>
+      getColumns({
+        rowsData,
+        updateParams,
+        requestTab,
+        deleteVariable,
+        setRowsData,
+        updateRowVariable,
+        requestValues,
+        isLive,
+        updateRowValue,
+        getTabsRowsData,
+      }),
+    []
+  );
 
   const buildRawDataView = (): JSX.Element => {
     return (
@@ -328,7 +339,15 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
             buildRawDataView()
           ) : (
             <>
-              <DataTable sortable data={rowsData[tab as EndpointTab]} columns={columns} />
+              <DataTable
+                sortable
+                data={rowsData[tab as EndpointTab]}
+                columns={columns}
+                setPagination={setPagination}
+                setSorting={setSorting}
+                pagination={pagination}
+                sorting={sorting}
+              />
               <hr style={{ margin: 0, borderTop: "1px solid #D2D3D8" }} />
             </>
           )}

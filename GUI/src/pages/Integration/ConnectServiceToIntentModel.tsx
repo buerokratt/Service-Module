@@ -1,5 +1,5 @@
 import { FC, useEffect, useMemo, useState } from "react";
-import { createColumnHelper, PaginationState } from "@tanstack/react-table";
+import { createColumnHelper, PaginationState, SortingState } from "@tanstack/react-table";
 import { useTranslation } from "react-i18next";
 import { MdOutlineArrowForward } from "react-icons/md";
 import useServiceStore from "store/services.store";
@@ -19,6 +19,7 @@ const ConnectServiceToIntentModel: FC<ConnectServiceToIntentModelProps> = ({ onM
     pageIndex: 0,
     pageSize: 8,
   });
+  const [sorting, setSorting] = useState<SortingState>([]);
   const [intents, setIntents] = useState<Intent[] | undefined>(undefined);
   const [selectedIntent, setSelectedIntent] = useState<Intent>();
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
@@ -37,10 +38,11 @@ const ConnectServiceToIntentModel: FC<ConnectServiceToIntentModelProps> = ({ onM
   }, []);
 
   const intentColumns = useMemo(
-    () => getColumns((intent) => {
-      setSelectedIntent(intent);
-      setShowConfirmationModal(true);
-    }),
+    () =>
+      getColumns((intent) => {
+        setSelectedIntent(intent);
+        setShowConfirmationModal(true);
+      }),
     []
   );
 
@@ -80,8 +82,10 @@ const ConnectServiceToIntentModel: FC<ConnectServiceToIntentModelProps> = ({ onM
           globalFilter={filter}
           setGlobalFilter={setFilter}
           sortable
+          sorting={sorting}
           pagination={pagination}
           setPagination={setPagination}
+          setSorting={setSorting}
         />
       )}
       {showConfirmationModal && (
@@ -114,10 +118,7 @@ const getColumns = (onClick: (intent: Intent) => void) => {
     columnHelper.display({
       id: "connect",
       cell: (props) => (
-        <Button
-          appearance="text"
-          onClick={() => onClick(props.row.original)}
-        >
+        <Button appearance="text" onClick={() => onClick(props.row.original)}>
           <Icon icon={<MdOutlineArrowForward color="rgba(0, 0, 0, 0.54)" />} />
           {i18n.t("overview.popup.connect")}
         </Button>
@@ -126,7 +127,7 @@ const getColumns = (onClick: (intent: Intent) => void) => {
         size: "1%",
       },
     }),
-  ]
-}
+  ];
+};
 
 export default ConnectServiceToIntentModel;
