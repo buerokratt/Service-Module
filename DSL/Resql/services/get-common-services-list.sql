@@ -30,5 +30,5 @@ JOIN (
     ) AS combined_endpoints
   ) subquery
 ) subquery ON true
-WHERE NOT deleted AND NOT is_common
+WHERE NOT deleted AND is_common
 ORDER BY id ASC;

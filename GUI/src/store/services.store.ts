@@ -5,6 +5,7 @@ import {
   changeServiceStatus,
   deleteService as deleteServiceApi,
   getAvailableIntents,
+  getCommonServicesList,
   getConnectionRequests,
   getServicesList,
   requestServiceIntentConnection,
@@ -20,6 +21,7 @@ interface ServiceStoreState {
   commonServices: Service[];
   notCommonServices: Service[];
   loadServicesList: () => Promise<void>;
+  loadCommonServicesList: () => Promise<void>;
   deleteService: (id: string) => Promise<void>;
   selectedService: Service | undefined;
   setSelectedService: (service: Service) => void;
@@ -79,10 +81,32 @@ const useServiceListStore = create<ServiceStoreState>((set, get, store) => ({
       ) || [];
 
     set({
-      services,
-      commonServices: services.filter((e: Service) => e.isCommon === true),
-      notCommonServices: services.filter((e: Service) => e.isCommon === false),
+      notCommonServices: services,
     });
+  },
+  loadCommonServicesList: async () => {
+    const result = await axios.get(getCommonServicesList());
+    const triggers = result.data.response[1];
+    const services =
+      result.data.response[0].map?.(
+        (item: any) =>
+          ({
+            id: item.id,
+            name: item.name,
+            description: item.description,
+            state: item.state,
+            type: item.type,
+            isCommon: item.iscommon,
+            serviceId: item.serviceId,
+            usedCount: 0,
+            linkedIntent: triggers.find((e: Trigger) => e.service === item.serviceId)?.intent || "",
+          } as Service)
+      ) || [];
+
+    set({
+      commonServices: services,
+    });
+    console.log(get().notCommonServices);
   },
   deleteService: async (id) => {
     const services = get().services.filter((e: Service) => e.serviceId !== id);
@@ -100,7 +124,6 @@ const useServiceListStore = create<ServiceStoreState>((set, get, store) => ({
   },
   changeServiceState: async (onEnd, successMessage, errorMessage, activate, draft) => {
     const selectedService = get().selectedService;
-    console.log(selectedService);
     if (!selectedService) return;
 
     try {
@@ -122,6 +145,7 @@ const useServiceListStore = create<ServiceStoreState>((set, get, store) => ({
       });
       useToastStore.getState().success({ title: successMessage });
       await useServiceListStore.getState().loadServicesList();
+      await useServiceListStore.getState().loadCommonServicesList();
     } catch (_) {
       useToastStore.getState().error({ title: errorMessage });
     }
@@ -178,6 +202,7 @@ const useServiceListStore = create<ServiceStoreState>((set, get, store) => ({
       });
       useToastStore.getState().success({ title: successMessage });
       await useServiceListStore.getState().loadServicesList();
+      await useServiceListStore.getState().loadCommonServicesList();
     } catch (_) {
       useToastStore.getState().error({ title: errorMessage });
     }
