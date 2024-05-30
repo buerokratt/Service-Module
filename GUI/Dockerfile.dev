@@ -22,4 +22,6 @@ RUN chown ${uid}:${gid} /app
 
 EXPOSE ${PORT}
 
+ENV REACT_APP_ENABLE_HIDDEN_FEATURES TRUE
+
 CMD ["npm", "run", "dev"]
