@@ -27,6 +27,7 @@ const FaultyServicesPage: React.FC = () => {
   const { t } = useTranslation();
   const [viewFaultyServiceLog, setViewFaultyServiceLog] = useState<FaultyService | null>(null);
   const [data, setData] = useState<FaultyService[]>([]);
+  const [pageCount, setPageCount] = useState<number>(0);
   const columns = useMemo(() => getColumns(setViewFaultyServiceLog), []);
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
@@ -34,8 +35,41 @@ const FaultyServicesPage: React.FC = () => {
   });
   const [sorting, setSorting] = useState<SortingState>([]);
 
+  const loadFaultyServices = (pagination: PaginationState, sorting: SortingState) => {
+    let sort = "dslName.keyword";
+    let order = "desc";
+
+    if (sorting.length > 0) {
+      switch (sorting[0].id) {
+        case "serviceMethod":
+          sort = "dslMethod.keyword";
+          break;
+        case "errorCode":
+          sort = "errorCode";
+          break;
+        case "stepName":
+          sort = "stepName.keyword";
+          break;
+        case "timestamp":
+          sort = "timestamp";
+          break;
+        default:
+          sort = "dslName.keyword";
+          break;
+      }
+      order = sorting[0].desc ? "desc" : "asc";
+    }
+    axios
+      .get(getFaultyServices(pagination.pageIndex + 1, pagination.pageSize, sort, order))
+      .then((res) => {
+        setData(res.data[0]);
+        setPageCount(Math.ceil(res.data[1] / pagination.pageSize));
+      })
+      .catch((err) => console.log(err));
+  };
+
   useEffect(() => {
-    axios.get(getFaultyServices()).then((res) => setData(res.data));
+    loadFaultyServices(pagination, sorting);
   }, []);
 
   return (
@@ -130,8 +164,17 @@ const FaultyServicesPage: React.FC = () => {
             columns={columns}
             sorting={sorting}
             pagination={pagination}
-            setSorting={setSorting}
-            setPagination={setPagination}
+            setPagination={(state: PaginationState) => {
+              if (state.pageIndex === pagination.pageIndex && state.pageSize === pagination.pageSize) return;
+              setPagination(state);
+              loadFaultyServices(state, sorting);
+            }}
+            setSorting={(state: SortingState) => {
+              setSorting(state);
+              loadFaultyServices(pagination, state);
+            }}
+            isClientSide={false}
+            pagesCount={pageCount}
           />
         </Card>
       </Track>
