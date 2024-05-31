@@ -15,24 +15,28 @@ const ConnectionRequestsPage: React.FC = () => {
     pageIndex: 0,
     pageSize: 10,
   });
-
   const [sorting, setSorting] = useState<SortingState>([]);
 
-  const loadConnectionRequests = () => {
+  const loadConnectionRequests = (pagination: PaginationState, sorting: SortingState) => {
     useServiceStore
       .getState()
-      .loadRequestsList((requests: Trigger[]) => setTriggers(requests), t("connectionRequests.toast.failed.requests"));
+      .loadRequestsList(
+        (requests: Trigger[]) => setTriggers(requests),
+        t("connectionRequests.toast.failed.requests"),
+        pagination,
+        sorting
+      );
   };
 
   useEffect(() => {
-    loadConnectionRequests();
+    loadConnectionRequests(pagination, sorting);
   }, []);
 
   const respondToConnectionRequest = (status: boolean, request: Trigger) => {
     useServiceStore
       .getState()
       .respondToConnectionRequest(
-        () => loadConnectionRequests(),
+        () => loadConnectionRequests(pagination, sorting),
         t("connectionRequests.approvedConnection"),
         t("connectionRequests.declinedConnection"),
         status,
@@ -54,8 +58,17 @@ const ConnectionRequestsPage: React.FC = () => {
           sortable
           sorting={sorting}
           pagination={pagination}
-          setPagination={setPagination}
-          setSorting={setSorting}
+          setPagination={(state: PaginationState) => {
+            if (state.pageIndex === pagination.pageIndex && state.pageSize === pagination.pageSize) return;
+            setPagination(state);
+            loadConnectionRequests(state, sorting);
+          }}
+          setSorting={(state: SortingState) => {
+            setSorting(state);
+            loadConnectionRequests(pagination, state);
+          }}
+          isClientSide={false}
+          pagesCount={triggers[triggers.length - 1]?.totalPages ?? 1}
         />
       </Card>
     </>

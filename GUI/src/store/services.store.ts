@@ -45,7 +45,12 @@ interface ServiceStoreState {
     pagination: PaginationState,
     sorting: SortingState
   ) => Promise<void>;
-  loadRequestsList: (onEnd: (requests: Trigger[]) => void, errorMessage: string) => Promise<void>;
+  loadRequestsList: (
+    onEnd: (requests: Trigger[]) => void,
+    errorMessage: string,
+    pagination: PaginationState,
+    sorting: SortingState
+  ) => Promise<void>;
   loadAvailableIntentsList: (
     onEnd: (requests: Intent[]) => void,
     errorMessage: string,
@@ -228,9 +233,14 @@ const useServiceListStore = create<ServiceStoreState>((set, get, store) => ({
     }
     onEnd();
   },
-  loadRequestsList: async (onEnd, errorMessage) => {
+  loadRequestsList: async (onEnd, errorMessage, pagination, sorting) => {
     try {
-      const requests = await axios.get(getConnectionRequests());
+      const sort = sorting.length === 0 ? "requestedAt desc" : sorting[0].id + " " + (sorting[0].desc ? "desc" : "asc");
+      const requests = await axios.post(getConnectionRequests(), {
+        page: pagination.pageIndex + 1,
+        page_size: pagination.pageSize,
+        sorting: sort,
+      });
       onEnd(requests.data.response);
     } catch (_) {
       onEnd([]);
