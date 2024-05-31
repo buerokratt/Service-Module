@@ -24,17 +24,19 @@ const ConnectServiceToIntentModel: FC<ConnectServiceToIntentModelProps> = ({ onM
   const [selectedIntent, setSelectedIntent] = useState<Intent>();
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
 
-  const loadAvailableIntents = () => {
+  const loadAvailableIntents = (pagination: PaginationState, sorting: SortingState) => {
     useServiceStore
       .getState()
       .loadAvailableIntentsList(
         (requests: Intent[]) => setIntents(requests),
-        t("overview.toast.failed.availableIntents")
+        t("overview.toast.failed.availableIntents"),
+        pagination,
+        sorting
       );
   };
 
   useEffect(() => {
-    loadAvailableIntents();
+    loadAvailableIntents(pagination, sorting);
   }, []);
 
   const intentColumns = useMemo(
@@ -84,8 +86,17 @@ const ConnectServiceToIntentModel: FC<ConnectServiceToIntentModelProps> = ({ onM
           sortable
           sorting={sorting}
           pagination={pagination}
-          setPagination={setPagination}
-          setSorting={setSorting}
+          setPagination={(state: PaginationState) => {
+            if (state.pageIndex === pagination.pageIndex && state.pageSize === pagination.pageSize) return;
+            setPagination(state);
+            loadAvailableIntents(state, sorting);
+          }}
+          setSorting={(state: SortingState) => {
+            setSorting(state);
+            loadAvailableIntents(pagination, state);
+          }}
+          isClientSide={false}
+          pagesCount={intents[intents.length - 1]?.totalPages ?? 1}
         />
       )}
       {showConfirmationModal && (

@@ -11,6 +11,10 @@ get_available_intents:
   call: http.post
   args:
     url: "[#SERVICE_TRAINING_RESQL]/get-available-intents"
+    body:
+      page: ${incoming.body.page}
+      page_size: ${incoming.body.page_size}
+      sorting: ${incoming.body.sorting}
   result: res
 
 return_result:
