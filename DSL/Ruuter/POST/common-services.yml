@@ -1,7 +1,7 @@
 declaration:
   call: declare
   version: 0.1
-  description: "Decription placeholder for 'SERVICES'"
+  description: "Decription placeholder for 'COMMON SERVICES'"
   method: get
   accepts: json
   returns: json
@@ -10,11 +10,15 @@ declaration:
 get_services_list:
   call: http.post
   args:
-    url: "[#SERVICE_RESQL]/get-services-list"
+    url: "[#SERVICE_RESQL]/get-common-services-list"
+    body:
+      page: ${incoming.body.page}
+      page_size: ${incoming.body.page_size}
+      sorting: ${incoming.body.sorting}
   result: services_res
 
 assign_services_result:
-  assign: 
+  assign:
     services: ${services_res.response.body}
 
 get_approved_triggers:
@@ -24,7 +28,7 @@ get_approved_triggers:
   result: triggers_res
 
 assign_training_result:
-  assign: 
+  assign:
     triggers: ${triggers_res.response.body}
 
 return_ok:

@@ -15,13 +15,14 @@ import { Service, ServiceState } from "types";
 import useToastStore from "./toasts.store";
 import { Trigger } from "types/Trigger";
 import { Intent } from "types/Intent";
+import { PaginationState, SortingState } from "@tanstack/react-table";
 
 interface ServiceStoreState {
   services: Service[];
   commonServices: Service[];
   notCommonServices: Service[];
-  loadServicesList: () => Promise<void>;
-  loadCommonServicesList: () => Promise<void>;
+  loadServicesList: (pagination: PaginationState, sorting: SortingState) => Promise<void>;
+  loadCommonServicesList: (pagination: PaginationState, sorting: SortingState) => Promise<void>;
   deleteService: (id: string) => Promise<void>;
   selectedService: Service | undefined;
   setSelectedService: (service: Service) => void;
@@ -30,7 +31,9 @@ interface ServiceStoreState {
     successMessage: string,
     errorMessage: string,
     activate: boolean,
-    draft: boolean
+    draft: boolean,
+    pagination: PaginationState,
+    sorting: SortingState
   ) => Promise<void>;
   checkServiceIntentConnection: (onConnected: (response: Trigger) => void, onNotConnected: () => void) => Promise<void>;
   deleteSelectedService: (onEnd: () => void, successMessage: string, errorMessage: string) => Promise<void>;
@@ -38,7 +41,9 @@ interface ServiceStoreState {
     onEnd: () => void,
     successMessage: string,
     errorMessage: string,
-    intent: string
+    intent: string,
+    pagination: PaginationState,
+    sorting: SortingState
   ) => Promise<void>;
   loadRequestsList: (onEnd: (requests: Trigger[]) => void, errorMessage: string) => Promise<void>;
   loadAvailableIntentsList: (onEnd: (requests: Intent[]) => void, errorMessage: string) => Promise<void>;
@@ -61,8 +66,13 @@ const useServiceListStore = create<ServiceStoreState>((set, get, store) => ({
   services: [],
   commonServices: [],
   notCommonServices: [],
-  loadServicesList: async () => {
-    const result = await axios.get(getServicesList());
+  loadServicesList: async (pagination, sorting) => {
+    const sort = sorting.length === 0 ? "id asc" : sorting[0].id + " " + (sorting[0].desc ? "desc" : "asc");
+    const result = await axios.post(getServicesList(), {
+      page: pagination.pageIndex + 1,
+      page_size: pagination.pageSize,
+      sorting: sort,
+    });
     const triggers = result.data.response[1];
     const services =
       result.data.response[0].map?.(
@@ -76,6 +86,7 @@ const useServiceListStore = create<ServiceStoreState>((set, get, store) => ({
             isCommon: item.iscommon,
             serviceId: item.serviceId,
             usedCount: 0,
+            totalPages: item.totalPages,
             linkedIntent: triggers.find((e: Trigger) => e.service === item.serviceId)?.intent || "",
           } as Service)
       ) || [];
@@ -84,8 +95,13 @@ const useServiceListStore = create<ServiceStoreState>((set, get, store) => ({
       notCommonServices: services,
     });
   },
-  loadCommonServicesList: async () => {
-    const result = await axios.get(getCommonServicesList());
+  loadCommonServicesList: async (pagination, sorting) => {
+    const sort = sorting.length === 0 ? "id asc" : sorting[0].id + " " + (sorting[0].desc ? "desc" : "asc");
+    const result = await axios.post(getCommonServicesList(), {
+      page: pagination.pageIndex + 1,
+      page_size: pagination.pageSize,
+      sorting: sort,
+    });
     const triggers = result.data.response[1];
     const services =
       result.data.response[0].map?.(
@@ -98,6 +114,7 @@ const useServiceListStore = create<ServiceStoreState>((set, get, store) => ({
             type: item.type,
             isCommon: item.iscommon,
             serviceId: item.serviceId,
+            totalPages: item.totalPages,
             usedCount: 0,
             linkedIntent: triggers.find((e: Trigger) => e.service === item.serviceId)?.intent || "",
           } as Service)
@@ -106,12 +123,10 @@ const useServiceListStore = create<ServiceStoreState>((set, get, store) => ({
     set({
       commonServices: services,
     });
-    console.log(get().notCommonServices);
   },
   deleteService: async (id) => {
     const services = get().services.filter((e: Service) => e.serviceId !== id);
     set({
-      services,
       commonServices: services.filter((e: Service) => e.isCommon === true),
       notCommonServices: services.filter((e: Service) => e.isCommon === false),
     });
@@ -122,7 +137,7 @@ const useServiceListStore = create<ServiceStoreState>((set, get, store) => ({
       selectedService: service,
     });
   },
-  changeServiceState: async (onEnd, successMessage, errorMessage, activate, draft) => {
+  changeServiceState: async (onEnd, successMessage, errorMessage, activate, draft, pagination, sorting) => {
     const selectedService = get().selectedService;
     if (!selectedService) return;
 
@@ -144,8 +159,8 @@ const useServiceListStore = create<ServiceStoreState>((set, get, store) => ({
         type: selectedService.type,
       });
       useToastStore.getState().success({ title: successMessage });
-      await useServiceListStore.getState().loadServicesList();
-      await useServiceListStore.getState().loadCommonServicesList();
+      await useServiceListStore.getState().loadServicesList(pagination, sorting);
+      await useServiceListStore.getState().loadCommonServicesList(pagination, sorting);
     } catch (_) {
       useToastStore.getState().error({ title: errorMessage });
     }
@@ -190,7 +205,7 @@ const useServiceListStore = create<ServiceStoreState>((set, get, store) => ({
     });
     onEnd();
   },
-  requestServiceIntentConnection: async (onEnd, successMessage, errorMessage, intent) => {
+  requestServiceIntentConnection: async (onEnd, successMessage, errorMessage, intent, pagination, sorting) => {
     const selectedService = get().selectedService;
     if (!selectedService) return;
 
@@ -201,8 +216,8 @@ const useServiceListStore = create<ServiceStoreState>((set, get, store) => ({
         intent: intent,
       });
       useToastStore.getState().success({ title: successMessage });
-      await useServiceListStore.getState().loadServicesList();
-      await useServiceListStore.getState().loadCommonServicesList();
+      await useServiceListStore.getState().loadServicesList(pagination, sorting);
+      await useServiceListStore.getState().loadCommonServicesList(pagination, sorting);
     } catch (_) {
       useToastStore.getState().error({ title: errorMessage });
     }

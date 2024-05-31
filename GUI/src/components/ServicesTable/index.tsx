@@ -31,15 +31,15 @@ const ServicesTable: FC<ServicesTableProps> = ({ isCommon = false }) => {
   const [selectedConnectionTrigger, setSelectedConnectionTrigger] = useState<Trigger | undefined>();
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
-    pageSize: 8,
+    pageSize: 10,
   });
   const [sorting, setSorting] = useState<SortingState>([]);
 
   useEffect(() => {
     if (!isCommon) {
-      useServiceListStore.getState().loadServicesList();
+      useServiceListStore.getState().loadServicesList(pagination, sorting);
     } else {
-      useServiceListStore.getState().loadCommonServicesList();
+      useServiceListStore.getState().loadCommonServicesList(pagination, sorting);
     }
   }, []);
 
@@ -89,7 +89,9 @@ const ServicesTable: FC<ServicesTableProps> = ({ isCommon = false }) => {
       t("overview.service.toast.updated"),
       t("overview.service.toast.failed.state"),
       activate,
-      draft
+      draft,
+      pagination,
+      sorting
     );
   };
 
@@ -110,7 +112,9 @@ const ServicesTable: FC<ServicesTableProps> = ({ isCommon = false }) => {
         () => setIsIntentConnectionPopupVisible(false),
         t("overview.service.toast.connectedToIntentSuccessfully"),
         t("overview.service.toast.failed.failedToConnectToIntent"),
-        intent
+        intent,
+        pagination,
+        sorting
       );
   };
 
@@ -211,8 +215,25 @@ const ServicesTable: FC<ServicesTableProps> = ({ isCommon = false }) => {
         columns={columns}
         pagination={pagination}
         sorting={sorting}
-        setPagination={setPagination}
-        setSorting={setSorting}
+        setPagination={(state: PaginationState) => {
+          if (state.pageIndex === pagination.pageIndex && state.pageSize === pagination.pageSize) return;
+          setPagination(state);
+          if (!isCommon) {
+            useServiceListStore.getState().loadServicesList(state, sorting);
+          } else {
+            useServiceListStore.getState().loadCommonServicesList(state, sorting);
+          }
+        }}
+        setSorting={(state: SortingState) => {
+          setSorting(state);
+          if (!isCommon) {
+            useServiceListStore.getState().loadServicesList(pagination, state);
+          } else {
+            useServiceListStore.getState().loadCommonServicesList(pagination, state);
+          }
+        }}
+        isClientSide={false}
+        pagesCount={services[services.length - 1]?.totalPages ?? 1}
       />
     </Card>
   );

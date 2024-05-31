@@ -10,7 +10,11 @@ declaration:
 get_services_list:
   call: http.post
   args:
-    url: "[#SERVICE_RESQL]/get-common-services-list"
+    url: "[#SERVICE_RESQL]/get-services-list"
+    body:
+      page: ${incoming.body.page}
+      page_size: ${incoming.body.page_size}
+      sorting: ${incoming.body.sorting}
   result: services_res
 
 assign_services_result:
