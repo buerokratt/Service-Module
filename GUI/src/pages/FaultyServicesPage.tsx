@@ -53,9 +53,6 @@ const FaultyServicesPage: React.FC = () => {
         case "timestamp":
           sort = "timestamp";
           break;
-        default:
-          sort = "dslName.keyword";
-          break;
       }
       order = sorting[0].desc ? "desc" : "asc";
     }
