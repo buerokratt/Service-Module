@@ -6,6 +6,17 @@ declaration:
   accepts: json
   returns: json
   namespace: service
+  allowlist:
+    params:
+      - field: page
+        type: number
+        description: "Parameter 'page'"
+      - field: page_size
+        type: number
+        description: "Parameter 'page_size'"
+      - field: sorting
+        type: string
+        description: "Parameter 'sorting'"
 
 getFaults:
   call: http.post
