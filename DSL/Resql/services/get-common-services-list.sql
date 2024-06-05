@@ -31,7 +31,7 @@ JOIN (
     ) AS combined_endpoints
   ) subquery
 ) subquery ON true
-WHERE NOT deleted AND NOT is_common
+WHERE NOT deleted AND is_common
 ORDER BY 
    CASE WHEN :sorting = 'id asc' THEN id END ASC,
    CASE WHEN :sorting = 'name asc' THEN name END ASC,

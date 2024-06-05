@@ -1,4 +1,4 @@
-import React, { CSSProperties, FC, ReactNode, useId, useState } from "react";
+import React, { CSSProperties, FC, ReactNode, useId } from "react";
 import {
   ColumnDef,
   useReactTable,
@@ -30,15 +30,19 @@ type DataTableProps = {
   data: any;
   columns: ColumnDef<any, any>[];
   tableBodyPrefix?: ReactNode;
+  isClientSide?: boolean;
   sortable?: boolean;
   filterable?: boolean;
   pagination?: PaginationState;
-  setPagination?: React.Dispatch<React.SetStateAction<PaginationState>>;
+  sorting?: SortingState;
+  setPagination?: (state: PaginationState) => void;
+  setSorting?: (state: SortingState) => void;
   globalFilter?: string;
   setGlobalFilter?: React.Dispatch<React.SetStateAction<string>>;
   columnVisibility?: VisibilityState;
   setColumnVisibility?: React.Dispatch<React.SetStateAction<VisibilityState>>;
   disableHead?: boolean;
+  pagesCount?: number;
   meta?: TableMeta<any>;
 };
 
@@ -80,18 +84,21 @@ const DataTable: FC<DataTableProps> = ({
   tableBodyPrefix,
   sortable,
   filterable,
+  isClientSide = true,
   pagination,
+  sorting,
   setPagination,
+  setSorting,
   globalFilter,
   setGlobalFilter,
   columnVisibility,
   setColumnVisibility,
   disableHead,
+  pagesCount,
   meta,
 }) => {
   const id = useId();
   const { t } = useTranslation();
-  const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
   const tablePagination = pagination ?? {
     pageIndex: 0,
@@ -116,16 +123,25 @@ const DataTable: FC<DataTableProps> = ({
     onGlobalFilterChange: setGlobalFilter,
     onColumnVisibilityChange: setColumnVisibility,
     globalFilterFn: fuzzyFilter,
-    onSortingChange: setSorting,
-    onPaginationChange: setPagination,
+    onSortingChange: (updater) => {
+      if (typeof updater !== "function") return;
+      setSorting?.(updater(table.getState().sorting));
+    },
+    onPaginationChange: (updater) => {
+      if (typeof updater !== "function") return;
+      setPagination?.(updater(table.getState().pagination));
+    },
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     ...(pagination && { getPaginationRowModel: getPaginationRowModel() }),
     ...(sortable && { getSortedRowModel: getSortedRowModel() }),
+    manualPagination: isClientSide ? undefined : true,
+    manualSorting: isClientSide ? undefined : true,
+    pageCount: isClientSide ? undefined : pagesCount,
   });
 
   return (
-    <div className="data-table__wrapper">
+    <div className="data-table__scrollWrapper">
       <table className="data-table">
         {!disableHead && (
           <thead>
@@ -146,9 +162,7 @@ const DataTable: FC<DataTableProps> = ({
                           </button>
                         )}
                         {flexRender(header.column.columnDef.header, header.getContext())}
-                        {filterable && header.column.getCanFilter() && (
-                          <Filter column={header.column} table={table} />
-                        )}
+                        {filterable && header.column.getCanFilter() && <Filter column={header.column} table={table} />}
                       </Track>
                     )}
                   </th>

@@ -1,0 +1,48 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Decription placeholder for 'COMMON SERVICES'"
+  method: post
+  accepts: json
+  returns: json
+  namespace: service
+  allowlist:
+    body:
+      - field: page
+        type: number
+        description: "Body field 'page'"
+      - field: page_size
+        type: number
+        description: "Body field 'page_size'"
+      - field: sorting
+        type: string
+        description: "Body field 'sorting'"
+
+get_services_list:
+  call: http.post
+  args:
+    url: "[#SERVICE_RESQL]/get-common-services-list"
+    body:
+      page: ${incoming.body.page}
+      page_size: ${incoming.body.page_size}
+      sorting: ${incoming.body.sorting}
+  result: services_res
+
+assign_services_result:
+  assign:
+    services: ${services_res.response.body}
+
+get_approved_triggers:
+  call: http.post
+  args:
+    url: "[#SERVICE_TRAINING_RESQL]/get-approved-tiggers"
+  result: triggers_res
+
+assign_training_result:
+  assign:
+    triggers: ${triggers_res.response.body}
+
+return_ok:
+  status: 200
+  return: ${[services, triggers]}
+  next: end

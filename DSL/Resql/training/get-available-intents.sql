@@ -19,9 +19,12 @@ WITH connected_intents AS
                  service_name)
      AND status in ('pending',
                     'approved'))
-SELECT intent
+SELECT intent, CEIL(COUNT(*) OVER() / :page_size::DECIMAL) AS total_pages
 FROM intent
 WHERE intent NOT IN
     (SELECT intent
      FROM connected_intents)
-ORDER BY intent ASC
+ORDER BY 
+   CASE WHEN :sorting = 'intent asc' THEN intent END ASC,
+   CASE WHEN :sorting = 'intent desc' THEN intent END DESC
+OFFSET ((GREATEST(:page, 1) - 1) * :page_size) LIMIT :page_size;

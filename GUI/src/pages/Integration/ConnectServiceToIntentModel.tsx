@@ -1,5 +1,5 @@
 import { FC, useEffect, useMemo, useState } from "react";
-import { createColumnHelper, PaginationState } from "@tanstack/react-table";
+import { createColumnHelper, PaginationState, SortingState } from "@tanstack/react-table";
 import { useTranslation } from "react-i18next";
 import { MdOutlineArrowForward } from "react-icons/md";
 import useServiceStore from "store/services.store";
@@ -19,28 +19,32 @@ const ConnectServiceToIntentModel: FC<ConnectServiceToIntentModelProps> = ({ onM
     pageIndex: 0,
     pageSize: 8,
   });
+  const [sorting, setSorting] = useState<SortingState>([]);
   const [intents, setIntents] = useState<Intent[] | undefined>(undefined);
   const [selectedIntent, setSelectedIntent] = useState<Intent>();
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
 
-  const loadAvailableIntents = () => {
+  const loadAvailableIntents = (pagination: PaginationState, sorting: SortingState) => {
     useServiceStore
       .getState()
       .loadAvailableIntentsList(
         (requests: Intent[]) => setIntents(requests),
-        t("overview.toast.failed.availableIntents")
+        t("overview.toast.failed.availableIntents"),
+        pagination,
+        sorting
       );
   };
 
   useEffect(() => {
-    loadAvailableIntents();
+    loadAvailableIntents(pagination, sorting);
   }, []);
 
   const intentColumns = useMemo(
-    () => getColumns((intent) => {
-      setSelectedIntent(intent);
-      setShowConfirmationModal(true);
-    }),
+    () =>
+      getColumns((intent) => {
+        setSelectedIntent(intent);
+        setShowConfirmationModal(true);
+      }),
     []
   );
 
@@ -80,8 +84,19 @@ const ConnectServiceToIntentModel: FC<ConnectServiceToIntentModelProps> = ({ onM
           globalFilter={filter}
           setGlobalFilter={setFilter}
           sortable
+          sorting={sorting}
           pagination={pagination}
-          setPagination={setPagination}
+          setPagination={(state: PaginationState) => {
+            if (state.pageIndex === pagination.pageIndex && state.pageSize === pagination.pageSize) return;
+            setPagination(state);
+            loadAvailableIntents(state, sorting);
+          }}
+          setSorting={(state: SortingState) => {
+            setSorting(state);
+            loadAvailableIntents(pagination, state);
+          }}
+          isClientSide={false}
+          pagesCount={intents[intents.length - 1]?.totalPages ?? 1}
         />
       )}
       {showConfirmationModal && (
@@ -114,10 +129,7 @@ const getColumns = (onClick: (intent: Intent) => void) => {
     columnHelper.display({
       id: "connect",
       cell: (props) => (
-        <Button
-          appearance="text"
-          onClick={() => onClick(props.row.original)}
-        >
+        <Button appearance="text" onClick={() => onClick(props.row.original)}>
           <Icon icon={<MdOutlineArrowForward color="rgba(0, 0, 0, 0.54)" />} />
           {i18n.t("overview.popup.connect")}
         </Button>
@@ -126,7 +138,7 @@ const getColumns = (onClick: (intent: Intent) => void) => {
         size: "1%",
       },
     }),
-  ]
-}
+  ];
+};
 
 export default ConnectServiceToIntentModel;

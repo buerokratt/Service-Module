@@ -12,4 +12,5 @@ export interface Service {
   readonly endpoints: any;
   readonly serviceId: string;
   readonly linkedIntent: string;
+  readonly totalPages: number;
 }

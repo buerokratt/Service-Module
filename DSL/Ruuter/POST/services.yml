@@ -2,19 +2,34 @@ declaration:
   call: declare
   version: 0.1
   description: "Decription placeholder for 'SERVICES'"
-  method: get
+  method: post
   accepts: json
   returns: json
   namespace: service
+  allowlist:
+    body:
+      - field: page
+        type: number
+        description: "Body field 'page'"
+      - field: page_size
+        type: number
+        description: "Body field 'page_size'"
+      - field: sorting
+        type: string
+        description: "Body field 'sorting'"
 
 get_services_list:
   call: http.post
   args:
     url: "[#SERVICE_RESQL]/get-services-list"
+    body:
+      page: ${incoming.body.page}
+      page_size: ${incoming.body.page_size}
+      sorting: ${incoming.body.sorting}
   result: services_res
 
 assign_services_result:
-  assign: 
+  assign:
     services: ${services_res.response.body}
 
 get_approved_triggers:
@@ -24,7 +39,7 @@ get_approved_triggers:
   result: triggers_res
 
 assign_training_result:
-  assign: 
+  assign:
     triggers: ${triggers_res.response.body}
 
 return_ok:

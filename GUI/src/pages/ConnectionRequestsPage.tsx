@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { createColumnHelper } from "@tanstack/react-table";
+import { PaginationState, SortingState, createColumnHelper } from "@tanstack/react-table";
 import { format } from "date-fns";
 import { AiFillCheckCircle, AiFillCloseCircle } from "react-icons/ai";
 import { Card, DataTable, Icon } from "components";
@@ -11,22 +11,32 @@ import withAuthorization, { ROLES } from "hoc/with-authorization";
 const ConnectionRequestsPage: React.FC = () => {
   const { t } = useTranslation();
   const [triggers, setTriggers] = useState<Trigger[] | undefined>(undefined);
+  const [pagination, setPagination] = useState<PaginationState>({
+    pageIndex: 0,
+    pageSize: 10,
+  });
+  const [sorting, setSorting] = useState<SortingState>([]);
 
-  const loadConnectionRequests = () => {
+  const loadConnectionRequests = (pagination: PaginationState, sorting: SortingState) => {
     useServiceStore
       .getState()
-      .loadRequestsList((requests: Trigger[]) => setTriggers(requests), t("connectionRequests.toast.failed.requests"));
+      .loadRequestsList(
+        (requests: Trigger[]) => setTriggers(requests),
+        t("connectionRequests.toast.failed.requests"),
+        pagination,
+        sorting
+      );
   };
 
   useEffect(() => {
-    loadConnectionRequests();
+    loadConnectionRequests(pagination, sorting);
   }, []);
 
   const respondToConnectionRequest = (status: boolean, request: Trigger) => {
     useServiceStore
       .getState()
       .respondToConnectionRequest(
-        () => loadConnectionRequests(),
+        () => loadConnectionRequests(pagination, sorting),
         t("connectionRequests.approvedConnection"),
         t("connectionRequests.declinedConnection"),
         status,
@@ -42,7 +52,24 @@ const ConnectionRequestsPage: React.FC = () => {
     <>
       <h1>{t("connectionRequests.title")}</h1>
       <Card>
-        <DataTable data={triggers} columns={appRequestColumns} sortable />
+        <DataTable
+          data={triggers}
+          columns={appRequestColumns}
+          sortable
+          sorting={sorting}
+          pagination={pagination}
+          setPagination={(state: PaginationState) => {
+            if (state.pageIndex === pagination.pageIndex && state.pageSize === pagination.pageSize) return;
+            setPagination(state);
+            loadConnectionRequests(state, sorting);
+          }}
+          setSorting={(state: SortingState) => {
+            setSorting(state);
+            loadConnectionRequests(pagination, state);
+          }}
+          isClientSide={false}
+          pagesCount={triggers[triggers.length - 1]?.totalPages ?? 1}
+        />
       </Card>
     </>
   );
@@ -109,10 +136,7 @@ const getColumns = (respondToConnectionRequest: (result: boolean, tigger: Trigge
         size: "1%",
       },
     }),
-  ]
-}
+  ];
+};
 
-export default withAuthorization(ConnectionRequestsPage, [
-  ROLES.ROLE_ADMINISTRATOR,
-  ROLES.ROLE_SERVICE_MANAGER,
-]);
+export default withAuthorization(ConnectionRequestsPage, [ROLES.ROLE_ADMINISTRATOR, ROLES.ROLE_SERVICE_MANAGER]);
