@@ -21,6 +21,7 @@ check_user_authority:
 
 return_unauthorized:
   return: "unauthorized"
+  status: 200
   next: end
 
 return_authorized:
