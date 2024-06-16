@@ -1,4 +1,4 @@
-## v2.0.0
+## [v2.0.0](https://github.com/buerokratt/Service-Module/compare/main...dev)
 
 ### Breaking Changes
 
