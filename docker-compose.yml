@@ -105,7 +105,7 @@ services:
       - ./DSL:/data
       - ./DSL/DMapper/hbs:/workspace/app/views/services
       - ./DSL/DMapper/js:/workspace/app/js/services
-      - ./DSL/DMapper/lib:/workspace/app/lib
+      - ./DSL/DMapper/lib/helpers.js:/workspace/app/lib/helpers.js
       - ./secrets:/data/secrets
     ports:
       - 3005:3005

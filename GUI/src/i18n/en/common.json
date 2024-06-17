@@ -229,7 +229,9 @@
       "failed": "Failed",
       "saveFailed": "Failed to save",
       "saveInfoFailed": "Failed to save info",
-      "saveConfigFailed": "Failed to save config"
+      "saveConfigFailed": "Failed to save config",
+      "testResultSuccess": "Test result- success",
+      "testResultError": "Test result - error"
     }
   },
   "serviceFlow": {
