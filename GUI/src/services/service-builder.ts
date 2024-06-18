@@ -874,12 +874,12 @@ export const runServiceTest = async () => {
   try {
     await axios.post(testService(state, name), {});
     useToastStore.getState().success({
-      title: "Test result- success",
+      title: i18next.t("newService.toast.testResultSuccess"),
     });
   } catch (error) {
     console.log("ERROR: ", error);
     useToastStore.getState().error({
-      title: "Test result - error",
+      title: i18next.t("newService.toast.testResultError"),
     });
   }
 };

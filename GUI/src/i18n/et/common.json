@@ -229,7 +229,9 @@
       "failed": "Ebaõnnestus",
       "saveFailed": "Salvestamine ebaõnnestus",
       "saveInfoFailed": "Teabe salvestamine ebaõnnestus",
-      "saveConfigFailed": "Seadete salvestamine ebaõnnestus"
+      "saveConfigFailed": "Seadete salvestamine ebaõnnestus",
+      "testResultSuccess": "Testi tulemus - edu",
+      "testResultError": "Testi tulemus - viga"
     }
   },
   "serviceFlow": {
