@@ -4,7 +4,7 @@
   "type": "module",
   "private": true,
   "dependencies": {
-    "@buerokratt-ria/header": "^0.1.7",
+    "@buerokratt-ria/header": "^0.1.8",
     "@buerokratt-ria/menu": "^0.1.16",
     "@buerokratt-ria/styles": "^0.0.1",
     "@fontsource/roboto": "^4.5.8",
