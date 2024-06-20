@@ -7,6 +7,7 @@
     "language": "Language",
     "search": "Search",
     "notificationError": "Error",
+    "notificationErrorMsg": "An error occurred",
     "active": "Active",
     "activate": "Activate",
     "deactivate": "Deactivate",
