@@ -327,6 +327,7 @@
   "chat": {
     "unanswered": "Vastamata",
     "forwarded": "Suunatud",
+    "pending": "Ootel",
     "incomplete-service-flow": "Puudulik teenusvoog",
     "no-start-node": "Alustamise sõlme ei leitud",
     "end-of-chat": "Jõuti vestluse lõppu",

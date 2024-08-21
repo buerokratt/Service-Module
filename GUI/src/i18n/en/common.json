@@ -327,6 +327,7 @@
   "chat": {
     "forwarder": "Forwarded",
     "unanswered": "Unanswered",
+    "pending": "Pending",
     "incomplete-service-flow": "Incomplete Service Flow",
     "no-start-node": "No Start Node found",
     "end-of-chat": "Reached end of chat",
