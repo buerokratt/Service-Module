@@ -1,4 +1,4 @@
-import { Button, Icon, Track } from "@buerokratt-ria/header/src/header/components";
+import { Button, Icon, Track } from "@buerokratt-ria/header/src/components";
 import { createColumnHelper } from "@tanstack/react-table";
 import Label from "components/Label";
 import Tooltip from "components/Tooltip";

@@ -2,7 +2,7 @@ import { Row, createColumnHelper } from "@tanstack/react-table";
 import { RequestVariablesRowData, RequestVariablesTableColumns, RequestVariablesTabsRowsData } from "types/request-variables";
 import VariableCell from "./VariableCell";
 import Tooltip from "components/Tooltip";
-import { Button, Icon, Track } from "@buerokratt-ria/header/src/header/components";
+import { Button ,Icon, Track } from "@buerokratt-ria/header/src/components";
 import { MdDeleteOutline } from "react-icons/md";
 import ValueCell from "./ValueCell";
 import i18n from "i18n";

@@ -3,7 +3,7 @@ import { t } from "i18next";
 import { Button, HeaderStepCounter, Track } from "..";
 import useServiceStore from "store/new-services.store";
 import { runServiceTest } from "services/service-builder";
-import "@buerokratt-ria/header/src/header/Header.scss";
+import "@buerokratt-ria/header/src/Header.scss";
 
 type NewServiceHeaderProps = {
   activeStep: number;
