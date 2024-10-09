@@ -12,6 +12,9 @@ services:
       - application.DSL.processedFiletypes=.yml,.yaml,.tmp
       - application.openSearchConfiguration.url=http://host.docker.internal:9200
       - application.openSearchConfiguration.index=ruuterlog
+      - application.logging.printStackTrace=true
+      - application.internalRequests.disabled=true
+      - application.internalRequests.allowedIPs=127.0.0.1
     volumes:
       - ./DSL/Ruuter:/DSL
       - ./constants.ini:/app/constants.ini
@@ -95,8 +98,8 @@ services:
     networks:
       - bykstack
 
-  data_mapper:
-    container_name: data_mapper
+  data-mapper:
+    container_name: data-mapper
     image: data-mapper
     environment:
       - PORT=3005
@@ -105,7 +108,6 @@ services:
       - ./DSL:/data
       - ./DSL/DMapper/hbs:/workspace/app/views/services
       - ./DSL/DMapper/js:/workspace/app/js/services
-      - ./DSL/DMapper/lib/helpers.js:/workspace/app/lib/helpers.js
       - ./secrets:/data/secrets
     ports:
       - 3005:3005
