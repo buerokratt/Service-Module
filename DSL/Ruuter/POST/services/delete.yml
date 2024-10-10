@@ -133,6 +133,7 @@ delete_intent_connection:
   result: return_ok
 
 return_ok:
+  reloadDsl: true
   status: 200
   return: "Service Deleted Successfully"
   next: end
