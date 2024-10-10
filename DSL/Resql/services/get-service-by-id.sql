@@ -1,8 +1,7 @@
 WITH MaxService AS (
-  SELECT id AS maxId
+  SELECT MAX(id) AS maxId
   FROM services
   WHERE service_id = :id
-  ORDER BY id
   LIMIT 1
 )
 SELECT

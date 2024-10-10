@@ -77,8 +77,8 @@ const useServiceListStore = create<ServiceStoreState>((set, get, store) => ({
   commonServices: [],
   notCommonServices: [],
   loadServicesList: async (pagination, sorting) => {
-    const order = sorting[0].desc ? "desc" : "asc";
-    const sort = sorting.length === 0 ? "id asc" : sorting[0].id + " " + order;
+    const order = sorting[0]?.desc ? "desc" : "asc";
+    const sort = sorting.length === 0 ? "id asc" : sorting[0]?.id + " " + order;
     const result = await axios.post(getServicesList(), {
       page: pagination.pageIndex + 1,
       page_size: pagination.pageSize,
@@ -107,8 +107,8 @@ const useServiceListStore = create<ServiceStoreState>((set, get, store) => ({
     });
   },
   loadCommonServicesList: async (pagination, sorting) => {
-    const order = sorting[0].desc ? "desc" : "asc";
-    const sort = sorting.length === 0 ? "id asc" : sorting[0].id + " " + order;
+    const order = sorting[0]?.desc ? "desc" : "asc";
+    const sort = sorting.length === 0 ? "id asc" : sorting[0]?.id + " " + order;
     const result = await axios.post(getCommonServicesList(), {
       page: pagination.pageIndex + 1,
       page_size: pagination.pageSize,
@@ -237,8 +237,8 @@ const useServiceListStore = create<ServiceStoreState>((set, get, store) => ({
   },
   loadRequestsList: async (onEnd, errorMessage, pagination, sorting) => {
     try {
-      const order = sorting[0].desc ? "desc" : "asc";
-      const sort = sorting.length === 0 ? "requestedAt desc" : sorting[0].id + " " + order;
+      const order = sorting[0]?.desc ? "desc" : "asc";
+      const sort = sorting.length === 0 ? "requestedAt desc" : sorting[0]?.id + " " + order;
       const requests = await axios.post(getConnectionRequests(), {
         page: pagination.pageIndex + 1,
         page_size: pagination.pageSize,
@@ -252,8 +252,8 @@ const useServiceListStore = create<ServiceStoreState>((set, get, store) => ({
   },
   loadAvailableIntentsList: async (onEnd, errorMessage, pagination, sorting) => {
     try {
-      const order = sorting[0].desc ? "desc" : "asc";
-      const sort = sorting.length === 0 ? "intent asc" : sorting[0].id + " " + order;
+      const order = sorting[0]?.desc ? "desc" : "asc";
+      const sort = sorting.length === 0 ? "intent asc" : sorting[0]?.id + " " + order;
       const requests = await axios.post(getAvailableIntents(), {
         page: pagination.pageIndex + 1,
         page_size: pagination.pageSize,
