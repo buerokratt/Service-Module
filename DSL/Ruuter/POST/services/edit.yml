@@ -8,6 +8,9 @@ declaration:
   namespace: service
   allowlist:
     body:
+      - field: content
+        type: string
+        description: "Body field 'content'"
       - field: description
         type: string
         description: "Body field 'description'"
@@ -31,7 +34,48 @@ extract_request_data:
     name: ${incoming.body.name}
     description: ${incoming.body.description}
     type: ${incoming.body.type}
+    content: ${incoming.body.content}
     structure: ${incoming.body.structure}
+
+check_for_content:
+  switch:
+    - condition: ${content === null}
+      next: check_for_required_parameters
+  next: convert_json_content_to_yml    
+
+convert_json_content_to_yml:
+  call: http.post
+  args:
+    url: "[#SERVICE_DMAPPER]/conversion/json_to_yaml_data"
+    body:
+      data: ${content}
+  result: ymlResult
+
+check_for_type:
+  switch:
+    - condition: ${type === 'GET'}
+      next: add_get_dsl
+  next: add_post_dsl
+
+add_get_dsl:
+  call: http.post
+  args:
+    url: "[#SERVICE_DMAPPER]/file-manager/create"
+    body:
+      file_path: "/Ruuter/GET/services/draft/${name}.tmp"
+      content: ${ymlResult.response.body.yaml}
+  result: results
+  next: check_for_required_parameters
+
+add_post_dsl:
+  call: http.post
+  args:
+    url: "[#SERVICE_DMAPPER]/file-manager/create"
+    body:
+      file_path: "/Ruuter/POST/services/draft/${name}.tmp"
+      content: ${ymlResult.response.body.yaml}
+  result: results
+  next: check_for_required_parameters
 
 check_for_required_parameters:
   switch:
@@ -107,6 +151,7 @@ service_edit:
   result: editedService
 
 return_ok:
+  reloadDsl: true
   status: 200
   return: "Edited Successfully"
   next: end
