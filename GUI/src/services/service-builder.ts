@@ -117,7 +117,7 @@ const saveEndpointInfo = async (
       { result },
       {
         params: {
-          location: `/Ruuter/POST/services/endpoints/info/${endpoint.isCommon ? "common/" : ""}${endpointName}-${env === EndpointEnv.Live ? "prod" : "test"
+          location: `${import.meta.env.REACT_APP_RUUTER_SERVICES_POST_PATH}/endpoints/info/${endpoint.isCommon ? "common/" : ""}${endpointName}-${env === EndpointEnv.Live ? "prod" : "test"
             }-info.yml`,
         },
       }
@@ -181,7 +181,7 @@ const saveEndpointConfig = async (
       { result },
       {
         params: {
-          location: `/Ruuter/POST/services/endpoints/configs/${data.isCommon ? "common/" : ""}${endpointName}-${env === EndpointEnv.Live ? "prod" : "test"
+          location: `${import.meta.env.REACT_APP_RUUTER_SERVICES_POST_PATH}/endpoints/configs/${data.isCommon ? "common/" : ""}${endpointName}-${env === EndpointEnv.Live ? "prod" : "test"
             }-configs.yml`,
         },
       }
@@ -573,7 +573,7 @@ export const saveFlow = async ({
         },
         {
           params: {
-            location: "/Ruuter/POST/services/tests.yml",
+            location: `${import.meta.env.REACT_APP_RUUTER_SERVICES_POST_PATH}/tests.yml`,
           },
         }
       )
