@@ -305,7 +305,7 @@ export async function saveEndpoints(
       { result },
       {
         params: {
-          location: `/Ruuter/${selectedEndpointType.methodType.toUpperCase()}/services/endpoints/${isCommonPath}${endpointName}.yml`,
+          location: `${import.meta.env.REACT_APP_RUUTER_SERVICES_PATH}/${selectedEndpointType.methodType.toUpperCase()}/${import.meta.env.REACT_APP_RUUTER_SERVICES_DIR_PATH}/endpoints/${isCommonPath}${endpointName}.yml`,
         },
       }
     ));
