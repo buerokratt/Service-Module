@@ -21,7 +21,7 @@ delete_get_endpoints:
   args:
     url: "[#SERVICE_DMAPPER]/file-manager/delete-all-that-starts-with"
     body:
-      path: "/Ruuter/GET/services/endpoints"
+      path: "[#RUUTER_SERVICES_GET_PATH]/endpoints"
       keyword: "${name}-"
   result: results
 
@@ -30,7 +30,7 @@ delete_get_endpoints_configs:
   args:
     url: "[#SERVICE_DMAPPER]/file-manager/delete-all-that-starts-with"
     body:
-      path: "/Ruuter/GET/services/endpoints/configs"
+      path: "[#RUUTER_SERVICES_GET_PATH]/endpoints/configs"
       keyword: "${name}-"
   result: results
 
@@ -39,7 +39,7 @@ delete_get_endpoints_info:
   args:
     url: "[#SERVICE_DMAPPER]/file-manager/delete-all-that-starts-with"
     body:
-      path: "/Ruuter/GET/services/endpoints/info"
+      path: "[#RUUTER_SERVICES_GET_PATH]/endpoints/info"
       keyword: "${name}-"
   result: results
 
@@ -48,7 +48,7 @@ delete_post_endpoints:
   args:
     url: "[#SERVICE_DMAPPER]/file-manager/delete-all-that-starts-with"
     body:
-      path: "/Ruuter/POST/services/endpoints"
+      path: "[#RUUTER_SERVICES_POST_PATH]/endpoints"
       keyword: "${name}-"
   result: results
 
@@ -57,7 +57,7 @@ delete_post_endpoints_configs:
   args:
     url: "[#SERVICE_DMAPPER]/file-manager/delete-all-that-starts-with"
     body:
-      path: "/Ruuter/POST/services/endpoints/configs"
+      path: "[#RUUTER_SERVICES_POST_PATH]/endpoints/configs"
       keyword: "${name}-"
   result: results
 
@@ -66,7 +66,7 @@ delete_post_endpoints_info:
   args:
     url: "[#SERVICE_DMAPPER]/file-manager/delete-all-that-starts-with"
     body:
-      path: "/Ruuter/POST/services/endpoints/info"
+      path: "[#RUUTER_SERVICES_POST_PATH]/endpoints/info"
       keyword: "${name}-"
   result: results
 
@@ -75,7 +75,7 @@ delete_get_common_endpoints:
   args:
     url: "[#SERVICE_DMAPPER]/file-manager/delete-all-that-starts-with"
     body:
-      path: "/Ruuter/GET/services/endpoints/common"
+      path: "[#RUUTER_SERVICES_GET_PATH]/endpoints/common"
       keyword: "${name}-"
   result: results
 
@@ -84,7 +84,7 @@ delete_get_common_endpoints_configs:
   args:
     url: "[#SERVICE_DMAPPER]/file-manager/delete-all-that-starts-with"
     body:
-      path: "/Ruuter/GET/services/endpoints/configs/common"
+      path: "[#RUUTER_SERVICES_GET_PATH]/endpoints/configs/common"
       keyword: "${name}-"
   result: results
 
@@ -93,7 +93,7 @@ delete_get_common_endpoints_info:
   args:
     url: "[#SERVICE_DMAPPER]/file-manager/delete-all-that-starts-with"
     body:
-      path: "/Ruuter/GET/services/endpoints/info/common"
+      path: "[#RUUTER_SERVICES_GET_PATH]/endpoints/info/common"
       keyword: "${name}-"
   result: results
 
@@ -102,7 +102,7 @@ delete_post_common_endpoints:
   args:
     url: "[#SERVICE_DMAPPER]/file-manager/delete-all-that-starts-with"
     body:
-      path: "/Ruuter/POST/services/endpoints/common"
+      path: "[#RUUTER_SERVICES_POST_PATH]/endpoints/common"
       keyword: "${name}-"
   result: results
 
@@ -111,7 +111,7 @@ delete_post_common_endpoints_configs:
   args:
     url: "[#SERVICE_DMAPPER]/file-manager/delete-all-that-starts-with"
     body:
-      path: "/Ruuter/POST/services/endpoints/configs/common"
+      path: "[#RUUTER_SERVICES_POST_PATH]/endpoints/configs/common"
       keyword: "${name}-"
   result: results
 
@@ -120,7 +120,7 @@ delete_post_common_endpoints_info:
   args:
     url: "[#SERVICE_DMAPPER]/file-manager/delete-all-that-starts-with"
     body:
-      path: "/Ruuter/POST/services/endpoints/info/common"
+      path: "[#RUUTER_SERVICES_POST_PATH]/endpoints/info/common"
       keyword: "${name}-"
   result: results
 
