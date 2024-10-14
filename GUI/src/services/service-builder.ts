@@ -117,7 +117,7 @@ const saveEndpointInfo = async (
       { result },
       {
         params: {
-          location: `/Ruuter/POST/services/endpoints/info/${endpoint.isCommon ? "common/" : ""}${endpointName}-${env === EndpointEnv.Live ? "prod" : "test"
+          location: `${import.meta.env.REACT_APP_RUUTER_SERVICES_POST_PATH}/endpoints/info/${endpoint.isCommon ? "common/" : ""}${endpointName}-${env === EndpointEnv.Live ? "prod" : "test"
             }-info.yml`,
         },
       }
@@ -181,7 +181,7 @@ const saveEndpointConfig = async (
       { result },
       {
         params: {
-          location: `/Ruuter/POST/services/endpoints/configs/${data.isCommon ? "common/" : ""}${endpointName}-${env === EndpointEnv.Live ? "prod" : "test"
+          location: `${import.meta.env.REACT_APP_RUUTER_SERVICES_POST_PATH}/endpoints/configs/${data.isCommon ? "common/" : ""}${endpointName}-${env === EndpointEnv.Live ? "prod" : "test"
             }-configs.yml`,
         },
       }
@@ -340,9 +340,9 @@ const buildSteps = (endpointName: string, endpoint: EndpointData, selectedEndpoi
       url: `${process.env.REACT_APP_API_URL}/services/endpoints/info/${endpoint.isCommon ? "common/" : ""
         }${endpointName}-prod-info`,
       body: {
-        params: "${incoming.body.params ?? new Map()}",
-        headers: "${incoming.body.headers ?? new Map()}",
-        body: "${incoming.body.body ?? new Map()}",
+        params: "${incoming.body != null ? incoming.body.params ?? new Map() : new Map()}",
+        headers: "${incoming.body != null ? incoming.body.headers ?? new Map() : new Map()}",
+        body: "${incoming.body != null ? incoming.body.body ?? new Map() : new Map()}",
       },
     },
     result: "info",
@@ -354,9 +354,9 @@ const buildSteps = (endpointName: string, endpoint: EndpointData, selectedEndpoi
       url: `${process.env.REACT_APP_API_URL}/services/endpoints/info/${endpoint.isCommon ? "common/" : ""
         }${endpointName}-test-info`,
       body: {
-        params: "${incoming.body.params ?? new Map()}",
-        headers: "${incoming.body.headers ?? new Map()}",
-        body: "${incoming.body.body ?? new Map()}",
+        params: "${incoming.body != null ? incoming.body.params ?? new Map() : new Map()}",
+        headers: "${incoming.body != null ? incoming.body.headers ?? new Map() : new Map()}",
+        body: "${incoming.body != null ? incoming.body.body ?? new Map() : new Map()}",
       },
     },
     result: "info",
@@ -573,7 +573,7 @@ export const saveFlow = async ({
         },
         {
           params: {
-            location: "/Ruuter/POST/services/tests.yml",
+            location: `${import.meta.env.REACT_APP_RUUTER_SERVICES_POST_PATH}/tests.yml`,
           },
         }
       )
@@ -749,11 +749,11 @@ const getDefinedEndpointStep = (steps: Step[], node: Node) => {
     };
   }
   return {
-    call: `http.post`,
+    call: `${selectedEndpoint.methodType.toLowerCase() === "get" ? "http.get" : "http.post"}`,
     args: {
-      url: `${process.env.REACT_APP_API_URL
-        }/services/endpoints/${selectedEndpoint.methodType.toLowerCase()}-${name}-${(endpoint.name.trim().length ?? 0) > 0 ? endpoint.name : endpoint.id
-        }?type=prod`,
+      url: `${process.env.REACT_APP_API_URL}/services/endpoints/${name}-${
+        (endpoint.name.trim().length ?? 0) > 0 ? endpoint.name.replaceAll(" ", "_") : endpoint.id
+      }?type=prod`,
       body: {
         headers: `\${new Map([${getPreDefinedEndpointVariables(selectedEndpoint.headers)}])}`,
         body: `\${new Map([${getPreDefinedEndpointVariables(selectedEndpoint.body)}])}`,
@@ -763,7 +763,7 @@ const getDefinedEndpointStep = (steps: Step[], node: Node) => {
         type: "prod",
       },
     },
-    result: (endpoint.name.trim().length ?? 0) > 0 ? endpoint.name : endpoint.id,
+    result: (endpoint.name.trim().length ?? 0) > 0 ? `${endpoint.name.replaceAll(" ", "_")}_res` : endpoint.id,
   };
 };
 
