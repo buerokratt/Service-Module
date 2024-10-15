@@ -95,7 +95,7 @@ const saveEndpointInfo = async (
   steps.set("get-configs", {
     call: "http.post",
     args: {
-      url: `${process.env.REACT_APP_API_URL}/services/endpoints/configs/${endpoint.isCommon ? "common/" : ""
+      url: `${import.meta.env.REACT_APP_API_URL}/services/endpoints/configs/${endpoint.isCommon ? "common/" : ""
         }${endpointName}-${env === EndpointEnv.Live ? "prod" : "test"}-configs`,
       body: {
         params: "${incoming.body.params}",
@@ -337,7 +337,7 @@ const buildSteps = (endpointName: string, endpoint: EndpointData, selectedEndpoi
   steps.set("get_prod_info", {
     call: "http.post",
     args: {
-      url: `${process.env.REACT_APP_API_URL}/services/endpoints/info/${endpoint.isCommon ? "common/" : ""
+      url: `${import.meta.env.REACT_APP_API_URL}/services/endpoints/info/${endpoint.isCommon ? "common/" : ""
         }${endpointName}-prod-info`,
       body: {
         params: "${incoming.body != null ? incoming.body.params ?? new Map() : new Map()}",
@@ -351,7 +351,7 @@ const buildSteps = (endpointName: string, endpoint: EndpointData, selectedEndpoi
   steps.set("get_test_info", {
     call: `http.post`,
     args: {
-      url: `${process.env.REACT_APP_API_URL}/services/endpoints/info/${endpoint.isCommon ? "common/" : ""
+      url: `${import.meta.env.REACT_APP_API_URL}/services/endpoints/info/${endpoint.isCommon ? "common/" : ""
         }${endpointName}-test-info`,
       body: {
         params: "${incoming.body != null ? incoming.body.params ?? new Map() : new Map()}",
@@ -480,7 +480,7 @@ export const saveFlow = async ({
     finishedFlow.set("get_secrets", {
       call: "http.get",
       args: {
-        url: `${process.env.REACT_APP_API_URL}/secrets-with-priority`,
+        url: `${import.meta.env.REACT_APP_API_URL}/secrets-with-priority`,
       },
       result: "secrets",
     });
@@ -751,7 +751,7 @@ const getDefinedEndpointStep = (steps: Step[], node: Node) => {
   return {
     call: `${selectedEndpoint.methodType.toLowerCase() === "get" ? "http.get" : "http.post"}`,
     args: {
-      url: `${process.env.REACT_APP_API_URL}/services/endpoints/${name}-${
+      url: `${import.meta.env.REACT_APP_API_URL}/services/endpoints/${name}-${
         (endpoint.name.trim().length ?? 0) > 0 ? endpoint.name.replaceAll(" ", "_") : endpoint.id
       }?type=prod`,
       body: {
