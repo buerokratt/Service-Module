@@ -94,7 +94,7 @@ check_file_exists:
   args:
     url: "[#SERVICE_DMAPPER]/file-manager/exists"
     body:
-      file_path: "/Ruuter/${ruuter_type}/services/${old_file_status_path}/${name + old_file_end}"
+      file_path: "[#RUUTER_SERVICES_PATH]/${ruuter_type}/[#RUUTER_SERVICES_DIR_PATH]/${old_file_status_path}/${name + old_file_end}"
   result: service_file_exists_result
   next: validate_file_exists
 
@@ -117,8 +117,8 @@ activate_service:
   args:
     url: "[#SERVICE_DMAPPER]/file-manager/move"
     body:
-      file_path: "/Ruuter/${ruuter_type}/services/${old_file_status_path}/${name + old_file_end}"
-      new_path: "/Ruuter/${ruuter_type}/services/active/${name}.yml"
+      file_path: "[#RUUTER_SERVICES_PATH]/${ruuter_type}/[#RUUTER_SERVICES_DIR_PATH]/${old_file_status_path}/${name + old_file_end}"
+      new_path: "[#RUUTER_SERVICES_PATH]/${ruuter_type}/[#RUUTER_SERVICES_DIR_PATH]/active/${name}.yml"
   result: activate_service_result
   next: return_ok
 
@@ -127,8 +127,8 @@ deactivate_service:
   args:
     url: "[#SERVICE_DMAPPER]/file-manager/move"
     body:
-      file_path: "/Ruuter/${ruuter_type}/services/${old_file_status_path}/${name + old_file_end}"
-      new_path: "/Ruuter/${ruuter_type}/services/inactive/${name}.tmp"
+      file_path: "[#RUUTER_SERVICES_PATH]/${ruuter_type}/[#RUUTER_SERVICES_DIR_PATH]/${old_file_status_path}/${name + old_file_end}"
+      new_path: "[#RUUTER_SERVICES_PATH]/${ruuter_type}/[#RUUTER_SERVICES_DIR_PATH]/inactive/${name}.tmp"
   result: deactivate_service_result
   next: return_ok
 
@@ -137,8 +137,8 @@ draft_service:
   args:
     url: "[#SERVICE_DMAPPER]/file-manager/move"
     body:
-      file_path: "/Ruuter/${ruuter_type}/services/${old_file_status_path}/${name + old_file_end}"
-      new_path: "/Ruuter/${ruuter_type}/services/draft/${name}.tmp"
+      file_path: "[#RUUTER_SERVICES_PATH]/${ruuter_type}/[#RUUTER_SERVICES_DIR_PATH]/${old_file_status_path}/${name + old_file_end}"
+      new_path: "[#RUUTER_SERVICES_PATH]/${ruuter_type}/[#RUUTER_SERVICES_DIR_PATH]/draft/${name}.tmp"
   result: draft_service_result
   next: check_for_intent_connection
 
