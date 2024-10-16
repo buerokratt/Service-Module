@@ -1,6 +1,6 @@
-import { t } from "i18next";
+import { t, use } from "i18next";
 import { FormRichText, OutputElementBox, Track } from "..";
-import { CSSProperties, FC } from "react";
+import { CSSProperties, FC, useEffect, useState } from "react";
 import useServiceStore from "store/new-services.store";
 
 type TextfieldContentProps = {
@@ -9,7 +9,8 @@ type TextfieldContentProps = {
 };
 
 const TextfieldContent: FC<TextfieldContentProps> = ({ defaultMessage, onChange }) => {
-  const variables = useServiceStore(state => state.getFlatVariables());
+  const variables = useServiceStore((state) => state.getFlatVariables());
+  const endpointsVariables = useServiceStore((state) => state.endpointsResponseVariables);
 
   const popupBodyCss: CSSProperties = {
     padding: 16,
@@ -30,7 +31,9 @@ const TextfieldContent: FC<TextfieldContentProps> = ({ defaultMessage, onChange 
   return (
     <>
       <Track direction="vertical" align="left" style={{ width: "100%", ...popupBodyCss }}>
-        <label htmlFor="message">{t("serviceFlow.popup.messageLabel")}</label>
+        <label htmlFor="message" style={{ marginBottom: "10px" }}>
+          {t("serviceFlow.popup.messageLabel")}
+        </label>
         <FormRichText
           onChange={(value) => {
             if (!onChange) return;
@@ -40,14 +43,16 @@ const TextfieldContent: FC<TextfieldContentProps> = ({ defaultMessage, onChange 
           defaultValue={defaultMessage}
         ></FormRichText>
       </Track>
-      <Track direction="vertical" align="left" style={{ width: "100%", ...popupBodyCss, backgroundColor: "#F9F9F9" }}>
-        <label htmlFor="json">{t("serviceFlow.popup.availableOutputElementsLabel")}</label>
-        <Track direction="horizontal" gap={4} justify="start" isMultiline style={{ maxHeight: "30vh", overflow: "auto" }}>
-          {variables.map((element, i) => (
-            <OutputElementBox key={`${element}-${i}`} text={element}></OutputElementBox>
-          ))}
+      {endpointsVariables.map((endpoint) => (
+        <Track direction="vertical" align="left" style={{ width: "100%", ...popupBodyCss, backgroundColor: "#F9F9F9" }}>
+          <label htmlFor="json" style={{ marginBottom: "10px", textTransform: "capitalize", cursor: "auto" }}>{`${endpoint.name}`}</label>
+          <Track direction="horizontal" gap={4} justify="start" isMultiline style={{ maxHeight: "30vh", overflow: "auto" }}>
+            {endpoint.chips.map((chip) => (
+              <OutputElementBox key={chip.value} text={chip.name} draggable={true} value={chip.value} useValue></OutputElementBox>
+            ))}
+          </Track>
         </Track>
-      </Track>
+      ))}
     </>
   );
 };
