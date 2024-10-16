@@ -25,7 +25,7 @@ const TextfieldContent: FC<TextfieldContentProps> = ({ defaultMessage, onChange,
     const names = endpointNodes.map((node) => node.data.label);
     endpointsVariables = endpointsVariables.filter((endpoint) => names.includes(endpoint.name));
     setEndpoints(endpointsVariables);
-  }, []);
+  }, [endpointsVariables]);
 
   const popupBodyCss: CSSProperties = {
     padding: 16,
