@@ -3,11 +3,13 @@ import Box from "../Box";
 
 type OutputElementBoxProps = {
   readonly text: string;
-  readonly color?: 'green' | 'yellow';
+  readonly value?: string | number;
+  readonly color?: "green" | "yellow";
   readonly draggable?: boolean;
-}
+  readonly useValue?: boolean;
+};
 
-const OutputElementBox: FC<OutputElementBoxProps> = ({ text, color = 'green', draggable = true }) => {
+const OutputElementBox: FC<OutputElementBoxProps> = ({ text, color = "green", draggable = true, useValue = false, value = "" }) => {
   const style: CSSProperties = {
     borderRadius: 46,
     paddingTop: 1.5,
@@ -18,16 +20,10 @@ const OutputElementBox: FC<OutputElementBoxProps> = ({ text, color = 'green', dr
   };
 
   return (
-    <Box
-      color={color}
-      draggable={draggable}
-      onDragStart={(event) => event.dataTransfer.setData('text/plain', text)}
-      style={style}
-    >
+    <Box color={color} draggable={draggable} onDragStart={(event) => event.dataTransfer.setData("text/plain", useValue ? `${value}` : text)} style={style}>
       {text}
     </Box>
   );
 };
-
 
 export default OutputElementBox;
