@@ -4,10 +4,12 @@
 
 .ql-container {
   border-radius: 0 0 4px 4px;
+  max-height: 145px;
+  overflow-y: scroll;
 }
 
 .ql-snow {
-  border: 1px solid #9799A4;
+  border: 1px solid #9799a4;
 }
 
 .ql-editor {
