@@ -28,73 +28,19 @@ extract_request_data:
     serviceMethod: ${incoming.body.serviceMethod || 'POST'}
     intent: ${incoming.body.intent}
 
-get_file_locations:
-  call: http.get
+link_intent_to_service_in_rasa_domain:
+  call: http.post
   args:
-    url: "[#SERVICE_RUUTER]/internal/return-file-locations"
+    url: "[#SERVICE_RUUTER]/services/domain-intent-service-link"
     headers:
       cookie: ${incoming.headers.cookie}
-  result: fileLocations
-  next: get_domain_file
-
-get_domain_file:
-  call: http.get
-  args:
-    url: "[#SERVICE_RUUTER]/internal/domain-file"
-    headers:
-      cookie: ${incoming.headers.cookie}
-  result: domainData
-  next: assign_domain_file_data
-
-assign_domain_file_data:
-  assign:
-    domain_data_json: ${domainData.response.body.response}
-  next: check_if_intent_exists  
-
-check_if_intent_exists:
-  switch:
-    - condition: ${domain_data_json.intents.includes(intent)}
-      next: update_existing_domain_response
-  next: return_intent_does_not_exist
-
-update_existing_domain_response:
-  call: http.post
-  args:
-    url: "[#SERVICE_DMAPPER]/domain/update-existing-response"
     body:
-      json: ${domain_data_json.responses}
-      searchKey: ${intent}
-      newKey: ${"utter_" + intent}
-      newKeyValue: "#service, /${serviceMethod}/services/active/${serviceName}"
-      deleteOldValue: false
-  result: updatedResponses
-  next: convert_domain_json_to_yaml
-
-convert_domain_json_to_yaml:
-  call: http.post
-  args:
-    url: "[#SERVICE_DMAPPER]/conversion/json_to_yaml"
-    body:
-      version: ${domain_data_json.version}
-      session_config: ${domain_data_json.session_config}
-      intents: ${domain_data_json.intents}
-      entities: ${domain_data_json.entities}
-      slots: ${domain_data_json.slots}
-      forms: ${domain_data_json.forms}
-      actions: ${domain_data_json.actions}
-      responses: ${updatedResponses.response.body}
-  result: domainYaml
-  next: resave_domain_file
-
-resave_domain_file:
-  call: http.post
-  args:
-    url: "[#SERVICE_DMAPPER]/file-manager/create"
-    body:
-      file_path: ${fileLocations.response.body.response.domain_location}
-      content: ${domainYaml.response.body.json}
-  result: fileResult
-  next: add_connection_request
+      serviceName: ${serviceName}
+      serviceMethod: ${serviceMethod}
+      intent: ${intent}
+      type: "Add"
+  result: link_res
+  error: return_intent_does_not_exist
   
 add_connection_request:
   call: http.post
@@ -112,6 +58,7 @@ add_connection_request:
 return_result:
   status: 200
   return: "Connection request sent successfully"
+  next: end
 
 return_intent_does_not_exist:
   status: 400
