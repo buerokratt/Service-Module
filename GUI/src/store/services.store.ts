@@ -225,6 +225,7 @@ const useServiceListStore = create<ServiceStoreState>((set, get, store) => ({
       await axios.post(requestServiceIntentConnection(), {
         serviceId: selectedService.serviceId,
         serviceName: selectedService.name,
+        serviceMethod: selectedService.type,
         intent: intent,
       });
       useToastStore.getState().success({ title: successMessage });
