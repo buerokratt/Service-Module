@@ -501,7 +501,7 @@ export const saveFlow = async ({
           throw new Error(i18next.t("toast.missing-client_input-rules") ?? "Error");
         }
 
-        const clientInput = `ClientInput_${parentNode.data.clientInputId}`;
+        const clientInput = `client_input_${parentNode.data.clientInputId}`;
         const clientInputName = `${clientInput}-step`;
         finishedFlow.set(parentStepName, getTemplate(steps, parentNode, clientInputName, `${clientInput}-assign`));
         finishedFlow.set(`${clientInput}-assign`, {
@@ -690,7 +690,7 @@ const getTemplateDataFromNode = (node: Node): { templateName: string; body?: any
   if (node.data.stepType === StepType.Input) {
     return {
       templateName: "client-input",
-      resultName: `ClientInput_${node.data.clientInputId}_result`,
+      resultName: `client_input_${node.data.clientInputId}_result`,
     };
   }
   if (node.data.stepType === StepType.FileGenerate) {

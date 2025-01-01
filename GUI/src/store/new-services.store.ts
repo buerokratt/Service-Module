@@ -311,7 +311,7 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
       await get().loadTaraVariables();
     }
 
-    const variables = nodes?.filter((node) => node.data.stepType === "input").map((node) => `{{ClientInput_${node.data.clientInputId}}}`);
+    const variables = nodes?.filter((node) => node.data.stepType === "input").map((node) => `{{client_input_${node.data.clientInputId}}}`);
 
     get().addProductionVariables(variables);
   },

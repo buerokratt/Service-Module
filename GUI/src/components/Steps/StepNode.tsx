@@ -98,7 +98,7 @@ const StepNode: FC<NodeDataProps> = ({ data }) => {
         <p>
           <span style={boldText}>{t("newService.endpoint.variable")}</span>
           <span style={{ marginLeft: 8 }} className="client-input-variable-tag">
-            ClientInput_{data.clientInputId}
+            client_input_{data.clientInputId}
           </span>
         </p>
       )}
