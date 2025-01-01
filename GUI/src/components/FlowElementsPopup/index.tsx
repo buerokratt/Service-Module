@@ -21,6 +21,7 @@ import { StepType } from "../../types";
 import useServiceStore from "store/new-services.store";
 import FileSignContent from "./FileSignContent";
 import "./styles.scss";
+import ConditionContent from "./ConditionContent";
 
 const FlowElementsPopup: React.FC = () => {
   const { t } = useTranslation();
@@ -217,6 +218,7 @@ const FlowElementsPopup: React.FC = () => {
             {stepType === StepType.FileSign && <FileSignContent onOptionChange={setSignOption} signOption={signOption} />}
             {stepType === StepType.FinishingStepEnd && <EndConversationContent />}
             {stepType === StepType.RasaRules && <RasaRulesContent />}
+            {stepType === StepType.Condition && <ConditionContent nodeId={node.id}/>}
             <JsonRequestContent isVisible={isJsonRequestVisible} jsonContent={jsonRequestContent} />
           </Tabs.Content>
           {!isReadonly && (
