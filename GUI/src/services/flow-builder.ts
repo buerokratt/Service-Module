@@ -388,21 +388,12 @@ export const onDrop = (
     });
 
     // Add new node in place of old placeholder
-    const prevClientInputs = prevNodes.filter((node) => node.data.stepType === "input");
+    const prevClientInputs = prevNodes.filter((node) => node.data.stepType === StepType.Input);
     const newClientInputId = (prevClientInputs[prevClientInputs.length - 1]?.data.clientInputId ?? 0) + 1;
-    const prevClientConditions = prevNodes.filter((node) => node.data.stepType === "condition");
-    const newClientConditionId = (prevClientConditions[prevClientConditions.length - 1]?.data.newClientConditionId ?? 0) + 1;
-    const isConditionLabel = StepType.Condition ? `${label} - ${newClientConditionId}` : label
-    const isConditionId = type === StepType.Condition ? newClientConditionId : undefined;
+    const prevClientConditions = prevNodes.filter((node) => node.data.stepType === StepType.Condition);
+    const isConditionLabel = StepType.Condition ? `${label} - ${prevClientConditions.length + 1}` : label;
     const newNodes = [
       ...prevNodes.filter((node) => node.id !== matchingPlaceholder.id),
-      buildPlaceholder({
-        id: `${newPlaceholderId + 15}`,
-        position: {
-          y: matchingPlaceholder.position.y + EDGE_LENGTH,
-          x: matchingPlaceholder.position.x + (matchingPlaceholder.width ?? 0) * 0.75,
-        },
-      }),
       {
         id: `${newNodeId}`,
         position: matchingPlaceholder.position,
@@ -413,7 +404,7 @@ export const onDrop = (
           onEdit: useServiceStore.getState().handleNodeEdit,
           type: [StepType.FinishingStepEnd, StepType.FinishingStepRedirect].includes(type) ? "finishing-step" : "step",
           stepType: type,
-          clientInputId: type === StepType.Input ? newClientInputId : isConditionId,
+          clientInputId: type === StepType.Input ? newClientInputId : undefined,
           readonly: [
             StepType.Auth,
             StepType.FinishingStepEnd,
