@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import { ExclamationBadge, CheckBadge, Track } from "../";
 import { StepType } from "../../types";
 import useServiceStore from "store/new-services.store";
+import { Group, Rule } from "components/FlowElementsPopup/RuleBuilder/types";
 
 type NodeDataProps = {
   data: {
@@ -25,6 +26,7 @@ type NodeDataProps = {
     fileContent?: string;
     signOption?: { label: string; value: string };
     originalDefinedNodeId?: string;
+    rules?: Group;
   };
 };
 
@@ -43,7 +45,23 @@ const StepNode: FC<NodeDataProps> = ({ data }) => {
   };
 
   const isStepInvalid = () => {
-    if (data.stepType === StepType.Input) return data.childrenCount < 2;
+    if (data.stepType === StepType.Input || data.stepType === StepType.Condition) {
+      const hasInvalidRules = (elements: any[]): boolean => {
+        return elements.some((e) => {
+          if ("children" in e) {
+            const group = e as Group;
+            if (group.children.length === 0) return true;
+            return hasInvalidRules(group.children);
+          } else {
+            const rule = e as Rule;
+            return rule.value === "" || rule.field === "" || rule.operator === "";
+          }
+        });
+      };
+
+      const invalidRulesExist = hasInvalidRules(data.rules?.children || []);
+      return data.rules?.children === undefined || invalidRulesExist || data.rules?.children.length === 0;
+    };
     if (data.stepType === StepType.OpenWebpage) return !data.link || !data.linkText;
     if (data.stepType === StepType.FileGenerate) return !data.fileName || !data.fileContent;
     if (data.stepType === StepType.FileSign) return !data.signOption;

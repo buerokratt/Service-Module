@@ -54,11 +54,11 @@ const FlowElementsPopup: React.FC = () => {
   const stepType = node?.data.stepType;
 
   useEffect(() => {
-    if (stepType !== StepType.Input) return;
+    if (stepType !== StepType.Input && stepType !== StepType.Condition) return;
     if (!node?.data?.rules) return;
 
     useServiceStore.getState().changeRulesNode(node.data.rules);
-  }, [stepType === StepType.Input]);
+  }, [stepType === StepType.Input, stepType === StepType.Condition]);
 
   if (!node) return <></>;
 
@@ -93,7 +93,7 @@ const FlowElementsPopup: React.FC = () => {
       },
     };
 
-    if (stepType === StepType.Input) {
+    if (stepType === StepType.Input || stepType === StepType.Condition) {
       updatedNode.data.rules = rules;
     }
 

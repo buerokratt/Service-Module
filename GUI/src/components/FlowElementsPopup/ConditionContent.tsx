@@ -9,7 +9,7 @@ type ConditionContentProps = {
 };
 
 const ConditionContent: FC<ConditionContentProps> = ({ nodeId }) => {
-  const [rules, setRules] = useState<any[]>([]);
+  const rules = useServiceStore((state) => state.rules);
 
   return (
     <Track direction="vertical" align="stretch">

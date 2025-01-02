@@ -456,6 +456,7 @@ export const saveFlow = async ({
           }
           break;
         case StepType.Input:
+        case StepType.Condition:
           if(followingNode?.type === "placeholder" && !allRelations.includes(node.id)) {
             allRelations.push(node.id);
             return;

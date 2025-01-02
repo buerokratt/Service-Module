@@ -373,7 +373,7 @@ export const onDrop = (
         );
       }
 
-      if(StepType.Input === type) {
+      if(StepType.Input === type || StepType.Condition === type) {
         newEdges.push(
           buildEdge({
             id: `edge-${newNodeId}-${newPlaceholderId + 2}`,
@@ -390,28 +390,37 @@ export const onDrop = (
     // Add new node in place of old placeholder
     const prevClientInputs = prevNodes.filter((node) => node.data.stepType === "input");
     const newClientInputId = (prevClientInputs[prevClientInputs.length - 1]?.data.clientInputId ?? 0) + 1;
+    const prevClientConditions = prevNodes.filter((node) => node.data.stepType === "condition");
+    const newClientConditionId = (prevClientConditions[prevClientConditions.length - 1]?.data.newClientConditionId ?? 0) + 1;
+    const isConditionLabel = StepType.Condition ? `${label} - ${newClientConditionId}` : label
+    const isConditionId = type === StepType.Condition ? newClientConditionId : undefined;
     const newNodes = [
       ...prevNodes.filter((node) => node.id !== matchingPlaceholder.id),
+      buildPlaceholder({
+        id: `${newPlaceholderId + 15}`,
+        position: {
+          y: matchingPlaceholder.position.y + EDGE_LENGTH,
+          x: matchingPlaceholder.position.x + (matchingPlaceholder.width ?? 0) * 0.75,
+        },
+      }),
       {
         id: `${newNodeId}`,
         position: matchingPlaceholder.position,
         type: "customNode",
         data: {
-          label: type === "input" ? `${label} - ${newClientInputId}` : label,
+          label: type === "input" ? `${label} - ${newClientInputId}` : isConditionLabel,
           onDelete: useServiceStore.getState().onDelete,
           onEdit: useServiceStore.getState().handleNodeEdit,
-          type: [StepType.FinishingStepEnd, StepType.FinishingStepRedirect].includes(type)
-            ? "finishing-step"
-            : "step",
+          type: [StepType.FinishingStepEnd, StepType.FinishingStepRedirect].includes(type) ? "finishing-step" : "step",
           stepType: type,
-          clientInputId: type === StepType.Input ? newClientInputId : undefined,
+          clientInputId: type === StepType.Input ? newClientInputId : isConditionId,
           readonly: [
             StepType.Auth,
             StepType.FinishingStepEnd,
             StepType.FinishingStepRedirect,
             StepType.UserDefined,
           ].includes(type),
-          childrenCount: type === StepType.Input ? 2 : 1,
+          childrenCount: type === StepType.Input || type === StepType.Condition ? 2 : 1,
           setClickedNode: useServiceStore.getState().setClickedNode,
           message: setDefaultMessages(type),
           originalDefinedNodeId: type === StepType.UserDefined ? originalDefinedNodeId : undefined,
@@ -422,7 +431,7 @@ export const onDrop = (
       },
     ];
 
-    if (![StepType.Input, StepType.FinishingStepEnd, StepType.FinishingStepRedirect].includes(type)) {
+    if (![StepType.Input, StepType.Condition, StepType.FinishingStepEnd, StepType.FinishingStepRedirect].includes(type)) {
       // Add placeholder right below new node
       newNodes.push(
         buildPlaceholder({
@@ -432,7 +441,7 @@ export const onDrop = (
       );
     }
 
-    if(StepType.Input === type) {
+    if(StepType.Input === type || StepType.Condition === type) {
       newNodes.push(
         buildPlaceholder({
           id: `${newPlaceholderId + 1}`,

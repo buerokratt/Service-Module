@@ -33,7 +33,7 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
   return (
     <Track direction="vertical" align="stretch">
       {endpoints.map((endpoint) => (
-        <Track direction="vertical" align="left" style={{ width: "100%", ...popupBodyCss, backgroundColor: "#F9F9F9" }}>
+        <Track key={endpoint.name} direction="vertical" align="left" style={{ width: "100%", ...popupBodyCss, backgroundColor: "#F9F9F9" }}>
           <label
             htmlFor="json"
             style={{ marginBottom: "10px", textTransform: "capitalize", cursor: "auto" }}

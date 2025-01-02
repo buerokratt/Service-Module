@@ -241,7 +241,7 @@
       "taraAuthentication": "TARA autentimine",
       "textfield": "Sõnum kliendile",
       "clientInput": "Kliendi sisend",
-      "condition": "Seisund",
+      "condition": "Tingimus",
       "openNewWebpage": "Uue veebilehe avamine",
       "fileGeneration": "Faili genereerimine",
       "fileSigning": "Faili allkirjastamine",
