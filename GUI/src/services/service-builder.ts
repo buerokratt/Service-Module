@@ -433,6 +433,34 @@ const hasInvalidRules = (elements: any[]): boolean => {
   });
 };
 
+const buildConditionString = (group: any): string => {
+  if ("children" in group) {
+    const subgroup = group as Group;
+    if (subgroup.children.length === 0) {
+      return "";
+    }
+
+    const conditions = subgroup.children.map((child) => {
+      if ("children" in child) {
+        return `(${buildConditionString(child)})`;
+      } else {
+        const rule = child;
+        return `${rule.field.replaceAll('${', '').replaceAll('}', '')} ${rule.operator} ${rule.value.replaceAll('${', '').replaceAll('}', '')}`;
+      }
+    });
+
+    if (subgroup.not) {
+      return `!(${subgroup.type === "and" ? conditions.join(" && ") : conditions.join(" || ")})`;
+
+    } else {
+      return subgroup.type === "and" ? conditions.join(" && ") : conditions.join(" || ");
+    };
+  } else {
+    const rule = group as Rule;
+    return `${rule.field.replaceAll("${", "").replaceAll("}", "")} ${rule.operator} ${rule.value.replaceAll('${', '').replaceAll('}', '')}`;
+  }
+};
+
 export const saveFlow = async ({
   steps,
   name,
@@ -500,9 +528,7 @@ export const saveFlow = async ({
       result: "secrets",
     });
     try {
-      console.log(allRelations);
       allRelations.forEach((r) => {
-        console.log(r);
         const [parentNodeId, childNodeId] = r.split("-");
         const parentNode = nodes.find((node) => node.id === parentNodeId);
         if (
@@ -516,13 +542,9 @@ export const saveFlow = async ({
         const parentStepName = `${parentNode.data.stepType}-${parentNodeId}`;
 
         if (parentNode.data.stepType === StepType.Condition) {
-          console.log(`hey there ${parentNodeId}`);
           const conditionRelations: string[] = allRelations.filter((r) => r.startsWith(parentNodeId));
           const firstChildNode = conditionRelations[0].split("-")[1];
           const secondChildNode = conditionRelations[1].split("-")[1];
-          console.log(conditionRelations);
-          console.log(firstChildNode);
-          console.log(secondChildNode);
 
           const firstChild = nodes.find((node) => node.id === firstChildNode);
           const secondChild = nodes.find((node) => node.id === secondChildNode);
@@ -532,20 +554,16 @@ export const saveFlow = async ({
           if (isInvalid) {
             throw new Error(i18next.t("toast.missing-condition-rules") ?? "Error");
           }
-          const rules = parentNode.data.rules.children.map((rule: Rule) => {
-            return {
-              field: rule.field,
-              operator: rule.operator,
-              value: rule.value,
-            };
+
+          finishedFlow.set(parentStepName, {
+            switch: [
+              {
+                condition: `\${${buildConditionString(parentNode.data.rules)}}`,
+                next: `${firstChild?.data.stepType}-${firstChildNode}`,
+              },
+            ],
+            next: `${secondChild?.data.stepType}-${secondChildNode}`,
           });
-          // finishedFlow.set(parentStepName, {
-          //   switch: {
-          //     condition: "${incoming.body != null ? incoming.body : new Map()}",
-          //     next: `${firstChild?.data.stepType}-${firstChildNode}`,
-          //   },
-          //   next: `${secondChild?.data.stepType}-${secondChildNode}`,
-          // });
           return;
         }
 
