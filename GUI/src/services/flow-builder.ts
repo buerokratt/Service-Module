@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { Node, Edge, MarkerType, XYPosition, NodeChange, NodeDimensionChange } from "reactflow";
 import useServiceStore from "store/new-services.store";
 import { ConditionRuleType, StepType } from "types";
@@ -7,10 +8,12 @@ import { GRID_UNIT, EDGE_LENGTH } from "types/service-flow";
 
 export const buildPlaceholder = ({
   id,
+  label,
   matchingPlaceholder,
   position,
 }: {
   id: string;
+  label?: string;
   matchingPlaceholder?: Node;
   position?: XYPosition;
 }): Node => {
@@ -28,6 +31,7 @@ export const buildPlaceholder = ({
     },
     data: {
       type: "placeholder",
+      label,
     },
     className: "placeholder",
     selectable: false,
@@ -440,6 +444,7 @@ export const onDrop = (
       newNodes.push(
         buildPlaceholder({
           id: `${newPlaceholderId + 1}`,
+          label: 'serviceFlow.placeholderNodeSuccess',
           position: {
             y: matchingPlaceholder.position.y + EDGE_LENGTH,
             x: matchingPlaceholder.position.x - (matchingPlaceholder.width ?? 0) * 0.75,
@@ -450,12 +455,13 @@ export const onDrop = (
       newNodes.push(
         buildPlaceholder({
           id: `${newPlaceholderId + 2}`,
+          label: 'serviceFlow.placeholderNodeFailure',
           position: {
             y: matchingPlaceholder.position.y + EDGE_LENGTH,
             x: matchingPlaceholder.position.x + (matchingPlaceholder.width ?? 0) * 0.75,
           },
         })
-      )
+      );
     }
 
     return newNodes;

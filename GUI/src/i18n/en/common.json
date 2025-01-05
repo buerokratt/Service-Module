@@ -286,6 +286,8 @@
     },
     "flow": "Service flow",
     "placeholderNode": "Drag the next step into the flow",
+    "placeholderNodeSuccess": "Drag the success step into the flow",
+    "placeholderNodeFailure": "Drag the failure step into the flow",
     "allElements": "All elements",
     "setupElements": "Setup elements",
     "tabs": {

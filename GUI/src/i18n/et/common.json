@@ -286,6 +286,8 @@
     },
     "flow": "Teenusvoog",
     "placeholderNode": "Lohista järgmine samm voogu",
+    "placeholderNodeSuccess": "Lohistage edusamm voogu",
+    "placeholderNodeFailure": "Lohistage tõrkeetapp voogu",
     "allElements": "Üldelemendid",
     "setupElements": "API elemendid",
     "tabs": {
