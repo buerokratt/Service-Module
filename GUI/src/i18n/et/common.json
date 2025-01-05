@@ -316,7 +316,8 @@
     "missing-textfield-message": "Palun sisestage puuduv sõnum",
     "missing-website": "Sisestage veebisaidi pealkiri ja link",
     "missing-file-generation": "Sisestage faili nimi ja sisu",
-    "missing-client_input-rules": "Määrake kliendi sisestusreeglid"
+    "missing-client_input-rules": "Määrake kliendi sisestusreeglid",
+    "missing-condition-rules": "Sisestage tingimuste reeglid"
   },
   "roles": {
     "ROLE_ADMINISTRATOR": "Administraator",

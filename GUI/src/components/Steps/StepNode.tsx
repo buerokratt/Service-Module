@@ -10,6 +10,7 @@ type NodeDataProps = {
   data: {
     childrenCount: number;
     clientInputId: number;
+    conditionId: number;
     label: string;
     onDelete: (id: string) => void;
     onEdit: (id: string) => void;

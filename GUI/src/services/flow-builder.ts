@@ -390,8 +390,11 @@ export const onDrop = (
     // Add new node in place of old placeholder
     const prevClientInputs = prevNodes.filter((node) => node.data.stepType === StepType.Input);
     const newClientInputId = (prevClientInputs[prevClientInputs.length - 1]?.data.clientInputId ?? 0) + 1;
+
     const prevClientConditions = prevNodes.filter((node) => node.data.stepType === StepType.Condition);
-    const isConditionLabel = StepType.Condition ? `${label} - ${prevClientConditions.length + 1}` : label;
+    const newConditionId = (prevClientConditions[prevClientConditions.length - 1]?.data.conditionId ?? 0) + 1;
+    const isConditionLabel = StepType.Condition ? `${label} - ${newConditionId}` : label;
+
     const newNodes = [
       ...prevNodes.filter((node) => node.id !== matchingPlaceholder.id),
       {
@@ -405,6 +408,7 @@ export const onDrop = (
           type: [StepType.FinishingStepEnd, StepType.FinishingStepRedirect].includes(type) ? "finishing-step" : "step",
           stepType: type,
           clientInputId: type === StepType.Input ? newClientInputId : undefined,
+          conditionId: type === StepType.Condition ? newConditionId : undefined,
           readonly: [
             StepType.Auth,
             StepType.FinishingStepEnd,

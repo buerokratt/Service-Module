@@ -1,4 +1,5 @@
 import axios from "axios";
+import { Group, Rule } from "components/FlowElementsPopup/RuleBuilder/types";
 import i18next from 'i18next';
 import { Edge, Node } from "reactflow";
 import {
@@ -419,6 +420,19 @@ interface SaveFlowConfig {
   isNewService: boolean,
 }
 
+const hasInvalidRules = (elements: any[]): boolean => {
+  return elements.some((e) => {
+    if ("children" in e) {
+      const group = e as Group;
+      if (group.children.length === 0) return true;
+      return hasInvalidRules(group.children);
+    } else {
+      const rule = e as Rule;
+      return rule.value === "" || rule.field === "" || rule.operator === "";
+    }
+  });
+};
+
 export const saveFlow = async ({
   steps,
   name,
@@ -485,74 +499,128 @@ export const saveFlow = async ({
       },
       result: "secrets",
     });
-    allRelations.forEach((r) => {
-      const [parentNodeId, childNodeId] = r.split("-");
-      const parentNode = nodes.find((node) => node.id === parentNodeId);
-      if (
-        !parentNode ||
-        parentNode.type !== "customNode" ||
-        [StepType.Rule, StepType.RuleDefinition].includes(parentNode.data.stepType)
-      )
-        return;
+    try {
+      console.log(allRelations);
+      allRelations.forEach((r) => {
+        console.log(r);
+        const [parentNodeId, childNodeId] = r.split("-");
+        const parentNode = nodes.find((node) => node.id === parentNodeId);
+        if (
+          !parentNode ||
+          parentNode.type !== "customNode" ||
+          [StepType.Rule, StepType.RuleDefinition].includes(parentNode.data.stepType)
+        )
+          return;
 
-      const childNode = nodes.find((node) => node.id === childNodeId);
-      const parentStepName = `${parentNode.data.stepType}-${parentNodeId}`;
-      if (parentNode.data.stepType === StepType.Input) {
-        if (parentNode.data.rules === undefined) {
-          throw new Error(i18next.t("toast.missing-client_input-rules") ?? "Error");
+        const childNode = nodes.find((node) => node.id === childNodeId);
+        const parentStepName = `${parentNode.data.stepType}-${parentNodeId}`;
+
+        if (parentNode.data.stepType === StepType.Condition) {
+          console.log(`hey there ${parentNodeId}`);
+          const conditionRelations: string[] = allRelations.filter((r) => r.startsWith(parentNodeId));
+          const firstChildNode = conditionRelations[0].split("-")[1];
+          const secondChildNode = conditionRelations[1].split("-")[1];
+          console.log(conditionRelations);
+          console.log(firstChildNode);
+          console.log(secondChildNode);
+
+          const firstChild = nodes.find((node) => node.id === firstChildNode);
+          const secondChild = nodes.find((node) => node.id === secondChildNode);
+
+          const invalidRulesExist = hasInvalidRules(parentNode.data.rules?.children || []);
+          const isInvalid = parentNode.data.rules?.children === undefined || invalidRulesExist || parentNode.data.rules?.children.length === 0;
+          if (isInvalid) {
+            throw new Error(i18next.t("toast.missing-condition-rules") ?? "Error");
+          }
+          const rules = parentNode.data.rules.children.map((rule: Rule) => {
+            return {
+              field: rule.field,
+              operator: rule.operator,
+              value: rule.value,
+            };
+          });
+          // finishedFlow.set(parentStepName, {
+          //   switch: {
+          //     condition: "${incoming.body != null ? incoming.body : new Map()}",
+          //     next: `${firstChild?.data.stepType}-${firstChildNode}`,
+          //   },
+          //   next: `${secondChild?.data.stepType}-${secondChildNode}`,
+          // });
+          return;
         }
 
-        const clientInput = `client_input_${parentNode.data.clientInputId}`;
-        const clientInputName = `${clientInput}-step`;
-        finishedFlow.set(parentStepName, getTemplate(steps, parentNode, clientInputName, `${clientInput}-assign`));
-        finishedFlow.set(`${clientInput}-assign`, {
-          assign: {
-            [clientInput]: `\${${clientInput}_result.input}`,
-          },
-          next: `${clientInput}-switch`,
-        });
+        if (parentNode.data.stepType === StepType.Input) {
+          const invalidRulesExist = hasInvalidRules(parentNode.data.rules?.children || []);
+          const isInvalid = parentNode.data.rules?.children === undefined || invalidRulesExist || parentNode.data.rules?.children.length === 0;
+          if (isInvalid) {
+            throw new Error(i18next.t("toast.missing-client_input-rules") ?? "Error");
+          }
 
-        const clientInputYesOrNo = (label: string) => label === "rule 1" ? '"Yes"' : '"No"';
+          const clientInput = `client_input_${parentNode.data.clientInputId}`;
+          const clientInputName = `${clientInput}-step`;
+          finishedFlow.set(parentStepName, getTemplate(steps, parentNode, clientInputName, `${clientInput}-assign`));
+          finishedFlow.set(`${clientInput}-assign`, {
+            assign: {
+              [clientInput]: `\${${clientInput}_result.input}`,
+            },
+            next: `${clientInput}-switch`,
+          });
 
-        const findTargetNodeId = (node: Node) => edges.find((edge) => edge.source === node.id)?.target;
-        const findFollowingNode = (node: Node) => {
-          const target = findTargetNodeId(node);
-          return nodes.find((n) => n.id === target);
+          const clientInputYesOrNo = (label: string) => (label === "rule 1" ? '"Yes"' : '"No"');
+
+          const findTargetNodeId = (node: Node) => edges.find((edge) => edge.source === node.id)?.target;
+          const findFollowingNode = (node: Node) => {
+            const target = findTargetNodeId(node);
+            return nodes.find((n) => n.id === target);
+          };
+
+          finishedFlow.set(
+            `${clientInput}-switch`,
+            getSwitchCase(
+              edges
+                .filter((e) => e.source === parentNodeId)
+                .map((e) => {
+                  const node = nodes.find((node) => node.id === e.target);
+                  if (!node) return e.target;
+                  const matchingRule = parentNode.data?.rules?.children?.find(
+                    (_: never, i: number) => `rule ${i + 1}` === node.data.label
+                  );
+                  const followingNode = findFollowingNode(node);
+                  return {
+                    case:
+                      matchingRule && !["Yes", "No"].includes(matchingRule?.condition)
+                        ? `\${${matchingRule.name.replace("{{", "").replace("}}", "")} ${matchingRule.condition} ${
+                            matchingRule.value
+                          }}`
+                        : `\${${clientInput} == ${clientInputYesOrNo(node.data.label)}}`,
+                    nextStep:
+                      followingNode?.type === "customNode"
+                        ? `${followingNode.data.stepType}-${followingNode.id}`
+                        : "service-end",
+                  };
+                })
+            )
+          );
+          return;
         }
 
-        finishedFlow.set(
-          `${clientInput}-switch`,
-          getSwitchCase(
-            edges
-              .filter((e) => e.source === parentNodeId)
-              .map((e) => {
-                const node = nodes.find((node) => node.id === e.target);
-                if (!node) return e.target;
-                const matchingRule = parentNode.data?.rules?.children?.find(
-                  (_: never, i: number) => `rule ${i + 1}` === node.data.label
-                );
-                const followingNode = findFollowingNode(node);
-                return {
-                  case:
-                    matchingRule && !["Yes", "No"].includes(matchingRule?.condition)
-                      ? `\${${matchingRule.name.replace("{{", "").replace("}}", "")} ${matchingRule.condition} ${matchingRule.value
-                      }}`
-                      : `\${${clientInput} == ${clientInputYesOrNo(node.data.label)}}`,
-                  nextStep:
-                    followingNode?.type === "customNode"
-                      ? `${followingNode.data.stepType}-${followingNode.id}`
-                      : "service-end",
-                };
-              })
+        return finishedFlow.set(
+          parentStepName,
+          getTemplate(
+            steps,
+            parentNode,
+            parentStepName,
+            childNode ? `${childNode.data.stepType}-${childNodeId}` : childNodeId
           )
         );
-        return;
-      }
-      return finishedFlow.set(
-        parentStepName,
-        getTemplate(steps, parentNode, parentStepName, childNode ? `${childNode.data.stepType}-${childNodeId}` : childNodeId)
-      );
-    });
+      });
+    } catch (e: any) {
+      useToastStore.getState().error({
+        title: i18next.t("toast.cannot-save-flow"),
+        message: e?.message,
+      });
+      return;
+    }
     finishedFlow.set("service-end", {
       wrapper: false,
       return: "",
