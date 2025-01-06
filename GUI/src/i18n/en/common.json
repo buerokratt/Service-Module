@@ -241,6 +241,7 @@
       "taraAuthentication": "Tara authorization",
       "textfield": "Send message to client",
       "clientInput": "Client input",
+      "condition": "Condition",
       "openNewWebpage": "Open new webpage",
       "fileGeneration": "File generation",
       "fileSigning": "File signing",
@@ -285,6 +286,8 @@
     },
     "flow": "Service flow",
     "placeholderNode": "Drag the next step into the flow",
+    "placeholderNodeSuccess": "Drag the success step into the flow",
+    "placeholderNodeFailure": "Drag the failure step into the flow",
     "allElements": "All elements",
     "setupElements": "Setup elements",
     "tabs": {
@@ -315,7 +318,8 @@
     "missing-textfield-message": "Please enter missing message",
     "missing-website": "Please enter website title and link",
     "missing-file-generation": "Please enter file name and content",
-    "missing-client_input-rules": "Please enter client input rules"
+    "missing-client_input-rules": "Please enter client input rules",
+    "missing-condition-rules": "Please enter condition rules"
   },
   "roles": {
     "ROLE_ADMINISTRATOR": "Administrator",

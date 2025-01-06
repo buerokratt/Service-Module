@@ -1,8 +1,7 @@
-import { t, use } from "i18next";
-import { FormRichText, OutputElementBox, Track } from "..";
-import { CSSProperties, FC, useEffect, useState } from "react";
-import useServiceStore from "store/new-services.store";
-import { endpointResponseVariables } from "types/endpoint/endpoint-response-variables";
+import { t } from "i18next";
+import { FormRichText, Track } from "..";
+import { CSSProperties, FC } from "react";
+import PreviousVariables from "./PreviousVariables";
 
 type TextfieldContentProps = {
   readonly defaultMessage?: string;
@@ -11,22 +10,6 @@ type TextfieldContentProps = {
 };
 
 const TextfieldContent: FC<TextfieldContentProps> = ({ defaultMessage, onChange, nodeId }) => {
-  const variables = useServiceStore((state) => state.getFlatVariables());
-  let endpointsVariables = useServiceStore((state) => state.endpointsResponseVariables);
-  const nodes = useServiceStore((state) => state.nodes);
-  const [endpoints, setEndpoints] = useState<endpointResponseVariables[]>([]);
-
-  useEffect(() => {
-    const previousNodes = nodes.slice(
-      0,
-      nodes.findIndex((node) => node.id === nodeId)
-    );
-    const endpointNodes = previousNodes.filter((node) => node.data.stepType === "user-defined");
-    const names = endpointNodes.map((node) => node.data.label);
-    endpointsVariables = endpointsVariables.filter((endpoint) => names.includes(endpoint.name));
-    setEndpoints(endpointsVariables);
-  }, [endpointsVariables]);
-
   const popupBodyCss: CSSProperties = {
     padding: 16,
     borderBottom: `1px solid #D2D3D8`,
@@ -58,16 +41,7 @@ const TextfieldContent: FC<TextfieldContentProps> = ({ defaultMessage, onChange,
           defaultValue={defaultMessage}
         ></FormRichText>
       </Track>
-      {endpoints.map((endpoint) => (
-        <Track direction="vertical" align="left" style={{ width: "100%", ...popupBodyCss, backgroundColor: "#F9F9F9" }}>
-          <label htmlFor="json" style={{ marginBottom: "10px", textTransform: "capitalize", cursor: "auto" }}>{`${endpoint.name}`}</label>
-          <Track direction="horizontal" gap={4} justify="start" isMultiline style={{ maxHeight: "30vh", overflow: "auto" }}>
-            {endpoint.chips.map((chip) => (
-              <OutputElementBox key={chip.value} text={chip.name} draggable={true} value={chip.value} useValue></OutputElementBox>
-            ))}
-          </Track>
-        </Track>
-      ))}
+      <PreviousVariables nodeId={nodeId} />
     </>
   );
 };
