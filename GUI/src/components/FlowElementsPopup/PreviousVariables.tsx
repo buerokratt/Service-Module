@@ -1,5 +1,4 @@
 import { CSSProperties, FC, useEffect, useState } from "react";
-import { useTranslation } from "react-i18next";
 import Track from "../Track";
 import useServiceStore from "store/new-services.store";
 import { endpointResponseVariables } from "types/endpoint/endpoint-response-variables";

@@ -397,7 +397,7 @@ export const onDrop = (
 
     const prevClientConditions = prevNodes.filter((node) => node.data.stepType === StepType.Condition);
     const newConditionId = (prevClientConditions[prevClientConditions.length - 1]?.data.conditionId ?? 0) + 1;
-    const isConditionLabel = StepType.Condition ? `${label} - ${newConditionId}` : label;
+    const isConditionLabel = type === StepType.Condition ? `${label} - ${newConditionId}` : label;
 
     const newNodes = [
       ...prevNodes.filter((node) => node.id !== matchingPlaceholder.id),
@@ -406,7 +406,7 @@ export const onDrop = (
         position: matchingPlaceholder.position,
         type: "customNode",
         data: {
-          label: type === "input" ? `${label} - ${newClientInputId}` : isConditionLabel,
+          label: type === StepType.Input ? `${label} - ${newClientInputId}` : isConditionLabel,
           onDelete: useServiceStore.getState().onDelete,
           onEdit: useServiceStore.getState().handleNodeEdit,
           type: [StepType.FinishingStepEnd, StepType.FinishingStepRedirect].includes(type) ? "finishing-step" : "step",
