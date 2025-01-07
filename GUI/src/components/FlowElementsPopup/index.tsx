@@ -35,10 +35,15 @@ const FlowElementsPopup: React.FC = () => {
 
   const endpoints = useServiceStore((state) => state.endpoints);
   const rules = useServiceStore((state) => state.rules);
+  const assignElements = useServiceStore((state) => state.assignElements);
 
   useEffect(() => {
     if (node) node.data.rules = rules;
   }, [rules]);
+
+  useEffect(() => {
+    if (node) node.data.assignElements = assignElements;
+  }, [assignElements]);
 
   // StepType.Textfield
   const [textfieldMessage, setTextfieldMessage] = useState<string | null>(null);
@@ -60,6 +65,13 @@ const FlowElementsPopup: React.FC = () => {
 
     useServiceStore.getState().changeRulesNode(node.data.rules);
   }, [stepType === StepType.Input, stepType === StepType.Condition]);
+
+  useEffect(() => {
+    if (stepType !== StepType.Assign) return;
+    if (!node?.data?.assignElements) return;
+
+    useServiceStore.getState().changeAssignNode(node.data.assignElements);
+  }, [stepType === StepType.Assign]);
 
   if (!node) return <></>;
 
@@ -96,6 +108,10 @@ const FlowElementsPopup: React.FC = () => {
 
     if (stepType === StepType.Input || stepType === StepType.Condition) {
       updatedNode.data.rules = rules;
+    }
+
+    if (stepType === StepType.Assign) {
+      updatedNode.data.assignElements = assignElements;
     }
 
     useServiceStore.getState().handlePopupSave(updatedNode);

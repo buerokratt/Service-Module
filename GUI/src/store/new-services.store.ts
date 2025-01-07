@@ -17,7 +17,7 @@ import { GroupOrRule } from "components/FlowElementsPopup/RuleBuilder/types";
 import useTestServiceStore from "./test-services.store";
 import { Chip } from "types/chip";
 import { endpointResponseVariables } from "types/endpoint/endpoint-response-variables";
-import { AssignGroup } from "components/FlowElementsPopup/AssignBuilder/assign-types";
+import { Assign } from "components/FlowElementsPopup/AssignBuilder/assign-types";
 
 interface ServiceStoreState {
   endpoints: EndpointData[];
@@ -29,12 +29,12 @@ interface ServiceStoreState {
   nodes: Node[];
   isNewService: boolean;
   serviceState: ServiceState;
-  assignElements: AssignGroup[];
+  assignElements: Assign[];
   rules: GroupOrRule[];
   isYesNoQuestion: boolean;
   endpointsResponseVariables: endpointResponseVariables[];
   setIsYesNoQuestion: (value: boolean) => void;
-  changeAssignNode: (assign: AssignGroup[]) => void;
+  changeAssignNode: (assign: Assign[]) => void;
   changeRulesNode: (rules: GroupOrRule[]) => void;
   markAsNewService: () => void;
   unmarkAsNewService: () => void;
@@ -69,7 +69,11 @@ interface ServiceStoreState {
   selectedTab: EndpointEnv;
   setSelectedTab: (tab: EndpointEnv) => void;
   isLive: () => boolean;
-  updateEndpointRawData: (rawData: RequestVariablesTabsRawData, endpointDataId?: string, parentEndpointId?: string) => void;
+  updateEndpointRawData: (
+    rawData: RequestVariablesTabsRawData,
+    endpointDataId?: string,
+    parentEndpointId?: string
+  ) => void;
   updateEndpointData: (data: RequestVariablesTabsRowsData, endpointDataId?: string, parentEndpointId?: string) => void;
   resetState: () => void;
   resetAssign: () => void;
@@ -112,7 +116,7 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
   isYesNoQuestion: false,
   endpointsResponseVariables: [],
   setIsYesNoQuestion: (value: boolean) => set({ isYesNoQuestion: value }),
-  changeAssignNode: (assign) => set({ assignElements: assign }),
+  changeAssignNode: (assignElements) => set({ assignElements: assignElements }),
   changeRulesNode: (rules) => set({ rules }),
   disableTestButton: () =>
     set({
@@ -258,6 +262,7 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
       edges: [initialEdge],
       nodes: initialNodes,
       isTestButtonEnabled: true,
+      assignElements: [],
       rules: [],
       isYesNoQuestion: false,
       clickedNode: null,
@@ -318,7 +323,9 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
       await get().loadTaraVariables();
     }
 
-    const variables = nodes?.filter((node) => node.data.stepType === StepType.Input).map((node) => `{{client_input_${node.data.clientInputId}}}`);
+    const variables = nodes
+      ?.filter((node) => node.data.stepType === StepType.Input)
+      .map((node) => `{{client_input_${node.data.clientInputId}}}`);
 
     get().addProductionVariables(variables);
   },
@@ -363,7 +370,9 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
     const response = endpoint?.definedEndpoints.find((x) => x.isSelected)?.response ?? [];
     const variables = response.map((x) => `{{${newName ?? x.id}.${x.name}}}`);
 
-    const oldFilteredVariables = get().availableVariables.prod.filter((v) => v.replace("{{", "").split(".")[0] !== oldName);
+    const oldFilteredVariables = get().availableVariables.prod.filter(
+      (v) => v.replace("{{", "").split(".")[0] !== oldName
+    );
 
     const newEndpoints = get().endpoints.map((x) => {
       if (x.id !== endpointId) return x;
@@ -402,7 +411,8 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
       .filter((x) => !!x.selected)
       .map(({ selected, endpoint }, index) => ({
         id: index + 1,
-        label: endpoint.name.trim().length > 0 ? endpoint.name : `${selected!.methodType.toUpperCase()} ${selected!.url}`,
+        label:
+          endpoint.name.trim().length > 0 ? endpoint.name : `${selected!.methodType.toUpperCase()} ${selected!.url}`,
         type: StepType.UserDefined,
         data: endpoint,
       }));
@@ -420,7 +430,9 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
     const live = get().isLive() ? "value" : "testValue";
 
     const endpoints = JSON.parse(JSON.stringify(get().endpoints)) as EndpointData[];
-    const defEndpoint = endpoints.find((x) => x.id === parentEndpointId)?.definedEndpoints.find((x) => x.id === endpointId);
+    const defEndpoint = endpoints
+      .find((x) => x.id === parentEndpointId)
+      ?.definedEndpoints.find((x) => x.id === endpointId);
 
     for (const key in data) {
       if (defEndpoint?.[key as EndpointTab]) {
@@ -437,14 +449,20 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
 
     const live = get().isLive() ? "value" : "testValue";
     const endpoints = JSON.parse(JSON.stringify(get().endpoints)) as EndpointData[];
-    const defEndpoint = endpoints.find((x) => x.id === parentEndpointId)?.definedEndpoints.find((x) => x.id === endpointId);
+    const defEndpoint = endpoints
+      .find((x) => x.id === parentEndpointId)
+      ?.definedEndpoints.find((x) => x.id === endpointId);
 
     if (!defEndpoint) return;
 
     for (const key in data) {
       const keyedDefEndpoint = defEndpoint[key as EndpointTab];
       for (const row of data[key as EndpointTab] ?? []) {
-        if (!row.endpointVariableId && row.variable && !keyedDefEndpoint?.variables.map((e) => e.name).includes(row.variable)) {
+        if (
+          !row.endpointVariableId &&
+          row.variable &&
+          !keyedDefEndpoint?.variables.map((e) => e.name).includes(row.variable)
+        ) {
           keyedDefEndpoint?.variables.push({
             id: uuid(),
             name: row.variable,

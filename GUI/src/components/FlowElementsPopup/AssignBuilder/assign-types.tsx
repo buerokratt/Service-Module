@@ -1,7 +1,7 @@
 import { v4 as uuidv4 } from 'uuid';
 
 export interface ElementGroupBuilderProps {
-  group?: AssignGroup;
+  assignElements?: Assign[];
   onRemove?: (id: string) => void;
   onChange: (config: any) => void;
   seedGroup?: any;
@@ -13,11 +13,6 @@ export interface Assign {
   value: string;
 }
 
-export interface AssignGroup {
-  id: string;
-  children: Assign[];
-}
-
 export const getInitialElement = () => {
   return {
     id: uuidv4(),
@@ -25,10 +20,3 @@ export const getInitialElement = () => {
     value: '',
   };
 }
-
-export const getInitialAssignGroup = () => {
-  return {
-    id: uuidv4(),
-    children: [getInitialElement()],
-  } as AssignGroup;
-};

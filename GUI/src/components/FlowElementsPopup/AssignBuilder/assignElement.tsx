@@ -23,10 +23,10 @@ const AssignElement: React.FC<AssignElementProps> = ({ element, onRemove, onChan
     <Track gap={16} isFlex>
       <Track gap={16} isFlex>
         <FormInput value={element.key} name="key" onChange={handleChange} label="" hideLabel />
-        =
+        :
         <FormInput value={element.value} name="value" onChange={handleChange} label="" hideLabel />
       </Track>
-      <button onClick={() => onRemove(element.id)} className="small-delete-rule-button rule-red">
+      <button onClick={() => onRemove(element.id)} className="small-assign-button assign-red">
         <Icon icon={<MdDeleteOutline />} />
       </button>
     </Track>

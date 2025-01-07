@@ -5,6 +5,7 @@ import { ExclamationBadge, CheckBadge, Track } from "../";
 import { StepType } from "../../types";
 import useServiceStore from "store/new-services.store";
 import { Group, Rule } from "components/FlowElementsPopup/RuleBuilder/types";
+import { Assign } from "components/FlowElementsPopup/AssignBuilder/assign-types";
 
 type NodeDataProps = {
   data: {
@@ -28,6 +29,7 @@ type NodeDataProps = {
     signOption?: { label: string; value: string };
     originalDefinedNodeId?: string;
     rules?: Group;
+    assignElements?: Assign[];
   };
 };
 
@@ -66,6 +68,17 @@ const StepNode: FC<NodeDataProps> = ({ data }) => {
     if (data.stepType === StepType.OpenWebpage) return !data.link || !data.linkText;
     if (data.stepType === StepType.FileGenerate) return !data.fileName || !data.fileContent;
     if (data.stepType === StepType.FileSign) return !data.signOption;
+    if (data.stepType === StepType.Assign) {
+      const hasInvalidElements = (elements: any[]): boolean => {
+        return elements.some((e) => {
+          const element = e as Assign;
+          return element.key === "" || element.value === "";
+        });
+      };
+
+      const invalidElementsExist = hasInvalidElements(data.assignElements || []);
+      return data?.assignElements === undefined || invalidElementsExist || data?.assignElements.length === 0;
+    };
 
     return !(data.readonly || !!data.message?.length);
   };

@@ -281,6 +281,7 @@
       "or": "OR",
       "not": "NOT",
       "addRule": "+ Rule",
+      "addElement": "+ Element",
       "addGroup": "+ Group",
       "remove": "Remove",
       "signType": "Sign Type"
