@@ -533,6 +533,7 @@ export const saveFlow = async ({
       assign: {
         chatId: "${incoming.body.chatId}",
         authorId: "${incoming.body.authorId}",
+        input: "${incoming.body.input}",
       },
       next: "get_secrets",
     });

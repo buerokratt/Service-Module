@@ -33,7 +33,12 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
     // Get Assign variables
     const assignNodes = previousNodes.filter((node) => node.data.stepType === StepType.Assign);
     const assignElements = assignNodes.map((node) => node.data.assignElements).flat();
-    setAssignedVariables(assignElements);
+    const inputElement: Assign = {
+      id: "-1",
+      key: "input",
+      value: "${incoming.body.input}",
+    };
+    setAssignedVariables([...assignElements, inputElement]);
   }, [endpointsVariables]);
 
   const popupBodyCss: CSSProperties = {
