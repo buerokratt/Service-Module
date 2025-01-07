@@ -17,6 +17,7 @@ import { GroupOrRule } from "components/FlowElementsPopup/RuleBuilder/types";
 import useTestServiceStore from "./test-services.store";
 import { Chip } from "types/chip";
 import { endpointResponseVariables } from "types/endpoint/endpoint-response-variables";
+import { AssignGroup } from "components/FlowElementsPopup/AssignBuilder/assign-types";
 
 interface ServiceStoreState {
   endpoints: EndpointData[];
@@ -28,10 +29,12 @@ interface ServiceStoreState {
   nodes: Node[];
   isNewService: boolean;
   serviceState: ServiceState;
+  assignElements: AssignGroup[];
   rules: GroupOrRule[];
   isYesNoQuestion: boolean;
   endpointsResponseVariables: endpointResponseVariables[];
   setIsYesNoQuestion: (value: boolean) => void;
+  changeAssignNode: (assign: AssignGroup[]) => void;
   changeRulesNode: (rules: GroupOrRule[]) => void;
   markAsNewService: () => void;
   unmarkAsNewService: () => void;
@@ -69,6 +72,7 @@ interface ServiceStoreState {
   updateEndpointRawData: (rawData: RequestVariablesTabsRawData, endpointDataId?: string, parentEndpointId?: string) => void;
   updateEndpointData: (data: RequestVariablesTabsRowsData, endpointDataId?: string, parentEndpointId?: string) => void;
   resetState: () => void;
+  resetAssign: () => void;
   resetRules: () => void;
   onContinueClick: (navigate: NavigateFunction) => Promise<void>;
   selectedNode: Node<NodeDataProps> | null;
@@ -103,10 +107,12 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
   serviceState: ServiceState.Draft,
   isTestButtonVisible: false,
   isTestButtonEnabled: true,
+  assignElements: [],
   rules: [],
   isYesNoQuestion: false,
   endpointsResponseVariables: [],
   setIsYesNoQuestion: (value: boolean) => set({ isYesNoQuestion: value }),
+  changeAssignNode: (assign) => set({ assignElements: assign }),
   changeRulesNode: (rules) => set({ rules }),
   disableTestButton: () =>
     set({
@@ -261,6 +267,7 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
     });
     useTestServiceStore.getState().reset();
   },
+  resetAssign: () => set({ assignElements: [] }),
   resetRules: () => set({ rules: [], isYesNoQuestion: false }),
   loadService: async (id) => {
     get().resetState();

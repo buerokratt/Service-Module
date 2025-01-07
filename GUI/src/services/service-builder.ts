@@ -520,6 +520,15 @@ export const saveFlow = async ({
     });
 
     const finishedFlow = new Map();
+
+    finishedFlow.set("prepare", {
+      assign: {
+        chatId: "${incoming.body.chatId}",
+        authorId: "${incoming.body.authorId}",
+      },
+      next: "get_secrets",
+    });
+
     finishedFlow.set("get_secrets", {
       call: "http.get",
       args: {

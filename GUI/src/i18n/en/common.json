@@ -241,6 +241,7 @@
       "taraAuthentication": "Tara authorization",
       "textfield": "Send message to client",
       "clientInput": "Client input",
+      "assign": "Assign",
       "condition": "Condition",
       "openNewWebpage": "Open new webpage",
       "fileGeneration": "File generation",

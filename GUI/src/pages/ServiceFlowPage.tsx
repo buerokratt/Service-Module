@@ -22,11 +22,12 @@ const ServiceFlowPage: FC = () => {
       { id: 10, label: t("serviceFlow.element.taraAuthentication"), type: StepType.Auth },
       { id: 20, label: t("serviceFlow.element.textfield"), type: StepType.Textfield },
       { id: 30, label: t("serviceFlow.element.clientInput"), type: StepType.Input },
-      { id: 40, label: t("serviceFlow.element.condition"), type: StepType.Condition },
-      { id: 50, label: t("serviceFlow.element.rasaRules"), type: StepType.RasaRules },
-      { id: 60, label: t("serviceFlow.element.openNewWebpage"), type: StepType.OpenWebpage },
-      { id: 70, label: t("serviceFlow.element.fileGeneration"), type: StepType.FileGenerate },
-      { id: 80, label: t("serviceFlow.element.fileSigning"), type: StepType.FileSign },
+      { id: 40, label: t("serviceFlow.element.assign"), type: StepType.Assign },
+      { id: 50, label: t("serviceFlow.element.condition"), type: StepType.Condition },
+      { id: 60, label: t("serviceFlow.element.rasaRules"), type: StepType.RasaRules },
+      { id: 70, label: t("serviceFlow.element.openNewWebpage"), type: StepType.OpenWebpage },
+      { id: 80, label: t("serviceFlow.element.fileGeneration"), type: StepType.FileGenerate },
+      { id: 90, label: t("serviceFlow.element.fileSigning"), type: StepType.FileSign },
       { id: 100, label: t("serviceFlow.element.conversationEnd"), type: StepType.FinishingStepEnd },
       { id: 110, label: t("serviceFlow.element.redirectConversationToSupport"), type: StepType.FinishingStepRedirect },
     ],
@@ -53,7 +54,6 @@ const ServiceFlowPage: FC = () => {
   const nodes = useServiceStore((state) => state.nodes);
 
   const setNodes = useServiceStore((state) => state.setNodes);
-  const availableVariables = useServiceStore((state) => state.availableVariables);
 
   const onDragStart = (event: React.DragEvent<HTMLDivElement>, step: Step) => {
     event.dataTransfer.setData("application/reactflow-label", step.label);
@@ -68,8 +68,6 @@ const ServiceFlowPage: FC = () => {
     <>
       <NewServiceHeader
         activeStep={3}
-        availableVariables={availableVariables}
-        serviceDescription={description}
         saveDraftOnClick={saveFlowClick}
         continueOnClick={() => navigate(ROUTES.OVERVIEW_ROUTE)}
       />
