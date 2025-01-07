@@ -1,4 +1,5 @@
 import axios from "axios";
+import { Assign } from "components/FlowElementsPopup/AssignBuilder/assign-types";
 import { Group, Rule } from "components/FlowElementsPopup/RuleBuilder/types";
 import i18next from 'i18next';
 import { Edge, Node } from "reactflow";
@@ -433,6 +434,13 @@ const hasInvalidRules = (elements: any[]): boolean => {
   });
 };
 
+const hasInvalidElements = (elements: any[]): boolean => {
+  return elements.some((e) => {
+    const element = e as Assign;
+    return element.key === "" || element.value === "";
+  });
+};
+
 const buildConditionString = (group: any): string => {
   if ("children" in group) {
     const subgroup = group as Group;
@@ -549,6 +557,23 @@ export const saveFlow = async ({
 
         const childNode = nodes.find((node) => node.id === childNodeId);
         const parentStepName = `${parentNode.data.stepType}-${parentNodeId}`;
+
+        if (parentNode.data.stepType === StepType.Assign) {
+          const invalidElementsExist = hasInvalidElements(parentNode.data.assignElements || []);
+          const isInvalid = parentNode.data?.assignElements === undefined || invalidElementsExist || parentNode.data?.assignElements.length === 0;
+          if (isInvalid) {
+            throw new Error(i18next.t("toast.missing-assign-elements") ?? "Error");
+          }
+
+          finishedFlow.set(parentStepName, {
+            assign: parentNode.data.assignElements.reduce((acc: any, e: any) => {
+              acc[e.key] = e.value;
+              return acc;
+            }, {}),
+            next: childNode ? `${childNode.data.stepType}-${childNodeId}` : childNodeId,
+          });
+          return;
+        }
 
         if (parentNode.data.stepType === StepType.Condition) {
           const conditionRelations: string[] = allRelations.filter((r) => r.startsWith(parentNodeId));

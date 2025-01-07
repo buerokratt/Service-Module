@@ -19,8 +19,6 @@ const AssignBuilder: React.FC<ElementGroupBuilderProps> = ({ assignElements, onR
     onChange,
     seedGroup,
    });
-
-   console.log('elements = ', elements);
   
   return (
     <Track gap={16} direction="vertical" align="stretch" className="assign-action-container">

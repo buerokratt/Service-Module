@@ -3,25 +3,37 @@ import Track from "../Track";
 import useServiceStore from "store/new-services.store";
 import { endpointResponseVariables } from "types/endpoint/endpoint-response-variables";
 import OutputElementBox from "components/OutputElementBox";
+import { StepType } from "types";
+import { Assign } from "./AssignBuilder/assign-types";
+import { useTranslation } from "react-i18next";
 
 type PreviousVariablesProps = {
   readonly nodeId: string;
 };
 
 const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
+  const { t } = useTranslation();
   let endpointsVariables = useServiceStore((state) => state.endpointsResponseVariables);
   const nodes = useServiceStore((state) => state.nodes);
   const [endpoints, setEndpoints] = useState<endpointResponseVariables[]>([]);
+  const [assignedVariables, setAssignedVariables] = useState<Assign[]>([]);
 
   useEffect(() => {
     const previousNodes = nodes.slice(
       0,
       nodes.findIndex((node) => node.id === nodeId)
     );
-    const endpointNodes = previousNodes.filter((node) => node.data.stepType === "user-defined");
+
+    // Get Endpoints variables
+    const endpointNodes = previousNodes.filter((node) => node.data.stepType === StepType.UserDefined);
     const names = endpointNodes.map((node) => node.data.label);
     endpointsVariables = endpointsVariables.filter((endpoint) => names.includes(endpoint.name));
     setEndpoints(endpointsVariables);
+
+    // Get Assign variables
+    const assignNodes = previousNodes.filter((node) => node.data.stepType === StepType.Assign);
+    const assignElements = assignNodes.map((node) => node.data.assignElements).flat();
+    setAssignedVariables(assignElements);
   }, [endpointsVariables]);
 
   const popupBodyCss: CSSProperties = {
@@ -31,8 +43,38 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
 
   return (
     <Track direction="vertical" align="stretch">
+      {assignedVariables.length > 0 && (
+        <Track direction="vertical" align="left" style={{ width: "100%", ...popupBodyCss, backgroundColor: "#F9F9F9" }}>
+          <label
+            htmlFor="json"
+            style={{ marginBottom: "10px", textTransform: "capitalize", cursor: "auto" }}
+          >{t('serviceFlow.previousVariables.assignElements')}</label>
+          <Track
+            direction="horizontal"
+            gap={4}
+            justify="start"
+            isMultiline
+            style={{ maxHeight: "30vh", overflow: "auto" }}
+          >
+            {assignedVariables.map((assign) => (
+              <OutputElementBox
+                key={assign.id}
+                text={assign.key}
+                draggable={true}
+                value={`\${${assign.key}}`}
+                useValue
+              ></OutputElementBox>
+            ))}
+          </Track>
+        </Track>
+      )}
       {endpoints.map((endpoint) => (
-        <Track key={endpoint.name} direction="vertical" align="left" style={{ width: "100%", ...popupBodyCss, backgroundColor: "#F9F9F9" }}>
+        <Track
+          key={endpoint.name}
+          direction="vertical"
+          align="left"
+          style={{ width: "100%", ...popupBodyCss, backgroundColor: "#F9F9F9" }}
+        >
           <label
             htmlFor="json"
             style={{ marginBottom: "10px", textTransform: "capitalize", cursor: "auto" }}

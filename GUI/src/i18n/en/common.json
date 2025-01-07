@@ -286,6 +286,9 @@
       "remove": "Remove",
       "signType": "Sign Type"
     },
+    "previousVariables": {
+      "assignElements": "Assign Elements"
+    },
     "flow": "Service flow",
     "placeholderNode": "Drag the next step into the flow",
     "placeholderNodeSuccess": "Drag the success step into the flow",
@@ -321,7 +324,8 @@
     "missing-website": "Please enter website title and link",
     "missing-file-generation": "Please enter file name and content",
     "missing-client_input-rules": "Please enter client input rules",
-    "missing-condition-rules": "Please enter condition rules"
+    "missing-condition-rules": "Please enter condition rules",
+    "missing-assign-elements": "Please enter assign elements"
   },
   "roles": {
     "ROLE_ADMINISTRATOR": "Administrator",

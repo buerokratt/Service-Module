@@ -9,11 +9,12 @@ type AssignContentProps = {
 };
 
 const AssignContent: FC<AssignContentProps> = ({ nodeId }) => {
-  const assignElements = useServiceStore((state) => state.assignElements);
+  const nodes = useServiceStore((state) => state.nodes);
+  const currentNodeElements = nodes.find((node) => node.id === nodeId)?.data?.assignElements ?? [];
 
   return (
     <Track direction="vertical" align="stretch">
-      <AssignBuilder onChange={useServiceStore.getState().changeAssignNode} seedGroup={assignElements} />
+      <AssignBuilder onChange={useServiceStore.getState().changeAssignNode} seedGroup={currentNodeElements} />
       <PreviousVariables nodeId={nodeId} />
     </Track>
   );

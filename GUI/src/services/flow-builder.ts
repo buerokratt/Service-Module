@@ -391,14 +391,9 @@ export const onDrop = (
       return newEdges;
     });
 
+    const nodeLabel = getNodeLabel(type, prevNodes, label);
+
     // Add new node in place of old placeholder
-    const prevClientInputs = prevNodes.filter((node) => node.data.stepType === StepType.Input);
-    const newClientInputId = (prevClientInputs[prevClientInputs.length - 1]?.data.clientInputId ?? 0) + 1;
-
-    const prevClientConditions = prevNodes.filter((node) => node.data.stepType === StepType.Condition);
-    const newConditionId = (prevClientConditions[prevClientConditions.length - 1]?.data.conditionId ?? 0) + 1;
-    const isConditionLabel = type === StepType.Condition ? `${label} - ${newConditionId}` : label;
-
     const newNodes = [
       ...prevNodes.filter((node) => node.id !== matchingPlaceholder.id),
       {
@@ -406,13 +401,14 @@ export const onDrop = (
         position: matchingPlaceholder.position,
         type: "customNode",
         data: {
-          label: type === StepType.Input ? `${label} - ${newClientInputId}` : isConditionLabel,
+          label: nodeLabel,
           onDelete: useServiceStore.getState().onDelete,
           onEdit: useServiceStore.getState().handleNodeEdit,
           type: [StepType.FinishingStepEnd, StepType.FinishingStepRedirect].includes(type) ? "finishing-step" : "step",
           stepType: type,
-          clientInputId: type === StepType.Input ? newClientInputId : undefined,
-          conditionId: type === StepType.Condition ? newConditionId : undefined,
+          clientInputId: type === StepType.Input ? parseInt(nodeLabel.split("-")[1].trim()) : undefined,
+          conditionId: type === StepType.Condition ? parseInt(nodeLabel.split("-")[1].trim()) : undefined,
+          assignId: type === StepType.Assign ? parseInt(nodeLabel.split("-")[1].trim()) : undefined,
           readonly: [
             StepType.Auth,
             StepType.FinishingStepEnd,
@@ -542,3 +538,18 @@ export const onFlowNodeDragStop = (
   });
   startDragNode.current = undefined;
 }
+function getNodeLabel(type: StepType, nodes: Node[], label: string) {
+  const prevNodes = nodes.filter((node) => node.data.stepType === type);
+  const lastNode = prevNodes[prevNodes.length - 1]?.data;
+  switch (type) {
+    case StepType.Input:
+      return `${label} - ${(lastNode?.clientInputId ?? 0) + 1}`;
+    case StepType.Condition:
+      return `${label} - ${(lastNode?.conditionId ?? 0) + 1}`;
+    case StepType.Assign:
+      return `${label} - ${(lastNode?.assignId ?? 0) + 1}`;
+    default:
+      return label;
+  }
+}
+
