@@ -14,6 +14,7 @@ import useServiceStore from "store/new-services.store";
 import useToastStore from "store/toasts.store";
 import { RawData, Step, StepType } from "types";
 import { EndpointData, EndpointEnv, EndpointType, EndpointVariableData } from "types/endpoint";
+import { NodeHtmlMarkdown } from "node-html-markdown";
 
 // refactor this file later
 
@@ -534,6 +535,9 @@ export const saveFlow = async ({
         chatId: "${incoming.body.chatId}",
         authorId: "${incoming.body.authorId}",
         input: "${incoming.body.input}",
+        res: {
+          "result": ""
+        }
       },
       next: "get_secrets",
     });
@@ -558,6 +562,22 @@ export const saveFlow = async ({
 
         const childNode = nodes.find((node) => node.id === childNodeId);
         const parentStepName = `${parentNode.data.stepType}-${parentNodeId}`;
+
+        
+        if (parentNode.data.stepType === StepType.Textfield) {
+          const htmlToMarkdown = new NodeHtmlMarkdown({textReplace: [[/\\_/g, "_"], [/\\\[/g, "["], [/\\\]/g, "]"]]});
+
+          finishedFlow.set(parentStepName, {
+            assign: {
+              res: {
+                result: `${htmlToMarkdown.translate(parentNode.data.message?.replace("{{", "${").replace("}}", "}"))}`,
+              },
+            },
+            next: childNode ? `${childNode.data.stepType}-${childNodeId}` : childNodeId,
+          });
+
+          return;
+        }
 
         if (parentNode.data.stepType === StepType.Assign) {
           const invalidElementsExist = hasInvalidElements(parentNode.data.assignElements || []);
@@ -674,9 +694,32 @@ export const saveFlow = async ({
       });
       return;
     }
+
+    finishedFlow.set("formatMessages", {
+      call: "http.post",
+      args: {
+        url: `${import.meta.env.REACT_APP_SERVICE_DMAPPER}/hbs/services/bot_responses_to_messages`,
+        headers: {
+          type: "json",
+        },
+        body: {
+          data: {
+            botMessages: "${[res]}",
+            chatId: "${chatId}",
+            authorId: "${authorId}",
+            authorFirstName: "",
+            authorLastName: "",
+            authorTimestamp: "${new Date().toISOString()}",
+            created: "${new Date().toISOString()}",
+          },
+        },
+      },
+      result: "formatMessage",
+      next: "service-end",
+    });
+
     finishedFlow.set("service-end", {
-      wrapper: false,
-      return: "",
+      return: "${formatMessage.response.body ?? ''}",
     });
 
     const result = Object.fromEntries(finishedFlow.entries());
@@ -782,7 +825,7 @@ const getTemplate = (steps: Step[], node: Node, stepName: string, nextStep?: str
   if (node.data.stepType === StepType.UserDefined) {
     return {
       ...getDefinedEndpointStep(steps, node),
-      next: nextStep ?? "service-end",
+      next: nextStep ?? "formatMessages",
     };
   }
   return {
@@ -790,7 +833,7 @@ const getTemplate = (steps: Step[], node: Node, stepName: string, nextStep?: str
     requestType: "templates",
     body: data?.body,
     result: data?.resultName ?? `${stepName}_result`,
-    next: nextStep ?? "service-end",
+    next: nextStep ?? "formatMessages",
   };
 };
 
@@ -799,14 +842,6 @@ const getTemplateDataFromNode = (node: Node): { templateName: string; body?: any
     return {
       templateName: "tara",
       resultName: "TARA",
-    };
-  }
-  if (node.data.stepType === StepType.Textfield) {
-    return {
-      templateName: "send-message-to-client",
-      body: {
-        message: `${node.data.message?.replace("{{", "${").replace("}}", "}")}`,
-      },
     };
   }
   if (node.data.stepType === StepType.Input) {

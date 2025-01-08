@@ -141,6 +141,7 @@ services:
       - REACT_APP_SERVICES_BASE_URL=http://localhost:8080/services
       - REACT_APP_SETTINGS_BASE_URL=http://localhost:8080/settings
       - REACT_APP_MONITORING_BASE_URL=http://localhost:8080/monitoring
+      - REACT_APP_SERVICE_DMAPPER=http://data-mapper:3005
       - REACT_APP_SERVICE_ID=services
       - REACT_APP_ENABLE_HIDDEN_FEATURES=TRUE
       - REACT_APP_RUUTER_SERVICES_GET_PATH=/Ruuter/GET/services
