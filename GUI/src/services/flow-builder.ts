@@ -351,21 +351,23 @@ export const onDrop = (
   if (!connectedNodeEdge) return;
 
   useServiceStore.getState().setNodes((prevNodes) => {
-    const newNodeId = matchingPlaceholder.id;
-    const newPlaceholderId = Math.max(...useServiceStore.getState().nodes.map((node) => +node.id)) + 1;
+    const newNodeId = `${Math.max(...useServiceStore.getState().nodes.map((node) => +node.id)) + 1}`;
+    const newPlaceholderId = Math.max(...useServiceStore.getState().nodes.map((node) => +node.id)) + 2;
+
     useServiceStore.getState().setEdges((prevEdges) => {
       // Point edge from previous node to new node
-      const newEdges = [
-        ...prevEdges.filter((edge) => edge.target !== matchingPlaceholder.id),
-        buildEdge({
-          id: connectedNodeEdge.id!,
-          source: connectedNodeEdge.source,
-          sourceHandle: connectedNodeEdge.sourceHandle,
-          target: newNodeId,
-        }),
-      ];
+      const newEdges = [...prevEdges];
 
       if (![StepType.FinishingStepEnd, StepType.FinishingStepRedirect].includes(type)) {
+        // Point edge from matching placeholder to new node
+        newEdges.push(
+          buildEdge({
+            id: `edge-${matchingPlaceholder.id}-${newNodeId + 1}`,
+            source: matchingPlaceholder.id,
+            sourceHandle: connectedNodeEdge.sourceHandle,
+            target: newNodeId,
+          })
+        );
         // Point edge from new node to new placeholder
         newEdges.push(
           buildEdge({
@@ -393,12 +395,17 @@ export const onDrop = (
 
     const nodeLabel = getNodeLabel(type, prevNodes, label);
 
+    const matchingPlaceholderIndex = prevNodes.findIndex((node) => node.id === matchingPlaceholder.id);
+
     // Add new node in place of old placeholder
     const newNodes = [
-      ...prevNodes.filter((node) => node.id !== matchingPlaceholder.id),
+      ...prevNodes.slice(0, matchingPlaceholderIndex + 1),
       {
         id: `${newNodeId}`,
-        position: matchingPlaceholder.position,
+        position: {
+          y: matchingPlaceholder.position.y + EDGE_LENGTH,
+          x: matchingPlaceholder.position.x,
+        },
         type: "customNode",
         data: {
           label: nodeLabel,
@@ -424,6 +431,7 @@ export const onDrop = (
           ? "finishing-step"
           : "step",
       },
+      ...prevNodes.slice(matchingPlaceholderIndex + 1),
     ];
 
     if (![StepType.Input, StepType.Condition, StepType.FinishingStepEnd, StepType.FinishingStepRedirect].includes(type)) {
