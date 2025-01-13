@@ -1,4 +1,5 @@
 import axios from "axios";
+import { Assign } from "components/FlowElementsPopup/AssignBuilder/assign-types";
 import { Group, Rule } from "components/FlowElementsPopup/RuleBuilder/types";
 import i18next from 'i18next';
 import { Edge, Node } from "reactflow";
@@ -13,6 +14,7 @@ import useServiceStore from "store/new-services.store";
 import useToastStore from "store/toasts.store";
 import { RawData, Step, StepType } from "types";
 import { EndpointData, EndpointEnv, EndpointType, EndpointVariableData } from "types/endpoint";
+import { NodeHtmlMarkdown } from "node-html-markdown";
 
 // refactor this file later
 
@@ -433,6 +435,13 @@ const hasInvalidRules = (elements: any[]): boolean => {
   });
 };
 
+const hasInvalidElements = (elements: any[]): boolean => {
+  return elements.some((e) => {
+    const element = e as Assign;
+    return element.key === "" || element.value === "";
+  });
+};
+
 const buildConditionString = (group: any): string => {
   if ("children" in group) {
     const subgroup = group as Group;
@@ -520,6 +529,19 @@ export const saveFlow = async ({
     });
 
     const finishedFlow = new Map();
+
+    finishedFlow.set("prepare", {
+      assign: {
+        chatId: "${incoming.body.chatId}",
+        authorId: "${incoming.body.authorId}",
+        input: "${incoming.body.input}",
+        res: {
+          "result": ""
+        }
+      },
+      next: "get_secrets",
+    });
+
     finishedFlow.set("get_secrets", {
       call: "http.get",
       args: {
@@ -540,6 +562,39 @@ export const saveFlow = async ({
 
         const childNode = nodes.find((node) => node.id === childNodeId);
         const parentStepName = `${parentNode.data.stepType}-${parentNodeId}`;
+
+        
+        if (parentNode.data.stepType === StepType.Textfield) {
+          const htmlToMarkdown = new NodeHtmlMarkdown({textReplace: [[/\\_/g, "_"], [/\\\[/g, "["], [/\\\]/g, "]"]]});
+
+          finishedFlow.set(parentStepName, {
+            assign: {
+              res: {
+                result: `${htmlToMarkdown.translate(parentNode.data.message?.replace("{{", "${").replace("}}", "}"))}`,
+              },
+            },
+            next: childNode ? `${childNode.data.stepType}-${childNodeId}` : childNodeId,
+          });
+
+          return;
+        }
+
+        if (parentNode.data.stepType === StepType.Assign) {
+          const invalidElementsExist = hasInvalidElements(parentNode.data.assignElements || []);
+          const isInvalid = parentNode.data?.assignElements === undefined || invalidElementsExist || parentNode.data?.assignElements.length === 0;
+          if (isInvalid) {
+            throw new Error(i18next.t("toast.missing-assign-elements") ?? "Error");
+          }
+
+          finishedFlow.set(parentStepName, {
+            assign: parentNode.data.assignElements.reduce((acc: any, e: any) => {
+              acc[e.key] = e.value;
+              return acc;
+            }, {}),
+            next: childNode ? `${childNode.data.stepType}-${childNodeId}` : childNodeId,
+          });
+          return;
+        }
 
         if (parentNode.data.stepType === StepType.Condition) {
           const conditionRelations: string[] = allRelations.filter((r) => r.startsWith(parentNodeId));
@@ -639,9 +694,32 @@ export const saveFlow = async ({
       });
       return;
     }
+
+    finishedFlow.set("formatMessages", {
+      call: "http.post",
+      args: {
+        url: `${import.meta.env.REACT_APP_SERVICE_DMAPPER}/hbs/services/bot_responses_to_messages`,
+        headers: {
+          type: "json",
+        },
+        body: {
+          data: {
+            botMessages: "${[res]}",
+            chatId: "${chatId}",
+            authorId: "${authorId}",
+            authorFirstName: "",
+            authorLastName: "",
+            authorTimestamp: "${new Date().toISOString()}",
+            created: "${new Date().toISOString()}",
+          },
+        },
+      },
+      result: "formatMessage",
+      next: "service-end",
+    });
+
     finishedFlow.set("service-end", {
-      wrapper: false,
-      return: "",
+      return: "${formatMessage.response.body ?? ''}",
     });
 
     const result = Object.fromEntries(finishedFlow.entries());
@@ -747,7 +825,7 @@ const getTemplate = (steps: Step[], node: Node, stepName: string, nextStep?: str
   if (node.data.stepType === StepType.UserDefined) {
     return {
       ...getDefinedEndpointStep(steps, node),
-      next: nextStep ?? "service-end",
+      next: nextStep ?? "formatMessages",
     };
   }
   return {
@@ -755,7 +833,7 @@ const getTemplate = (steps: Step[], node: Node, stepName: string, nextStep?: str
     requestType: "templates",
     body: data?.body,
     result: data?.resultName ?? `${stepName}_result`,
-    next: nextStep ?? "service-end",
+    next: nextStep ?? "formatMessages",
   };
 };
 
@@ -764,14 +842,6 @@ const getTemplateDataFromNode = (node: Node): { templateName: string; body?: any
     return {
       templateName: "tara",
       resultName: "TARA",
-    };
-  }
-  if (node.data.stepType === StepType.Textfield) {
-    return {
-      templateName: "send-message-to-client",
-      body: {
-        message: `${node.data.message?.replace("{{", "${").replace("}}", "}")}`,
-      },
     };
   }
   if (node.data.stepType === StepType.Input) {
