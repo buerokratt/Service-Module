@@ -351,7 +351,7 @@ export const onDrop = (
   if (!connectedNodeEdge) return;
 
   useServiceStore.getState().setNodes((prevNodes) => {
-    const newNodeId = `${Math.max(...useServiceStore.getState().nodes.map((node) => +node.id)) + 1}`;
+    const newNodeId = prevNodes.length > 2 ? `${Math.max(...useServiceStore.getState().nodes.map((node) => +node.id)) + 1}` : matchingPlaceholder.id;
     const newPlaceholderId = Math.max(...useServiceStore.getState().nodes.map((node) => +node.id)) + 2;
 
     useServiceStore.getState().setEdges((prevEdges) => {
@@ -360,14 +360,16 @@ export const onDrop = (
 
       if (![StepType.FinishingStepEnd, StepType.FinishingStepRedirect].includes(type)) {
         // Point edge from matching placeholder to new node
-        newEdges.push(
-          buildEdge({
-            id: `edge-${matchingPlaceholder.id}-${newNodeId + 1}`,
-            source: matchingPlaceholder.id,
-            sourceHandle: connectedNodeEdge.sourceHandle,
-            target: newNodeId,
-          })
-        );
+        if (prevNodes.length > 2) {
+          newEdges.push(
+            buildEdge({
+              id: `edge-${matchingPlaceholder.id}-${newNodeId + 1}`,
+              source: matchingPlaceholder.id,
+              sourceHandle: `handle-${matchingPlaceholder.id}-${newNodeId}`,
+              target: newNodeId,
+            })
+          );
+        }
         // Point edge from new node to new placeholder
         newEdges.push(
           buildEdge({
@@ -402,10 +404,10 @@ export const onDrop = (
       ...prevNodes.slice(0, matchingPlaceholderIndex + 1),
       {
         id: `${newNodeId}`,
-        position: {
+        position: prevNodes.length > 2 ? {
           y: matchingPlaceholder.position.y + EDGE_LENGTH,
           x: matchingPlaceholder.position.x,
-        },
+        } : matchingPlaceholder.position,
         type: "customNode",
         data: {
           label: nodeLabel,
