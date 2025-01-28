@@ -128,6 +128,7 @@ services:
       - REACT_APP_MENU_URL=https://admin.dev.buerokratt.ee
       - REACT_APP_RUUTER_V2_SERVICE_API_URL=http://localhost:8086
       - REACT_APP_AUTH_BASE_URL=http://localhost:8086
+      - REACT_APP_NOTIFICATION_NODE_URL=http://localhost:4040
       - REACT_APP_AUTH_PATH=/auth
       - REACT_APP_MENU_PATH=/chat/menu.json
       - REACT_APP_API_PATH=/
