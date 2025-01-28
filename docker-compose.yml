@@ -169,6 +169,7 @@ services:
       - tim-postgresql
     environment:
       - SECURITY_ALLOWLIST_JWT=ruuter,resql,resql_users,tim,tim-postgresql,node_server,data_mapper,gui_dev,127.0.0.1,::1
+      - JWT_INTEGRATION_SIGNATURE_KEY_STORE_PASSWORD=defaultpassword
     ports:
       - 8085:8085
     networks:
