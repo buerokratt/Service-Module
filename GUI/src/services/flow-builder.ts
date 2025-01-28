@@ -357,6 +357,7 @@ export const onDrop = (
     useServiceStore.getState().setEdges((prevEdges) => {
       // Point edge from previous node to new node
       const newEdges = [...prevEdges];
+      let matchingPlaceholderNextNodeId = undefined;
 
       if (![StepType.FinishingStepEnd, StepType.FinishingStepRedirect].includes(type)) {
         // Point edge from matching placeholder to new node
@@ -369,6 +370,16 @@ export const onDrop = (
               target: newNodeId,
             })
           );
+
+          // Check if the new node is added in between two nodes
+          const previousEdgesOfMatchingPlaceholder = newEdges.filter((edge) => edge.source === matchingPlaceholder.id).length;
+          if (previousEdgesOfMatchingPlaceholder > 1) {
+            matchingPlaceholderNextNodeId = newEdges.find((edge) => edge.source === matchingPlaceholder.id)?.target;
+            newEdges.splice(
+              newEdges.findIndex((edge) => edge.source === matchingPlaceholder.id),
+              1
+            );
+          }
         }
         // Point edge from new node to new placeholder
         newEdges.push(
@@ -379,6 +390,18 @@ export const onDrop = (
             target: `${newPlaceholderId + 1}`,
           })
         );
+
+        // In-case there is a node after the matching placeholder, point edge from new placeholder to that node
+        if (matchingPlaceholderNextNodeId) {
+          newEdges.push(
+            buildEdge({
+              id: `edge-${newPlaceholderId + 1}-${matchingPlaceholderNextNodeId}`,
+              source: `${newPlaceholderId + 1}`,
+              sourceHandle: `handle-${newNodeId}-0`,
+              target: matchingPlaceholderNextNodeId,
+            })
+          );
+        }
       }
 
       if(StepType.Input === type || StepType.Condition === type) {
@@ -400,14 +423,22 @@ export const onDrop = (
     const matchingPlaceholderIndex = prevNodes.findIndex((node) => node.id === matchingPlaceholder.id);
 
     // Add new node in place of old placeholder
+    const previousNodes = [...prevNodes.slice(0, matchingPlaceholderIndex + 1)];
+    const nextNodes = [...prevNodes.slice(matchingPlaceholderIndex + 1)];
+    nextNodes.forEach((node) => {
+      node.position.y += EDGE_LENGTH * 1.5;
+    });
     const newNodes = [
-      ...prevNodes.slice(0, matchingPlaceholderIndex + 1),
+      ...previousNodes,
       {
         id: `${newNodeId}`,
-        position: prevNodes.length > 2 ? {
-          y: matchingPlaceholder.position.y + EDGE_LENGTH,
-          x: matchingPlaceholder.position.x,
-        } : matchingPlaceholder.position,
+        position:
+          prevNodes.length > 2
+            ? {
+                y: matchingPlaceholder.position.y + EDGE_LENGTH,
+                x: matchingPlaceholder.position.x,
+              }
+            : matchingPlaceholder.position,
         type: "customNode",
         data: {
           label: nodeLabel,
@@ -433,7 +464,7 @@ export const onDrop = (
           ? "finishing-step"
           : "step",
       },
-      ...prevNodes.slice(matchingPlaceholderIndex + 1),
+      ...nextNodes,
     ];
 
     if (![StepType.Input, StepType.Condition, StepType.FinishingStepEnd, StepType.FinishingStepRedirect].includes(type)) {
@@ -442,6 +473,10 @@ export const onDrop = (
         buildPlaceholder({
           id: `${newPlaceholderId + 1}`,
           matchingPlaceholder,
+          position: {
+            y: matchingPlaceholder.position.y + EDGE_LENGTH * 1.5,
+            x: matchingPlaceholder.position.x,
+          },
         })
       );
     }
@@ -452,7 +487,7 @@ export const onDrop = (
           id: `${newPlaceholderId + 1}`,
           label: 'serviceFlow.placeholderNodeSuccess',
           position: {
-            y: matchingPlaceholder.position.y + EDGE_LENGTH,
+            y: matchingPlaceholder.position.y + EDGE_LENGTH * 1.5,
             x: matchingPlaceholder.position.x - (matchingPlaceholder.width ?? 0) * 0.75,
           },
         })
@@ -463,7 +498,7 @@ export const onDrop = (
           id: `${newPlaceholderId + 2}`,
           label: 'serviceFlow.placeholderNodeFailure',
           position: {
-            y: matchingPlaceholder.position.y + EDGE_LENGTH,
+            y: matchingPlaceholder.position.y + EDGE_LENGTH * 1.5,
             x: matchingPlaceholder.position.x + (matchingPlaceholder.width ?? 0) * 0.75,
           },
         })
