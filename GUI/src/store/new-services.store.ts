@@ -3,7 +3,13 @@ import { create } from "zustand";
 import { v4 as uuid } from "uuid";
 import { Edge, EdgeChange, Node, NodeChange, ReactFlowInstance, applyEdgeChanges, applyNodeChanges } from "reactflow";
 import { EndpointData, EndpointEnv, EndpointTab, PreDefinedEndpointEnvVariables } from "types/endpoint";
-import { getEndpointValidation, getSecretVariables, getServiceById, getTaraAuthResponseVariables, servicesRequestsExplain } from "resources/api-constants";
+import {
+  getEndpointValidation,
+  getSecretVariables,
+  getServiceById,
+  getTaraAuthResponseVariables,
+  servicesRequestsExplain,
+} from "resources/api-constants";
 import { Service, ServiceState, Step, StepType } from "types";
 import { RequestVariablesTabsRawData, RequestVariablesTabsRowsData } from "types/request-variables";
 import useToastStore from "./toasts.store";
@@ -525,7 +531,18 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
       .getEdges()
       .filter((edge) => edge.source === id)
       .map((x) => x.target);
-    let children = reactFlowInstance.getNodes().filter((node) => edgeFromDeletedNode.includes(node.id));
+
+    const edgeFromNextNode = reactFlowInstance
+      .getEdges()
+      .filter((edge) => edge.source === edgeFromDeletedNode[0])
+      .map((x) => x.target);
+
+    let children: Node<any>[] = [];
+    if (edgeFromNextNode.length > 0) {
+      children = reactFlowInstance.getNodes().filter((node) => edgeFromNextNode.includes(node.id));
+    } else {
+      children = reactFlowInstance.getNodes().filter((node) => edgeFromDeletedNode.includes(node.id));
+    }
 
     let nodes = get().nodes.filter((x) => x.id !== id);
 
@@ -554,6 +571,20 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
       .map((x) => (x.target === id && child ? { ...x, target: child.id } : x));
 
     nodes = nodes.filter((x) => edges.find((y) => y.target === x.id || y.source === x.id));
+
+    if (edgeFromNextNode.length > 0) {
+      nodes = nodes.filter((x) => x.id !== edgeFromDeletedNode[0]);
+      if (edgeFromNextNode.length === 2) {
+        nodes = nodes.filter((x) => x.id !== edgeFromDeletedNode[1]);
+      }
+    }
+
+    if (edgeFromDeletedNode.length > 0 && get().nodes.length > 4) {
+      nodes = nodes.filter((x) => x.id !== edgeFromDeletedNode[0]);
+      if (edgeFromDeletedNode.length === 2) {
+        nodes = nodes.filter((x) => x.id !== edgeFromDeletedNode[1]);
+      }
+    }
 
     set({ edges, nodes });
   },
