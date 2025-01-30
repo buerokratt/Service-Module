@@ -333,6 +333,14 @@ export const onDrop = (
     event.dataTransfer.getData("application/reactflow-type") as StepType,
     event.dataTransfer.getData("application/reactflow-originalDefinedNodeId"),
   ];
+  
+  if (type === StepType.FinishingStepEnd || type === StepType.FinishingStepRedirect) {
+    const currentNodeStepTypes = reactFlowInstance.getNodes().map((node) => node.data.stepType);
+    if (currentNodeStepTypes.includes(type)) {
+      return;
+    }
+  }
+
   const position = reactFlowInstance.screenToFlowPosition({
     x: event.clientX,
     y: event.clientY,
