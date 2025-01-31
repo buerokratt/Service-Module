@@ -111,6 +111,7 @@
       "popupNotifications": "Pop-up märguanded",
       "newUnansweredChat": "Uus vastamata vestlus",
       "newForwardedChat": "Uus suunatud vestlus",
+      "newValidationMessage": "Uus teade kinnitamiseks",
       "useAutocorrect": "Teksti autokorrektor",
       "required": "Nõutud",
       "invalidemail": "Kehtetu e-posti aadress"
@@ -240,6 +241,8 @@
       "taraAuthentication": "TARA autentimine",
       "textfield": "Sõnum kliendile",
       "clientInput": "Kliendi sisend",
+      "assign": "Suunamine",
+      "condition": "Tingimus",
       "openNewWebpage": "Uue veebilehe avamine",
       "fileGeneration": "Faili genereerimine",
       "fileSigning": "Faili allkirjastamine",
@@ -278,12 +281,18 @@
       "or": "VÕI",
       "not": "MITTE",
       "addRule": "+ Reegel",
+      "addElement": "+ Element",
       "addGroup": "+ Grupp",
       "remove": "Eemalda",
       "signType": "Märgi tüüp"
     },
+    "previousVariables": {
+      "assignElements": "Määra elemendid"
+    },
     "flow": "Teenusvoog",
     "placeholderNode": "Lohista järgmine samm voogu",
+    "placeholderNodeSuccess": "Lohistage edusamm voogu",
+    "placeholderNodeFailure": "Lohistage tõrkeetapp voogu",
     "allElements": "Üldelemendid",
     "setupElements": "API elemendid",
     "tabs": {
@@ -314,7 +323,9 @@
     "missing-textfield-message": "Palun sisestage puuduv sõnum",
     "missing-website": "Sisestage veebisaidi pealkiri ja link",
     "missing-file-generation": "Sisestage faili nimi ja sisu",
-    "missing-client_input-rules": "Määrake kliendi sisestusreeglid"
+    "missing-client_input-rules": "Määrake kliendi sisestusreeglid",
+    "missing-condition-rules": "Sisestage tingimuste reeglid",
+    "missing-assign-elements": "Sisestage elementide määramine"
   },
   "roles": {
     "ROLE_ADMINISTRATOR": "Administraator",

@@ -2,6 +2,8 @@ export enum StepType {
   Auth = "auth",
   Textfield = "textfield",
   Input = "input",
+  Assign = "assign",
+  Condition = "condition",
   RuleDefinition = "rule-definition",
   OpenWebpage = "open-webpage",
   FileGenerate = "file-generate",

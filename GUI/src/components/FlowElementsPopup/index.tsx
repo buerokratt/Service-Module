@@ -21,22 +21,29 @@ import { StepType } from "../../types";
 import useServiceStore from "store/new-services.store";
 import FileSignContent from "./FileSignContent";
 import "./styles.scss";
+import ConditionContent from "./ConditionContent";
+import AssignContent from "./AssignContent";
 
 const FlowElementsPopup: React.FC = () => {
   const { t } = useTranslation();
   const [selectedTab, setSelectedTab] = useState<string | null>(null);
   const [isJsonRequestVisible, setIsJsonRequestVisible] = useState(false);
   const [jsonRequestContent, setJsonRequestContent] = useState<any>(null);
-  const node = useServiceStore(state => state.selectedNode);
+  const node = useServiceStore((state) => state.selectedNode);
 
   const isUserDefinedNode = node?.data?.stepType === "user-defined";
 
-  const endpoints = useServiceStore(state => state.endpoints);
-  const rules = useServiceStore(state => state.rules);
+  const endpoints = useServiceStore((state) => state.endpoints);
+  const rules = useServiceStore((state) => state.rules);
+  const assignElements = useServiceStore((state) => state.assignElements);
 
   useEffect(() => {
     if (node) node.data.rules = rules;
   }, [rules]);
+
+  useEffect(() => {
+    if (node) node.data.assignElements = assignElements;
+  }, [assignElements]);
 
   // StepType.Textfield
   const [textfieldMessage, setTextfieldMessage] = useState<string | null>(null);
@@ -53,11 +60,18 @@ const FlowElementsPopup: React.FC = () => {
   const stepType = node?.data.stepType;
 
   useEffect(() => {
-    if(stepType !== StepType.Input) return;
-    if(!node?.data?.rules) return;
+    if (stepType !== StepType.Input && stepType !== StepType.Condition) return;
+    if (!node?.data?.rules) return;
 
     useServiceStore.getState().changeRulesNode(node.data.rules);
-  }, [stepType === StepType.Input]);
+  }, [stepType === StepType.Input, stepType === StepType.Condition]);
+
+  useEffect(() => {
+    if (stepType !== StepType.Assign) return;
+    if (!node?.data?.assignElements) return;
+
+    useServiceStore.getState().changeAssignNode(node.data.assignElements);
+  }, [stepType === StepType.Assign]);
 
   if (!node) return <></>;
 
@@ -91,9 +105,13 @@ const FlowElementsPopup: React.FC = () => {
         signOption: signOption ?? node.data?.signOption,
       },
     };
-    
-    if (stepType === StepType.Input) {
+
+    if (stepType === StepType.Input || stepType === StepType.Condition) {
       updatedNode.data.rules = rules;
+    }
+
+    if (stepType === StepType.Assign) {
+      updatedNode.data.assignElements = assignElements;
     }
 
     useServiceStore.getState().handlePopupSave(updatedNode);
@@ -146,7 +164,7 @@ const FlowElementsPopup: React.FC = () => {
 
   return (
     <Popup
-      style={{ maxWidth: 700, overflow: 'visible' }}
+      style={{ maxWidth: 700, overflow: "visible" }}
       title={title}
       onClose={onClose}
       footer={
@@ -160,20 +178,13 @@ const FlowElementsPopup: React.FC = () => {
                 {t("global.cancel")}
               </Button>
             )}
-            <Button onClick={handleSaveClick}>
-              {t(isReadonly ? "global.close" : "global.save")}
-            </Button>
+            <Button onClick={handleSaveClick}>{t(isReadonly ? "global.close" : "global.save")}</Button>
           </Track>
         </Track>
       }
     >
       <Track direction="vertical" align="stretch" gap={16} className="flow-body-reverse-margin">
-        <Tabs.Root
-          className="vertical-tabs__column"
-          orientation="horizontal"
-          value={selectedTab ?? t("serviceFlow.tabs.setup")!}
-          onValueChange={setSelectedTab}
-        >
+        <Tabs.Root className="vertical-tabs__column" orientation="horizontal" value={selectedTab ?? t("serviceFlow.tabs.setup")!} onValueChange={setSelectedTab}>
           <Tabs.List>
             <Tabs.Trigger className="vertical-tabs__trigger" value={t("serviceFlow.tabs.setup")}>
               {t("serviceFlow.tabs.setup")}
@@ -189,6 +200,7 @@ const FlowElementsPopup: React.FC = () => {
             {stepType === StepType.Textfield && (
               <TextfieldContent
                 defaultMessage={node.data.message ?? textfieldMessage ?? undefined}
+                nodeId={node.id}
                 onChange={(message, placeholders) => {
                   setTextfieldMessage(message);
                   setTextfieldMessagePlaceholders(placeholders);
@@ -218,28 +230,19 @@ const FlowElementsPopup: React.FC = () => {
                 />
               </DndProvider>
             )}
-            {stepType === StepType.FinishingStepRedirect && (
-              <DefaultMessageContent message={t("serviceFlow.popup.redirectToCustomerSupport")} />
-            )}
+            {stepType === StepType.FinishingStepRedirect && <DefaultMessageContent message={t("serviceFlow.popup.redirectToCustomerSupport")} />}
             {stepType === StepType.Auth && <DefaultMessageContent message={t("serviceFlow.popup.loginWithTARA")} />}
-            {stepType === StepType.FileSign && (
-              <FileSignContent onOptionChange={setSignOption} signOption={signOption} />
-            )}
+            {stepType === StepType.FileSign && <FileSignContent onOptionChange={setSignOption} signOption={signOption} />}
             {stepType === StepType.FinishingStepEnd && <EndConversationContent />}
             {stepType === StepType.RasaRules && <RasaRulesContent />}
+            {stepType === StepType.Assign && <AssignContent nodeId={node.id} />}
+            {stepType === StepType.Condition && <ConditionContent nodeId={node.id}/>}
             <JsonRequestContent isVisible={isJsonRequestVisible} jsonContent={jsonRequestContent} />
           </Tabs.Content>
           {!isReadonly && (
             <Tabs.Content value={t("serviceFlow.tabs.test")} className="vertical-tabs__body">
-              {stepType === StepType.Textfield && (
-                <TextfieldTestContent
-                  placeholders={textfieldMessagePlaceholders}
-                  message={textfieldMessage || node.data.message}
-                />
-              )}
-              {stepType === StepType.OpenWebpage && (
-                <OpenWebPageTestContent websiteUrl={webpageUrl} websiteName={webpageName} />
-              )}
+              {stepType === StepType.Textfield && <TextfieldTestContent placeholders={textfieldMessagePlaceholders} message={textfieldMessage || node.data.message} />}
+              {stepType === StepType.OpenWebpage && <OpenWebPageTestContent websiteUrl={webpageUrl} websiteName={webpageName} />}
             </Tabs.Content>
           )}
         </Tabs.Root>

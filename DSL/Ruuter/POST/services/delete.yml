@@ -71,7 +71,7 @@ check_service_file_exists:
   args:
     url: "[#SERVICE_DMAPPER]/file-manager/exists"
     body:
-      file_path: "/Ruuter/${ruuter_type}/services/${old_file_status_path}/${name_res.response.body[0].name}.tmp"
+      file_path: "[#RUUTER_SERVICES_PATH]/${ruuter_type}/[#RUUTER_SERVICES_DIR_PATH]/${old_file_status_path}/${name_res.response.body[0].name}.tmp"
   result: service_file_exists
   next: validate_service_file_exists
 
@@ -86,7 +86,7 @@ delete_deactivated_service:
   args:
     url: "[#SERVICE_DMAPPER]/file-manager/delete"
     body:
-      file_path: "/Ruuter/${ruuter_type}/services/${old_file_status_path}/${name_res.response.body[0].name}.tmp"
+      file_path: "[#RUUTER_SERVICES_PATH]/${ruuter_type}/[#RUUTER_SERVICES_DIR_PATH]/${old_file_status_path}/${name_res.response.body[0].name}.tmp"
   result: results
   next: check_result
 

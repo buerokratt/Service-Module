@@ -1,16 +1,15 @@
 import { t } from "i18next";
-import { FormRichText, OutputElementBox, Track } from "..";
+import { FormRichText, Track } from "..";
 import { CSSProperties, FC } from "react";
-import useServiceStore from "store/new-services.store";
+import PreviousVariables from "./PreviousVariables";
 
 type TextfieldContentProps = {
   readonly defaultMessage?: string;
+  readonly nodeId: string;
   readonly onChange?: (message: string | null, placeholders: { [key: string]: string }) => void;
 };
 
-const TextfieldContent: FC<TextfieldContentProps> = ({ defaultMessage, onChange }) => {
-  const variables = useServiceStore(state => state.getFlatVariables());
-
+const TextfieldContent: FC<TextfieldContentProps> = ({ defaultMessage, onChange, nodeId }) => {
   const popupBodyCss: CSSProperties = {
     padding: 16,
     borderBottom: `1px solid #D2D3D8`,
@@ -30,7 +29,9 @@ const TextfieldContent: FC<TextfieldContentProps> = ({ defaultMessage, onChange 
   return (
     <>
       <Track direction="vertical" align="left" style={{ width: "100%", ...popupBodyCss }}>
-        <label htmlFor="message">{t("serviceFlow.popup.messageLabel")}</label>
+        <label htmlFor="message" style={{ marginBottom: "10px" }}>
+          {t("serviceFlow.popup.messageLabel")}
+        </label>
         <FormRichText
           onChange={(value) => {
             if (!onChange) return;
@@ -40,14 +41,7 @@ const TextfieldContent: FC<TextfieldContentProps> = ({ defaultMessage, onChange 
           defaultValue={defaultMessage}
         ></FormRichText>
       </Track>
-      <Track direction="vertical" align="left" style={{ width: "100%", ...popupBodyCss, backgroundColor: "#F9F9F9" }}>
-        <label htmlFor="json">{t("serviceFlow.popup.availableOutputElementsLabel")}</label>
-        <Track direction="horizontal" gap={4} justify="start" isMultiline style={{ maxHeight: "30vh", overflow: "auto" }}>
-          {variables.map((element, i) => (
-            <OutputElementBox key={`${element}-${i}`} text={element}></OutputElementBox>
-          ))}
-        </Track>
-      </Track>
+      <PreviousVariables nodeId={nodeId} />
     </>
   );
 };

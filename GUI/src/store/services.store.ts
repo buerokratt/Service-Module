@@ -208,7 +208,8 @@ const useServiceListStore = create<ServiceStoreState>((set, get, store) => ({
         type: selectedService?.type,
       });
       useToastStore.getState().success({ title: successMessage });
-      await useServiceListStore.getState().deleteService(selectedService.serviceId);
+      await useServiceListStore.getState().loadServicesList({ pageIndex: 0, pageSize: 10 }, []);
+      await useServiceListStore.getState().loadCommonServicesList({ pageIndex: 0, pageSize: 10 }, []);
     } catch (_) {
       useToastStore.getState().error({ title: errorMessage });
     }
@@ -225,6 +226,7 @@ const useServiceListStore = create<ServiceStoreState>((set, get, store) => ({
       await axios.post(requestServiceIntentConnection(), {
         serviceId: selectedService.serviceId,
         serviceName: selectedService.name,
+        serviceMethod: selectedService.type,
         intent: intent,
       });
       useToastStore.getState().success({ title: successMessage });
@@ -270,6 +272,7 @@ const useServiceListStore = create<ServiceStoreState>((set, get, store) => ({
       await axios.post(respondToConnectionRequest(), {
         serviceId: request.service,
         serviceName: request.serviceName,
+        serviceMethod: 'POST',
         intent: request.intent,
         authorRole: request.authorRole,
         status: status === true ? "approved" : "declined",
@@ -285,6 +288,7 @@ const useServiceListStore = create<ServiceStoreState>((set, get, store) => ({
       await axios.post(respondToConnectionRequest(), {
         serviceId: request.service,
         serviceName: request.serviceName,
+        serviceMethod: 'POST',
         intent: request.intent,
         authorRole: request.authorRole,
         status: "deleted",

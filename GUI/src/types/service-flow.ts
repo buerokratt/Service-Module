@@ -43,6 +43,7 @@ export type NodeDataProps = {
   fileContent?: string;
   signOption?: any;
   rules?: any;
+  assignElements?: any;
 };
 
 export const initialNodes: Node[] = [
