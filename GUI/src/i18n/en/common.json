@@ -7,6 +7,7 @@
     "language": "Language",
     "search": "Search",
     "notificationError": "Error",
+    "notificationErrorMsg": "An error occurred",
     "active": "Active",
     "activate": "Activate",
     "deactivate": "Deactivate",
@@ -110,6 +111,7 @@
       "popupNotifications": "Popup notifications",
       "newUnansweredChat": "New unanswered chat",
       "newForwardedChat": "New forwarded chat",
+      "newValidationMessage": "New message to validate",
       "useAutocorrect": "Text auto corrector",
       "required": "Required",
       "invalidemail": "Invalid email"
@@ -229,7 +231,9 @@
       "failed": "Failed",
       "saveFailed": "Failed to save",
       "saveInfoFailed": "Failed to save info",
-      "saveConfigFailed": "Failed to save config"
+      "saveConfigFailed": "Failed to save config",
+      "testResultSuccess": "Test result- success",
+      "testResultError": "Test result - error"
     }
   },
   "serviceFlow": {
@@ -237,6 +241,8 @@
       "taraAuthentication": "Tara authorization",
       "textfield": "Send message to client",
       "clientInput": "Client input",
+      "assign": "Assign",
+      "condition": "Condition",
       "openNewWebpage": "Open new webpage",
       "fileGeneration": "File generation",
       "fileSigning": "File signing",
@@ -275,12 +281,18 @@
       "or": "OR",
       "not": "NOT",
       "addRule": "+ Rule",
+      "addElement": "+ Element",
       "addGroup": "+ Group",
       "remove": "Remove",
       "signType": "Sign Type"
     },
+    "previousVariables": {
+      "assignElements": "Assign Elements"
+    },
     "flow": "Service flow",
     "placeholderNode": "Drag the next step into the flow",
+    "placeholderNodeSuccess": "Drag the success step into the flow",
+    "placeholderNodeFailure": "Drag the failure step into the flow",
     "allElements": "All elements",
     "setupElements": "Setup elements",
     "tabs": {
@@ -311,7 +323,9 @@
     "missing-textfield-message": "Please enter missing message",
     "missing-website": "Please enter website title and link",
     "missing-file-generation": "Please enter file name and content",
-    "missing-client_input-rules": "Please enter client input rules"
+    "missing-client_input-rules": "Please enter client input rules",
+    "missing-condition-rules": "Please enter condition rules",
+    "missing-assign-elements": "Please enter assign elements"
   },
   "roles": {
     "ROLE_ADMINISTRATOR": "Administrator",
@@ -324,6 +338,7 @@
   "chat": {
     "forwarder": "Forwarded",
     "unanswered": "Unanswered",
+    "pending": "Pending",
     "incomplete-service-flow": "Incomplete Service Flow",
     "no-start-node": "No Start Node found",
     "end-of-chat": "Reached end of chat",

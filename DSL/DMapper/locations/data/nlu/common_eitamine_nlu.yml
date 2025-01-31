@@ -1,0 +1,26 @@
+version: "3.0"
+nlu:
+- intent: common_eitamine
+  examples: |
+    - ei
+    - mkm
+    - iialgi
+    - ei meeldi
+    - mitte väga
+    - ei ole
+    - ei viitsi vist
+    - Ei, hetkel mitte,
+    - Eih
+    - Hetkel mitte
+    - Ma ei taha
+    - ei ei
+    - vist ei
+    - eip
+    - eeeiii
+    - vahet pole
+    - ei?
+    - Ei, aitäh)
+    - ära seda tee
+    - ära tee
+    - ära suuna
+    - ära parem suuna

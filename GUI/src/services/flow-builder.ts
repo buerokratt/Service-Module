@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { Node, Edge, MarkerType, XYPosition, NodeChange, NodeDimensionChange } from "reactflow";
 import useServiceStore from "store/new-services.store";
 import { ConditionRuleType, StepType } from "types";
@@ -7,10 +8,12 @@ import { GRID_UNIT, EDGE_LENGTH } from "types/service-flow";
 
 export const buildPlaceholder = ({
   id,
+  label,
   matchingPlaceholder,
   position,
 }: {
   id: string;
+  label?: string;
   matchingPlaceholder?: Node;
   position?: XYPosition;
 }): Node => {
@@ -28,6 +31,7 @@ export const buildPlaceholder = ({
     },
     data: {
       type: "placeholder",
+      label,
     },
     className: "placeholder",
     selectable: false,
@@ -78,7 +82,7 @@ export const alignNodesInCaseAnyGotOverlapped = (nodeChanges: NodeChange[], prev
     });
   });
   return prevNodes;
-}
+};
 
 export const buildRuleWithPlaceholder = ({
   id,
@@ -134,8 +138,8 @@ export interface UpdateFlowInputRules {
 }
 
 export const updateFlowInputRules = (
-  updatedRules: UpdateFlowInputRules, 
-  updateNodeInternals?: (nodeId: string) => void,
+  updatedRules: UpdateFlowInputRules,
+  updateNodeInternals?: (nodeId: string) => void
 ) => {
   const clickedNode = useServiceStore.getState().clickedNode;
 
@@ -284,35 +288,36 @@ export const onNodeDrag = (_event: React.MouseEvent, draggedNode: Node) => {
 
   const draggedEdges = edges.filter((edge) => edge.source === draggedNode.id);
   if (draggedEdges.length === 0) return;
-  const placeholders = nodes.filter((node) => 
-    draggedEdges.map((edge) => edge.target).includes(node.id) && node.type === "placeholder"
+  const placeholders = nodes.filter(
+    (node) => draggedEdges.map((edge) => edge.target).includes(node.id) && node.type === "placeholder"
   );
   // only drag placeholders following the node
   if (placeholders.length === 0) return;
 
-  useServiceStore.getState().setNodes((prevNodes) => 
+  useServiceStore.getState().setNodes((prevNodes) =>
     prevNodes.map((prevNode) => {
-      if(placeholders.length === 2) {
-        if(prevNode.id === placeholders[0].id) {
+      if (placeholders.length === 2) {
+        if (prevNode.id === placeholders[0].id) {
           prevNode.position.y = draggedNode.position.y + EDGE_LENGTH * 2;
-          prevNode.position.x = draggedNode.position.x - (draggedNode.width ?? 0) * 0.75;          
+          prevNode.position.x = draggedNode.position.x - (draggedNode.width ?? 0) * 0.75;
         }
-        if(prevNode.id === placeholders[1].id) {
+        if (prevNode.id === placeholders[1].id) {
           prevNode.position.y = draggedNode.position.y + EDGE_LENGTH * 2;
-          prevNode.position.x = draggedNode.position.x + (draggedNode.width ?? 0) * 0.75;          
+          prevNode.position.x = draggedNode.position.x + (draggedNode.width ?? 0) * 0.75;
         }
-      } else if(prevNode.id === placeholders[0].id) {
-          prevNode.position.x = draggedNode.position.x;
-          prevNode.position.y = EDGE_LENGTH + draggedNode.position.y + (draggedNode.height ?? 0);
+      } else if (prevNode.id === placeholders[0].id) {
+        prevNode.position.x = draggedNode.position.x;
+        prevNode.position.y = EDGE_LENGTH + draggedNode.position.y + (draggedNode.height ?? 0);
       }
       return prevNode;
-  }));
-}
+    })
+  );
+};
 
 export const onDrop = (
   event: React.DragEvent<HTMLDivElement>,
   reactFlowWrapper: React.RefObject<HTMLDivElement>,
-  setDefaultMessages: (stepType: StepType) => any,
+  setDefaultMessages: (stepType: StepType) => any
 ) => {
   // Dragging and dropping the element from the list on the left
   // onto the placeholder node adds it to the flow
@@ -328,6 +333,14 @@ export const onDrop = (
     event.dataTransfer.getData("application/reactflow-type") as StepType,
     event.dataTransfer.getData("application/reactflow-originalDefinedNodeId"),
   ];
+  
+  if (type === StepType.FinishingStepEnd || type === StepType.FinishingStepRedirect) {
+    const currentNodeStepTypes = reactFlowInstance.getNodes().map((node) => node.data.stepType);
+    if (currentNodeStepTypes.includes(type)) {
+      return;
+    }
+  }
+
   const position = reactFlowInstance.screenToFlowPosition({
     x: event.clientX,
     y: event.clientY,
@@ -347,33 +360,63 @@ export const onDrop = (
   if (!connectedNodeEdge) return;
 
   useServiceStore.getState().setNodes((prevNodes) => {
-    const newNodeId = matchingPlaceholder.id;
-    const newPlaceholderId = Math.max(...useServiceStore.getState().nodes.map((node) => +node.id)) + 1;
+    const newNodeId =
+      prevNodes.length > 2
+        ? `${Math.max(...useServiceStore.getState().nodes.map((node) => +node.id)) + 1}`
+        : matchingPlaceholder.id;
+    const newPlaceholderId = Math.max(...useServiceStore.getState().nodes.map((node) => +node.id)) + 2;
+
     useServiceStore.getState().setEdges((prevEdges) => {
       // Point edge from previous node to new node
-      const newEdges = [
-        ...prevEdges.filter((edge) => edge.target !== matchingPlaceholder.id),
-        buildEdge({
-          id: connectedNodeEdge.id!,
-          source: connectedNodeEdge.source,
-          sourceHandle: connectedNodeEdge.sourceHandle,
-          target: newNodeId,
-        }),
-      ];
+      const newEdges = [...prevEdges];
+      let matchingPlaceholderNextNodeId = undefined;
 
-      if (![StepType.FinishingStepEnd, StepType.FinishingStepRedirect].includes(type)) {
-        // Point edge from new node to new placeholder
+      // Point edge from matching placeholder to new node
+      if (prevNodes.length > 2) {
         newEdges.push(
           buildEdge({
-            id: `edge-${newNodeId}-${newPlaceholderId + 1}`,
-            source: newNodeId,
+            id: `edge-${matchingPlaceholder.id}-${newNodeId + 1}`,
+            source: matchingPlaceholder.id,
+            sourceHandle: `handle-${matchingPlaceholder.id}-${newNodeId}`,
+            target: newNodeId,
+          })
+        );
+
+        // Check if the new node is added in between two nodes
+        const previousEdgesOfMatchingPlaceholder = newEdges.filter(
+          (edge) => edge.source === matchingPlaceholder.id
+        ).length;
+        if (previousEdgesOfMatchingPlaceholder > 1) {
+          matchingPlaceholderNextNodeId = newEdges.find((edge) => edge.source === matchingPlaceholder.id)?.target;
+          newEdges.splice(
+            newEdges.findIndex((edge) => edge.source === matchingPlaceholder.id),
+            1
+          );
+        }
+      }
+      // Point edge from new node to new placeholder
+      newEdges.push(
+        buildEdge({
+          id: `edge-${newNodeId}-${newPlaceholderId + 1}`,
+          source: newNodeId,
+          sourceHandle: `handle-${newNodeId}-0`,
+          target: `${newPlaceholderId + 1}`,
+        })
+      );
+
+      // In-case there is a node after the matching placeholder, point edge from new placeholder to that node
+      if (matchingPlaceholderNextNodeId) {
+        newEdges.push(
+          buildEdge({
+            id: `edge-${newPlaceholderId + 1}-${matchingPlaceholderNextNodeId}`,
+            source: `${newPlaceholderId + 1}`,
             sourceHandle: `handle-${newNodeId}-0`,
-            target: `${newPlaceholderId + 1}`,
+            target: matchingPlaceholderNextNodeId,
           })
         );
       }
 
-      if(StepType.Input === type) {
+      if (StepType.Input === type || StepType.Condition === type) {
         newEdges.push(
           buildEdge({
             id: `edge-${newNodeId}-${newPlaceholderId + 2}`,
@@ -387,31 +430,44 @@ export const onDrop = (
       return newEdges;
     });
 
+    const nodeLabel = getNodeLabel(type, prevNodes, label);
+
+    const matchingPlaceholderIndex = prevNodes.findIndex((node) => node.id === matchingPlaceholder.id);
+
     // Add new node in place of old placeholder
-    const prevClientInputs = prevNodes.filter((node) => node.data.stepType === "input");
-    const newClientInputId = (prevClientInputs[prevClientInputs.length - 1]?.data.clientInputId ?? 0) + 1;
+    const previousNodes = [...prevNodes.slice(0, matchingPlaceholderIndex + 1)];
+    const nextNodes = [...prevNodes.slice(matchingPlaceholderIndex + 1)];
+    nextNodes.forEach((node) => {
+      node.position.y += EDGE_LENGTH * 1.5;
+    });
     const newNodes = [
-      ...prevNodes.filter((node) => node.id !== matchingPlaceholder.id),
+      ...previousNodes,
       {
         id: `${newNodeId}`,
-        position: matchingPlaceholder.position,
+        position:
+          prevNodes.length > 2
+            ? {
+                y: matchingPlaceholder.position.y + EDGE_LENGTH,
+                x: matchingPlaceholder.position.x,
+              }
+            : matchingPlaceholder.position,
         type: "customNode",
         data: {
-          label: type === "input" ? `${label} - ${newClientInputId}` : label,
+          label: nodeLabel,
           onDelete: useServiceStore.getState().onDelete,
           onEdit: useServiceStore.getState().handleNodeEdit,
-          type: [StepType.FinishingStepEnd, StepType.FinishingStepRedirect].includes(type)
-            ? "finishing-step"
-            : "step",
+          type: [StepType.FinishingStepEnd, StepType.FinishingStepRedirect].includes(type) ? "finishing-step" : "step",
           stepType: type,
-          clientInputId: type === StepType.Input ? newClientInputId : undefined,
+          clientInputId: type === StepType.Input ? parseInt(nodeLabel.split("-")[1].trim()) : undefined,
+          conditionId: type === StepType.Condition ? parseInt(nodeLabel.split("-")[1].trim()) : undefined,
+          assignId: type === StepType.Assign ? parseInt(nodeLabel.split("-")[1].trim()) : undefined,
           readonly: [
             StepType.Auth,
             StepType.FinishingStepEnd,
             StepType.FinishingStepRedirect,
             StepType.UserDefined,
           ].includes(type),
-          childrenCount: type === StepType.Input ? 2 : 1,
+          childrenCount: type === StepType.Input || type === StepType.Condition ? 2 : 1,
           setClickedNode: useServiceStore.getState().setClickedNode,
           message: setDefaultMessages(type),
           originalDefinedNodeId: type === StepType.UserDefined ? originalDefinedNodeId : undefined,
@@ -420,24 +476,32 @@ export const onDrop = (
           ? "finishing-step"
           : "step",
       },
+      ...nextNodes,
     ];
 
-    if (![StepType.Input, StepType.FinishingStepEnd, StepType.FinishingStepRedirect].includes(type)) {
+    if (
+      ![StepType.Input, StepType.Condition, StepType.FinishingStepEnd, StepType.FinishingStepRedirect].includes(type)
+    ) {
       // Add placeholder right below new node
       newNodes.push(
         buildPlaceholder({
           id: `${newPlaceholderId + 1}`,
           matchingPlaceholder,
+          position: {
+            y: matchingPlaceholder.position.y + EDGE_LENGTH * 1.5,
+            x: matchingPlaceholder.position.x,
+          },
         })
       );
     }
 
-    if(StepType.Input === type) {
+    if (StepType.Input === type || StepType.Condition === type) {
       newNodes.push(
         buildPlaceholder({
           id: `${newPlaceholderId + 1}`,
+          label: "serviceFlow.placeholderNodeSuccess",
           position: {
-            y: matchingPlaceholder.position.y + EDGE_LENGTH,
+            y: matchingPlaceholder.position.y + EDGE_LENGTH * 1.5,
             x: matchingPlaceholder.position.x - (matchingPlaceholder.width ?? 0) * 0.75,
           },
         })
@@ -446,17 +510,18 @@ export const onDrop = (
       newNodes.push(
         buildPlaceholder({
           id: `${newPlaceholderId + 2}`,
+          label: "serviceFlow.placeholderNodeFailure",
           position: {
-            y: matchingPlaceholder.position.y + EDGE_LENGTH,
+            y: matchingPlaceholder.position.y + EDGE_LENGTH * 1.5,
             x: matchingPlaceholder.position.x + (matchingPlaceholder.width ?? 0) * 0.75,
           },
         })
-      )
+      );
     }
 
     return newNodes;
   });
-  
+
   useServiceStore.getState().disableTestButton();
 };
 
@@ -464,7 +529,7 @@ export const onFlowNodeDragStop = (
   event: any,
   draggedNode: Node,
   reactFlowWrapper: React.RefObject<HTMLDivElement>,
-  startDragNode: React.MutableRefObject<Node | undefined>,
+  startDragNode: React.MutableRefObject<Node | undefined>
 ) => {
   // Dragging existing node onto placeholder
 
@@ -531,4 +596,18 @@ export const onFlowNodeDragStop = (
     ];
   });
   startDragNode.current = undefined;
+};
+function getNodeLabel(type: StepType, nodes: Node[], label: string) {
+  const prevNodes = nodes.filter((node) => node.data.stepType === type);
+  const lastNode = prevNodes[prevNodes.length - 1]?.data;
+  switch (type) {
+    case StepType.Input:
+      return `${label} - ${(lastNode?.clientInputId ?? 0) + 1}`;
+    case StepType.Condition:
+      return `${label} - ${(lastNode?.conditionId ?? 0) + 1}`;
+    case StepType.Assign:
+      return `${label} - ${(lastNode?.assignId ?? 0) + 1}`;
+    default:
+      return label;
+  }
 }

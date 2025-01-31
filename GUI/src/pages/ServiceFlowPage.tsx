@@ -17,39 +17,48 @@ import withAuthorization, { ROLES } from "hoc/with-authorization";
 const ServiceFlowPage: FC = () => {
   const { t } = useTranslation();
 
-  const allElements: Step[] = useMemo(() => [
-    { id: 10, label: t("serviceFlow.element.taraAuthentication"), type: StepType.Auth },
-    { id: 20, label: t("serviceFlow.element.textfield"), type: StepType.Textfield },
-    { id: 30, label: t("serviceFlow.element.clientInput"), type: StepType.Input },
-    { id: 40, label: t("serviceFlow.element.rasaRules"), type: StepType.RasaRules },
-    { id: 50, label: t("serviceFlow.element.openNewWebpage"), type: StepType.OpenWebpage },
-    { id: 60, label: t("serviceFlow.element.fileGeneration"), type: StepType.FileGenerate },
-    { id: 70, label: t("serviceFlow.element.fileSigning"), type: StepType.FileSign },
-    { id: 90, label: t("serviceFlow.element.conversationEnd"), type: StepType.FinishingStepEnd },
-    { id: 100, label: t("serviceFlow.element.redirectConversationToSupport"), type: StepType.FinishingStepRedirect },
-  ], [t]);
+  const allElements: Step[] = useMemo(
+    () => [
+      { id: 10, label: t("serviceFlow.element.taraAuthentication"), type: StepType.Auth },
+      { id: 20, label: t("serviceFlow.element.textfield"), type: StepType.Textfield },
+      { id: 30, label: t("serviceFlow.element.clientInput"), type: StepType.Input },
+      { id: 40, label: t("serviceFlow.element.assign"), type: StepType.Assign },
+      { id: 50, label: t("serviceFlow.element.condition"), type: StepType.Condition },
+      { id: 60, label: t("serviceFlow.element.rasaRules"), type: StepType.RasaRules },
+      { id: 70, label: t("serviceFlow.element.openNewWebpage"), type: StepType.OpenWebpage },
+      { id: 80, label: t("serviceFlow.element.fileGeneration"), type: StepType.FileGenerate },
+      { id: 90, label: t("serviceFlow.element.fileSigning"), type: StepType.FileSign },
+      { id: 100, label: t("serviceFlow.element.conversationEnd"), type: StepType.FinishingStepEnd },
+      { id: 110, label: t("serviceFlow.element.redirectConversationToSupport"), type: StepType.FinishingStepRedirect },
+    ],
+    [t]
+  );
 
   const navigate = useNavigate();
-  const description = useServiceStore(state => state.description);
-  const steps = useServiceStore(state => state.mapEndpointsToSetps());
-  const name = useServiceStore(state => state.serviceNameDashed());
+  const description = useServiceStore((state) => state.description);
+  const steps = useServiceStore((state) => state.mapEndpointsToSetps());
+  const name = useServiceStore((state) => state.serviceNameDashed());
   const { id } = useParams();
 
   useEffect(() => {
     if (!id) return;
-    useServiceStore.getState().loadService(id);
-  }, [])
+    useServiceStore
+      .getState()
+      .loadService(id)
+      .then(() => {
+        useServiceStore.getState().loadEndpointsResponseVariables();
+      });
+  }, []);
 
   const edges = useServiceStore((state) => state.edges);
   const nodes = useServiceStore((state) => state.nodes);
 
   const setNodes = useServiceStore((state) => state.setNodes);
-  const availableVariables = useServiceStore((state) => state.availableVariables);
 
   const onDragStart = (event: React.DragEvent<HTMLDivElement>, step: Step) => {
     event.dataTransfer.setData("application/reactflow-label", step.label);
     event.dataTransfer.setData("application/reactflow-type", step.type);
-    event.dataTransfer.setData("application/reactflow-originalDefinedNodeId", step.data?.id ?? '');
+    event.dataTransfer.setData("application/reactflow-originalDefinedNodeId", step.data?.id ?? "");
     event.dataTransfer.effectAllowed = "move";
   };
 
@@ -59,8 +68,6 @@ const ServiceFlowPage: FC = () => {
     <>
       <NewServiceHeader
         activeStep={3}
-        availableVariables={availableVariables}
-        serviceDescription={description}
         saveDraftOnClick={saveFlowClick}
         continueOnClick={() => navigate(ROUTES.OVERVIEW_ROUTE)}
       />
@@ -90,11 +97,7 @@ const ServiceFlowPage: FC = () => {
                     {steps.map((step) => (
                       <Box
                         key={step.id}
-                        color={
-                          [StepType.FinishingStepEnd, StepType.FinishingStepRedirect].includes(step.type)
-                            ? "red"
-                            : "blue"
-                        }
+                        color={[StepType.FinishingStepEnd, StepType.FinishingStepRedirect].includes(step.type) ? "red" : "blue"}
                         onDragStart={(event) => onDragStart(event, step)}
                         draggable
                       >
@@ -113,11 +116,7 @@ const ServiceFlowPage: FC = () => {
                     {allElements.map((step) => (
                       <Box
                         key={step.id}
-                        color={
-                          [StepType.FinishingStepEnd, StepType.FinishingStepRedirect].includes(step.type)
-                            ? "red"
-                            : "blue"
-                        }
+                        color={[StepType.FinishingStepEnd, StepType.FinishingStepRedirect].includes(step.type) ? "red" : "blue"}
                         onDragStart={(event) => onDragStart(event, step)}
                         draggable
                       >
@@ -129,12 +128,7 @@ const ServiceFlowPage: FC = () => {
               )}
             </Track>
           </div>
-          <FlowBuilder
-            description={description}
-            nodes={nodes}
-            setNodes={setNodes}
-            edges={edges}
-          />
+          <FlowBuilder description={description} nodes={nodes} setNodes={setNodes} edges={edges} />
           <Chat />
         </div>
       </ReactFlowProvider>
@@ -142,7 +136,4 @@ const ServiceFlowPage: FC = () => {
   );
 };
 
-export default withAuthorization(ServiceFlowPage, [
-  ROLES.ROLE_ADMINISTRATOR,
-  ROLES.ROLE_SERVICE_MANAGER,
-]);
+export default withAuthorization(ServiceFlowPage, [ROLES.ROLE_ADMINISTRATOR, ROLES.ROLE_SERVICE_MANAGER]);

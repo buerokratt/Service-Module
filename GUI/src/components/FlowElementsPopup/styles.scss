@@ -131,3 +131,31 @@ div>.small-rule-group-button:last-child {
 .rule-gray:hover {
   background: #0002;
 }
+
+.assign-action-container {
+  padding: 10px;
+  background: rgba(25, 0, 255, 0.067);
+  border: 1px solid rgba(25, 0, 255, 0.067);
+}
+
+.small-assign-button {
+  padding: 4px 10px;
+  margin: 4px;
+  border-radius: 10px;
+}
+
+.assign-blue {
+  background: #00f5;
+}
+
+.assign-blue:hover {
+  background: #00f6;
+}
+
+.assign-red {
+  background: #f007;
+}
+
+.assign-red:hover {
+  background: #f008;
+}

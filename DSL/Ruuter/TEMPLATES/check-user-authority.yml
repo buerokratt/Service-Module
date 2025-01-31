@@ -10,13 +10,15 @@ declaration:
 get_tara_info:
   template: tara
   requestType: templates
-  result: TARA
+  headers:
+    cookie: ${incoming.headers.cookie}
+  result: tara_res
 
 check_user_authority:
   switch:
-    - condition: ${TARA.response.body.authorities.includes("ROLE_ADMINISTRATOR")}
+    - condition: ${tara_res.authorities.includes("ROLE_ADMINISTRATOR")}
       next: return_authorized
-    - condition: ${TARA.response.body.authorities.includes("ROLE_SERVICE_MANAGER")}
+    - condition: ${tara_res.authorities.includes("ROLE_SERVICE_MANAGER")}
       next: return_authorized
 
 return_unauthorized:
@@ -25,4 +27,4 @@ return_unauthorized:
   next: end
 
 return_authorized:
-  return: ${TARA.response.body}
+  return: ${tara_res}

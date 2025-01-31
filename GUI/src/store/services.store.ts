@@ -77,8 +77,8 @@ const useServiceListStore = create<ServiceStoreState>((set, get, store) => ({
   commonServices: [],
   notCommonServices: [],
   loadServicesList: async (pagination, sorting) => {
-    const order = sorting[0].desc ? "desc" : "asc";
-    const sort = sorting.length === 0 ? "id asc" : sorting[0].id + " " + order;
+    const order = sorting[0]?.desc ? "desc" : "asc";
+    const sort = sorting.length === 0 ? "id asc" : sorting[0]?.id + " " + order;
     const result = await axios.post(getServicesList(), {
       page: pagination.pageIndex + 1,
       page_size: pagination.pageSize,
@@ -107,8 +107,8 @@ const useServiceListStore = create<ServiceStoreState>((set, get, store) => ({
     });
   },
   loadCommonServicesList: async (pagination, sorting) => {
-    const order = sorting[0].desc ? "desc" : "asc";
-    const sort = sorting.length === 0 ? "id asc" : sorting[0].id + " " + order;
+    const order = sorting[0]?.desc ? "desc" : "asc";
+    const sort = sorting.length === 0 ? "id asc" : sorting[0]?.id + " " + order;
     const result = await axios.post(getCommonServicesList(), {
       page: pagination.pageIndex + 1,
       page_size: pagination.pageSize,
@@ -208,7 +208,8 @@ const useServiceListStore = create<ServiceStoreState>((set, get, store) => ({
         type: selectedService?.type,
       });
       useToastStore.getState().success({ title: successMessage });
-      await useServiceListStore.getState().deleteService(selectedService.serviceId);
+      await useServiceListStore.getState().loadServicesList({ pageIndex: 0, pageSize: 10 }, []);
+      await useServiceListStore.getState().loadCommonServicesList({ pageIndex: 0, pageSize: 10 }, []);
     } catch (_) {
       useToastStore.getState().error({ title: errorMessage });
     }
@@ -225,6 +226,7 @@ const useServiceListStore = create<ServiceStoreState>((set, get, store) => ({
       await axios.post(requestServiceIntentConnection(), {
         serviceId: selectedService.serviceId,
         serviceName: selectedService.name,
+        serviceMethod: selectedService.type,
         intent: intent,
       });
       useToastStore.getState().success({ title: successMessage });
@@ -237,8 +239,8 @@ const useServiceListStore = create<ServiceStoreState>((set, get, store) => ({
   },
   loadRequestsList: async (onEnd, errorMessage, pagination, sorting) => {
     try {
-      const order = sorting[0].desc ? "desc" : "asc";
-      const sort = sorting.length === 0 ? "requestedAt desc" : sorting[0].id + " " + order;
+      const order = sorting[0]?.desc ? "desc" : "asc";
+      const sort = sorting.length === 0 ? "requestedAt desc" : sorting[0]?.id + " " + order;
       const requests = await axios.post(getConnectionRequests(), {
         page: pagination.pageIndex + 1,
         page_size: pagination.pageSize,
@@ -252,8 +254,8 @@ const useServiceListStore = create<ServiceStoreState>((set, get, store) => ({
   },
   loadAvailableIntentsList: async (onEnd, errorMessage, pagination, sorting) => {
     try {
-      const order = sorting[0].desc ? "desc" : "asc";
-      const sort = sorting.length === 0 ? "intent asc" : sorting[0].id + " " + order;
+      const order = sorting[0]?.desc ? "desc" : "asc";
+      const sort = sorting.length === 0 ? "intent asc" : sorting[0]?.id + " " + order;
       const requests = await axios.post(getAvailableIntents(), {
         page: pagination.pageIndex + 1,
         page_size: pagination.pageSize,
@@ -270,6 +272,7 @@ const useServiceListStore = create<ServiceStoreState>((set, get, store) => ({
       await axios.post(respondToConnectionRequest(), {
         serviceId: request.service,
         serviceName: request.serviceName,
+        serviceMethod: 'POST',
         intent: request.intent,
         authorRole: request.authorRole,
         status: status === true ? "approved" : "declined",
@@ -285,6 +288,7 @@ const useServiceListStore = create<ServiceStoreState>((set, get, store) => ({
       await axios.post(respondToConnectionRequest(), {
         serviceId: request.service,
         serviceName: request.serviceName,
+        serviceMethod: 'POST',
         intent: request.intent,
         authorRole: request.authorRole,
         status: "deleted",

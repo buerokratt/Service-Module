@@ -15,6 +15,9 @@ export default ({ mode }) => {
       tsconfigPaths(),
       svgr(),
     ],
+    optimizeDeps: {
+      include: ['howler']
+    },
     base: "/services",
     define: {
       "process.env": process.env,

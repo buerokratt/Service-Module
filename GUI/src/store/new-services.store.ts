@@ -2,17 +2,13 @@ import axios from "axios";
 import { create } from "zustand";
 import { v4 as uuid } from "uuid";
 import { Edge, EdgeChange, Node, NodeChange, ReactFlowInstance, applyEdgeChanges, applyNodeChanges } from "reactflow";
-import {
-  EndpointData,
-  EndpointEnv,
-  EndpointTab,
-  PreDefinedEndpointEnvVariables,
-} from "types/endpoint";
+import { EndpointData, EndpointEnv, EndpointTab, PreDefinedEndpointEnvVariables } from "types/endpoint";
 import {
   getEndpointValidation,
   getSecretVariables,
   getServiceById,
   getTaraAuthResponseVariables,
+  servicesRequestsExplain,
 } from "resources/api-constants";
 import { Service, ServiceState, Step, StepType } from "types";
 import { RequestVariablesTabsRawData, RequestVariablesTabsRowsData } from "types/request-variables";
@@ -22,13 +18,12 @@ import { ROUTES } from "resources/routes-constants";
 import { NavigateFunction } from "react-router-dom";
 import { editServiceInfo, saveFlowClick } from "services/service-builder";
 import { NodeDataProps, initialEdge, initialNodes } from "types/service-flow";
-import {
-  alignNodesInCaseAnyGotOverlapped,
-  buildPlaceholder,
-  updateFlowInputRules,
-} from "services/flow-builder";
+import { alignNodesInCaseAnyGotOverlapped, buildPlaceholder, updateFlowInputRules } from "services/flow-builder";
 import { GroupOrRule } from "components/FlowElementsPopup/RuleBuilder/types";
 import useTestServiceStore from "./test-services.store";
+import { Chip } from "types/chip";
+import { endpointResponseVariables } from "types/endpoint/endpoint-response-variables";
+import { Assign } from "components/FlowElementsPopup/AssignBuilder/assign-types";
 
 interface ServiceStoreState {
   endpoints: EndpointData[];
@@ -40,9 +35,12 @@ interface ServiceStoreState {
   nodes: Node[];
   isNewService: boolean;
   serviceState: ServiceState;
+  assignElements: Assign[];
   rules: GroupOrRule[];
   isYesNoQuestion: boolean;
+  endpointsResponseVariables: endpointResponseVariables[];
   setIsYesNoQuestion: (value: boolean) => void;
+  changeAssignNode: (assign: Assign[]) => void;
   changeRulesNode: (rules: GroupOrRule[]) => void;
   markAsNewService: () => void;
   unmarkAsNewService: () => void;
@@ -61,6 +59,7 @@ interface ServiceStoreState {
   isCommonEndpoint: (id: string) => boolean;
   setIsCommonEndpoint: (id: string, isCommon: boolean) => void;
   setDescription: (description: string) => void;
+  loadEndpointsResponseVariables: () => void;
   setSecrets: (newSecrets: PreDefinedEndpointEnvVariables) => void;
   addProductionVariables: (variables: string[]) => void;
   addTestVariables: (variables: string[]) => void;
@@ -83,6 +82,7 @@ interface ServiceStoreState {
   ) => void;
   updateEndpointData: (data: RequestVariablesTabsRowsData, endpointDataId?: string, parentEndpointId?: string) => void;
   resetState: () => void;
+  resetAssign: () => void;
   resetRules: () => void;
   onContinueClick: (navigate: NavigateFunction) => Promise<void>;
   selectedNode: Node<NodeDataProps> | null;
@@ -117,9 +117,12 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
   serviceState: ServiceState.Draft,
   isTestButtonVisible: false,
   isTestButtonEnabled: true,
+  assignElements: [],
   rules: [],
   isYesNoQuestion: false,
+  endpointsResponseVariables: [],
   setIsYesNoQuestion: (value: boolean) => set({ isYesNoQuestion: value }),
+  changeAssignNode: (assignElements) => set({ assignElements: assignElements }),
   changeRulesNode: (rules) => set({ rules }),
   disableTestButton: () =>
     set({
@@ -158,6 +161,49 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
   },
   secrets: { prod: [], test: [] },
   availableVariables: { prod: [], test: [] },
+  loadEndpointsResponseVariables: async () => {
+    try {
+      const endpointResponses = await Promise.all(
+        get().endpoints.map(async (e) => {
+          return Promise.all(
+            e.definedEndpoints.map(async (endpoint) => {
+              const response = await axios.post(servicesRequestsExplain(), {
+                url: endpoint.url,
+                method: endpoint.methodType,
+                headers: extractMapValues(endpoint.headers),
+                body: extractMapValues(endpoint.body),
+                params: extractMapValues(endpoint.params),
+              });
+              return response.data;
+            })
+          );
+        })
+      );
+
+      const variables: endpointResponseVariables[] = [];
+
+      endpointResponses.forEach((endpointResponses, i) => {
+        const endpoint = get().endpoints[i];
+        const chips: Chip[] = [];
+
+        endpointResponses.forEach((response) => {
+          Object.keys(response).forEach((key) => {
+            chips.push({
+              name: key,
+              value: `\${${endpoint.name.replace(" ", "_")}_res.response.body.${key}}`,
+            });
+          });
+        });
+
+        variables.push({
+          name: endpoint.name,
+          chips: chips,
+        });
+      });
+
+      set({ endpointsResponseVariables: variables });
+    } catch (e) {}
+  },
   getFlatVariables: () => {
     return [...get().availableVariables.prod, ...get().availableVariables.test];
   },
@@ -222,6 +268,7 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
       edges: [initialEdge],
       nodes: initialNodes,
       isTestButtonEnabled: true,
+      assignElements: [],
       rules: [],
       isYesNoQuestion: false,
       clickedNode: null,
@@ -231,6 +278,7 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
     });
     useTestServiceStore.getState().reset();
   },
+  resetAssign: () => set({ assignElements: [] }),
   resetRules: () => set({ rules: [], isYesNoQuestion: false }),
   loadService: async (id) => {
     get().resetState();
@@ -282,8 +330,8 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
     }
 
     const variables = nodes
-      ?.filter((node) => node.data.stepType === "input")
-      .map((node) => `{{ClientInput_${node.data.clientInputId}}}`);
+      ?.filter((node) => node.data.stepType === StepType.Input)
+      .map((node) => `{{client_input_${node.data.clientInputId}}}`);
 
     get().addProductionVariables(variables);
   },
@@ -388,7 +436,9 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
     const live = get().isLive() ? "value" : "testValue";
 
     const endpoints = JSON.parse(JSON.stringify(get().endpoints)) as EndpointData[];
-    const defEndpoint = endpoints.find(x => x.id === parentEndpointId)?.definedEndpoints.find(x => x.id === endpointId);
+    const defEndpoint = endpoints
+      .find((x) => x.id === parentEndpointId)
+      ?.definedEndpoints.find((x) => x.id === endpointId);
 
     for (const key in data) {
       if (defEndpoint?.[key as EndpointTab]) {
@@ -397,17 +447,19 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
     }
 
     set({
-      endpoints
+      endpoints,
     });
   },
   updateEndpointData: (data: RequestVariablesTabsRowsData, endpointId?: string, parentEndpointId?: string) => {
     if (!endpointId) return;
 
-    const live = get().isLive() ? "value" : "testValue"
+    const live = get().isLive() ? "value" : "testValue";
     const endpoints = JSON.parse(JSON.stringify(get().endpoints)) as EndpointData[];
-    const defEndpoint = endpoints.find(x => x.id === parentEndpointId)?.definedEndpoints.find(x => x.id === endpointId);
+    const defEndpoint = endpoints
+      .find((x) => x.id === parentEndpointId)
+      ?.definedEndpoints.find((x) => x.id === endpointId);
 
-    if(!defEndpoint) return;
+    if (!defEndpoint) return;
 
     for (const key in data) {
       const keyedDefEndpoint = defEndpoint[key as EndpointTab];
@@ -426,7 +478,7 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
           });
         }
       }
-      
+
       for (const variable of keyedDefEndpoint?.variables ?? []) {
         const updatedVariable = data[key as EndpointTab]!.find((updated) => updated.endpointVariableId === variable.id);
         variable[live] = updatedVariable?.value;
@@ -435,7 +487,7 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
     }
 
     set({
-        endpoints,
+      endpoints,
     });
   },
   reactFlowInstance: null,
@@ -479,7 +531,18 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
       .getEdges()
       .filter((edge) => edge.source === id)
       .map((x) => x.target);
-    let children = reactFlowInstance.getNodes().filter((node) => edgeFromDeletedNode.includes(node.id));
+
+    const edgeFromNextNode = reactFlowInstance
+      .getEdges()
+      .filter((edge) => edge.source === edgeFromDeletedNode[0])
+      .map((x) => x.target);
+
+    let children: Node<any>[] = [];
+    if (edgeFromNextNode.length > 0) {
+      children = reactFlowInstance.getNodes().filter((node) => edgeFromNextNode.includes(node.id));
+    } else {
+      children = reactFlowInstance.getNodes().filter((node) => edgeFromDeletedNode.includes(node.id));
+    }
 
     let nodes = get().nodes.filter((x) => x.id !== id);
 
@@ -508,6 +571,20 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
       .map((x) => (x.target === id && child ? { ...x, target: child.id } : x));
 
     nodes = nodes.filter((x) => edges.find((y) => y.target === x.id || y.source === x.id));
+
+    if (edgeFromNextNode.length > 0) {
+      nodes = nodes.filter((x) => x.id !== edgeFromDeletedNode[0]);
+      if (edgeFromNextNode.length === 2) {
+        nodes = nodes.filter((x) => x.id !== edgeFromDeletedNode[1]);
+      }
+    }
+
+    if (edgeFromDeletedNode.length > 0 && get().nodes.length > 4) {
+      nodes = nodes.filter((x) => x.id !== edgeFromDeletedNode[0]);
+      if (edgeFromDeletedNode.length === 2) {
+        nodes = nodes.filter((x) => x.id !== edgeFromDeletedNode[1]);
+      }
+    }
 
     set({ edges, nodes });
   },
@@ -578,5 +655,17 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
     }
   },
 }));
+
+function extractMapValues(element: any) {
+  if (element.rawData && element.rawData.length > 0) {
+    return element.rawData.value;
+  }
+
+  let result: any = {};
+  for (const entry of element.variables) {
+    result = { ...result, [entry.name]: entry.value };
+  }
+  return result;
+}
 
 export default useServiceStore;
