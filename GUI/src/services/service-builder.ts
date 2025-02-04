@@ -698,7 +698,7 @@ export const saveFlow = async ({
     finishedFlow.set("formatMessages", {
       call: "http.post",
       args: {
-        url: `${import.meta.env.REACT_APP_SERVICE_DMAPPER}/hbs/services/bot_responses_to_messages`,
+        url: `${import.meta.env.REACT_APP_SERVICE_DMAPPER}/bot_responses_to_messages`,
         headers: {
           type: "json",
         },
