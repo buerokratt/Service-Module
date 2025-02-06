@@ -161,8 +161,6 @@ unlink_service_from_intent_in_rasa_domain:
   call: http.post
   args:
     url: "[#SERVICE_RUUTER]/services/domain-intent-service-link"
-    headers:
-      cookie: ${incoming.headers.cookie}
     body:
       serviceName: ${connection_res.response.body[0].serviceName}
       intent: ${connection_res.response.body[0].intent}
