@@ -154,7 +154,7 @@ ENTRYPOINT ["npm","start"]
 ```
 curl -X POST -H "Content-Type: application/json" -d '{
   "login": "EE30303039914",
-  "password": ""
+  "password": "OK"
 }' http://localhost:8086/auth/login
 ```
 
