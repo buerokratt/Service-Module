@@ -870,7 +870,7 @@ const getTemplate = (steps: Step[], node: Node, stepName: string, nextStep?: str
     };
   }
   return {
-    template: `${data?.templateName}`,
+    template: `${import.meta.env.REACT_APP_PROJECT_LAYER}/${data?.templateName}`,
     requestType: "templates",
     body: data?.body,
     result: data?.resultName ?? `${stepName}_result`,
