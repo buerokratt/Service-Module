@@ -561,9 +561,15 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
     if (children.length === 1) child = children[0];
     if (children.length === 0) {
       const deletedNodePosition = reactFlowInstance.getNodes().find((node) => node.id === id)?.position;
-      const placeholder = buildPlaceholder({ id, position: deletedNodePosition });
-      nodes.push(placeholder);
-      child = placeholder;
+      const deletedNodeStepType = reactFlowInstance.getNodes().find((node) => node.id === id)?.data.stepType;
+      if (
+        deletedNodeStepType !== StepType.FinishingStepEnd ||
+        deletedNodeStepType !== StepType.FinishingStepRedirect && get().nodes.length <= 4
+      ) {
+        const placeholder = buildPlaceholder({ id, position: deletedNodePosition });
+        nodes.push(placeholder);
+        child = placeholder;
+      }
     }
 
     const edges = get()

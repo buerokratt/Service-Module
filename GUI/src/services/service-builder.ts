@@ -485,19 +485,20 @@ export const saveFlow = async ({
   try {
     const allRelations: any[] = [];
     // find regular edges 1 -> 1
-    edges.forEach((edge) => {
+    const updatedEdges = skipPlaceholderNodes(nodes, edges);
+    updatedEdges.forEach((edge) => {
       const node = nodes.find((node) => node.id === edge.source);
       const followingNode = nodes.find((node) => node.id === edge.target);
       if (!node) return;
       let error;
-      switch(node.data.stepType) {
+      switch (node.data.stepType) {
         case StepType.Textfield:
-            if (node.data.message === undefined) {
-              error = i18next.t("toast.missing-textfield-message");
-            }
-            break;
+          if (node.data.message === undefined) {
+            error = i18next.t("toast.missing-textfield-message");
+          }
+          break;
         case StepType.OpenWebpage:
-          if(node.data.link === undefined || node.data.linkText === undefined) {
+          if (node.data.link === undefined || node.data.linkText === undefined) {
             error = i18next.t("toast.missing-website");
           }
           break;
@@ -508,23 +509,23 @@ export const saveFlow = async ({
           break;
         case StepType.Input:
         case StepType.Condition:
-          if(followingNode?.type === "placeholder" && !allRelations.includes(node.id)) {
+          if (followingNode?.type === "placeholder" && !allRelations.includes(node.id)) {
             allRelations.push(node.id);
             return;
           }
           break;
       }
 
-      if(error) {
+      if (error) {
         throw new Error(error);
       }
 
       allRelations.push(`${edge.source}-${edge.target}`);
     });
     // find finishing nodes
-    edges.forEach((edge) => {
-      const current = edges.find((lastEdge) => lastEdge.source === edge.source);
-      const nextStep = edges.find((lastEdge) => lastEdge.source === edge.target);
+    updatedEdges.forEach((edge) => {
+      const current = updatedEdges.find((lastEdge) => lastEdge.source === edge.source);
+      const nextStep = updatedEdges.find((lastEdge) => lastEdge.source === edge.target);
       if (!nextStep && current?.type !== "placeholder") allRelations.push(edge.target);
     });
 
@@ -552,18 +553,18 @@ export const saveFlow = async ({
     try {
       allRelations.forEach((r) => {
         const [parentNodeId, childNodeId] = r.split("-");
-        const parentNode = nodes.find((node) => node.id === parentNodeId);
+        const parentNode = nodes.findLast((node) => node.id === parentNodeId);
         if (
           !parentNode ||
           parentNode.type !== "customNode" ||
           [StepType.Rule, StepType.RuleDefinition].includes(parentNode.data.stepType)
-        )
+        ) {
           return;
+        }
 
         const childNode = nodes.find((node) => node.id === childNodeId);
         const parentStepName = `${parentNode.data.stepType}-${parentNodeId}`;
 
-        
         if (parentNode.data.stepType === StepType.Textfield) {
           const htmlToMarkdown = new NodeHtmlMarkdown({textReplace: [[/\\_/g, "_"], [/\\\[/g, "["], [/\\\]/g, "]"]]});
 
@@ -641,7 +642,7 @@ export const saveFlow = async ({
 
           const clientInputYesOrNo = (label: string) => (label === "rule 1" ? '"Yes"' : '"No"');
 
-          const findTargetNodeId = (node: Node) => edges.find((edge) => edge.source === node.id)?.target;
+          const findTargetNodeId = (node: Node) => updatedEdges.find((edge) => edge.source === node.id)?.target;
           const findFollowingNode = (node: Node) => {
             const target = findTargetNodeId(node);
             return nodes.find((n) => n.id === target);
@@ -650,7 +651,7 @@ export const saveFlow = async ({
           finishedFlow.set(
             `${clientInput}-switch`,
             getSwitchCase(
-              edges
+              updatedEdges
                 .filter((e) => e.source === parentNodeId)
                 .map((e) => {
                   const node = nodes.find((node) => node.id === e.target);
@@ -683,7 +684,7 @@ export const saveFlow = async ({
             steps,
             parentNode,
             parentStepName,
-            childNode ? `${childNode.data.stepType}-${childNodeId}` : childNodeId
+            childNode ? `${childNode.data.stepType}-${childNodeId}` : undefined
           )
         );
       });
@@ -756,6 +757,46 @@ export const saveFlow = async ({
     });
   }
 };
+
+function skipPlaceholderNodes(nodes: Node[], edges: Edge[]) {
+  const nodeMap = nodes.reduce((map: any, node: any) => {
+    map[node.id] = node;
+    return map;
+  }, {});
+
+  const edgeMap = edges.reduce((map: any, edge: any) => {
+    if (!map[edge.source]) {
+      map[edge.source] = [];
+    }
+    map[edge.source].push(edge);
+    return map;
+  }, {});
+
+  function findNextNonPlaceholderNode(nodeId: any) {
+    let currentNodeId = nodeId;
+    while (nodeMap[currentNodeId] && nodeMap[currentNodeId]?.data?.type === "placeholder") {
+      const nextEdges = edgeMap[currentNodeId];
+      if (nextEdges && nextEdges.length > 0) {
+        currentNodeId = nextEdges[0].target;
+      } else {
+        break;
+      }
+    }
+    return currentNodeId;
+  }
+
+  const modifiedEdges = edges.map((edge: any) => {
+    const newTarget = findNextNonPlaceholderNode(edge.target);
+    return {
+      ...edge,
+      target: newTarget,
+    };
+  });
+
+  const finalEdges = modifiedEdges.filter((edge: any) => nodeMap[edge.target]?.data?.type !== "placeholder");
+
+  return finalEdges;
+}
 
 const getMapEntry = (value: string) => {
   const secrets = useServiceStore.getState().secrets;
