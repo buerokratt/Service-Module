@@ -869,6 +869,7 @@ const getTemplate = (steps: Step[], node: Node, stepName: string, nextStep?: str
       next: nextStep ?? "formatMessages",
     };
   }
+  
   return {
     template: `${import.meta.env.REACT_APP_PROJECT_LAYER}/${data?.templateName}`,
     requestType: "templates",
