@@ -1,0 +1,56 @@
+extract_request_data:
+  assign:
+    type: ${incoming.params.type}
+  next: check_for_type
+check_for_type:
+  switch:
+    - condition: ${type == null}
+      next: return_no_type_error
+  next: check_for_environment
+check_for_environment:
+  switch:
+    - condition: ${type.toLowerCase() == 'prod'}
+      next: get_prod_info
+  next: get_test_info
+get_prod_info:
+  call: http.post
+  args:
+    url: http://localhost:8086/services/endpoints/info/currency-get_euro_exchange-prod-info
+    body:
+      params: "${incoming.body != null ? incoming.body.params ?? new Map() : new
+        Map()}"
+      headers: "${incoming.body != null ? incoming.body.headers ?? new Map() : new
+        Map()}"
+      body: "${incoming.body != null ? incoming.body.body ?? new Map() : new Map()}"
+  result: info
+  next: assign_endpoint_url
+get_test_info:
+  call: http.post
+  args:
+    url: http://localhost:8086/services/endpoints/info/currency-get_euro_exchange-test-info
+    body:
+      params: "${incoming.body != null ? incoming.body.params ?? new Map() : new
+        Map()}"
+      headers: "${incoming.body != null ? incoming.body.headers ?? new Map() : new
+        Map()}"
+      body: "${incoming.body != null ? incoming.body.body ?? new Map() : new Map()}"
+  result: info
+  next: assign_endpoint_url
+assign_endpoint_url:
+  assign:
+    endpoint_url: https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/eur.json
+  next: execute_endpoint
+execute_endpoint:
+  call: http.get
+  args:
+    url: ${endpoint_url}
+  result: res
+  next: return_result
+return_result:
+  wrapper: false
+  return: ${res.response.body}
+  next: end
+return_no_type_error:
+  status: "400"
+  return: Please Specify Endpoint Type 'prod' Or 'test'
+  next: end
