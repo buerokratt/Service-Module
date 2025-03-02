@@ -11,6 +11,7 @@ import {
   NewServiceHeader,
   Track,
   Switch,
+  FormSelect,
 } from "../components";
 import { saveDraft } from "services/service-builder";
 import useStore from "store/store";
@@ -97,6 +98,12 @@ const NewServicePage: React.FC = () => {
                 />
               </Track>
             )}
+
+            <FormSelect
+              name="slot"
+              label=""
+              options={slots?.map((slot) => ({ label: slot, value: slot })) ?? []}
+            />
           </Track>
         </Card>
 
