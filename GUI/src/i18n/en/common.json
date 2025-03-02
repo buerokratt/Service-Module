@@ -195,7 +195,7 @@
     "endpoints": "Endpoints",
     "test": "Test URL",
     "isCommon": "Common Service",
-    "slots": "Slots",
+    "slot": "Slot",
     "endpoint": {
       "add": "+ Add API endpoint",
       "addTestEnv": "+ Add test environment",

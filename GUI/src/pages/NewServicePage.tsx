@@ -85,7 +85,7 @@ const NewServicePage: React.FC = () => {
               />
             </div>
             <div>
-              <label htmlFor="slot">{t("newService.slots")}</label>
+              <label htmlFor="slot">{t("newService.slot")}</label>
               <FormSelect name="slot" label="" options={slots?.map((slot) => ({ label: slot, value: slot })) ?? []} />
             </div>
             {userInfo?.authorities.includes("ROLE_ADMINISTRATOR") && (
