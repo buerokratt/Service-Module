@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useParams } from "react-router-dom";
 import {
@@ -16,6 +16,9 @@ import { saveDraft } from "services/service-builder";
 import useStore from "store/store";
 import useServiceStore from "store/new-services.store";
 import withAuthorization, { ROLES } from "hoc/with-authorization";
+import { useQuery } from "@tanstack/react-query";
+import axios from "axios";
+import { getSlots } from "resources/api-constants";
 
 const NewServicePage: React.FC = () => {
   const { t } = useTranslation();
@@ -26,6 +29,21 @@ const NewServicePage: React.FC = () => {
   const description = useServiceStore((state) => state.description);
   const name = useServiceStore((state) => state.name);
   const { intentName, id } = useParams();
+  // todo maybe useQuery
+  const [slots, setSlots] = useState([]);
+  // todo type
+  // const { data: slots } = useQuery<unknown[]>({
+  //   queryKey: ['slots'],
+  // });
+  // console.log(slots);
+
+  useEffect(() => {
+    axios.get(getSlots()).then((res) => {
+      setSlots(res.data.response);
+    });
+  }, []);
+
+  // console.log(slots);
 
   useEffect(() => {
     const name = intentName?.trim();
