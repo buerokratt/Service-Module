@@ -29,21 +29,10 @@ const NewServicePage: React.FC = () => {
   const description = useServiceStore((state) => state.description);
   const name = useServiceStore((state) => state.name);
   const { intentName, id } = useParams();
-  // todo maybe useQuery
-  const [slots, setSlots] = useState([]);
-  // todo type
-  // const { data: slots } = useQuery<unknown[]>({
-  //   queryKey: ['slots'],
-  // });
-  // console.log(slots);
-
-  useEffect(() => {
-    axios.get(getSlots()).then((res) => {
-      setSlots(res.data.response);
-    });
-  }, []);
-
-  // console.log(slots);
+  const { data: slots } = useQuery<string[]>({
+    queryKey: ['slots'],
+    queryFn: () => axios.get(getSlots()).then((res) => res.data.response),
+  });
 
   useEffect(() => {
     const name = intentName?.trim();
