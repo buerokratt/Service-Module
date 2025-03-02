@@ -195,6 +195,7 @@
     "endpoints": "Otspunktid",
     "test": "Testi URLi",
     "isCommon": "Üldteenus",
+    "slots": "Mälukohad",
     "endpoint": {
       "add": "+ Lisa API otspunkt",
       "addTestEnv": "+ Lisa testkeskkond",

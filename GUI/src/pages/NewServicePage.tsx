@@ -31,7 +31,7 @@ const NewServicePage: React.FC = () => {
   const name = useServiceStore((state) => state.name);
   const { intentName, id } = useParams();
   const { data: slots } = useQuery<string[]>({
-    queryKey: ['slots'],
+    queryKey: ["slots"],
     queryFn: () => axios.get(getSlots()).then((res) => res.data.response),
   });
 
@@ -84,6 +84,10 @@ const NewServicePage: React.FC = () => {
                 }}
               />
             </div>
+            <div>
+              <label htmlFor="slot">{t("newService.slots")}</label>
+              <FormSelect name="slot" label="" options={slots?.map((slot) => ({ label: slot, value: slot })) ?? []} />
+            </div>
             {userInfo?.authorities.includes("ROLE_ADMINISTRATOR") && (
               <Track gap={16}>
                 <label htmlFor="isCommon">{t("newService.isCommon")}</label>
@@ -98,12 +102,6 @@ const NewServicePage: React.FC = () => {
                 />
               </Track>
             )}
-
-            <FormSelect
-              name="slot"
-              label=""
-              options={slots?.map((slot) => ({ label: slot, value: slot })) ?? []}
-            />
           </Track>
         </Card>
 
@@ -120,7 +118,4 @@ const NewServicePage: React.FC = () => {
   );
 };
 
-export default withAuthorization(NewServicePage, [
-  ROLES.ROLE_ADMINISTRATOR,
-  ROLES.ROLE_SERVICE_MANAGER,
-]);
+export default withAuthorization(NewServicePage, [ROLES.ROLE_ADMINISTRATOR, ROLES.ROLE_SERVICE_MANAGER]);
