@@ -30,6 +30,7 @@ interface ServiceStoreState {
   name: string;
   serviceId: string;
   description: string;
+  slot: string;
   isCommon: boolean;
   edges: Edge[];
   nodes: Node[];
@@ -59,6 +60,7 @@ interface ServiceStoreState {
   isCommonEndpoint: (id: string) => boolean;
   setIsCommonEndpoint: (id: string, isCommon: boolean) => void;
   setDescription: (description: string) => void;
+  setSlot: (slot: string) => void;
   loadEndpointsResponseVariables: () => void;
   setSecrets: (newSecrets: PreDefinedEndpointEnvVariables) => void;
   addProductionVariables: (variables: string[]) => void;
@@ -109,6 +111,7 @@ interface ServiceStoreState {
 const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
   endpoints: [],
   name: "",
+  slot: "",
   serviceId: uuid(),
   description: "",
   edges: [initialEdge],
@@ -215,6 +218,7 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
   },
   changeServiceName: (name: string) => set({ name }),
   setDescription: (description: string) => set({ description }),
+  setSlot: (slot: string) => set({ slot }),
   isCommon: false,
   setIsCommon: (isCommon: boolean) => set({ isCommon }),
   isCommonEndpoint: (id: string) => {
@@ -259,6 +263,7 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
       endpoints: [],
       serviceId: uuid(),
       description: "",
+      slot: "",
       secrets: { prod: [], test: [] },
       availableVariables: { prod: [], test: [] },
       isCommon: false,
@@ -315,6 +320,7 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
         name: service.data[0].name,
         isCommon: service.data[0].isCommon,
         description: service.data[0].description,
+        slot: service.data[0].slot ?? "",
         edges,
         nodes,
         endpoints,
@@ -564,7 +570,7 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
       const deletedNodeStepType = reactFlowInstance.getNodes().find((node) => node.id === id)?.data.stepType;
       if (
         deletedNodeStepType !== StepType.FinishingStepEnd ||
-        deletedNodeStepType !== StepType.FinishingStepRedirect && get().nodes.length <= 4
+        (deletedNodeStepType !== StepType.FinishingStepRedirect && get().nodes.length <= 4)
       ) {
         const placeholder = buildPlaceholder({ id, position: deletedNodePosition });
         nodes.push(placeholder);

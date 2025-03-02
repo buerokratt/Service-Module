@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useParams } from "react-router-dom";
 import {
@@ -28,6 +28,7 @@ const NewServicePage: React.FC = () => {
   const endpoints = useServiceStore((state) => state.endpoints);
   const isCommon = useServiceStore((state) => state.isCommon);
   const description = useServiceStore((state) => state.description);
+  const slot = useServiceStore((state) => state.slot);
   const name = useServiceStore((state) => state.name);
   const { intentName, id } = useParams();
   const { data: slots } = useQuery<string[]>({
@@ -86,7 +87,13 @@ const NewServicePage: React.FC = () => {
             </div>
             <div>
               <label htmlFor="slot">{t("newService.slot")}</label>
-              <FormSelect name="slot" label="" options={slots?.map((slot) => ({ label: slot, value: slot })) ?? []} />
+              <FormSelect
+                name="slot"
+                label=""
+                options={slots?.map((slot) => ({ label: slot, value: slot })) ?? []}
+                onSelectionChange={(selection) => useServiceStore.getState().setSlot(selection?.value ?? "")}
+                defaultValue={slot}
+              />
             </div>
             {userInfo?.authorities.includes("ROLE_ADMINISTRATOR") && (
               <Track gap={16}>
