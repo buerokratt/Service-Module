@@ -21,3 +21,8 @@ curl -H "Content-Type: application/x-ndjson" -X PUT "$URL/faults" -ku "$AUTH" --
 if $MOCK_ALLOWED; then curl -H "Content-Type: application/x-ndjson" -X PUT "$URL/faults/_bulk" -ku "$AUTH" --data-binary "@mock/faults.json"; fi
 curl -L -XPOST "$URL/_scripts/get-faults-by-request-id" -H 'Content-Type: application/json' -H 'Cookie: customJwtCookie=test' --data-binary "@templates/get-faults-by-request-id.json"
 curl -L -XPOST "$URL/_scripts/get-faults-by-level" -H 'Content-Type: application/json' -H 'Cookie: customJwtCookie=test' --data-binary "@templates/get-faults-by-level.json"
+
+#Domain
+curl -XDELETE "$URL/domain?ignore_unavailable=true" -u "$AUTH" --insecure
+if $MOCK_ALLOWED; then curl -H "Content-Type: application/x-ndjson" -X PUT "$URL/domain/_bulk" -ku "$AUTH" --data-binary "@mock/domain.json"; fi
+curl -L -X POST "$URL/_scripts/domain-objects-with-pagination" -H 'Content-Type: application/json' -H 'Cookie: customJwtCookie=test' --data-binary "@templates/domain-objects-with-pagination.json"
