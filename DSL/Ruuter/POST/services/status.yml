@@ -109,7 +109,7 @@ check_for_status:
     - condition: ${new_state === "active"}
       next: activate_service
     - condition: ${new_state === "draft"}
-      next: draft_service  
+      next: draft_service
   next: deactivate_service
 
 activate_service:
@@ -210,5 +210,5 @@ return_service_file_missing:
 
 return_intent_does_not_exist:
   status: 400
-  return: 'does not exists'
+  return: "does not exists"
   next: end

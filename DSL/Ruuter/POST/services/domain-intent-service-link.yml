@@ -17,17 +17,25 @@ declaration:
       - field: serviceMethod
         type: string
         description: "Body field 'serviceMethod'"
+      - field: serviceSlot
+        type: string
+        description: "Slot input"
       - field: type
         type: string
-        description: "Body field 'type'"  
+        description: "Body field 'type'"
 
 extract_request_data:
   assign:
     serviceName: ${incoming.body.serviceName || ""}
     serviceMethod: ${incoming.body.serviceMethod || 'POST'}
+    serviceSlot: ${incoming.body.serviceSlot ?? ""}
     intent: ${incoming.body.intent}
     type: ${incoming.body.type}
-    service_path: "#service, /${serviceMethod}/services/active/${serviceName}"
+    # service_path: >-
+    #   ${serviceSlot
+    #     ? "#service, /${serviceMethod}/services/active/${serviceName}, ({${serviceSlot}})"
+    #     : "#service, /${serviceMethod}/services/active/${serviceName}"}
+    service_path: '${serviceSlot ? "#service, /${serviceMethod}/services/active/${serviceName}, ({${serviceSlot}})" : "#service, /${serviceMethod}/services/active/${serviceName}"}'
 
 get_file_locations:
   call: http.get
@@ -46,7 +54,7 @@ get_domain_file:
 assign_domain_file_data:
   assign:
     domain_data_json: ${domainData.response.body.response}
-  next: check_if_intent_exists  
+  next: check_if_intent_exists
 
 check_if_intent_exists:
   switch:
@@ -100,5 +108,5 @@ return_result:
 
 return_intent_does_not_exist:
   status: 400
-  return: 'Intent does not exists'
+  return: "Intent does not exists"
   next: end

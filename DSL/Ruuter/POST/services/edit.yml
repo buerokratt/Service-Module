@@ -16,7 +16,7 @@ declaration:
         description: "Body field 'description'"
       - field: slot
         type: string
-        description: "Optional slot input"
+        description: "Slot input"
       - field: name
         type: string
         description: "Body field 'name'"

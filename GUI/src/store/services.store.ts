@@ -227,6 +227,7 @@ const useServiceListStore = create<ServiceStoreState>((set, get, store) => ({
         serviceId: selectedService.serviceId,
         serviceName: selectedService.name,
         serviceMethod: selectedService.type,
+        serviceSlot: selectedService.slot,
         intent: intent,
       });
       useToastStore.getState().success({ title: successMessage });
@@ -272,7 +273,7 @@ const useServiceListStore = create<ServiceStoreState>((set, get, store) => ({
       await axios.post(respondToConnectionRequest(), {
         serviceId: request.service,
         serviceName: request.serviceName,
-        serviceMethod: 'POST',
+        serviceMethod: "POST",
         intent: request.intent,
         authorRole: request.authorRole,
         status: status === true ? "approved" : "declined",
@@ -288,7 +289,7 @@ const useServiceListStore = create<ServiceStoreState>((set, get, store) => ({
       await axios.post(respondToConnectionRequest(), {
         serviceId: request.service,
         serviceName: request.serviceName,
-        serviceMethod: 'POST',
+        serviceMethod: "POST",
         intent: request.intent,
         authorRole: request.authorRole,
         status: "deleted",

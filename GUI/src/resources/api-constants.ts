@@ -13,9 +13,11 @@ export const getTaraAuthResponseVariables = (): string => `${baseUrl}/user-info`
 export const getEndpointValidationMock = (): string => `${baseUrl}/mocks/validation-mock`;
 export const getEndpointValidation = (): string => `${baseUrl}/services/endpoint-url-validation`;
 export const deleteService = (): string => `${baseUrl}/services/delete`;
+// todo 3
 export const changeServiceStatus = (): string => `${baseUrl}/services/status`;
 export const changeIntentConnection = (): string => `${baseUrl}/services/check-intent-connection`;
 export const requestServiceIntentConnection = (): string => `${baseUrl}/services/request-service-intent-connection`;
+// todo 2
 export const respondToConnectionRequest = (): string => `${baseUrl}/services/respond-to-connection-request`;
 export const createNewService = (): string => `${baseUrl}/services/add`;
 export const testService = (state: ServiceState, serviceName: string): string =>
