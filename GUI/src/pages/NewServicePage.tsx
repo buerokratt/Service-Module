@@ -37,6 +37,7 @@ const NewServicePage: React.FC = () => {
   });
 
   // TODO IMPORTANT reset select to empty string
+  // todo insert service - check ALL SQL files to have slots
 
   useEffect(() => {
     const name = intentName?.trim();
