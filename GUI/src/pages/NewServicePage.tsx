@@ -36,10 +36,6 @@ const NewServicePage: React.FC = () => {
     queryFn: () => axios.get(getSlots()).then((res) => res.data.response),
   });
 
-  // TODO IMPORTANT reset select to empty string\
-  // .concat({ label: "", value: "" })
-  // todo make sure that scrolling works too todo
-
   useEffect(() => {
     const name = intentName?.trim();
     if (name) {
@@ -94,7 +90,9 @@ const NewServicePage: React.FC = () => {
               <FormSelect
                 name="slot"
                 label=""
-                options={slots?.map((slot) => ({ label: slot, value: slot })) ?? []}
+                options={[{ label: t("global.none"), value: "" }].concat(
+                  slots?.map((slot) => ({ label: slot, value: slot })) ?? []
+                )}
                 onSelectionChange={(selection) => useServiceStore.getState().setSlot(selection?.value ?? "")}
                 defaultValue={slot}
               />

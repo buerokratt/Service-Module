@@ -50,7 +50,8 @@
     "cancel": "Tühista",
     "close": "Sulge",
     "common": "Üldteenus",
-    "errorMessage": "Teenusele puudub ligipääs. Proovi hiljem uuesti."
+    "errorMessage": "Teenusele puudub ligipääs. Proovi hiljem uuesti.",
+    "none": "Puudub"
   },
   "menu": {
     "overview": "Ülevaade",

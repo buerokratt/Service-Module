@@ -50,7 +50,8 @@
     "cancel": "Cancel",
     "close": "Close",
     "common": "Common",
-    "errorMessage": "There is no access to the service. Try again later."
+    "errorMessage": "There is no access to the service. Try again later.",
+    "none": "None"
   },
   "menu": {
     "overview": "Overview",
