@@ -16,7 +16,6 @@ export const deleteService = (): string => `${baseUrl}/services/delete`;
 export const changeServiceStatus = (): string => `${baseUrl}/services/status`;
 export const changeIntentConnection = (): string => `${baseUrl}/services/check-intent-connection`;
 export const requestServiceIntentConnection = (): string => `${baseUrl}/services/request-service-intent-connection`;
-// todo 2
 export const respondToConnectionRequest = (): string => `${baseUrl}/services/respond-to-connection-request`;
 export const createNewService = (): string => `${baseUrl}/services/add`;
 export const testService = (state: ServiceState, serviceName: string): string =>
