@@ -421,6 +421,7 @@ interface SaveFlowConfig {
   onSuccess: (e: any) => void;
   onError: (e: any) => void;
   description: string;
+  slot: string;
   isCommon: boolean;
   serviceId: string;
   isNewService: boolean;
@@ -485,6 +486,7 @@ export const saveFlow = async ({
   onSuccess,
   onError,
   description,
+  slot,
   isCommon,
   serviceId,
   isNewService,
@@ -754,6 +756,7 @@ export const saveFlow = async ({
           name,
           serviceId,
           description,
+          slot,
           type: "POST",
           content: result,
           isCommon,
@@ -1025,12 +1028,12 @@ export const saveFlowClick = async () => {
   const name = useServiceStore.getState().serviceNameDashed();
   const serviceId = useServiceStore.getState().serviceId;
   const description = useServiceStore.getState().description;
+  const slot = useServiceStore.getState().slot;
   const isCommon = useServiceStore.getState().isCommon;
   const steps = useServiceStore.getState().mapEndpointsToSetps();
   const isNewService = useServiceStore.getState().isNewService;
   const edges = useServiceStore.getState().edges;
   const nodes = useServiceStore.getState().nodes;
-  const slot = useServiceStore.getState().slot;
 
   await saveFlow({
     steps,
@@ -1051,6 +1054,7 @@ export const saveFlowClick = async () => {
       });
     },
     description,
+    slot,
     isCommon,
     serviceId,
     isNewService,
