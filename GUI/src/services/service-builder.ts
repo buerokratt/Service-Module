@@ -751,6 +751,7 @@ export const saveFlow = async ({
 
     await axios
       .post(
+        // todo edit request here
         isNewService ? createNewService() : editService(serviceId),
         {
           name,
@@ -1035,6 +1036,10 @@ export const saveFlowClick = async () => {
   const edges = useServiceStore.getState().edges;
   const nodes = useServiceStore.getState().nodes;
 
+  console.log("saveFlowClick", {
+    slot,
+  });
+
   await saveFlow({
     steps,
     name,
@@ -1067,6 +1072,7 @@ export const editServiceInfo = async () => {
   const endpoints = useServiceStore.getState().endpoints;
   const serviceId = useServiceStore.getState().serviceId;
   const endPointsName = useServiceStore.getState().name;
+  const slot = useServiceStore.getState().slot;
 
   const tasks: Promise<any>[] = [];
 
@@ -1074,6 +1080,7 @@ export const editServiceInfo = async () => {
     axios.post(editService(serviceId), {
       name,
       description,
+      slot,
       type: "POST",
     })
   );

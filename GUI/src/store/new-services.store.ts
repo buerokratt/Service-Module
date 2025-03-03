@@ -320,7 +320,7 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
         name: service.data[0].name,
         isCommon: service.data[0].isCommon,
         description: service.data[0].description,
-        slot: service.data[0].slot ?? "",
+        slot: service.data[0].slot,
         edges,
         nodes,
         endpoints,

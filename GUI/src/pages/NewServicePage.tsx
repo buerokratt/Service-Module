@@ -36,8 +36,9 @@ const NewServicePage: React.FC = () => {
     queryFn: () => axios.get(getSlots()).then((res) => res.data.response),
   });
 
-  // TODO IMPORTANT reset select to empty string
-  // todo insert service - check ALL SQL files to have slots
+  // TODO IMPORTANT reset select to empty string\
+  // .concat({ label: "", value: "" })
+  // todo make sure that scrolling works too todo
 
   useEffect(() => {
     const name = intentName?.trim();
