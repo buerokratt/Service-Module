@@ -751,7 +751,6 @@ export const saveFlow = async ({
 
     await axios
       .post(
-        // todo edit request here
         isNewService ? createNewService() : editService(serviceId),
         {
           name,

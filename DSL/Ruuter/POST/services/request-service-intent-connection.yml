@@ -29,7 +29,7 @@ extract_request_data:
     serviceId: ${incoming.body.serviceId}
     serviceName: ${incoming.body.serviceName || ""}
     serviceMethod: ${incoming.body.serviceMethod || 'POST'}
-    serviceSlot: ${incoming.body.serviceSlot}
+    serviceSlot: ${incoming.body.serviceSlot ?? ""}
     intent: ${incoming.body.intent}
 
 link_intent_to_service_in_rasa_domain:

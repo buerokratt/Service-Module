@@ -26,16 +26,16 @@ declaration:
 
 extract_request_data:
   assign:
-    serviceName: ${incoming.body.serviceName || ""}
-    serviceMethod: ${incoming.body.serviceMethod || 'POST'}
-    serviceSlot: ${incoming.body.serviceSlot ?? ""}
-    intent: ${incoming.body.intent}
-    type: ${incoming.body.type}
-    # service_path: >-
-    #   ${serviceSlot
-    #     ? "#service, /${serviceMethod}/services/active/${serviceName}, ({${serviceSlot}})"
-    #     : "#service, /${serviceMethod}/services/active/${serviceName}"}
-    service_path: '${serviceSlot ? "#service, /${serviceMethod}/services/active/${serviceName}, ({${serviceSlot}})" : "#service, /${serviceMethod}/services/active/${serviceName}"}'
+    serviceName: "${incoming.body.serviceName || ''}"
+    serviceMethod: "${incoming.body.serviceMethod || 'POST'}"
+    serviceSlot: "${incoming.body.serviceSlot ? ', (' + incoming.body.serviceSlot + ')' : ''}"
+    intent: "${incoming.body.intent}"
+    type: "${incoming.body.type}"
+    service_path: "#service, /${serviceMethod}/services/active/${serviceName}${serviceSlot}"
+
+# todo remove
+log_service_slot:
+  log: ${serviceSlot}
 
 get_file_locations:
   call: http.get

@@ -92,6 +92,7 @@ const useServiceListStore = create<ServiceStoreState>((set, get, store) => ({
             id: item.id,
             name: item.name,
             description: item.description,
+            slot: item.slot,
             state: item.state,
             type: item.type,
             isCommon: item.iscommon,
