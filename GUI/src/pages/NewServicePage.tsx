@@ -36,6 +36,8 @@ const NewServicePage: React.FC = () => {
     queryFn: () => axios.get(getSlots()).then((res) => res.data.response),
   });
 
+  // TODO IMPORTANT reset select to empty string
+
   useEffect(() => {
     const name = intentName?.trim();
     if (name) {
