@@ -28,14 +28,17 @@ extract_request_data:
   assign:
     serviceName: "${incoming.body.serviceName || ''}"
     serviceMethod: "${incoming.body.serviceMethod || 'POST'}"
-    serviceSlot: ", ({${incoming.body.serviceSlot ? incoming.body.serviceSlot : ''}})"
+    serviceSlot: ', ({${incoming.body.serviceSlot ? incoming.body.serviceSlot : ''}})'
     intent: "${incoming.body.intent}"
     type: "${incoming.body.type}"
     service_path: "#service, /${serviceMethod}/services/active/${serviceName}${incoming.body.serviceSlot ? serviceSlot : ''}"
 
 # todo remove
-log_service_slot:
-  log: ${serviceSlot}
+log_slot_string:
+  log: "${incoming.body.serviceSlot ? serviceSlot : ''}"
+
+log_service_path:
+  log: "${service_path}"
 
 get_file_locations:
   call: http.get
