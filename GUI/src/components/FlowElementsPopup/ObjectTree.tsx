@@ -2,11 +2,6 @@ import OutputElementBox from "components/OutputElementBox";
 import { FC } from "react";
 import { JSONTree } from "react-json-tree";
 
-type ObjectTreeProps = {
-  data: object;
-  path: string | number;
-};
-
 const theme = {
   base00: "black",
   base01: "#383830",
@@ -24,6 +19,11 @@ const theme = {
   base0D: "#66d9ef",
   base0E: "#ae81ff",
   base0F: "#cc6633",
+};
+
+type ObjectTreeProps = {
+  data: object;
+  path: string | number;
 };
 
 const testObj = {

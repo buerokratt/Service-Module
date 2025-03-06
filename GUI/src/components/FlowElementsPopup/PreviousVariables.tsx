@@ -8,12 +8,16 @@ import { Assign } from "./AssignBuilder/assign-types";
 import { useTranslation } from "react-i18next";
 import { ObjectTree } from "./ObjectTree";
 
-type PreviousVariablesProps = {
-  readonly nodeId: string;
-};
-
 const isObject = (x: unknown) => {
   return typeof x === "object" && x !== null;
+};
+
+const getBoxValue = (value: string | number) => {
+  return "${" + value + "}";
+};
+
+type PreviousVariablesProps = {
+  readonly nodeId: string;
 };
 
 const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
@@ -24,7 +28,6 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
   const [assignedVariables, setAssignedVariables] = useState<Assign[]>([]);
   const [objectTreeData, setObjectTreeData] = useState<unknown>(null);
   const [objectTreePath, setObjectTreePath] = useState<string | number>("");
-  // const
 
   useEffect(() => {
     const previousNodes = nodes.slice(
@@ -69,13 +72,13 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
             style={{ maxHeight: "30vh", overflow: "auto" }}
           >
             {/* todo not ready for assigned variables */}
-            {/* todo maybe can be common element with the other one */}
-            {assignedVariables.map((assign) => (
+            {/* todo maybe can be common comp with the other one */}
+            {assignedVariables.map((variable) => (
               <OutputElementBox
-                key={assign.id}
-                text={assign.key}
+                key={variable.id}
+                text={variable.key}
                 draggable={true}
-                value={`\${${assign.key}}`}
+                value={getBoxValue(variable.key)}
                 useValue
               ></OutputElementBox>
             ))}
@@ -103,20 +106,24 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
             {endpoint.chips.map((chip) =>
               isObject(chip.content) ? (
                 <OutputElementBox
-                  text={chip.name}
+                  text={objectTreePath === chip.value ? chip.name + " ▲" : chip.name + " ▼"}
                   draggable={false}
                   value={chip.value}
                   useValue
-                  // todo logic to close
-                  // todo close open indicator
-                  // todo cursor if object not null
+                  style={{ cursor: "pointer" }}
                   onClick={() => {
+                    if (objectTreePath === chip.value) {
+                      setObjectTreeData(null);
+                      setObjectTreePath("");
+                      return;
+                    }
+
                     setObjectTreeData(chip.content);
                     setObjectTreePath(chip.value);
                   }}
                 />
               ) : (
-                <OutputElementBox text={chip.name} value={"${" + chip.value + "}"} useValue />
+                <OutputElementBox text={chip.name} value={getBoxValue(chip.value)} useValue />
               )
             )}
           </Track>
