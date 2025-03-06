@@ -58,8 +58,8 @@ export const ObjectTree: FC<ObjectTreeProps> = ({ path, data }) => {
   return (
     <div style={{ padding: "0px 15px 5px" }}>
       <JSONTree
-        data={testObj}
         // todo obj
+        data={testObj}
         // data={data}
         theme={theme}
         invertTheme={true}

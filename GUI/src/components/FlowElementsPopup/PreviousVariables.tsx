@@ -26,8 +26,7 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
   const nodes = useServiceStore((state) => state.nodes);
   const [endpoints, setEndpoints] = useState<EndpointResponseVariable[]>([]);
   const [assignedVariables, setAssignedVariables] = useState<Assign[]>([]);
-  const [objectTreeData, setObjectTreeData] = useState<unknown>(null);
-  const [objectTreePath, setObjectTreePath] = useState<string | number>("");
+  const [objectTree, setObjectTree] = useState<{ data: unknown; path: string | number } | null>(null);
 
   useEffect(() => {
     const previousNodes = nodes.slice(
@@ -106,20 +105,13 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
             {endpoint.chips.map((chip) =>
               isObject(chip.data) ? (
                 <OutputElementBox
-                  text={objectTreePath === chip.value ? chip.name + " ▲" : chip.name + " ▼"}
+                  text={objectTree?.path === chip.value ? chip.name + " ▲" : chip.name + " ▼"}
                   draggable={false}
                   value={chip.value}
                   useValue
                   style={{ cursor: "pointer" }}
                   onClick={() => {
-                    if (objectTreePath === chip.value) {
-                      setObjectTreeData(null);
-                      setObjectTreePath("");
-                      return;
-                    }
-
-                    setObjectTreeData(chip.data);
-                    setObjectTreePath(chip.value);
+                    setObjectTree(objectTree?.path === chip.value ? null : { data: chip.data, path: chip.value });
                   }}
                 />
               ) : (
@@ -129,7 +121,8 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
           </Track>
         </Track>
       ))}
-      {objectTreeData ? <ObjectTree data={objectTreeData} path={objectTreePath} /> : <></>}
+
+      {isObject(objectTree?.data) && <ObjectTree data={objectTree.data} path={objectTree.path} />}
     </Track>
   );
 };
