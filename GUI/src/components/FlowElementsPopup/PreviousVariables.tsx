@@ -104,7 +104,7 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
             style={{ maxHeight: "30vh", overflow: "auto" }}
           >
             {endpoint.chips.map((chip) =>
-              isObject(chip.content) ? (
+              isObject(chip.data) ? (
                 <OutputElementBox
                   text={objectTreePath === chip.value ? chip.name + " ▲" : chip.name + " ▼"}
                   draggable={false}
@@ -118,7 +118,7 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
                       return;
                     }
 
-                    setObjectTreeData(chip.content);
+                    setObjectTreeData(chip.data);
                     setObjectTreePath(chip.value);
                   }}
                 />
