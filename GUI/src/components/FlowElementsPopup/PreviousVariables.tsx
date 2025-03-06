@@ -1,7 +1,7 @@
 import { CSSProperties, FC, useEffect, useState } from "react";
 import Track from "../Track";
 import useServiceStore from "store/new-services.store";
-import { endpointResponseVariables } from "types/endpoint/endpoint-response-variables";
+import { EndpointResponseVariable } from "types/endpoint/endpoint-response-variables";
 import OutputElementBox from "components/OutputElementBox";
 import { StepType } from "types";
 import { Assign } from "./AssignBuilder/assign-types";
@@ -15,7 +15,7 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
   const { t } = useTranslation();
   let endpointsVariables = useServiceStore((state) => state.endpointsResponseVariables);
   const nodes = useServiceStore((state) => state.nodes);
-  const [endpoints, setEndpoints] = useState<endpointResponseVariables[]>([]);
+  const [endpoints, setEndpoints] = useState<EndpointResponseVariable[]>([]);
   const [assignedVariables, setAssignedVariables] = useState<Assign[]>([]);
 
   useEffect(() => {
@@ -50,10 +50,9 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
     <Track direction="vertical" align="stretch">
       {assignedVariables.length > 0 && (
         <Track direction="vertical" align="left" style={{ width: "100%", ...popupBodyCss, backgroundColor: "#F9F9F9" }}>
-          <label
-            htmlFor="json"
-            style={{ marginBottom: "10px", textTransform: "capitalize", cursor: "auto" }}
-          >{t('serviceFlow.previousVariables.assignElements')}</label>
+          <label htmlFor="json" style={{ marginBottom: "10px", textTransform: "capitalize", cursor: "auto" }}>
+            {t("serviceFlow.previousVariables.assignElements")}
+          </label>
           <Track
             direction="horizontal"
             gap={4}

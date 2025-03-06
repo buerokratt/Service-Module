@@ -97,7 +97,11 @@ const ServiceFlowPage: FC = () => {
                     {steps.map((step) => (
                       <Box
                         key={step.id}
-                        color={[StepType.FinishingStepEnd, StepType.FinishingStepRedirect].includes(step.type) ? "red" : "blue"}
+                        color={
+                          [StepType.FinishingStepEnd, StepType.FinishingStepRedirect].includes(step.type)
+                            ? "red"
+                            : "blue"
+                        }
                         onDragStart={(event) => onDragStart(event, step)}
                         draggable
                       >
@@ -116,7 +120,11 @@ const ServiceFlowPage: FC = () => {
                     {allElements.map((step) => (
                       <Box
                         key={step.id}
-                        color={[StepType.FinishingStepEnd, StepType.FinishingStepRedirect].includes(step.type) ? "red" : "blue"}
+                        color={
+                          [StepType.FinishingStepEnd, StepType.FinishingStepRedirect].includes(step.type)
+                            ? "red"
+                            : "blue"
+                        }
                         onDragStart={(event) => onDragStart(event, step)}
                         draggable
                       >
