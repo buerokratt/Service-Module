@@ -12,6 +12,10 @@ type PreviousVariablesProps = {
   readonly nodeId: string;
 };
 
+const isObject = (x: unknown) => {
+  return typeof x === "object" && x !== null;
+};
+
 const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
   const { t } = useTranslation();
   let endpointsVariables = useServiceStore((state) => state.endpointsResponseVariables);
@@ -63,6 +67,8 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
             isMultiline
             style={{ maxHeight: "30vh", overflow: "auto" }}
           >
+            {/* todo not ready for assigned variables */}
+            {/* todo maybe can be common element with the other one */}
             {assignedVariables.map((assign) => (
               <OutputElementBox
                 key={assign.id}
@@ -93,27 +99,28 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
             isMultiline
             style={{ maxHeight: "30vh", overflow: "auto" }}
           >
-            {endpoint.chips.map((chip) => (
-              <OutputElementBox
-                key={chip.value}
-                text={chip.name}
-                // todo draggable only if not object OR null
-                draggable={false}
-                value={chip.value}
-                useValue
-                // todo logic to close
-                // todo close open indicator
-                // todo cursor if object not null
-                onClick={() => {
-                  setVariableContent(chip.content);
-                  setVariableContentKey(chip.value);
-                }}
-              ></OutputElementBox>
-            ))}
+            {endpoint.chips.map((chip) =>
+              isObject(chip.content) ? (
+                <OutputElementBox
+                  text={chip.name}
+                  draggable={false}
+                  value={chip.value}
+                  useValue
+                  // todo logic to close
+                  // todo close open indicator
+                  // todo cursor if object not null
+                  onClick={() => {
+                    setVariableContent(chip.content);
+                    setVariableContentKey(chip.value);
+                  }}
+                />
+              ) : (
+                <OutputElementBox text={chip.name} value={"${" + chip.value + "}"} useValue />
+              )
+            )}
           </Track>
         </Track>
       ))}
-      {/* todo scroll is likely broken with long content */}
       {variableContent ? <VariableContent value={variableContent} name={variableContentKey} /> : <></>}
     </Track>
   );

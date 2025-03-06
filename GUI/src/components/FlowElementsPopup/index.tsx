@@ -164,7 +164,7 @@ const FlowElementsPopup: React.FC = () => {
 
   return (
     <Popup
-      style={{ maxWidth: 700, overflow: "visible" }}
+      style={{ maxWidth: 700 }}
       title={title}
       onClose={onClose}
       footer={
@@ -184,7 +184,12 @@ const FlowElementsPopup: React.FC = () => {
       }
     >
       <Track direction="vertical" align="stretch" gap={16} className="flow-body-reverse-margin">
-        <Tabs.Root className="vertical-tabs__column" orientation="horizontal" value={selectedTab ?? t("serviceFlow.tabs.setup")!} onValueChange={setSelectedTab}>
+        <Tabs.Root
+          className="vertical-tabs__column"
+          orientation="horizontal"
+          value={selectedTab ?? t("serviceFlow.tabs.setup")!}
+          onValueChange={setSelectedTab}
+        >
           <Tabs.List>
             <Tabs.Trigger className="vertical-tabs__trigger" value={t("serviceFlow.tabs.setup")}>
               {t("serviceFlow.tabs.setup")}
@@ -230,19 +235,30 @@ const FlowElementsPopup: React.FC = () => {
                 />
               </DndProvider>
             )}
-            {stepType === StepType.FinishingStepRedirect && <DefaultMessageContent message={t("serviceFlow.popup.redirectToCustomerSupport")} />}
+            {stepType === StepType.FinishingStepRedirect && (
+              <DefaultMessageContent message={t("serviceFlow.popup.redirectToCustomerSupport")} />
+            )}
             {stepType === StepType.Auth && <DefaultMessageContent message={t("serviceFlow.popup.loginWithTARA")} />}
-            {stepType === StepType.FileSign && <FileSignContent onOptionChange={setSignOption} signOption={signOption} />}
+            {stepType === StepType.FileSign && (
+              <FileSignContent onOptionChange={setSignOption} signOption={signOption} />
+            )}
             {stepType === StepType.FinishingStepEnd && <EndConversationContent />}
             {stepType === StepType.RasaRules && <RasaRulesContent />}
             {stepType === StepType.Assign && <AssignContent nodeId={node.id} />}
-            {stepType === StepType.Condition && <ConditionContent nodeId={node.id}/>}
+            {stepType === StepType.Condition && <ConditionContent nodeId={node.id} />}
             <JsonRequestContent isVisible={isJsonRequestVisible} jsonContent={jsonRequestContent} />
           </Tabs.Content>
           {!isReadonly && (
             <Tabs.Content value={t("serviceFlow.tabs.test")} className="vertical-tabs__body">
-              {stepType === StepType.Textfield && <TextfieldTestContent placeholders={textfieldMessagePlaceholders} message={textfieldMessage || node.data.message} />}
-              {stepType === StepType.OpenWebpage && <OpenWebPageTestContent websiteUrl={webpageUrl} websiteName={webpageName} />}
+              {stepType === StepType.Textfield && (
+                <TextfieldTestContent
+                  placeholders={textfieldMessagePlaceholders}
+                  message={textfieldMessage || node.data.message}
+                />
+              )}
+              {stepType === StepType.OpenWebpage && (
+                <OpenWebPageTestContent websiteUrl={webpageUrl} websiteName={webpageName} />
+              )}
             </Tabs.Content>
           )}
         </Tabs.Root>
