@@ -26,6 +26,7 @@ type ObjectTreeProps = {
   path: string | number;
 };
 
+// todo remove
 const testObj = {
   test: {
     test2: {
