@@ -50,6 +50,7 @@ const testObj = {
   null: null,
   undefined: undefined,
   arr: [1, 2, 3],
+  1: "string value",
 };
 
 export const ObjectTree: FC<ObjectTreeProps> = ({ path, data }) => {
