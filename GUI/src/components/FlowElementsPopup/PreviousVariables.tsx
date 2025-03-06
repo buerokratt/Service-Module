@@ -6,7 +6,7 @@ import OutputElementBox from "components/OutputElementBox";
 import { StepType } from "types";
 import { Assign } from "./AssignBuilder/assign-types";
 import { useTranslation } from "react-i18next";
-import { VariableContent } from "./VariableContent";
+import { ObjectTree } from "./ObjectTree";
 
 type PreviousVariablesProps = {
   readonly nodeId: string;
@@ -22,8 +22,9 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
   const nodes = useServiceStore((state) => state.nodes);
   const [endpoints, setEndpoints] = useState<EndpointResponseVariable[]>([]);
   const [assignedVariables, setAssignedVariables] = useState<Assign[]>([]);
-  const [variableContent, setVariableContent] = useState<unknown>(null);
-  const [variableContentKey, setVariableContentKey] = useState<string | number>("");
+  const [objectTreeData, setObjectTreeData] = useState<unknown>(null);
+  const [objectTreePath, setObjectTreePath] = useState<string | number>("");
+  // const
 
   useEffect(() => {
     const previousNodes = nodes.slice(
@@ -110,8 +111,8 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
                   // todo close open indicator
                   // todo cursor if object not null
                   onClick={() => {
-                    setVariableContent(chip.content);
-                    setVariableContentKey(chip.value);
+                    setObjectTreeData(chip.content);
+                    setObjectTreePath(chip.value);
                   }}
                 />
               ) : (
@@ -121,7 +122,7 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
           </Track>
         </Track>
       ))}
-      {variableContent ? <VariableContent value={variableContent} name={variableContentKey} /> : <></>}
+      {objectTreeData ? <ObjectTree data={objectTreeData} path={objectTreePath} /> : <></>}
     </Track>
   );
 };

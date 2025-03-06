@@ -8,6 +8,7 @@ type OutputElementBoxProps = {
   readonly draggable?: boolean;
   readonly useValue?: boolean;
   readonly onClick?: () => void;
+  readonly style?: CSSProperties;
 };
 
 const OutputElementBox: FC<OutputElementBoxProps> = ({
@@ -17,24 +18,25 @@ const OutputElementBox: FC<OutputElementBoxProps> = ({
   useValue = false,
   value = "",
   onClick,
+  style,
 }) => {
-  const style: CSSProperties = {
+  const mergedStyle: CSSProperties = {
     borderRadius: 46,
     paddingTop: 1.5,
     paddingBottom: 1.5,
     paddingLeft: 10,
     paddingRight: 10,
     fontSize: 14,
+    ...style,
   };
 
   return (
-    // todo can this be button?
     <Box
       onClick={onClick}
       color={color}
       draggable={draggable}
       onDragStart={(event) => event.dataTransfer.setData("text/plain", useValue ? `${value}` : text)}
-      style={style}
+      style={mergedStyle}
     >
       {text}
     </Box>
