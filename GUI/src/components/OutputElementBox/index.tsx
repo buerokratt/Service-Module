@@ -7,9 +7,17 @@ type OutputElementBoxProps = {
   readonly color?: "green" | "yellow";
   readonly draggable?: boolean;
   readonly useValue?: boolean;
+  readonly onClick?: () => void;
 };
 
-const OutputElementBox: FC<OutputElementBoxProps> = ({ text, color = "green", draggable = true, useValue = false, value = "" }) => {
+const OutputElementBox: FC<OutputElementBoxProps> = ({
+  text,
+  color = "green",
+  draggable = true,
+  useValue = false,
+  value = "",
+  onClick,
+}) => {
   const style: CSSProperties = {
     borderRadius: 46,
     paddingTop: 1.5,
@@ -20,7 +28,14 @@ const OutputElementBox: FC<OutputElementBoxProps> = ({ text, color = "green", dr
   };
 
   return (
-    <Box color={color} draggable={draggable} onDragStart={(event) => event.dataTransfer.setData("text/plain", useValue ? `${value}` : text)} style={style}>
+    // todo can this be button?
+    <Box
+      onClick={onClick}
+      color={color}
+      draggable={draggable}
+      onDragStart={(event) => event.dataTransfer.setData("text/plain", useValue ? `${value}` : text)}
+      style={style}
+    >
       {text}
     </Box>
   );

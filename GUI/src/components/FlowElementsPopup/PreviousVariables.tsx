@@ -6,6 +6,7 @@ import OutputElementBox from "components/OutputElementBox";
 import { StepType } from "types";
 import { Assign } from "./AssignBuilder/assign-types";
 import { useTranslation } from "react-i18next";
+import { VariableContent } from "./VariableContent";
 
 type PreviousVariablesProps = {
   readonly nodeId: string;
@@ -17,6 +18,7 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
   const nodes = useServiceStore((state) => state.nodes);
   const [endpoints, setEndpoints] = useState<EndpointResponseVariable[]>([]);
   const [assignedVariables, setAssignedVariables] = useState<Assign[]>([]);
+  const [variableContent, setVariableContent] = useState<unknown>(null);
 
   useEffect(() => {
     const previousNodes = nodes.slice(
@@ -94,14 +96,20 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
               <OutputElementBox
                 key={chip.value}
                 text={chip.name}
-                draggable={true}
+                // todo draggable if not object, null
+                // todo what if want to use obj itself?
+                // draggable={true}
                 value={chip.value}
                 useValue
+                // todo logic to close
+                onClick={() => setVariableContent(chip.content)}
               ></OutputElementBox>
             ))}
           </Track>
         </Track>
       ))}
+      {/* todo scroll is likely broken with long content */}
+      {variableContent ? <VariableContent content={variableContent} /> : <></>}
     </Track>
   );
 };
