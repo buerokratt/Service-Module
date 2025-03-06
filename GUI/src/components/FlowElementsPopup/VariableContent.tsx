@@ -60,8 +60,8 @@ export const VariableContent: FC<VariableContentProps> = ({ name, value }) => {
       theme={theme}
       invertTheme={true}
       // keyPath={typeof name === "string" ? name.split(".") : [name]}
-      keyPath={typeof name === "string" ? [name.split(".").pop()] : [name]}
-      labelRenderer={([key, keyPath]) => {
+      // keyPath={typeof name === "string" ? [name.split(".").pop()] : [name]}
+      labelRenderer={(keyPath) => {
         // console.log(key);
         console.log(keyPath);
         return (
@@ -70,9 +70,8 @@ export const VariableContent: FC<VariableContentProps> = ({ name, value }) => {
           // todo bad if array - test also nested in obj
           <>
             <OutputElementBox
-              text={String(key)}
-              // value={`\${${name}.${key}}`}
-              value={`\${${name}.${keyPath}.${key}}`}
+              text={String(keyPath[0])}
+              value={name + "." + keyPath.toReversed().join(".")}
               useValue
               draggable={true}
             ></OutputElementBox>
