@@ -19,6 +19,7 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
   const [endpoints, setEndpoints] = useState<EndpointResponseVariable[]>([]);
   const [assignedVariables, setAssignedVariables] = useState<Assign[]>([]);
   const [variableContent, setVariableContent] = useState<unknown>(null);
+  const [variableContentKey, setVariableContentKey] = useState<string | number>("");
 
   useEffect(() => {
     const previousNodes = nodes.slice(
@@ -96,20 +97,23 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
               <OutputElementBox
                 key={chip.value}
                 text={chip.name}
-                // todo draggable if not object, null
-                // todo what if want to use obj itself?
-                // draggable={true}
+                draggable={true}
                 value={chip.value}
                 useValue
                 // todo logic to close
-                onClick={() => setVariableContent(chip.content)}
+                // todo expandable if not object, null
+                // todo can drag root from expanded?
+                onClick={() => {
+                  setVariableContent(chip.content);
+                  setVariableContentKey(chip.value);
+                }}
               ></OutputElementBox>
             ))}
           </Track>
         </Track>
       ))}
       {/* todo scroll is likely broken with long content */}
-      {variableContent ? <VariableContent content={variableContent} /> : <></>}
+      {variableContent ? <VariableContent value={variableContent} name={variableContentKey} /> : <></>}
     </Track>
   );
 };
