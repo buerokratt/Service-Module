@@ -33,8 +33,6 @@ get_file_locations:
   call: http.get
   args:
     url: "[#SERVICE_RUUTER]/internal/return-file-locations"
-    headers:
-      cookie: ${incoming.headers.cookie}
   result: fileLocations
   next: get_domain_file
 
@@ -42,8 +40,6 @@ get_domain_file:
   call: http.get
   args:
     url: "[#SERVICE_RUUTER]/internal/domain-file"
-    headers:
-      cookie: ${incoming.headers.cookie}
   result: domainData
   next: assign_domain_file_data
 
@@ -74,7 +70,7 @@ update_existing_domain_response:
 convert_domain_json_to_yaml:
   call: http.post
   args:
-    url: "[#SERVICE_DMAPPER]/conversion/json_to_yaml"
+    url: "[#SERVICE_DMAPPER]/conversion/json_to_yaml_domain"
     body:
       version: ${domain_data_json.version}
       session_config: ${domain_data_json.session_config}
