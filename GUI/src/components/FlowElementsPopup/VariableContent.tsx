@@ -50,36 +50,31 @@ const testObj = {
   undefined: undefined,
 };
 
-// todo name
+// todo name + prop names
 export const VariableContent: FC<VariableContentProps> = ({ name, value }) => {
-  // console.log("igor path", typeof name === "string" ? name.split(".") : [name]);
+  const pathArray = typeof name === "string" ? name.split(".") : [name];
+  const root = pathArray.pop()!;
+
   return (
     <JSONTree
       data={testObj}
+      // todo obj
       // data={value}
       theme={theme}
       invertTheme={true}
-      // keyPath={typeof name === "string" ? name.split(".") : [name]}
-      // keyPath={typeof name === "string" ? [name.split(".").pop()] : [name]}
-      labelRenderer={(keyPath) => {
-        // console.log(key);
-        console.log(keyPath);
-        return (
-          // todo parse number strings? Number.isInteger() for int/float
-          // todo key needs to have prefix when dragged
-          // todo bad if array - test also nested in obj
-          <>
-            <OutputElementBox
-              text={String(keyPath[0])}
-              value={name + "." + keyPath.toReversed().join(".")}
-              useValue
-              draggable={true}
-            ></OutputElementBox>
-            {/* <span>:</span> */}
-          </>
-        );
-      }}
+      keyPath={[String(root)]}
+      labelRenderer={(keyPath) => (
+        <>
+          <OutputElementBox
+            text={String(keyPath[0])}
+            value={"${" + pathArray.join(".") + "." + keyPath.toReversed().join(".") + "}"}
+            useValue
+            draggable={true}
+          ></OutputElementBox>
+          {/* todo styles + colon */}
+          {/* <span>:</span> */}
+        </>
+      )}
     />
   );
-  //   return <>{JSON.stringify(value)}</>;
 };

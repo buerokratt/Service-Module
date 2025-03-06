@@ -97,12 +97,13 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
               <OutputElementBox
                 key={chip.value}
                 text={chip.name}
-                draggable={true}
+                // todo draggable only if not object OR null
+                draggable={false}
                 value={chip.value}
                 useValue
                 // todo logic to close
-                // todo expandable if not object, null
-                // todo can drag root from expanded?
+                // todo close open indicator
+                // todo cursor if object not null
                 onClick={() => {
                   setVariableContent(chip.content);
                   setVariableContentKey(chip.value);
