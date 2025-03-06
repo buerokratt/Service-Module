@@ -51,7 +51,6 @@ const testObj = {
   arr: [1, 2, 3],
 };
 
-// todo name + prop names
 export const ObjectTree: FC<ObjectTreeProps> = ({ path, data }) => {
   const pathArray = typeof path === "string" ? path.split(".") : [path];
   const root = pathArray.pop()!;
