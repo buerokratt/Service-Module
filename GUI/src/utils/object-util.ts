@@ -16,7 +16,6 @@ export const getValueByPath = (obj: unknown, path: string) => {
       if (Array.isArray(result)) {
         result = result[index];
       } else {
-        // If trying to use array notation on non-array, return undefined
         return undefined;
       }
     }
