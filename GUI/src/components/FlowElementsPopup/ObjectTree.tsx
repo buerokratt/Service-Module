@@ -70,14 +70,12 @@ export const ObjectTree: FC<ObjectTreeProps> = ({ path, data }) => {
         labelRenderer={(keyPath) => (
           <>
             <OutputElementBox
-              text={String(keyPath[0])}
+              text={String(keyPath[0]) + ":"}
               value={"${" + pathArray.join(".") + "." + keyPath.toReversed().join(".") + "}"}
               useValue
               draggable={true}
               className="object-tree-chip"
             />
-            {/* todo colon */}
-            {/* <span>:</span> */}
           </>
         )}
       />
