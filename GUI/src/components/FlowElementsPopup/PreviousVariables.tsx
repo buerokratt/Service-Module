@@ -7,14 +7,8 @@ import { StepType } from "types";
 import { Assign } from "./AssignBuilder/assign-types";
 import { useTranslation } from "react-i18next";
 import { ObjectTree } from "./ObjectTree";
-
-const isObject = (x: unknown) => {
-  return typeof x === "object" && x !== null;
-};
-
-const getBoxValue = (value: string | number) => {
-  return "${" + value + "}";
-};
+import { stringToTemplate } from "utils/string-util";
+import { isObject } from "utils/object-util";
 
 type PreviousVariablesProps = {
   readonly nodeId: string;
@@ -77,7 +71,7 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
                 key={variable.id}
                 text={variable.key}
                 draggable={true}
-                value={getBoxValue(variable.key)}
+                value={stringToTemplate(variable.key)}
                 useValue
               ></OutputElementBox>
             ))}
@@ -115,7 +109,7 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
                   }}
                 />
               ) : (
-                <OutputElementBox text={chip.name} value={getBoxValue(chip.value)} useValue />
+                <OutputElementBox text={chip.name} value={stringToTemplate(chip.value)} useValue />
               )
             )}
           </Track>

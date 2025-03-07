@@ -23,6 +23,8 @@ import FileSignContent from "./FileSignContent";
 import "./styles.scss";
 import ConditionContent from "./ConditionContent";
 import AssignContent from "./AssignContent";
+import { templateToString } from "utils/string-util";
+import { getValueByPath } from "utils/object-util";
 
 const FlowElementsPopup: React.FC = () => {
   const { t } = useTranslation();
@@ -36,6 +38,7 @@ const FlowElementsPopup: React.FC = () => {
   const endpoints = useServiceStore((state) => state.endpoints);
   const rules = useServiceStore((state) => state.rules);
   const assignElements = useServiceStore((state) => state.assignElements);
+  const endpointsVariables = useServiceStore((state) => state.endpointsResponseVariables);
 
   useEffect(() => {
     if (node) node.data.rules = rules;
@@ -92,6 +95,7 @@ const FlowElementsPopup: React.FC = () => {
     useServiceStore.getState().resetRules();
   };
 
+  // todo node save is here igor
   const handleSaveClick = () => {
     const updatedNode = {
       ...node,
@@ -111,6 +115,16 @@ const FlowElementsPopup: React.FC = () => {
     }
 
     if (stepType === StepType.Assign) {
+      const flatEndpointVariables = endpointsVariables.map((endpoint) => endpoint.chips).flat();
+      // todo test old with [0] array index - BROKEN, ${mutual_res.response.body.data[1].nav}
+      assignElements.forEach((element) => {
+        const pathArray = templateToString(element.value).split(".");
+        const endpointVariable = flatEndpointVariables.find(
+          (variable) => pathArray.slice(0, 4).join(".") === variable.value
+        );
+        const path = pathArray.slice(4).join(".");
+        element.data = getValueByPath(endpointVariable?.data, path);
+      });
       updatedNode.data.assignElements = assignElements;
     }
 
@@ -200,7 +214,6 @@ const FlowElementsPopup: React.FC = () => {
               </Tabs.Trigger>
             )}
           </Tabs.List>
-
           <Tabs.Content value={t("serviceFlow.tabs.setup")} className="vertical-tabs__body">
             {stepType === StepType.Textfield && (
               <TextfieldContent

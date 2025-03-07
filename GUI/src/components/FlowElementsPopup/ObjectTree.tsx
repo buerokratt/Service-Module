@@ -2,6 +2,7 @@ import OutputElementBox from "components/OutputElementBox";
 import { FC } from "react";
 import { JSONTree } from "react-json-tree";
 import "./styles.scss";
+import { stringToTemplate } from "utils/string-util";
 
 const theme = {
   base00: "black",
@@ -37,6 +38,7 @@ const testObj = {
   test2: [
     {
       test3: "test",
+      nestedArr: [1, 2, 3],
     },
   ],
   test3: [
@@ -62,15 +64,15 @@ export const ObjectTree: FC<ObjectTreeProps> = ({ path, data }) => {
     <div style={{ padding: "0px 15px 5px" }}>
       <JSONTree
         // todo obj
-        data={testObj}
-        // data={data}
+        // data={testObj}
+        data={data}
         theme={theme}
         invertTheme={true}
         keyPath={[String(root)]}
         labelRenderer={(keyPath) => (
           <OutputElementBox
             text={String(keyPath[0]) + ":"}
-            value={"${" + pathArray.join(".") + "." + keyPath.toReversed().join(".") + "}"}
+            value={stringToTemplate(pathArray.join(".") + "." + keyPath.toReversed().join("."))}
             useValue
             draggable={true}
             className="object-tree-chip"
