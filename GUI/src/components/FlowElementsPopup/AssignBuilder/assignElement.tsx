@@ -1,6 +1,6 @@
-import React from 'react';
-import { FormInput, Icon, Track } from 'components';
-import { MdDeleteOutline } from 'react-icons/md';
+import React from "react";
+import { FormInput, Icon, Track } from "components";
+import { MdDeleteOutline } from "react-icons/md";
 import { Assign } from "./assign-types";
 
 interface AssignElementProps {
@@ -10,14 +10,13 @@ interface AssignElementProps {
 }
 
 const AssignElement: React.FC<AssignElementProps> = ({ element, onRemove, onChange }) => {
-  
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     change(e.target.name, e.target.value);
-  }
+  };
 
   const change = (name: string, value?: string) => {
     onChange({ ...element, [name]: value });
-  }
+  };
 
   return (
     <Track gap={16} isFlex>
@@ -31,6 +30,6 @@ const AssignElement: React.FC<AssignElementProps> = ({ element, onRemove, onChan
       </button>
     </Track>
   );
-}
+};
 
 export default AssignElement;

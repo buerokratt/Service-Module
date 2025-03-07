@@ -118,12 +118,10 @@ const FlowElementsPopup: React.FC = () => {
       const flatEndpointVariables = endpointsVariables.map((endpoint) => endpoint.chips).flat();
       // todo test old with [0] array index - BROKEN, ${mutual_res.response.body.data[1].nav}
       assignElements.forEach((element) => {
-        const pathArray = templateToString(element.value).split(".");
-        const endpointVariable = flatEndpointVariables.find(
-          (variable) => pathArray.slice(0, 4).join(".") === variable.value
-        );
-        const path = pathArray.slice(4).join(".");
-        element.data = getValueByPath(endpointVariable?.data, path);
+        const fullPath = templateToString(element.value);
+        const endpointVariable = flatEndpointVariables.find((variable) => fullPath.startsWith(String(variable.value)))!;
+        const remainingPath = fullPath.substring(String(endpointVariable.value).length + 1); // +1 for the dot
+        element.data = getValueByPath(endpointVariable.data, remainingPath);
       });
       updatedNode.data.assignElements = assignElements;
     }
