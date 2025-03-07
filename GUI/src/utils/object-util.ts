@@ -4,7 +4,12 @@ export const getValueByPath = (obj: unknown, path: string) => {
   const keys = path.split(".");
   let result = obj;
 
-  for (const key of keys) {
+  for (let key of keys) {
+    // To support array notation, e.g. data[1].something; needed for backwards compatibility
+    if (key.startsWith("[") && key.endsWith("]")) {
+      key = key.substring(1, key.length - 1);
+    }
+
     if (result === null || result === undefined) {
       return undefined;
     }
