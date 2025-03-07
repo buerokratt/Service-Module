@@ -121,9 +121,9 @@ const FlowElementsPopup: React.FC = () => {
         const value = String(endpointVariable.value);
         const remainingPath = fullPath.substring(
           fullPath[value.length] === "["
-            ? // Uses array notation, e.g. data[1].something; needed for backwards compatibility
+            ? // Uses array notation, e.g. endpointVariable[1].something; needed for backwards compatibility
               value.length
-            : // Uses object notation, e.g. data.1.something
+            : // Uses object notation, e.g. endpointVariable.1.something
               value.length + 1
         );
         element.data = remainingPath ? getValueByPath(endpointVariable.data, remainingPath) : endpointVariable.data;
