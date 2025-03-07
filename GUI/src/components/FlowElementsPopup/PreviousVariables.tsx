@@ -75,8 +75,6 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
             isMultiline
             style={{ maxHeight: "30vh", overflow: "auto" }}
           >
-            {/* todo maybe can be common comp with the other one */}
-            {/* todo merge assign and chip types? FlowVariable */}
             {assignedVariables.map((variable) =>
               isObject(variable.data) ? (
                 <OutputElementBox
