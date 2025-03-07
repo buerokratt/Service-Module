@@ -115,13 +115,10 @@ const FlowElementsPopup: React.FC = () => {
 
     if (stepType === StepType.Assign) {
       const flatEndpointVariables = endpointsVariables.map((endpoint) => endpoint.chips).flat();
-      // todo test old with [0] array index - BROKEN, ${mutual_res.response.body.data[1].nav}
       assignElements.forEach((element) => {
         const fullPath = templateToString(element.value);
-        // console.log("FULL PATH", fullPath);
         const endpointVariable = flatEndpointVariables.find((variable) => fullPath.startsWith(String(variable.value)))!;
         const value = String(endpointVariable.value);
-        // console.log("VALUE AT", fullPath[value.length]);
         const remainingPath = fullPath.substring(
           fullPath[value.length] === "["
             ? // Uses array notation, e.g. data[1].something; needed for backwards compatibility
@@ -129,9 +126,7 @@ const FlowElementsPopup: React.FC = () => {
             : // Uses object notation, e.g. data.1.something
               value.length + 1
         );
-        // console.log("REMAINING", remainingPath);
         element.data = remainingPath ? getValueByPath(endpointVariable.data, remainingPath) : endpointVariable.data;
-        console.log("DATA", element.data);
       });
       updatedNode.data.assignElements = assignElements;
     }
