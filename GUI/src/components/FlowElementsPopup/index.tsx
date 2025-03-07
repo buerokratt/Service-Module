@@ -120,7 +120,7 @@ const FlowElementsPopup: React.FC = () => {
         const fullPath = templateToString(element.value);
         const endpointVariable = flatEndpointVariables.find((variable) => fullPath.startsWith(String(variable.value)))!;
         const remainingPath = fullPath.substring(String(endpointVariable.value).length + 1); // +1 for the dot
-        element.data = getValueByPath(endpointVariable.data, remainingPath);
+        element.data = remainingPath ? getValueByPath(endpointVariable.data, remainingPath) : endpointVariable.data;
       });
       updatedNode.data.assignElements = assignElements;
     }

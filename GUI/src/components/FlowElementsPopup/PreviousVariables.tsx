@@ -89,7 +89,7 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
         </Track>
       )}
 
-      {/* todo style when expanded */}
+      {/* todo style bugs when expanded */}
       {isObject(assignedObjectTree?.data) && (
         <ObjectTree data={assignedObjectTree.data} path={templateToString(assignedObjectTree.path)} />
       )}
