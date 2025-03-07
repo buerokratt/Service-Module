@@ -54,7 +54,7 @@ services:
     ports:
       - 8087:8087
     volumes:
-      - ./DSL/Resql/services:/workspace/app/templates/services
+      - ./DSL/Resql:/DSL
     networks:
       - bykstack
 
@@ -74,7 +74,7 @@ services:
     ports:
       - 8088:8088
     volumes:
-      - ./DSL/Resql/users:/workspace/app/templates/users
+       - ./DSL/Resql:/DSL
     networks:
       - bykstack
 
@@ -94,7 +94,7 @@ services:
     ports:
       - 8089:8089
     volumes:
-      - ./DSL/Resql/training:/workspace/app/templates/training
+       - ./DSL/Resql:/DSL
     networks:
       - bykstack
 
@@ -106,10 +106,10 @@ services:
       - CONTENT_FOLDER=/data
     volumes:
       - ./DSL:/data
-      - ./DSL/DMapper/hbs:/workspace/app/views/services
-      - ./DSL/DMapper/js:/workspace/app/js/services
+      - ./DSL/DMapper/services/hbs:/workspace/app/views/services
+      - ./DSL/DMapper/services/js:/workspace/app/js/services
       - ./secrets:/data/secrets
-      - ./DSL/DMapper/locations:/rasa/locations
+      - ./DSL/DMapper/services/locations:/rasa/locations
     ports:
       - 3005:3005
     networks:
@@ -120,21 +120,21 @@ services:
     environment:
       - NODE_ENV=development
       - CHOKIDAR_USEPOLLING=true
-      - REACT_APP_API_URL=http://localhost:8086
+      - REACT_APP_API_URL=http://localhost:8086/services
       - REACT_APP_TRAINING_MODULE_GUI_BASE_URL=http://localhost:3001
       - PORT=3006
       - REACT_APP_APP_PORT=3006
-      - REACT_APP_MENU_BASE_URL=http://localhost:8086
+      - REACT_APP_MENU_BASE_URL=http://localhost:8086/services
       - REACT_APP_MENU_URL=https://admin.dev.buerokratt.ee
-      - REACT_APP_RUUTER_V2_SERVICE_API_URL=http://localhost:8086
-      - REACT_APP_AUTH_BASE_URL=http://localhost:8086
+      - REACT_APP_RUUTER_V2_SERVICE_API_URL=http://localhost:8086/services
+      - REACT_APP_AUTH_BASE_URL=http://localhost:8086/services
       - REACT_APP_NOTIFICATION_NODE_URL=http://localhost:4040
       - REACT_APP_AUTH_PATH=/auth
       - REACT_APP_MENU_PATH=/chat/menu.json
       - REACT_APP_API_PATH=/
       - REACT_APP_LOCAL=true
-      - REACT_APP_RUUTER_API_URL=http://localhost:8086
-      - REACT_APP_RUUTER_PRIVATE_API_URL=http://localhost:8086
+      - REACT_APP_RUUTER_API_URL=http://localhost:8086/services
+      - REACT_APP_RUUTER_PRIVATE_API_URL=http://localhost:8086/services
       - REACT_APP_CSP=upgrade-insecure-requests; default-src 'self'; font-src 'self' data:; img-src 'self' data:; script-src 'self' 'unsafe-eval' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; object-src 'none'; connect-src 'self' http://localhost:8086 http://localhost:8085 https://admin.dev.buerokratt.ee/chat/menu.json;
       - REACT_APP_CONVERSATIONS_BASE_URL=http://localhost:8080/chat
       - REACT_APP_TRAINING_BASE_URL=http://localhost:8080/training

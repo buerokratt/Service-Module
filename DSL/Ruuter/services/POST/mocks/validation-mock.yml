@@ -16,7 +16,7 @@ call_mock:
   result: mock_res
 
 call_template:
-  template: validation-template
+  template: "[#SERVICE_PROJECT_LAYER]/validation-template"
   requestType: templates
   body:
     response: ${mock_res.response}
