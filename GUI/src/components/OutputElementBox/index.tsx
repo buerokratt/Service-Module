@@ -9,6 +9,7 @@ type OutputElementBoxProps = {
   readonly useValue?: boolean;
   readonly onClick?: () => void;
   readonly style?: CSSProperties;
+  readonly className?: string;
 };
 
 const OutputElementBox: FC<OutputElementBoxProps> = ({
@@ -19,6 +20,7 @@ const OutputElementBox: FC<OutputElementBoxProps> = ({
   value = "",
   onClick,
   style,
+  className,
 }) => {
   const mergedStyle: CSSProperties = {
     borderRadius: 46,
@@ -32,6 +34,7 @@ const OutputElementBox: FC<OutputElementBoxProps> = ({
 
   return (
     <Box
+      className={className}
       onClick={onClick}
       color={color}
       draggable={draggable}

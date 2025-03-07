@@ -1,6 +1,7 @@
 import OutputElementBox from "components/OutputElementBox";
 import { FC } from "react";
 import { JSONTree } from "react-json-tree";
+import "./styles.scss";
 
 const theme = {
   base00: "black",
@@ -73,10 +74,9 @@ export const ObjectTree: FC<ObjectTreeProps> = ({ path, data }) => {
               value={"${" + pathArray.join(".") + "." + keyPath.toReversed().join(".") + "}"}
               useValue
               draggable={true}
-              // todo broken
-              style={{ textAlign: "center" }}
+              className="object-tree-chip"
             />
-            {/* todo styles + colon */}
+            {/* todo colon */}
             {/* <span>:</span> */}
           </>
         )}
