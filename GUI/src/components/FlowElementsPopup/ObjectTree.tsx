@@ -1,5 +1,5 @@
 import OutputElementBox from "components/OutputElementBox";
-import { FC } from "react";
+import { CSSProperties, FC } from "react";
 import { JSONTree } from "react-json-tree";
 import "./styles.scss";
 import { stringToTemplate } from "utils/string-util";
@@ -26,14 +26,15 @@ const theme = {
 type ObjectTreeProps = {
   data: object;
   path: string | number;
+  style?: CSSProperties;
 };
 
-export const ObjectTree: FC<ObjectTreeProps> = ({ path, data }) => {
+export const ObjectTree: FC<ObjectTreeProps> = ({ path, data, style }) => {
   const pathArray = typeof path === "string" ? path.split(".") : [path];
   const root = pathArray.pop()!;
 
   return (
-    <div style={{ padding: "0px 15px 5px" }}>
+    <div style={{ padding: "0px 15px 5px", ...style }}>
       <JSONTree
         data={data}
         theme={theme}

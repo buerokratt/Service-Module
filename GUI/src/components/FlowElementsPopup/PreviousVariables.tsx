@@ -48,13 +48,23 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
 
   const popupBodyCss: CSSProperties = {
     padding: 16,
-    borderBottom: `1px solid #D2D3D8`,
+    backgroundColor: "#F9F9F9",
+    width: "100%",
   };
+
+  const border = "1px solid #D2D3D8";
 
   return (
     <Track direction="vertical" align="stretch">
       {assignedVariables.length > 0 && (
-        <Track direction="vertical" align="left" style={{ width: "100%", ...popupBodyCss, backgroundColor: "#F9F9F9" }}>
+        <Track
+          direction="vertical"
+          align="left"
+          style={{
+            ...popupBodyCss,
+            borderBottom: assignedObjectTree ? undefined : border,
+          }}
+        >
           <label htmlFor="json" style={{ marginBottom: "10px", textTransform: "capitalize", cursor: "auto" }}>
             {t("serviceFlow.previousVariables.assignElements")}
           </label>
@@ -89,18 +99,16 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
         </Track>
       )}
 
-      {/* todo style bugs when expanded */}
       {isObject(assignedObjectTree?.data) && (
-        <ObjectTree data={assignedObjectTree.data} path={templateToString(assignedObjectTree.path)} />
+        <ObjectTree
+          data={assignedObjectTree.data}
+          path={templateToString(assignedObjectTree.path)}
+          style={{ borderBottom: border, borderTop: border }}
+        />
       )}
 
       {endpoints.map((endpoint) => (
-        <Track
-          key={endpoint.name}
-          direction="vertical"
-          align="left"
-          style={{ width: "100%", ...popupBodyCss, backgroundColor: "#F9F9F9" }}
-        >
+        <Track key={endpoint.name} direction="vertical" align="left" style={{ ...popupBodyCss, borderBottom: border }}>
           <label
             htmlFor="json"
             style={{ marginBottom: "10px", textTransform: "capitalize", cursor: "auto" }}
