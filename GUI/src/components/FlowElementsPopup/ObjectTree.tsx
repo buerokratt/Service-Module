@@ -75,7 +75,7 @@ export const ObjectTree: FC<ObjectTreeProps> = ({ path, data }) => {
               draggable={true}
               // todo broken
               style={{ textAlign: "center" }}
-            ></OutputElementBox>
+            />
             {/* todo styles + colon */}
             {/* <span>:</span> */}
           </>
