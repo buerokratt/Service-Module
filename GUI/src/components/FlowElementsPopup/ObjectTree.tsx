@@ -30,7 +30,7 @@ type ObjectTreeProps = {
 };
 
 export const ObjectTree: FC<ObjectTreeProps> = ({ path, data, style }) => {
-  const pathArray = typeof path === "string" ? path.split(".") : [path];
+  const pathArray = String(path).split(".");
   const root = pathArray.pop()!;
 
   return (
