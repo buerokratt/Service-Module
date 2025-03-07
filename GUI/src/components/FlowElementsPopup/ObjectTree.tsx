@@ -68,15 +68,13 @@ export const ObjectTree: FC<ObjectTreeProps> = ({ path, data }) => {
         invertTheme={true}
         keyPath={[String(root)]}
         labelRenderer={(keyPath) => (
-          <>
-            <OutputElementBox
-              text={String(keyPath[0]) + ":"}
-              value={"${" + pathArray.join(".") + "." + keyPath.toReversed().join(".") + "}"}
-              useValue
-              draggable={true}
-              className="object-tree-chip"
-            />
-          </>
+          <OutputElementBox
+            text={String(keyPath[0]) + ":"}
+            value={"${" + pathArray.join(".") + "." + keyPath.toReversed().join(".") + "}"}
+            useValue
+            draggable={true}
+            className="object-tree-chip"
+          />
         )}
       />
     </div>
