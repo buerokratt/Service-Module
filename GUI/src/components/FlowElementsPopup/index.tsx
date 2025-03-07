@@ -95,7 +95,6 @@ const FlowElementsPopup: React.FC = () => {
     useServiceStore.getState().resetRules();
   };
 
-  // todo node save is here igor
   const handleSaveClick = () => {
     const updatedNode = {
       ...node,

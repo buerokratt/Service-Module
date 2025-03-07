@@ -9,7 +9,6 @@ export const getValueByPath = (obj: unknown, path: string) => {
       return undefined;
     }
 
-    // Check if key is a number (array index)
     const index = Number(key);
     if (!isNaN(index) && Array.isArray(result)) {
       result = result[index];

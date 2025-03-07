@@ -7,7 +7,7 @@ import { StepType } from "types";
 import { Assign } from "./AssignBuilder/assign-types";
 import { useTranslation } from "react-i18next";
 import { ObjectTree } from "./ObjectTree";
-import { stringToTemplate } from "utils/string-util";
+import { stringToTemplate, templateToString } from "utils/string-util";
 import { isObject } from "utils/object-util";
 
 type PreviousVariablesProps = {
@@ -20,7 +20,8 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
   const nodes = useServiceStore((state) => state.nodes);
   const [endpoints, setEndpoints] = useState<EndpointResponseVariable[]>([]);
   const [assignedVariables, setAssignedVariables] = useState<Assign[]>([]);
-  const [objectTree, setObjectTree] = useState<{ data: unknown; path: string | number } | null>(null);
+  const [endpointsObjectTree, setEndpointsObjectTree] = useState<{ data: unknown; path: string | number } | null>(null);
+  const [assignedObjectTree, setAssignedObjectTree] = useState<{ data: unknown; path: string | number } | null>(null);
 
   useEffect(() => {
     const previousNodes = nodes.slice(
@@ -40,7 +41,7 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
     const inputElement: Assign = {
       id: "-1",
       key: "input",
-      value: "${incoming.body.input}",
+      value: stringToTemplate("incoming.body.input"),
     };
     setAssignedVariables([...assignElements, inputElement]);
   }, [endpointsVariables]);
@@ -64,20 +65,35 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
             isMultiline
             style={{ maxHeight: "30vh", overflow: "auto" }}
           >
-            {/* todo not ready for assigned variables */}
             {/* todo maybe can be common comp with the other one */}
-            {assignedVariables.map((variable) => (
-              <OutputElementBox
-                key={variable.id}
-                text={variable.key}
-                draggable={true}
-                value={stringToTemplate(variable.key)}
-                useValue
-              ></OutputElementBox>
-            ))}
+            {/* todo merge assign and chip types? FlowVariable */}
+            {assignedVariables.map((variable) =>
+              isObject(variable.data) ? (
+                <OutputElementBox
+                  text={assignedObjectTree?.path === variable.value ? variable.key + " ▲" : variable.key + " ▼"}
+                  draggable={false}
+                  value={variable.value}
+                  useValue
+                  style={{ cursor: "pointer" }}
+                  onClick={() => {
+                    setAssignedObjectTree(
+                      assignedObjectTree?.path === variable.value ? null : { data: variable.data, path: variable.value }
+                    );
+                  }}
+                />
+              ) : (
+                <OutputElementBox text={variable.key} value={variable.value} useValue />
+              )
+            )}
           </Track>
         </Track>
       )}
+
+      {/* todo style when expanded */}
+      {isObject(assignedObjectTree?.data) && (
+        <ObjectTree data={assignedObjectTree.data} path={templateToString(assignedObjectTree.path)} />
+      )}
+
       {endpoints.map((endpoint) => (
         <Track
           key={endpoint.name}
@@ -99,13 +115,15 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
             {endpoint.chips.map((chip) =>
               isObject(chip.data) ? (
                 <OutputElementBox
-                  text={objectTree?.path === chip.value ? chip.name + " ▲" : chip.name + " ▼"}
+                  text={endpointsObjectTree?.path === chip.value ? chip.name + " ▲" : chip.name + " ▼"}
                   draggable={false}
                   value={chip.value}
                   useValue
                   style={{ cursor: "pointer" }}
                   onClick={() => {
-                    setObjectTree(objectTree?.path === chip.value ? null : { data: chip.data, path: chip.value });
+                    setEndpointsObjectTree(
+                      endpointsObjectTree?.path === chip.value ? null : { data: chip.data, path: chip.value }
+                    );
                   }}
                 />
               ) : (
@@ -116,7 +134,9 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
         </Track>
       ))}
 
-      {isObject(objectTree?.data) && <ObjectTree data={objectTree.data} path={objectTree.path} />}
+      {isObject(endpointsObjectTree?.data) && (
+        <ObjectTree data={endpointsObjectTree.data} path={endpointsObjectTree.path} />
+      )}
     </Track>
   );
 };

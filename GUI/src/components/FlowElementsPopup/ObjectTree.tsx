@@ -28,34 +28,6 @@ type ObjectTreeProps = {
   path: string | number;
 };
 
-// todo remove
-const testObj = {
-  test: {
-    test2: {
-      test3: "test",
-    },
-  },
-  test2: [
-    {
-      test3: "test",
-      nestedArr: [1, 2, 3],
-    },
-  ],
-  test3: [
-    {
-      test4: "test",
-    },
-  ],
-  float: 1.23,
-  int: 1,
-  bool: true,
-  string: "test",
-  null: null,
-  undefined: undefined,
-  arr: [1, 2, 3],
-  1: "string value",
-};
-
 export const ObjectTree: FC<ObjectTreeProps> = ({ path, data }) => {
   const pathArray = typeof path === "string" ? path.split(".") : [path];
   const root = pathArray.pop()!;
@@ -63,8 +35,6 @@ export const ObjectTree: FC<ObjectTreeProps> = ({ path, data }) => {
   return (
     <div style={{ padding: "0px 15px 5px" }}>
       <JSONTree
-        // todo obj
-        // data={testObj}
         data={data}
         theme={theme}
         invertTheme={true}
