@@ -13,12 +13,12 @@ import useToastStore from "store/toasts.store";
 import { Service, ServiceState } from "types";
 
 interface GetColumnsConfig {
-  isCommon: boolean,
-  navigate: NavigateFunction,
-  checkIntentConnection: () => void,
-  hideDeletePopup: () => void,
-  showStatePopup: (text: string) => void,
-  showReadyPopup: () => void,
+  isCommon: boolean;
+  navigate: NavigateFunction;
+  checkIntentConnection: () => void;
+  hideDeletePopup: () => void;
+  showStatePopup: (text: string) => void;
+  showReadyPopup: () => void;
 }
 
 export const getColumns = ({
@@ -167,8 +167,8 @@ export const getColumns = ({
         </Track>
       ),
     }),
-  ]
-}
+  ];
+};
 
 const getLabelType = (serviceState: ServiceState) => {
   switch (serviceState) {
@@ -182,9 +182,7 @@ const getLabelType = (serviceState: ServiceState) => {
 };
 
 const getStatePopupContent = (state: ServiceState) => {
-  if(state === ServiceState.Draft)
-    return i18n.t("overview.popup.setReady");
-  if(state === ServiceState.Active)
-    return i18n.t("overview.popup.setInactive");
+  if (state === ServiceState.Draft) return i18n.t("overview.popup.setReady");
+  if (state === ServiceState.Active) return i18n.t("overview.popup.setInactive");
   return i18n.t("overview.popup.setActive");
-}
+};

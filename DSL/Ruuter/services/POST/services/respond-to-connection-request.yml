@@ -20,6 +20,9 @@ declaration:
       - field: serviceName
         type: string
         description: "Body field 'serviceName'"
+      - field: serviceSlot
+        type: string
+        description: "Slot input"
       - field: status
         type: string
         description: "Body field 'status'"
@@ -29,6 +32,7 @@ extract_request_data:
     serviceId: ${incoming.body.serviceId}
     serviceName: ${incoming.body.serviceName}
     serviceMethod: ${incoming.body.serviceMethod}
+    serviceSlot: ${incoming.body.serviceSlot}
     authorRole: ${incoming.body.authorRole}
     intent: ${incoming.body.intent}
     status: ${incoming.body.status}
@@ -74,5 +78,5 @@ return_result:
 
 return_intent_does_not_exist:
   status: 400
-  return: 'does not exists'
+  return: "does not exists"
   next: end

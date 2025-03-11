@@ -8,6 +8,7 @@ export interface Service {
   readonly type: "GET" | "POST";
   readonly isCommon: boolean;
   readonly description?: string;
+  readonly slot: string;
   readonly structure: any;
   readonly endpoints: any;
   readonly serviceId: string;

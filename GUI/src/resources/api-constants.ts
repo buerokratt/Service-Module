@@ -31,3 +31,4 @@ export const getFaultyServices = (page: number, pageSize: number, sort: string, 
 export const trainingModuleTraining = (): string => `${trainingModuleBaseUrl}/treening/treeni-uus-mudel`;
 export const getServiceById = (id: string): string => `${baseUrl}/service-by-id?id=${id}`;
 export const updateServiceEndpoints = (id: string): string => `${baseUrl}/services/update-service-endpoints?id=${id}`;
+export const getSlots = (): string => `${baseUrl}/slots`;
