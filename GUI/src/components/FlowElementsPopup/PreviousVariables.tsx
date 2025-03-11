@@ -1,11 +1,14 @@
 import { CSSProperties, FC, useEffect, useState } from "react";
 import Track from "../Track";
 import useServiceStore from "store/new-services.store";
-import { endpointResponseVariables } from "types/endpoint/endpoint-response-variables";
+import { EndpointResponseVariable } from "types/endpoint/endpoint-response-variables";
 import OutputElementBox from "components/OutputElementBox";
 import { StepType } from "types";
 import { Assign } from "./AssignBuilder/assign-types";
 import { useTranslation } from "react-i18next";
+import { ObjectTree } from "./ObjectTree";
+import { stringToTemplate, templateToString } from "utils/string-util";
+import { isObject } from "utils/object-util";
 
 type PreviousVariablesProps = {
   readonly nodeId: string;
@@ -15,8 +18,10 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
   const { t } = useTranslation();
   let endpointsVariables = useServiceStore((state) => state.endpointsResponseVariables);
   const nodes = useServiceStore((state) => state.nodes);
-  const [endpoints, setEndpoints] = useState<endpointResponseVariables[]>([]);
+  const [endpoints, setEndpoints] = useState<EndpointResponseVariable[]>([]);
   const [assignedVariables, setAssignedVariables] = useState<Assign[]>([]);
+  const [endpointsObjectTree, setEndpointsObjectTree] = useState<{ data: unknown; path: string | number } | null>(null);
+  const [assignedObjectTree, setAssignedObjectTree] = useState<{ data: unknown; path: string | number } | null>(null);
 
   useEffect(() => {
     const previousNodes = nodes.slice(
@@ -36,24 +41,33 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
     const inputElement: Assign = {
       id: "-1",
       key: "input",
-      value: "${incoming.body.input}",
+      value: stringToTemplate("incoming.body.input"),
     };
     setAssignedVariables([...assignElements, inputElement]);
   }, [endpointsVariables]);
 
   const popupBodyCss: CSSProperties = {
     padding: 16,
-    borderBottom: `1px solid #D2D3D8`,
+    backgroundColor: "#F9F9F9",
+    width: "100%",
   };
+
+  const border = "1px solid #D2D3D8";
 
   return (
     <Track direction="vertical" align="stretch">
       {assignedVariables.length > 0 && (
-        <Track direction="vertical" align="left" style={{ width: "100%", ...popupBodyCss, backgroundColor: "#F9F9F9" }}>
-          <label
-            htmlFor="json"
-            style={{ marginBottom: "10px", textTransform: "capitalize", cursor: "auto" }}
-          >{t('serviceFlow.previousVariables.assignElements')}</label>
+        <Track
+          direction="vertical"
+          align="left"
+          style={{
+            ...popupBodyCss,
+            borderBottom: assignedObjectTree ? undefined : border,
+          }}
+        >
+          <label htmlFor="json" style={{ marginBottom: "10px", textTransform: "capitalize", cursor: "auto" }}>
+            {t("serviceFlow.previousVariables.assignElements")}
+          </label>
           <Track
             direction="horizontal"
             gap={4}
@@ -61,25 +75,38 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
             isMultiline
             style={{ maxHeight: "30vh", overflow: "auto" }}
           >
-            {assignedVariables.map((assign) => (
-              <OutputElementBox
-                key={assign.id}
-                text={assign.key}
-                draggable={true}
-                value={`\${${assign.key}}`}
-                useValue
-              ></OutputElementBox>
-            ))}
+            {assignedVariables.map((variable) =>
+              isObject(variable.data) ? (
+                <OutputElementBox
+                  text={assignedObjectTree?.path === variable.value ? variable.key + " ▲" : variable.key + " ▼"}
+                  draggable={false}
+                  value={variable.value}
+                  useValue
+                  style={{ cursor: "pointer" }}
+                  onClick={() => {
+                    setAssignedObjectTree(
+                      assignedObjectTree?.path === variable.value ? null : { data: variable.data, path: variable.value }
+                    );
+                  }}
+                />
+              ) : (
+                <OutputElementBox text={variable.key} value={variable.value} useValue />
+              )
+            )}
           </Track>
         </Track>
       )}
+
+      {isObject(assignedObjectTree?.data) && (
+        <ObjectTree
+          data={assignedObjectTree.data}
+          path={templateToString(assignedObjectTree.path)}
+          style={{ borderBottom: border, borderTop: border }}
+        />
+      )}
+
       {endpoints.map((endpoint) => (
-        <Track
-          key={endpoint.name}
-          direction="vertical"
-          align="left"
-          style={{ width: "100%", ...popupBodyCss, backgroundColor: "#F9F9F9" }}
-        >
+        <Track key={endpoint.name} direction="vertical" align="left" style={{ ...popupBodyCss, borderBottom: border }}>
           <label
             htmlFor="json"
             style={{ marginBottom: "10px", textTransform: "capitalize", cursor: "auto" }}
@@ -91,18 +118,31 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
             isMultiline
             style={{ maxHeight: "30vh", overflow: "auto" }}
           >
-            {endpoint.chips.map((chip) => (
-              <OutputElementBox
-                key={chip.value}
-                text={chip.name}
-                draggable={true}
-                value={chip.value}
-                useValue
-              ></OutputElementBox>
-            ))}
+            {endpoint.chips.map((chip) =>
+              isObject(chip.data) ? (
+                <OutputElementBox
+                  text={endpointsObjectTree?.path === chip.value ? chip.name + " ▲" : chip.name + " ▼"}
+                  draggable={false}
+                  value={chip.value}
+                  useValue
+                  style={{ cursor: "pointer" }}
+                  onClick={() => {
+                    setEndpointsObjectTree(
+                      endpointsObjectTree?.path === chip.value ? null : { data: chip.data, path: chip.value }
+                    );
+                  }}
+                />
+              ) : (
+                <OutputElementBox text={chip.name} value={stringToTemplate(chip.value)} useValue />
+              )
+            )}
           </Track>
         </Track>
       ))}
+
+      {isObject(endpointsObjectTree?.data) && (
+        <ObjectTree data={endpointsObjectTree.data} path={endpointsObjectTree.path} />
+      )}
     </Track>
   );
 };

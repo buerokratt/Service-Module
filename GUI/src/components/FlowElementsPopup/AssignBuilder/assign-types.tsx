@@ -1,4 +1,4 @@
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidv4 } from "uuid";
 
 export interface ElementGroupBuilderProps {
   assignElements?: Assign[];
@@ -11,12 +11,13 @@ export interface Assign {
   id: string;
   key: string;
   value: string;
+  data?: unknown;
 }
 
 export const getInitialElement = () => {
   return {
     id: uuidv4(),
-    key: '',
-    value: '',
+    key: "",
+    value: "",
   };
-}
+};

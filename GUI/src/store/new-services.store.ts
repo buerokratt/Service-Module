@@ -22,7 +22,7 @@ import { alignNodesInCaseAnyGotOverlapped, buildPlaceholder, updateFlowInputRule
 import { GroupOrRule } from "components/FlowElementsPopup/RuleBuilder/types";
 import useTestServiceStore from "./test-services.store";
 import { Chip } from "types/chip";
-import { endpointResponseVariables } from "types/endpoint/endpoint-response-variables";
+import { EndpointResponseVariable } from "types/endpoint/endpoint-response-variables";
 import { Assign } from "components/FlowElementsPopup/AssignBuilder/assign-types";
 
 interface ServiceStoreState {
@@ -39,7 +39,7 @@ interface ServiceStoreState {
   assignElements: Assign[];
   rules: GroupOrRule[];
   isYesNoQuestion: boolean;
-  endpointsResponseVariables: endpointResponseVariables[];
+  endpointsResponseVariables: EndpointResponseVariable[];
   setIsYesNoQuestion: (value: boolean) => void;
   changeAssignNode: (assign: Assign[]) => void;
   changeRulesNode: (rules: GroupOrRule[]) => void;
@@ -183,19 +183,20 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
         })
       );
 
-      const variables: endpointResponseVariables[] = [];
+      const variables: EndpointResponseVariable[] = [];
 
-      endpointResponses.forEach((endpointResponses, i) => {
+      endpointResponses.forEach((response, i) => {
         const endpoint = get().endpoints[i];
         const chips: Chip[] = [];
 
-        endpointResponses.forEach((response) => {
-          Object.keys(response).forEach((key) => {
+        response.forEach((response) => {
+          for (const [key, value] of Object.entries(response)) {
             chips.push({
               name: key,
-              value: `\${${endpoint.name.replace(" ", "_")}_res.response.body.${key}}`,
+              value: `${endpoint.name.replace(" ", "_")}_res.response.body.${key}`,
+              data: value,
             });
-          });
+          }
         });
 
         variables.push({

@@ -23,6 +23,8 @@ import FileSignContent from "./FileSignContent";
 import "./styles.scss";
 import ConditionContent from "./ConditionContent";
 import AssignContent from "./AssignContent";
+import { templateToString } from "utils/string-util";
+import { getValueByPath } from "utils/object-util";
 import ApiContent from "./ApiContent";
 import { saveEndpoints } from "services/service-builder";
 import useToastStore from "store/toasts.store";
@@ -40,6 +42,7 @@ const FlowElementsPopup: React.FC = () => {
   const endpoints = useServiceStore((state) => state.endpoints);
   const rules = useServiceStore((state) => state.rules);
   const assignElements = useServiceStore((state) => state.assignElements);
+  const endpointsVariables = useServiceStore((state) => state.endpointsResponseVariables);
 
   useEffect(() => {
     if (node) node.data.rules = rules;
@@ -115,6 +118,20 @@ const FlowElementsPopup: React.FC = () => {
     }
 
     if (stepType === StepType.Assign) {
+      const flatEndpointVariables = endpointsVariables.map((endpoint) => endpoint.chips).flat();
+      assignElements.forEach((element) => {
+        const fullPath = templateToString(element.value);
+        const endpointVariable = flatEndpointVariables.find((variable) => fullPath.startsWith(String(variable.value)))!;
+        const value = String(endpointVariable.value);
+        const remainingPath = fullPath.substring(
+          fullPath[value.length] === "["
+            ? // Uses array notation, e.g. endpointVariable[1].something; needed for backwards compatibility
+              value.length
+            : // Uses object notation, e.g. endpointVariable.1.something
+              value.length + 1
+        );
+        element.data = remainingPath ? getValueByPath(endpointVariable.data, remainingPath) : endpointVariable.data;
+      });
       updatedNode.data.assignElements = assignElements;
     }
 
@@ -197,7 +214,7 @@ const FlowElementsPopup: React.FC = () => {
 
   return (
     <Popup
-      style={{ maxWidth: 700, overflow: "visible" }}
+      style={{ maxWidth: 700 }}
       title={title}
       onClose={onClose}
       footer={
@@ -217,7 +234,12 @@ const FlowElementsPopup: React.FC = () => {
       }
     >
       <Track direction="vertical" align="stretch" gap={16} className="flow-body-reverse-margin">
-        <Tabs.Root className="vertical-tabs__column" orientation="horizontal" value={selectedTab ?? t("serviceFlow.tabs.setup")!} onValueChange={setSelectedTab}>
+        <Tabs.Root
+          className="vertical-tabs__column"
+          orientation="horizontal"
+          value={selectedTab ?? t("serviceFlow.tabs.setup")!}
+          onValueChange={setSelectedTab}
+        >
           <Tabs.List>
             <Tabs.Trigger className="vertical-tabs__trigger" value={t("serviceFlow.tabs.setup")}>
               {t("serviceFlow.tabs.setup")}
@@ -228,7 +250,6 @@ const FlowElementsPopup: React.FC = () => {
               </Tabs.Trigger>
             )}
           </Tabs.List>
-
           <Tabs.Content value={t("serviceFlow.tabs.setup")} className="vertical-tabs__body">
             {stepType === StepType.Textfield && (
               <TextfieldContent
@@ -263,20 +284,36 @@ const FlowElementsPopup: React.FC = () => {
                 />
               </DndProvider>
             )}
-            {stepType === StepType.FinishingStepRedirect && <DefaultMessageContent message={t("serviceFlow.popup.redirectToCustomerSupport")} />}
+            {stepType === StepType.FinishingStepRedirect && (
+              <DefaultMessageContent message={t("serviceFlow.popup.redirectToCustomerSupport")} />
+            )}
             {stepType === StepType.Auth && <DefaultMessageContent message={t("serviceFlow.popup.loginWithTARA")} />}
-            {stepType === StepType.FileSign && <FileSignContent onOptionChange={setSignOption} signOption={signOption} />}
+            {stepType === StepType.FileSign && (
+              <FileSignContent onOptionChange={setSignOption} signOption={signOption} />
+            )}
             {stepType === StepType.FinishingStepEnd && <EndConversationContent />}
             {stepType === StepType.RasaRules && <RasaRulesContent />}
             {stepType === StepType.Assign && <AssignContent nodeId={node.id} />}
-            {stepType === StepType.Condition && <ConditionContent nodeId={node.id}/>}
-            {stepType === StepType.UserDefined && <ApiContent nodeId={node.id} endpoint={endpoints.find((e) => e.name === node.data.label || node.data.label.includes(e.name))}/>}
+            {stepType === StepType.Condition && <ConditionContent nodeId={node.id} />}
+            {stepType === StepType.UserDefined && (
+              <ApiContent
+                nodeId={node.id}
+                endpoint={endpoints.find((e) => e.name === node.data.label || node.data.label.includes(e.name))}
+              />
+            )}
             <JsonRequestContent isVisible={isJsonRequestVisible} jsonContent={jsonRequestContent} />
           </Tabs.Content>
           {!isReadonly && (
             <Tabs.Content value={t("serviceFlow.tabs.test")} className="vertical-tabs__body">
-              {stepType === StepType.Textfield && <TextfieldTestContent placeholders={textfieldMessagePlaceholders} message={textfieldMessage || node.data.message} />}
-              {stepType === StepType.OpenWebpage && <OpenWebPageTestContent websiteUrl={webpageUrl} websiteName={webpageName} />}
+              {stepType === StepType.Textfield && (
+                <TextfieldTestContent
+                  placeholders={textfieldMessagePlaceholders}
+                  message={textfieldMessage || node.data.message}
+                />
+              )}
+              {stepType === StepType.OpenWebpage && (
+                <OpenWebPageTestContent websiteUrl={webpageUrl} websiteName={webpageName} />
+              )}
             </Tabs.Content>
           )}
         </Tabs.Root>
