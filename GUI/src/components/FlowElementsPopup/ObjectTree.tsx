@@ -66,7 +66,7 @@ export const ObjectTree: FC<ObjectTreeProps> = ({ path, data, style }) => {
   const [roundedValues, setRoundedValues] = useState<Map<string, number>>(new Map());
   // todo maybe test escaping
 
-  console.log("igor roundedValues", Object.fromEntries(roundedValues));
+  console.log("roundedValues", Object.fromEntries(roundedValues));
 
   const buildKeyPathString = (keyPath: KeyPath) => {
     const base = pathArray.join(".") + "." + getKeyPathString(keyPath);
@@ -120,7 +120,8 @@ export const ObjectTree: FC<ObjectTreeProps> = ({ path, data, style }) => {
                 type="checkbox"
                 onClick={(e) => toggleRounding(keyPath, raw, (e.target as HTMLInputElement).checked)}
               />
-              <span style={{ color: "black", fontStyle: "italic" }}>Round </span>
+              {/* todo should be label tag */}
+              <span style={{ color: "black", fontStyle: "italic" }}> Round </span>
               <span>{roundedValues.has(getKeyPathString(keyPath)) ? round(raw) : raw}</span>
             </>
           ) : (
