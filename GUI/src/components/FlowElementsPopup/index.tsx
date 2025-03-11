@@ -25,6 +25,10 @@ import ConditionContent from "./ConditionContent";
 import AssignContent from "./AssignContent";
 import { templateToString } from "utils/string-util";
 import { getValueByPath } from "utils/object-util";
+import ApiContent from "./ApiContent";
+import { saveEndpoints } from "services/service-builder";
+import useToastStore from "store/toasts.store";
+import i18next from "i18next";
 
 const FlowElementsPopup: React.FC = () => {
   const { t } = useTranslation();
@@ -131,6 +135,10 @@ const FlowElementsPopup: React.FC = () => {
       updatedNode.data.assignElements = assignElements;
     }
 
+    if (stepType === StepType.UserDefined) {
+      saveApiEndpoints();
+    }
+
     useServiceStore.getState().handlePopupSave(updatedNode);
     onClose();
   };
@@ -177,6 +185,31 @@ const FlowElementsPopup: React.FC = () => {
     if (!isUserDefinedNode || selectedTab === t("serviceFlow.tabs.test")) return "";
     if (isJsonRequestVisible) return t("serviceFlow.popup.hideJsonRequest");
     return t("serviceFlow.popup.showJsonRequest");
+  };
+
+  const saveApiEndpoints = async () => {
+    const endpoints = useServiceStore.getState().endpoints;
+    const name = useServiceStore.getState().name;
+    const id = useServiceStore.getState().serviceId;
+
+    await saveEndpoints(
+      endpoints,
+      name,
+      id,
+      () => {
+        useToastStore.getState().success({
+          title: i18next.t("newService.toast.success"),
+          message: i18next.t("newService.toast.savedSuccessfully"),
+        });
+      },
+      (e) => {
+        useToastStore.getState().error({
+          title: i18next.t("newService.toast.failed"),
+          message: i18next.t("newService.toast.saveFailed"),
+        });
+      }
+    );
+    return true;
   };
 
   return (
@@ -262,6 +295,12 @@ const FlowElementsPopup: React.FC = () => {
             {stepType === StepType.RasaRules && <RasaRulesContent />}
             {stepType === StepType.Assign && <AssignContent nodeId={node.id} />}
             {stepType === StepType.Condition && <ConditionContent nodeId={node.id} />}
+            {stepType === StepType.UserDefined && (
+              <ApiContent
+                nodeId={node.id}
+                endpoint={endpoints.find((e) => e.name === node.data.label || node.data.label.includes(e.name))}
+              />
+            )}
             <JsonRequestContent isVisible={isJsonRequestVisible} jsonContent={jsonRequestContent} />
           </Tabs.Content>
           {!isReadonly && (
