@@ -11,9 +11,11 @@ import useServiceStore from "store/new-services.store";
 
 type EndpointCardProps = {
   endpoint: EndpointData;
+  isDeletable?: boolean;
+  isNameDisabled?: boolean;
 };
 
-const ApiEndpointCard: FC<EndpointCardProps> = ({ endpoint }) => {
+const ApiEndpointCard: FC<EndpointCardProps> = ({ endpoint, isDeletable = true, isNameDisabled = false }) => {
   const { 
     onNameChange, 
     deleteEndpoint, 
@@ -59,10 +61,11 @@ const ApiEndpointCard: FC<EndpointCardProps> = ({ endpoint }) => {
             {t(testEnvExists ? "newService.endpoint.testEnv" : "newService.endpoint.addTestEnv")}
           </Tabs.Trigger>
         </Tabs.List>
-        <Button appearance="text" onClick={() => deleteEndpoint(endpoint.id)} style={{ color: "#9799A4" }}>
+        { isDeletable &&<Button appearance="text" onClick={() => deleteEndpoint(endpoint.id)} style={{ color: "#9799A4" }}>
           <Icon icon={<MdDeleteOutline />} size="medium" />
           {t("overview.delete")}
         </Button>
+      }
       </Track>
       {[EndpointEnv.Live, EndpointEnv.Test].map((env) => {
         return (
@@ -89,7 +92,7 @@ const ApiEndpointCard: FC<EndpointCardProps> = ({ endpoint }) => {
                     name="endpointName"
                     label=""
                     value={endpointName}
-                    disabled={selectedTab === EndpointEnv.Test}
+                    disabled={isNameDisabled || selectedTab === EndpointEnv.Test}
                     onChange={(e) => {
                       onNameChange(endpoint.id, endpointName, e.target.value);
                       setEndpointName(e.target.value);
