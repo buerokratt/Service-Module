@@ -49,6 +49,17 @@ export const ObjectTree: FC<ObjectTreeProps> = ({ path, data, style }) => {
             className="object-tree-chip"
           />
         )}
+        valueRenderer={(raw) => {
+          return typeof raw === "number" ? ( // todo Number.isInteger()
+            <>
+              <input type="checkbox" />
+              <span style={{ color: "black" }}>Round </span>
+              <span>{String(raw)}</span>
+            </>
+          ) : (
+            <strong>{String(raw)}</strong>
+          );
+        }}
       />
     </div>
   );
