@@ -373,6 +373,7 @@ const buildSteps = (endpointName: string, endpoint: EndpointData, selectedEndpoi
   const endpointHeaders = getEndpointVariables("headers", selectedEndpointType.headers);
   const endpointBody = getEndpointVariables("body", selectedEndpointType.body);
   const headers = Object.keys(endpointHeaders).length > 0 ? endpointHeaders : undefined;
+  const params = Object.keys(endpointParams).length > 0 ? endpointParams : undefined;
   const body = Object.keys(endpointBody).length > 0 ? endpointBody : undefined;
 
   let endpointUrl = selectedEndpointType.url;
@@ -393,6 +394,7 @@ const buildSteps = (endpointName: string, endpoint: EndpointData, selectedEndpoi
     call: selectedEndpointType.methodType.toLowerCase() === "get" ? "http.get" : "http.post",
     args: {
       url: "${endpoint_url}",
+      params,
       headers,
       body,
     },
@@ -895,7 +897,7 @@ const getTemplate = (steps: Step[], node: Node, stepName: string, nextStep?: str
   }
 
   return {
-    template: `${import.meta.env.REACT_APP_PROJECT_LAYER}/${data?.templateName}`,
+    template: `${data?.templateName}`,
     requestType: "templates",
     body: data?.body,
     result: data?.resultName ?? `${stepName}_result`,
