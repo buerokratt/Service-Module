@@ -21,7 +21,7 @@ extract_request_data:
     type: ${incoming.body.type}
 
 call_template:
-  template: validation-template
+  template: "[#SERVICE_PROJECT_LAYER]/validation-template"
   requestType: templates
   body:
     response: ${url}

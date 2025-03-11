@@ -23,7 +23,7 @@ check_for_body:
 rename_file:
   call: http.post
   args:
-    url: "[#SERVICE_DMAPPER]/hbs/services/rename"
+    url: "[#SERVICE_DMAPPER_HBS]/rename"
     headers:
       type: 'json'
     body:
