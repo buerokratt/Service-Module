@@ -25,7 +25,7 @@ const theme = {
 };
 
 const getKeyPathString = (keyPath: KeyPath) => {
-  // todo implemeny
+  return keyPath.toReversed().join(".");
 };
 
 type ObjectTreeProps = {
@@ -52,14 +52,14 @@ export const ObjectTree: FC<ObjectTreeProps> = ({ path, data, style }) => {
         labelRenderer={(keyPath) => (
           <OutputElementBox
             text={String(keyPath[0]) + ":"}
-            value={stringToTemplate(pathArray.join(".") + "." + keyPath.toReversed().join("."))}
+            value={stringToTemplate(pathArray.join(".") + "." + getKeyPathString(keyPath))}
             useValue
             draggable={true}
             className="object-tree-chip"
           />
         )}
-        valueRenderer={(raw, val, ...keyPath) => {
-          // console.log("igor render", val, keyPath);
+        valueRenderer={(raw, _, ...keyPath) => {
+          // console.log("igor render", _, keyPath);
           return typeof raw === "number" && !Number.isInteger(raw) ? (
             <>
               {/* todo style */}
@@ -73,19 +73,12 @@ export const ObjectTree: FC<ObjectTreeProps> = ({ path, data, style }) => {
                 type="checkbox"
                 onClick={(e) => {
                   const target = e.target as HTMLInputElement;
-                  console.log(target.checked);
-                  if (target.checked) {
-                    setRoundedValues((prev) => ({
-                      ...prev,
-                      [keyPath.toReversed().join(".")]: Math.round((raw + Number.EPSILON) * 100) / 100,
-                    }));
-                  } else {
-                    // setRoundedValues((prev) => {
-                    //   const newState = { ...prev };
-                    //   delete newState[getKeyPathString(keyPath)];
-                    //   return newState;
-                    // });
-                  }
+                  const keyPathString = getKeyPathString(keyPath);
+                  setRoundedValues((prev) =>
+                    target.checked
+                      ? { ...prev, [keyPathString]: Math.round((raw + Number.EPSILON) * 100) / 100 }
+                      : Object.fromEntries(Object.entries(prev).filter(([k]) => k !== keyPathString))
+                  );
                 }}
               />
               <span style={{ color: "black", fontStyle: "italic" }}>Round </span>
