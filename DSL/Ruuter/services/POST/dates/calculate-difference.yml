@@ -50,7 +50,7 @@ check_is_output_type_valid:
 calculate_difference:
   call: http.post
   args:
-    url: "[#SERVICE_DMAPPER]/hbs/services/calculate-date-difference"
+    url: "[#SERVICE_DMAPPER_HBS]/calculate-date-difference"
     headers:
       type: "json"
     body:

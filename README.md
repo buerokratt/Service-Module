@@ -155,7 +155,7 @@ ENTRYPOINT ["npm","start"]
 curl -X POST -H "Content-Type: application/json" -d '{
   "login": "EE30303039914",
   "password": "OK"
-}' http://localhost:8086/auth/login
+}' http://localhost:8086/services/auth/login
 ```
 
 ### Kubernetes deployment
