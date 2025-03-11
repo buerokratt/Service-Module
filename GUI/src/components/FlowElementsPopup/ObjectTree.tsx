@@ -76,6 +76,20 @@ export const ObjectTree: FC<ObjectTreeProps> = ({ path, data, style }) => {
     return stringToTemplate("Math.round((" + base + " + Number.EPSILON) * 100) / 100)");
   };
 
+  const toggleRounding = (keyPath: KeyPath, value: number, roundValue = true) => {
+    const keyPathString = getKeyPathString(keyPath);
+
+    setRoundedValues((prev) => {
+      const newMap = new Map(prev);
+      if (roundValue) {
+        newMap.set(keyPathString, round(value));
+      } else {
+        newMap.delete(keyPathString);
+      }
+      return newMap;
+    });
+  };
+
   return (
     <div style={{ padding: "0px 15px 5px", ...style }}>
       <JSONTree
@@ -104,20 +118,7 @@ export const ObjectTree: FC<ObjectTreeProps> = ({ path, data, style }) => {
               ></FormCheckbox> */}
               <input
                 type="checkbox"
-                onClick={(e) => {
-                  // todo extract
-                  const target = e.target as HTMLInputElement;
-                  const keyPathString = getKeyPathString(keyPath);
-                  setRoundedValues((prev) => {
-                    const newMap = new Map(prev);
-                    if (target.checked) {
-                      newMap.set(keyPathString, round(raw));
-                    } else {
-                      newMap.delete(keyPathString);
-                    }
-                    return newMap;
-                  });
-                }}
+                onClick={(e) => toggleRounding(keyPath, raw, (e.target as HTMLInputElement).checked)}
               />
               <span style={{ color: "black", fontStyle: "italic" }}>Round </span>
               <span>{roundedValues.has(getKeyPathString(keyPath)) ? round(raw) : raw}</span>
