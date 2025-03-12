@@ -3,6 +3,7 @@ import { CSSProperties, FC, useState } from "react";
 import { JSONTree, KeyPath } from "react-json-tree";
 import "./styles.scss";
 import { stringToTemplate } from "utils/string-util";
+import { FormCheckbox } from "components/FormElements";
 
 const theme = {
   base00: "black",
@@ -107,22 +108,24 @@ export const ObjectTree: FC<ObjectTreeProps> = ({ path, data, style }) => {
           />
         )}
         valueRenderer={(raw, _, ...keyPath) => {
+          const key = getKeyPathString(keyPath);
           return typeof raw === "number" && !Number.isInteger(raw) ? (
             <>
               {/* todo style */}
               {/* <FormCheckbox
                 checked={true}
-                item={{ value: "round", label: "round" }}
+                item={{ value: "round", label: "Round" }}
                 onChange={() => null}
                 // style={{ color: "black", fontStyle: "italic" }}
               ></FormCheckbox> */}
+
               <input
+                id={key}
                 type="checkbox"
                 onClick={(e) => toggleRounding(keyPath, raw, (e.target as HTMLInputElement).checked)}
               />
-              {/* todo should be label tag */}
-              <span style={{ color: "black", fontStyle: "italic" }}> Round </span>
-              <span>{roundedValues.has(getKeyPathString(keyPath)) ? round(raw) : raw}</span>
+              <label htmlFor={key}> Round </label>
+              <span>{roundedValues.has(key) ? round(raw) : raw}</span>
             </>
           ) : (
             <span>{String(raw)}</span>
