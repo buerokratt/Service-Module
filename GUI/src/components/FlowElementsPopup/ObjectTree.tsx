@@ -85,14 +85,6 @@ export const ObjectTree: FC<ObjectTreeProps> = ({ path, data, style }) => {
           const key = getKeyPathString(keyPath);
           return typeof raw === "number" && !Number.isInteger(raw) ? (
             <>
-              {/* todo style */}
-              {/* <FormCheckbox
-                checked={true}
-                item={{ value: "round", label: "Round" }}
-                onChange={() => null}
-                // style={{ color: "black", fontStyle: "italic" }}
-              ></FormCheckbox> */}
-
               <input
                 id={key}
                 type="checkbox"
