@@ -3,7 +3,6 @@ import { CSSProperties, FC, useState } from "react";
 import { JSONTree, KeyPath } from "react-json-tree";
 import "./styles.scss";
 import { stringToTemplate } from "utils/string-util";
-import { FormCheckbox } from "components/FormElements";
 
 const theme = {
   base00: "black",
@@ -44,22 +43,24 @@ export const ObjectTree: FC<ObjectTreeProps> = ({ path, data, style }) => {
   const [roundedValues, setRoundedValues] = useState<Map<string, number>>(new Map());
 
   const buildKeyPathString = (keyPath: KeyPath) => {
-    const base = pathArray.join(".") + "." + getKeyPathString(keyPath);
-    const isRounded = roundedValues.has(getKeyPathString(keyPath));
+    const key = getKeyPathString(keyPath);
+
+    const base = pathArray.join(".") + "." + key;
+    const isRounded = roundedValues.has(key);
     if (!isRounded) return stringToTemplate(base);
 
     return stringToTemplate("Math.round((" + base + " + Number.EPSILON) * 100) / 100)");
   };
 
   const toggleRounding = (keyPath: KeyPath, value: number, roundValue = true) => {
-    const keyPathString = getKeyPathString(keyPath);
+    const key = getKeyPathString(keyPath);
 
     setRoundedValues((prev) => {
       const newMap = new Map(prev);
       if (roundValue) {
-        newMap.set(keyPathString, round(value));
+        newMap.set(key, round(value));
       } else {
-        newMap.delete(keyPathString);
+        newMap.delete(key);
       }
       return newMap;
     });
@@ -83,6 +84,7 @@ export const ObjectTree: FC<ObjectTreeProps> = ({ path, data, style }) => {
         )}
         valueRenderer={(raw, _, ...keyPath) => {
           const key = getKeyPathString(keyPath);
+
           return typeof raw === "number" && !Number.isInteger(raw) ? (
             <>
               <input
