@@ -172,7 +172,7 @@ li:not(:has(> div > div)) .object-tree-chip {
   margin-left: -7px;
 }
 
-@include checkbox-styling;
+@include veera-checkbox;
 
 input[type=checkbox] {
   + label {
