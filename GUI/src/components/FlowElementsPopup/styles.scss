@@ -177,9 +177,9 @@ li:not(:has(> div > div)) .object-tree-chip {
 input[type=checkbox] {
   + label {
     display: inline;  
-    padding-left: 20px; 
-    padding-right: 5px;
-    color: get-color(black-coral-10);
+    padding-left: 25px; 
+    padding-right: 10px;
+    color: get-color(black-coral-8);
     font-style: italic;
     
     &::before {

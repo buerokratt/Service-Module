@@ -92,7 +92,7 @@ export const ObjectTree: FC<ObjectTreeProps> = ({ path, data, style }) => {
                 type="checkbox"
                 onClick={(e) => toggleRounding(keyPath, raw, (e.target as HTMLInputElement).checked)}
               />
-              <label htmlFor={key}> Round </label>
+              <label htmlFor={key}>Round</label>
               <span>{roundedValues.has(key) ? round(raw) : raw}</span>
             </>
           ) : (
