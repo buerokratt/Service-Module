@@ -38,36 +38,10 @@ type ObjectTreeProps = {
   style?: CSSProperties;
 };
 
-// todo remove
-// const fakeData = {
-//   a: 1.123456789,
-//   b: 2.123456789,
-//   c: 3.123456789,
-//   d: 4.123456789,
-//   e: 5.123456789,
-//   f: {
-//     a: 1.123456789,
-//     b: 2.123456789,
-//     c: 3.123456789,
-//     d: 4.123456789,
-//     e: 5.123456789,
-//   },
-//   bool: true,
-//   null: null,
-//   undefined: undefined,
-//   array: [1, 2, 3, 4, 5],
-//   object: {
-//     a: 1,
-//   },
-// };
-
 export const ObjectTree: FC<ObjectTreeProps> = ({ path, data, style }) => {
   const pathArray = String(path).split(".");
   const root = pathArray.pop()!;
   const [roundedValues, setRoundedValues] = useState<Map<string, number>>(new Map());
-  // todo maybe test escaping
-
-  console.log("roundedValues", Object.fromEntries(roundedValues));
 
   const buildKeyPathString = (keyPath: KeyPath) => {
     const base = pathArray.join(".") + "." + getKeyPathString(keyPath);
