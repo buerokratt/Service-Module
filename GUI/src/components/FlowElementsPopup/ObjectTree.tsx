@@ -3,6 +3,7 @@ import { CSSProperties, FC, useState } from "react";
 import { JSONTree, KeyPath } from "react-json-tree";
 import "./styles.scss";
 import { stringToTemplate } from "utils/string-util";
+import { useTranslation } from "react-i18next";
 
 // Theme colors are inverted with invertTheme below
 const theme = {
@@ -41,6 +42,7 @@ type ObjectTreeProps = {
 export const ObjectTree: FC<ObjectTreeProps> = ({ path, data, style }) => {
   const pathArray = String(path).split(".");
   const root = pathArray.pop()!;
+  const { t } = useTranslation();
   const [roundedValues, setRoundedValues] = useState<Map<string, number>>(new Map());
 
   const buildKeyPathString = (keyPath: KeyPath) => {
@@ -93,7 +95,7 @@ export const ObjectTree: FC<ObjectTreeProps> = ({ path, data, style }) => {
                 type="checkbox"
                 onClick={(e) => toggleRounding(keyPath, raw, (e.target as HTMLInputElement).checked)}
               />
-              <label htmlFor={key}>Round</label>
+              <label htmlFor={key}>{t("serviceFlow.popup.round")}</label>
               <span>{roundedValues.has(key) ? round(raw) : raw}</span>
             </>
           ) : (
