@@ -68,10 +68,7 @@ const ServiceFlowPage: FC = () => {
     <>
       <NewServiceHeader
         activeStep={3}
-        saveDraftOnClick={() => {
-          console.log("saveDraftOnClick");
-          return saveFlowClick();
-        }}
+        saveDraftOnClick={() => saveFlowClick()}
         continueOnClick={() => navigate(ROUTES.OVERVIEW_ROUTE)}
       />
       <h1 style={{ paddingLeft: 16, paddingTop: 16 }}>

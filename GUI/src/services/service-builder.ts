@@ -1037,10 +1037,6 @@ export const saveFlowClick = async () => {
   const edges = useServiceStore.getState().edges;
   const nodes = useServiceStore.getState().nodes;
 
-  console.log("saveFlowClick", {
-    slot,
-  });
-
   await saveFlow({
     steps,
     name,

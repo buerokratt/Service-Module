@@ -137,6 +137,22 @@ rename_dsl:
       new_path: "[#RUUTER_SERVICES_PATH]/${type}/[#RUUTER_SERVICES_DIR_PATH]/${old_state}/${name}.tmp"
   result: results
 
+
+log_igor_id:
+  log: ${id}
+
+log_igor_name:
+  log: ${name}
+
+log_igor_description:
+  log: ${description} 
+
+log_igor_slot:
+  log: ${slot}
+
+log_igor_structure:
+  log: ${new_structure}
+
 check_result:
   switch:
     - condition: ${200 <= results.response.statusCodeValue && results.response.statusCodeValue < 300}
