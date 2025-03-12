@@ -68,7 +68,10 @@ const ServiceFlowPage: FC = () => {
     <>
       <NewServiceHeader
         activeStep={3}
-        saveDraftOnClick={saveFlowClick}
+        saveDraftOnClick={() => {
+          console.log("saveDraftOnClick");
+          return saveFlowClick();
+        }}
         continueOnClick={() => navigate(ROUTES.OVERVIEW_ROUTE)}
       />
       <h1 style={{ paddingLeft: 16, paddingTop: 16 }}>
@@ -97,7 +100,11 @@ const ServiceFlowPage: FC = () => {
                     {steps.map((step) => (
                       <Box
                         key={step.id}
-                        color={[StepType.FinishingStepEnd, StepType.FinishingStepRedirect].includes(step.type) ? "red" : "blue"}
+                        color={
+                          [StepType.FinishingStepEnd, StepType.FinishingStepRedirect].includes(step.type)
+                            ? "red"
+                            : "blue"
+                        }
                         onDragStart={(event) => onDragStart(event, step)}
                         draggable
                       >
@@ -116,7 +123,11 @@ const ServiceFlowPage: FC = () => {
                     {allElements.map((step) => (
                       <Box
                         key={step.id}
-                        color={[StepType.FinishingStepEnd, StepType.FinishingStepRedirect].includes(step.type) ? "red" : "blue"}
+                        color={
+                          [StepType.FinishingStepEnd, StepType.FinishingStepRedirect].includes(step.type)
+                            ? "red"
+                            : "blue"
+                        }
                         onDragStart={(event) => onDragStart(event, step)}
                         draggable
                       >

@@ -1,7 +1,8 @@
-INSERT INTO services (name, description, created_at, updated_at, ruuter_type, current_state, service_id, is_common, deleted, structure, endpoints)
+INSERT INTO services (name, description, slot, created_at, updated_at, ruuter_type, current_state, service_id, is_common, deleted, structure, endpoints)
 SELECT 
   name,
   description,
+  slot,
   created_at,
   updated_at,
   ruuter_type,

@@ -20,12 +20,16 @@ declaration:
       - field: serviceMethod
         type: string
         description: "Body field 'serviceMethod'"
+      - field: serviceSlot
+        type: string
+        description: "Slot input"
 
 extract_request_data:
   assign:
     serviceId: ${incoming.body.serviceId}
     serviceName: ${incoming.body.serviceName || ""}
     serviceMethod: ${incoming.body.serviceMethod || 'POST'}
+    serviceSlot: ${incoming.body.serviceSlot ?? ""}
     intent: ${incoming.body.intent}
 
 link_intent_to_service_in_rasa_domain:
@@ -33,13 +37,14 @@ link_intent_to_service_in_rasa_domain:
   args:
     url: "[#SERVICE_RUUTER]/services/domain-intent-service-link"
     body:
-      serviceName: ${serviceName}
       serviceMethod: ${serviceMethod}
+      serviceName: ${serviceName}
+      serviceSlot: ${serviceSlot}
       intent: ${intent}
       type: "Add"
   result: link_res
   error: return_intent_does_not_exist
-  
+
 add_connection_request:
   call: http.post
   args:
@@ -60,5 +65,5 @@ return_result:
 
 return_intent_does_not_exist:
   status: 400
-  return: 'does not exists'
+  return: "does not exists"
   next: end

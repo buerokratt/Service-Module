@@ -465,7 +465,6 @@ export const onDrop = (
             StepType.Auth,
             StepType.FinishingStepEnd,
             StepType.FinishingStepRedirect,
-            StepType.UserDefined,
           ].includes(type),
           childrenCount: type === StepType.Input || type === StepType.Condition ? 2 : 1,
           setClickedNode: useServiceStore.getState().setClickedNode,

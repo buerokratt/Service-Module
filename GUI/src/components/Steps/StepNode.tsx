@@ -66,6 +66,7 @@ const StepNode: FC<NodeDataProps> = ({ data }) => {
       const invalidRulesExist = hasInvalidRules(data.rules?.children || []);
       return data.rules?.children === undefined || invalidRulesExist || data.rules?.children.length === 0;
     };
+    if (data.stepType === StepType.UserDefined) return;
     if (data.stepType === StepType.OpenWebpage) return !data.link || !data.linkText;
     if (data.stepType === StepType.FileGenerate) return !data.fileName || !data.fileContent;
     if (data.stepType === StepType.FileSign) return !data.signOption;
