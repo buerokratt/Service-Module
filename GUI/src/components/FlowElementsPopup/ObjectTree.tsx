@@ -5,7 +5,7 @@ import "./styles.scss";
 import { stringToTemplate } from "utils/string-util";
 import { useTranslation } from "react-i18next";
 
-// Theme colors are inverted with invertTheme below
+// Some theme colors are inverted with invertTheme below to get the light theme
 const theme = {
   base00: "#2b2c34", // black-coral-16 (background)
   base01: "#3c3e48", // black-coral-14 (slightly lighter background)
