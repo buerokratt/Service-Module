@@ -6,9 +6,9 @@ USER nonroot
 
 WORKDIR /usr/src/app
 
-COPY --chown=nonroot:nonroot pipelines.js ./
-COPY --chown=nonroot:nonroot package.json ./
-COPY --chown=nonroot:nonroot pipelines/ ./pipelines/
+COPY pipelines.js ./
+COPY package.json ./
+COPY pipelines/ ./pipelines/
 
 RUN npm install --ignore-scripts
 ENTRYPOINT ["npm","start"]
