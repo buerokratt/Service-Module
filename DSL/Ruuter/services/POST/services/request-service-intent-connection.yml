@@ -1,0 +1,69 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Decription placeholder for 'REQUEST-SERVICE-INTENT-CONNECTION'"
+  method: post
+  accepts: json
+  returns: json
+  namespace: service
+  allowlist:
+    body:
+      - field: intent
+        type: string
+        description: "Body field 'intent'"
+      - field: serviceId
+        type: string
+        description: "Body field 'serviceId'"
+      - field: serviceName
+        type: string
+        description: "Body field 'serviceName'"
+      - field: serviceMethod
+        type: string
+        description: "Body field 'serviceMethod'"
+      - field: serviceSlot
+        type: string
+        description: "Slot input"
+
+extract_request_data:
+  assign:
+    serviceId: ${incoming.body.serviceId}
+    serviceName: ${incoming.body.serviceName || ""}
+    serviceMethod: ${incoming.body.serviceMethod || 'POST'}
+    serviceSlot: ${incoming.body.serviceSlot ?? ""}
+    intent: ${incoming.body.intent}
+
+link_intent_to_service_in_rasa_domain:
+  call: http.post
+  args:
+    url: "[#SERVICE_RUUTER]/services/domain-intent-service-link"
+    body:
+      serviceMethod: ${serviceMethod}
+      serviceName: ${serviceName}
+      serviceSlot: ${serviceSlot}
+      intent: ${intent}
+      type: "Add"
+  result: link_res
+  error: return_intent_does_not_exist
+
+add_connection_request:
+  call: http.post
+  args:
+    url: "[#SERVICE_TRAINING_RESQL]/add-service-trigger"
+    body:
+      serviceId: ${serviceId}
+      intent: ${intent}
+      status: "approved"
+      authorRole: "service_manager"
+      serviceName: ${serviceName}
+  result: res
+  next: return_result
+
+return_result:
+  status: 200
+  return: "Connection request sent successfully"
+  next: end
+
+return_intent_does_not_exist:
+  status: 400
+  return: "does not exists"
+  next: end

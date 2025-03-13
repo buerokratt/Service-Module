@@ -159,3 +159,9 @@ div>.small-rule-group-button:last-child {
 .assign-red:hover {
   background: #f008;
 }
+
+// Workaround for chips to show properly in JSONTree
+li:not(:has(> div > div)) .object-tree-chip {
+  text-indent: 0;
+  margin-left: -7px;
+}

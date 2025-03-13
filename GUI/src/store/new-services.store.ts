@@ -22,7 +22,7 @@ import { alignNodesInCaseAnyGotOverlapped, buildPlaceholder, updateFlowInputRule
 import { GroupOrRule } from "components/FlowElementsPopup/RuleBuilder/types";
 import useTestServiceStore from "./test-services.store";
 import { Chip } from "types/chip";
-import { endpointResponseVariables } from "types/endpoint/endpoint-response-variables";
+import { EndpointResponseVariable } from "types/endpoint/endpoint-response-variables";
 import { Assign } from "components/FlowElementsPopup/AssignBuilder/assign-types";
 
 interface ServiceStoreState {
@@ -30,6 +30,7 @@ interface ServiceStoreState {
   name: string;
   serviceId: string;
   description: string;
+  slot: string;
   isCommon: boolean;
   edges: Edge[];
   nodes: Node[];
@@ -38,7 +39,7 @@ interface ServiceStoreState {
   assignElements: Assign[];
   rules: GroupOrRule[];
   isYesNoQuestion: boolean;
-  endpointsResponseVariables: endpointResponseVariables[];
+  endpointsResponseVariables: EndpointResponseVariable[];
   setIsYesNoQuestion: (value: boolean) => void;
   changeAssignNode: (assign: Assign[]) => void;
   changeRulesNode: (rules: GroupOrRule[]) => void;
@@ -59,6 +60,7 @@ interface ServiceStoreState {
   isCommonEndpoint: (id: string) => boolean;
   setIsCommonEndpoint: (id: string, isCommon: boolean) => void;
   setDescription: (description: string) => void;
+  setSlot: (slot: string) => void;
   loadEndpointsResponseVariables: () => void;
   setSecrets: (newSecrets: PreDefinedEndpointEnvVariables) => void;
   addProductionVariables: (variables: string[]) => void;
@@ -109,6 +111,7 @@ interface ServiceStoreState {
 const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
   endpoints: [],
   name: "",
+  slot: "",
   serviceId: uuid(),
   description: "",
   edges: [initialEdge],
@@ -180,19 +183,20 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
         })
       );
 
-      const variables: endpointResponseVariables[] = [];
+      const variables: EndpointResponseVariable[] = [];
 
-      endpointResponses.forEach((endpointResponses, i) => {
+      endpointResponses.forEach((response, i) => {
         const endpoint = get().endpoints[i];
         const chips: Chip[] = [];
 
-        endpointResponses.forEach((response) => {
-          Object.keys(response).forEach((key) => {
+        response.forEach((response) => {
+          for (const [key, value] of Object.entries(response)) {
             chips.push({
               name: key,
-              value: `\${${endpoint.name.replace(" ", "_")}_res.response.body.${key}}`,
+              value: `${endpoint.name.replace(" ", "_")}_res.response.body.${key}`,
+              data: value,
             });
-          });
+          }
         });
 
         variables.push({
@@ -215,6 +219,7 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
   },
   changeServiceName: (name: string) => set({ name }),
   setDescription: (description: string) => set({ description }),
+  setSlot: (slot: string) => set({ slot }),
   isCommon: false,
   setIsCommon: (isCommon: boolean) => set({ isCommon }),
   isCommonEndpoint: (id: string) => {
@@ -259,6 +264,7 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
       endpoints: [],
       serviceId: uuid(),
       description: "",
+      slot: "",
       secrets: { prod: [], test: [] },
       availableVariables: { prod: [], test: [] },
       isCommon: false,
@@ -315,6 +321,7 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
         name: service.data[0].name,
         isCommon: service.data[0].isCommon,
         description: service.data[0].description,
+        slot: service.data[0].slot,
         edges,
         nodes,
         endpoints,
@@ -564,7 +571,7 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
       const deletedNodeStepType = reactFlowInstance.getNodes().find((node) => node.id === id)?.data.stepType;
       if (
         deletedNodeStepType !== StepType.FinishingStepEnd ||
-        deletedNodeStepType !== StepType.FinishingStepRedirect && get().nodes.length <= 4
+        (deletedNodeStepType !== StepType.FinishingStepRedirect && get().nodes.length <= 4)
       ) {
         const placeholder = buildPlaceholder({ id, position: deletedNodePosition });
         nodes.push(placeholder);
