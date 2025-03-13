@@ -4,10 +4,11 @@ RUN addgroup -S nonroot \
     && adduser -S nonroot -G nonroot
 USER nonroot
 
-ENV NODE_ENV development
 WORKDIR /usr/src/app
 
-COPY . .
+COPY --chown=nonroot:nonroot pipelines.js ./
+COPY --chown=nonroot:nonroot package.json ./
+COPY --chown=nonroot:nonroot pipelines/ ./pipelines/
 
-RUN npm install
+RUN npm install --ignore-scripts
 ENTRYPOINT ["npm","start"]
