@@ -1,7 +1,3 @@
-@import 'src/styles/tools/spacing';
-@import 'src/styles/tools/color';
-@import 'src/styles/settings/variables/other';
-@import 'src/styles/settings/variables/typography';
 @import 'src/styles/settings/mixins';
 
 .yellow-tag {
@@ -174,6 +170,7 @@ li:not(:has(> div > div)) .object-tree-chip {
 
 @include veera-checkbox;
 
+// Overrides for JSONTree component
 input[type=checkbox] {
   + label {
     display: inline;  
