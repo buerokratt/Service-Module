@@ -68,6 +68,7 @@ update_existing_domain_response:
       newKey: ${"utter_" + intent}
       newKeyValue: '${type === "Add" ? service_path : "UNKNOWN"}'
       deleteOldValue: false
+      createIfAbsent: true
   result: updatedResponses
   next: convert_domain_json_to_yaml
 
