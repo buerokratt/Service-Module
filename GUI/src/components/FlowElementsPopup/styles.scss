@@ -1,14 +1,18 @@
-@import 'src/styles/settings/mixins';
+@import "src/styles/tools/spacing";
+@import "src/styles/tools/color";
+@import "src/styles/settings/variables/other";
+@import "src/styles/settings/variables/typography";
+@import "src/styles/settings/mixins";
 
 .yellow-tag {
-  padding: 0 .3rem;
+  padding: 0 0.3rem;
   background: #fff9e8;
   border: 1px solid #ffde92;
   border-radius: 1rem;
 }
 
 .green-tag {
-  padding: 0 .3rem;
+  padding: 0 0.3rem;
   background: #d9e8de;
   border: 1px solid #b4d3c0;
   border-radius: 1rem;
@@ -26,31 +30,31 @@
 }
 
 .flow-item-footer {
-  width: 100%
+  width: 100%;
 }
 
 .flow-body-reverse-margin {
-  margin: -16px
+  margin: -16px;
 }
 
 .flow-body-padding {
-  padding: 16px
+  padding: 16px;
 }
 
 .flow-tags-container {
-  flex-wrap: wrap
+  flex-wrap: wrap;
 }
 
 .popup-darker-track {
-  background: #f9f9f9
+  background: #f9f9f9;
 }
 
 .flow-rule-container {
-  width: 5rem
+  width: 5rem;
 }
 
 .flow-darker-container {
-  padding: 0 .5rem;
+  padding: 0 0.5rem;
   color: grey;
 }
 
@@ -87,18 +91,18 @@
   border: 1px solid #f002;
 }
 
-div>.small-rule-group-button {
+div > .small-rule-group-button {
   padding: 4px;
   min-width: 40px;
   text-align: center;
 }
 
-div>.small-rule-group-button:first-child {
+div > .small-rule-group-button:first-child {
   padding: 4px 10px;
   border-radius: 10px 0 0 10px;
 }
 
-div>.small-rule-group-button:last-child {
+div > .small-rule-group-button:last-child {
   border-radius: 0 10px 10px 0;
 }
 
@@ -168,19 +172,20 @@ li:not(:has(> div > div)) .object-tree-chip {
   margin-left: -7px;
 }
 
-@include veera-checkbox;
+.object-tree-checkbox {
+  @include veera-checkbox;
 
-// Overrides for JSONTree component
-input[type=checkbox] {
-  + label {
-    display: inline;  
-    padding-left: 25px; 
-    padding-right: 10px;
-    color: get-color(black-coral-8);
-    font-style: italic;
-    
-    &::before {
-      top: 2px;
+  input[type="checkbox"] {
+    + label {
+      display: inline;
+      padding-left: 25px;
+      padding-right: 10px;
+      color: get-color(black-coral-8);
+      font-style: italic;
+
+      &::before {
+        top: 2px;
+      }
     }
   }
 }

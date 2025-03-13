@@ -89,7 +89,7 @@ export const ObjectTree: FC<ObjectTreeProps> = ({ path, data, style }) => {
           const key = getKeyPathString(keyPath);
 
           return typeof raw === "number" && !Number.isInteger(raw) ? (
-            <>
+            <span className="object-tree-checkbox">
               <input
                 id={key}
                 type="checkbox"
@@ -97,7 +97,7 @@ export const ObjectTree: FC<ObjectTreeProps> = ({ path, data, style }) => {
               />
               <label htmlFor={key}>{t("serviceFlow.popup.round")}</label>
               <span>{roundedValues.has(key) ? round(raw) : raw}</span>
-            </>
+            </span>
           ) : (
             <span>{String(raw)}</span>
           );
