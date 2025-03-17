@@ -80,8 +80,6 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
                 <OutputElementBox
                   text={assignedObjectTree?.path === variable.value ? variable.key + " ▲" : variable.key + " ▼"}
                   draggable={false}
-                  value={variable.value}
-                  useValue
                   style={{ cursor: "pointer" }}
                   onClick={() => {
                     setAssignedObjectTree(
@@ -123,8 +121,6 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
                 <OutputElementBox
                   text={endpointsObjectTree?.path === chip.value ? chip.name + " ▲" : chip.name + " ▼"}
                   draggable={false}
-                  value={chip.value}
-                  useValue
                   style={{ cursor: "pointer" }}
                   onClick={() => {
                     setEndpointsObjectTree(
@@ -133,6 +129,7 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
                   }}
                 />
               ) : (
+                // todo here is for endpoint top-level vars
                 <OutputElementBox text={chip.name} value={stringToTemplate(chip.value)} useValue />
               )
             )}
