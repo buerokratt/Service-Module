@@ -286,7 +286,8 @@
       "addElement": "+ Element",
       "addGroup": "+ Group",
       "remove": "Remove",
-      "signType": "Sign Type"
+      "signType": "Sign Type",
+      "round": "Round"
     },
     "previousVariables": {
       "assignElements": "Assign Elements"

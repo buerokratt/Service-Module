@@ -286,7 +286,8 @@
       "addElement": "+ Element",
       "addGroup": "+ Grupp",
       "remove": "Eemalda",
-      "signType": "Märgi tüüp"
+      "signType": "Märgi tüüp",
+      "round": "Ümarda"
     },
     "previousVariables": {
       "assignElements": "Määra elemendid"
