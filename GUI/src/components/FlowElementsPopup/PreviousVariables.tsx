@@ -7,7 +7,7 @@ import { StepType } from "types";
 import { Assign } from "./AssignBuilder/assign-types";
 import { useTranslation } from "react-i18next";
 import { ObjectTree } from "./ObjectTree";
-import { stringToTemplate } from "utils/string-util";
+import { stringToTemplate, templateToString } from "utils/string-util";
 import { isObject } from "utils/object-util";
 
 type PreviousVariablesProps = {
@@ -41,7 +41,7 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
     const inputElement: Assign = {
       id: "-1",
       key: "input",
-      value: "incoming.body.input",
+      value: stringToTemplate("incoming.body.input"),
     };
     setAssignedVariables([...assignElements, inputElement]);
   }, [endpointsVariables]);
@@ -90,7 +90,7 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
                   }}
                 />
               ) : (
-                <OutputElementBox text={variable.key} value={stringToTemplate(variable.value)} useValue />
+                <OutputElementBox text={variable.key} value={variable.value} useValue />
               )
             )}
           </Track>
@@ -100,7 +100,7 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
       {isObject(assignedObjectTree?.data) && (
         <ObjectTree
           data={assignedObjectTree.data}
-          path={assignedObjectTree.path}
+          path={templateToString(assignedObjectTree.path)}
           style={{ borderBottom: border, borderTop: border }}
         />
       )}

@@ -23,12 +23,12 @@ import FileSignContent from "./FileSignContent";
 import "./styles.scss";
 import ConditionContent from "./ConditionContent";
 import AssignContent from "./AssignContent";
+import { templateToString } from "utils/string-util";
 import { getValueByPath } from "utils/object-util";
 import ApiContent from "./ApiContent";
 import { saveEndpoints } from "services/service-builder";
 import useToastStore from "store/toasts.store";
 import i18next from "i18next";
-import { templateToString } from "utils/string-util";
 
 const FlowElementsPopup: React.FC = () => {
   const { t } = useTranslation();
@@ -120,8 +120,7 @@ const FlowElementsPopup: React.FC = () => {
     if (stepType === StepType.Assign) {
       const flatEndpointVariables = endpointsVariables.map((endpoint) => endpoint.chips).flat();
       assignElements.forEach((element) => {
-        element.value = templateToString(element.value);
-        const fullPath = element.value;
+        const fullPath = templateToString(element.value);
         const endpointVariable = flatEndpointVariables.find((variable) => fullPath.startsWith(String(variable.value)));
 
         if (!endpointVariable) {

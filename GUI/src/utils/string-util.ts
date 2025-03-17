@@ -2,7 +2,6 @@ export const stringToTemplate = (value: string | number) => {
   return "${" + value + "}";
 };
 
-// todo check if unused
 export const templateToString = (value: string | number) => {
   const valueString = String(value);
   if (
