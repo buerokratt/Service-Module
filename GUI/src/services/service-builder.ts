@@ -32,7 +32,14 @@ const getEndpointVariables = (
       result[v.name] = `\${new Map([${nestedResult}])}`;
       return;
     }
-    if (v.value) result[v.name] = `\${info.response.body.${key}["${v.name}"]}`;
+
+    if (v.value) {
+      if (v.value.startsWith("${")) {
+        result[v.name] = `\${incoming.params.${v.name}}`;
+      } else {
+        result[v.name] = `\${info.response.body.${key}["${v.name}"]}`;
+      }
+    }
   });
   if (Object.keys(result).length === 0) {
     try {
@@ -144,11 +151,19 @@ const saveEndpointConfig = async (
     env,
     assignEndpointVariables(env, "params", endpoint.params)
   );
+  const filteredParams = Object.fromEntries(
+    Object.entries(params).filter(([_, value]) => !String(value).startsWith("${"))
+  );
+
+  const filteredBody = Object.fromEntries(
+    Object.entries(body).filter(([_, value]) => !String(value).startsWith("${"))
+  );
+
   const steps = new Map();
   const variables: { [key: string]: string } = {};
   assignValues(headers, "headers", variables);
-  assignValues(body, "body", variables);
-  assignValues(params, "params", variables);
+  assignValues(body ? filteredBody : body, "body", variables);
+  assignValues(params ? filteredParams : params , "params", variables);
   steps.set("prepare_step", {
     assign: variables,
   });
@@ -164,7 +179,7 @@ const saveEndpointConfig = async (
       }, ${typeof body === "string" ? `["body", body]` : `["body", new Map([${bodyStr}])]`}, ${
         typeof params === "string"
           ? `["params", params]`
-          : `["params", new Map([${Object.keys(params ?? {}).map(
+          : `["params", new Map([${Object.keys(filteredParams ?? {}).map(
               (p) => `["${p.replaceAll("__", ".")}", params_${p}]`
             )}])]`
       }])}`,
@@ -376,14 +391,7 @@ const buildSteps = (endpointName: string, endpoint: EndpointData, selectedEndpoi
   const params = Object.keys(endpointParams).length > 0 ? endpointParams : undefined;
   const body = Object.keys(endpointBody).length > 0 ? endpointBody : undefined;
 
-  let endpointUrl = selectedEndpointType.url;
-  if (endpointUrl?.includes("{")) {
-    const variable = selectedEndpointType.url?.slice(
-      selectedEndpointType.url?.indexOf("{") + 1,
-      selectedEndpointType.url.indexOf("}")
-    );
-    endpointUrl = selectedEndpointType.url?.replace(`{${variable}}`, endpointParams[variable ?? ""]);
-  }
+  let endpointUrl = selectedEndpointType.url?.split("?")[0];
   steps.set("assign_endpoint_url", {
     assign: {
       endpoint_url: endpointUrl,
@@ -394,7 +402,7 @@ const buildSteps = (endpointName: string, endpoint: EndpointData, selectedEndpoi
     call: selectedEndpointType.methodType.toLowerCase() === "get" ? "http.get" : "http.post",
     args: {
       url: "${endpoint_url}",
-      params,
+      query: params,
       headers,
       body,
     },
@@ -973,6 +981,19 @@ const getDefinedEndpointStep = (steps: Step[], node: Node) => {
       return: "",
     };
   }
+
+  const paramss = rawDataIfVariablesMissing(
+    selectedEndpoint,
+    "params",
+    EndpointEnv.Live,
+    assignEndpointVariables(EndpointEnv.Live, "params", selectedEndpoint.params)
+  );
+  const filteredParams = Object.fromEntries(
+    Object.entries(paramss).filter(([_, value]) => String(value).startsWith("${"))
+  );
+  filteredParams['type'] = "prod";
+
+
   return {
     call: `${selectedEndpoint.methodType.toLowerCase() === "get" ? "http.get" : "http.post"}`,
     args: {
@@ -984,9 +1005,7 @@ const getDefinedEndpointStep = (steps: Step[], node: Node) => {
         body: `\${new Map([${getPreDefinedEndpointVariables(selectedEndpoint.body)}])}`,
         params: `\${new Map([${getPreDefinedEndpointVariables(selectedEndpoint.params)}])}`,
       },
-      params: {
-        type: "prod",
-      },
+      query: filteredParams,
     },
     result: (endpoint.name.trim().length ?? 0) > 0 ? `${endpoint.name.replaceAll(" ", "_")}_res` : endpoint.id,
   };
