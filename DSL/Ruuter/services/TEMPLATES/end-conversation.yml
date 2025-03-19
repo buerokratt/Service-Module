@@ -23,6 +23,10 @@ extract_request_data:
   assign:
     message: ${incoming.body.message}
 
+end_log_message:
+  log: ${message}
+  next: send_message_to_client
+
 # TODO: do the actual request
 send_message_to_client:
   call: reflect.mock
@@ -31,6 +35,10 @@ send_message_to_client:
       status: 'OK'
       message: "Teenus on lõpetatud"
   result: result
+
+end_log_result:
+  log: ${result.response.body}
+  next: return_value
 
 return_value:
   return: ${result.response.body}

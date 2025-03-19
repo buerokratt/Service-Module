@@ -1037,6 +1037,9 @@ export const saveFlowClick = async () => {
   const edges = useServiceStore.getState().edges;
   const nodes = useServiceStore.getState().nodes;
 
+  // todo test: saving non-common endpoints
+  // todo bug1: common endpoints path is wrong, trying to point to non-existing non-common
+
   await saveFlow({
     steps,
     name,
