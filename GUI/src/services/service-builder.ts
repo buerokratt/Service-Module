@@ -286,9 +286,8 @@ export async function saveEndpoints(
     const selectedEndpointType = endpoint.definedEndpoints.find((e) => e.isSelected);
     if (!selectedEndpointType) continue;
 
-    const endpointName = `${name.replaceAll(" ", "_")}-${
-      (endpoint.name.trim().length ?? 0) > 0 ? endpoint?.name.replaceAll(" ", "_") : endpoint?.id
-    }`;
+    const endpointName = `${name.replaceAll(" ", "_")}-${getEndpointName(endpoint)}`;
+    endpoint.fileName = endpointName;
     for (const env of [EndpointEnv.Live, EndpointEnv.Test]) {
       await saveEndpointInfo(selectedEndpointType, env, endpointName, endpoint);
     }
@@ -974,16 +973,14 @@ const getDefinedEndpointStep = (steps: Step[], node: Node) => {
     };
   }
 
-  console.log("igor name\n", name);
-  console.log("igor endpoint\n", endpoint);
+  const isCommonPath = endpoint.isCommon ? "common/" : "";
+  // For backwards compatibility, in case fileName was not defined
+  const fileName = `${endpoint.fileName ?? `${name}-${getEndpointName(endpoint)}`}`;
 
   return {
     call: `${selectedEndpoint.methodType.toLowerCase() === "get" ? "http.get" : "http.post"}`,
     args: {
-      // todo bug: common endpoints path is wrong, trying to point to non-existing non-common
-      url: `${import.meta.env.REACT_APP_API_URL}/services/endpoints/${name}-${
-        (endpoint.name.trim().length ?? 0) > 0 ? endpoint.name.replaceAll(" ", "_") : endpoint.id
-      }?type=prod`,
+      url: `${import.meta.env.REACT_APP_API_URL}/services/endpoints/${isCommonPath}${fileName}?type=prod`,
       body: {
         headers: `\${new Map([${getPreDefinedEndpointVariables(selectedEndpoint.headers)}])}`,
         body: `\${new Map([${getPreDefinedEndpointVariables(selectedEndpoint.body)}])}`,
@@ -993,8 +990,12 @@ const getDefinedEndpointStep = (steps: Step[], node: Node) => {
         type: "prod",
       },
     },
-    result: (endpoint.name.trim().length ?? 0) > 0 ? `${endpoint.name.replaceAll(" ", "_")}_res` : endpoint.id,
+    result: `${endpoint.name.replaceAll(" ", "_")}_res`,
   };
+};
+
+const getEndpointName = (endpoint: EndpointData) => {
+  return `${(endpoint.name.trim().length ?? 0) > 0 ? endpoint?.name.replaceAll(" ", "_") : endpoint?.id}`;
 };
 
 export const saveDraft = async () => {
