@@ -908,19 +908,19 @@ const getTemplate = (steps: Step[], node: Node, stepName: string, nextStep?: str
 const getTemplateDataFromNode = (node: Node): { templateName: string; body?: any; resultName?: string } | undefined => {
   if (node.data.stepType === StepType.Auth) {
     return {
-      templateName: "tara",
+      templateName: "[#SERVICE_PROJECT_LAYER]/tara",
       resultName: "TARA",
     };
   }
   if (node.data.stepType === StepType.Input) {
     return {
-      templateName: "client-input",
+      templateName: "[#SERVICE_PROJECT_LAYER]/client-input",
       resultName: `client_input_${node.data.clientInputId}_result`,
     };
   }
   if (node.data.stepType === StepType.FileGenerate) {
     return {
-      templateName: "file-generate",
+      templateName: "[#SERVICE_PROJECT_LAYER]/file-generate",
       body: {
         fileName: node.data.fileName ?? "",
         fileContent: node.data.fileContent ?? "",
@@ -929,7 +929,7 @@ const getTemplateDataFromNode = (node: Node): { templateName: string; body?: any
   }
   if (node.data.stepType === StepType.FileSign) {
     return {
-      templateName: "siga",
+      templateName: "[#SERVICE_PROJECT_LAYER]/siga",
       body: {
         type: "smart_id",
         country: "EE",
@@ -939,7 +939,7 @@ const getTemplateDataFromNode = (node: Node): { templateName: string; body?: any
   }
   if (node.data.stepType === StepType.FinishingStepRedirect) {
     return {
-      templateName: "direct-to-cs",
+      templateName: "[#SERVICE_PROJECT_LAYER]/direct-to-cs",
       body: {
         message: node.data.message ?? "",
       },
@@ -947,7 +947,7 @@ const getTemplateDataFromNode = (node: Node): { templateName: string; body?: any
   }
   if (node.data.stepType === StepType.FinishingStepEnd) {
     return {
-      templateName: "end-conversation",
+      templateName: "[#SERVICE_PROJECT_LAYER]/end-conversation",
       body: {
         message: node.data.message ?? "",
       },
@@ -955,7 +955,7 @@ const getTemplateDataFromNode = (node: Node): { templateName: string; body?: any
   }
   if (node.data.stepType === StepType.OpenWebpage) {
     return {
-      templateName: "open-webpage",
+      templateName: "[#SERVICE_PROJECT_LAYER]/open-webpage",
       body: {
         link: node.data.link ?? "",
         linkText: node.data.linkText ?? "",
@@ -1039,6 +1039,9 @@ export const saveFlowClick = async () => {
 
   // todo test: saving non-common endpoints
   // todo bug1: common endpoints path is wrong, trying to point to non-existing non-common
+  // todo in yaml generation:
+  //  chatId: ${chatId ?? ''}
+  // authorId: ${authorId ?? ''}
 
   await saveFlow({
     steps,
