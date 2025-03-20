@@ -732,8 +732,8 @@ export const saveFlow = async ({
         body: {
           data: {
             botMessages: "${[res]}",
-            chatId: "${chatId}",
-            authorId: "${authorId}",
+            chatId: "${chatId} ?? ''",
+            authorId: "${authorId} ?? ''",
             authorFirstName: "",
             authorLastName: "",
             authorTimestamp: "${new Date().toISOString()}",
