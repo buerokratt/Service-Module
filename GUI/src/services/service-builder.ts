@@ -973,9 +973,14 @@ const getDefinedEndpointStep = (steps: Step[], node: Node) => {
       return: "",
     };
   }
+
+  console.log("igor name\n", name);
+  console.log("igor endpoint\n", endpoint);
+
   return {
     call: `${selectedEndpoint.methodType.toLowerCase() === "get" ? "http.get" : "http.post"}`,
     args: {
+      // todo bug: common endpoints path is wrong, trying to point to non-existing non-common
       url: `${import.meta.env.REACT_APP_API_URL}/services/endpoints/${name}-${
         (endpoint.name.trim().length ?? 0) > 0 ? endpoint.name.replaceAll(" ", "_") : endpoint.id
       }?type=prod`,
@@ -1036,12 +1041,6 @@ export const saveFlowClick = async () => {
   const isNewService = useServiceStore.getState().isNewService;
   const edges = useServiceStore.getState().edges;
   const nodes = useServiceStore.getState().nodes;
-
-  // todo test: saving non-common endpoints
-  // todo bug1: common endpoints path is wrong, trying to point to non-existing non-common
-  // todo in yaml generation:
-  //  chatId: ${chatId ?? ''}
-  // authorId: ${authorId ?? ''}
 
   await saveFlow({
     steps,
