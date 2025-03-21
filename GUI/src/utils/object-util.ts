@@ -53,3 +53,22 @@ export const getValueByPath = (obj: unknown, path: string) => {
 export const isObject = (x: unknown) => {
   return typeof x === "object" && x !== null;
 };
+
+export const getTypeColor = (value: any): { type: string; color: string } => {
+  switch (true) {
+    case value === null || value === undefined:
+      return { type: "null/undefined", color: "#A1A1A1" };
+    case typeof value === "string":
+      return { type: "string", color: "#FF6F61" };
+    case typeof value === "number":
+      return { type: "number", color: "#6BDB75" };
+    case value instanceof Date:
+      return { type: "date", color: "#FFC145" };
+    case Array.isArray(value):
+      return { type: "array", color: "#64C1FF" };
+    case typeof value === "object":
+      return { type: "object", color: "#8E6CE8" };
+    default:
+      return { type: "unknown", color: "#FFFFFF" };
+  }
+}
