@@ -56,6 +56,23 @@ export const ObjectTree: FC<ObjectTreeProps> = ({ path, data, style }) => {
     return stringToTemplate("Math.round((" + base + " + Number.EPSILON) * 100) / 100)");
   };
 
+  const parseValue = (raw: any): number | string | any[] | undefined | {}  => {
+    console.log('parsing', raw)
+    if (raw === 'Number') {
+      return 0;
+    }
+    if (raw === 'String') {
+      return "";
+    }
+    if(raw === 'Array') {
+      return [];
+    }
+    if(raw === 'Object') {
+      return {};
+    }
+    return undefined;
+  }
+
   const toggleRounding = (keyPath: KeyPath, value: number, roundValue = true) => {
     const key = getKeyPathString(keyPath);
 
@@ -77,10 +94,9 @@ export const ObjectTree: FC<ObjectTreeProps> = ({ path, data, style }) => {
         theme={theme}
         invertTheme={true}
         keyPath={[String(root)]}
-        labelRenderer={(keyPath) => {
+        labelRenderer={(keyPath,raw) => {
           const key = keyPath[0];
-          const value = data[key];
-          const typeColor = getTypeColor(value);
+          const typeColor = getTypeColor(parseValue(raw));
 
           return (
               <OutputElementBox
