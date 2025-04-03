@@ -129,7 +129,6 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
                   }}
                 />
               ) : (
-                // todo here is for endpoint top-level vars
                 <OutputElementBox text={chip.name} value={stringToTemplate(chip.value)} useValue />
               )
             )}
