@@ -155,15 +155,13 @@ const saveEndpointConfig = async (
     Object.entries(params).filter(([_, value]) => !String(value).startsWith("${"))
   );
 
-  const filteredBody = Object.fromEntries(
-    Object.entries(body).filter(([_, value]) => !String(value).startsWith("${"))
-  );
+  const filteredBody = Object.fromEntries(Object.entries(body).filter(([_, value]) => !String(value).startsWith("${")));
 
   const steps = new Map();
   const variables: { [key: string]: string } = {};
   assignValues(headers, "headers", variables);
   assignValues(body ? filteredBody : body, "body", variables);
-  assignValues(params ? filteredParams : params , "params", variables);
+  assignValues(params ? filteredParams : params, "params", variables);
   steps.set("prepare_step", {
     assign: variables,
   });
@@ -301,9 +299,8 @@ export async function saveEndpoints(
     const selectedEndpointType = endpoint.definedEndpoints.find((e) => e.isSelected);
     if (!selectedEndpointType) continue;
 
-    const endpointName = `${name.replaceAll(" ", "_")}-${
-      (endpoint.name.trim().length ?? 0) > 0 ? endpoint?.name.replaceAll(" ", "_") : endpoint?.id
-    }`;
+    const endpointName = `${name.replaceAll(" ", "_")}-${getEndpointName(endpoint)}`;
+    endpoint.fileName = endpointName;
     for (const env of [EndpointEnv.Live, EndpointEnv.Test]) {
       await saveEndpointInfo(selectedEndpointType, env, endpointName, endpoint);
     }
@@ -740,8 +737,8 @@ export const saveFlow = async ({
         body: {
           data: {
             botMessages: "${[res]}",
-            chatId: "${chatId}",
-            authorId: "${authorId}",
+            chatId: "${chatId} ?? ''",
+            authorId: "${authorId} ?? ''",
             authorFirstName: "",
             authorLastName: "",
             authorTimestamp: "${new Date().toISOString()}",
@@ -916,19 +913,19 @@ const getTemplate = (steps: Step[], node: Node, stepName: string, nextStep?: str
 const getTemplateDataFromNode = (node: Node): { templateName: string; body?: any; resultName?: string } | undefined => {
   if (node.data.stepType === StepType.Auth) {
     return {
-      templateName: "tara",
+      templateName: "[#SERVICE_PROJECT_LAYER]/tara",
       resultName: "TARA",
     };
   }
   if (node.data.stepType === StepType.Input) {
     return {
-      templateName: "client-input",
+      templateName: "[#SERVICE_PROJECT_LAYER]/client-input",
       resultName: `client_input_${node.data.clientInputId}_result`,
     };
   }
   if (node.data.stepType === StepType.FileGenerate) {
     return {
-      templateName: "file-generate",
+      templateName: "[#SERVICE_PROJECT_LAYER]/file-generate",
       body: {
         fileName: node.data.fileName ?? "",
         fileContent: node.data.fileContent ?? "",
@@ -937,7 +934,7 @@ const getTemplateDataFromNode = (node: Node): { templateName: string; body?: any
   }
   if (node.data.stepType === StepType.FileSign) {
     return {
-      templateName: "siga",
+      templateName: "[#SERVICE_PROJECT_LAYER]/siga",
       body: {
         type: "smart_id",
         country: "EE",
@@ -947,7 +944,7 @@ const getTemplateDataFromNode = (node: Node): { templateName: string; body?: any
   }
   if (node.data.stepType === StepType.FinishingStepRedirect) {
     return {
-      templateName: "direct-to-cs",
+      templateName: "[#SERVICE_PROJECT_LAYER]/direct-to-cs",
       body: {
         message: node.data.message ?? "",
       },
@@ -955,7 +952,7 @@ const getTemplateDataFromNode = (node: Node): { templateName: string; body?: any
   }
   if (node.data.stepType === StepType.FinishingStepEnd) {
     return {
-      templateName: "end-conversation",
+      templateName: "[#SERVICE_PROJECT_LAYER]/end-conversation",
       body: {
         message: node.data.message ?? "",
       },
@@ -963,7 +960,7 @@ const getTemplateDataFromNode = (node: Node): { templateName: string; body?: any
   }
   if (node.data.stepType === StepType.OpenWebpage) {
     return {
-      templateName: "open-webpage",
+      templateName: "[#SERVICE_PROJECT_LAYER]/open-webpage",
       body: {
         link: node.data.link ?? "",
         linkText: node.data.linkText ?? "",
@@ -982,6 +979,9 @@ const getDefinedEndpointStep = (steps: Step[], node: Node) => {
     };
   }
 
+  const isCommonPath = endpoint.isCommon ? "common/" : "";
+  // For backwards compatibility, in case fileName was not defined
+  const fileName = `${endpoint.fileName ?? `${name}-${getEndpointName(endpoint)}`}`;
   const paramss = rawDataIfVariablesMissing(
     selectedEndpoint,
     "params",
@@ -991,15 +991,12 @@ const getDefinedEndpointStep = (steps: Step[], node: Node) => {
   const filteredParams = Object.fromEntries(
     Object.entries(paramss).filter(([_, value]) => String(value).startsWith("${"))
   );
-  filteredParams['type'] = "prod";
-
+  filteredParams["type"] = "prod";
 
   return {
     call: `${selectedEndpoint.methodType.toLowerCase() === "get" ? "http.get" : "http.post"}`,
     args: {
-      url: `${import.meta.env.REACT_APP_API_URL}/services/endpoints/${name}-${
-        (endpoint.name.trim().length ?? 0) > 0 ? endpoint.name.replaceAll(" ", "_") : endpoint.id
-      }?type=prod`,
+      url: `${import.meta.env.REACT_APP_API_URL}/services/endpoints/${isCommonPath}${fileName}?type=prod`,
       body: {
         headers: `\${new Map([${getPreDefinedEndpointVariables(selectedEndpoint.headers)}])}`,
         body: `\${new Map([${getPreDefinedEndpointVariables(selectedEndpoint.body)}])}`,
@@ -1007,8 +1004,12 @@ const getDefinedEndpointStep = (steps: Step[], node: Node) => {
       },
       query: filteredParams,
     },
-    result: (endpoint.name.trim().length ?? 0) > 0 ? `${endpoint.name.replaceAll(" ", "_")}_res` : endpoint.id,
+    result: `${endpoint.name.replaceAll(" ", "_")}_res`,
   };
+};
+
+const getEndpointName = (endpoint: EndpointData) => {
+  return `${(endpoint.name.trim().length ?? 0) > 0 ? endpoint?.name.replaceAll(" ", "_") : endpoint?.id}`;
 };
 
 export const saveDraft = async () => {
