@@ -27,11 +27,15 @@ const theme = {
 };
 
 const getKeyPathString = (keyPath: KeyPath) => {
-  return keyPath.toReversed().join(".");
+  return keyPath.toReversed().join('"]["');
 };
 
 const round = (n: number) => {
   return Math.round((n + Number.EPSILON) * 100) / 100;
+};
+
+const escapeKey = (key: string) => {
+  return key.replace(/"/g, '\\"');
 };
 
 type ObjectTreeProps = {
@@ -49,11 +53,33 @@ export const ObjectTree: FC<ObjectTreeProps> = ({ path, data, style }) => {
   const buildKeyPathString = (keyPath: KeyPath) => {
     const key = getKeyPathString(keyPath);
 
-    const base = pathArray.join(".") + "." + key;
-    const isRounded = roundedValues.has(key);
-    if (!isRounded) return stringToTemplate(base);
+    let base = "";
+    if (pathArray.length > 0) {
+      // Start with the root object name
+      base = pathArray[0];
 
-    return stringToTemplate("Math.round((" + base + " + Number.EPSILON) * 100) / 100)");
+      // Add remaining path elements with bracket notation
+      for (let i = 1; i < pathArray.length; i++) {
+        base += `["${escapeKey(pathArray[i])}"]`;
+      }
+
+      // Add the final key parts
+      const keyParts = key.split('"]["');
+      for (const part of keyParts) {
+        base += `["${escapeKey(part)}"]`;
+      }
+    } else {
+      // If there's no path array, just use the root and key
+      base = `${root}`;
+
+      // Add the key parts
+      const keyParts = key.split('"]["');
+      for (const part of keyParts) {
+        base += `["${escapeKey(part)}"]`;
+      }
+    }
+
+    return stringToTemplate(roundedValues.has(key) ? "Math.round((" + base + " + Number.EPSILON) * 100) / 100" : base);
   };
 
   const parseValue = (raw: any): number | string | any[] | undefined | {}  => {
