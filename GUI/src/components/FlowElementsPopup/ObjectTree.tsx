@@ -4,6 +4,7 @@ import { JSONTree, KeyPath } from "react-json-tree";
 import "./styles.scss";
 import { stringToTemplate } from "utils/string-util";
 import { useTranslation } from "react-i18next";
+import {getTypeColor} from "../../utils/object-util";
 
 // Some theme colors are inverted with invertTheme below to get the light theme
 const theme = {
@@ -15,13 +16,13 @@ const theme = {
   base05: "#d2d3d8", // black-coral-2 (default foreground)
   base06: "#e1e2e5", // black-coral-1 (light foreground)
   base07: "#f0f0f2", // black-coral-0 (light background)
-  base08: "#d73e3e", // jasper-10 (red - variables, XML tags)
-  base09: "#ff8000", // orange-10 (orange - integers, boolean)
-  base0A: "#ffb511", // dark-tangerine-10 (yellow - classes, CSS rules)
-  base0B: "#308653", // sea-green-10 (green - strings, attr names)
-  base0C: "#73a5cc", // sapphire-blue-5 (teal - operators, regex)
+  base08: "#FF6F61", // jasper-10 (red - variables, XML tags)
+  base09: "#6BDB75", // orange-10 (orange - integers, boolean)
+  base0A: "#FFC145", // dark-tangerine-10 (yellow - classes, CSS rules)
+  base0B: "#FF6F61", // sea-green-10 (green - strings, attr names)
+  base0C: "#A1A1A1", // sapphire-blue-5 (teal - operators, regex)
   base0D: "#f9f9f9", // extra-light (blue - functions, methods)
-  base0E: "#e99595", // jasper-5 (purple - keywords)
+  base0E: "#d73e3e", // jasper-5 (purple - keywords)
   base0F: "#e87500", // orange-11 (dark orange - deprecated)
 };
 
@@ -55,6 +56,23 @@ export const ObjectTree: FC<ObjectTreeProps> = ({ path, data, style }) => {
     return stringToTemplate("Math.round((" + base + " + Number.EPSILON) * 100) / 100)");
   };
 
+  const parseValue = (raw: any): number | string | any[] | undefined | {}  => {
+    console.log('parsing', raw)
+    if (raw === 'Number') {
+      return 0;
+    }
+    if (raw === 'String') {
+      return "";
+    }
+    if(raw === 'Array') {
+      return [];
+    }
+    if(raw === 'Object') {
+      return {};
+    }
+    return undefined;
+  }
+
   const toggleRounding = (keyPath: KeyPath, value: number, roundValue = true) => {
     const key = getKeyPathString(keyPath);
 
@@ -76,15 +94,21 @@ export const ObjectTree: FC<ObjectTreeProps> = ({ path, data, style }) => {
         theme={theme}
         invertTheme={true}
         keyPath={[String(root)]}
-        labelRenderer={(keyPath) => (
-          <OutputElementBox
-            text={String(keyPath[0]) + ":"}
-            value={buildKeyPathString(keyPath)}
-            useValue
-            draggable={true}
-            className="object-tree-chip"
-          />
-        )}
+        labelRenderer={(keyPath,raw) => {
+          const key = keyPath[0];
+          const typeColor = getTypeColor(parseValue(raw));
+
+          return (
+              <OutputElementBox
+                  style={{ border: `3px outset ${typeColor.color}` }}
+                  text={`${String(key)}:`}
+                  value={buildKeyPathString(keyPath)}
+                  useValue
+                  draggable={true}
+                  className="object-tree-chip"
+              />
+          );
+        }}
         valueRenderer={(raw, _, ...keyPath) => {
           const key = getKeyPathString(keyPath);
 
