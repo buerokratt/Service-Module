@@ -1,4 +1,4 @@
-import { CSSProperties, FC, useEffect, useState } from "react";
+import React, { CSSProperties, FC, useEffect, useState } from "react";
 import Track from "../Track";
 import useServiceStore from "store/new-services.store";
 import { EndpointResponseVariable } from "types/endpoint/endpoint-response-variables";
@@ -8,7 +8,8 @@ import { Assign } from "./AssignBuilder/assign-types";
 import { useTranslation } from "react-i18next";
 import { ObjectTree } from "./ObjectTree";
 import { stringToTemplate, templateToString } from "utils/string-util";
-import { isObject } from "utils/object-util";
+import { getTypeColor, isObject } from "utils/object-util";
+import Tooltip from "../Tooltip";
 
 type PreviousVariablesProps = {
   readonly nodeId: string;
@@ -20,7 +21,10 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
   const nodes = useServiceStore((state) => state.nodes);
   const [endpoints, setEndpoints] = useState<EndpointResponseVariable[]>([]);
   const [assignedVariables, setAssignedVariables] = useState<Assign[]>([]);
-  const [endpointsObjectTree, setEndpointsObjectTree] = useState<{ data: unknown; path: string | number } | null>(null);
+  const [endpointsObjectTree, setEndpointsObjectTree] = useState<{
+    data: unknown;
+    path: string | number;
+  } | null>(null);
   const [assignedObjectTree, setAssignedObjectTree] = useState<{ data: unknown; path: string | number } | null>(null);
 
   useEffect(() => {
@@ -77,18 +81,49 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
           >
             {assignedVariables.map((variable) =>
               isObject(variable.data) ? (
-                <OutputElementBox
-                  text={assignedObjectTree?.path === variable.value ? variable.key + " ▲" : variable.key + " ▼"}
-                  draggable={false}
-                  style={{ cursor: "pointer" }}
-                  onClick={() => {
-                    setAssignedObjectTree(
-                      assignedObjectTree?.path === variable.value ? null : { data: variable.data, path: variable.value }
+                <>
+                  {(() => {
+                    const typeColor = getTypeColor(variable.value);
+
+                    return (
+                      <Tooltip content={`${variable.value} : ${typeColor.type}`}>
+                        <OutputElementBox
+                          text={assignedObjectTree?.path === variable.value ? variable.key + " ▲" : variable.key + " ▼"}
+                          draggable={false}
+                          className="tooltip"
+                          style={{ cursor: "pointer", border: `2px outset ${typeColor.color}` }}
+                          onClick={() => {
+                            setAssignedObjectTree(
+                              assignedObjectTree?.path === variable.value
+                                ? null
+                                : {
+                                    data: variable.data,
+                                    path: variable.value,
+                                  }
+                            );
+                          }}
+                        />
+                      </Tooltip>
                     );
-                  }}
-                />
+                  })()}
+                </>
               ) : (
-                <OutputElementBox text={variable.key} value={variable.value} useValue />
+                <>
+                  {(() => {
+                    const typeColor = getTypeColor(variable.value);
+
+                    return (
+                      <Tooltip content={`${variable.value} : ${typeColor.type}`}>
+                        <OutputElementBox
+                          style={{ border: `2px outset ${typeColor.color}` }}
+                          text={variable.key}
+                          value={variable.value}
+                          useValue
+                        />
+                      </Tooltip>
+                    );
+                  })()}
+                </>
               )
             )}
           </Track>
@@ -118,18 +153,47 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
           >
             {endpoint.chips.map((chip) =>
               isObject(chip.data) ? (
-                <OutputElementBox
-                  text={endpointsObjectTree?.path === chip.value ? chip.name + " ▲" : chip.name + " ▼"}
-                  draggable={false}
-                  style={{ cursor: "pointer" }}
-                  onClick={() => {
-                    setEndpointsObjectTree(
-                      endpointsObjectTree?.path === chip.value ? null : { data: chip.data, path: chip.value }
+                <>
+                  {(() => {
+                    const typeColor = getTypeColor(chip.data);
+
+                    return (
+                      <Tooltip content={`${chip.data} : ${typeColor.type}`}>
+                        <OutputElementBox
+                          text={endpointsObjectTree?.path === chip.value ? chip.name + " ▲" : chip.name + " ▼"}
+                          draggable={false}
+                          style={{ cursor: "pointer", border: `2px outset ${typeColor.color}` }}
+                          onClick={() => {
+                            setEndpointsObjectTree(
+                              endpointsObjectTree?.path === chip.value
+                                ? null
+                                : {
+                                    data: chip.data,
+                                    path: chip.value,
+                                  }
+                            );
+                          }}
+                        />
+                      </Tooltip>
                     );
-                  }}
-                />
+                  })()}
+                </>
               ) : (
-                <OutputElementBox text={chip.name} value={stringToTemplate(chip.value)} useValue />
+                <>
+                  {(() => {
+                    const typeColor = getTypeColor(chip.data);
+                    return (
+                      <Tooltip content={`${chip.data} : ${typeColor.type}`}>
+                        <OutputElementBox
+                          style={{ border: `2px outset ${typeColor.color}` }}
+                          text={chip.name}
+                          value={stringToTemplate(chip.value)}
+                          useValue
+                        />
+                      </Tooltip>
+                    );
+                  })()}
+                </>
               )
             )}
           </Track>
