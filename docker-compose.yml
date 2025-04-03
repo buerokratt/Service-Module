@@ -196,6 +196,21 @@ services:
     networks:
       - bykstack
 
+  pipelines:
+    container_name: pipelines
+    build:
+      context: ./DSL/Pipelines
+    environment:
+      - OPENSEARCH_PROTOCOL=http
+      - PORT=3010
+      - OPENSEARCH_HOST=opensearch
+      - OPENSEARCH_PORT=9200
+      - OPENSEARCH_AUTH=admin:admin
+    ports:
+      - 3010:3010
+    networks:
+      - bykstack    
+
   opensearch:
     image: opensearchproject/opensearch:2.11.1
     container_name: opensearch
