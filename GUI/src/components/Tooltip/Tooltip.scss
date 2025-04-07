@@ -3,6 +3,7 @@
 @import 'src/styles/settings/variables/typography';
 
 .tooltip {
+  z-index: 1000;
   background-color: get-color(white);
   padding: 4px;
   border-radius: 4px;

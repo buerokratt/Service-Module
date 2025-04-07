@@ -120,8 +120,15 @@ const FlowElementsPopup: React.FC = () => {
     if (stepType === StepType.Assign) {
       const flatEndpointVariables = endpointsVariables.map((endpoint) => endpoint.chips).flat();
       assignElements.forEach((element) => {
+        // Values are saved as templates for backwards compatibility
         const fullPath = templateToString(element.value);
-        const endpointVariable = flatEndpointVariables.find((variable) => fullPath.startsWith(String(variable.value)))!;
+        const endpointVariable = flatEndpointVariables.find((variable) => fullPath.startsWith(String(variable.value)));
+
+        if (!endpointVariable) {
+          // Element is not an object so no data for ObjectTree
+          return;
+        }
+
         const value = String(endpointVariable.value);
         const remainingPath = fullPath.substring(
           fullPath[value.length] === "["

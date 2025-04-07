@@ -6,7 +6,8 @@ const instance = axios.create({
     baseURL: import.meta.env.REACT_APP_RUUTER_API_URL + '/generic/',
     headers: {
         Accept: 'application/json',
-        Testcookie: ''
+        Testcookie: '',
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
     },
     withCredentials: false,
 });

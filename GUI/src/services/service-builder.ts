@@ -32,7 +32,14 @@ const getEndpointVariables = (
       result[v.name] = `\${new Map([${nestedResult}])}`;
       return;
     }
-    if (v.value) result[v.name] = `\${info.response.body.${key}["${v.name}"]}`;
+
+    if (v.value) {
+      if (v.value.startsWith("${")) {
+        result[v.name] = `\${incoming.params.${v.name}}`;
+      } else {
+        result[v.name] = `\${info.response.body.${key}["${v.name}"]}`;
+      }
+    }
   });
   if (Object.keys(result).length === 0) {
     try {
@@ -144,11 +151,17 @@ const saveEndpointConfig = async (
     env,
     assignEndpointVariables(env, "params", endpoint.params)
   );
+  const filteredParams = Object.fromEntries(
+    Object.entries(params).filter(([_, value]) => !String(value).startsWith("${"))
+  );
+
+  const filteredBody = Object.fromEntries(Object.entries(body).filter(([_, value]) => !String(value).startsWith("${")));
+
   const steps = new Map();
   const variables: { [key: string]: string } = {};
   assignValues(headers, "headers", variables);
-  assignValues(body, "body", variables);
-  assignValues(params, "params", variables);
+  assignValues(body ? filteredBody : body, "body", variables);
+  assignValues(params ? filteredParams : params, "params", variables);
   steps.set("prepare_step", {
     assign: variables,
   });
@@ -164,7 +177,7 @@ const saveEndpointConfig = async (
       }, ${typeof body === "string" ? `["body", body]` : `["body", new Map([${bodyStr}])]`}, ${
         typeof params === "string"
           ? `["params", params]`
-          : `["params", new Map([${Object.keys(params ?? {}).map(
+          : `["params", new Map([${Object.keys(filteredParams ?? {}).map(
               (p) => `["${p.replaceAll("__", ".")}", params_${p}]`
             )}])]`
       }])}`,
@@ -286,9 +299,8 @@ export async function saveEndpoints(
     const selectedEndpointType = endpoint.definedEndpoints.find((e) => e.isSelected);
     if (!selectedEndpointType) continue;
 
-    const endpointName = `${name.replaceAll(" ", "_")}-${
-      (endpoint.name.trim().length ?? 0) > 0 ? endpoint?.name.replaceAll(" ", "_") : endpoint?.id
-    }`;
+    const endpointName = `${name.replaceAll(" ", "_")}-${getEndpointName(endpoint)}`;
+    endpoint.fileName = endpointName;
     for (const env of [EndpointEnv.Live, EndpointEnv.Test]) {
       await saveEndpointInfo(selectedEndpointType, env, endpointName, endpoint);
     }
@@ -376,14 +388,7 @@ const buildSteps = (endpointName: string, endpoint: EndpointData, selectedEndpoi
   const params = Object.keys(endpointParams).length > 0 ? endpointParams : undefined;
   const body = Object.keys(endpointBody).length > 0 ? endpointBody : undefined;
 
-  let endpointUrl = selectedEndpointType.url;
-  if (endpointUrl?.includes("{")) {
-    const variable = selectedEndpointType.url?.slice(
-      selectedEndpointType.url?.indexOf("{") + 1,
-      selectedEndpointType.url.indexOf("}")
-    );
-    endpointUrl = selectedEndpointType.url?.replace(`{${variable}}`, endpointParams[variable ?? ""]);
-  }
+  let endpointUrl = selectedEndpointType.url?.split("?")[0];
   steps.set("assign_endpoint_url", {
     assign: {
       endpoint_url: endpointUrl,
@@ -394,7 +399,7 @@ const buildSteps = (endpointName: string, endpoint: EndpointData, selectedEndpoi
     call: selectedEndpointType.methodType.toLowerCase() === "get" ? "http.get" : "http.post",
     args: {
       url: "${endpoint_url}",
-      params,
+      query: params,
       headers,
       body,
     },
@@ -732,8 +737,8 @@ export const saveFlow = async ({
         body: {
           data: {
             botMessages: "${[res]}",
-            chatId: "${chatId}",
-            authorId: "${authorId}",
+            chatId: "${chatId} ?? ''",
+            authorId: "${authorId} ?? ''",
             authorFirstName: "",
             authorLastName: "",
             authorTimestamp: "${new Date().toISOString()}",
@@ -908,19 +913,19 @@ const getTemplate = (steps: Step[], node: Node, stepName: string, nextStep?: str
 const getTemplateDataFromNode = (node: Node): { templateName: string; body?: any; resultName?: string } | undefined => {
   if (node.data.stepType === StepType.Auth) {
     return {
-      templateName: "tara",
+      templateName: "[#SERVICE_PROJECT_LAYER]/tara",
       resultName: "TARA",
     };
   }
   if (node.data.stepType === StepType.Input) {
     return {
-      templateName: "client-input",
+      templateName: "[#SERVICE_PROJECT_LAYER]/client-input",
       resultName: `client_input_${node.data.clientInputId}_result`,
     };
   }
   if (node.data.stepType === StepType.FileGenerate) {
     return {
-      templateName: "file-generate",
+      templateName: "[#SERVICE_PROJECT_LAYER]/file-generate",
       body: {
         fileName: node.data.fileName ?? "",
         fileContent: node.data.fileContent ?? "",
@@ -929,7 +934,7 @@ const getTemplateDataFromNode = (node: Node): { templateName: string; body?: any
   }
   if (node.data.stepType === StepType.FileSign) {
     return {
-      templateName: "siga",
+      templateName: "[#SERVICE_PROJECT_LAYER]/siga",
       body: {
         type: "smart_id",
         country: "EE",
@@ -939,7 +944,7 @@ const getTemplateDataFromNode = (node: Node): { templateName: string; body?: any
   }
   if (node.data.stepType === StepType.FinishingStepRedirect) {
     return {
-      templateName: "direct-to-cs",
+      templateName: "[#SERVICE_PROJECT_LAYER]/direct-to-cs",
       body: {
         message: node.data.message ?? "",
       },
@@ -947,7 +952,7 @@ const getTemplateDataFromNode = (node: Node): { templateName: string; body?: any
   }
   if (node.data.stepType === StepType.FinishingStepEnd) {
     return {
-      templateName: "end-conversation",
+      templateName: "[#SERVICE_PROJECT_LAYER]/end-conversation",
       body: {
         message: node.data.message ?? "",
       },
@@ -955,7 +960,7 @@ const getTemplateDataFromNode = (node: Node): { templateName: string; body?: any
   }
   if (node.data.stepType === StepType.OpenWebpage) {
     return {
-      templateName: "open-webpage",
+      templateName: "[#SERVICE_PROJECT_LAYER]/open-webpage",
       body: {
         link: node.data.link ?? "",
         linkText: node.data.linkText ?? "",
@@ -973,23 +978,38 @@ const getDefinedEndpointStep = (steps: Step[], node: Node) => {
       return: "",
     };
   }
+
+  const isCommonPath = endpoint.isCommon ? "common/" : "";
+  // For backwards compatibility, in case fileName was not defined
+  const fileName = `${endpoint.fileName ?? `${name}-${getEndpointName(endpoint)}`}`;
+  const paramss = rawDataIfVariablesMissing(
+    selectedEndpoint,
+    "params",
+    EndpointEnv.Live,
+    assignEndpointVariables(EndpointEnv.Live, "params", selectedEndpoint.params)
+  );
+  const filteredParams = Object.fromEntries(
+    Object.entries(paramss).filter(([_, value]) => String(value).startsWith("${"))
+  );
+  filteredParams["type"] = "prod";
+
   return {
     call: `${selectedEndpoint.methodType.toLowerCase() === "get" ? "http.get" : "http.post"}`,
     args: {
-      url: `${import.meta.env.REACT_APP_API_URL}/services/endpoints/${name}-${
-        (endpoint.name.trim().length ?? 0) > 0 ? endpoint.name.replaceAll(" ", "_") : endpoint.id
-      }?type=prod`,
+      url: `${import.meta.env.REACT_APP_API_URL}/services/endpoints/${isCommonPath}${fileName}?type=prod`,
       body: {
         headers: `\${new Map([${getPreDefinedEndpointVariables(selectedEndpoint.headers)}])}`,
         body: `\${new Map([${getPreDefinedEndpointVariables(selectedEndpoint.body)}])}`,
         params: `\${new Map([${getPreDefinedEndpointVariables(selectedEndpoint.params)}])}`,
       },
-      params: {
-        type: "prod",
-      },
+      query: filteredParams,
     },
-    result: (endpoint.name.trim().length ?? 0) > 0 ? `${endpoint.name.replaceAll(" ", "_")}_res` : endpoint.id,
+    result: `${endpoint.name.replaceAll(" ", "_")}_res`,
   };
+};
+
+const getEndpointName = (endpoint: EndpointData) => {
+  return `${(endpoint.name.trim().length ?? 0) > 0 ? endpoint?.name.replaceAll(" ", "_") : endpoint?.id}`;
 };
 
 export const saveDraft = async () => {
@@ -1036,10 +1056,6 @@ export const saveFlowClick = async () => {
   const isNewService = useServiceStore.getState().isNewService;
   const edges = useServiceStore.getState().edges;
   const nodes = useServiceStore.getState().nodes;
-
-  console.log("saveFlowClick", {
-    slot,
-  });
 
   await saveFlow({
     steps,

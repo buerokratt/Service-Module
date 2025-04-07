@@ -26,6 +26,7 @@ get_services_list:
       page: ${incoming.body.page}
       page_size: ${incoming.body.page_size}
       sorting: ${incoming.body.sorting}
+  limit: 400
   result: services_res
 
 assign_services_result:
