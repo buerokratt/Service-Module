@@ -1,4 +1,4 @@
-SELECT DISTINCT ON (service_id) *
+SELECT DISTINCT ON (service_id) name, service_id
 FROM services
 WHERE jsonb_path_exists(
         structure::jsonb,

@@ -297,6 +297,7 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
       const structure = JSON.parse(service.data[0].structure?.value ?? "{}");
       // todo here
       let endpoints = JSON.parse(service.data[0].endpoints?.value ?? "{}");
+      console.log(endpoints);
       // let endpoints = [];
       let edges = structure?.edges;
       nodes = structure?.nodes;
