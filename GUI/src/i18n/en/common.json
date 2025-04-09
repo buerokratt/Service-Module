@@ -297,7 +297,7 @@
     "placeholderNodeSuccess": "Drag the success step into the flow",
     "placeholderNodeFailure": "Drag the failure step into the flow",
     "allElements": "All elements",
-    "setupElements": "Setup elements",
+    "setupElements": "API elements",
     "tabs": {
       "setup": "Setup",
       "test": "Test"
