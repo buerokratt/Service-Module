@@ -213,6 +213,7 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
   },
   vaildServiceInfo: () => !!get().name && !!get().description,
   serviceNameDashed: () => get().name.replace(" ", "-"),
+  // todo need to call this on deletion too
   deleteEndpoint: (id: string) => {
     const newEndpoints = get().endpoints.filter((x) => x.id !== id);
     set({ endpoints: newEndpoints });
@@ -294,7 +295,9 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
       const service = await axios.get<Service[]>(getServiceById(id));
 
       const structure = JSON.parse(service.data[0].structure?.value ?? "{}");
+      // todo here
       let endpoints = JSON.parse(service.data[0].endpoints?.value ?? "{}");
+      // let endpoints = [];
       let edges = structure?.edges;
       nodes = structure?.nodes;
 
@@ -416,6 +419,7 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
     set({ endpoints });
   },
   mapEndpointsToSetps: (): Step[] => {
+    console.log(get().endpoints);
     return get()
       .endpoints.map((x) => ({
         selected: x.definedEndpoints.find((e) => e.isSelected),
