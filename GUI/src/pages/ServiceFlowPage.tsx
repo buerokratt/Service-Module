@@ -92,7 +92,7 @@ const ServiceFlowPage: FC = () => {
           <div className="graph__controls">
             <Track direction="vertical" gap={16} align="stretch">
               {steps && (
-                <Collapsible title={t("serviceFlow.setupElements")} contentStyle={contentStyle}>
+                <Collapsible title={t("serviceFlow.apiElements")} contentStyle={contentStyle}>
                   <Track direction="vertical" align="stretch" gap={4}>
                     {steps.map((step) => (
                       <Box

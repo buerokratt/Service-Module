@@ -297,7 +297,7 @@
     "placeholderNodeSuccess": "Lohistage edusamm voogu",
     "placeholderNodeFailure": "Lohistage tõrkeetapp voogu",
     "allElements": "Üldelemendid",
-    "setupElements": "API elemendid",
+    "apiElements": "API elemendid",
     "tabs": {
       "setup": "Seadistamine",
       "test": "Testimine"
