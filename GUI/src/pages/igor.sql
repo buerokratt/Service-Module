@@ -1,15 +1,14 @@
-
--- todo return conflicting and show as links
+-- todo broken with params
 SELECT DISTINCT ON (service_id) name, service_id
 FROM services
 WHERE jsonb_path_exists(
         structure::jsonb,
-        '$.**.originalDefinedNodeId ? (@ == "bfef3b94-2008-4ac7-b768-06ef01af3940")'
+        '$.**.originalDefinedNodeId ? (@ == "' || :node_id || '")'
       )
-  AND service_id != 'f9e239ae-db08-45ab-87ec-c0bf7ed713a1'
+  AND service_id != :excluded_service_id
 ORDER BY service_id, id DESC;
 
--- todo for deletion - add params
+-- for deletion
 INSERT INTO services (
     name,
     description,
@@ -39,12 +38,12 @@ SELECT
         (
             SELECT jsonb_agg(endpoint)
             FROM jsonb_array_elements(endpoints::jsonb) endpoint
-            WHERE endpoint->>'id' != 'bfef3b94-2008-4ac7-b768-06ef01af3940'
+            WHERE endpoint->>'id' != :endpoint_id
         ),
         '[]'::jsonb
     ) as endpoints,
     slot
 FROM services
-WHERE service_id = 'f9e239ae-db08-45ab-87ec-c0bf7ed713a1'
+WHERE service_id = :service_id
 ORDER BY id DESC
 LIMIT 1;
