@@ -6,7 +6,6 @@ import axios from "axios";
 import { useParams } from "react-router-dom";
 import Box from "components/Box";
 import Button from "components/Button";
-import Collapsible from "components/Collapsible";
 import Icon from "components/Icon";
 import Track from "components/Track";
 import { getServicesByEndpointId } from "resources/api-constants";
@@ -15,12 +14,11 @@ import { EndpointData } from "types/endpoint";
 import Popup from "components/Popup";
 import { onDragStart } from "utils/component-util";
 
-interface ApiElementsListProps {
-  steps: Step[];
-  contentStyle: React.CSSProperties;
+interface ApiEndpointProps {
+  step: Step;
 }
 
-const ApiElementsList: FC<ApiElementsListProps> = ({ steps, contentStyle }) => {
+const ApiEndpoint: FC<ApiEndpointProps> = ({ step }) => {
   const { t } = useTranslation();
   const { id } = useParams();
 
@@ -51,30 +49,26 @@ const ApiElementsList: FC<ApiElementsListProps> = ({ steps, contentStyle }) => {
         </Popup>
       )}
 
-      <Collapsible title={t("serviceFlow.apiElements")} contentStyle={contentStyle}>
-        <Track direction="vertical" align="stretch" gap={4}>
-          {steps.map((step) => (
-            <Box
-              key={step.id}
-              color={[StepType.FinishingStepEnd, StepType.FinishingStepRedirect].includes(step.type) ? "red" : "blue"}
-              onDragStart={(event) => onDragStart(event, step)}
-              draggable
-            >
-              <Track gap={8} style={{ overflow: "hidden" }}>
-                {step.type === "user-defined" && <img alt="" src={apiIconTag} />}
-                {step.label}
+      <Box
+        key={step.id}
+        color={[StepType.FinishingStepEnd, StepType.FinishingStepRedirect].includes(step.type) ? "red" : "blue"}
+        onDragStart={(event) => onDragStart(event, step)}
+        draggable
+      >
+        <Track gap={8} style={{ overflow: "hidden" }}>
+          {step.type === "user-defined" && <img alt="" src={apiIconTag} />}
+          {step.label}
 
-                <Button appearance="text" onClick={() => deleteApiElement(step.data!)}>
-                  <Icon icon={<MdDeleteOutline />} size="medium" />
-                  {t("serviceFlow.delete")}
-                </Button>
-              </Track>
-            </Box>
-          ))}
+          {/* todo style */}
+          {/* todo on hover */}
+          <Button appearance="text" onClick={() => deleteApiElement(step.data!)}>
+            <Icon icon={<MdDeleteOutline />} size="medium" />
+            {t("serviceFlow.delete")}
+          </Button>
         </Track>
-      </Collapsible>
+      </Box>
     </>
   );
 };
 
-export default ApiElementsList;
+export default ApiEndpoint;

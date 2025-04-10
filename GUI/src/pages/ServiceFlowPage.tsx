@@ -13,7 +13,7 @@ import "./ServiceFlowPage.scss";
 import Chat from "components/chat/chat";
 import withAuthorization, { ROLES } from "hoc/with-authorization";
 
-import ApiElementsList from "components/ApiEndpointList";
+import ApiEndpoint from "components/ApiEndpointList";
 import { onDragStart } from "utils/component-util";
 
 const ServiceFlowPage: FC = () => {
@@ -86,7 +86,15 @@ const ServiceFlowPage: FC = () => {
         <div className="graph">
           <div className="graph__controls">
             <Track direction="vertical" gap={16} align="stretch">
-              {steps && <ApiElementsList steps={steps} contentStyle={contentStyle} />}
+              {steps && (
+                <Collapsible title={t("serviceFlow.apiElements")} contentStyle={contentStyle}>
+                  <Track direction="vertical" align="stretch" gap={4}>
+                    {steps.map((step) => (
+                      <ApiEndpoint step={step} />
+                    ))}
+                  </Track>
+                </Collapsible>
+              )}
               {allElements && (
                 <Collapsible title={t("serviceFlow.allElements")} contentStyle={contentStyle}>
                   <Track direction="vertical" align="stretch" gap={4}>
