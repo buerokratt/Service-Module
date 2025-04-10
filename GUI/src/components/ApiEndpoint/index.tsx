@@ -13,6 +13,7 @@ import { Step, StepType } from "types";
 import { EndpointData } from "types/endpoint";
 import Popup from "components/Popup";
 import { onDragStart } from "utils/component-util";
+import "./ApiEndpoint.module.scss";
 
 interface RelatedService {
   serviceId: string;
@@ -77,6 +78,7 @@ const ApiEndpoint: FC<ApiEndpointProps> = ({ step }) => {
       )}
 
       <Box
+        className="box"
         key={step.id}
         color={[StepType.FinishingStepEnd, StepType.FinishingStepRedirect].includes(step.type) ? "red" : "blue"}
         onDragStart={(event) => onDragStart(event, step)}
@@ -86,12 +88,11 @@ const ApiEndpoint: FC<ApiEndpointProps> = ({ step }) => {
           {step.type === "user-defined" && <img alt="" src={apiIconTag} />}
           {step.label}
 
-          {/* todo style */}
-          {/* todo on hover */}
+          {/* Delete button with hover effect */}
           {isGettingRelatedServices ? (
             <div className="loader" style={{ width: 20, height: 20 }} />
           ) : (
-            <Button appearance="text" onClick={() => deleteApiElement(step.data!)}>
+            <Button className="delete-button" appearance="text" onClick={() => deleteApiElement(step.data!)}>
               <Icon icon={<MdDeleteOutline />} size="medium" />
               {t("serviceFlow.delete")}
             </Button>
