@@ -9,10 +9,15 @@ import Button from "components/Button";
 import Icon from "components/Icon";
 import Track from "components/Track";
 import { getServicesByEndpointId } from "resources/api-constants";
-import { Step, StepType } from "types";
+import { Service, Step, StepType } from "types";
 import { EndpointData } from "types/endpoint";
 import Popup from "components/Popup";
 import { onDragStart } from "utils/component-util";
+
+interface RelatedService {
+  serviceId: string;
+  name: string;
+}
 
 interface ApiEndpointProps {
   step: Step;
@@ -22,7 +27,7 @@ const ApiEndpoint: FC<ApiEndpointProps> = ({ step }) => {
   const { t } = useTranslation();
   const { id } = useParams();
 
-  const [showDeleteBlockedPopup, setShowDeleteBlockedPopup] = useState(false);
+  const [relatedServices, setRelatedServices] = useState<Service[]>([]);
   const [showDeletePopup, setShowDeletePopup] = useState(false);
 
   const deleteApiElement = async (endpoint: EndpointData) => {
@@ -34,17 +39,17 @@ const ApiEndpoint: FC<ApiEndpointProps> = ({ step }) => {
     });
 
     // todo check isCommon
-    const services = await axios.get(getServicesByEndpointId(endpoint.id, id));
+    const services = await axios.get<RelatedService[]>(getServicesByEndpointId(endpoint.id, id));
     console.log("got services", services);
-    setShowDeleteBlockedPopup(true);
+    // setRelatedServices(services);
     // todo delete also from canvas
   };
 
   return (
     <>
       {/* todo content */}
-      {showDeleteBlockedPopup && (
-        <Popup title={t("serviceFlow.deleteBlocked")} onClose={() => setShowDeleteBlockedPopup(false)}>
+      {relatedServices.length > 0 && (
+        <Popup title={t("serviceFlow.deleteBlocked")} onClose={() => setRelatedServices([])}>
           <p>{t("serviceFlow.deleteBlockedMessage")}</p>
         </Popup>
       )}
