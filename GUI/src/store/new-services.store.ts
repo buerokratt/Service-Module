@@ -295,10 +295,9 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
       const service = await axios.get<Service[]>(getServiceById(id));
 
       const structure = JSON.parse(service.data[0].structure?.value ?? "{}");
-      // todo here
       let endpoints = JSON.parse(service.data[0].endpoints?.value ?? "{}");
-      console.log(endpoints);
-      // let endpoints = [];
+      // todo here
+      console.log("assign endpoints", endpoints);
       let edges = structure?.edges;
       nodes = structure?.nodes;
 
@@ -420,7 +419,6 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
     set({ endpoints });
   },
   mapEndpointsToSetps: (): Step[] => {
-    console.log(get().endpoints);
     return get()
       .endpoints.map((x) => ({
         selected: x.definedEndpoints.find((e) => e.isSelected),

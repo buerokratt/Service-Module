@@ -296,6 +296,7 @@
     "placeholderNode": "Lohista järgmine samm voogu",
     "placeholderNodeSuccess": "Lohistage edusamm voogu",
     "placeholderNodeFailure": "Lohistage tõrkeetapp voogu",
+    "delete": "Kustuta",
     "allElements": "Üldelemendid",
     "apiElements": "API elemendid",
     "tabs": {

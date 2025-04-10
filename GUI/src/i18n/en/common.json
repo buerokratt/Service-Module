@@ -296,6 +296,7 @@
     "placeholderNode": "Drag the next step into the flow",
     "placeholderNodeSuccess": "Drag the success step into the flow",
     "placeholderNodeFailure": "Drag the failure step into the flow",
+    "delete": "Delete",
     "allElements": "All elements",
     "apiElements": "API elements",
     "tabs": {

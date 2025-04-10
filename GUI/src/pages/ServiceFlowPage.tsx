@@ -2,7 +2,7 @@ import { CSSProperties, FC, useEffect, useMemo } from "react";
 import { ReactFlowProvider } from "reactflow";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useParams } from "react-router-dom";
-import { Box, Collapsible, NewServiceHeader, Track, FlowElementsPopup } from "../components";
+import { Box, Collapsible, NewServiceHeader, Track, FlowElementsPopup, Icon, Button } from "../components";
 import FlowBuilder from "../components/FlowBuilder/FlowBuilder";
 import { ROUTES } from "../resources/routes-constants";
 import apiIconTag from "../assets/images/api-icon-tag.svg";
@@ -13,6 +13,8 @@ import "reactflow/dist/style.css";
 import "./ServiceFlowPage.scss";
 import Chat from "components/chat/chat";
 import withAuthorization, { ROLES } from "hoc/with-authorization";
+import { MdDeleteOutline } from "react-icons/md";
+import { EndpointData } from "types/endpoint";
 
 const ServiceFlowPage: FC = () => {
   const { t } = useTranslation();
@@ -64,6 +66,10 @@ const ServiceFlowPage: FC = () => {
 
   const contentStyle: CSSProperties = { overflowY: "auto", maxHeight: "40vh" };
 
+  const deleteApiElement = (data: EndpointData) => {
+    console.log(data);
+  };
+
   return (
     <>
       <NewServiceHeader
@@ -108,6 +114,11 @@ const ServiceFlowPage: FC = () => {
                         <Track gap={8} style={{ overflow: "hidden" }}>
                           {step.type === "user-defined" && <img alt="" src={apiIconTag} />}
                           {step.label}
+
+                          <Button appearance="text" onClick={() => deleteApiElement(step.data!)}>
+                            <Icon icon={<MdDeleteOutline />} size="medium" />
+                            {t("serviceFlow.delete")}
+                          </Button>
                         </Track>
                       </Box>
                     ))}
