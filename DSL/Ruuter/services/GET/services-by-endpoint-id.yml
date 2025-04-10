@@ -1,0 +1,41 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Get services by endpoint id"
+  method: get
+  accepts: json
+  returns: json
+  namespace: service
+  allowlist:
+    params:
+      - field: endpoint_id
+        type: string
+        description: "Endpoint UUID"
+      - field: excluded_service_id
+        type: string
+        description: "Optional UUID of the service to exclude"
+
+check_for_parameters:
+  switch:
+    - condition: ${incoming.params == null || incoming.params.endpoint_id == null}
+      next: return_incorrect_request
+
+get_services_by_endpoint_id:
+  call: http.post
+  args:
+    url: "[#SERVICE_RESQL]/get-services-by-endpoint-id"
+    body:
+      endpoint_id: ${incoming.params.endpoint_id}
+      excluded_service_id: ${incoming.params.excluded_service_id}
+  result: results
+
+return_ok:
+  status: 200
+  wrapper: false
+  return: ${results.response.body}
+  next: end
+
+return_incorrect_request:
+  status: 400
+  return: "Required parameter(s) missing"
+  next: end

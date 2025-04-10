@@ -4,5 +4,5 @@ WHERE jsonb_path_exists(
         structure::jsonb,
         ('$.**.originalDefinedNodeId ? (@ == "' || :endpoint_id || '")')::jsonpath
       )
-  AND service_id != :service_id
+  AND (:excluded_service_id::text IS NULL OR service_id != :excluded_service_id)
 ORDER BY service_id, id DESC;
