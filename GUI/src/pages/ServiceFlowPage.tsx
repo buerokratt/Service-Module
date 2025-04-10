@@ -68,6 +68,7 @@ const ServiceFlowPage: FC = () => {
 
   const deleteApiElement = (data: EndpointData) => {
     console.log(data);
+    // todo check isCommon
   };
 
   return (
@@ -111,6 +112,7 @@ const ServiceFlowPage: FC = () => {
                         onDragStart={(event) => onDragStart(event, step)}
                         draggable
                       >
+                        {/* todo style + on hover */}
                         <Track gap={8} style={{ overflow: "hidden" }}>
                           {step.type === "user-defined" && <img alt="" src={apiIconTag} />}
                           {step.label}
