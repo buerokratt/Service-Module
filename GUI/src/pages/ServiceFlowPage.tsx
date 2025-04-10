@@ -13,7 +13,7 @@ import "./ServiceFlowPage.scss";
 import Chat from "components/chat/chat";
 import withAuthorization, { ROLES } from "hoc/with-authorization";
 
-import ApiEndpoint from "components/ApiEndpointList";
+import ApiEndpoint from "components/ApiEndpoint";
 import { onDragStart } from "utils/component-util";
 
 const ServiceFlowPage: FC = () => {
