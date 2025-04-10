@@ -57,23 +57,22 @@ const ApiEndpoint: FC<ApiEndpointProps> = ({ step }) => {
 
   return (
     <>
-      {/* todo implement */}
       {showDeletePopup && (
-        <Popup title={t("serviceFlow.deleteConfirmation")} onClose={() => setShowDeletePopup(false)}>
-          <p>{t("serviceFlow.deleteConfirmationMessage")}</p>
+        <Popup title={t("serviceFlow.apiElements.deleteConfirmation")} onClose={() => setShowDeletePopup(false)}>
+          <p className={styles.popupText}>{t("serviceFlow.apiElements.deleteConfirmationMessage")}</p>
           <Button appearance="error" onClick={() => deleteEndpoint(step.data!)}>
-            {t("serviceFlow.delete")}
+            {t("serviceFlow.apiElements.delete")}
           </Button>
-          <Button appearance="primary" onClick={() => setShowDeletePopup(false)}>
+          <Button appearance="primary" style={{ marginLeft: 10 }} onClick={() => setShowDeletePopup(false)}>
             {t("global.cancel")}
           </Button>
         </Popup>
       )}
 
       {relatedServices.length > 0 && (
-        <Popup title={t("serviceFlow.deletionImpossible")} onClose={() => setRelatedServices([])}>
-          <p>{t("serviceFlow.deletionImpossibleMessage")}</p>
-          <ol className={styles.popupListPadding}>
+        <Popup title={t("serviceFlow.apiElements.deletionImpossible")} onClose={() => setRelatedServices([])}>
+          <p>{t("serviceFlow.apiElements.deletionImpossibleMessage")}</p>
+          <ol className={styles.popupList}>
             {relatedServices.map((service) => (
               <li key={service.serviceId}>
                 <Link to={`/flow/${service.serviceId}`}>{service.name}</Link>
@@ -101,7 +100,7 @@ const ApiEndpoint: FC<ApiEndpointProps> = ({ step }) => {
           ) : (
             <Button className={styles.deleteButton} appearance="text" onClick={() => canDeleteEndpoint(step.data!)}>
               <Icon icon={<MdDeleteOutline />} size="medium" />
-              {t("serviceFlow.delete")}
+              {t("serviceFlow.apiElements.delete")}
             </Button>
           )}
         </Track>

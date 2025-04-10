@@ -1,17 +1,17 @@
-import { CSSProperties, FC, useEffect, useMemo } from "react";
-import { ReactFlowProvider } from "reactflow";
-import { useTranslation } from "react-i18next";
-import { useNavigate, useParams } from "react-router-dom";
-import { Box, Collapsible, NewServiceHeader, Track, FlowElementsPopup } from "../components";
-import FlowBuilder from "../components/FlowBuilder/FlowBuilder";
-import { ROUTES } from "../resources/routes-constants";
-import { StepType, Step } from "../types";
-import useServiceStore from "store/new-services.store";
-import { saveFlowClick } from "services/service-builder";
-import "reactflow/dist/style.css";
-import "./ServiceFlowPage.scss";
 import Chat from "components/chat/chat";
 import withAuthorization, { ROLES } from "hoc/with-authorization";
+import { CSSProperties, FC, useEffect, useMemo } from "react";
+import { useTranslation } from "react-i18next";
+import { useNavigate, useParams } from "react-router-dom";
+import { ReactFlowProvider } from "reactflow";
+import "reactflow/dist/style.css";
+import { saveFlowClick } from "services/service-builder";
+import useServiceStore from "store/new-services.store";
+import { Box, Collapsible, FlowElementsPopup, NewServiceHeader, Track } from "../components";
+import FlowBuilder from "../components/FlowBuilder/FlowBuilder";
+import { ROUTES } from "../resources/routes-constants";
+import { Step, StepType } from "../types";
+import "./ServiceFlowPage.scss";
 
 import ApiEndpoint from "components/ApiEndpoint";
 import { onDragStart } from "utils/component-util";
@@ -87,7 +87,7 @@ const ServiceFlowPage: FC = () => {
           <div className="graph__controls">
             <Track direction="vertical" gap={16} align="stretch">
               {steps && (
-                <Collapsible title={t("serviceFlow.apiElements")} contentStyle={contentStyle}>
+                <Collapsible title={t("serviceFlow.apiElements.title")} contentStyle={contentStyle}>
                   <Track direction="vertical" align="stretch" gap={4}>
                     {steps.map((step) => (
                       <ApiEndpoint step={step} />

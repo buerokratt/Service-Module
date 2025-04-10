@@ -296,13 +296,15 @@
     "placeholderNode": "Lohista järgmine samm voogu",
     "placeholderNodeSuccess": "Lohistage edusamm voogu",
     "placeholderNodeFailure": "Lohistage tõrkeetapp voogu",
-    "delete": "Kustuta",
-    "deletionImpossible": "Kustutamine ei ole võimalik",
-    "deletionImpossibleMessage": "Kustutamine ei ole võimalik. API element on kasutusel järgmistes teenustes. Kustutage API element nendes teenustes enne teenuste kustutamist.",
-    "deleteConfirmation": "Kustutamine",
-    "deleteConfirmationMessage": "Kas olete kindel, et soovite kustutada API elementi?",
     "allElements": "Üldelemendid",
-    "apiElements": "API elemendid",
+    "apiElements": {
+      "title": "API elemendid",
+      "delete": "Kustuta",
+      "deletionImpossible": "Kustutamine ei ole võimalik",
+      "deletionImpossibleMessage": "Kustutamine ei ole võimalik. API element on kasutusel järgmistes teenustes. Kustutage API element nendes teenustes enne teenuste kustutamist.",
+      "deleteConfirmation": "Kustutamine",
+      "deleteConfirmationMessage": "Kas olete kindel, et soovite kustutada API elementi?"
+    },
     "tabs": {
       "setup": "Seadistamine",
       "test": "Testimine"
