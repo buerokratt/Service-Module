@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { MdDeleteOutline } from "react-icons/md";
 import apiIconTag from "../../assets/images/api-icon-tag.svg";
 import axios from "axios";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import Box from "components/Box";
 import Button from "components/Button";
 import Icon from "components/Icon";
@@ -33,13 +33,13 @@ const ApiEndpoint: FC<ApiEndpointProps> = ({ step }) => {
   const deleteApiElement = async (endpoint: EndpointData) => {
     console.log("DATA", endpoint);
 
-    console.log("making request", {
-      endpointId: endpoint.id,
-      excludedServiceId: id,
-    });
-
-    // todo check isCommon
     if (endpoint.isCommon) {
+      // todo spinner
+      console.log("making request", {
+        endpointId: endpoint.id,
+        excludedServiceId: id,
+      });
+
       const servicesResponse = await axios.get<RelatedService[]>(getServicesByEndpointId(endpoint.id, id));
       console.log("got services", servicesResponse);
       setRelatedServices(servicesResponse.data);
@@ -51,10 +51,20 @@ const ApiEndpoint: FC<ApiEndpointProps> = ({ step }) => {
 
   return (
     <>
-      {/* todo content */}
+      {showDeletePopup && (
+        <Popup title={t("serviceFlow.deleteConfirmation")} onClose={() => setShowDeletePopup(false)}></Popup>
+      )}
+
       {relatedServices.length > 0 && (
-        <Popup title={t("serviceFlow.deleteBlocked")} onClose={() => setRelatedServices([])}>
-          <p>{t("serviceFlow.deleteBlockedMessage")}</p>
+        <Popup title={t("serviceFlow.deletionImpossible")} onClose={() => setRelatedServices([])}>
+          <p>{t("serviceFlow.deletionImpossibleMessage")}</p>
+          <ol style={{ paddingLeft: 25, paddingTop: 10 }}>
+            {relatedServices.map((service) => (
+              <li key={service.serviceId}>
+                <Link to={`/flow/${service.serviceId}`}>{service.name}</Link>
+              </li>
+            ))}
+          </ol>
         </Popup>
       )}
 

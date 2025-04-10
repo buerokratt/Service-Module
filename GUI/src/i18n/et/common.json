@@ -297,6 +297,8 @@
     "placeholderNodeSuccess": "Lohistage edusamm voogu",
     "placeholderNodeFailure": "Lohistage tõrkeetapp voogu",
     "delete": "Kustuta",
+    "deletionImpossible": "Kustutamine ei ole võimalik",
+    "deletionImpossibleMessage": "Kustutamine ei ole võimalik. API element on kasutusel järgmistes teenustes:",
     "allElements": "Üldelemendid",
     "apiElements": "API elemendid",
     "tabs": {

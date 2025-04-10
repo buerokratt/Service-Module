@@ -1,8 +1,8 @@
-import { CSSProperties, FC, useEffect, useMemo, useState } from "react";
+import { CSSProperties, FC, useEffect, useMemo } from "react";
 import { ReactFlowProvider } from "reactflow";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useParams } from "react-router-dom";
-import { Box, Collapsible, NewServiceHeader, Track, FlowElementsPopup, Icon, Button } from "../components";
+import { Box, Collapsible, NewServiceHeader, Track, FlowElementsPopup } from "../components";
 import FlowBuilder from "../components/FlowBuilder/FlowBuilder";
 import { ROUTES } from "../resources/routes-constants";
 import { StepType, Step } from "../types";
