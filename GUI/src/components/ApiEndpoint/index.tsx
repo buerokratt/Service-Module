@@ -1,18 +1,19 @@
-import { FC, useState } from "react";
-import { useTranslation } from "react-i18next";
-import { MdDeleteOutline } from "react-icons/md";
-import apiIconTag from "../../assets/images/api-icon-tag.svg";
 import axios from "axios";
-import { Link, useParams } from "react-router-dom";
+import clsx from "clsx";
 import Box from "components/Box";
 import Button from "components/Button";
 import Icon from "components/Icon";
+import Popup from "components/Popup";
 import Track from "components/Track";
+import { FC, useState } from "react";
+import { useTranslation } from "react-i18next";
+import { MdDeleteOutline } from "react-icons/md";
+import { Link, useParams } from "react-router-dom";
 import { getServicesByEndpointId } from "resources/api-constants";
 import { Step, StepType } from "types";
 import { EndpointData } from "types/endpoint";
-import Popup from "components/Popup";
 import { onDragStart } from "utils/component-util";
+import apiIconTag from "../../assets/images/api-icon-tag.svg";
 import styles from "./ApiEndpoint.module.scss";
 
 interface RelatedService {
@@ -84,13 +85,14 @@ const ApiEndpoint: FC<ApiEndpointProps> = ({ step }) => {
         onDragStart={(event) => onDragStart(event, step)}
         draggable
       >
-        <Track gap={8} style={{ overflow: "hidden" }}>
-          {step.type === "user-defined" && <img alt="" src={apiIconTag} />}
-          {step.label}
+        <Track gap={8} style={{ justifyContent: "space-between", overflow: "hidden" }}>
+          <div className={styles.labelContainer}>
+            {step.type === "user-defined" && <img alt="" src={apiIconTag} />}
+            <span className={styles.label}>{step.label}</span>
+          </div>
 
-          {/* Delete button with hover effect */}
           {isGettingRelatedServices ? (
-            <div className="loader" style={{ width: 20, height: 20 }} />
+            <div className={clsx("loader", styles.loader)} />
           ) : (
             <Button className={styles.deleteButton} appearance="text" onClick={() => deleteApiElement(step.data!)}>
               <Icon icon={<MdDeleteOutline />} size="medium" />

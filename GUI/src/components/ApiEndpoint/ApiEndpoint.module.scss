@@ -1,9 +1,28 @@
+@import "src/styles/tools/color";
+
 .box {
   position: relative;
 
+  .labelContainer {
+    display: flex;
+    align-items: center;
+
+    .label {
+      padding-left: 8px;
+    }
+  }
+
+  .loader {
+    width: 20px;
+    height: 20px;
+  }
+
   .deleteButton {
+    align-items: center;
+    color: get-color(sapphire-blue-10);
+    display: flex;
     opacity: 0;
-    transition: opacity 0.2s ease-in-out;
+    transition: opacity 0.1s ease-in-out;
   }
 
   &:hover {
@@ -11,4 +30,4 @@
       opacity: 1;
     }
   }
-} 
+}
