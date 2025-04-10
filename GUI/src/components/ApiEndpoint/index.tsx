@@ -27,6 +27,7 @@ const ApiEndpoint: FC<ApiEndpointProps> = ({ step }) => {
   const { t } = useTranslation();
   const { id } = useParams();
 
+  const [isGettingRelatedServices, setIsGettingRelatedServices] = useState(false);
   const [relatedServices, setRelatedServices] = useState<RelatedService[]>([]);
   const [showDeletePopup, setShowDeletePopup] = useState(false);
 
@@ -34,23 +35,30 @@ const ApiEndpoint: FC<ApiEndpointProps> = ({ step }) => {
     console.log("DATA", endpoint);
 
     if (endpoint.isCommon) {
-      // todo spinner
+      setIsGettingRelatedServices(true);
       console.log("making request", {
         endpointId: endpoint.id,
         excludedServiceId: id,
       });
 
-      const servicesResponse = await axios.get<RelatedService[]>(getServicesByEndpointId(endpoint.id, id));
-      console.log("got services", servicesResponse);
-      setRelatedServices(servicesResponse.data);
+      const services = (await axios.get<RelatedService[]>(getServicesByEndpointId(endpoint.id, id))).data;
+      console.log("got services", services);
+      if (services.length > 0) {
+        setRelatedServices(services);
+      } else {
+        setShowDeletePopup(true);
+      }
+
+      setIsGettingRelatedServices(false);
     } else {
-      // todo other logic
+      setShowDeletePopup(true);
       // todo delete also from canvas
     }
   };
 
   return (
     <>
+      {/* todo implement */}
       {showDeletePopup && (
         <Popup title={t("serviceFlow.deleteConfirmation")} onClose={() => setShowDeletePopup(false)}></Popup>
       )}
@@ -80,10 +88,14 @@ const ApiEndpoint: FC<ApiEndpointProps> = ({ step }) => {
 
           {/* todo style */}
           {/* todo on hover */}
-          <Button appearance="text" onClick={() => deleteApiElement(step.data!)}>
-            <Icon icon={<MdDeleteOutline />} size="medium" />
-            {t("serviceFlow.delete")}
-          </Button>
+          {isGettingRelatedServices ? (
+            <div className="loader" style={{ width: 20, height: 20 }} />
+          ) : (
+            <Button appearance="text" onClick={() => deleteApiElement(step.data!)}>
+              <Icon icon={<MdDeleteOutline />} size="medium" />
+              {t("serviceFlow.delete")}
+            </Button>
+          )}
         </Track>
       </Box>
     </>

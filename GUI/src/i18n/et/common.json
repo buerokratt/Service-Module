@@ -299,6 +299,8 @@
     "delete": "Kustuta",
     "deletionImpossible": "Kustutamine ei ole võimalik",
     "deletionImpossibleMessage": "Kustutamine ei ole võimalik. API element on kasutusel järgmistes teenustes:",
+    "deleteConfirmation": "Kustutamine",
+    "deleteConfirmationMessage": "Kas olete kindel, et soovite kustutada API elementi?",
     "allElements": "Üldelemendid",
     "apiElements": "API elemendid",
     "tabs": {
