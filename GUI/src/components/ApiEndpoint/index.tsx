@@ -9,7 +9,7 @@ import Button from "components/Button";
 import Icon from "components/Icon";
 import Track from "components/Track";
 import { getServicesByEndpointId } from "resources/api-constants";
-import { Service, Step, StepType } from "types";
+import { Step, StepType } from "types";
 import { EndpointData } from "types/endpoint";
 import Popup from "components/Popup";
 import { onDragStart } from "utils/component-util";
@@ -27,7 +27,7 @@ const ApiEndpoint: FC<ApiEndpointProps> = ({ step }) => {
   const { t } = useTranslation();
   const { id } = useParams();
 
-  const [relatedServices, setRelatedServices] = useState<Service[]>([]);
+  const [relatedServices, setRelatedServices] = useState<RelatedService[]>([]);
   const [showDeletePopup, setShowDeletePopup] = useState(false);
 
   const deleteApiElement = async (endpoint: EndpointData) => {
@@ -39,10 +39,14 @@ const ApiEndpoint: FC<ApiEndpointProps> = ({ step }) => {
     });
 
     // todo check isCommon
-    const services = await axios.get<RelatedService[]>(getServicesByEndpointId(endpoint.id, id));
-    console.log("got services", services);
-    // setRelatedServices(services);
-    // todo delete also from canvas
+    if (endpoint.isCommon) {
+      const servicesResponse = await axios.get<RelatedService[]>(getServicesByEndpointId(endpoint.id, id));
+      console.log("got services", servicesResponse);
+      setRelatedServices(servicesResponse.data);
+    } else {
+      // todo other logic
+      // todo delete also from canvas
+    }
   };
 
   return (
