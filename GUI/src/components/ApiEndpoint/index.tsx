@@ -62,13 +62,21 @@ const ApiEndpoint: FC<ApiEndpointProps> = ({ step }) => {
     <>
       {/* todo implement */}
       {showDeletePopup && (
-        <Popup title={t("serviceFlow.deleteConfirmation")} onClose={() => setShowDeletePopup(false)}></Popup>
+        <Popup title={t("serviceFlow.deleteConfirmation")} onClose={() => setShowDeletePopup(false)}>
+          <p>{t("serviceFlow.deleteConfirmationMessage")}</p>
+          <Button appearance="error" onClick={() => deleteApiElement(step.data!)}>
+            {t("serviceFlow.delete")}
+          </Button>
+          <Button appearance="primary" onClick={() => setShowDeletePopup(false)}>
+            {t("serviceFlow.cancel")}
+          </Button>
+        </Popup>
       )}
 
       {relatedServices.length > 0 && (
         <Popup title={t("serviceFlow.deletionImpossible")} onClose={() => setRelatedServices([])}>
           <p>{t("serviceFlow.deletionImpossibleMessage")}</p>
-          <ol style={{ paddingLeft: 25, paddingTop: 10 }}>
+          <ol className={styles.popupListPadding}>
             {relatedServices.map((service) => (
               <li key={service.serviceId}>
                 <Link to={`/flow/${service.serviceId}`}>{service.name}</Link>
