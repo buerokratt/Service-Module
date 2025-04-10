@@ -12,6 +12,7 @@ import Track from "components/Track";
 import { getServicesByEndpointId } from "resources/api-constants";
 import { Step, StepType } from "types";
 import { EndpointData } from "types/endpoint";
+import Popup from "components/Popup";
 
 interface ApiElementsListProps {
   steps: Step[];
@@ -23,8 +24,8 @@ const ApiElementsList: FC<ApiElementsListProps> = ({ steps, contentStyle, onDrag
   const { t } = useTranslation();
   const { id } = useParams();
 
-  const [showDeleteServicePopup, setShowDeleteServicePopup] = useState(false);
-  const [showDeleteEndpointPopup, setShowDeleteEndpointPopup] = useState(false);
+  const [showDeleteBlockedPopup, setShowDeleteBlockedPopup] = useState(false);
+  const [showDeletePopup, setShowDeletePopup] = useState(false);
 
   const deleteApiElement = async (endpoint: EndpointData) => {
     console.log("DATA", endpoint);
@@ -36,31 +37,41 @@ const ApiElementsList: FC<ApiElementsListProps> = ({ steps, contentStyle, onDrag
 
     const services = await axios.get(getServicesByEndpointId(endpoint.id, id));
     console.log("got services", services);
+    setShowDeleteBlockedPopup(true);
   };
 
   return (
-    <Collapsible title={t("serviceFlow.apiElements")} contentStyle={contentStyle}>
-      <Track direction="vertical" align="stretch" gap={4}>
-        {steps.map((step) => (
-          <Box
-            key={step.id}
-            color={[StepType.FinishingStepEnd, StepType.FinishingStepRedirect].includes(step.type) ? "red" : "blue"}
-            onDragStart={(event) => onDragStart(event, step)}
-            draggable
-          >
-            <Track gap={8} style={{ overflow: "hidden" }}>
-              {step.type === "user-defined" && <img alt="" src={apiIconTag} />}
-              {step.label}
+    <>
+      {/* todo content */}
+      {showDeleteBlockedPopup && (
+        <Popup title={t("serviceFlow.deleteBlocked")} onClose={() => setShowDeleteBlockedPopup(false)}>
+          <p>{t("serviceFlow.deleteBlockedMessage")}</p>
+        </Popup>
+      )}
 
-              <Button appearance="text" onClick={() => deleteApiElement(step.data!)}>
-                <Icon icon={<MdDeleteOutline />} size="medium" />
-                {t("serviceFlow.delete")}
-              </Button>
-            </Track>
-          </Box>
-        ))}
-      </Track>
-    </Collapsible>
+      <Collapsible title={t("serviceFlow.apiElements")} contentStyle={contentStyle}>
+        <Track direction="vertical" align="stretch" gap={4}>
+          {steps.map((step) => (
+            <Box
+              key={step.id}
+              color={[StepType.FinishingStepEnd, StepType.FinishingStepRedirect].includes(step.type) ? "red" : "blue"}
+              onDragStart={(event) => onDragStart(event, step)}
+              draggable
+            >
+              <Track gap={8} style={{ overflow: "hidden" }}>
+                {step.type === "user-defined" && <img alt="" src={apiIconTag} />}
+                {step.label}
+
+                <Button appearance="text" onClick={() => deleteApiElement(step.data!)}>
+                  <Icon icon={<MdDeleteOutline />} size="medium" />
+                  {t("serviceFlow.delete")}
+                </Button>
+              </Track>
+            </Box>
+          ))}
+        </Track>
+      </Collapsible>
+    </>
   );
 };
 
