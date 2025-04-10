@@ -65,7 +65,7 @@ const ApiEndpoint: FC<ApiEndpointProps> = ({ step }) => {
             {t("serviceFlow.delete")}
           </Button>
           <Button appearance="primary" onClick={() => setShowDeletePopup(false)}>
-            {t("serviceFlow.cancel")}
+            {t("global.cancel")}
           </Button>
         </Popup>
       )}
