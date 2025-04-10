@@ -1,11 +1,10 @@
-import { CSSProperties, FC, useEffect, useMemo } from "react";
+import { CSSProperties, FC, useEffect, useMemo, useState } from "react";
 import { ReactFlowProvider } from "reactflow";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useParams } from "react-router-dom";
 import { Box, Collapsible, NewServiceHeader, Track, FlowElementsPopup, Icon, Button } from "../components";
 import FlowBuilder from "../components/FlowBuilder/FlowBuilder";
 import { ROUTES } from "../resources/routes-constants";
-import apiIconTag from "../assets/images/api-icon-tag.svg";
 import { StepType, Step } from "../types";
 import useServiceStore from "store/new-services.store";
 import { saveFlowClick } from "services/service-builder";
@@ -13,10 +12,8 @@ import "reactflow/dist/style.css";
 import "./ServiceFlowPage.scss";
 import Chat from "components/chat/chat";
 import withAuthorization, { ROLES } from "hoc/with-authorization";
-import { MdDeleteOutline } from "react-icons/md";
-import { EndpointData } from "types/endpoint";
-import axios from "axios";
-import { getServicesByEndpointId } from "resources/api-constants";
+
+import ApiElementsList from "components/ApiEndpointList";
 
 const ServiceFlowPage: FC = () => {
   const { t } = useTranslation();
@@ -68,20 +65,6 @@ const ServiceFlowPage: FC = () => {
 
   const contentStyle: CSSProperties = { overflowY: "auto", maxHeight: "40vh" };
 
-  const deleteApiElement = async (data: EndpointData) => {
-    console.log("DATA", data);
-
-    // todo check isCommon
-    console.log("making request", {
-      endpointId: data.id,
-      excludedServiceId: id,
-    });
-    // todo type
-    const services = await axios.get(getServicesByEndpointId(data.id, id));
-
-    console.log("got services", services);
-  };
-
   return (
     <>
       <NewServiceHeader
@@ -109,35 +92,7 @@ const ServiceFlowPage: FC = () => {
         <div className="graph">
           <div className="graph__controls">
             <Track direction="vertical" gap={16} align="stretch">
-              {steps && (
-                <Collapsible title={t("serviceFlow.apiElements")} contentStyle={contentStyle}>
-                  <Track direction="vertical" align="stretch" gap={4}>
-                    {steps.map((step) => (
-                      <Box
-                        key={step.id}
-                        color={
-                          [StepType.FinishingStepEnd, StepType.FinishingStepRedirect].includes(step.type)
-                            ? "red"
-                            : "blue"
-                        }
-                        onDragStart={(event) => onDragStart(event, step)}
-                        draggable
-                      >
-                        {/* todo style + on hover */}
-                        <Track gap={8} style={{ overflow: "hidden" }}>
-                          {step.type === "user-defined" && <img alt="" src={apiIconTag} />}
-                          {step.label}
-
-                          <Button appearance="text" onClick={() => deleteApiElement(step.data!)}>
-                            <Icon icon={<MdDeleteOutline />} size="medium" />
-                            {t("serviceFlow.delete")}
-                          </Button>
-                        </Track>
-                      </Box>
-                    ))}
-                  </Track>
-                </Collapsible>
-              )}
+              {steps && <ApiElementsList steps={steps} contentStyle={contentStyle} onDragStart={onDragStart} />}
               {allElements && (
                 <Collapsible title={t("serviceFlow.allElements")} contentStyle={contentStyle}>
                   <Track direction="vertical" align="stretch" gap={4}>
