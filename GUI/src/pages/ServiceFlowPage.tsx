@@ -15,6 +15,8 @@ import Chat from "components/chat/chat";
 import withAuthorization, { ROLES } from "hoc/with-authorization";
 import { MdDeleteOutline } from "react-icons/md";
 import { EndpointData } from "types/endpoint";
+import axios from "axios";
+import { getServicesByEndpointId } from "resources/api-constants";
 
 const ServiceFlowPage: FC = () => {
   const { t } = useTranslation();
@@ -66,9 +68,18 @@ const ServiceFlowPage: FC = () => {
 
   const contentStyle: CSSProperties = { overflowY: "auto", maxHeight: "40vh" };
 
-  const deleteApiElement = (data: EndpointData) => {
-    console.log(data);
+  const deleteApiElement = async (data: EndpointData) => {
+    console.log("DATA", data);
+
     // todo check isCommon
+    console.log("making request", {
+      endpointId: data.id,
+      excludedServiceId: id,
+    });
+    // todo type
+    const services = await axios.get(getServicesByEndpointId(data.id, id));
+
+    console.log("got services", services);
   };
 
   return (

@@ -296,8 +296,6 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
 
       const structure = JSON.parse(service.data[0].structure?.value ?? "{}");
       let endpoints = JSON.parse(service.data[0].endpoints?.value ?? "{}");
-      // todo here
-      console.log("assign endpoints", endpoints);
       let edges = structure?.edges;
       nodes = structure?.nodes;
 

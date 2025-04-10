@@ -8,16 +8,16 @@ declaration:
   namespace: service
   allowlist:
     params:
-      - field: endpoint_id
+      - field: endpointId
         type: string
         description: "Endpoint UUID"
-      - field: excluded_service_id
+      - field: excludedServiceId
         type: string
         description: "Optional UUID of the service to exclude"
 
 check_for_parameters:
   switch:
-    - condition: ${incoming.params == null || incoming.params.endpoint_id == null}
+    - condition: ${incoming.params == null || incoming.params.endpointId == null}
       next: return_incorrect_request
 
 get_services_by_endpoint_id:
@@ -25,8 +25,8 @@ get_services_by_endpoint_id:
   args:
     url: "[#SERVICE_RESQL]/get-services-by-endpoint-id"
     body:
-      endpoint_id: ${incoming.params.endpoint_id}
-      excluded_service_id: ${incoming.params.excluded_service_id}
+      endpoint_id: ${incoming.params.endpointId}
+      excluded_service_id: ${incoming.params.excludedServiceId}
   result: results
 
 return_ok:
