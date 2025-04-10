@@ -13,14 +13,14 @@ import { getServicesByEndpointId } from "resources/api-constants";
 import { Step, StepType } from "types";
 import { EndpointData } from "types/endpoint";
 import Popup from "components/Popup";
+import { onDragStart } from "utils/component-util";
 
 interface ApiElementsListProps {
   steps: Step[];
   contentStyle: React.CSSProperties;
-  onDragStart: (event: React.DragEvent<HTMLDivElement>, step: Step) => void;
 }
 
-const ApiElementsList: FC<ApiElementsListProps> = ({ steps, contentStyle, onDragStart }) => {
+const ApiElementsList: FC<ApiElementsListProps> = ({ steps, contentStyle }) => {
   const { t } = useTranslation();
   const { id } = useParams();
 
@@ -35,9 +35,11 @@ const ApiElementsList: FC<ApiElementsListProps> = ({ steps, contentStyle, onDrag
       excludedServiceId: id,
     });
 
+    // todo check isCommon
     const services = await axios.get(getServicesByEndpointId(endpoint.id, id));
     console.log("got services", services);
     setShowDeleteBlockedPopup(true);
+    // todo delete also from canvas
   };
 
   return (

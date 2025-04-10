@@ -14,6 +14,7 @@ import Chat from "components/chat/chat";
 import withAuthorization, { ROLES } from "hoc/with-authorization";
 
 import ApiElementsList from "components/ApiEndpointList";
+import { onDragStart } from "utils/component-util";
 
 const ServiceFlowPage: FC = () => {
   const { t } = useTranslation();
@@ -56,13 +57,6 @@ const ServiceFlowPage: FC = () => {
 
   const setNodes = useServiceStore((state) => state.setNodes);
 
-  const onDragStart = (event: React.DragEvent<HTMLDivElement>, step: Step) => {
-    event.dataTransfer.setData("application/reactflow-label", step.label);
-    event.dataTransfer.setData("application/reactflow-type", step.type);
-    event.dataTransfer.setData("application/reactflow-originalDefinedNodeId", step.data?.id ?? "");
-    event.dataTransfer.effectAllowed = "move";
-  };
-
   const contentStyle: CSSProperties = { overflowY: "auto", maxHeight: "40vh" };
 
   return (
@@ -92,7 +86,7 @@ const ServiceFlowPage: FC = () => {
         <div className="graph">
           <div className="graph__controls">
             <Track direction="vertical" gap={16} align="stretch">
-              {steps && <ApiElementsList steps={steps} contentStyle={contentStyle} onDragStart={onDragStart} />}
+              {steps && <ApiElementsList steps={steps} contentStyle={contentStyle} />}
               {allElements && (
                 <Collapsible title={t("serviceFlow.allElements")} contentStyle={contentStyle}>
                   <Track direction="vertical" align="stretch" gap={4}>
