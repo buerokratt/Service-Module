@@ -10,6 +10,7 @@ import { useTranslation } from "react-i18next";
 import { MdDeleteOutline } from "react-icons/md";
 import { Link, useParams } from "react-router-dom";
 import { getServicesByEndpointId } from "resources/api-constants";
+import { saveFlowClick } from "services/service-builder";
 import useServiceStore from "store/new-services.store";
 import useToastStore from "store/toasts.store";
 import { Step, StepType } from "types";
@@ -57,24 +58,23 @@ const ApiEndpoint: FC<ApiEndpointProps> = ({ step }) => {
   };
 
   const deleteSelectedEndpoint = async (endpoint: EndpointData) => {
-    // todo delete from DB
-    console.log("deleting", endpoint, id);
-    console.log("nodes", nodes);
-
     try {
-      // await axios.post(deleteEndpoint(), { id: endpoint.id });
       deleteEndpoint(endpoint.id);
 
       const nodeIdsToDelete = nodes
         .filter((node) => node.type === "customNode" && node.data.originalDefinedNodeId === endpoint.id)
         .map((node) => node.id);
       nodeIdsToDelete.forEach((nodeId) => useServiceStore.getState().onDelete(nodeId));
-      // todo toast
+
+      saveFlowClick({ supressToast: true });
+      // todo toast text
       useToastStore.getState().success({ title: "TODO PLACEHOLDER" });
     } catch (_) {
-      // todo error
+      // todo error text
       useToastStore.getState().error({ title: "TODO PLACEHOLDER" });
     }
+
+    setShowDeletePopup(false);
   };
 
   return (

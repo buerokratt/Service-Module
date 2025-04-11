@@ -2,13 +2,13 @@ import axios from "axios";
 import { Assign } from "components/FlowElementsPopup/AssignBuilder/assign-types";
 import { Group, Rule } from "components/FlowElementsPopup/RuleBuilder/types";
 import i18next from "i18next";
+import { NodeHtmlMarkdown } from "node-html-markdown";
 import { Edge, Node } from "reactflow";
-import { createNewService, editService, updateServiceEndpoints, jsonToYml, testService } from "resources/api-constants";
+import { createNewService, editService, jsonToYml, testService, updateServiceEndpoints } from "resources/api-constants";
 import useServiceStore from "store/new-services.store";
 import useToastStore from "store/toasts.store";
 import { RawData, Step, StepType } from "types";
 import { EndpointData, EndpointEnv, EndpointType, EndpointVariableData } from "types/endpoint";
-import { NodeHtmlMarkdown } from "node-html-markdown";
 
 // refactor this file later
 
@@ -1046,7 +1046,7 @@ export const saveDraft = async () => {
   return true;
 };
 
-export const saveFlowClick = async () => {
+export const saveFlowClick = async ({ supressToast = false }: { supressToast?: boolean } = {}) => {
   const name = useServiceStore.getState().serviceNameDashed();
   const serviceId = useServiceStore.getState().serviceId;
   const description = useServiceStore.getState().description;
@@ -1063,17 +1063,21 @@ export const saveFlowClick = async () => {
     edges,
     nodes,
     onSuccess: () => {
-      useToastStore.getState().success({
-        title: i18next.t("newService.toast.success"),
-        message: i18next.t("newService.toast.savedSuccessfully"),
-      });
+      if (!supressToast) {
+        useToastStore.getState().success({
+          title: i18next.t("newService.toast.success"),
+          message: i18next.t("newService.toast.savedSuccessfully"),
+        });
+      }
       useServiceStore.getState().enableTestButton();
     },
     onError: (e) => {
-      useToastStore.getState().error({
-        title: i18next.t("toast.cannot-save-flow"),
-        message: e?.message,
-      });
+      if (!supressToast) {
+        useToastStore.getState().error({
+          title: i18next.t("toast.cannot-save-flow"),
+          message: e?.message,
+        });
+      }
     },
     description,
     slot,
