@@ -303,7 +303,9 @@
       "deletionImpossible": "Kustutamine ei ole võimalik",
       "deletionImpossibleMessage": "Kustutamine ei ole võimalik. API element on kasutusel järgmistes teenustes. Kustutage API element nendes teenustes enne teenuste kustutamist.",
       "deleteConfirmation": "Kustutamine",
-      "deleteConfirmationMessage": "Kas olete kindel, et soovite kustutada API elementi?"
+      "deleteConfirmationMessage": "Kas olete kindel, et soovite kustutada API elementi?",
+      "deleteSuccess": "API element kustutatud",
+      "deleteError": "API elementi kustutamine ebaõnnestus"
     },
     "tabs": {
       "setup": "Seadistamine",

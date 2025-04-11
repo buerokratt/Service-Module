@@ -67,11 +67,9 @@ const ApiEndpoint: FC<ApiEndpointProps> = ({ step }) => {
       nodeIdsToDelete.forEach((nodeId) => useServiceStore.getState().onDelete(nodeId));
 
       saveFlowClick({ supressToast: true });
-      // todo toast text
-      useToastStore.getState().success({ title: "TODO PLACEHOLDER" });
+      useToastStore.getState().success({ title: t("serviceFlow.apiElements.deleteSuccess") });
     } catch (_) {
-      // todo error text
-      useToastStore.getState().error({ title: "TODO PLACEHOLDER" });
+      useToastStore.getState().error({ title: t("serviceFlow.apiElements.deleteError") });
     }
 
     setShowDeletePopup(false);
