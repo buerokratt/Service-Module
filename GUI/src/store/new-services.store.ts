@@ -1,8 +1,9 @@
 import axios from "axios";
-import { create } from "zustand";
-import { v4 as uuid } from "uuid";
+import { Assign } from "components/FlowElementsPopup/AssignBuilder/assign-types";
+import { GroupOrRule } from "components/FlowElementsPopup/RuleBuilder/types";
+import i18next from "i18next";
+import { NavigateFunction } from "react-router-dom";
 import { Edge, EdgeChange, Node, NodeChange, ReactFlowInstance, applyEdgeChanges, applyNodeChanges } from "reactflow";
-import { EndpointData, EndpointEnv, EndpointTab, PreDefinedEndpointEnvVariables } from "types/endpoint";
 import {
   getEndpointValidation,
   getSecretVariables,
@@ -10,20 +11,19 @@ import {
   getTaraAuthResponseVariables,
   servicesRequestsExplain,
 } from "resources/api-constants";
-import { Service, ServiceState, Step, StepType } from "types";
-import { RequestVariablesTabsRawData, RequestVariablesTabsRowsData } from "types/request-variables";
-import useToastStore from "./toasts.store";
-import i18next from "i18next";
 import { ROUTES } from "resources/routes-constants";
-import { NavigateFunction } from "react-router-dom";
-import { editServiceInfo, saveFlowClick } from "services/service-builder";
-import { NodeDataProps, initialEdge, initialNodes } from "types/service-flow";
 import { alignNodesInCaseAnyGotOverlapped, buildPlaceholder, updateFlowInputRules } from "services/flow-builder";
-import { GroupOrRule } from "components/FlowElementsPopup/RuleBuilder/types";
-import useTestServiceStore from "./test-services.store";
+import { editServiceInfo, saveFlowClick } from "services/service-builder";
+import { Service, ServiceState, Step, StepType } from "types";
 import { Chip } from "types/chip";
+import { EndpointData, EndpointEnv, EndpointTab, PreDefinedEndpointEnvVariables } from "types/endpoint";
 import { EndpointResponseVariable } from "types/endpoint/endpoint-response-variables";
-import { Assign } from "components/FlowElementsPopup/AssignBuilder/assign-types";
+import { RequestVariablesTabsRawData, RequestVariablesTabsRowsData } from "types/request-variables";
+import { NodeDataProps, initialEdge, initialNodes } from "types/service-flow";
+import { v4 as uuid } from "uuid";
+import { create } from "zustand";
+import useTestServiceStore from "./test-services.store";
+import useToastStore from "./toasts.store";
 
 interface ServiceStoreState {
   endpoints: EndpointData[];

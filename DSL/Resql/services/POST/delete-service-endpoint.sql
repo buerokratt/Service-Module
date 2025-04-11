@@ -33,6 +33,5 @@ SELECT
     ) as endpoints,
     slot
 FROM services
-WHERE service_id = :service_id
 ORDER BY id DESC
 LIMIT 1;
