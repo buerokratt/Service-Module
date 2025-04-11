@@ -213,7 +213,6 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
   },
   vaildServiceInfo: () => !!get().name && !!get().description,
   serviceNameDashed: () => get().name.replace(" ", "-"),
-  // todo need to call this on deletion too
   deleteEndpoint: (id: string) => {
     const newEndpoints = get().endpoints.filter((x) => x.id !== id);
     set({ endpoints: newEndpoints });
