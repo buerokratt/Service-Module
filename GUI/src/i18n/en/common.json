@@ -51,7 +51,8 @@
     "close": "Close",
     "common": "Common",
     "errorMessage": "There is no access to the service. Try again later.",
-    "none": "None"
+    "none": "None",
+    "statusClarification": "Status clarification"
   },
   "menu": {
     "overview": "Overview",
@@ -115,7 +116,8 @@
       "newValidationMessage": "New message to validate",
       "useAutocorrect": "Text auto corrector",
       "required": "Required",
-      "invalidemail": "Invalid email"
+      "invalidemail": "Invalid email",
+      "statusCommentUpdated": "Status clarification updated"
     }
   },
   "overview": {
