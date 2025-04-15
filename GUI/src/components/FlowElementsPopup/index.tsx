@@ -97,6 +97,7 @@ const FlowElementsPopup: React.FC = () => {
     setTextfieldMessagePlaceholders({});
     useServiceStore.getState().resetSelectedNode();
     useServiceStore.getState().resetRules();
+    useServiceStore.getState().resetAssign();
   };
 
   const handleSaveClick = () => {
