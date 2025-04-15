@@ -290,7 +290,8 @@
       "round": "Round"
     },
     "previousVariables": {
-      "assignElements": "Assign Elements"
+      "assignElements": "Assign Elements",
+      "noName": "<No name>"
     },
     "flow": "Service flow",
     "placeholderNode": "Drag the next step into the flow",

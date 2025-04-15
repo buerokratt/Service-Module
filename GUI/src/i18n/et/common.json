@@ -290,7 +290,8 @@
       "round": "Ümarda"
     },
     "previousVariables": {
-      "assignElements": "Määra elemendid"
+      "assignElements": "Määra elemendid",
+      "noName": "<Nimeta>"
     },
     "flow": "Teenusvoog",
     "placeholderNode": "Lohista järgmine samm voogu",

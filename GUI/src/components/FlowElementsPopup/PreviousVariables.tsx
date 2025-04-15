@@ -26,7 +26,9 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
     path: string | number;
   } | null>(null);
   const [assignedObjectTree, setAssignedObjectTree] = useState<{ data: unknown; path: string | number } | null>(null);
-
+  // todo check if empty after closing Assign and opening e.g. Send message...
+  const currentAssignElements = useServiceStore((state) => state.assignElements);
+  console.log("PreviousVariables currentAssignElements", currentAssignElements);
   useEffect(() => {
     const previousNodes = nodes.slice(
       0,
@@ -79,7 +81,7 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
             isMultiline
             style={{ maxHeight: "30vh", overflow: "auto" }}
           >
-            {assignedVariables.map((variable) =>
+            {[...assignedVariables, ...currentAssignElements].map((variable) =>
               isObject(variable.data) ? (
                 <>
                   {(() => {
@@ -116,7 +118,7 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
                       <Tooltip content={`${variable.value} : ${typeColor.type}`}>
                         <OutputElementBox
                           style={{ border: `2px outset ${typeColor.color}` }}
-                          text={variable.key}
+                          text={variable.key || t("serviceFlow.previousVariables.noName")}
                           value={variable.value}
                           useValue
                         />
