@@ -3,10 +3,8 @@ import { Assign } from "./assign-types";
 import { v4 as uuidv4 } from "uuid";
 
 interface UseAssignBuilderProps {
-  assignElements?: Assign[];
-  root?: boolean;
   onChange: (group: Assign[]) => void;
-  seedGroup?: any;
+  seedGroup: Assign[];
 }
 
 export const createNewElement = () => {
@@ -17,14 +15,12 @@ export const createNewElement = () => {
   };
 };
 
-export const useAssignBuilder = (config: UseAssignBuilderProps) => {
-  const elementsInitialValue = config.root ? config.seedGroup ?? [] : config.assignElements!;
-  const [elements, setElements] = useState<Assign[]>(elementsInitialValue ?? []);
+export const useAssignBuilder = ({ seedGroup, onChange }: UseAssignBuilderProps) => {
+  const [elements, setElements] = useState<Assign[]>(seedGroup);
 
   useEffect(() => {
-    console.log("useAssignBuilder useeffect", elements);
-    config.onChange(elements);
-  }, [elements]);
+    onChange(elements);
+  }, [elements, onChange]);
 
   const addElement = () => {
     setElements([...elements, createNewElement()]);
