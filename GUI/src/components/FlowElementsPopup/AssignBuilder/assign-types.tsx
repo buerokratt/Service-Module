@@ -1,5 +1,3 @@
-import { v4 as uuidv4 } from "uuid";
-
 export interface ElementGroupBuilderProps {
   assignElements?: Assign[];
   onRemove?: (id: string) => void;
@@ -13,11 +11,3 @@ export interface Assign {
   value: string;
   data?: unknown;
 }
-
-export const getInitialElement = () => {
-  return {
-    id: uuidv4(),
-    key: "",
-    value: "",
-  };
-};

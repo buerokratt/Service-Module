@@ -8,6 +8,7 @@ type AssignContentProps = {
   readonly nodeId: string;
 };
 
+// todo ROOT component
 const AssignContent: FC<AssignContentProps> = ({ nodeId }) => {
   const nodes = useServiceStore((state) => state.nodes);
   const currentNodeElements = nodes.find((node) => node.id === nodeId)?.data?.assignElements ?? [];
