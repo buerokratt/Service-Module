@@ -27,8 +27,7 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
   } | null>(null);
   const [assignedObjectTree, setAssignedObjectTree] = useState<{ data: unknown; path: string | number } | null>(null);
   // New elements added in Assign node before saving
-  const currentAssignElements = useServiceStore((state) => state.assignElements);
-  console.log("PreviousVariables currentAssignElements", currentAssignElements);
+  const newAssignElements = useServiceStore((state) => state.assignElements);
   useEffect(() => {
     const previousNodes = nodes.slice(
       0,
@@ -81,7 +80,7 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
             isMultiline
             style={{ maxHeight: "30vh", overflow: "auto" }}
           >
-            {[...assignedVariables, ...currentAssignElements].map((variable) =>
+            {[...assignedVariables, ...newAssignElements].map((variable) =>
               isObject(variable.data) ? (
                 <>
                   {(() => {
