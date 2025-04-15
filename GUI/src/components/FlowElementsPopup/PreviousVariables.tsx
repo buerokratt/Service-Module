@@ -26,7 +26,7 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
     path: string | number;
   } | null>(null);
   const [assignedObjectTree, setAssignedObjectTree] = useState<{ data: unknown; path: string | number } | null>(null);
-  // todo check if empty after closing Assign and opening e.g. Send message...
+  // New elements added in Assign node before saving
   const currentAssignElements = useServiceStore((state) => state.assignElements);
   console.log("PreviousVariables currentAssignElements", currentAssignElements);
   useEffect(() => {
