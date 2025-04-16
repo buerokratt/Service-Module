@@ -1,5 +1,4 @@
-import React, { forwardRef, InputHTMLAttributes } from "react";
-import clsx from "clsx";
+import { forwardRef, InputHTMLAttributes } from "react";
 import { FormInput } from "components";
 
 type DraggableInputProps = InputHTMLAttributes<HTMLInputElement> & {
