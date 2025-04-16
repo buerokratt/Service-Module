@@ -3,7 +3,7 @@ import { FormInput, Icon, OutputElementBox, Track } from "components";
 import { MdDeleteOutline } from "react-icons/md";
 import { Assign } from "./assign-types";
 import "../styles.scss";
-import DragInput from "components/FormElements/DraggableInput";
+import DragInput from "components/FormElements/DragInput";
 
 interface AssignElementProps {
   element: Assign;
