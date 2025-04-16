@@ -8,7 +8,7 @@ type DraggableInputProps = InputHTMLAttributes<HTMLInputElement> & {
   hideLabel?: boolean;
 };
 
-const DraggableInput = forwardRef<HTMLInputElement, DraggableInputProps>(({ label, name, hideLabel, ...rest }, ref) => {
+const DragInput = forwardRef<HTMLInputElement, DraggableInputProps>(({ label, name, hideLabel, ...rest }, ref) => {
   const inputClasses = clsx("input");
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -57,6 +57,6 @@ const DraggableInput = forwardRef<HTMLInputElement, DraggableInputProps>(({ labe
   );
 });
 
-DraggableInput.displayName = "DraggableInput";
+DragInput.displayName = "DraggableInput";
 
-export default DraggableInput;
+export default DragInput;

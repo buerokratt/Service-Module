@@ -3,7 +3,7 @@ import { FormInput, Icon, OutputElementBox, Track } from "components";
 import { MdDeleteOutline } from "react-icons/md";
 import { Assign } from "./assign-types";
 import "../styles.scss";
-import DraggableInput from "components/FormElements/DraggableInput";
+import DragInput from "components/FormElements/DraggableInput";
 
 interface AssignElementProps {
   element: Assign;
@@ -27,7 +27,7 @@ const AssignElement: React.FC<AssignElementProps> = ({ element, onRemove, onChan
         {element.value ? (
           <OutputElementBox text={element.value} color="green" draggable={true} />
         ) : (
-          <DraggableInput
+          <DragInput
             value={element.value}
             name="value"
             onChange={handleChange}
