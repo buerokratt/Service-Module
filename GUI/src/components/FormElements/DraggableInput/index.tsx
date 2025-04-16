@@ -43,7 +43,6 @@ const DraggableInput = forwardRef<HTMLInputElement, DraggableInputProps>(({ labe
           onKeyDown={handleKeyDown}
           // onDrop={handleDrop}
           onDragOver={(e) => e.preventDefault()}
-          readOnly
           {...rest}
         />
       </div>
