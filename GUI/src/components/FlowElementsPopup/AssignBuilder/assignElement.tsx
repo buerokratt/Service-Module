@@ -4,6 +4,7 @@ import { MdDeleteOutline } from "react-icons/md";
 import { Assign } from "./assign-types";
 import "../styles.scss";
 import DragInput from "components/FormElements/DragInput";
+import { t } from "i18next";
 
 interface AssignElementProps {
   element: Assign;
@@ -27,8 +28,12 @@ const AssignElement: React.FC<AssignElementProps> = ({ element, onRemove, onChan
         {element.value ? (
           <OutputElementBox text={element.value} color="green" draggable={true} />
         ) : (
-          // todo translate
-          <DragInput value={element.value} name="value" onChange={handleChange} placeholder="Drag element here" />
+          <DragInput
+            value={element.value}
+            name="value"
+            onChange={handleChange}
+            placeholder={t("serviceFlow.popup.dragElementHere")!}
+          />
         )}
       </Track>
       <button onClick={() => onRemove(element.id)} className="small-assign-button assign-red">

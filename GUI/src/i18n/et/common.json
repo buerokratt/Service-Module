@@ -287,7 +287,8 @@
       "addGroup": "+ Grupp",
       "remove": "Eemalda",
       "signType": "Märgi tüüp",
-      "round": "Ümarda"
+      "round": "Ümarda",
+      "dragElementHere": "Lohista element siia"
     },
     "previousVariables": {
       "assignElements": "Määra elemendid",

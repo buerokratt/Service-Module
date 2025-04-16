@@ -287,7 +287,8 @@
       "addGroup": "+ Group",
       "remove": "Remove",
       "signType": "Sign Type",
-      "round": "Round"
+      "round": "Round",
+      "dragElementHere": "Drag element here"
     },
     "previousVariables": {
       "assignElements": "Assign Elements",
