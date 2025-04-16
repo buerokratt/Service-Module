@@ -1,5 +1,6 @@
 import { InputHTMLAttributes } from "react";
 import { FormInput } from "components";
+import styles from "./DragInput.module.scss";
 
 type DragInputProps = InputHTMLAttributes<HTMLInputElement> & {
   name: string;
@@ -10,6 +11,7 @@ const DragInput = ({ ...rest }: DragInputProps) => {
     <FormInput
       label=""
       hideLabel
+      className={styles.dragInput}
       // Disables focus, text cursor and everything related to keyboard input
       tabIndex={-1}
       onFocus={(e) => e.target.blur()}

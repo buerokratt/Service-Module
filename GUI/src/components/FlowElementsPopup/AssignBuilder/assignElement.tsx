@@ -27,16 +27,8 @@ const AssignElement: React.FC<AssignElementProps> = ({ element, onRemove, onChan
         {element.value ? (
           <OutputElementBox text={element.value} color="green" draggable={true} />
         ) : (
-          <DragInput
-            value={element.value}
-            name="value"
-            onChange={handleChange}
-            placeholder="Drag element here"
-            // todo useless props?
-            label=""
-            hideLabel
-            className="assign-value-input"
-          />
+          // todo translate
+          <DragInput value={element.value} name="value" onChange={handleChange} placeholder="Drag element here" />
         )}
       </Track>
       <button onClick={() => onRemove(element.id)} className="small-assign-button assign-red">
