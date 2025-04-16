@@ -16,6 +16,11 @@ const DraggableInput = forwardRef<HTMLInputElement, DraggableInputProps>(({ labe
     e.preventDefault();
   };
 
+  const handleFocus = (e: React.FocusEvent<HTMLInputElement>) => {
+    // Prevent focus
+    e.target.blur();
+  };
+
   // const handleDrop = (e: React.DragEvent<HTMLInputElement>) => {
   //   e.preventDefault();
   //   const value = e.dataTransfer.getData("text/plain");
@@ -41,8 +46,10 @@ const DraggableInput = forwardRef<HTMLInputElement, DraggableInputProps>(({ labe
           ref={ref}
           aria-label={hideLabel ? label : undefined}
           onKeyDown={handleKeyDown}
-          // onDrop={handleDrop}
+          onFocus={handleFocus}
           onDragOver={(e) => e.preventDefault()}
+          tabIndex={-1}
+          // onDrop={handleDrop}
           {...rest}
         />
       </div>
