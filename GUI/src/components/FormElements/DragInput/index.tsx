@@ -1,26 +1,22 @@
-import { forwardRef, InputHTMLAttributes } from "react";
+import { InputHTMLAttributes } from "react";
 import { FormInput } from "components";
 
-type DraggableInputProps = InputHTMLAttributes<HTMLInputElement> & {
-  label: string;
+type DragInputProps = InputHTMLAttributes<HTMLInputElement> & {
   name: string;
-  hideLabel?: boolean;
 };
 
-// todo props type
-const DragInput = forwardRef<HTMLInputElement, DraggableInputProps>(({ ...rest }, ref) => {
+const DragInput = ({ ...rest }: DragInputProps) => {
   return (
     <FormInput
+      label=""
+      hideLabel
       // Disables focus, text cursor and everything related to keyboard input
       tabIndex={-1}
       onFocus={(e) => e.target.blur()}
       onDragOver={(e) => e.preventDefault()}
       {...rest}
-      ref={ref}
     />
   );
-});
-
-DragInput.displayName = "DraggableInput";
+};
 
 export default DragInput;

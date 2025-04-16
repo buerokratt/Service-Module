@@ -31,8 +31,9 @@ const AssignElement: React.FC<AssignElementProps> = ({ element, onRemove, onChan
             value={element.value}
             name="value"
             onChange={handleChange}
-            label=""
             placeholder="Drag element here"
+            // todo useless props?
+            label=""
             hideLabel
             className="assign-value-input"
           />
