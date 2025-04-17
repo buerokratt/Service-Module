@@ -33,7 +33,6 @@ export const useAssignBuilder = ({ seedGroup, onChange }: UseAssignBuilderProps)
   const changeElement = (element: Assign) => setElementById(element.id, element);
 
   const setElementById = (id: string, element: Assign) => {
-    console.log("setElementById", id, element);
     const newElements = elements.map((x) => (x.id === id ? { ...element } : x));
     setElements(newElements);
   };
