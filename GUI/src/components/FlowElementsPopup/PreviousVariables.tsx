@@ -107,7 +107,8 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
               ) : (
                 <Tooltip content={`${variable.value} : ${typeColor.type}`}>
                   <OutputElementBox
-                    dragData={variable}
+                    dragData={variable.key ? variable : undefined}
+                    style={{ cursor: variable.key ? "grab" : "default" }}
                     text={variable.key || t("serviceFlow.previousVariables.noName")}
                     value={variable.value}
                     useValue

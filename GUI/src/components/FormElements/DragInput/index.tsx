@@ -2,13 +2,14 @@ import { useState } from "react";
 import { FormInput, OutputElementBox } from "components";
 import styles from "./DragInput.module.scss";
 import { Assign } from "types";
+import { t } from "i18next";
+import { getTypeColor } from "utils/object-util";
 
 interface DragInputProps {
   // todo do i need this prop? move here from outer?
   name: string;
-  value: string;
+  element?: Assign;
   onChange: (data: Assign) => void;
-  placeholder: string;
 }
 
 // todo simple state
@@ -16,17 +17,20 @@ interface DragInputState {
   text: string;
 }
 
-const DragInput = ({ value, onChange, ...rest }: DragInputProps) => {
+const DragInput = ({ onChange, element, name }: DragInputProps) => {
   const [state, setState] = useState<DragInputState>({
-    text: value,
+    text: element?.key ?? "",
   });
 
-  return state.text ? (
-    <OutputElementBox {...state} />
+  return element ? (
+    // todo tooltip
+    <OutputElementBox {...state} borderColor={getTypeColor(element?.data).color} />
   ) : (
     <FormInput
+      // todo ???
+      name={name}
+      placeholder={t("serviceFlow.popup.dragElementHere")!}
       label=""
-      hideLabel
       className={styles.dragInput}
       onDrop={(e) => {
         // todo prevent if same ID
@@ -40,7 +44,6 @@ const DragInput = ({ value, onChange, ...rest }: DragInputProps) => {
       tabIndex={-1}
       onFocus={(e) => e.target.blur()}
       onDragOver={(e) => e.preventDefault()}
-      {...rest}
     />
   );
 };

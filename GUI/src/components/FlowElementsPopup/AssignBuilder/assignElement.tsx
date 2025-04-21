@@ -3,7 +3,6 @@ import { DragInput, FormInput, Icon, Track } from "components";
 import { MdDeleteOutline } from "react-icons/md";
 import { Assign } from "../../../types/assign";
 import "../styles.scss";
-import { t } from "i18next";
 
 interface AssignElementProps {
   element: Assign;
@@ -24,14 +23,9 @@ const AssignElement: React.FC<AssignElementProps> = ({ element, onRemove, onChan
     <Track gap={16} isFlex>
       <Track gap={16} isFlex>
         <FormInput value={element.key} name="key" onChange={handleKeyChange} label="" hideLabel />
-        {/* todo resets to value after save */}
-        <DragInput
-          value={element.value}
-          name="value"
-          onChange={(value) => handleValueChange(value)}
-          placeholder={t("serviceFlow.popup.dragElementHere")!}
-        />
-        {element.slots?.length ? <div>WE HAVE A SLOT</div> : null}
+        {/* todo NAME*/}
+        <DragInput element={element.slots?.[0]} name="value" onChange={(value) => handleValueChange(value)} />
+        {element.slots?.length ? <div>!!!</div> : null}
       </Track>
       <button onClick={() => onRemove(element.id)} className="small-assign-button assign-red">
         <Icon icon={<MdDeleteOutline />} />
