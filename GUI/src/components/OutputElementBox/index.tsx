@@ -1,6 +1,7 @@
 import { CSSProperties, FC } from "react";
 import Box from "../Box";
-import { DragData } from "types";
+import { DragData, StepType } from "types";
+import useServiceStore from "store/new-services.store";
 
 type OutputElementBoxProps = {
   readonly text: string;
@@ -27,6 +28,8 @@ const OutputElementBox: FC<OutputElementBoxProps> = ({
   style,
   className,
 }) => {
+  const node = useServiceStore((state) => state.selectedNode);
+
   const mergedStyle: CSSProperties = {
     borderRadius: 46,
     paddingTop: 1.5,
@@ -38,14 +41,18 @@ const OutputElementBox: FC<OutputElementBoxProps> = ({
     ...(borderColor && { border: `2px outset ${borderColor}` }),
   };
 
-  // todo fix in textarea for Message
   const handleDragStart = (event: React.DragEvent<HTMLDivElement>) => {
+    const dragValue = useValue ? `${value}` : text;
     const data: DragData = {
       text: dragInputText ?? text,
-      value: useValue ? `${value}` : text,
+      value: dragValue,
       borderColor: borderColor ?? "",
     };
-    event.dataTransfer.setData("text/plain", JSON.stringify(data));
+
+    event.dataTransfer.setData(
+      "text/plain",
+      node?.data.stepType === StepType.Assign ? JSON.stringify(data) : dragValue
+    );
   };
 
   return (
