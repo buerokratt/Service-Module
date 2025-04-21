@@ -29,6 +29,7 @@ const DragInput = ({ value, onChange, ...rest }: DragInputProps) => {
       hideLabel
       className={styles.dragInput}
       onDrop={(e) => {
+        // todo prevent if same ID
         e.preventDefault();
         const data = JSON.parse(e.dataTransfer.getData("text/plain")) as AssignSlot;
         console.log("onDrop", data);
