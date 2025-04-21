@@ -51,7 +51,8 @@
     "close": "Sulge",
     "common": "Üldteenus",
     "errorMessage": "Teenusele puudub ligipääs. Proovi hiljem uuesti.",
-    "none": "Puudub"
+    "none": "Puudub",
+    "statusClarification": "Staatuse täpsustus"
   },
   "menu": {
     "overview": "Ülevaade",
@@ -115,7 +116,8 @@
       "newValidationMessage": "Uus teade kinnitamiseks",
       "useAutocorrect": "Teksti autokorrektor",
       "required": "Nõutud",
-      "invalidemail": "Kehtetu e-posti aadress"
+      "invalidemail": "Kehtetu e-posti aadress",
+      "statusCommentUpdated": "Staatuse täpsustus uuendatud"
     }
   },
   "overview": {
