@@ -13,12 +13,20 @@ interface AssignElementProps {
 }
 
 const AssignElement: React.FC<AssignElementProps> = ({ element, onRemove, onChange }) => {
-  const slots = element.slots ?? [];
+  const [slots, setSlots] = useState(element.slots ?? []);
   const [isSecondSlotOpen, setIsSecondSlotOpen] = useState(!!slots[1]);
-  const [isEditingManually, setIsEditingManually] = useState(false);
+  const [isEditingManually, setIsEditingManually] = useState(element.value && !slots.length);
+
+  console.log("isEditingManually CONDITION", slots);
 
   const changeKey = (e: React.ChangeEvent<HTMLInputElement>) => {
     onChange({ ...element, key: e.target.value });
+  };
+
+  const changeValue = (e: React.ChangeEvent<HTMLInputElement>) => {
+    // todo broken when opening AGAIN
+    setSlots([]);
+    onChange({ ...element, value: e.target.value, slots: undefined });
   };
 
   const changeFirstSlot = (data: Assign) => {
@@ -44,7 +52,7 @@ const AssignElement: React.FC<AssignElementProps> = ({ element, onRemove, onChan
       <FormInput value={element.key} name="key" onChange={changeKey} label="" hideLabel />:
       <Track style={{ flex: "1 0 75%", justifyContent: "flex-end" }}>
         {isEditingManually ? (
-          <div>tada!</div>
+          <FormInput value={element.value} name="value" onChange={changeValue} label="" hideLabel />
         ) : (
           <Track gap={3} isFlex>
             <DragInput disallowedId={element.id} element={slots[0]} onChange={(value) => changeFirstSlot(value)} />
@@ -64,7 +72,6 @@ const AssignElement: React.FC<AssignElementProps> = ({ element, onRemove, onChan
             ) : null}
           </Track>
         )}
-        {/* todo manual edit */}
         {!isEditingManually ? (
           <button onClick={() => setIsEditingManually(true)} className="small-assign-button assign-blue">
             <Icon icon={<MdEdit />} />
