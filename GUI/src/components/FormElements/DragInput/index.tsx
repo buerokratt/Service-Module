@@ -9,12 +9,12 @@ import { templateToString } from "utils/string-util";
 interface DragInputProps {
   // todo do i need this prop? move here from outer?
   name: string;
-  id: string;
   element: Assign | undefined;
+  disallowedId: string;
   onChange: (data: Assign) => void;
 }
 
-const DragInput = ({ onChange, element, name, id }: DragInputProps) => {
+const DragInput = ({ onChange, element, name, disallowedId }: DragInputProps) => {
   const [text, setText] = useState(element?.key ?? "");
   const [placeholder, setPlaceholder] = useState(t("serviceFlow.popup.dragElementHere")!);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -44,7 +44,7 @@ const DragInput = ({ onChange, element, name, id }: DragInputProps) => {
       onDrop={(e) => {
         const data = getData(e);
 
-        if (data.id === id) {
+        if (disallowedId === data.id) {
           resetPlaceholder();
           return;
         }
@@ -57,8 +57,10 @@ const DragInput = ({ onChange, element, name, id }: DragInputProps) => {
       onDragOver={(e) => {
         const data = getData(e);
 
-        inputRef.current?.classList.add(data.id === id ? styles.dragHoverDisabled : styles.dragHover);
-        if (data.id === id) setPlaceholder(t("serviceFlow.popup.assignToSelfNotAllowed")!);
+        console.log("onDragOver data", data);
+
+        inputRef.current?.classList.add(disallowedId === data.id ? styles.dragHoverDisabled : styles.dragHover);
+        if (disallowedId === data.id) setPlaceholder(t("serviceFlow.popup.assignToSelfNotAllowed")!);
       }}
       onDragLeave={resetPlaceholder}
     />
