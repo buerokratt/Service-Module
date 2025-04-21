@@ -4,7 +4,7 @@ import { MdDeleteOutline, MdEdit, MdMoveDown } from "react-icons/md";
 import { Assign } from "../../../types/assign";
 import "../styles.scss";
 import { stringToTemplate, templateToString } from "utils/string-util";
-import { isArray, isObject } from "utils/object-util";
+import { isArray, isObject, normalizeObjectPath } from "utils/object-util";
 
 interface AssignElementProps {
   element: Assign;
@@ -27,14 +27,16 @@ const AssignElement: React.FC<AssignElementProps> = ({ element, onRemove, onChan
 
   // todo - handle VALUE
   const changeSecondSlot = (data: Assign) => {
-    const value = stringToTemplate(templateToString(element.value) + '["' + templateToString(data.value) + '"]');
-    console.log("old value", element.value);
-    console.log("new value", value);
-    onChange({ ...element, value, slots: [slots[0]!, data] });
+    // // const value = stringToTemplate(templateToString(element.value) + '["' + templateToString(data.value) + '"]');
+    // const value = stringToTemplate(templateToString(element.value) + normalizeObjectPath(templateToString(data.value)));
+    // console.log("old value", element.value);
+    // console.log("new value", data.value);
+    // console.log("PROCESSED value", value);
+    // onChange({ ...element, value, slots: [slots[0]!, data] });
   };
 
   const resetSecondSlot = () => {
-    onChange({ ...element, slots: [slots[0]!] });
+    onChange({ ...element, value: slots[0]!.value, slots: [slots[0]!] });
   };
 
   // todo tooltips
@@ -50,7 +52,7 @@ const AssignElement: React.FC<AssignElementProps> = ({ element, onRemove, onChan
                 setIsSecondSlotOpen(!isSecondSlotOpen);
                 if (!isSecondSlotOpen) resetSecondSlot();
               }}
-              className="small-assign-button assign-blue"
+              className={`small-assign-button ${isSecondSlotOpen ? "assign-red" : "assign-blue"}`}
             >
               <Icon icon={<MdMoveDown />} />
             </button>
