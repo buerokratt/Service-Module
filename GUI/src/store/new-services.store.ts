@@ -23,7 +23,7 @@ import { GroupOrRule } from "components/FlowElementsPopup/RuleBuilder/types";
 import useTestServiceStore from "./test-services.store";
 import { Chip } from "types/chip";
 import { EndpointResponseVariable } from "types/endpoint/endpoint-response-variables";
-import { Assign } from "components/FlowElementsPopup/AssignBuilder/assign-types";
+import { Assign } from "types/assign";
 
 interface ServiceStoreState {
   endpoints: EndpointData[];

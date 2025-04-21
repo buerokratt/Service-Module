@@ -125,11 +125,10 @@ export const ObjectTree: FC<ObjectTreeProps> = ({ path, data, style }) => {
 
           return (
             <OutputElementBox
-              dragInputText={key}
               text={`${key}:`}
               value={buildKeyPathString(keyPath)}
               useValue
-              draggable={true}
+              dragData={{ key, value: buildKeyPathString(keyPath), data: parseValue(raw) }}
               className="object-tree-chip"
               borderColor={typeColor.color}
             />

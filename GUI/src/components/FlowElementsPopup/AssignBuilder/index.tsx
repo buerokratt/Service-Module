@@ -4,7 +4,7 @@ import { Track } from "components";
 import AssignElement from "./assignElement";
 import { useAssignBuilder } from "./useAssignBuilder";
 import "../styles.scss";
-import { Assign } from "./assign-types";
+import { Assign } from "../../../types/assign";
 
 export interface ElementGroupBuilderProps {
   onChange: (group: Assign[]) => void;

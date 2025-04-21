@@ -4,7 +4,7 @@ import useServiceStore from "store/new-services.store";
 import { EndpointResponseVariable } from "types/endpoint/endpoint-response-variables";
 import OutputElementBox from "components/OutputElementBox";
 import { StepType } from "types";
-import { Assign } from "./AssignBuilder/assign-types";
+import { Assign } from "../../types/assign";
 import { useTranslation } from "react-i18next";
 import { ObjectTree } from "./ObjectTree";
 import { stringToTemplate, templateToString } from "utils/string-util";
@@ -81,7 +81,7 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
             style={{ maxHeight: "30vh", overflow: "auto" }}
           >
             {[...assignedVariables, ...newAssignElements].map((variable) => {
-              console.log("variable", variable);
+              // console.log("variable", variable);
               return isObject(variable.data) ? (
                 <>
                   {(() => {
@@ -90,10 +90,9 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
                     return (
                       <Tooltip content={`${variable.value} : ${typeColor.type}`}>
                         <OutputElementBox
-                          dragInputText={variable.key}
                           text={assignedObjectTree?.path === variable.value ? variable.key + " ▲" : variable.key + " ▼"}
-                          draggable={false}
                           className="tooltip"
+                          dragData={variable}
                           style={{ cursor: "pointer" }}
                           borderColor={typeColor.color}
                           onClick={() => {
@@ -119,7 +118,7 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
                     return (
                       <Tooltip content={`${variable.value} : ${typeColor.type}`}>
                         <OutputElementBox
-                          dragInputText={variable.key}
+                          dragData={variable}
                           text={variable.key || t("serviceFlow.previousVariables.noName")}
                           value={variable.value}
                           useValue
@@ -157,7 +156,7 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
             style={{ maxHeight: "30vh", overflow: "auto" }}
           >
             {endpoint.chips.map((chip) => {
-              console.log("chip", chip);
+              // console.log("chip", chip);
               return isObject(chip.data) ? (
                 <>
                   {(() => {
@@ -168,8 +167,7 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
                         <OutputElementBox
                           text={endpointsObjectTree?.path === chip.value ? chip.name + " ▲" : chip.name + " ▼"}
                           value={stringToTemplate(chip.value)}
-                          dragInputText={chip.name}
-                          draggable={false}
+                          dragData={{ ...chip, key: chip.name, value: stringToTemplate(chip.value) }}
                           style={{ cursor: "pointer" }}
                           borderColor={typeColor.color}
                           onClick={() => {
@@ -197,7 +195,7 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
                           borderColor={typeColor.color}
                           text={chip.name}
                           value={stringToTemplate(chip.value)}
-                          dragInputText={chip.name}
+                          dragData={{ ...chip, key: chip.name, value: stringToTemplate(chip.value) }}
                           useValue
                         />
                       </Tooltip>

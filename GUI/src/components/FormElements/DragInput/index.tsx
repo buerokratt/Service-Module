@@ -1,7 +1,7 @@
-import { InputHTMLAttributes, useState } from "react";
+import { useState } from "react";
 import { FormInput, OutputElementBox } from "components";
 import styles from "./DragInput.module.scss";
-import { DragData } from "types";
+import { AssignSlot } from "types";
 
 interface DragInputProps {
   // todo do i need this prop? move here from outer?
@@ -13,18 +13,17 @@ interface DragInputProps {
 
 interface DragInputState {
   text: string;
-  borderColor: string | undefined;
+  // borderColor: string | undefined;
 }
 
 const DragInput = ({ value, onChange, ...rest }: DragInputProps) => {
-  // todo use DragData?
   const [state, setState] = useState<DragInputState>({
     text: value,
-    borderColor: undefined,
+    // borderColor: undefined,
   });
 
   return state.text ? (
-    <OutputElementBox color="green" {...state} />
+    <OutputElementBox {...state} />
   ) : (
     <FormInput
       label=""
@@ -32,10 +31,10 @@ const DragInput = ({ value, onChange, ...rest }: DragInputProps) => {
       className={styles.dragInput}
       onDrop={(e) => {
         e.preventDefault();
-        const data = JSON.parse(e.dataTransfer.getData("text/plain")) as DragData;
+        const data = JSON.parse(e.dataTransfer.getData("text/plain")) as AssignSlot;
         console.log("onDrop", data);
         onChange(data.value);
-        setState({ ...data });
+        setState({ text: data.key });
       }}
       // Disables focus, text cursor and everything related to keyboard input
       tabIndex={-1}

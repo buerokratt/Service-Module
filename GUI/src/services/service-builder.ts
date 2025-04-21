@@ -1,5 +1,5 @@
 import axios from "axios";
-import { Assign } from "components/FlowElementsPopup/AssignBuilder/assign-types";
+import { Assign } from "types/assign";
 import { Group, Rule } from "components/FlowElementsPopup/RuleBuilder/types";
 import i18next from "i18next";
 import { Edge, Node } from "reactflow";
