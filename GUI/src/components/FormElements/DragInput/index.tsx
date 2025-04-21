@@ -11,15 +11,14 @@ interface DragInputProps {
   placeholder: string;
 }
 
+// todo simple state
 interface DragInputState {
   text: string;
-  // borderColor: string | undefined;
 }
 
 const DragInput = ({ value, onChange, ...rest }: DragInputProps) => {
   const [state, setState] = useState<DragInputState>({
     text: value,
-    // borderColor: undefined,
   });
 
   return state.text ? (
