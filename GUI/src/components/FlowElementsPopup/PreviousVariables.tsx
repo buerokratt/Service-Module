@@ -4,7 +4,7 @@ import useServiceStore from "store/new-services.store";
 import { EndpointResponseVariable } from "types/endpoint/endpoint-response-variables";
 import OutputElementBox from "components/OutputElementBox";
 import { StepType } from "types";
-import { Assign } from "../../types/assign";
+import { Assign, AssignSlot } from "../../types/assign";
 import { useTranslation } from "react-i18next";
 import { ObjectTree } from "./ObjectTree";
 import { stringToTemplate, templateToString } from "utils/string-util";
@@ -83,6 +83,7 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
             {[...assignedVariables, ...newAssignElements].map((variable) => {
               // console.log("variable", variable);
               const typeColor = getTypeColor(variable.value);
+
               return isObject(variable.data) ? (
                 <Tooltip content={`${variable.value} : ${typeColor.type}`}>
                   <OutputElementBox
@@ -143,12 +144,18 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
             {endpoint.chips.map((chip) => {
               // console.log("chip", chip);
               const typeColor = getTypeColor(chip.data);
+              const dragData: AssignSlot = {
+                key: chip.name,
+                value: stringToTemplate(chip.value),
+                data: chip.data,
+              };
+
               return isObject(chip.data) ? (
                 <Tooltip content={`${chip.data} : ${typeColor.type}`}>
                   <OutputElementBox
                     text={endpointsObjectTree?.path === chip.value ? chip.name + " ▲" : chip.name + " ▼"}
                     value={stringToTemplate(chip.value)}
-                    dragData={{ ...chip, key: chip.name, value: stringToTemplate(chip.value) }}
+                    dragData={dragData}
                     style={{ cursor: "pointer" }}
                     borderColor={typeColor.color}
                     onClick={() => {
@@ -169,7 +176,7 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
                     borderColor={typeColor.color}
                     text={chip.name}
                     value={stringToTemplate(chip.value)}
-                    dragData={{ ...chip, key: chip.name, value: stringToTemplate(chip.value) }}
+                    dragData={dragData}
                     useValue
                   />
                 </Tooltip>
