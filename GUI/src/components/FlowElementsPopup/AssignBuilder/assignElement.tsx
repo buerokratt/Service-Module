@@ -1,5 +1,5 @@
 import React from "react";
-import { DragInput, FormInput, Icon, OutputElementBox, Track } from "components";
+import { DragInput, FormInput, Icon, Track } from "components";
 import { MdDeleteOutline } from "react-icons/md";
 import { Assign } from "./assign-types";
 import "../styles.scss";
