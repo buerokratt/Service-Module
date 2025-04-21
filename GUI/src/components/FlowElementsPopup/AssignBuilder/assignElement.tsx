@@ -15,10 +15,7 @@ interface AssignElementProps {
 const AssignElement: React.FC<AssignElementProps> = ({ element, onRemove, onChange }) => {
   const slots = element.slots ?? [];
   const [isSecondSlotOpen, setIsSecondSlotOpen] = useState(!!slots[1]);
-  const [isEditingManually, setIsEditingManually] = useState(false);
-
-  console.log("isEditingManually CONDITION", element.value);
-  console.log("isEditingManually CONDITION", slots);
+  const [isEditingManually, setIsEditingManually] = useState(element.value && !slots.length);
 
   const changeKey = (e: React.ChangeEvent<HTMLInputElement>) => {
     onChange({ ...element, key: e.target.value });
@@ -30,6 +27,11 @@ const AssignElement: React.FC<AssignElementProps> = ({ element, onRemove, onChan
 
   const changeFirstSlot = (data: Assign) => {
     onChange({ ...element, value: data.value, slots: [data] });
+  };
+
+  const enableManualEdit = () => {
+    setIsEditingManually(true);
+    onChange({ ...element, slots: undefined });
   };
 
   // todo - handle VALUE
@@ -69,14 +71,7 @@ const AssignElement: React.FC<AssignElementProps> = ({ element, onRemove, onChan
           </Track>
         )}
         {!isEditingManually ? (
-          <button
-            onClick={() => {
-              // todo broken when opening AGAIN - editing manually state is not preserved
-              setIsEditingManually(true);
-              onChange({ ...element, slots: undefined });
-            }}
-            className="small-assign-button assign-blue"
-          >
+          <button onClick={enableManualEdit} className="small-assign-button assign-blue">
             <Icon icon={<MdEdit />} />
           </button>
         ) : null}
