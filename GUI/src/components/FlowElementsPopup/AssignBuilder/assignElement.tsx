@@ -29,9 +29,9 @@ const AssignElement: React.FC<AssignElementProps> = ({ element, onRemove, onChan
     onChange({ ...element, value: data.value, slots: [data] });
   };
 
-  const enableManualEdit = () => {
-    setIsEditingManually(true);
-    onChange({ ...element, slots: undefined });
+  const resetSecondSlot = () => {
+    if (!slots[0]) return;
+    onChange({ ...element, value: slots[0].value, slots: [slots[0]] });
   };
 
   // todo - handle VALUE
@@ -41,6 +41,11 @@ const AssignElement: React.FC<AssignElementProps> = ({ element, onRemove, onChan
     console.log("new value", data.value);
     console.log("PROCESSED value", value);
     onChange({ ...element, value, slots: [slots[0]!, data] });
+  };
+
+  const enableManualEdit = () => {
+    setIsEditingManually(true);
+    onChange({ ...element, slots: undefined });
   };
 
   // todo tooltips
@@ -57,8 +62,7 @@ const AssignElement: React.FC<AssignElementProps> = ({ element, onRemove, onChan
               <button
                 onClick={() => {
                   setIsSecondSlotOpen(!isSecondSlotOpen);
-                  // Reset second slot
-                  if (!isSecondSlotOpen) onChange({ ...element, value: slots[0].value, slots: [slots[0]] });
+                  if (!isSecondSlotOpen) resetSecondSlot();
                 }}
                 className={`small-assign-button ${isSecondSlotOpen ? "assign-red" : "assign-blue"}`}
               >
