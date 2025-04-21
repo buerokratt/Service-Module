@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { FormInput, OutputElementBox } from "components";
 import styles from "./DragInput.module.scss";
 import { Assign } from "types";
@@ -13,37 +13,52 @@ interface DragInputProps {
   onChange: (data: Assign) => void;
 }
 
-// todo simple state
-interface DragInputState {
-  text: string;
-}
-
 const DragInput = ({ onChange, element, name, id }: DragInputProps) => {
-  const [state, setState] = useState<DragInputState>({
-    text: element?.key ?? "",
-  });
+  const [text, setText] = useState(element?.key ?? "");
+  const [placeholder, setPlaceholder] = useState(t("serviceFlow.popup.dragElementHere")!);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  const resetPlaceholder = () => {
+    inputRef.current?.classList.remove(styles.dragHover, styles.dragHoverDisabled);
+    setPlaceholder(t("serviceFlow.popup.dragElementHere")!);
+  };
+
+  const getData = (e: React.DragEvent<HTMLInputElement>) => {
+    e.preventDefault();
+    return JSON.parse(e.dataTransfer.getData("text/plain")) as Assign;
+  };
 
   return element ? (
     // todo tooltip
-    <OutputElementBox {...state} borderColor={getTypeColor(element?.data).color} />
+    <OutputElementBox text={text} borderColor={getTypeColor(element?.data).color} />
   ) : (
     <FormInput
+      ref={inputRef}
       // todo ???
       name={name}
-      placeholder={t("serviceFlow.popup.dragElementHere")!}
+      placeholder={placeholder}
       label=""
       className={styles.dragInput}
       onDrop={(e) => {
-        e.preventDefault();
-        const data = JSON.parse(e.dataTransfer.getData("text/plain")) as Assign;
-        if (data.id === id) return;
+        const data = getData(e);
+
+        if (data.id === id) {
+          resetPlaceholder();
+          return;
+        }
         onChange(data);
-        setState({ text: data.key });
+        setText(data.key);
       }}
-      // Disables focus, text cursor and everything related to keyboard input
+      // Disable focus, text cursor and everything related to keyboard input
       tabIndex={-1}
       onFocus={(e) => e.target.blur()}
-      onDragOver={(e) => e.preventDefault()}
+      onDragOver={(e) => {
+        const data = getData(e);
+
+        inputRef.current?.classList.add(data.id === id ? styles.dragHoverDisabled : styles.dragHover);
+        if (data.id === id) setPlaceholder(t("serviceFlow.popup.assignToSelfNotAllowed")!);
+      }}
+      onDragLeave={resetPlaceholder}
     />
   );
 };

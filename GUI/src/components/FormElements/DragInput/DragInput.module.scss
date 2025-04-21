@@ -9,3 +9,15 @@
   font-style: italic;
   cursor: default;
 }
+
+.dragHover {
+  border: 1px solid get-color(sea-green-10) !important;
+}
+
+.dragHoverDisabled {
+  border: 1px solid get-color(jasper-10) !important;
+
+  &::placeholder {
+    color: get-color(jasper-10) !important;
+  }
+}

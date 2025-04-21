@@ -288,7 +288,8 @@
       "remove": "Eemalda",
       "signType": "Märgi tüüp",
       "round": "Ümarda",
-      "dragElementHere": "Lohista element siia"
+      "dragElementHere": "Lohista element siia",
+      "assignToSelfNotAllowed": "Määramine iseendale ei ole lubatud"
     },
     "previousVariables": {
       "assignElements": "Määra elemendid",

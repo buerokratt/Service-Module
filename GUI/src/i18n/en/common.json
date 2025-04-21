@@ -288,7 +288,8 @@
       "remove": "Remove",
       "signType": "Sign Type",
       "round": "Round",
-      "dragElementHere": "Drag element here"
+      "dragElementHere": "Drag element here",
+      "assignToSelfNotAllowed": "Assign to self not allowed"
     },
     "previousVariables": {
       "assignElements": "Assign Elements",
