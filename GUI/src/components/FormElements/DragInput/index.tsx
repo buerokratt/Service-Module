@@ -1,14 +1,21 @@
-import { InputHTMLAttributes } from "react";
-import { FormInput } from "components";
+import { InputHTMLAttributes, useState } from "react";
+import { FormInput, OutputElementBox } from "components";
 import styles from "./DragInput.module.scss";
 import { DragData } from "types";
 
 type DragInputProps = InputHTMLAttributes<HTMLInputElement> & {
   name: string;
+  value: string;
 };
 
-const DragInput = ({ ...rest }: DragInputProps) => {
-  return (
+const DragInput = ({ value, ...rest }: DragInputProps) => {
+  // todo generally broken when dragging from tree
+  const [text, setText] = useState(value);
+  const [borderColor, setBorderColor] = useState<string | undefined>(undefined);
+
+  return text ? (
+    <OutputElementBox text={text} color="green" borderColor={borderColor} />
+  ) : (
     <FormInput
       label=""
       hideLabel
@@ -17,7 +24,8 @@ const DragInput = ({ ...rest }: DragInputProps) => {
         e.preventDefault();
         const data = JSON.parse(e.dataTransfer.getData("text/plain")) as DragData;
         console.log("drop", data);
-        (e.target as HTMLInputElement).value = data.value;
+        setText(data.text);
+        setBorderColor(data.borderColor);
       }}
       // Disables focus, text cursor and everything related to keyboard input
       tabIndex={-1}

@@ -24,16 +24,12 @@ const AssignElement: React.FC<AssignElementProps> = ({ element, onRemove, onChan
     <Track gap={16} isFlex>
       <Track gap={16} isFlex>
         <FormInput value={element.key} name="key" onChange={handleChange} label="" hideLabel />
-        {element.value ? (
-          <OutputElementBox text={element.value} color="green" />
-        ) : (
-          <DragInput
-            value={element.value}
-            name="value"
-            onChange={handleChange}
-            placeholder={t("serviceFlow.popup.dragElementHere")!}
-          />
-        )}
+        <DragInput
+          value={element.value}
+          name="value"
+          onChange={handleChange}
+          placeholder={t("serviceFlow.popup.dragElementHere")!}
+        />
       </Track>
       <button onClick={() => onRemove(element.id)} className="small-assign-button assign-red">
         <Icon icon={<MdDeleteOutline />} />
