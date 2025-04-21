@@ -1,15 +1,16 @@
 import { useRef, useState } from "react";
-import { FormInput, OutputElementBox } from "components";
+import { FormInput, OutputElementBox, Tooltip } from "components";
 import styles from "./DragInput.module.scss";
 import { Assign } from "types";
 import { t } from "i18next";
 import { getTypeColor } from "utils/object-util";
+import { templateToString } from "utils/string-util";
 
 interface DragInputProps {
   // todo do i need this prop? move here from outer?
   name: string;
-  id?: string;
-  element?: Assign;
+  id: string;
+  element: Assign | undefined;
   onChange: (data: Assign) => void;
 }
 
@@ -29,8 +30,9 @@ const DragInput = ({ onChange, element, name, id }: DragInputProps) => {
   };
 
   return element ? (
-    // todo tooltip
-    <OutputElementBox text={text} borderColor={getTypeColor(element?.data).color} />
+    <Tooltip content={templateToString(element.value)}>
+      <OutputElementBox text={text} borderColor={getTypeColor(element?.data).color} />
+    </Tooltip>
   ) : (
     <FormInput
       ref={inputRef}
