@@ -4,5 +4,5 @@ export interface Assign {
   value: string;
   data?: unknown;
   // todo from here
-  slots?: [Assign, Assign];
+  slots?: [Assign] | [Assign, Assign];
 }

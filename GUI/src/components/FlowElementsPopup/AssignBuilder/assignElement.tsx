@@ -16,8 +16,8 @@ const AssignElement: React.FC<AssignElementProps> = ({ element, onRemove, onChan
     onChange({ ...element, key: e.target.value });
   };
 
-  const handleValueChange = (value: string) => {
-    onChange({ ...element, value });
+  const handleValueChange = (data: Assign) => {
+    onChange({ ...element, value: data.value, slots: [data] });
   };
 
   return (
@@ -31,6 +31,7 @@ const AssignElement: React.FC<AssignElementProps> = ({ element, onRemove, onChan
           onChange={(value) => handleValueChange(value)}
           placeholder={t("serviceFlow.popup.dragElementHere")!}
         />
+        {element.slots?.length ? <div>WE HAVE A SLOT</div> : null}
       </Track>
       <button onClick={() => onRemove(element.id)} className="small-assign-button assign-red">
         <Icon icon={<MdDeleteOutline />} />
