@@ -6,7 +6,6 @@ export interface Assign {
 }
 
 // todo merge + names?
-
 export interface AssignSlot {
   id?: string;
   key: string;
