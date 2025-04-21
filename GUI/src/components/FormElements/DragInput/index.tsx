@@ -31,7 +31,6 @@ const DragInput = ({ value, onChange, ...rest }: DragInputProps) => {
       onDrop={(e) => {
         e.preventDefault();
         const data = JSON.parse(e.dataTransfer.getData("text/plain")) as DragData;
-        // e.target.value = data.text;
         onChange({
           target: {
             name: "value",
@@ -44,10 +43,6 @@ const DragInput = ({ value, onChange, ...rest }: DragInputProps) => {
       tabIndex={-1}
       onFocus={(e) => e.target.blur()}
       onDragOver={(e) => e.preventDefault()}
-      // onChange={(e) => {
-      //   console.log("onChange", e.target.value);
-      //   return onChange!(e.target.value);
-      // }}
       {...rest}
     />
   );
