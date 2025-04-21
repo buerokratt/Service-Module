@@ -21,7 +21,7 @@ const DragInput = ({ value, ...rest }: DragInputProps) => {
   });
 
   return state.text ? (
-    <OutputElementBox text={state.text} color="green" borderColor={state.borderColor} />
+    <OutputElementBox color="green" {...state} />
   ) : (
     <FormInput
       label=""
