@@ -6,6 +6,7 @@ import { DragData } from "types";
 type DragInputProps = InputHTMLAttributes<HTMLInputElement> & {
   name: string;
   value: string;
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 };
 
 type DragInputState = {
@@ -13,7 +14,7 @@ type DragInputState = {
   borderColor: string | undefined;
 };
 
-const DragInput = ({ value, ...rest }: DragInputProps) => {
+const DragInput = ({ value, onChange, ...rest }: DragInputProps) => {
   // todo use DragData?
   const [state, setState] = useState<DragInputState>({
     text: value,
@@ -21,7 +22,7 @@ const DragInput = ({ value, ...rest }: DragInputProps) => {
   });
 
   return state.text ? (
-    <OutputElementBox color="green" {...state} value={state.text} />
+    <OutputElementBox color="green" {...state} />
   ) : (
     <FormInput
       label=""
@@ -31,12 +32,22 @@ const DragInput = ({ value, ...rest }: DragInputProps) => {
         e.preventDefault();
         const data = JSON.parse(e.dataTransfer.getData("text/plain")) as DragData;
         // e.target.value = data.text;
+        onChange({
+          target: {
+            name: "value",
+            value: data.value,
+          },
+        } as React.ChangeEvent<HTMLInputElement>);
         setState({ ...data });
       }}
       // Disables focus, text cursor and everything related to keyboard input
       tabIndex={-1}
       onFocus={(e) => e.target.blur()}
       onDragOver={(e) => e.preventDefault()}
+      // onChange={(e) => {
+      //   console.log("onChange", e.target.value);
+      //   return onChange!(e.target.value);
+      // }}
       {...rest}
     />
   );
