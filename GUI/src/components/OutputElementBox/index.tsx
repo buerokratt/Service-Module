@@ -1,4 +1,4 @@
-import { CSSProperties, FC } from "react";
+import { CSSProperties, FC, DragEvent } from "react";
 import Box from "../Box";
 import { AssignSlot, StepType } from "types";
 import useServiceStore from "store/new-services.store";
@@ -27,7 +27,6 @@ const OutputElementBox: FC<OutputElementBoxProps> = ({
   className,
 }) => {
   const node = useServiceStore((state) => state.selectedNode);
-
   const mergedStyle: CSSProperties = {
     borderRadius: 46,
     paddingTop: 1.5,
@@ -39,7 +38,7 @@ const OutputElementBox: FC<OutputElementBoxProps> = ({
     ...(borderColor && { border: `2px outset ${borderColor}` }),
   };
 
-  const handleDragStart = (event: React.DragEvent<HTMLDivElement>) => {
+  const handleDragStart = (event: DragEvent<HTMLDivElement>) => {
     const dragValue = useValue ? `${value}` : text;
 
     event.dataTransfer.setData(
