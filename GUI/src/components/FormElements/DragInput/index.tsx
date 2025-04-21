@@ -3,16 +3,18 @@ import { FormInput, OutputElementBox } from "components";
 import styles from "./DragInput.module.scss";
 import { DragData } from "types";
 
-type DragInputProps = InputHTMLAttributes<HTMLInputElement> & {
+interface DragInputProps {
+  // todo do i need this prop? move here from outer?
   name: string;
   value: string;
-  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-};
+  onChange: (value: string) => void;
+  placeholder: string;
+}
 
-type DragInputState = {
+interface DragInputState {
   text: string;
   borderColor: string | undefined;
-};
+}
 
 const DragInput = ({ value, onChange, ...rest }: DragInputProps) => {
   // todo use DragData?
@@ -32,12 +34,7 @@ const DragInput = ({ value, onChange, ...rest }: DragInputProps) => {
         e.preventDefault();
         const data = JSON.parse(e.dataTransfer.getData("text/plain")) as DragData;
         console.log("onDrop", data);
-        onChange({
-          target: {
-            name: "value",
-            value: data.value,
-          },
-        } as React.ChangeEvent<HTMLInputElement>);
+        onChange(data.value);
         setState({ ...data });
       }}
       // Disables focus, text cursor and everything related to keyboard input

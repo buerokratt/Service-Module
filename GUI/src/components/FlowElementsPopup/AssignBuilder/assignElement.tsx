@@ -16,8 +16,8 @@ const AssignElement: React.FC<AssignElementProps> = ({ element, onRemove, onChan
     onChange({ ...element, key: e.target.value });
   };
 
-  const handleValueChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    onChange({ ...element, value: e.target.value });
+  const handleValueChange = (value: string) => {
+    onChange({ ...element, value });
   };
 
   return (
@@ -28,7 +28,7 @@ const AssignElement: React.FC<AssignElementProps> = ({ element, onRemove, onChan
         <DragInput
           value={element.value}
           name="value"
-          onChange={handleValueChange}
+          onChange={(value) => handleValueChange(value)}
           placeholder={t("serviceFlow.popup.dragElementHere")!}
         />
       </Track>
