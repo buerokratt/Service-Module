@@ -22,7 +22,6 @@ const DragInput = ({ value, ...rest }: DragInputProps) => {
       onDrop={(e) => {
         e.preventDefault();
         const data = JSON.parse(e.dataTransfer.getData("text/plain")) as DragData;
-        console.log("drop", data);
         setText(data.text);
         setBorderColor(data.borderColor);
       }}
