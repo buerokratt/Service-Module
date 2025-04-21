@@ -121,6 +121,7 @@ const FlowElementsPopup: React.FC = () => {
     if (stepType === StepType.Assign) {
       const flatEndpointVariables = endpointsVariables.map((endpoint) => endpoint.chips).flat();
       assignElements.forEach((element) => {
+        console.log("SAVE element", element);
         // Values are saved as templates for backwards compatibility
         const fullPath = templateToString(element.value);
         const endpointVariable = flatEndpointVariables.find((variable) => fullPath.startsWith(String(variable.value)));

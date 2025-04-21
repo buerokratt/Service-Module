@@ -21,7 +21,7 @@ const DragInput = ({ value, ...rest }: DragInputProps) => {
   });
 
   return state.text ? (
-    <OutputElementBox color="green" {...state} />
+    <OutputElementBox color="green" {...state} value={state.text} />
   ) : (
     <FormInput
       label=""
@@ -30,6 +30,7 @@ const DragInput = ({ value, ...rest }: DragInputProps) => {
       onDrop={(e) => {
         e.preventDefault();
         const data = JSON.parse(e.dataTransfer.getData("text/plain")) as DragData;
+        // e.target.value = data.text;
         setState({ ...data });
       }}
       // Disables focus, text cursor and everything related to keyboard input
