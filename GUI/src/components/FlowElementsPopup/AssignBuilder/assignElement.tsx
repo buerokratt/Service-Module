@@ -13,10 +13,11 @@ interface AssignElementProps {
 }
 
 const AssignElement: React.FC<AssignElementProps> = ({ element, onRemove, onChange }) => {
-  const [slots, setSlots] = useState(element.slots ?? []);
+  const slots = element.slots ?? [];
   const [isSecondSlotOpen, setIsSecondSlotOpen] = useState(!!slots[1]);
-  const [isEditingManually, setIsEditingManually] = useState(element.value && !slots.length);
+  const [isEditingManually, setIsEditingManually] = useState(false);
 
+  console.log("isEditingManually CONDITION", element.value);
   console.log("isEditingManually CONDITION", slots);
 
   const changeKey = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -24,9 +25,7 @@ const AssignElement: React.FC<AssignElementProps> = ({ element, onRemove, onChan
   };
 
   const changeValue = (e: React.ChangeEvent<HTMLInputElement>) => {
-    // todo broken when opening AGAIN
-    setSlots([]);
-    onChange({ ...element, value: e.target.value, slots: undefined });
+    onChange({ ...element, value: e.target.value });
   };
 
   const changeFirstSlot = (data: Assign) => {
@@ -40,10 +39,6 @@ const AssignElement: React.FC<AssignElementProps> = ({ element, onRemove, onChan
     console.log("new value", data.value);
     console.log("PROCESSED value", value);
     onChange({ ...element, value, slots: [slots[0]!, data] });
-  };
-
-  const resetSecondSlot = () => {
-    onChange({ ...element, value: slots[0]!.value, slots: [slots[0]!] });
   };
 
   // todo tooltips
@@ -60,7 +55,8 @@ const AssignElement: React.FC<AssignElementProps> = ({ element, onRemove, onChan
               <button
                 onClick={() => {
                   setIsSecondSlotOpen(!isSecondSlotOpen);
-                  if (!isSecondSlotOpen) resetSecondSlot();
+                  // Reset second slot
+                  if (!isSecondSlotOpen) onChange({ ...element, value: slots[0].value, slots: [slots[0]] });
                 }}
                 className={`small-assign-button ${isSecondSlotOpen ? "assign-red" : "assign-blue"}`}
               >
@@ -73,7 +69,14 @@ const AssignElement: React.FC<AssignElementProps> = ({ element, onRemove, onChan
           </Track>
         )}
         {!isEditingManually ? (
-          <button onClick={() => setIsEditingManually(true)} className="small-assign-button assign-blue">
+          <button
+            onClick={() => {
+              // todo broken when opening AGAIN - editing manually state is not preserved
+              setIsEditingManually(true);
+              onChange({ ...element, slots: undefined });
+            }}
+            className="small-assign-button assign-blue"
+          >
             <Icon icon={<MdEdit />} />
           </button>
         ) : null}
