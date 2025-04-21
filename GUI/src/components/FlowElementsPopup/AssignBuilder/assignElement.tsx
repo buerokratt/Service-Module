@@ -13,34 +13,46 @@ interface AssignElementProps {
 
 const AssignElement: React.FC<AssignElementProps> = ({ element, onRemove, onChange }) => {
   const [isSecondSlotOpen, setIsSecondSlotOpen] = useState(!!element.slots?.[1]);
+  const [isEditingManually, setIsEditingManually] = useState(false);
 
-  console.log("AssignElement element", element);
-
-  const handleKeyChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const changeKey = (e: React.ChangeEvent<HTMLInputElement>) => {
     onChange({ ...element, key: e.target.value });
   };
 
-  const handleFirstSlotValueChange = (data: Assign) => {
+  const changeFirstSlot = (data: Assign) => {
     onChange({ ...element, value: data.value, slots: [data] });
   };
 
-  const handleSecondSlotValueChange = (data: Assign) => {
+  // todo - handle VALUE
+  const changeSecondSlot = (data: Assign) => {
+    console.log("old value", element.value);
+    console.log("new value", data.value);
     onChange({ ...element, value: data.value, slots: [element.slots?.[0]!, data] });
+  };
+
+  const resetSecondSlot = () => {
+    onChange({ ...element, slots: [element.slots?.[0]!] });
   };
 
   // todo tooltips
   return (
     <Track gap={16} isFlex>
-      <FormInput value={element.key} name="key" onChange={handleKeyChange} label="" hideLabel />:
+      <FormInput value={element.key} name="key" onChange={changeKey} label="" hideLabel />:
       <Track style={{ flex: "1 0 50%", justifyContent: "flex-end" }}>
         <Track gap={3} isFlex>
           <DragInput
             disallowedId={element.id}
             element={element.slots?.[0]}
-            onChange={(value) => handleFirstSlotValueChange(value)}
+            onChange={(value) => changeFirstSlot(value)}
           />
           {element.slots?.length && isObject(element.slots?.[0].data) ? (
-            <button onClick={() => setIsSecondSlotOpen(!isSecondSlotOpen)} className="small-assign-button assign-blue">
+            <button
+              onClick={() => {
+                setIsSecondSlotOpen(!isSecondSlotOpen);
+                if (!isSecondSlotOpen) resetSecondSlot();
+              }}
+              className="small-assign-button assign-blue"
+            >
               <Icon icon={<MdMoveDown />} />
             </button>
           ) : null}
@@ -48,7 +60,7 @@ const AssignElement: React.FC<AssignElementProps> = ({ element, onRemove, onChan
             <DragInput
               disallowedId={element.id}
               element={element.slots?.[1]}
-              onChange={(value) => handleSecondSlotValueChange(value)}
+              onChange={(value) => changeSecondSlot(value)}
             />
           ) : null}
         </Track>
