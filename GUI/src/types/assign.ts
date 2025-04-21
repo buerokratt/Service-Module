@@ -3,6 +3,8 @@ export interface Assign {
   key: string;
   value: string;
   data?: unknown;
+  // todo from here
+  slots?: [AssignSlot, AssignSlot];
 }
 
 // todo merge + names?
