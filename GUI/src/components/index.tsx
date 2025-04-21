@@ -7,6 +7,7 @@ import Dialog from "./Dialog";
 import Drawer from "./Drawer";
 import DataTable from "./DataTable";
 import {
+  DragInput,
   FormAutocomplete,
   FormCheckbox,
   FormCheckboxes,
@@ -53,6 +54,7 @@ export {
   EndpointOpenAPI,
   ExclamationBadge,
   CheckBadge,
+  DragInput,
   FlowBuilder,
   FormAutocomplete,
   FormCheckbox,

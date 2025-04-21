@@ -1,13 +1,7 @@
-import { InputHTMLAttributes, Key } from "react";
+import { InputHTMLAttributes } from "react";
 import { FormInput } from "components";
 import styles from "./DragInput.module.scss";
-
-// todo move
-export interface DragData {
-  text: string;
-  value: string;
-  borderColor: string;
-}
+import { DragData } from "types";
 
 type DragInputProps = InputHTMLAttributes<HTMLInputElement> & {
   name: string;
@@ -19,16 +13,16 @@ const DragInput = ({ ...rest }: DragInputProps) => {
       label=""
       hideLabel
       className={styles.dragInput}
-      // Disables focus, text cursor and everything related to keyboard input
-      tabIndex={-1}
-      onFocus={(e) => e.target.blur()}
-      onDragOver={(e) => e.preventDefault()}
       onDrop={(e) => {
         e.preventDefault();
         const data = JSON.parse(e.dataTransfer.getData("text/plain")) as DragData;
         console.log("drop", data);
         (e.target as HTMLInputElement).value = data.value;
       }}
+      // Disables focus, text cursor and everything related to keyboard input
+      tabIndex={-1}
+      onFocus={(e) => e.target.blur()}
+      onDragOver={(e) => e.preventDefault()}
       {...rest}
     />
   );

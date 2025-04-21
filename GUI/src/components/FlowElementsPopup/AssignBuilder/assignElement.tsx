@@ -1,9 +1,8 @@
 import React from "react";
-import { FormInput, Icon, OutputElementBox, Track } from "components";
+import { DragInput, FormInput, Icon, OutputElementBox, Track } from "components";
 import { MdDeleteOutline } from "react-icons/md";
 import { Assign } from "./assign-types";
 import "../styles.scss";
-import DragInput from "components/FormElements/DragInput";
 import { t } from "i18next";
 
 interface AssignElementProps {
@@ -26,7 +25,7 @@ const AssignElement: React.FC<AssignElementProps> = ({ element, onRemove, onChan
       <Track gap={16} isFlex>
         <FormInput value={element.key} name="key" onChange={handleChange} label="" hideLabel />
         {element.value ? (
-          <OutputElementBox text={element.value} color="green" draggable={true} />
+          <OutputElementBox text={element.value} color="green" />
         ) : (
           <DragInput
             value={element.value}

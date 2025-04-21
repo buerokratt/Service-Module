@@ -1,6 +1,6 @@
-import { CSSProperties, FC, Key } from "react";
+import { CSSProperties, FC } from "react";
 import Box from "../Box";
-import { DragData } from "components/FormElements/DragInput";
+import { DragData } from "types";
 
 type OutputElementBoxProps = {
   readonly text: string;
@@ -45,11 +45,8 @@ const OutputElementBox: FC<OutputElementBoxProps> = ({
       value: useValue ? `${value}` : text,
       borderColor: borderColor ?? "",
     };
-    console.log("drag", data);
     event.dataTransfer.setData("text/plain", JSON.stringify(data));
   };
-
-  // onDragStart={(event) => event.dataTransfer.setData("text/plain", useValue ? `${value}` : text)}
 
   return (
     <Box
