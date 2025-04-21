@@ -4,7 +4,7 @@ import useServiceStore from "store/new-services.store";
 import { EndpointResponseVariable } from "types/endpoint/endpoint-response-variables";
 import OutputElementBox from "components/OutputElementBox";
 import { StepType } from "types";
-import { Assign, AssignSlot } from "../../types/assign";
+import { Assign } from "../../types/assign";
 import { useTranslation } from "react-i18next";
 import { ObjectTree } from "./ObjectTree";
 import { stringToTemplate, templateToString } from "utils/string-util";
@@ -144,7 +144,8 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
             {endpoint.chips.map((chip) => {
               // console.log("chip", chip);
               const typeColor = getTypeColor(chip.data);
-              const dragData: AssignSlot = {
+              const dragData: Assign = {
+                id: "",
                 key: chip.name,
                 value: stringToTemplate(chip.value),
                 data: chip.data,

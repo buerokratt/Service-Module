@@ -1,14 +1,13 @@
 import { CSSProperties, FC, DragEvent } from "react";
 import Box from "../Box";
-import { AssignSlot, StepType } from "types";
+import { Assign, StepType } from "types";
 import useServiceStore from "store/new-services.store";
 
 type OutputElementBoxProps = {
   readonly text: string;
   readonly value?: string | number;
-  readonly color?: "green" | "yellow";
   readonly borderColor?: string;
-  readonly dragData?: AssignSlot;
+  readonly dragData?: Assign;
   readonly useValue?: boolean;
   readonly onClick?: () => void;
   readonly style?: CSSProperties;
@@ -17,7 +16,6 @@ type OutputElementBoxProps = {
 
 const OutputElementBox: FC<OutputElementBoxProps> = ({
   text,
-  color = "green",
   borderColor,
   dragData,
   useValue = false,
@@ -51,7 +49,7 @@ const OutputElementBox: FC<OutputElementBoxProps> = ({
     <Box
       className={className}
       onClick={onClick}
-      color={color}
+      color="green"
       draggable={!!dragData}
       onDragStart={dragData && handleDragStart}
       style={mergedStyle}

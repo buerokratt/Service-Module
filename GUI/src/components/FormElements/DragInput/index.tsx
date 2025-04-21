@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { FormInput, OutputElementBox } from "components";
 import styles from "./DragInput.module.scss";
-import { AssignSlot } from "types";
+import { Assign } from "types";
 
 interface DragInputProps {
   // todo do i need this prop? move here from outer?
@@ -31,7 +31,7 @@ const DragInput = ({ value, onChange, ...rest }: DragInputProps) => {
       onDrop={(e) => {
         // todo prevent if same ID
         e.preventDefault();
-        const data = JSON.parse(e.dataTransfer.getData("text/plain")) as AssignSlot;
+        const data = JSON.parse(e.dataTransfer.getData("text/plain")) as Assign;
         console.log("onDrop", data);
         onChange(data.value);
         setState({ text: data.key });
