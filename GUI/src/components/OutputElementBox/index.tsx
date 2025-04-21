@@ -53,7 +53,7 @@ const OutputElementBox: FC<OutputElementBoxProps> = ({
       onClick={onClick}
       color={color}
       draggable={!!dragData}
-      onDragStart={handleDragStart}
+      onDragStart={dragData && handleDragStart}
       style={mergedStyle}
     >
       {text}
