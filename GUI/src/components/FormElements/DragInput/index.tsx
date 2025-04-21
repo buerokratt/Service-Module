@@ -8,12 +8,20 @@ type DragInputProps = InputHTMLAttributes<HTMLInputElement> & {
   value: string;
 };
 
-const DragInput = ({ value, ...rest }: DragInputProps) => {
-  const [text, setText] = useState(value);
-  const [borderColor, setBorderColor] = useState<string | undefined>(undefined);
+type DragInputState = {
+  text: string;
+  borderColor: string | undefined;
+};
 
-  return text ? (
-    <OutputElementBox text={text} color="green" borderColor={borderColor} />
+const DragInput = ({ value, ...rest }: DragInputProps) => {
+  // todo use DragData?
+  const [state, setState] = useState<DragInputState>({
+    text: value,
+    borderColor: undefined,
+  });
+
+  return state.text ? (
+    <OutputElementBox text={state.text} color="green" borderColor={state.borderColor} />
   ) : (
     <FormInput
       label=""
@@ -22,8 +30,7 @@ const DragInput = ({ value, ...rest }: DragInputProps) => {
       onDrop={(e) => {
         e.preventDefault();
         const data = JSON.parse(e.dataTransfer.getData("text/plain")) as DragData;
-        setText(data.text);
-        setBorderColor(data.borderColor);
+        setState({ ...data });
       }}
       // Disables focus, text cursor and everything related to keyboard input
       tabIndex={-1}
