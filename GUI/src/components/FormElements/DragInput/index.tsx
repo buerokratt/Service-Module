@@ -9,7 +9,6 @@ type DragInputProps = InputHTMLAttributes<HTMLInputElement> & {
 };
 
 const DragInput = ({ value, ...rest }: DragInputProps) => {
-  // todo generally broken when dragging from tree
   const [text, setText] = useState(value);
   const [borderColor, setBorderColor] = useState<string | undefined>(undefined);
 

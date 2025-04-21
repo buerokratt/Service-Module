@@ -4,7 +4,7 @@ import { JSONTree, KeyPath } from "react-json-tree";
 import "./styles.scss";
 import { stringToTemplate } from "utils/string-util";
 import { useTranslation } from "react-i18next";
-import {getTypeColor} from "../../utils/object-util";
+import { getTypeColor } from "../../utils/object-util";
 
 // Some theme colors are inverted with invertTheme below to get the light theme
 const theme = {
@@ -82,22 +82,21 @@ export const ObjectTree: FC<ObjectTreeProps> = ({ path, data, style }) => {
     return stringToTemplate(roundedValues.has(key) ? "Math.round((" + base + " + Number.EPSILON) * 100) / 100" : base);
   };
 
-  const parseValue = (raw: any): number | string | any[] | undefined | {}  => {
-    console.log('parsing', raw)
-    if (raw === 'Number') {
+  const parseValue = (raw: any): number | string | any[] | undefined | {} => {
+    if (raw === "Number") {
       return 0;
     }
-    if (raw === 'String') {
+    if (raw === "String") {
       return "";
     }
-    if(raw === 'Array') {
+    if (raw === "Array") {
       return [];
     }
-    if(raw === 'Object') {
+    if (raw === "Object") {
       return {};
     }
     return undefined;
-  }
+  };
 
   const toggleRounding = (keyPath: KeyPath, value: number, roundValue = true) => {
     const key = getKeyPathString(keyPath);
@@ -120,19 +119,20 @@ export const ObjectTree: FC<ObjectTreeProps> = ({ path, data, style }) => {
         theme={theme}
         invertTheme={true}
         keyPath={[String(root)]}
-        labelRenderer={(keyPath,raw) => {
-          const key = keyPath[0];
+        labelRenderer={(keyPath, raw) => {
+          const key = String(keyPath[0]);
           const typeColor = getTypeColor(parseValue(raw));
 
           return (
-              <OutputElementBox
-                  style={{ border: `3px outset ${typeColor.color}` }}
-                  text={`${String(key)}:`}
-                  value={buildKeyPathString(keyPath)}
-                  useValue
-                  draggable={true}
-                  className="object-tree-chip"
-              />
+            <OutputElementBox
+              dragInputText={key}
+              text={`${key}:`}
+              value={buildKeyPathString(keyPath)}
+              useValue
+              draggable={true}
+              className="object-tree-chip"
+              borderColor={typeColor.color}
+            />
           );
         }}
         valueRenderer={(raw, _, ...keyPath) => {
