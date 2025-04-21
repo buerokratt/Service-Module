@@ -12,7 +12,9 @@ interface AssignElementProps {
 }
 
 const AssignElement: React.FC<AssignElementProps> = ({ element, onRemove, onChange }) => {
-  const [isSecondSlotOpen, setIsSecondSlotOpen] = useState(false);
+  const [isSecondSlotOpen, setIsSecondSlotOpen] = useState(!!element.slots?.[1]);
+
+  console.log("AssignElement element", element);
 
   const handleKeyChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     onChange({ ...element, key: e.target.value });
@@ -32,11 +34,9 @@ const AssignElement: React.FC<AssignElementProps> = ({ element, onRemove, onChan
       <FormInput value={element.key} name="key" onChange={handleKeyChange} label="" hideLabel />:
       <Track style={{ flex: "1 0 50%", justifyContent: "flex-end" }}>
         <Track gap={3} isFlex>
-          {/* todo NAME*/}
           <DragInput
             disallowedId={element.id}
             element={element.slots?.[0]}
-            name="value"
             onChange={(value) => handleFirstSlotValueChange(value)}
           />
           {element.slots?.length && isObject(element.slots?.[0].data) ? (
@@ -48,7 +48,6 @@ const AssignElement: React.FC<AssignElementProps> = ({ element, onRemove, onChan
             <DragInput
               disallowedId={element.id}
               element={element.slots?.[1]}
-              name="second"
               onChange={(value) => handleSecondSlotValueChange(value)}
             />
           ) : null}

@@ -7,14 +7,12 @@ import { getTypeColor } from "utils/object-util";
 import { templateToString } from "utils/string-util";
 
 interface DragInputProps {
-  // todo do i need this prop? move here from outer?
-  name: string;
   element: Assign | undefined;
   disallowedId: string;
   onChange: (data: Assign) => void;
 }
 
-const DragInput = ({ onChange, element, name, disallowedId }: DragInputProps) => {
+const DragInput = ({ onChange, element, disallowedId }: DragInputProps) => {
   const [text, setText] = useState(element?.key ?? "");
   const [placeholder, setPlaceholder] = useState(t("serviceFlow.popup.dragElementHere")!);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -36,8 +34,7 @@ const DragInput = ({ onChange, element, name, disallowedId }: DragInputProps) =>
   ) : (
     <FormInput
       ref={inputRef}
-      // todo ???
-      name={name}
+      name=""
       placeholder={placeholder}
       label=""
       className={styles.dragInput}
