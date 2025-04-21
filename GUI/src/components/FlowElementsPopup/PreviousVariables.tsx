@@ -80,8 +80,9 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
             isMultiline
             style={{ maxHeight: "30vh", overflow: "auto" }}
           >
-            {[...assignedVariables, ...newAssignElements].map((variable) =>
-              isObject(variable.data) ? (
+            {[...assignedVariables, ...newAssignElements].map((variable) => {
+              console.log("variable", variable);
+              return isObject(variable.data) ? (
                 <>
                   {(() => {
                     const typeColor = getTypeColor(variable.value);
@@ -128,8 +129,8 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
                     );
                   })()}
                 </>
-              )
-            )}
+              );
+            })}
           </Track>
         </Track>
       )}
@@ -155,8 +156,9 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
             isMultiline
             style={{ maxHeight: "30vh", overflow: "auto" }}
           >
-            {endpoint.chips.map((chip) =>
-              isObject(chip.data) ? (
+            {endpoint.chips.map((chip) => {
+              console.log("chip", chip);
+              return isObject(chip.data) ? (
                 <>
                   {(() => {
                     const typeColor = getTypeColor(chip.data);
@@ -202,8 +204,8 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
                     );
                   })()}
                 </>
-              )
-            )}
+              );
+            })}
           </Track>
         </Track>
       ))}

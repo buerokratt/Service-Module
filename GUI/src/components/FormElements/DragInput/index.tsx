@@ -31,6 +31,7 @@ const DragInput = ({ value, onChange, ...rest }: DragInputProps) => {
       onDrop={(e) => {
         e.preventDefault();
         const data = JSON.parse(e.dataTransfer.getData("text/plain")) as DragData;
+        console.log("onDrop", data);
         onChange({
           target: {
             name: "value",

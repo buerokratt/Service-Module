@@ -12,19 +12,23 @@ interface AssignElementProps {
 }
 
 const AssignElement: React.FC<AssignElementProps> = ({ element, onRemove, onChange }) => {
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    onChange({ ...element, [e.target.name]: e.target.value });
+  const handleKeyChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    onChange({ ...element, key: e.target.value });
+  };
+
+  const handleValueChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    onChange({ ...element, value: e.target.value });
   };
 
   return (
     <Track gap={16} isFlex>
       <Track gap={16} isFlex>
-        <FormInput value={element.key} name="key" onChange={handleChange} label="" hideLabel />
+        <FormInput value={element.key} name="key" onChange={handleKeyChange} label="" hideLabel />
         {/* todo resets to value after save */}
         <DragInput
           value={element.value}
           name="value"
-          onChange={handleChange}
+          onChange={handleValueChange}
           placeholder={t("serviceFlow.popup.dragElementHere")!}
         />
       </Track>
