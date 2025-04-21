@@ -8,6 +8,7 @@ import { getTypeColor } from "utils/object-util";
 interface DragInputProps {
   // todo do i need this prop? move here from outer?
   name: string;
+  id?: string;
   element?: Assign;
   onChange: (data: Assign) => void;
 }
@@ -17,7 +18,7 @@ interface DragInputState {
   text: string;
 }
 
-const DragInput = ({ onChange, element, name }: DragInputProps) => {
+const DragInput = ({ onChange, element, name, id }: DragInputProps) => {
   const [state, setState] = useState<DragInputState>({
     text: element?.key ?? "",
   });
@@ -33,10 +34,9 @@ const DragInput = ({ onChange, element, name }: DragInputProps) => {
       label=""
       className={styles.dragInput}
       onDrop={(e) => {
-        // todo prevent if same ID
         e.preventDefault();
         const data = JSON.parse(e.dataTransfer.getData("text/plain")) as Assign;
-        console.log("onDrop", data);
+        if (data.id === id) return;
         onChange(data);
         setState({ text: data.key });
       }}

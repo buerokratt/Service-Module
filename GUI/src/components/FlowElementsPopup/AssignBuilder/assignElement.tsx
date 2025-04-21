@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import { DragInput, FormInput, Icon, Track } from "components";
-import { MdDeleteOutline, MdEdit, MdMoveDown } from "react-icons/md";
+import { MdDeleteOutline, MdMoveDown } from "react-icons/md";
 import { Assign } from "../../../types/assign";
 import "../styles.scss";
-import { isObject, isObjectOrArray } from "utils/object-util";
+import { isObject } from "utils/object-util";
 
 interface AssignElementProps {
   element: Assign;
@@ -28,7 +28,12 @@ const AssignElement: React.FC<AssignElementProps> = ({ element, onRemove, onChan
       <FormInput value={element.key} name="key" onChange={handleKeyChange} label="" hideLabel />:
       <Track gap={4} isFlex style={{ flex: "1 0 50%", justifyContent: "flex-end" }}>
         {/* todo NAME*/}
-        <DragInput element={element.slots?.[0]} name="value" onChange={(value) => handleValueChange(value)} />
+        <DragInput
+          id={element.id}
+          element={element.slots?.[0]}
+          name="value"
+          onChange={(value) => handleValueChange(value)}
+        />
         {element.slots?.length && isObject(element.slots?.[0].data) ? (
           <button onClick={() => setIsSecondSlotOpen(!isSecondSlotOpen)} className="small-assign-button assign-blue">
             <Icon icon={<MdMoveDown />} />
