@@ -3,7 +3,8 @@ import { DragInput, FormInput, Icon, Track } from "components";
 import { MdDeleteOutline, MdEdit, MdMoveDown } from "react-icons/md";
 import { Assign } from "../../../types/assign";
 import "../styles.scss";
-import { isObject } from "utils/object-util";
+import { stringToTemplate, templateToString } from "utils/string-util";
+import { isArray, isObject } from "utils/object-util";
 
 interface AssignElementProps {
   element: Assign;
@@ -12,7 +13,8 @@ interface AssignElementProps {
 }
 
 const AssignElement: React.FC<AssignElementProps> = ({ element, onRemove, onChange }) => {
-  const [isSecondSlotOpen, setIsSecondSlotOpen] = useState(!!element.slots?.[1]);
+  const slots = element.slots ?? [];
+  const [isSecondSlotOpen, setIsSecondSlotOpen] = useState(!!slots[1]);
   const [isEditingManually, setIsEditingManually] = useState(false);
 
   const changeKey = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -25,27 +27,24 @@ const AssignElement: React.FC<AssignElementProps> = ({ element, onRemove, onChan
 
   // todo - handle VALUE
   const changeSecondSlot = (data: Assign) => {
+    const value = stringToTemplate(templateToString(element.value) + '["' + templateToString(data.value) + '"]');
     console.log("old value", element.value);
-    console.log("new value", data.value);
-    onChange({ ...element, value: data.value, slots: [element.slots?.[0]!, data] });
+    console.log("new value", value);
+    onChange({ ...element, value, slots: [slots[0]!, data] });
   };
 
   const resetSecondSlot = () => {
-    onChange({ ...element, slots: [element.slots?.[0]!] });
+    onChange({ ...element, slots: [slots[0]!] });
   };
 
   // todo tooltips
   return (
     <Track gap={16} isFlex>
       <FormInput value={element.key} name="key" onChange={changeKey} label="" hideLabel />:
-      <Track style={{ flex: "1 0 50%", justifyContent: "flex-end" }}>
+      <Track style={{ flex: "1 0 75%", justifyContent: "flex-end" }}>
         <Track gap={3} isFlex>
-          <DragInput
-            disallowedId={element.id}
-            element={element.slots?.[0]}
-            onChange={(value) => changeFirstSlot(value)}
-          />
-          {element.slots?.length && isObject(element.slots?.[0].data) ? (
+          <DragInput disallowedId={element.id} element={slots[0]} onChange={(value) => changeFirstSlot(value)} />
+          {slots.length && isObject(slots[0]?.data) && !isArray(slots[0]?.data) ? (
             <button
               onClick={() => {
                 setIsSecondSlotOpen(!isSecondSlotOpen);
@@ -57,11 +56,7 @@ const AssignElement: React.FC<AssignElementProps> = ({ element, onRemove, onChan
             </button>
           ) : null}
           {isSecondSlotOpen ? (
-            <DragInput
-              disallowedId={element.id}
-              element={element.slots?.[1]}
-              onChange={(value) => changeSecondSlot(value)}
-            />
+            <DragInput disallowedId={element.id} element={slots[1]} onChange={(value) => changeSecondSlot(value)} />
           ) : null}
         </Track>
         {/* todo manual edit */}

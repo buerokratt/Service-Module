@@ -8,7 +8,7 @@ import { Assign } from "../../types/assign";
 import { useTranslation } from "react-i18next";
 import { ObjectTree } from "./ObjectTree";
 import { stringToTemplate, templateToString } from "utils/string-util";
-import { getTypeColor, isObjectOrArray } from "utils/object-util";
+import { getTypeColor, isObject } from "utils/object-util";
 import Tooltip from "../Tooltip";
 
 type PreviousVariablesProps = {
@@ -84,7 +84,7 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
               // console.log("variable", variable);
               const typeColor = getTypeColor(variable.value);
 
-              return isObjectOrArray(variable.data) ? (
+              return isObject(variable.data) ? (
                 <Tooltip content={`${variable.value} : ${typeColor.type}`}>
                   <OutputElementBox
                     text={assignedObjectTree?.path === variable.value ? variable.key + " ▲" : variable.key + " ▼"}
@@ -121,7 +121,7 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
         </Track>
       )}
 
-      {isObjectOrArray(assignedObjectTree?.data) && (
+      {isObject(assignedObjectTree?.data) && (
         <ObjectTree
           data={assignedObjectTree.data}
           path={templateToString(assignedObjectTree.path)}
@@ -152,7 +152,7 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
                 data: chip.data,
               };
 
-              return isObjectOrArray(chip.data) ? (
+              return isObject(chip.data) ? (
                 <Tooltip content={`${chip.data} : ${typeColor.type}`}>
                   <OutputElementBox
                     text={endpointsObjectTree?.path === chip.value ? chip.name + " ▲" : chip.name + " ▼"}
@@ -188,7 +188,7 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
         </Track>
       ))}
 
-      {isObjectOrArray(endpointsObjectTree?.data) && (
+      {isObject(endpointsObjectTree?.data) && (
         <ObjectTree data={endpointsObjectTree.data} path={endpointsObjectTree.path} />
       )}
     </Track>

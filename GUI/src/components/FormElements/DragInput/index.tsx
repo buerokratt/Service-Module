@@ -17,14 +17,14 @@ const DragInput = ({ onChange, element, disallowedId }: DragInputProps) => {
   const [placeholder, setPlaceholder] = useState(t("serviceFlow.popup.dragElementHere")!);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const resetPlaceholder = () => {
-    inputRef.current?.classList.remove(styles.dragHover, styles.dragHoverDisabled);
-    setPlaceholder(t("serviceFlow.popup.dragElementHere")!);
-  };
-
   const getData = (e: React.DragEvent<HTMLInputElement>) => {
     e.preventDefault();
     return JSON.parse(e.dataTransfer.getData("text/plain")) as Assign;
+  };
+
+  const resetPlaceholder = () => {
+    inputRef.current?.classList.remove(styles.dragHover, styles.dragHoverDisabled);
+    setPlaceholder(t("serviceFlow.popup.dragElementHere")!);
   };
 
   return element ? (
@@ -53,8 +53,6 @@ const DragInput = ({ onChange, element, disallowedId }: DragInputProps) => {
       onFocus={(e) => e.target.blur()}
       onDragOver={(e) => {
         const data = getData(e);
-
-        console.log("onDragOver data", data);
 
         inputRef.current?.classList.add(disallowedId === data.id ? styles.dragHoverDisabled : styles.dragHover);
         if (disallowedId === data.id) setPlaceholder(t("serviceFlow.popup.assignToSelfNotAllowed")!);

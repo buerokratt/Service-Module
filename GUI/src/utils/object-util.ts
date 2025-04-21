@@ -1,5 +1,5 @@
 export const getValueByPath = (obj: unknown, path: string) => {
-  if (!isObjectOrArray(obj)) return obj;
+  if (!isObject(obj)) return obj;
 
   const keys = path.split(".");
   let result = obj;
@@ -25,7 +25,7 @@ export const getValueByPath = (obj: unknown, path: string) => {
       const indexStr = key.substring(key.indexOf("[") + 1, key.length - 1);
       const index = parseInt(indexStr);
 
-      if (isObjectOrArray(result) && propName in (result as Record<string, unknown>)) {
+      if (isObject(result) && propName in (result as Record<string, unknown>)) {
         const propValue = (result as Record<string, unknown>)[propName];
         if (Array.isArray(propValue) && !isNaN(index)) {
           result = propValue[index];
@@ -39,7 +39,7 @@ export const getValueByPath = (obj: unknown, path: string) => {
       const index = Number(key);
       if (!isNaN(index) && Array.isArray(result)) {
         result = result[index];
-      } else if (isObjectOrArray(result) && key in (result as Record<string, unknown>)) {
+      } else if (isObject(result) && key in (result as Record<string, unknown>)) {
         result = (result as Record<string, object>)[key];
       } else {
         return undefined;
@@ -50,12 +50,12 @@ export const getValueByPath = (obj: unknown, path: string) => {
   return result;
 };
 
-export const isObjectOrArray = (x: unknown) => {
+export const isObject = (x: unknown) => {
   return typeof x === "object" && x !== null;
 };
 
-export const isObject = (x: unknown) => {
-  return isObjectOrArray(x) && !Array.isArray(x);
+export const isArray = (x: unknown) => {
+  return Array.isArray(x);
 };
 
 export const getTypeColor = (value: any): { type: string; color: string } => {
