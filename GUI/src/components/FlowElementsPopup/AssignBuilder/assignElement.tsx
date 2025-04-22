@@ -36,15 +36,12 @@ const AssignElement: React.FC<AssignElementProps> = ({ element, onRemove, onChan
     onChange({ ...element, value: slots[0].value, slots: [slots[0]] });
   };
 
-  // todo - handle VALUE
   const changeSecondSlot = (data: Assign) => {
     if (!slots[0]) return;
 
-    const value = stringToTemplate(templateToString(element.value) + '["' + templateToString(data.value) + '"]');
-
-    console.log("old value", element.value);
-    console.log("new value", data.value);
-    console.log("PROCESSED value", value);
+    const elementValueContent = templateToString(element.value);
+    const dataValueContent = templateToString(data.value);
+    const value = stringToTemplate(`${elementValueContent}[${dataValueContent}]`);
 
     onChange({ ...element, value, slots: [slots[0], data] });
   };
@@ -63,6 +60,7 @@ const AssignElement: React.FC<AssignElementProps> = ({ element, onRemove, onChan
         ) : (
           <Track gap={3} isFlex>
             <DragInput disallowedId={element.id} element={slots[0]} onChange={(value) => changeFirstSlot(value)} />
+
             {slots.length && isObject(slots[0]?.data) && !isArray(slots[0]?.data) ? (
               <Tooltip
                 content={t(
@@ -85,6 +83,7 @@ const AssignElement: React.FC<AssignElementProps> = ({ element, onRemove, onChan
             ) : null}
           </Track>
         )}
+
         {!isEditingManually ? (
           <Tooltip content={t("serviceFlow.popup.assignManualEdit")}>
             <button onClick={enableManualEdit} className="small-assign-button assign-blue">
@@ -92,6 +91,7 @@ const AssignElement: React.FC<AssignElementProps> = ({ element, onRemove, onChan
             </button>
           </Tooltip>
         ) : null}
+
         <button onClick={() => onRemove(element.id)} className="small-assign-button assign-red">
           <Icon icon={<MdDeleteOutline />} />
         </button>
