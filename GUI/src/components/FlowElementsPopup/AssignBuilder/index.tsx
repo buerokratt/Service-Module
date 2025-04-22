@@ -6,12 +6,12 @@ import { useAssignBuilder } from "./useAssignBuilder";
 import "../styles.scss";
 import { Assign } from "../../../types/assign";
 
-export interface ElementGroupBuilderProps {
+interface AssignBuilderProps {
   onChange: (group: Assign[]) => void;
   seedGroup: Assign[];
 }
 
-const AssignBuilder: React.FC<ElementGroupBuilderProps> = ({ onChange, seedGroup }) => {
+const AssignBuilder: React.FC<AssignBuilderProps> = ({ onChange, seedGroup }) => {
   const { t } = useTranslation();
   const { elements, addElement, remove, changeElement } = useAssignBuilder({
     onChange,
