@@ -32,16 +32,19 @@ const AssignElement: React.FC<AssignElementProps> = ({ element, onRemove, onChan
 
   const resetSecondSlot = () => {
     if (!slots[0]) return;
+
     onChange({ ...element, value: slots[0].value, slots: [slots[0]] });
   };
 
   // todo - handle VALUE
   const changeSecondSlot = (data: Assign) => {
+    if (!slots[0]) return;
+
     const value = stringToTemplate(templateToString(element.value) + '["' + templateToString(data.value) + '"]');
     console.log("old value", element.value);
     console.log("new value", data.value);
     console.log("PROCESSED value", value);
-    onChange({ ...element, value, slots: [slots[0]!, data] });
+    onChange({ ...element, value, slots: [slots[0], data] });
   };
 
   const enableManualEdit = () => {
