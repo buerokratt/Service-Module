@@ -289,7 +289,10 @@
       "signType": "Märgi tüüp",
       "round": "Ümarda",
       "dragElementHere": "Lohista element siia",
-      "assignToSelfNotAllowed": "Määramine iseendale ei ole lubatud"
+      "assignToSelfNotAllowed": "Määramine iseendale ei ole lubatud",
+      "assignAsValue": "Määra teine element väärtuseks",
+      "removeValueAssignment": "Eemalda element, mis on määratud väärtuseks",
+      "assignManualEdit": "Muutke muutuja määramist käsitsi"
     },
     "previousVariables": {
       "assignElements": "Määra elemendid",

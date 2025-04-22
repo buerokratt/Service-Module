@@ -288,8 +288,11 @@
       "remove": "Remove",
       "signType": "Sign Type",
       "round": "Round",
-      "dragElementHere": "Drag element here",
-      "assignToSelfNotAllowed": "Assign to self not allowed"
+      "dragElementHere": "Drag an element here",
+      "assignToSelfNotAllowed": "Assign to self not allowed",
+      "assignAsValue": "Assign another element to use as value",
+      "removeValueAssignment": "Remove element assigned as value",
+      "assignManualEdit": "Manually edit variable assignment"
     },
     "previousVariables": {
       "assignElements": "Assign Elements",
