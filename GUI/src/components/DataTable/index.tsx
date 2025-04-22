@@ -196,7 +196,7 @@ const DataTable: FC<DataTableProps> = ({
               <button className="previous" onClick={() => table.previousPage()} disabled={!table.getCanPreviousPage()}>
                 <MdOutlineWest />
               </button>
-              <nav role="navigation" aria-label={t("global.paginationNavigation") || ""}>
+              <nav role="navigation" aria-label={t("global.paginationNavigation") ?? ""}>
                 <ul className="links">
                   {[...Array(table.getPageCount())].map((_, index) => (
                     <li

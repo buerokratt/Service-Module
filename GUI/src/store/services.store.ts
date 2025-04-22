@@ -100,7 +100,7 @@ const useServiceListStore = create<ServiceStoreState>((set, get, store) => ({
             serviceId: item.serviceId,
             usedCount: 0,
             totalPages: item.totalPages,
-            linkedIntent: triggers.find((e: Trigger) => e.service === item.serviceId)?.intent || "",
+            linkedIntent: triggers.find((e: Trigger) => e.service === item.serviceId)?.intent ?? "",
           } as Service)
       ) ?? [];
 
@@ -130,7 +130,7 @@ const useServiceListStore = create<ServiceStoreState>((set, get, store) => ({
             serviceId: item.serviceId,
             totalPages: item.totalPages,
             usedCount: 0,
-            linkedIntent: triggers.find((e: Trigger) => e.service === item.serviceId)?.intent || "",
+            linkedIntent: triggers.find((e: Trigger) => e.service === item.serviceId)?.intent ?? "",
           } as Service)
       ) ?? [];
 
