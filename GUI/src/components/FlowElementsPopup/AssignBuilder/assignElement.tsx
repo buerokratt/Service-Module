@@ -41,9 +41,11 @@ const AssignElement: React.FC<AssignElementProps> = ({ element, onRemove, onChan
     if (!slots[0]) return;
 
     const value = stringToTemplate(templateToString(element.value) + '["' + templateToString(data.value) + '"]');
+
     console.log("old value", element.value);
     console.log("new value", data.value);
     console.log("PROCESSED value", value);
+
     onChange({ ...element, value, slots: [slots[0], data] });
   };
 
