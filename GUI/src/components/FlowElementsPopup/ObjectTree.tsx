@@ -35,6 +35,8 @@ export const ObjectTree: FC<ObjectTreeProps> = ({ path, data, style }) => {
   const root = pathArray.pop()!;
   const [roundedValues, setRoundedValues] = useState<Map<string, number>>(new Map());
 
+  // Memoizes the component functions to prevent them from being recreated on each render
+  // https://stackoverflow.com/a/72589674/7405507
   const labelRenderer = useCallback(
     (keyPath: KeyPath, nodeType: string) => (
       <ObjectTreeLabel
@@ -46,7 +48,6 @@ export const ObjectTree: FC<ObjectTreeProps> = ({ path, data, style }) => {
     ),
     [pathArray, root, roundedValues]
   );
-
   const valueRenderer = useCallback(
     (rawValue: unknown, _: unknown, ...keyPath: KeyPath) => (
       <ObjectTreeValue
