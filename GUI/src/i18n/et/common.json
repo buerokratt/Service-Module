@@ -289,10 +289,16 @@
       "addGroup": "+ Grupp",
       "remove": "Eemalda",
       "signType": "Märgi tüüp",
-      "round": "Ümarda"
+      "round": "Ümarda",
+      "dragElementHere": "Lohista element siia",
+      "assignToSelfNotAllowed": "Määramine iseendale ei ole lubatud",
+      "assignAsValue": "Määra teine element väärtuseks",
+      "removeValueAssignment": "Eemalda element, mis on määratud väärtuseks",
+      "assignManualEdit": "Muutke muutuja määramist käsitsi"
     },
     "previousVariables": {
-      "assignElements": "Määra elemendid"
+      "assignElements": "Määra elemendid",
+      "noName": "<Nimeta>"
     },
     "flow": "Teenusvoog",
     "placeholderNode": "Lohista järgmine samm voogu",

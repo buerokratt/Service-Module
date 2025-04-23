@@ -289,10 +289,16 @@
       "addGroup": "+ Group",
       "remove": "Remove",
       "signType": "Sign Type",
-      "round": "Round"
+      "round": "Round",
+      "dragElementHere": "Drag an element here",
+      "assignToSelfNotAllowed": "Assign to self not allowed",
+      "assignAsValue": "Assign another element to use as value",
+      "removeValueAssignment": "Remove element assigned as value",
+      "assignManualEdit": "Manually edit variable assignment"
     },
     "previousVariables": {
-      "assignElements": "Assign Elements"
+      "assignElements": "Assign Elements",
+      "noName": "<No name>"
     },
     "flow": "Service flow",
     "placeholderNode": "Drag the next step into the flow",
