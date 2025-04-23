@@ -1,9 +1,7 @@
 import { CSSProperties, FC, useState } from "react";
-import { JSONTree, KeyPath } from "react-json-tree";
-import "./styles.scss";
-import { useTranslation } from "react-i18next";
+import { JSONTree } from "react-json-tree";
 import { ObjectTreeLabel } from "./ObjectTreeLabel";
-import { getKeyPathString } from "utils/object-util";
+import { ObjectTreeValue } from "./ObjectTreeValue";
 
 // Some theme colors are inverted with invertTheme below to get the light theme
 const theme = {
@@ -25,10 +23,6 @@ const theme = {
   base0F: "#e87500", // orange-11 (dark orange - deprecated)
 };
 
-const round = (n: number) => {
-  return Math.round((n + Number.EPSILON) * 100) / 100;
-};
-
 type ObjectTreeProps = {
   data: object;
   path: string | number;
@@ -36,25 +30,10 @@ type ObjectTreeProps = {
 };
 
 export const ObjectTree: FC<ObjectTreeProps> = ({ path, data, style }) => {
-  const { t } = useTranslation();
   // Consider using global state if this component gets more complex
   const pathArray = String(path).split(".");
   const root = pathArray.pop()!;
   const [roundedValues, setRoundedValues] = useState<Map<string, number>>(new Map());
-
-  const toggleRounding = (keyPath: KeyPath, value: number, roundValue = true) => {
-    const key = getKeyPathString(keyPath);
-
-    setRoundedValues((prev) => {
-      const newMap = new Map(prev);
-      if (roundValue) {
-        newMap.set(key, round(value));
-      } else {
-        newMap.delete(key);
-      }
-      return newMap;
-    });
-  };
 
   return (
     <div style={{ padding: "0px 15px 5px", ...style }}>
@@ -71,23 +50,14 @@ export const ObjectTree: FC<ObjectTreeProps> = ({ path, data, style }) => {
             roundedValues={roundedValues}
           />
         )}
-        valueRenderer={(raw, _, ...keyPath) => {
-          const key = getKeyPathString(keyPath);
-
-          return typeof raw === "number" && !Number.isInteger(raw) ? (
-            <span className="object-tree-checkbox">
-              <input
-                id={key}
-                type="checkbox"
-                onClick={(e) => toggleRounding(keyPath, raw, (e.target as HTMLInputElement).checked)}
-              />
-              <label htmlFor={key}>{t("serviceFlow.popup.round")}</label>
-              <span>{roundedValues.has(key) ? round(raw) : raw}</span>
-            </span>
-          ) : (
-            <span>{String(raw)}</span>
-          );
-        }}
+        valueRenderer={(raw, _, ...keyPath) => (
+          <ObjectTreeValue
+            rawValue={raw}
+            keyPath={keyPath}
+            roundedValues={roundedValues}
+            setRoundedValues={setRoundedValues}
+          />
+        )}
       />
     </div>
   );
