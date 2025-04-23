@@ -1,40 +1,41 @@
-WITH connected_intents AS
-         (SELECT intent,
-                 service,
-                 service_name,
-                 status,
-                 created
-          FROM service_trigger
-          WHERE (intent,
-                 service,
-                 service_name,
-                 created) IN
-                (SELECT intent,
-                        service,
-                        service_name,
-                        max(created)
-                 FROM service_trigger
-                 GROUP BY intent,
-                          service,
-                          service_name)
-            AND status in ('pending',
-                           'approved'))
+WITH connected_intents AS (
+    SELECT intent,
+           service,
+           service_name,
+           status,
+           created
+    FROM service_trigger
+    WHERE (intent,
+           service,
+           service_name,
+           created) IN (
+           SELECT intent,
+                  service,
+                  service_name,
+                  max(created)
+           FROM service_trigger
+           GROUP BY intent,
+                    service,
+                    service_name)
+      AND status in ('pending', 'approved')
+),
+latest_intent_status AS (
+    SELECT intent,
+           isforservice,
+           created,
+           ROW_NUMBER() OVER (PARTITION BY intent ORDER BY created DESC) AS rn
+    FROM intent
+)
 SELECT intent,
        CEIL(COUNT(*) OVER() / :page_size::DECIMAL) AS total_pages,
-       isforservice,
        created
-FROM (
-         SELECT intent,
-                isforservice,
-                MAX(created) AS created
-         FROM intent
-         WHERE isforservice = true
-         GROUP BY intent, isforservice
-     ) AS latest_intents
-WHERE intent NOT IN (
-    SELECT intent
-    FROM connected_intents
-)
+FROM latest_intent_status
+WHERE rn = 1 
+  AND isforservice = true
+  AND intent NOT IN (
+      SELECT intent
+      FROM connected_intents
+  )
 ORDER BY
     CASE WHEN :sorting = 'intent asc' THEN intent END ASC,
     CASE WHEN :sorting = 'intent desc' THEN intent END DESC

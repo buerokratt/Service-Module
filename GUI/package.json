@@ -4,7 +4,7 @@
   "type": "module",
   "private": true,
   "dependencies": {
-    "@buerokratt-ria/header": "^0.1.27",
+    "@buerokratt-ria/header": "^0.1.32",
     "@buerokratt-ria/menu": "^0.2.6",
     "@buerokratt-ria/styles": "^0.0.1",
     "@fontsource/roboto": "^4.5.8",
@@ -17,7 +17,6 @@
     "@tanstack/match-sorter-utils": "^8.7.6",
     "@tanstack/react-query": "^4.23.0",
     "@tanstack/react-table": "^8.7.9",
-    "@vitejs/plugin-react": "^4.0.4",
     "axios": "^1.2.2",
     "axios-mock-adapter": "^1.21.5",
     "clsx": "^1.2.1",
@@ -55,9 +54,6 @@
     "to-json-schema": "^0.2.5",
     "typescript": "^4.9.4",
     "uuid": "^9.0.0",
-    "vite": "^4.4.9",
-    "vite-plugin-svgr": "^3.2.0",
-    "vite-tsconfig-paths": "^4.2.0",
     "yup": "^1.0.0"
   },
   "scripts": {
@@ -84,12 +80,11 @@
     "@types/react-dom": "^18.2.0",
     "@types/to-json-schema": "^0.2.1",
     "@types/uuid": "^9.0.1",
-    "@vitejs/plugin-react": "^3.0.0",
-    "react-scripts": "^5.0.1",
-    "vite": "^4.0.0",
-    "vite-plugin-env-compatible": "^1.1.1",
-    "vite-plugin-svgr": "^2.4.0",
-    "vite-tsconfig-paths": "^4.0.3"
+    "@vitejs/plugin-react": "^4.0.4",
+    "vite": "^4.4.9",
+    "vite-plugin-svgr": "^3.2.0",
+    "vite-tsconfig-paths": "^4.2.0",
+    "vite-plugin-env-compatible": "^1.1.1"
   },
   "msw": {
     "workerDirectory": "public"

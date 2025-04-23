@@ -51,7 +51,8 @@
     "close": "Sulge",
     "common": "Üldteenus",
     "errorMessage": "Teenusele puudub ligipääs. Proovi hiljem uuesti.",
-    "none": "Puudub"
+    "none": "Puudub",
+    "statusClarification": "Staatuse täpsustus"
   },
   "menu": {
     "overview": "Ülevaade",
@@ -115,7 +116,8 @@
       "newValidationMessage": "Uus teade kinnitamiseks",
       "useAutocorrect": "Teksti autokorrektor",
       "required": "Nõutud",
-      "invalidemail": "Kehtetu e-posti aadress"
+      "invalidemail": "Kehtetu e-posti aadress",
+      "statusCommentUpdated": "Staatuse täpsustus uuendatud"
     }
   },
   "overview": {
@@ -287,10 +289,16 @@
       "addGroup": "+ Grupp",
       "remove": "Eemalda",
       "signType": "Märgi tüüp",
-      "round": "Ümarda"
+      "round": "Ümarda",
+      "dragElementHere": "Lohista element siia",
+      "assignToSelfNotAllowed": "Määramine iseendale ei ole lubatud",
+      "assignAsValue": "Määra teine element väärtuseks",
+      "removeValueAssignment": "Eemalda element, mis on määratud väärtuseks",
+      "assignManualEdit": "Muutke muutuja määramist käsitsi"
     },
     "previousVariables": {
-      "assignElements": "Määra elemendid"
+      "assignElements": "Määra elemendid",
+      "noName": "<Nimeta>"
     },
     "flow": "Teenusvoog",
     "placeholderNode": "Lohista järgmine samm voogu",

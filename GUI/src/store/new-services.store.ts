@@ -1,5 +1,4 @@
 import axios from "axios";
-import { Assign } from "components/FlowElementsPopup/AssignBuilder/assign-types";
 import { GroupOrRule } from "components/FlowElementsPopup/RuleBuilder/types";
 import i18next from "i18next";
 import { NavigateFunction } from "react-router-dom";
@@ -24,6 +23,7 @@ import { v4 as uuid } from "uuid";
 import { create } from "zustand";
 import useTestServiceStore from "./test-services.store";
 import useToastStore from "./toasts.store";
+import { Assign } from "types/assign";
 
 interface ServiceStoreState {
   endpoints: EndpointData[];

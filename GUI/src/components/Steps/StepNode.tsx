@@ -5,7 +5,7 @@ import { ExclamationBadge, CheckBadge, Track } from "../";
 import { StepType } from "../../types";
 import useServiceStore from "store/new-services.store";
 import { Group, Rule } from "components/FlowElementsPopup/RuleBuilder/types";
-import { Assign } from "components/FlowElementsPopup/AssignBuilder/assign-types";
+import { Assign } from "types/assign";
 
 type NodeDataProps = {
   data: {
@@ -65,7 +65,7 @@ const StepNode: FC<NodeDataProps> = ({ data }) => {
 
       const invalidRulesExist = hasInvalidRules(data.rules?.children || []);
       return data.rules?.children === undefined || invalidRulesExist || data.rules?.children.length === 0;
-    };
+    }
     if (data.stepType === StepType.UserDefined) return;
     if (data.stepType === StepType.OpenWebpage) return !data.link || !data.linkText;
     if (data.stepType === StepType.FileGenerate) return !data.fileName || !data.fileContent;
@@ -80,7 +80,7 @@ const StepNode: FC<NodeDataProps> = ({ data }) => {
 
       const invalidElementsExist = hasInvalidElements(data.assignElements || []);
       return data?.assignElements === undefined || invalidElementsExist || data?.assignElements.length === 0;
-    };
+    }
 
     return !(data.readonly || !!data.message?.length);
   };
@@ -177,15 +177,13 @@ const StepNode: FC<NodeDataProps> = ({ data }) => {
 const TestStatue = ({
   isTestedAndPassed,
   isStepInvalid,
-}:{
-  isTestedAndPassed: boolean | null,
-  isStepInvalid: () => boolean,
+}: {
+  isTestedAndPassed: boolean | null;
+  isStepInvalid: () => boolean;
 }) => {
-  if(isTestedAndPassed) 
-    return <CheckBadge />
-  if(isStepInvalid())
-    return <ExclamationBadge />
-  return <ExclamationBadge color="purple" />
-}
+  if (isTestedAndPassed) return <CheckBadge />;
+  if (isStepInvalid()) return <ExclamationBadge />;
+  return <ExclamationBadge color="purple" />;
+};
 
 export default memo(StepNode);
