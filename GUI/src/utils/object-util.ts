@@ -1,54 +1,61 @@
-export const getValueByPath = (obj: unknown, path: string) => {
+export const getValueByPath = (obj: unknown, path: string): unknown => {
   if (!isObject(obj)) return obj;
 
   const keys = path.split(".");
-  let result = obj;
+  let result: unknown = obj;
 
   for (let key of keys) {
     if (result === null || result === undefined) {
       return undefined;
     }
 
-    // Handle array notation properly, needed for backwards compatibility
-    const arrayMatch = /^\[(\d+)\]$/.exec(key);
-    if (arrayMatch) {
-      // Extract the index from [n] format
-      const index = parseInt(arrayMatch[1]);
-      if (Array.isArray(result)) {
-        result = result[index];
-      } else {
-        return undefined;
-      }
-    }
-    // Handle mixed notation like "items[0]"
-    else if (key.includes("[") && key.endsWith("]")) {
-      const propName = key.substring(0, key.indexOf("["));
-      const indexStr = key.substring(key.indexOf("[") + 1, key.length - 1);
-      const index = parseInt(indexStr);
+    const nextResult =
+      handleArrayNotation(result, key) ?? handleMixedNotation(result, key) ?? handleSimpleNotation(result, key);
 
-      if (isObject(result) && propName in (result as Record<string, unknown>)) {
-        const propValue = (result as Record<string, unknown>)[propName];
-        if (Array.isArray(propValue) && !isNaN(index)) {
-          result = propValue[index];
-        } else {
-          return undefined;
-        }
-      } else {
-        return undefined;
-      }
-    } else {
-      const index = Number(key);
-      if (!isNaN(index) && Array.isArray(result)) {
-        result = result[index];
-      } else if (isObject(result) && key in (result as Record<string, unknown>)) {
-        result = (result as Record<string, object>)[key];
-      } else {
-        return undefined;
-      }
+    if (nextResult === undefined) {
+      return undefined;
     }
+
+    result = nextResult;
   }
 
   return result;
+};
+
+const handleArrayNotation = (result: unknown, key: string): unknown | undefined => {
+  const arrayMatch = /^\[(\d+)\]$/.exec(key);
+  if (!arrayMatch) return undefined;
+
+  const index = parseInt(arrayMatch[1]);
+  return Array.isArray(result) ? result[index] : undefined;
+};
+
+const handleMixedNotation = (result: unknown, key: string): unknown | undefined => {
+  if (!(key.includes("[") && key.endsWith("]"))) return undefined;
+
+  const propName = key.substring(0, key.indexOf("["));
+  const indexStr = key.substring(key.indexOf("[") + 1, key.length - 1);
+  const index = parseInt(indexStr);
+
+  if (!isObject(result) || !(propName in (result as Record<string, unknown>))) {
+    return undefined;
+  }
+
+  const propValue = (result as Record<string, unknown>)[propName];
+  return Array.isArray(propValue) && !isNaN(index) ? propValue[index] : undefined;
+};
+
+const handleSimpleNotation = (result: unknown, key: string): unknown | undefined => {
+  const index = Number(key);
+  if (!isNaN(index) && Array.isArray(result)) {
+    return result[index];
+  }
+
+  if (isObject(result) && key in (result as Record<string, unknown>)) {
+    return (result as Record<string, object>)[key];
+  }
+
+  return undefined;
 };
 
 export const isObject = (x: unknown) => {
