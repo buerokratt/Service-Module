@@ -29,7 +29,7 @@ const buildKeyPathString = (key: string, pathArray: string[]) => {
   let path = "";
   if (remainingPath.length > 0) {
     // Start with the root object name
-    path = remainingPath.reverse()[0];
+    path = remainingPath.toReversed()[0];
 
     // Add remaining path elements with bracket notation
     for (let i = 1; i < pathArray.length - 1; i++) {

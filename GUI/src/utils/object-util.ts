@@ -24,7 +24,7 @@ export const getValueByPath = (obj: unknown, path: string): unknown => {
   return result;
 };
 
-const handleArrayNotation = (result: unknown, key: string): unknown | undefined => {
+const handleArrayNotation = (result: unknown, key: string): unknown => {
   const arrayMatch = /^\[(\d+)\]$/.exec(key);
   if (!arrayMatch) return undefined;
 
@@ -32,7 +32,7 @@ const handleArrayNotation = (result: unknown, key: string): unknown | undefined 
   return Array.isArray(result) ? result[index] : undefined;
 };
 
-const handleMixedNotation = (result: unknown, key: string): unknown | undefined => {
+const handleMixedNotation = (result: unknown, key: string): unknown => {
   if (!(key.includes("[") && key.endsWith("]"))) return undefined;
 
   const propName = key.substring(0, key.indexOf("["));
@@ -47,7 +47,7 @@ const handleMixedNotation = (result: unknown, key: string): unknown | undefined 
   return Array.isArray(propValue) && !isNaN(index) ? propValue[index] : undefined;
 };
 
-const handleSimpleNotation = (result: unknown, key: string): unknown | undefined => {
+const handleSimpleNotation = (result: unknown, key: string): unknown => {
   const index = Number(key);
   if (!isNaN(index) && Array.isArray(result)) {
     return result[index];
