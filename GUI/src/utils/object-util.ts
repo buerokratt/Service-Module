@@ -1,3 +1,5 @@
+import { KeyPath } from "react-json-tree";
+
 export const getValueByPath = (obj: unknown, path: string): unknown => {
   if (!isObject(obj)) return obj;
 
@@ -83,4 +85,8 @@ export const getTypeColor = (value: any): { type: string; color: string } => {
     default:
       return { type: "unknown", color: "#FFFFFF" };
   }
+};
+
+export const getKeyPathString = (keyPath: KeyPath) => {
+  return keyPath.toReversed().join('"]["');
 };

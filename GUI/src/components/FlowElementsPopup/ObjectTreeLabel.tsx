@@ -1,33 +1,26 @@
 import { FC } from "react";
 import { KeyPath } from "react-json-tree";
 import OutputElementBox from "components/OutputElementBox";
-import { getTypeColor } from "../../utils/object-util";
+import { getKeyPathString, getTypeColor } from "../../utils/object-util";
 import { stringToTemplate } from "utils/string-util";
-
-// Re-export this for use in ObjectTree
-// todo to common util
-export const getKeyPathString = (keyPath: KeyPath) => {
-  return keyPath.toReversed().join('"]["');
-};
 
 const escapeKey = (key: string) => {
   return key.replace(/"/g, '\\"');
 };
 
-const parseValue = (nodeType: string): number | string | unknown[] | undefined | {} => {
-  if (nodeType === "Number") {
-    return 0;
+const parseNodeType = (nodeType: string): number | string | unknown[] | undefined | {} => {
+  switch (nodeType) {
+    case "Number":
+      return 0;
+    case "String":
+      return "";
+    case "Array":
+      return [];
+    case "Object":
+      return {};
+    default:
+      return undefined;
   }
-  if (nodeType === "String") {
-    return "";
-  }
-  if (nodeType === "Array") {
-    return [];
-  }
-  if (nodeType === "Object") {
-    return {};
-  }
-  return undefined;
 };
 
 interface ObjectTreeLabelProps {
@@ -73,14 +66,14 @@ export const ObjectTreeLabel: FC<ObjectTreeLabelProps> = ({ keyPath, nodeType, p
   };
 
   const key = String(keyPath[0]);
-  const typeColor = getTypeColor(parseValue(nodeType));
+  const typeColor = getTypeColor(parseNodeType(nodeType));
 
   return (
     <OutputElementBox
       text={`${key}:`}
       value={buildKeyPathString(keyPath)}
       useValue
-      dragData={{ key, value: buildKeyPathString(keyPath), data: parseValue(nodeType), id: "" }}
+      dragData={{ key, value: buildKeyPathString(keyPath), data: parseNodeType(nodeType), id: "" }}
       className="object-tree-chip"
       borderColor={typeColor.color}
     />

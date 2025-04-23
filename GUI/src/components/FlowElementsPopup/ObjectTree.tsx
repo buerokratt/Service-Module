@@ -2,7 +2,8 @@ import { CSSProperties, FC, useState } from "react";
 import { JSONTree, KeyPath } from "react-json-tree";
 import "./styles.scss";
 import { useTranslation } from "react-i18next";
-import { ObjectTreeLabel, getKeyPathString } from "./ObjectTreeLabel";
+import { ObjectTreeLabel } from "./ObjectTreeLabel";
+import { getKeyPathString } from "utils/object-util";
 
 // Some theme colors are inverted with invertTheme below to get the light theme
 const theme = {
