@@ -1,11 +1,11 @@
 import { Dispatch, FC, SetStateAction } from "react";
+import { Handle, NodeProps, Position } from "reactflow";
 import { useTranslation } from "react-i18next";
 import { MdDeleteOutline, MdOutlineEdit, MdOutlineRemoveRedEye } from "react-icons/md";
-import { Handle, NodeProps, Position } from "reactflow";
+import StepNode from "./StepNode";
 import { Box, Button, Icon, Track } from "../";
 import { StepType } from "../../types";
 import "./Node.scss";
-import StepNode from "./StepNode";
 
 type NodeDataProps = {
   data: {
