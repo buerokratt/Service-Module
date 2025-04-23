@@ -81,7 +81,6 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
             style={{ maxHeight: "30vh", overflow: "auto" }}
           >
             {[...assignedVariables, ...newAssignElements].map((variable) => {
-              // console.log("variable", variable);
               const typeColor = getTypeColor(variable.value);
 
               return isObject(variable.data) ? (
@@ -109,7 +108,7 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
                   <OutputElementBox
                     dragData={variable.key ? variable : undefined}
                     style={{ cursor: variable.key ? "grab" : "default" }}
-                    text={variable.key || t("serviceFlow.previousVariables.noName")}
+                    text={variable.key.length > 0 ? variable.key : t("serviceFlow.previousVariables.noName")}
                     value={variable.value}
                     useValue
                     borderColor={typeColor.color}
@@ -143,7 +142,6 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
             style={{ maxHeight: "30vh", overflow: "auto" }}
           >
             {endpoint.chips.map((chip) => {
-              // console.log("chip", chip);
               const typeColor = getTypeColor(chip.data);
               const dragData: Assign = {
                 id: "",

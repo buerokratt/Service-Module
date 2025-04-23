@@ -10,9 +10,10 @@ export const getValueByPath = (obj: unknown, path: string) => {
     }
 
     // Handle array notation properly, needed for backwards compatibility
-    if (key.match(/^\[(\d+)\]$/)) {
+    const arrayMatch = /^\[(\d+)\]$/.exec(key);
+    if (arrayMatch) {
       // Extract the index from [n] format
-      const index = parseInt(key.substring(1, key.length - 1));
+      const index = parseInt(arrayMatch[1]);
       if (Array.isArray(result)) {
         result = result[index];
       } else {

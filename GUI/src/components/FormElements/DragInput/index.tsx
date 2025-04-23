@@ -14,7 +14,7 @@ interface DragInputProps {
 
 const DragInput = ({ onChange, element, disallowedId }: DragInputProps) => {
   const [text, setText] = useState(element?.key ?? "");
-  const [placeholder, setPlaceholder] = useState(t("serviceFlow.popup.dragElementHere")!);
+  const [placeholder, setPlaceholder] = useState(t("serviceFlow.popup.dragElementHere"));
   const inputRef = useRef<HTMLInputElement>(null);
 
   const getData = (e: React.DragEvent<HTMLInputElement>) => {
@@ -24,7 +24,7 @@ const DragInput = ({ onChange, element, disallowedId }: DragInputProps) => {
 
   const resetPlaceholder = () => {
     inputRef.current?.classList.remove(styles.dragHover, styles.dragHoverDisabled);
-    setPlaceholder(t("serviceFlow.popup.dragElementHere")!);
+    setPlaceholder(t("serviceFlow.popup.dragElementHere"));
   };
 
   return element ? (
@@ -35,7 +35,7 @@ const DragInput = ({ onChange, element, disallowedId }: DragInputProps) => {
     <FormInput
       ref={inputRef}
       name=""
-      placeholder={placeholder}
+      placeholder={placeholder ?? ""}
       label=""
       className={styles.dragInput}
       onDrop={(e) => {
@@ -55,7 +55,7 @@ const DragInput = ({ onChange, element, disallowedId }: DragInputProps) => {
         const data = getData(e);
 
         inputRef.current?.classList.add(disallowedId === data.id ? styles.dragHoverDisabled : styles.dragHover);
-        if (disallowedId === data.id) setPlaceholder(t("serviceFlow.popup.assignToSelfNotAllowed")!);
+        if (disallowedId === data.id) setPlaceholder(t("serviceFlow.popup.assignToSelfNotAllowed"));
       }}
       onDragLeave={resetPlaceholder}
     />
