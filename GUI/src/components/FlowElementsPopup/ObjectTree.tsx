@@ -52,8 +52,8 @@ export const ObjectTree: FC<ObjectTreeProps> = ({ path, data, style }) => {
         )}
         valueRenderer={(raw, _, ...keyPath) => (
           <ObjectTreeValue
-            rawValue={raw}
             keyPath={keyPath}
+            rawValue={raw}
             roundedValues={roundedValues}
             setRoundedValues={setRoundedValues}
           />
