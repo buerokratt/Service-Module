@@ -40,7 +40,9 @@ const ApiEndpoint: FC<ApiEndpointProps> = ({ step }) => {
 
   const { deleteEndpoint } = useServiceStore();
 
-  const canDeleteEndpoint = async (endpoint: EndpointData) => {
+  const canDeleteEndpoint = async (endpoint: EndpointData | undefined) => {
+    if (!endpoint) return;
+
     if (endpoint.isCommon) {
       setIsGettingRelatedServices(true);
 
@@ -57,7 +59,9 @@ const ApiEndpoint: FC<ApiEndpointProps> = ({ step }) => {
     }
   };
 
-  const deleteSelectedEndpoint = async (endpoint: EndpointData) => {
+  const deleteSelectedEndpoint = async (endpoint: EndpointData | undefined) => {
+    if (!endpoint) return;
+
     try {
       deleteEndpoint(endpoint.id);
 
@@ -68,7 +72,8 @@ const ApiEndpoint: FC<ApiEndpointProps> = ({ step }) => {
 
       saveFlowClick({ supressToast: true });
       useToastStore.getState().success({ title: t("serviceFlow.apiElements.deleteSuccess") });
-    } catch (_) {
+    } catch (error) {
+      console.error(`Error deleting API endpoint: ${error}`);
       useToastStore.getState().error({ title: t("serviceFlow.apiElements.deleteError") });
     }
 
@@ -80,7 +85,7 @@ const ApiEndpoint: FC<ApiEndpointProps> = ({ step }) => {
       {showDeletePopup && (
         <Popup title={t("serviceFlow.apiElements.deleteConfirmation")} onClose={() => setShowDeletePopup(false)}>
           <p className={styles.popupText}>{t("serviceFlow.apiElements.deleteConfirmationMessage")}</p>
-          <Button appearance="error" onClick={() => deleteSelectedEndpoint(step.data!)}>
+          <Button appearance="error" onClick={() => deleteSelectedEndpoint(step.data)}>
             {t("serviceFlow.apiElements.delete")}
           </Button>
           <Button appearance="primary" style={{ marginLeft: 10 }} onClick={() => setShowDeletePopup(false)}>
@@ -118,7 +123,7 @@ const ApiEndpoint: FC<ApiEndpointProps> = ({ step }) => {
           {isGettingRelatedServices ? (
             <div className={clsx("loader", styles.loader)} />
           ) : (
-            <Button className={styles.deleteButton} appearance="text" onClick={() => canDeleteEndpoint(step.data!)}>
+            <Button className={styles.deleteButton} appearance="text" onClick={() => canDeleteEndpoint(step.data)}>
               <Icon icon={<MdDeleteOutline />} size="medium" />
               {t("serviceFlow.apiElements.delete")}
             </Button>
