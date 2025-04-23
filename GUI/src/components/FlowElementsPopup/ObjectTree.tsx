@@ -1,5 +1,5 @@
-import { CSSProperties, FC, useState } from "react";
-import { JSONTree } from "react-json-tree";
+import { CSSProperties, FC, useState, useCallback } from "react";
+import { JSONTree, KeyPath } from "react-json-tree";
 import { ObjectTreeLabel } from "./ObjectTreeLabel";
 import { ObjectTreeValue } from "./ObjectTreeValue";
 
@@ -35,6 +35,30 @@ export const ObjectTree: FC<ObjectTreeProps> = ({ path, data, style }) => {
   const root = pathArray.pop()!;
   const [roundedValues, setRoundedValues] = useState<Map<string, number>>(new Map());
 
+  const labelRenderer = useCallback(
+    (keyPath: KeyPath, nodeType: string) => (
+      <ObjectTreeLabel
+        keyPath={keyPath}
+        nodeType={nodeType}
+        pathArray={[...pathArray, root]}
+        roundedValues={roundedValues}
+      />
+    ),
+    [pathArray, root, roundedValues]
+  );
+
+  const valueRenderer = useCallback(
+    (rawValue: unknown, _: unknown, ...keyPath: KeyPath) => (
+      <ObjectTreeValue
+        keyPath={keyPath}
+        rawValue={rawValue}
+        roundedValues={roundedValues}
+        setRoundedValues={setRoundedValues}
+      />
+    ),
+    [roundedValues, setRoundedValues]
+  );
+
   return (
     <div style={{ padding: "0px 15px 5px", ...style }}>
       <JSONTree
@@ -42,22 +66,8 @@ export const ObjectTree: FC<ObjectTreeProps> = ({ path, data, style }) => {
         theme={theme}
         invertTheme={true}
         keyPath={[String(root)]}
-        labelRenderer={(keyPath, nodeType) => (
-          <ObjectTreeLabel
-            keyPath={keyPath}
-            nodeType={nodeType}
-            pathArray={[...pathArray, root]}
-            roundedValues={roundedValues}
-          />
-        )}
-        valueRenderer={(raw, _, ...keyPath) => (
-          <ObjectTreeValue
-            keyPath={keyPath}
-            rawValue={raw}
-            roundedValues={roundedValues}
-            setRoundedValues={setRoundedValues}
-          />
-        )}
+        labelRenderer={labelRenderer}
+        valueRenderer={valueRenderer}
       />
     </div>
   );
