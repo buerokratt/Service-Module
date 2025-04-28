@@ -10,6 +10,7 @@ import { ObjectTree } from "./ObjectTree";
 import { stringToTemplate, templateToString } from "utils/string-util";
 import { getTypeColor, isObject } from "utils/object-util";
 import Tooltip from "../Tooltip";
+import { v4 } from "uuid";
 
 type PreviousVariablesProps = {
   readonly nodeId: string;
@@ -155,7 +156,7 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
             {endpoint.chips.map((chip) => {
               const typeColor = getTypeColor(chip.data);
               const dragData: Assign = {
-                id: "",
+                id: v4(),
                 key: chip.name,
                 value: stringToTemplate(chip.value),
                 data: chip.data,

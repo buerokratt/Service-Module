@@ -3,7 +3,7 @@ import { FormInput, OutputElementBox, Tooltip } from "components";
 import styles from "./DragInput.module.scss";
 import { Assign } from "types";
 import { t } from "i18next";
-import { getTypeColor } from "utils/object-util";
+import { getTypeColor, isArray } from "utils/object-util";
 import { templateToString } from "utils/string-util";
 
 const getData = (e: React.DragEvent<HTMLInputElement>) => {
@@ -27,11 +27,34 @@ const DragInput = ({ onChange, element, disallowedId }: DragInputProps) => {
     setPlaceholder(t("serviceFlow.popup.dragElementHere"));
   };
 
-  return element ? (
-    <Tooltip content={templateToString(element.value)}>
-      <OutputElementBox borderColor={getTypeColor(element?.data).color}>{text}</OutputElementBox>
-    </Tooltip>
-  ) : (
+  if (element) {
+    return (
+      <Tooltip content={templateToString(element.value)}>
+        <OutputElementBox borderColor={getTypeColor(element?.data).color}>
+          {isArray(element.data) ? (
+            <>
+              {text}
+              <FormInput
+                name={element.value}
+                type="number"
+                min={1}
+                onChange={(e) => {
+                  console.log(e.target.value);
+                  onChange({
+                    ...element,
+                  });
+                }}
+              />
+            </>
+          ) : (
+            text
+          )}
+        </OutputElementBox>
+      </Tooltip>
+    );
+  }
+
+  return (
     <FormInput
       ref={inputRef}
       name=""
