@@ -193,7 +193,7 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
           for (const [key, value] of Object.entries(response)) {
             chips.push({
               name: key,
-              value: `${endpoint.name.replace(" ", "_")}_res.response.body.${key}`,
+              value: `${endpoint.name.replace(" ", "_")}_res.${key}`,
               data: value,
             });
           }
