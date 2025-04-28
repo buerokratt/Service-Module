@@ -48,7 +48,7 @@ const DragInput = ({ onChange, element, disallowedId }: DragInputProps): ReactNo
       const index = getArrayIndex(element.value);
       setArrayIndex(index);
     }
-  }, []);
+  }, [element]);
   // todo implement slicing for other arrays too MAYBE -- if not, check for input key here?
   // todo css
 
