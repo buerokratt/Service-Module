@@ -6,6 +6,11 @@ import { t } from "i18next";
 import { getTypeColor } from "utils/object-util";
 import { templateToString } from "utils/string-util";
 
+const getData = (e: React.DragEvent<HTMLInputElement>) => {
+  e.preventDefault();
+  return JSON.parse(e.dataTransfer.getData("text/plain")) as Assign;
+};
+
 interface DragInputProps {
   element: Assign | undefined;
   disallowedId: string;
@@ -16,11 +21,6 @@ const DragInput = ({ onChange, element, disallowedId }: DragInputProps) => {
   const [text, setText] = useState(element?.key ?? "");
   const [placeholder, setPlaceholder] = useState(t("serviceFlow.popup.dragElementHere"));
   const inputRef = useRef<HTMLInputElement>(null);
-
-  const getData = (e: React.DragEvent<HTMLInputElement>) => {
-    e.preventDefault();
-    return JSON.parse(e.dataTransfer.getData("text/plain")) as Assign;
-  };
 
   const resetPlaceholder = () => {
     inputRef.current?.classList.remove(styles.dragHover, styles.dragHoverDisabled);
