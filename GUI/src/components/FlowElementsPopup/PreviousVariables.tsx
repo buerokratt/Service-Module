@@ -32,6 +32,7 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
   const [assignedObjectTree, setAssignedObjectTree] = useState<{ data: unknown; path: string | number } | null>(null);
   // New elements added in Assign node before saving
   const newAssignElements = useServiceStore((state) => state.assignElements);
+
   useEffect(() => {
     const previousNodes = nodes.slice(
       0,
@@ -57,8 +58,9 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
       // Value is not known at this point, so passing a dummy to correctly infer type
       data: [],
     };
-    setAssignedVariables([...assignElements, inputElement]);
-  }, [endpointsVariables]);
+
+    setAssignedVariables([...assignElements, inputElement, ...newAssignElements]);
+  }, [endpointsVariables, newAssignElements]);
 
   const popupBodyCss: CSSProperties = {
     padding: 16,
@@ -89,7 +91,7 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
             isMultiline
             style={{ maxHeight: "30vh", overflow: "auto" }}
           >
-            {[...assignedVariables, ...newAssignElements].map((variable) => {
+            {assignedVariables.map((variable) => {
               const typeColor = getTypeColor(variable.data);
 
               return isObject(variable.data) && variable.id !== INPUT_ELEMENT_KEY ? (
