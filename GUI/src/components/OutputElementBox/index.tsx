@@ -5,25 +5,14 @@ import useServiceStore from "store/new-services.store";
 
 type OutputElementBoxProps = {
   readonly children: ReactNode;
-  readonly value?: string | number;
   readonly borderColor?: string;
-  readonly dragData?: Assign;
-  readonly useValue?: boolean;
+  readonly value?: Assign;
   readonly onClick?: () => void;
   readonly style?: CSSProperties;
   readonly className?: string;
 };
 
-const OutputElementBox: FC<OutputElementBoxProps> = ({
-  borderColor,
-  dragData,
-  useValue = false,
-  value = "",
-  onClick,
-  style,
-  className,
-  children,
-}) => {
+const OutputElementBox: FC<OutputElementBoxProps> = ({ borderColor, value, onClick, style, className, children }) => {
   const node = useServiceStore((state) => state.selectedNode);
   const mergedStyle: CSSProperties = {
     borderRadius: 46,
@@ -37,12 +26,14 @@ const OutputElementBox: FC<OutputElementBoxProps> = ({
   };
 
   const handleDragStart = (event: DragEvent<HTMLDivElement>) => {
+    if (!value) return;
+    // console.log("dragData", dragData);
     // todo string children? other places?
-    const dragValue = useValue ? `${value}` : String(children);
+    // todo check how it works with client message
 
     event.dataTransfer.setData(
       "text/plain",
-      node?.data.stepType === StepType.Assign && dragData ? JSON.stringify(dragData) : dragValue
+      node?.data.stepType === StepType.Assign ? JSON.stringify(value) : value.value
     );
   };
 
@@ -51,8 +42,8 @@ const OutputElementBox: FC<OutputElementBoxProps> = ({
       className={className}
       onClick={onClick}
       color="green"
-      draggable={!!dragData}
-      onDragStart={dragData && handleDragStart}
+      draggable={!!value}
+      onDragStart={handleDragStart}
       style={mergedStyle}
     >
       {children}

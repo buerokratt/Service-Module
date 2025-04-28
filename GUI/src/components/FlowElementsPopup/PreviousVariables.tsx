@@ -98,7 +98,7 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
                 <Tooltip content={`${variable.value} : ${typeColor.type}`}>
                   <OutputElementBox
                     className="tooltip"
-                    dragData={variable}
+                    value={variable}
                     style={{ cursor: "pointer" }}
                     borderColor={typeColor.color}
                     onClick={() => {
@@ -118,10 +118,8 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
               ) : (
                 <Tooltip content={`${variable.value} : ${typeColor.type}`}>
                   <OutputElementBox
-                    dragData={variable.key ? variable : undefined}
+                    value={variable.key ? variable : undefined}
                     style={{ cursor: variable.key ? "grab" : "default" }}
-                    value={variable.value}
-                    useValue
                     borderColor={typeColor.color}
                   >
                     {variable.key.length > 0 ? variable.key : t("serviceFlow.previousVariables.noName")}
@@ -166,8 +164,7 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
               return isObject(chip.data) ? (
                 <Tooltip content={`${chip.data} : ${typeColor.type}`}>
                   <OutputElementBox
-                    value={stringToTemplate(chip.value)}
-                    dragData={dragData}
+                    value={dragData}
                     style={{ cursor: "pointer" }}
                     borderColor={typeColor.color}
                     onClick={() => {
@@ -186,12 +183,7 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
                 </Tooltip>
               ) : (
                 <Tooltip content={`${chip.data} : ${typeColor.type}`}>
-                  <OutputElementBox
-                    borderColor={typeColor.color}
-                    value={stringToTemplate(chip.value)}
-                    dragData={dragData}
-                    useValue
-                  >
+                  <OutputElementBox borderColor={typeColor.color} value={dragData}>
                     {chip.name}
                   </OutputElementBox>
                 </Tooltip>
