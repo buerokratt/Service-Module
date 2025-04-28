@@ -1,18 +1,20 @@
-import { CSSProperties, FC, useEffect, useMemo } from "react";
-import { ReactFlowProvider } from "reactflow";
-import { useTranslation } from "react-i18next";
-import { useNavigate, useParams } from "react-router-dom";
-import { Box, Collapsible, NewServiceHeader, Track, FlowElementsPopup } from "../components";
-import FlowBuilder from "../components/FlowBuilder/FlowBuilder";
-import { ROUTES } from "../resources/routes-constants";
-import apiIconTag from "../assets/images/api-icon-tag.svg";
-import { StepType, Step } from "../types";
-import useServiceStore from "store/new-services.store";
-import { saveFlowClick } from "services/service-builder";
-import "reactflow/dist/style.css";
-import "./ServiceFlowPage.scss";
 import Chat from "components/chat/chat";
 import withAuthorization, { ROLES } from "hoc/with-authorization";
+import { CSSProperties, FC, useEffect, useMemo } from "react";
+import { useTranslation } from "react-i18next";
+import { useNavigate, useParams } from "react-router-dom";
+import { ReactFlowProvider } from "reactflow";
+import "reactflow/dist/style.css";
+import { saveFlowClick } from "services/service-builder";
+import useServiceStore from "store/new-services.store";
+import { Box, Collapsible, FlowElementsPopup, NewServiceHeader, Track } from "../components";
+import FlowBuilder from "../components/FlowBuilder/FlowBuilder";
+import { ROUTES } from "../resources/routes-constants";
+import { Step, StepType } from "../types";
+import "./ServiceFlowPage.scss";
+
+import ApiEndpoint from "components/ApiEndpoint";
+import { onDragStart } from "utils/component-util";
 
 const ServiceFlowPage: FC = () => {
   const { t } = useTranslation();
@@ -55,13 +57,6 @@ const ServiceFlowPage: FC = () => {
 
   const setNodes = useServiceStore((state) => state.setNodes);
 
-  const onDragStart = (event: React.DragEvent<HTMLDivElement>, step: Step) => {
-    event.dataTransfer.setData("application/reactflow-label", step.label);
-    event.dataTransfer.setData("application/reactflow-type", step.type);
-    event.dataTransfer.setData("application/reactflow-originalDefinedNodeId", step.data?.id ?? "");
-    event.dataTransfer.effectAllowed = "move";
-  };
-
   const contentStyle: CSSProperties = { overflowY: "auto", maxHeight: "40vh" };
 
   return (
@@ -92,24 +87,10 @@ const ServiceFlowPage: FC = () => {
           <div className="graph__controls">
             <Track direction="vertical" gap={16} align="stretch">
               {steps && (
-                <Collapsible title={t("serviceFlow.setupElements")} contentStyle={contentStyle}>
+                <Collapsible title={t("serviceFlow.apiElements.title")} contentStyle={contentStyle}>
                   <Track direction="vertical" align="stretch" gap={4}>
-                    {steps.map((step) => (
-                      <Box
-                        key={step.id}
-                        color={
-                          [StepType.FinishingStepEnd, StepType.FinishingStepRedirect].includes(step.type)
-                            ? "red"
-                            : "blue"
-                        }
-                        onDragStart={(event) => onDragStart(event, step)}
-                        draggable
-                      >
-                        <Track gap={8} style={{ overflow: "hidden" }}>
-                          {step.type === "user-defined" && <img alt="" src={apiIconTag} />}
-                          {step.label}
-                        </Track>
-                      </Box>
+                    {steps.map((step, index) => (
+                      <ApiEndpoint step={step} key={index} />
                     ))}
                   </Track>
                 </Collapsible>
