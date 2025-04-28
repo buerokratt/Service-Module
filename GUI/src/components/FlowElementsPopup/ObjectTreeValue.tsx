@@ -42,7 +42,7 @@ export const ObjectTreeValue: FC<ObjectTreeValueProps> = ({ rawValue, keyPath, r
           onClick={(e) => toggleRounding(keyPath, rawValue, (e.target as HTMLInputElement).checked)}
         />
         <label htmlFor={key}>{t("serviceFlow.popup.round")}</label>
-        <span>{roundedValues.has(key) ? round(rawValue) : rawValue}</span>
+        <span>{roundedValues.has(key) ? round(rawValue).toFixed(2) : rawValue}</span>
       </span>
     );
   }
