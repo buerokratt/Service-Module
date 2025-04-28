@@ -16,7 +16,7 @@ type PreviousVariablesProps = {
 };
 
 // Unique key for input element, used below to identify it
-// All other element keys are UUIDs
+// All other assign element keys are UUIDs
 const INPUT_ELEMENT_KEY = "-1";
 
 const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
