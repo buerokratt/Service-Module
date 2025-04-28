@@ -15,6 +15,9 @@ type PreviousVariablesProps = {
   readonly nodeId: string;
 };
 
+// Unique key for input element, used below to identify it
+const INPUT_ELEMENT_KEY = "-1";
+
 const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
   const { t } = useTranslation();
   let endpointsVariables = useServiceStore((state) => state.endpointsResponseVariables);
@@ -44,12 +47,14 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
     const assignNodes = previousNodes.filter((node) => node.data.stepType === StepType.Assign);
     const assignElements = assignNodes.map((node) => node.data.assignElements).flat();
     // todo input w/o slot -- arrange call with guys -- check input flow in chat module first
-    // todo implement slicing for other arrays too
-    // todo array type border
+    // todo implement slicing for other arrays too MAYBE
     const inputElement: Assign = {
-      id: "-1",
+      id: INPUT_ELEMENT_KEY,
       key: "input",
       value: stringToTemplate("incoming.body.input"),
+      // Can only be a string array, see trigger-service.yaml in Buerokratt-Chatbot
+      // Value is not known at this point, so passing a dummy to correctly infer type
+      data: [],
     };
     setAssignedVariables([...assignElements, inputElement]);
   }, [endpointsVariables]);
@@ -84,9 +89,9 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
             style={{ maxHeight: "30vh", overflow: "auto" }}
           >
             {[...assignedVariables, ...newAssignElements].map((variable) => {
-              const typeColor = getTypeColor(variable.value);
+              const typeColor = getTypeColor(variable.data);
 
-              return isObject(variable.data) ? (
+              return isObject(variable.data) && variable.id !== INPUT_ELEMENT_KEY ? (
                 <Tooltip content={`${variable.value} : ${typeColor.type}`}>
                   <OutputElementBox
                     text={assignedObjectTree?.path === variable.value ? variable.key + " ▲" : variable.key + " ▼"}
