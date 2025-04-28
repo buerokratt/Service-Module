@@ -29,7 +29,7 @@ const DragInput = ({ onChange, element, disallowedId }: DragInputProps) => {
 
   return element ? (
     <Tooltip content={templateToString(element.value)}>
-      <OutputElementBox text={text} borderColor={getTypeColor(element?.data).color} />
+      <OutputElementBox borderColor={getTypeColor(element?.data).color}>{text}</OutputElementBox>
     </Tooltip>
   ) : (
     <FormInput

@@ -1,10 +1,10 @@
-import { CSSProperties, FC, DragEvent } from "react";
+import { CSSProperties, FC, DragEvent, ReactNode } from "react";
 import Box from "../Box";
 import { Assign, StepType } from "types";
 import useServiceStore from "store/new-services.store";
 
 type OutputElementBoxProps = {
-  readonly text: string;
+  readonly children: ReactNode;
   readonly value?: string | number;
   readonly borderColor?: string;
   readonly dragData?: Assign;
@@ -15,7 +15,6 @@ type OutputElementBoxProps = {
 };
 
 const OutputElementBox: FC<OutputElementBoxProps> = ({
-  text,
   borderColor,
   dragData,
   useValue = false,
@@ -23,6 +22,7 @@ const OutputElementBox: FC<OutputElementBoxProps> = ({
   onClick,
   style,
   className,
+  children,
 }) => {
   const node = useServiceStore((state) => state.selectedNode);
   const mergedStyle: CSSProperties = {
@@ -37,7 +37,8 @@ const OutputElementBox: FC<OutputElementBoxProps> = ({
   };
 
   const handleDragStart = (event: DragEvent<HTMLDivElement>) => {
-    const dragValue = useValue ? `${value}` : text;
+    // todo string children? other places?
+    const dragValue = useValue ? `${value}` : String(children);
 
     event.dataTransfer.setData(
       "text/plain",
@@ -54,7 +55,7 @@ const OutputElementBox: FC<OutputElementBoxProps> = ({
       onDragStart={dragData && handleDragStart}
       style={mergedStyle}
     >
-      {text}
+      {children}
     </Box>
   );
 };

@@ -97,7 +97,6 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
               return isObject(variable.data) && variable.id !== INPUT_ELEMENT_KEY ? (
                 <Tooltip content={`${variable.value} : ${typeColor.type}`}>
                   <OutputElementBox
-                    text={assignedObjectTree?.path === variable.value ? variable.key + " ▲" : variable.key + " ▼"}
                     className="tooltip"
                     dragData={variable}
                     style={{ cursor: "pointer" }}
@@ -112,18 +111,21 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
                             }
                       );
                     }}
-                  />
+                  >
+                    {assignedObjectTree?.path === variable.value ? variable.key + " ▲" : variable.key + " ▼"}
+                  </OutputElementBox>
                 </Tooltip>
               ) : (
                 <Tooltip content={`${variable.value} : ${typeColor.type}`}>
                   <OutputElementBox
                     dragData={variable.key ? variable : undefined}
                     style={{ cursor: variable.key ? "grab" : "default" }}
-                    text={variable.key.length > 0 ? variable.key : t("serviceFlow.previousVariables.noName")}
                     value={variable.value}
                     useValue
                     borderColor={typeColor.color}
-                  />
+                  >
+                    {variable.key.length > 0 ? variable.key : t("serviceFlow.previousVariables.noName")}
+                  </OutputElementBox>
                 </Tooltip>
               );
             })}
@@ -164,7 +166,6 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
               return isObject(chip.data) ? (
                 <Tooltip content={`${chip.data} : ${typeColor.type}`}>
                   <OutputElementBox
-                    text={endpointsObjectTree?.path === chip.value ? chip.name + " ▲" : chip.name + " ▼"}
                     value={stringToTemplate(chip.value)}
                     dragData={dragData}
                     style={{ cursor: "pointer" }}
@@ -179,17 +180,20 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
                             }
                       );
                     }}
-                  />
+                  >
+                    {endpointsObjectTree?.path === chip.value ? chip.name + " ▲" : chip.name + " ▼"}
+                  </OutputElementBox>
                 </Tooltip>
               ) : (
                 <Tooltip content={`${chip.data} : ${typeColor.type}`}>
                   <OutputElementBox
                     borderColor={typeColor.color}
-                    text={chip.name}
                     value={stringToTemplate(chip.value)}
                     dragData={dragData}
                     useValue
-                  />
+                  >
+                    {chip.name}
+                  </OutputElementBox>
                 </Tooltip>
               );
             })}
