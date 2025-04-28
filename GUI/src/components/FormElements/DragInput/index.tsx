@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { ReactNode, useEffect, useRef, useState } from "react";
 import { FormInput, OutputElementBox, Tooltip } from "components";
 import styles from "./DragInput.module.scss";
 import { Assign } from "types";
@@ -11,13 +11,27 @@ const getData = (e: React.DragEvent<HTMLInputElement>) => {
   return JSON.parse(e.dataTransfer.getData("text/plain")) as Assign;
 };
 
+const getArrayIndex = (value: string): number => {
+  const base = templateToString(value);
+  const index = base.match(/\[\d+\]$/);
+  return index ? parseInt(index[0].slice(1, -1)) + 1 : 1;
+};
+
+const updateArrayIndex = (value: string, index: number): string => {
+  let base = templateToString(value);
+  base = base.replace(/\[\d+\]$/, "");
+  return stringToTemplate(`${base}[${index - 1}]`);
+};
+
 interface DragInputProps {
   element: Assign | undefined;
   disallowedId: string;
   onChange: (data: Assign) => void;
 }
 
-const DragInput = ({ onChange, element, disallowedId }: DragInputProps) => {
+const DragInput = ({ onChange, element, disallowedId }: DragInputProps): ReactNode => {
+  // Index is 1-based in UI for non-technical users
+  const [arrayIndex, setArrayIndex] = useState(1);
   const [text, setText] = useState(element?.key ?? "");
   const [placeholder, setPlaceholder] = useState(t("serviceFlow.popup.dragElementHere"));
   const inputRef = useRef<HTMLInputElement>(null);
@@ -27,14 +41,14 @@ const DragInput = ({ onChange, element, disallowedId }: DragInputProps) => {
     setPlaceholder(t("serviceFlow.popup.dragElementHere"));
   };
 
-  // todo use effect to set value if array on []
   useEffect(() => {
-    console.log("use effect");
-    if (isArray(element?.data)) {
-      setText(element?.value);
+    if (!element) return;
+
+    if (isArray(element.data)) {
+      const index = getArrayIndex(element.value);
+      setArrayIndex(index);
     }
   }, []);
-  // todo off by one AC
   // todo implement slicing for other arrays too MAYBE -- if not, check for input key here?
   // todo css
 
@@ -49,13 +63,14 @@ const DragInput = ({ onChange, element, disallowedId }: DragInputProps) => {
                 name={element.value}
                 type="number"
                 min={1}
-                // todo maybe remove? AND SET VALUE
-                // defaultValue={1}
+                value={arrayIndex}
                 onChange={(e) => {
-                  let base = templateToString(element.value);
-                  base = base.replace(/\[\d+\]$/, "");
-                  const newValue = stringToTemplate(`${base}[${e.target.value}]`);
-                  onChange({ ...element, value: newValue });
+                  const index = Number(e.target.value);
+                  setArrayIndex(index);
+                  onChange({
+                    ...element,
+                    value: updateArrayIndex(element.value, index),
+                  });
                 }}
               />
             </>
