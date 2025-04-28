@@ -49,8 +49,6 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
     // Get Assign variables
     const assignNodes = previousNodes.filter((node) => node.data.stepType === StepType.Assign);
     const assignElements = assignNodes.map((node) => node.data.assignElements).flat();
-    // todo input w/o slot -- arrange call with guys -- check input flow in chat module first
-    // todo implement slicing for other arrays too MAYBE
     const inputElement: Assign = {
       id: INPUT_ELEMENT_KEY,
       key: "input",

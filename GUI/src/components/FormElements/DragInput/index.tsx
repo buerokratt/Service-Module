@@ -1,10 +1,10 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { FormInput, OutputElementBox, Tooltip } from "components";
 import styles from "./DragInput.module.scss";
 import { Assign } from "types";
 import { t } from "i18next";
 import { getTypeColor, isArray } from "utils/object-util";
-import { templateToString } from "utils/string-util";
+import { stringToTemplate, templateToString } from "utils/string-util";
 
 const getData = (e: React.DragEvent<HTMLInputElement>) => {
   e.preventDefault();
@@ -27,6 +27,17 @@ const DragInput = ({ onChange, element, disallowedId }: DragInputProps) => {
     setPlaceholder(t("serviceFlow.popup.dragElementHere"));
   };
 
+  // todo use effect to set value if array on []
+  useEffect(() => {
+    console.log("use effect");
+    if (isArray(element?.data)) {
+      setText(element?.value);
+    }
+  }, []);
+  // todo off by one AC
+  // todo implement slicing for other arrays too MAYBE -- if not, check for input key here?
+  // todo css
+
   if (element) {
     return (
       <Tooltip content={templateToString(element.value)}>
@@ -38,11 +49,13 @@ const DragInput = ({ onChange, element, disallowedId }: DragInputProps) => {
                 name={element.value}
                 type="number"
                 min={1}
+                // todo maybe remove? AND SET VALUE
+                // defaultValue={1}
                 onChange={(e) => {
-                  console.log(e.target.value);
-                  onChange({
-                    ...element,
-                  });
+                  let base = templateToString(element.value);
+                  base = base.replace(/\[\d+\]$/, "");
+                  const newValue = stringToTemplate(`${base}[${e.target.value}]`);
+                  onChange({ ...element, value: newValue });
                 }}
               />
             </>
