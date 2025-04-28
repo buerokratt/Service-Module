@@ -96,7 +96,7 @@ const DragInput = ({ onChange, element, disallowedId }: DragInputProps): ReactNo
           resetPlaceholder();
           return;
         }
-        onChange(data);
+        onChange({ ...data, value: updateArrayIndex(data.value, arrayIndex) });
         setText(data.key);
       }}
       // Disable focus, text cursor and everything related to keyboard input
