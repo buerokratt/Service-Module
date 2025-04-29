@@ -3,6 +3,18 @@
 @import "src/styles/settings/variables/other";
 @import "src/styles/settings/variables/typography";
 
+.array {
+  display: flex;
+
+  .arrayIndex {
+    height: 5px;
+    margin-left: 4px;
+    padding: 8px 0;
+    text-align: center;
+    width: 50px;
+  }
+}
+
 .dragInput {
   background: transparent !important;
   border: 1px dashed !important;

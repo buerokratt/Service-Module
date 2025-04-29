@@ -50,14 +50,13 @@ const DragInput = ({ onChange, element, disallowedId }: DragInputProps): ReactNo
     }
   }, [element]);
   // todo implement slicing for other arrays too MAYBE -- if not, check for input key here?
-  // todo css
 
   if (element) {
     return (
       <Tooltip content={templateToString(element.value)}>
         <OutputElementBox borderColor={getTypeColor(element?.data).color}>
           {isArray(element.data) ? (
-            <>
+            <div className={styles.array}>
               {text}
               <FormInput
                 name={element.value}
@@ -72,8 +71,9 @@ const DragInput = ({ onChange, element, disallowedId }: DragInputProps): ReactNo
                     value: updateArrayIndex(element.value, index),
                   });
                 }}
+                className={styles.arrayIndex}
               />
-            </>
+            </div>
           ) : (
             text
           )}
