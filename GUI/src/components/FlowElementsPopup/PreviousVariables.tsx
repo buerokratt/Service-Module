@@ -28,6 +28,41 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
   const [assignedObjectTree, setAssignedObjectTree] = useState<{ data: unknown; path: string | number } | null>(null);
   // New elements added in Assign node before saving
   const newAssignElements = useServiceStore((state) => state.assignElements);
+
+  // Get Date Variables
+  const dates: Assign[] = [
+    {
+      id: "service_current_date",
+      key: "current date",
+      value: stringToTemplate("new Date.now()"),
+    },
+    {
+      id: "service_current_time",
+      key: "current time",
+      value: stringToTemplate("new Date.now()"),
+    },
+    {
+      id: "service_current_date_time",
+      key: "current date & time",
+      value: stringToTemplate("new Date.now()"),
+    },
+    {
+      id: "service_yesterday",
+      key: "yesterday",
+      value: stringToTemplate("new Date.now()"),
+    },
+    {
+      id: "service_tomorrow",
+      key: "tomorrow",
+      value: stringToTemplate("new Date.now()"),
+    },
+    {
+      id: "service_custom_date_time",
+      key: "custom date time",
+      value: stringToTemplate("new Date.now()"),
+    }
+  ];
+
   useEffect(() => {
     const previousNodes = nodes.slice(
       0,
@@ -48,6 +83,7 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
       key: "input",
       value: stringToTemplate("incoming.body.input"),
     };
+
     setAssignedVariables([...assignElements, inputElement]);
   }, [endpointsVariables]);
 
@@ -127,6 +163,63 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
           style={{ borderBottom: border, borderTop: border }}
         />
       )}
+
+      <Track
+        direction="vertical"
+        align="left"
+        style={{
+          ...popupBodyCss,
+          borderBottom: assignedObjectTree ? undefined : border,
+        }}
+      >
+        <label htmlFor="json" style={{ marginBottom: "10px", textTransform: "capitalize", cursor: "auto" }}>
+          {t("serviceFlow.previousVariables.dates")}
+        </label>
+        <Track
+          direction="horizontal"
+          gap={4}
+          justify="start"
+          isMultiline
+          style={{ maxHeight: "30vh", overflow: "auto" }}
+        >
+          {[...dates].map((variable) => {
+            const typeColor = getTypeColor(variable.value);
+
+            return isObject(variable.data) ? (
+              <Tooltip content={`${variable.value} : ${typeColor.type}`}>
+                <OutputElementBox
+                  text={assignedObjectTree?.path === variable.value ? variable.key + " ▲" : variable.key + " ▼"}
+                  className="tooltip"
+                  dragData={variable}
+                  style={{ cursor: "pointer" }}
+                  borderColor={typeColor.color}
+                  onClick={() => {
+                    setAssignedObjectTree(
+                      assignedObjectTree?.path === variable.value
+                        ? null
+                        : {
+                            data: variable.data,
+                            path: variable.value,
+                          }
+                    );
+                  }}
+                />
+              </Tooltip>
+            ) : (
+              <Tooltip content={`${variable.value} : ${typeColor.type}`}>
+                <OutputElementBox
+                  dragData={variable.key ? variable : undefined}
+                  style={{ cursor: variable.key ? "grab" : "default" }}
+                  text={variable.key.length > 0 ? variable.key : t("serviceFlow.previousVariables.noName")}
+                  value={variable.value}
+                  useValue
+                  borderColor={typeColor.color}
+                />
+              </Tooltip>
+            );
+          })}
+        </Track>
+      </Track>
 
       {endpoints.map((endpoint) => (
         <Track key={endpoint.name} direction="vertical" align="left" style={{ ...popupBodyCss, borderBottom: border }}>

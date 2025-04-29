@@ -298,6 +298,7 @@
     },
     "previousVariables": {
       "assignElements": "Assign Elements",
+      "dates": "Dates",
       "noName": "<No name>"
     },
     "flow": "Service flow",
