@@ -1,5 +1,5 @@
 import { ReactNode, useEffect, useRef, useState } from "react";
-import { CheckBadge, FormCheckbox, FormInput, OutputElementBox, Tooltip } from "components";
+import { FormInput, OutputElementBox, Tooltip } from "components";
 import styles from "./DragInput.module.scss";
 import { Assign } from "types";
 import { t } from "i18next";
