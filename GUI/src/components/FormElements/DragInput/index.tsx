@@ -1,5 +1,5 @@
 import { ReactNode, useEffect, useRef, useState } from "react";
-import { FormInput, OutputElementBox, Tooltip } from "components";
+import { CheckBadge, FormCheckbox, FormInput, OutputElementBox, Tooltip } from "components";
 import styles from "./DragInput.module.scss";
 import { Assign } from "types";
 import { t } from "i18next";
@@ -14,13 +14,13 @@ const getData = (e: React.DragEvent<HTMLInputElement>) => {
 const getArrayIndex = (value: string): number => {
   const base = templateToString(value);
   const index = base.match(/\[\d+\]$/);
-  return index ? parseInt(index[0].slice(1, -1)) + 1 : 1;
+  return index ? parseInt(index[0].slice(1, -1)) : 0;
 };
 
 const updateArrayIndex = (value: string, index: number): string => {
   let base = templateToString(value);
   base = base.replace(/\[\d+\]$/, "");
-  return stringToTemplate(`${base}[${index - 1}]`);
+  return stringToTemplate(`${base}[${index}]`);
 };
 
 interface DragInputProps {
@@ -30,8 +30,7 @@ interface DragInputProps {
 }
 
 const DragInput = ({ onChange, element, disallowedId }: DragInputProps): ReactNode => {
-  // Index is 1-based in UI for non-technical users
-  const [arrayIndex, setArrayIndex] = useState(1);
+  const [arrayIndex, setArrayIndex] = useState(0);
   const [text, setText] = useState(element?.key ?? "");
   const [placeholder, setPlaceholder] = useState(t("serviceFlow.popup.dragElementHere"));
   const inputRef = useRef<HTMLInputElement>(null);
@@ -54,14 +53,14 @@ const DragInput = ({ onChange, element, disallowedId }: DragInputProps): ReactNo
   if (element) {
     return (
       <Tooltip content={templateToString(element.value)}>
-        <OutputElementBox borderColor={getTypeColor(element?.data).color}>
+        <OutputElementBox borderColor={getTypeColor(element?.data).color} className={styles.element}>
           {isArray(element.data) ? (
             <div className={styles.array}>
               {text}
               <FormInput
                 name={element.value}
                 type="number"
-                min={1}
+                min={0}
                 value={arrayIndex}
                 onChange={(e) => {
                   const index = Number(e.target.value);
@@ -73,6 +72,10 @@ const DragInput = ({ onChange, element, disallowedId }: DragInputProps): ReactNo
                 }}
                 className={styles.arrayIndex}
               />
+              <span className={styles.arrayAll}>
+                <input id="all" type="checkbox" />
+                <label htmlFor="all">{t("serviceFlow.popup.all")}</label>
+              </span>
             </div>
           ) : (
             text
