@@ -23,6 +23,12 @@ const updateArrayIndex = (value: string, index: number): string => {
   return stringToTemplate(`${base}[${index}]`);
 };
 
+const updateArrayAll = (value: string): string => {
+  let base = templateToString(value);
+  base = base.replace(/\[\d+\]$/, "");
+  return stringToTemplate(base);
+};
+
 interface DragInputProps {
   element: Assign | undefined;
   disallowedId: string;
@@ -30,6 +36,7 @@ interface DragInputProps {
 }
 
 const DragInput = ({ onChange, element, disallowedId }: DragInputProps): ReactNode => {
+  const [all, setAll] = useState(false);
   const [arrayIndex, setArrayIndex] = useState(0);
   const [text, setText] = useState(element?.key ?? "");
   const [placeholder, setPlaceholder] = useState(t("serviceFlow.popup.dragElementHere"));
@@ -48,7 +55,6 @@ const DragInput = ({ onChange, element, disallowedId }: DragInputProps): ReactNo
       setArrayIndex(index);
     }
   }, [element]);
-  // todo implement slicing for other arrays too MAYBE -- if not, check for input key here?
 
   if (element) {
     return (
@@ -57,23 +63,35 @@ const DragInput = ({ onChange, element, disallowedId }: DragInputProps): ReactNo
           {isArray(element.data) ? (
             <div className={styles.array}>
               {text}
-              <FormInput
-                name={element.value}
-                type="number"
-                min={0}
-                value={arrayIndex}
-                onChange={(e) => {
-                  const index = Number(e.target.value);
-                  setArrayIndex(index);
-                  onChange({
-                    ...element,
-                    value: updateArrayIndex(element.value, index),
-                  });
-                }}
-                className={styles.arrayIndex}
-              />
+              {!all ? (
+                <FormInput
+                  name={element.value}
+                  type="number"
+                  min={0}
+                  value={arrayIndex}
+                  onChange={(e) => {
+                    const index = Number(e.target.value);
+                    setArrayIndex(index);
+                    onChange({
+                      ...element,
+                      value: updateArrayIndex(element.value, index),
+                    });
+                  }}
+                  className={styles.arrayIndex}
+                />
+              ) : (
+                <></>
+              )}
               <span className={styles.arrayAll}>
-                <input id="all" type="checkbox" />
+                <input
+                  id="all"
+                  type="checkbox"
+                  checked={all}
+                  onChange={(e) => {
+                    setAll(e.target.checked);
+                    onChange({ ...element, value: updateArrayAll(element.value) });
+                  }}
+                />
                 <label htmlFor="all">{t("serviceFlow.popup.all")}</label>
               </span>
             </div>
