@@ -6,27 +6,23 @@ import { t } from "i18next";
 import { getTypeColor, isArray } from "utils/object-util";
 import { stringToTemplate, templateToString } from "utils/string-util";
 
-const getData = (e: React.DragEvent<HTMLInputElement>) => {
-  e.preventDefault();
-  return JSON.parse(e.dataTransfer.getData("text/plain")) as Assign;
-};
+const ARRAY_INDEX_PATTERN = /\[\d+\]$/;
 
 const getArrayIndex = (value: string): number => {
   const base = templateToString(value);
-  const index = base.match(/\[\d+\]$/);
+  const index = base.match(ARRAY_INDEX_PATTERN);
   return index ? parseInt(index[0].slice(1, -1)) : 0;
 };
 
-const updateArrayIndex = (value: string, index: number): string => {
+const updateArrayIndex = (value: string, index?: number): string => {
   let base = templateToString(value);
-  base = base.replace(/\[\d+\]$/, "");
-  return stringToTemplate(`${base}[${index}]`);
+  base = base.replace(ARRAY_INDEX_PATTERN, "");
+  return stringToTemplate(index ? `${base}[${index}]` : base);
 };
 
-const updateArrayAll = (value: string): string => {
-  let base = templateToString(value);
-  base = base.replace(/\[\d+\]$/, "");
-  return stringToTemplate(base);
+const getDragData = (e: React.DragEvent<HTMLInputElement>) => {
+  e.preventDefault();
+  return JSON.parse(e.dataTransfer.getData("text/plain")) as Assign;
 };
 
 interface DragInputProps {
@@ -89,7 +85,7 @@ const DragInput = ({ onChange, element, disallowedId }: DragInputProps): ReactNo
                   checked={all}
                   onChange={(e) => {
                     setAll(e.target.checked);
-                    onChange({ ...element, value: updateArrayAll(element.value) });
+                    onChange({ ...element, value: updateArrayIndex(element.value) });
                   }}
                 />
                 <label htmlFor="all">{t("serviceFlow.popup.all")}</label>
@@ -111,7 +107,7 @@ const DragInput = ({ onChange, element, disallowedId }: DragInputProps): ReactNo
       label=""
       className={styles.dragInput}
       onDrop={(e) => {
-        const data = getData(e);
+        const data = getDragData(e);
 
         if (disallowedId === data.id) {
           resetPlaceholder();
@@ -124,7 +120,7 @@ const DragInput = ({ onChange, element, disallowedId }: DragInputProps): ReactNo
       tabIndex={-1}
       onFocus={(e) => e.target.blur()}
       onDragOver={(e) => {
-        const data = getData(e);
+        const data = getDragData(e);
 
         inputRef.current?.classList.add(disallowedId === data.id ? styles.dragHoverDisabled : styles.dragHover);
         if (disallowedId === data.id) setPlaceholder(t("serviceFlow.popup.assignToSelfNotAllowed"));
