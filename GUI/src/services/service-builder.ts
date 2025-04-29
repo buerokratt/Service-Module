@@ -215,6 +215,7 @@ const rawDataIfVariablesMissing = (
     assignNestedRawVariables(JSON.parse(rawData), key, "", data);
     return data;
   } catch (e) {
+    console.error(e);
     return "";
   }
 };
@@ -582,131 +583,19 @@ export const saveFlow = async ({
         const parentStepName = `${parentNode.data.stepType}-${parentNodeId}`;
 
         if (parentNode.data.stepType === StepType.Textfield) {
-          const htmlToMarkdown = new NodeHtmlMarkdown({
-            textReplace: [
-              [/\\_/g, "_"],
-              [/\\\[/g, "["],
-              [/\\\]/g, "]"],
-            ],
-          });
-
-          finishedFlow.set(parentStepName, {
-            assign: {
-              res: {
-                result: `${htmlToMarkdown.translate(parentNode.data.message?.replace("{{", "${").replace("}}", "}"))}`,
-              },
-            },
-            next: childNode ? `${childNode.data.stepType}-${childNodeId}` : childNodeId,
-          });
-
-          return;
+          return handleTextField(finishedFlow, parentStepName, parentNode, childNode, childNodeId);
         }
 
         if (parentNode.data.stepType === StepType.Assign) {
-          const invalidElementsExist = hasInvalidElements(parentNode.data.assignElements || []);
-          const isInvalid =
-            parentNode.data?.assignElements === undefined ||
-            invalidElementsExist ||
-            parentNode.data?.assignElements.length === 0;
-          if (isInvalid) {
-            throw new Error(i18next.t("toast.missing-assign-elements") ?? "Error");
-          }
-
-          finishedFlow.set(parentStepName, {
-            assign: parentNode.data.assignElements.reduce((acc: any, e: any) => {
-              acc[e.key] = e.value;
-              return acc;
-            }, {}),
-            next: childNode ? `${childNode.data.stepType}-${childNodeId}` : childNodeId,
-          });
-          return;
+          return handleAssignStep(parentNode, finishedFlow, parentStepName, childNode, childNodeId);
         }
 
         if (parentNode.data.stepType === StepType.Condition) {
-          const conditionRelations: string[] = allRelations.filter((r) => r.startsWith(parentNodeId));
-          const firstChildNode = conditionRelations[0].split("-")[1];
-          const secondChildNode = conditionRelations[1].split("-")[1];
-
-          const firstChild = nodes.find((node) => node.id === firstChildNode);
-          const secondChild = nodes.find((node) => node.id === secondChildNode);
-
-          const invalidRulesExist = hasInvalidRules(parentNode.data.rules?.children || []);
-          const isInvalid =
-            parentNode.data.rules?.children === undefined ||
-            invalidRulesExist ||
-            parentNode.data.rules?.children.length === 0;
-          if (isInvalid) {
-            throw new Error(i18next.t("toast.missing-condition-rules") ?? "Error");
-          }
-
-          finishedFlow.set(parentStepName, {
-            switch: [
-              {
-                condition: `\${${buildConditionString(parentNode.data.rules)}}`,
-                next: `${firstChild?.data.stepType}-${firstChildNode}`,
-              },
-            ],
-            next: `${secondChild?.data.stepType}-${secondChildNode}`,
-          });
-          return;
+          return handleConditionStep(allRelations, parentNodeId, nodes, parentNode, finishedFlow, parentStepName);
         }
 
         if (parentNode.data.stepType === StepType.Input) {
-          const invalidRulesExist = hasInvalidRules(parentNode.data.rules?.children || []);
-          const isInvalid =
-            parentNode.data.rules?.children === undefined ||
-            invalidRulesExist ||
-            parentNode.data.rules?.children.length === 0;
-          if (isInvalid) {
-            throw new Error(i18next.t("toast.missing-client_input-rules") ?? "Error");
-          }
-
-          const clientInput = `client_input_${parentNode.data.clientInputId}`;
-          const clientInputName = `${clientInput}-step`;
-          finishedFlow.set(parentStepName, getTemplate(steps, parentNode, clientInputName, `${clientInput}-assign`));
-          finishedFlow.set(`${clientInput}-assign`, {
-            assign: {
-              [clientInput]: `\${${clientInput}_result.input}`,
-            },
-            next: `${clientInput}-switch`,
-          });
-
-          const clientInputYesOrNo = (label: string) => (label === "rule 1" ? '"Yes"' : '"No"');
-
-          const findTargetNodeId = (node: Node) => updatedEdges.find((edge) => edge.source === node.id)?.target;
-          const findFollowingNode = (node: Node) => {
-            const target = findTargetNodeId(node);
-            return nodes.find((n) => n.id === target);
-          };
-
-          finishedFlow.set(
-            `${clientInput}-switch`,
-            getSwitchCase(
-              updatedEdges
-                .filter((e) => e.source === parentNodeId)
-                .map((e) => {
-                  const node = nodes.find((node) => node.id === e.target);
-                  if (!node) return e.target;
-                  const matchingRule = parentNode.data?.rules?.children?.find(
-                    (_: never, i: number) => `rule ${i + 1}` === node.data.label
-                  );
-                  const followingNode = findFollowingNode(node);
-                  return {
-                    case:
-                      matchingRule && !["Yes", "No"].includes(matchingRule?.condition)
-                        ? `\${${matchingRule.name.replace("{{", "").replace("}}", "")} ${matchingRule.condition} ${
-                            matchingRule.value
-                          }}`
-                        : `\${${clientInput} == ${clientInputYesOrNo(node.data.label)}}`,
-                    nextStep:
-                      followingNode?.type === "customNode"
-                        ? `${followingNode.data.stepType}-${followingNode.id}`
-                        : "service-end",
-                  };
-                })
-            )
-          );
-          return;
+          return handleInputStep(parentNode, finishedFlow, parentStepName, steps, updatedEdges, nodes, parentNodeId);
         }
 
         return finishedFlow.set(
@@ -789,6 +678,146 @@ export const saveFlow = async ({
   }
 };
 
+function handleTextField(
+  finishedFlow: Map<any, any>,
+  parentStepName: string,
+  parentNode: Node,
+  childNode: Node | undefined,
+  childNodeId: any
+) {
+  const htmlToMarkdown = new NodeHtmlMarkdown({
+    textReplace: [
+      [/\\_/g, "_"],
+      [/\\\[/g, "["],
+      [/\\\]/g, "]"],
+    ],
+  });
+
+  finishedFlow.set(parentStepName, {
+    assign: {
+      res: {
+        result: `${htmlToMarkdown.translate(parentNode.data.message?.replace("{{", "${").replace("}}", "}"))}`,
+      },
+    },
+    next: childNode ? `${childNode.data.stepType}-${childNodeId}` : childNodeId,
+  });
+}
+
+function handleConditionStep(
+  allRelations: any[],
+  parentNodeId: any,
+  nodes: Node[],
+  parentNode: Node,
+  finishedFlow: Map<any, any>,
+  parentStepName: string
+) {
+  const conditionRelations: string[] = allRelations.filter((r) => r.startsWith(parentNodeId));
+  const firstChildNode = conditionRelations[0].split("-")[1];
+  const secondChildNode = conditionRelations[1].split("-")[1];
+
+  const firstChild = nodes.find((node) => node.id === firstChildNode);
+  const secondChild = nodes.find((node) => node.id === secondChildNode);
+
+  const invalidRulesExist = hasInvalidRules(parentNode.data.rules?.children ?? []);
+  const isInvalid =
+    parentNode.data.rules?.children === undefined || invalidRulesExist || parentNode.data.rules?.children.length === 0;
+  if (isInvalid) {
+    throw new Error(i18next.t("toast.missing-condition-rules") ?? "Error");
+  }
+
+  finishedFlow.set(parentStepName, {
+    switch: [
+      {
+        condition: `\${${buildConditionString(parentNode.data.rules)}}`,
+        next: `${firstChild?.data.stepType}-${firstChildNode}`,
+      },
+    ],
+    next: `${secondChild?.data.stepType}-${secondChildNode}`,
+  });
+}
+
+function handleAssignStep(parentNode: Node, finishedFlow: Map<any, any>, parentStepName: string, childNode: Node | undefined, childNodeId: any) {
+  const invalidElementsExist = hasInvalidElements(parentNode.data.assignElements ?? []);
+  const isInvalid = parentNode.data?.assignElements === undefined ||
+    invalidElementsExist ||
+    parentNode.data?.assignElements.length === 0;
+
+    if (isInvalid) {
+      throw new Error(i18next.t("toast.missing-assign-elements") ?? "Error");
+    }
+
+  finishedFlow.set(parentStepName, {
+    assign: parentNode.data.assignElements.reduce((acc: any, e: any) => {
+      acc[e.key] = e.value;
+      return acc;
+    }, {}),
+    next: childNode ? `${childNode.data.stepType}-${childNodeId}` : childNodeId,
+  });
+}
+
+function handleInputStep(
+  parentNode: Node,
+  finishedFlow: Map<any, any>,
+  parentStepName: string,
+  steps: Step[],
+  updatedEdges: any[],
+  nodes: Node[],
+  parentNodeId: any
+) {
+  const invalidRulesExist = hasInvalidRules(parentNode.data.rules?.children ?? []);
+  const isInvalid =
+    parentNode.data.rules?.children === undefined || invalidRulesExist || parentNode.data.rules?.children.length === 0;
+  if (isInvalid) {
+    throw new Error(i18next.t("toast.missing-client_input-rules") ?? "Error");
+  }
+
+  const clientInput = `client_input_${parentNode.data.clientInputId}`;
+  const clientInputName = `${clientInput}-step`;
+  finishedFlow.set(parentStepName, getTemplate(steps, parentNode, clientInputName, `${clientInput}-assign`));
+  finishedFlow.set(`${clientInput}-assign`, {
+    assign: {
+      [clientInput]: `\${${clientInput}_result.input}`,
+    },
+    next: `${clientInput}-switch`,
+  });
+
+  const clientInputYesOrNo = (label: string) => (label === "rule 1" ? '"Yes"' : '"No"');
+
+  const findTargetNodeId = (node: Node) => updatedEdges.find((edge) => edge.source === node.id)?.target;
+  const findFollowingNode = (node: Node) => {
+    const target = findTargetNodeId(node);
+    return nodes.find((n) => n.id === target);
+  };
+
+  finishedFlow.set(
+    `${clientInput}-switch`,
+    getSwitchCase(
+      updatedEdges
+        .filter((e) => e.source === parentNodeId)
+        .map((e) => {
+          const node = nodes.find((node) => node.id === e.target);
+          if (!node) return e.target;
+          const matchingRule = parentNode.data?.rules?.children?.find(
+            (_: never, i: number) => `rule ${i + 1}` === node.data.label
+          );
+          const followingNode = findFollowingNode(node);
+          return {
+            case:
+              matchingRule && !["Yes", "No"].includes(matchingRule?.condition)
+                ? `\${${matchingRule.name.replace("{{", "").replace("}}", "")} ${matchingRule.condition} ${
+                    matchingRule.value
+                  }}`
+                : `\${${clientInput} == ${clientInputYesOrNo(node.data.label)}}`,
+            nextStep:
+              followingNode?.type === "customNode"
+                ? `${followingNode.data.stepType}-${followingNode.id}`
+                : "service-end",
+          };
+        })
+    )
+  );
+}
+
 function skipPlaceholderNodes(nodes: Node[], edges: Edge[]) {
   const nodeMap = nodes.reduce((map: any, node: any) => {
     map[node.id] = node;
@@ -796,9 +825,7 @@ function skipPlaceholderNodes(nodes: Node[], edges: Edge[]) {
   }, {});
 
   const edgeMap = edges.reduce((map: any, edge: any) => {
-    if (!map[edge.source]) {
-      map[edge.source] = [];
-    }
+    map[edge.source] ??= [];
     map[edge.source].push(edge);
     return map;
   }, {});
@@ -876,7 +903,9 @@ const getPreDefinedEndpointVariables = (data?: { variables: EndpointVariableData
   try {
     getNestedPreDefinedRawVariables(JSON.parse(data.rawData?.value ?? "{}"), result);
     getNestedPreDefinedRawVariables(JSON.parse(data.rawData?.testValue ?? "{}"), result);
-  } catch (_) {}
+  } catch (e) {
+    console.error(e);
+  }
 
   return result;
 };
@@ -981,7 +1010,8 @@ const getDefinedEndpointStep = (steps: Step[], node: Node) => {
 
   const isCommonPath = endpoint.isCommon ? "common/" : "";
   // For backwards compatibility, in case fileName was not defined
-  const fileName = `${endpoint.fileName ?? `${name}-${getEndpointName(endpoint)}`}`;
+  const defaultFileName = `${name}-${getEndpointName(endpoint)}`;
+  const fileName = endpoint.fileName ?? defaultFileName;
   const paramss = rawDataIfVariablesMissing(
     selectedEndpoint,
     "params",
