@@ -10,7 +10,7 @@ const ARRAY_INDEX_PATTERN = /\[\d+\]$/;
 
 const getArrayIndex = (value: string): number => {
   const base = templateToString(value);
-  const index = base.match(ARRAY_INDEX_PATTERN);
+  const index = ARRAY_INDEX_PATTERN.exec(base);
   return index ? parseInt(index[0].slice(1, -1)) : 0;
 };
 
