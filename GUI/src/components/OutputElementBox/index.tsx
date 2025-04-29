@@ -27,9 +27,6 @@ const OutputElementBox: FC<OutputElementBoxProps> = ({ borderColor, value, onCli
 
   const handleDragStart = (event: DragEvent<HTMLDivElement>) => {
     if (!value) return;
-    // console.log("dragData", dragData);
-    // todo string children? other places?
-    // todo check how it works with client message
 
     event.dataTransfer.setData(
       "text/plain",
