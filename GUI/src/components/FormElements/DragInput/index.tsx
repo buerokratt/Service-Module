@@ -5,6 +5,7 @@ import { Assign } from "types";
 import { t } from "i18next";
 import { getTypeColor } from "utils/object-util";
 import { templateToString } from "utils/string-util";
+import { getDragData } from "utils/component-util";
 
 interface DragInputProps {
   element: Assign | undefined;
@@ -16,11 +17,6 @@ const DragInput = ({ onChange, element, disallowedId }: DragInputProps) => {
   const [text, setText] = useState(element?.key ?? "");
   const [placeholder, setPlaceholder] = useState(t("serviceFlow.popup.dragElementHere"));
   const inputRef = useRef<HTMLInputElement>(null);
-
-  const getData = (e: React.DragEvent<HTMLInputElement>) => {
-    e.preventDefault();
-    return JSON.parse(e.dataTransfer.getData("text/plain")) as Assign;
-  };
 
   const resetPlaceholder = () => {
     inputRef.current?.classList.remove(styles.dragHover, styles.dragHoverDisabled);
@@ -39,7 +35,7 @@ const DragInput = ({ onChange, element, disallowedId }: DragInputProps) => {
       label=""
       className={styles.dragInput}
       onDrop={(e) => {
-        const data = getData(e);
+        const data = getDragData(e);
 
         if (disallowedId === data.id) {
           resetPlaceholder();
@@ -52,7 +48,7 @@ const DragInput = ({ onChange, element, disallowedId }: DragInputProps) => {
       tabIndex={-1}
       onFocus={(e) => e.target.blur()}
       onDragOver={(e) => {
-        const data = getData(e);
+        const data = getDragData(e);
 
         inputRef.current?.classList.add(disallowedId === data.id ? styles.dragHoverDisabled : styles.dragHover);
         if (disallowedId === data.id) setPlaceholder(t("serviceFlow.popup.assignToSelfNotAllowed"));
