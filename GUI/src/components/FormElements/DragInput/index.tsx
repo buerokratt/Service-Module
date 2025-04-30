@@ -27,11 +27,11 @@ const getDragData = (e: React.DragEvent<HTMLInputElement>) => {
 
 interface DragInputProps {
   element: Assign | undefined;
-  disallowedId: string;
+  id: string;
   onChange: (data: Assign) => void;
 }
 
-const DragInput = ({ onChange, element, disallowedId }: DragInputProps): ReactNode => {
+const DragInput = ({ onChange, element, id }: DragInputProps): ReactNode => {
   const [all, setAll] = useState(false);
   const [arrayIndex, setArrayIndex] = useState(0);
   const [text, setText] = useState(element?.key ?? "");
@@ -42,6 +42,8 @@ const DragInput = ({ onChange, element, disallowedId }: DragInputProps): ReactNo
     inputRef.current?.classList.remove(styles.dragHover, styles.dragHoverDisabled);
     setPlaceholder(t("serviceFlow.popup.dragElementHere"));
   };
+
+  // todo change related assigns on value update
 
   useEffect(() => {
     if (!element) return;
@@ -80,7 +82,7 @@ const DragInput = ({ onChange, element, disallowedId }: DragInputProps): ReactNo
               )}
               <span className={styles.arrayAll}>
                 <input
-                  id="all"
+                  id={`${id}-all`}
                   type="checkbox"
                   checked={all}
                   onChange={(e) => {
@@ -88,7 +90,7 @@ const DragInput = ({ onChange, element, disallowedId }: DragInputProps): ReactNo
                     onChange({ ...element, value: updateArrayIndex(element.value) });
                   }}
                 />
-                <label htmlFor="all">{t("serviceFlow.popup.all")}</label>
+                <label htmlFor={`${id}-all`}>{t("serviceFlow.popup.all")}</label>
               </span>
             </div>
           ) : (
@@ -109,7 +111,7 @@ const DragInput = ({ onChange, element, disallowedId }: DragInputProps): ReactNo
       onDrop={(e) => {
         const data = getDragData(e);
 
-        if (disallowedId === data.id) {
+        if (id === data.id) {
           resetPlaceholder();
           return;
         }
@@ -122,8 +124,8 @@ const DragInput = ({ onChange, element, disallowedId }: DragInputProps): ReactNo
       onDragOver={(e) => {
         const data = getDragData(e);
 
-        inputRef.current?.classList.add(disallowedId === data.id ? styles.dragHoverDisabled : styles.dragHover);
-        if (disallowedId === data.id) setPlaceholder(t("serviceFlow.popup.assignToSelfNotAllowed"));
+        inputRef.current?.classList.add(id === data.id ? styles.dragHoverDisabled : styles.dragHover);
+        if (id === data.id) setPlaceholder(t("serviceFlow.popup.assignToSelfNotAllowed"));
       }}
       onDragLeave={resetPlaceholder}
     />

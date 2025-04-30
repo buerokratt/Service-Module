@@ -59,7 +59,7 @@ const AssignElement: React.FC<AssignElementProps> = ({ element, onRemove, onChan
           <FormInput value={element.value} name="value" onChange={changeValue} label="" hideLabel />
         ) : (
           <Track gap={3} isFlex>
-            <DragInput disallowedId={element.id} element={slots[0]} onChange={(value) => changeFirstSlot(value)} />
+            <DragInput id={element.id} element={slots[0]} onChange={(value) => changeFirstSlot(value)} />
 
             {slots.length && isObject(slots[0]?.data) && !isArray(slots[0]?.data) ? (
               <Tooltip
@@ -79,7 +79,7 @@ const AssignElement: React.FC<AssignElementProps> = ({ element, onRemove, onChan
               </Tooltip>
             ) : null}
             {isSecondSlotOpen ? (
-              <DragInput disallowedId={element.id} element={slots[1]} onChange={(value) => changeSecondSlot(value)} />
+              <DragInput id={element.id} element={slots[1]} onChange={(value) => changeSecondSlot(value)} />
             ) : null}
           </Track>
         )}
