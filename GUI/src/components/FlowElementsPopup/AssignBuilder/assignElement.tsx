@@ -64,12 +64,13 @@ const AssignElement: React.FC<AssignElementProps> = ({ element, onRemove, onChan
       <Track style={{ flex: "1 0 75%", justifyContent: "flex-end" }}>
         {isEditingManually ? (
           <FormInput
-            value={manualInputValue}
+            // todo investigate why set state is not working
+            value={element.value}
             name="value"
             onChange={changeValue}
             label=""
             hideLabel
-            onDrop={changeManualInputValue}
+            // onDrop={changeManualInputValue}
           />
         ) : (
           <Track gap={3} isFlex>
