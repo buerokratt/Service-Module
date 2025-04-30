@@ -11,10 +11,15 @@ import { stringToTemplate, templateToString } from "utils/string-util";
 import { getTypeColor, isObject } from "utils/object-util";
 import Tooltip from "../Tooltip";
 import { DATE_CONSTANTS } from "utils/constants";
+import { v4 } from "uuid";
 
 type PreviousVariablesProps = {
   readonly nodeId: string;
 };
+
+// Unique key for input element, used below to identify it
+// All other assign element keys are UUIDs
+const INPUT_ELEMENT_KEY = "-1";
 
 const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
   const { t } = useTranslation();
@@ -31,18 +36,18 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
   const newAssignElements = useServiceStore((state) => state.assignElements);
 
   const createDateTemplate = (id: string, key: string, value: string): Assign => ({
-    id: `service_${id}`,
+    id,
     key,
     value: stringToTemplate(value),
   });
 
   const dates: Assign[] = [
-    createDateTemplate("current_date", "current date", DATE_CONSTANTS.TODAY),
-    createDateTemplate("current_time", "current time", DATE_CONSTANTS.CURRENT_TIME),
-    createDateTemplate("current_date_time", "current date & time", DATE_CONSTANTS.NOW),
-    createDateTemplate("yesterday", "yesterday", DATE_CONSTANTS.YESTERDAY),
-    createDateTemplate("tomorrow", "tomorrow", DATE_CONSTANTS.TOMORROW),
-    createDateTemplate("custom_date_time", "custom date time", DATE_CONSTANTS.CUSTOM),
+    createDateTemplate(v4(), "current date", DATE_CONSTANTS.TODAY),
+    createDateTemplate(v4(), "current time", DATE_CONSTANTS.CURRENT_TIME),
+    createDateTemplate(v4(), "current date & time", DATE_CONSTANTS.NOW),
+    createDateTemplate(v4(), "yesterday", DATE_CONSTANTS.YESTERDAY),
+    createDateTemplate(v4(), "tomorrow", DATE_CONSTANTS.TOMORROW),
+    createDateTemplate(v4(), "custom date time", DATE_CONSTANTS.CUSTOM),
   ];
 
   useEffect(() => {
@@ -61,13 +66,16 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
     const assignNodes = previousNodes.filter((node) => node.data.stepType === StepType.Assign);
     const assignElements = assignNodes.map((node) => node.data.assignElements).flat();
     const inputElement: Assign = {
-      id: "-1",
+      id: INPUT_ELEMENT_KEY,
       key: "input",
       value: stringToTemplate("incoming.body.input"),
+      // Can only be a string array, see trigger-service.yaml in Buerokratt-Chatbot
+      // Value is not known at this point, so passing a dummy to correctly infer type
+      data: [],
     };
 
-    setAssignedVariables([...assignElements, inputElement]);
-  }, [endpointsVariables]);
+    setAssignedVariables([...assignElements, inputElement, ...newAssignElements]);
+  }, [endpointsVariables, newAssignElements]);
 
   const popupBodyCss: CSSProperties = {
     padding: 16,
@@ -123,7 +131,7 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
             {endpoint.chips.map((chip) => {
               const typeColor = getTypeColor(chip.data);
               const dragData: Assign = {
-                id: "",
+                id: v4(),
                 key: chip.name,
                 value: stringToTemplate(chip.value),
                 data: chip.data,
@@ -132,8 +140,6 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
               return isObject(chip.data) ? (
                 <Tooltip content={`${chip.data} : ${typeColor.type}`}>
                   <OutputElementBox
-                    text={endpointsObjectTree?.path === chip.value ? chip.name + " ▲" : chip.name + " ▼"}
-                    value={stringToTemplate(chip.value)}
                     dragData={dragData}
                     style={{ cursor: "pointer" }}
                     borderColor={typeColor.color}
@@ -147,17 +153,15 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
                             }
                       );
                     }}
-                  />
+                  >
+                    {endpointsObjectTree?.path === chip.value ? chip.name + " ▲" : chip.name + " ▼"}
+                  </OutputElementBox>
                 </Tooltip>
               ) : (
                 <Tooltip content={`${chip.data} : ${typeColor.type}`}>
-                  <OutputElementBox
-                    borderColor={typeColor.color}
-                    text={chip.name}
-                    value={stringToTemplate(chip.value)}
-                    dragData={dragData}
-                    useValue
-                  />
+                  <OutputElementBox borderColor={typeColor.color} dragData={dragData}>
+                    {chip.name}
+                  </OutputElementBox>
                 </Tooltip>
               );
             })}
@@ -197,10 +201,9 @@ const VariableSection = ({
         {variables.map((variable: any) => {
           const typeColor = getTypeColor(variable.value);
 
-          return isObject(variable.data) ? (
-            <Tooltip key={variable.value} content={`${variable.value} : ${typeColor.type}`}>
+          return isObject(variable.data) && variable.id !== INPUT_ELEMENT_KEY ? (
+            <Tooltip content={`${variable.value} : ${typeColor.type}`}>
               <OutputElementBox
-                text={assignedObjectTree?.path === variable.value ? variable.key + " ▲" : variable.key + " ▼"}
                 className="tooltip"
                 dragData={variable}
                 style={{ cursor: "pointer" }}
@@ -215,18 +218,19 @@ const VariableSection = ({
                         }
                   );
                 }}
-              />
+              >
+                {assignedObjectTree?.path === variable.value ? variable.key + " ▲" : variable.key + " ▼"}
+              </OutputElementBox>
             </Tooltip>
           ) : (
-            <Tooltip key={variable.value} content={`${variable.value} : ${typeColor.type}`}>
+            <Tooltip content={`${variable.value} : ${typeColor.type}`}>
               <OutputElementBox
                 dragData={variable.key ? variable : undefined}
                 style={{ cursor: variable.key ? "grab" : "default" }}
-                text={variable.key.length > 0 ? variable.key : t("serviceFlow.previousVariables.noName")}
-                value={variable.value}
-                useValue
                 borderColor={typeColor.color}
-              />
+              >
+                {variable.key.length > 0 ? variable.key : t("serviceFlow.previousVariables.noName")}
+              </OutputElementBox>
             </Tooltip>
           );
         })}

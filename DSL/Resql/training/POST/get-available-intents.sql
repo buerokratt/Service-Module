@@ -36,6 +36,7 @@ WHERE rn = 1
       SELECT intent
       FROM connected_intents
   )
+  AND (:search IS NULL OR intent ILIKE '%' || :search || '%')
 ORDER BY
     CASE WHEN :sorting = 'intent asc' THEN intent END ASC,
     CASE WHEN :sorting = 'intent desc' THEN intent END DESC

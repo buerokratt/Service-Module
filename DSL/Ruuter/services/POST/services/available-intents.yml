@@ -26,6 +26,7 @@ get_available_intents:
       page: ${incoming.body.page}
       page_size: ${incoming.body.page_size}
       sorting: ${incoming.body.sorting}
+      search: ${incoming.body.search}
   result: res
 
 return_result:

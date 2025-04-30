@@ -281,6 +281,7 @@
       "fileSignYesNo": "Do you want to sign this file? Yes/No",
       "serviceEnded": "Service ended",
       "rule": "Rule",
+      "all": "All",
       "and": "AND",
       "or": "OR",
       "not": "NOT",
