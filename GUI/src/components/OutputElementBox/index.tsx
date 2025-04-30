@@ -2,6 +2,7 @@ import { CSSProperties, FC, DragEvent } from "react";
 import Box from "../Box";
 import { Assign, StepType } from "types";
 import useServiceStore from "store/new-services.store";
+import { ASSIGN_DRAG_DATA } from "utils/component-util";
 
 type OutputElementBoxProps = {
   readonly text: string;
@@ -40,7 +41,7 @@ const OutputElementBox: FC<OutputElementBoxProps> = ({
     const dragValue = useValue ? `${value}` : text;
 
     event.dataTransfer.setData(
-      "text/plain",
+      ASSIGN_DRAG_DATA,
       node?.data.stepType === StepType.Assign && dragData ? JSON.stringify(dragData) : dragValue
     );
   };

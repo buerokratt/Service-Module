@@ -1,5 +1,7 @@
 import { Step } from "types";
 
+export const ASSIGN_DRAG_DATA = "assign-drag-data";
+
 export const onDragStart = (event: React.DragEvent<HTMLDivElement>, step: Step) => {
   event.dataTransfer.setData("application/reactflow-label", step.label);
   event.dataTransfer.setData("application/reactflow-type", step.type);
@@ -9,5 +11,5 @@ export const onDragStart = (event: React.DragEvent<HTMLDivElement>, step: Step) 
 
 export const getDragData = (event: React.DragEvent<HTMLDivElement>) => {
   event.preventDefault();
-  return JSON.parse(event.dataTransfer.getData("text/plain"));
+  return JSON.parse(event.dataTransfer.getData(ASSIGN_DRAG_DATA));
 };
