@@ -97,7 +97,7 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
                 <Tooltip content={`${variable.value} : ${typeColor.type}`}>
                   <OutputElementBox
                     className="tooltip"
-                    value={variable}
+                    dragData={variable}
                     style={{ cursor: "pointer" }}
                     borderColor={typeColor.color}
                     onClick={() => {
@@ -117,7 +117,7 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
               ) : (
                 <Tooltip content={`${variable.value} : ${typeColor.type}`}>
                   <OutputElementBox
-                    value={variable.key ? variable : undefined}
+                    dragData={variable.key ? variable : undefined}
                     style={{ cursor: variable.key ? "grab" : "default" }}
                     borderColor={typeColor.color}
                   >
@@ -163,7 +163,7 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
               return isObject(chip.data) ? (
                 <Tooltip content={`${chip.data} : ${typeColor.type}`}>
                   <OutputElementBox
-                    value={dragData}
+                    dragData={dragData}
                     style={{ cursor: "pointer" }}
                     borderColor={typeColor.color}
                     onClick={() => {
@@ -182,7 +182,7 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
                 </Tooltip>
               ) : (
                 <Tooltip content={`${chip.data} : ${typeColor.type}`}>
-                  <OutputElementBox borderColor={typeColor.color} value={dragData}>
+                  <OutputElementBox borderColor={typeColor.color} dragData={dragData}>
                     {chip.name}
                   </OutputElementBox>
                 </Tooltip>

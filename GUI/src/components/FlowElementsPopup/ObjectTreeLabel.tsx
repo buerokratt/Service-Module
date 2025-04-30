@@ -77,7 +77,7 @@ export const ObjectTreeLabel: FC<ObjectTreeLabelProps> = ({ keyPath, nodeType, p
 
   return (
     <OutputElementBox
-      value={{ key, value: buildValueString(keyPath), data: parseNodeType(nodeType), id: "" }}
+      dragData={{ key, value: buildValueString(keyPath), data: parseNodeType(nodeType), id: "" }}
       className="object-tree-chip"
       borderColor={typeColor.color}
     >

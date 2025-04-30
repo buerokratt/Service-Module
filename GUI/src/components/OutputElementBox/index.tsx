@@ -6,13 +6,20 @@ import useServiceStore from "store/new-services.store";
 type OutputElementBoxProps = {
   readonly children: ReactNode;
   readonly borderColor?: string;
-  readonly value?: Assign;
+  readonly dragData?: Assign;
   readonly onClick?: () => void;
   readonly style?: CSSProperties;
   readonly className?: string;
 };
 
-const OutputElementBox: FC<OutputElementBoxProps> = ({ borderColor, value, onClick, style, className, children }) => {
+const OutputElementBox: FC<OutputElementBoxProps> = ({
+  borderColor,
+  dragData,
+  onClick,
+  style,
+  className,
+  children,
+}) => {
   const node = useServiceStore((state) => state.selectedNode);
   const mergedStyle: CSSProperties = {
     borderRadius: 46,
@@ -26,11 +33,11 @@ const OutputElementBox: FC<OutputElementBoxProps> = ({ borderColor, value, onCli
   };
 
   const handleDragStart = (event: DragEvent<HTMLDivElement>) => {
-    if (!value) return;
+    if (!dragData) return;
 
     event.dataTransfer.setData(
       "text/plain",
-      node?.data.stepType === StepType.Assign ? JSON.stringify(value) : value.value
+      node?.data.stepType === StepType.Assign ? JSON.stringify(dragData) : dragData.value
     );
   };
 
@@ -39,7 +46,7 @@ const OutputElementBox: FC<OutputElementBoxProps> = ({ borderColor, value, onCli
       className={className}
       onClick={onClick}
       color="green"
-      draggable={!!value}
+      draggable={!!dragData}
       onDragStart={handleDragStart}
       style={mergedStyle}
     >
