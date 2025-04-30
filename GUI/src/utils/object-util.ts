@@ -68,7 +68,9 @@ export const isArray = (x: unknown) => {
   return Array.isArray(x);
 };
 
-export const getTypeColor = (value: any): { type: string; color: string } => {
+export const getTypeColor = (
+  value: unknown
+): { type: "null/undefined" | "string" | "number" | "date" | "array" | "object" | "unknown"; color: string } => {
   switch (true) {
     case value === null || value === undefined:
       return { type: "null/undefined", color: "#A1A1A1" };
