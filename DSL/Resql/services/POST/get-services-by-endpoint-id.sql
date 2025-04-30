@@ -8,6 +8,6 @@ WHERE jsonb_path_exists(
   AND NOT EXISTS (
     SELECT 1 FROM services s2 
     WHERE s2.service_id = s1.service_id 
-    AND s2.deleted IS false
+    AND s2.deleted IS true
   )
 ORDER BY service_id, id DESC;
