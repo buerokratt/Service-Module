@@ -20,7 +20,7 @@ const FileGenerateContent: React.FC<FileGenerateContentProps> = ({
   defaultFileContent,
 }) => {
   const { t } = useTranslation();
-  const variables = useServiceStore(state => state.getFlatVariables());
+  const variables = useServiceStore((state) => state.getFlatVariables());
 
   return (
     <Track direction="vertical" align="stretch">
@@ -58,7 +58,7 @@ const FileGenerateContent: React.FC<FileGenerateContentProps> = ({
         <span>{t("serviceFlow.popup.availableVariables")}</span>
         <Track gap={7} className="flow-tags-container">
           {variables.map((element, i) => (
-            <OutputElementBox key={`${element}-${i}`} text={element}></OutputElementBox>
+            <OutputElementBox key={`${element}-${i}`}>{element}</OutputElementBox>
           ))}
         </Track>
       </Track>

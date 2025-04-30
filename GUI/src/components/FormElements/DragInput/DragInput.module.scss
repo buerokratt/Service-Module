@@ -2,6 +2,39 @@
 @import "src/styles/tools/color";
 @import "src/styles/settings/variables/other";
 @import "src/styles/settings/variables/typography";
+@import "src/styles/settings/mixins";
+
+.element {
+  cursor: default !important;
+}
+
+.array {
+  display: flex;
+
+  .arrayIndex {
+    height: 5px;
+    margin-left: 4px;
+    padding: 8px 0;
+    text-align: center;
+    width: 50px;
+  }
+
+  .arrayAll {
+    @include veera-checkbox;
+
+    input[type="checkbox"] {
+      + label {
+        display: inline;
+        padding-left: 25px;
+
+        &::before {
+          background-color: get-color(white);
+          top: 2px;
+        }
+      }
+    }
+  }
+}
 
 .dragInput {
   background: transparent !important;
