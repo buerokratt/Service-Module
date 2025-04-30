@@ -23,7 +23,7 @@ import { GroupOrRule } from "components/FlowElementsPopup/RuleBuilder/types";
 import useTestServiceStore from "./test-services.store";
 import { Chip } from "types/chip";
 import { EndpointResponseVariable } from "types/endpoint/endpoint-response-variables";
-import { Assign } from "components/FlowElementsPopup/AssignBuilder/assign-types";
+import { Assign } from "types/assign";
 
 interface ServiceStoreState {
   endpoints: EndpointData[];
@@ -193,7 +193,7 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
           for (const [key, value] of Object.entries(response)) {
             chips.push({
               name: key,
-              value: `${endpoint.name.replace(" ", "_")}_res.response.body.${key}`,
+              value: `${endpoint.name.replace(" ", "_")}_res.${key}`,
               data: value,
             });
           }
@@ -206,7 +206,9 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
       });
 
       set({ endpointsResponseVariables: variables });
-    } catch (e) {}
+    } catch (e) {
+      console.error(e);
+    }
   },
   getFlatVariables: () => {
     return [...get().availableVariables.prod, ...get().availableVariables.test];
@@ -531,74 +533,35 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
   },
 
   onDelete: (id) => {
-    const reactFlowInstance = get().reactFlowInstance;
-    if (!reactFlowInstance) return;
+    const state = get();
+    const reactFlowInstance = getReactFlowInstance(state);
 
-    const edgeFromDeletedNode = reactFlowInstance
-      .getEdges()
-      .filter((edge) => edge.source === id)
-      .map((x) => x.target);
+    // Get connected nodes and edges
+    const { edgesFromNode, edgesFromNextNode } = getConnectedNodes(reactFlowInstance, id);
 
-    const edgeFromNextNode = reactFlowInstance
-      .getEdges()
-      .filter((edge) => edge.source === edgeFromDeletedNode[0])
-      .map((x) => x.target);
+    // Determine children nodes
+    let children = determineChildrenNodes(reactFlowInstance, edgesFromNode, edgesFromNextNode);
 
-    let children: Node<any>[] = [];
-    if (edgeFromNextNode.length > 0) {
-      children = reactFlowInstance.getNodes().filter((node) => edgeFromNextNode.includes(node.id));
-    } else {
-      children = reactFlowInstance.getNodes().filter((node) => edgeFromDeletedNode.includes(node.id));
-    }
+    // Start with removing the deleted node
+    let nodes = state.nodes.filter((x) => x.id !== id);
 
-    let nodes = get().nodes.filter((x) => x.id !== id);
+    // Handle placeholder nodes if they exist
+    ({ children, nodes } = handlePlaceholderNodes(children, nodes));
 
-    if (children.length === 2) {
-      if (children[0].type === "placeholder") {
-        nodes = nodes.filter((x) => x.id !== children[0].id);
-        children.shift();
-      } else if (children[1].type === "placeholder") {
-        nodes = nodes.filter((x) => x.id !== children[1].id);
-        children.pop();
-      } else children = [];
-    }
+    // Handle child node (either existing or new placeholder)
+    const { child, nodes: updatedNodes } = handleChildNode(reactFlowInstance, children, nodes, id, state.nodes.length);
+    nodes = updatedNodes;
 
-    let child: Node | undefined;
+    // Update edges (remove and redirect)
+    const edges = updateEdges(state.edges, id, child);
 
-    if (children.length === 1) child = children[0];
-    if (children.length === 0) {
-      const deletedNodePosition = reactFlowInstance.getNodes().find((node) => node.id === id)?.position;
-      const deletedNodeStepType = reactFlowInstance.getNodes().find((node) => node.id === id)?.data.stepType;
-      if (
-        deletedNodeStepType !== StepType.FinishingStepEnd ||
-        (deletedNodeStepType !== StepType.FinishingStepRedirect && get().nodes.length <= 4)
-      ) {
-        const placeholder = buildPlaceholder({ id, position: deletedNodePosition });
-        nodes.push(placeholder);
-        child = placeholder;
-      }
-    }
+    // Clean up orphaned nodes
+    nodes = cleanupOrphanedNodes(nodes, edges);
 
-    const edges = get()
-      .edges.filter((x) => x.source !== id)
-      .map((x) => (x.target === id && child ? { ...x, target: child.id } : x));
+    // Clean up intermediate nodes if needed
+    nodes = cleanupIntermediateNodes(nodes, edgesFromNode, edgesFromNextNode, state.nodes.length);
 
-    nodes = nodes.filter((x) => edges.find((y) => y.target === x.id || y.source === x.id));
-
-    if (edgeFromNextNode.length > 0) {
-      nodes = nodes.filter((x) => x.id !== edgeFromDeletedNode[0]);
-      if (edgeFromNextNode.length === 2) {
-        nodes = nodes.filter((x) => x.id !== edgeFromDeletedNode[1]);
-      }
-    }
-
-    if (edgeFromDeletedNode.length > 0 && get().nodes.length > 4) {
-      nodes = nodes.filter((x) => x.id !== edgeFromDeletedNode[0]);
-      if (edgeFromDeletedNode.length === 2) {
-        nodes = nodes.filter((x) => x.id !== edgeFromDeletedNode[1]);
-      }
-    }
-
+    // Update edges and nodes
     set({ edges, nodes });
   },
   clickedNode: null,
@@ -664,6 +627,7 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
       }
       onSuccess();
     } catch (e) {
+      console.error(e);
       onError();
     }
   },
@@ -680,5 +644,119 @@ function extractMapValues(element: any) {
   }
   return result;
 }
+
+const getReactFlowInstance = (state: any) => {
+  const instance = state.reactFlowInstance;
+  if (!instance) throw new Error("React Flow instance not available");
+  return instance;
+};
+
+const getConnectedNodes = (reactFlowInstance: any, nodeId: string) => {
+  const edgesFromNode = reactFlowInstance
+    .getEdges()
+    .filter((edge: any) => edge.source === nodeId)
+    .map((edge: any) => edge.target);
+
+  const edgesFromNextNode = reactFlowInstance
+    .getEdges()
+    .filter((edge: any) => edge.source === edgesFromNode[0])
+    .map((edge: any) => edge.target);
+
+  return { edgesFromNode, edgesFromNextNode };
+};
+
+const determineChildrenNodes = (
+  reactFlowInstance: any,
+  edgesFromNode: string[],
+  edgesFromNextNode: string[]
+) => {
+  if (edgesFromNextNode.length > 0) {
+    return reactFlowInstance
+      .getNodes()
+      .filter((node: any) => edgesFromNextNode.includes(node.id));
+  }
+  return reactFlowInstance
+    .getNodes()
+    .filter((node: any) => edgesFromNode.includes(node.id));
+};
+
+const handlePlaceholderNodes = (children: any[], nodes: any[]) => {
+  if (children.length === 2) {
+    if (children[0].type === "placeholder") {
+      nodes = nodes.filter((x) => x.id !== children[0].id);
+      children.shift();
+    } else if (children[1].type === "placeholder") {
+      nodes = nodes.filter((x) => x.id !== children[1].id);
+      children.pop();
+    } else {
+      children = [];
+    }
+  }
+  return { children, nodes };
+};
+
+const handleChildNode = (
+  reactFlowInstance: any,
+  children: any[],
+  nodes: any[],
+  deletedNodeId: string,
+  stateNodesLength: number
+) => {
+  let child: any = undefined;
+
+  if (children.length === 1) {
+    child = children[0];
+  } else if (children.length === 0) {
+    const deletedNode = reactFlowInstance.getNodes().find((node: any) => node.id === deletedNodeId);
+    const deletedNodePosition = deletedNode?.position;
+    const deletedNodeStepType = deletedNode?.data.stepType;
+
+    if (
+      deletedNodeStepType !== StepType.FinishingStepEnd ||
+      (deletedNodeStepType !== StepType.FinishingStepRedirect && stateNodesLength <= 4)
+    ) {
+      const placeholder = buildPlaceholder({ id: deletedNodeId, position: deletedNodePosition });
+      nodes.push(placeholder);
+      child = placeholder;
+    }
+  }
+
+  return { child, nodes };
+};
+
+const updateEdges = (edges: any[], deletedNodeId: string, child: any) => {
+  return edges
+    .filter((x) => x.source !== deletedNodeId)
+    .map((x) => (x.target === deletedNodeId && child ? { ...x, target: child.id } : x));
+};
+
+const cleanupOrphanedNodes = (nodes: any[], edges: any[]) => {
+  return nodes.filter((x) => edges.find((y) => y.target === x.id || y.source === x.id));
+};
+
+const cleanupIntermediateNodes = (
+  nodes: any[],
+  edgesFromNode: string[],
+  edgesFromNextNode: string[],
+  stateNodesLength: number
+) => {
+  let updatedNodes = [...nodes];
+
+  if (edgesFromNextNode.length > 0) {
+    updatedNodes = updatedNodes.filter((x) => x.id !== edgesFromNode[0]);
+    if (edgesFromNextNode.length === 2) {
+      updatedNodes = updatedNodes.filter((x) => x.id !== edgesFromNode[1]);
+    }
+  }
+
+  if (edgesFromNode.length > 0 && stateNodesLength > 4) {
+    updatedNodes = updatedNodes.filter((x) => x.id !== edgesFromNode[0]);
+    if (edgesFromNode.length === 2) {
+      updatedNodes = updatedNodes.filter((x) => x.id !== edgesFromNode[1]);
+    }
+  }
+
+  return updatedNodes;
+};
 
 export default useServiceStore;

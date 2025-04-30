@@ -1,0 +1,24 @@
+@import "src/styles/tools/spacing";
+@import "src/styles/tools/color";
+@import "src/styles/settings/variables/other";
+@import "src/styles/settings/variables/typography";
+
+.dragInput {
+  background: transparent !important;
+  border: 1px dashed !important;
+  font-style: italic;
+  cursor: default;
+  height: 27px !important;
+}
+
+.dragHover {
+  border: 1px solid get-color(sea-green-10) !important;
+}
+
+.dragHoverDisabled {
+  border: 1px solid get-color(jasper-10) !important;
+
+  &::placeholder {
+    color: get-color(jasper-10) !important;
+  }
+}

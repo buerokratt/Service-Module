@@ -22,6 +22,10 @@ export const testService = (state: ServiceState, serviceName: string): string =>
   `${baseUrl}/services/${state.toLowerCase()}/${serviceName}`;
 export const editService = (id: string): string => `${baseUrl}/services/edit?id=${id}`;
 export const getServicesList = (): string => `${baseUrl}/services`;
+export const getServicesByEndpointId = (endpointId: string, excludedServiceId?: string): string =>
+  `${baseUrl}/services-by-endpoint-id?endpointId=${endpointId}${
+    excludedServiceId ? `&excludedServiceId=${excludedServiceId}` : ""
+  }`;
 export const getCommonServicesList = (): string => `${baseUrl}/common-services`;
 export const getConnectionRequests = (): string => `${baseUrl}/services/connection-requests`;
 export const getAvailableIntents = (): string => `${baseUrl}/services/available-intents`;

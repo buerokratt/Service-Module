@@ -34,9 +34,11 @@ type DataTableProps = {
   sortable?: boolean;
   filterable?: boolean;
   pagination?: PaginationState;
+  columnFilters?: ColumnFiltersState;
   sorting?: SortingState;
   setPagination?: (state: PaginationState) => void;
   setSorting?: (state: SortingState) => void;
+  setFiltering?: (state: ColumnFiltersState) => void;
   globalFilter?: string;
   setGlobalFilter?: React.Dispatch<React.SetStateAction<string>>;
   columnVisibility?: VisibilityState;
@@ -87,8 +89,10 @@ const DataTable: FC<DataTableProps> = ({
   isClientSide = true,
   pagination,
   sorting,
+  columnFilters,
   setPagination,
   setSorting,
+  setFiltering,
   globalFilter,
   setGlobalFilter,
   columnVisibility,
@@ -99,7 +103,6 @@ const DataTable: FC<DataTableProps> = ({
 }) => {
   const id = useId();
   const { t } = useTranslation();
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
   const tablePagination = pagination ?? {
     pageIndex: 0,
     pageSize: 10,
@@ -113,13 +116,16 @@ const DataTable: FC<DataTableProps> = ({
     },
     state: {
       sorting,
-      columnFilters,
       globalFilter,
       columnVisibility,
       ...{ pagination: tablePagination },
+      ...{ columnFilters },
     },
     meta,
-    onColumnFiltersChange: setColumnFilters,
+    onColumnFiltersChange: (updater) => {
+      if (typeof updater !== "function") return;
+      setFiltering?.(updater(table.getState().columnFilters));
+    },
     onGlobalFilterChange: setGlobalFilter,
     onColumnVisibilityChange: setColumnVisibility,
     globalFilterFn: fuzzyFilter,
@@ -136,6 +142,7 @@ const DataTable: FC<DataTableProps> = ({
     ...(pagination && { getPaginationRowModel: getPaginationRowModel() }),
     ...(sortable && { getSortedRowModel: getSortedRowModel() }),
     manualPagination: isClientSide ? undefined : true,
+    manualFiltering: isClientSide ? undefined : true,
     manualSorting: isClientSide ? undefined : true,
     pageCount: isClientSide ? undefined : pagesCount,
   });
@@ -189,7 +196,7 @@ const DataTable: FC<DataTableProps> = ({
               <button className="previous" onClick={() => table.previousPage()} disabled={!table.getCanPreviousPage()}>
                 <MdOutlineWest />
               </button>
-              <nav role="navigation" aria-label={t("global.paginationNavigation") || ""}>
+              <nav role="navigation" aria-label={t("global.paginationNavigation") ?? ""}>
                 <ul className="links">
                   {[...Array(table.getPageCount())].map((_, index) => (
                     <li

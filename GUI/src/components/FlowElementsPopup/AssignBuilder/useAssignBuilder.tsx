@@ -1,31 +1,37 @@
 import { useEffect, useState } from "react";
-import { Assign, getInitialElement } from "./assign-types";
+import { Assign } from "../../../types/assign";
+import { v4 as uuidv4 } from "uuid";
 
 interface UseAssignBuilderProps {
-  assignElements?: Assign[];
-  root?: boolean;
   onChange: (group: Assign[]) => void;
-  seedGroup?: any;
+  seedGroup: Assign[];
 }
 
-export const useAssignBuilder = (config: UseAssignBuilderProps) => {
-  const elementsInitialValue = config.root ? config.seedGroup ?? [] : config.assignElements!;
-  const [elements, setElements] = useState<Assign[]>(elementsInitialValue ?? []);
+export const createNewElement = () => {
+  return {
+    id: uuidv4(),
+    key: "",
+    value: "",
+  };
+};
+
+export const useAssignBuilder = ({ seedGroup, onChange }: UseAssignBuilderProps) => {
+  const [elements, setElements] = useState<Assign[]>(seedGroup);
 
   useEffect(() => {
-    config.onChange(elements)
-  }, [elements]);
+    onChange(elements);
+  }, [elements, onChange]);
 
   const addElement = () => {
-    setElements([...elements, getInitialElement()]);
-  }
+    setElements([...elements, createNewElement()]);
+  };
 
   const remove = (id: string) => {
-    setElements(elements.filter(x => x.id !== id));
-  }
+    setElements(elements.filter((x) => x.id !== id));
+  };
 
   const changeElement = (element: Assign) => setElementById(element.id, element);
-  
+
   const setElementById = (id: string, element: Assign) => {
     const newElements = elements.map((x) => (x.id === id ? { ...element } : x));
     setElements(newElements);
@@ -37,4 +43,4 @@ export const useAssignBuilder = (config: UseAssignBuilderProps) => {
     remove,
     changeElement,
   };
-}
+};

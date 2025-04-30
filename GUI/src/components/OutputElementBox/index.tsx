@@ -1,11 +1,13 @@
-import { CSSProperties, FC } from "react";
+import { CSSProperties, FC, DragEvent } from "react";
 import Box from "../Box";
+import { Assign, StepType } from "types";
+import useServiceStore from "store/new-services.store";
 
 type OutputElementBoxProps = {
   readonly text: string;
   readonly value?: string | number;
-  readonly color?: "green" | "yellow";
-  readonly draggable?: boolean;
+  readonly borderColor?: string;
+  readonly dragData?: Assign;
   readonly useValue?: boolean;
   readonly onClick?: () => void;
   readonly style?: CSSProperties;
@@ -14,14 +16,15 @@ type OutputElementBoxProps = {
 
 const OutputElementBox: FC<OutputElementBoxProps> = ({
   text,
-  color = "green",
-  draggable = true,
+  borderColor,
+  dragData,
   useValue = false,
   value = "",
   onClick,
   style,
   className,
 }) => {
+  const node = useServiceStore((state) => state.selectedNode);
   const mergedStyle: CSSProperties = {
     borderRadius: 46,
     paddingTop: 1.5,
@@ -30,15 +33,25 @@ const OutputElementBox: FC<OutputElementBoxProps> = ({
     paddingRight: 10,
     fontSize: 14,
     ...style,
+    ...(borderColor && { border: `2px outset ${borderColor}` }),
+  };
+
+  const handleDragStart = (event: DragEvent<HTMLDivElement>) => {
+    const dragValue = useValue ? `${value}` : text;
+
+    event.dataTransfer.setData(
+      "text/plain",
+      node?.data.stepType === StepType.Assign && dragData ? JSON.stringify(dragData) : dragValue
+    );
   };
 
   return (
     <Box
       className={className}
       onClick={onClick}
-      color={color}
-      draggable={draggable}
-      onDragStart={(event) => event.dataTransfer.setData("text/plain", useValue ? `${value}` : text)}
+      color="green"
+      draggable={!!dragData}
+      onDragStart={dragData && handleDragStart}
       style={mergedStyle}
     >
       {text}

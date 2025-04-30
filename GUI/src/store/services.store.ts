@@ -55,7 +55,8 @@ interface ServiceStoreState {
     onEnd: (requests: Intent[]) => void,
     errorMessage: string,
     pagination: PaginationState,
-    sorting: SortingState
+    sorting: SortingState,
+    search: string
   ) => Promise<void>;
   respondToConnectionRequest: (
     onEnd: () => void,
@@ -99,9 +100,9 @@ const useServiceListStore = create<ServiceStoreState>((set, get, store) => ({
             serviceId: item.serviceId,
             usedCount: 0,
             totalPages: item.totalPages,
-            linkedIntent: triggers.find((e: Trigger) => e.service === item.serviceId)?.intent || "",
+            linkedIntent: triggers.find((e: Trigger) => e.service === item.serviceId)?.intent ?? "",
           } as Service)
-      ) || [];
+      ) ?? [];
 
     set({
       notCommonServices: services,
@@ -129,9 +130,9 @@ const useServiceListStore = create<ServiceStoreState>((set, get, store) => ({
             serviceId: item.serviceId,
             totalPages: item.totalPages,
             usedCount: 0,
-            linkedIntent: triggers.find((e: Trigger) => e.service === item.serviceId)?.intent || "",
+            linkedIntent: triggers.find((e: Trigger) => e.service === item.serviceId)?.intent ?? "",
           } as Service)
-      ) || [];
+      ) ?? [];
 
     set({
       commonServices: services,
@@ -174,7 +175,8 @@ const useServiceListStore = create<ServiceStoreState>((set, get, store) => ({
       useToastStore.getState().success({ title: successMessage });
       await useServiceListStore.getState().loadServicesList(pagination, sorting);
       await useServiceListStore.getState().loadCommonServicesList(pagination, sorting);
-    } catch (_) {
+    } catch (error) {
+      console.error(error);
       useToastStore.getState().error({ title: errorMessage });
     }
     set({
@@ -195,7 +197,8 @@ const useServiceListStore = create<ServiceStoreState>((set, get, store) => ({
       } else {
         onNotConnected();
       }
-    } catch (_) {
+    } catch (error) {
+      console.error(error);
       onNotConnected();
     }
   },
@@ -211,7 +214,8 @@ const useServiceListStore = create<ServiceStoreState>((set, get, store) => ({
       useToastStore.getState().success({ title: successMessage });
       await useServiceListStore.getState().loadServicesList({ pageIndex: 0, pageSize: 10 }, []);
       await useServiceListStore.getState().loadCommonServicesList({ pageIndex: 0, pageSize: 10 }, []);
-    } catch (_) {
+    } catch (error) {
+      console.error(error);
       useToastStore.getState().error({ title: errorMessage });
     }
     set({
@@ -234,7 +238,8 @@ const useServiceListStore = create<ServiceStoreState>((set, get, store) => ({
       useToastStore.getState().success({ title: successMessage });
       await useServiceListStore.getState().loadServicesList(pagination, sorting);
       await useServiceListStore.getState().loadCommonServicesList(pagination, sorting);
-    } catch (_) {
+    } catch (error) {
+      console.error(error);
       useToastStore.getState().error({ title: errorMessage });
     }
     onEnd();
@@ -249,12 +254,13 @@ const useServiceListStore = create<ServiceStoreState>((set, get, store) => ({
         sorting: sort,
       });
       onEnd(requests.data.response);
-    } catch (_) {
+    } catch (error) {
+      console.error(error);
       onEnd([]);
       useToastStore.getState().error({ title: errorMessage });
     }
   },
-  loadAvailableIntentsList: async (onEnd, errorMessage, pagination, sorting) => {
+  loadAvailableIntentsList: async (onEnd, errorMessage, pagination, sorting, search) => {
     try {
       const order = sorting[0]?.desc ? "desc" : "asc";
       const sort = sorting.length === 0 ? "intent asc" : sorting[0]?.id + " " + order;
@@ -262,9 +268,11 @@ const useServiceListStore = create<ServiceStoreState>((set, get, store) => ({
         page: pagination.pageIndex + 1,
         page_size: pagination.pageSize,
         sorting: sort,
+        search: search
       });
       onEnd(requests.data.response);
-    } catch (_) {
+    } catch (error) {
+      console.error(error);
       onEnd([]);
       useToastStore.getState().error({ title: errorMessage });
     }
@@ -280,7 +288,8 @@ const useServiceListStore = create<ServiceStoreState>((set, get, store) => ({
         status: status === true ? "approved" : "declined",
       });
       useToastStore.getState().success({ title: successMessage });
-    } catch (_) {
+    } catch (error) {
+      console.error(error);
       useToastStore.getState().error({ title: errorMessage });
     }
     onEnd();
@@ -296,7 +305,8 @@ const useServiceListStore = create<ServiceStoreState>((set, get, store) => ({
         status: "deleted",
       });
       useToastStore.getState().success({ title: successMessage });
-    } catch (_) {
+    } catch (error) {
+      console.error(error);
       useToastStore.getState().error({ title: errorMessage });
     }
     onEnd();

@@ -289,17 +289,32 @@
       "addGroup": "+ Group",
       "remove": "Remove",
       "signType": "Sign Type",
-      "round": "Round"
+      "round": "Round",
+      "dragElementHere": "Drag an element here",
+      "assignToSelfNotAllowed": "Assign to self not allowed",
+      "assignAsValue": "Assign another element to use as value",
+      "removeValueAssignment": "Remove element assigned as value",
+      "assignManualEdit": "Manually edit variable assignment"
     },
     "previousVariables": {
-      "assignElements": "Assign Elements"
+      "assignElements": "Assign Elements",
+      "noName": "<No name>"
     },
     "flow": "Service flow",
     "placeholderNode": "Drag the next step into the flow",
     "placeholderNodeSuccess": "Drag the success step into the flow",
     "placeholderNodeFailure": "Drag the failure step into the flow",
     "allElements": "All elements",
-    "setupElements": "Setup elements",
+    "apiElements": {
+      "title": "API elements",
+      "delete": "Delete",
+      "deletionImpossible": "Deletion impossible",
+      "deletionImpossibleMessage": "Deletion is impossible. This API element is used in the following services. Please remove the API element from these services first.",
+      "deleteConfirmation": "Delete",
+      "deleteConfirmationMessage": "Are you sure you want to delete this API element?",
+      "deleteSuccess": "API element deleted successfully",
+      "deleteError": "Failed to delete API element"
+    },
     "tabs": {
       "setup": "Setup",
       "test": "Test"
