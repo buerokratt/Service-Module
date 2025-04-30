@@ -1,3 +1,7 @@
+export const isTemplate = (value: string | number) => {
+  return String(value).startsWith("${") && String(value).endsWith("}");
+};
+
 export const stringToTemplate = (value: string | number) => {
   return "${" + value + "}";
 };

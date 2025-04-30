@@ -23,7 +23,7 @@ import FileSignContent from "./FileSignContent";
 import "./styles.scss";
 import ConditionContent from "./ConditionContent";
 import AssignContent from "./AssignContent";
-import { templateToString } from "utils/string-util";
+import { isTemplate, stringToTemplate, templateToString } from "utils/string-util";
 import { getValueByPath } from "utils/object-util";
 import ApiContent from "./ApiContent";
 import { saveEndpoints } from "services/service-builder";
@@ -121,7 +121,12 @@ const FlowElementsPopup: React.FC = () => {
     if (stepType === StepType.Assign) {
       const flatEndpointVariables = endpointsVariables.map((endpoint) => endpoint.chips).flat();
       assignElements.forEach((element) => {
-        // Values are saved as templates for backwards compatibility
+        // Convert simple values such as "some input" to simple string
+        if (!isTemplate(element.value)) {
+          element.value = stringToTemplate('"' + element.value + '"');
+          return;
+        }
+
         const fullPath = templateToString(element.value);
         const endpointVariable = flatEndpointVariables.find((variable) => fullPath.startsWith(String(variable.value)));
 
