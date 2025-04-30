@@ -17,7 +17,7 @@ const getArrayIndex = (value: string): number => {
 const updateArrayIndex = (value: string, index?: number): string => {
   let base = templateToString(value);
   base = base.replace(ARRAY_INDEX_PATTERN, "");
-  return stringToTemplate(index ? `${base}[${index}]` : base);
+  return stringToTemplate(index !== undefined ? `${base}[${index}]` : base);
 };
 
 const getDragData = (e: React.DragEvent<HTMLInputElement>) => {
@@ -113,7 +113,7 @@ const DragInput = ({ onChange, element, disallowedId }: DragInputProps): ReactNo
           resetPlaceholder();
           return;
         }
-        onChange({ ...data, value: updateArrayIndex(data.value, arrayIndex) });
+        onChange({ ...data, value: isArray(data.data) ? updateArrayIndex(data.value, 0) : data.value });
         setText(data.key);
       }}
       // Disable focus, text cursor and everything related to keyboard input
