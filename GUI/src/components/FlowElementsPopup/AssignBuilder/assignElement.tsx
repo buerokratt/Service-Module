@@ -18,7 +18,6 @@ const AssignElement: React.FC<AssignElementProps> = ({ element, onRemove, onChan
   const slots = element.slots ?? [];
   const [isSecondSlotOpen, setIsSecondSlotOpen] = useState(!!slots[1]);
   const [isEditingManually, setIsEditingManually] = useState(element.value && !slots.length);
-  const [manualInputValue, setManualInputValue] = useState(element.value);
 
   const changeKey = (e: React.ChangeEvent<HTMLInputElement>) => {
     onChange({ ...element, key: e.target.value });
@@ -30,7 +29,7 @@ const AssignElement: React.FC<AssignElementProps> = ({ element, onRemove, onChan
 
   const changeManualInputValue = (e: React.DragEvent<HTMLInputElement>) => {
     const data = getDragData(e);
-    setManualInputValue(data.value);
+    onChange({ ...element, value: data.value });
   };
 
   const changeFirstSlot = (data: Assign) => {
@@ -64,13 +63,12 @@ const AssignElement: React.FC<AssignElementProps> = ({ element, onRemove, onChan
       <Track style={{ flex: "1 0 75%", justifyContent: "flex-end" }}>
         {isEditingManually ? (
           <FormInput
-            // todo investigate why set state is not working
             value={element.value}
             name="value"
             onChange={changeValue}
             label=""
             hideLabel
-            // onDrop={changeManualInputValue}
+            onDrop={changeManualInputValue}
           />
         ) : (
           <Track gap={3} isFlex>
