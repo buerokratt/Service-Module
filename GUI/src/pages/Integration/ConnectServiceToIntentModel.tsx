@@ -24,20 +24,22 @@ const ConnectServiceToIntentModel: FC<ConnectServiceToIntentModelProps> = ({ onM
   const [selectedIntent, setSelectedIntent] = useState<Intent>();
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
 
-  const loadAvailableIntents = (pagination: PaginationState, sorting: SortingState) => {
+  const loadAvailableIntents = (pagination: PaginationState, sorting: SortingState, search: string) => {
     useServiceStore
       .getState()
       .loadAvailableIntentsList(
         (requests: Intent[]) => setIntents(requests),
         t("overview.toast.failed.availableIntents"),
         pagination,
-        sorting
+        sorting,
+        search
       );
   };
 
   useEffect(() => {
-    loadAvailableIntents(pagination, sorting);
-  }, []);
+    const intialPagination = { pageIndex: 0, pageSize: 10 };
+    loadAvailableIntents(filter ? intialPagination : pagination, sorting, filter);
+  }, [filter]);
 
   const intentColumns = useMemo(
     () =>
@@ -81,19 +83,18 @@ const ConnectServiceToIntentModel: FC<ConnectServiceToIntentModelProps> = ({ onM
         <DataTable
           data={intents}
           columns={intentColumns}
-          globalFilter={filter}
-          setGlobalFilter={setFilter}
+          filterable
           sortable
           sorting={sorting}
           pagination={pagination}
           setPagination={(state: PaginationState) => {
             if (state.pageIndex === pagination.pageIndex && state.pageSize === pagination.pageSize) return;
             setPagination(state);
-            loadAvailableIntents(state, sorting);
+            loadAvailableIntents(state, sorting, filter);
           }}
           setSorting={(state: SortingState) => {
             setSorting(state);
-            loadAvailableIntents(pagination, state);
+            loadAvailableIntents(pagination, state, filter);
           }}
           isClientSide={false}
           pagesCount={intents[intents.length - 1]?.totalPages ?? 1}
@@ -124,7 +125,7 @@ const getColumns = (onClick: (intent: Intent) => void) => {
 
   return [
     columnHelper.accessor("intent", {
-      header: i18n.t("overview.popup.intent") || "",
+      header: i18n.t("overview.popup.intent") ?? "",
     }),
     columnHelper.display({
       id: "connect",
