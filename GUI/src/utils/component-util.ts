@@ -11,5 +11,9 @@ export const onDragStart = (event: React.DragEvent<HTMLDivElement>, step: Step) 
 
 export const getDragData = (event: React.DragEvent<HTMLDivElement>) => {
   event.preventDefault();
+  console.log("IGOR event.dataTransfer.getData", event.dataTransfer.getData(ASSIGN_DRAG_TYPE));
+
+  if (!event.dataTransfer.getData(ASSIGN_DRAG_TYPE)) return;
+
   return JSON.parse(event.dataTransfer.getData(ASSIGN_DRAG_TYPE));
 };

@@ -74,7 +74,7 @@ const DragInput = ({ onChange, element, disallowedId }: DragInputProps): ReactNo
               ) : (
                 <></>
               )}
-              <span className={styles.arrayAll}>
+              <div className={styles.arrayAll}>
                 <input
                   id="all"
                   type="checkbox"
@@ -85,7 +85,7 @@ const DragInput = ({ onChange, element, disallowedId }: DragInputProps): ReactNo
                   }}
                 />
                 <label htmlFor="all">{t("serviceFlow.popup.all")}</label>
-              </span>
+              </div>
             </div>
           ) : (
             text
@@ -117,6 +117,7 @@ const DragInput = ({ onChange, element, disallowedId }: DragInputProps): ReactNo
       onFocus={(e) => e.target.blur()}
       onDragOver={(e) => {
         const data = getDragData(e);
+        if (!data) return;
 
         inputRef.current?.classList.add(disallowedId === data.id ? styles.dragHoverDisabled : styles.dragHover);
         if (disallowedId === data.id) setPlaceholder(t("serviceFlow.popup.assignToSelfNotAllowed"));
