@@ -90,11 +90,11 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
             isMultiline
             style={{ maxHeight: "30vh", overflow: "auto" }}
           >
-            {assignedVariables.map((variable) => {
+            {assignedVariables.map((variable, index) => {
               const typeColor = getTypeColor(variable.data);
 
               return isObject(variable.data) && variable.id !== INPUT_ELEMENT_KEY ? (
-                <Tooltip content={`${variable.value} : ${typeColor.type}`}>
+                <Tooltip content={`${variable.value} : ${typeColor.type}`} key={index}>
                   <OutputElementBox
                     className="tooltip"
                     dragData={variable}
@@ -115,7 +115,7 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
                   </OutputElementBox>
                 </Tooltip>
               ) : (
-                <Tooltip content={`${variable.value} : ${typeColor.type}`}>
+                <Tooltip content={`${variable.value} : ${typeColor.type}`} key={index}>
                   <OutputElementBox
                     dragData={variable.key ? variable : undefined}
                     style={{ cursor: variable.key ? "grab" : "default" }}
@@ -138,8 +138,8 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
         />
       )}
 
-      {endpoints.map((endpoint) => (
-        <Track key={endpoint.name} direction="vertical" align="left" style={{ ...popupBodyCss, borderBottom: border }}>
+      {endpoints.map((endpoint, endpointIndex) => (
+        <Track key={endpointIndex} direction="vertical" align="left" style={{ ...popupBodyCss, borderBottom: border }}>
           <label
             htmlFor="json"
             style={{ marginBottom: "10px", textTransform: "capitalize", cursor: "auto" }}
@@ -151,7 +151,7 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
             isMultiline
             style={{ maxHeight: "30vh", overflow: "auto" }}
           >
-            {endpoint.chips.map((chip) => {
+            {endpoint.chips.map((chip, index) => {
               const typeColor = getTypeColor(chip.data);
               const dragData: Assign = {
                 id: v4(),
@@ -161,7 +161,7 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
               };
 
               return isObject(chip.data) ? (
-                <Tooltip content={`${chip.data} : ${typeColor.type}`}>
+                <Tooltip content={`${chip.data} : ${typeColor.type}`} key={index}>
                   <OutputElementBox
                     dragData={dragData}
                     style={{ cursor: "pointer" }}
@@ -181,7 +181,7 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
                   </OutputElementBox>
                 </Tooltip>
               ) : (
-                <Tooltip content={`${chip.data} : ${typeColor.type}`}>
+                <Tooltip content={`${chip.data} : ${typeColor.type}`} key={index}>
                   <OutputElementBox borderColor={typeColor.color} dragData={dragData}>
                     {chip.name}
                   </OutputElementBox>
