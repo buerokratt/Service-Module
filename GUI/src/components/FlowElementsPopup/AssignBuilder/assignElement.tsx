@@ -108,7 +108,7 @@ const AssignElement: React.FC<AssignElementProps> = ({ element, onRemove, onChan
 
         {!isEditingManually ? (
           <Tooltip content={t("serviceFlow.popup.assignManualEdit")}>
-            <div onClick={enableManualEdit} className="small-assign-button assign-blue">
+            <div onClick={enableManualEdit} onKeyDown={enableManualEdit} className="small-assign-button assign-blue">
               <Icon icon={<MdEdit />} />
             </div>
           </Tooltip>
