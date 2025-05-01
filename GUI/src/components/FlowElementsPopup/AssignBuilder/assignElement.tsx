@@ -59,7 +59,15 @@ const AssignElement: React.FC<AssignElementProps> = ({ element, onRemove, onChan
 
   return (
     <Track gap={16} isFlex>
-      <FormInput value={element.key} name="key" onChange={changeKey} label="" hideLabel />:
+      <FormInput
+        value={element.key}
+        name="key"
+        onChange={changeKey}
+        onDrop={(e) => e.preventDefault()}
+        label=""
+        hideLabel
+      />
+      :
       <Track style={{ flex: "1 0 75%", justifyContent: "flex-end" }}>
         {isEditingManually ? (
           <FormInput

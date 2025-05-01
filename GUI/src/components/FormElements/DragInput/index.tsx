@@ -106,9 +106,14 @@ const DragInput = ({ onChange, element, disallowedId }: DragInputProps): ReactNo
         const data = getDragData(e);
 
         if (disallowedId === data.id) {
-          resetPlaceholder();
+          inputRef.current?.classList.add(styles.dragHoverDisabled);
+          setPlaceholder(t("serviceFlow.popup.assignToSelfNotAllowed"));
+          setTimeout(() => {
+            resetPlaceholder();
+          }, 800);
           return;
         }
+
         onChange({ ...data, value: updateArrayIndex(data.value, arrayIndex) });
         setText(data.key);
       }}
@@ -117,11 +122,9 @@ const DragInput = ({ onChange, element, disallowedId }: DragInputProps): ReactNo
       onFocus={(e) => e.target.blur()}
       // Have to use onDragOver since onDragEnter is broken in Firefox
       onDragOver={(e) => {
-        const data = getDragData(e);
-        if (!data) return;
-
-        inputRef.current?.classList.add(disallowedId === data.id ? styles.dragHoverDisabled : styles.dragHover);
-        if (disallowedId === data.id) setPlaceholder(t("serviceFlow.popup.assignToSelfNotAllowed"));
+        // Prevents text cursor from appearing inside input
+        e.preventDefault();
+        inputRef.current?.classList.add(styles.dragHover);
       }}
       onDragLeave={resetPlaceholder}
     />
