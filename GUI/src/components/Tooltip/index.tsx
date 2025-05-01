@@ -5,15 +5,22 @@ import "./Tooltip.scss";
 
 type TooltipProps = {
   content: ReactNode;
+  onButtonClick?: () => void;
 };
 
-const Tooltip: FC<PropsWithChildren<TooltipProps>> = ({ content, children }) => {
+const Tooltip: FC<PropsWithChildren<TooltipProps>> = ({ content, children, onButtonClick }) => {
   const [open, setOpen] = useState(false);
   return (
     <RadixTooltip.Provider delayDuration={100}>
       <RadixTooltip.Root open={open} onOpenChange={setOpen}>
         <RadixTooltip.Trigger asChild>
-          <button style={{ display: "inline-flex" }} onClick={() => setOpen(true)}>
+          <button
+            style={{ display: "inline-flex" }}
+            onClick={() => {
+              setOpen(true);
+              onButtonClick?.();
+            }}
+          >
             {children}
           </button>
         </RadixTooltip.Trigger>

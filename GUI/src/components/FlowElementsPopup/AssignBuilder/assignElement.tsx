@@ -87,16 +87,14 @@ const AssignElement: React.FC<AssignElementProps> = ({ element, onRemove, onChan
                 content={t(
                   isSecondSlotOpen ? "serviceFlow.popup.removeValueAssignment" : "serviceFlow.popup.assignAsValue"
                 )}
+                onButtonClick={() => {
+                  setIsSecondSlotOpen(!isSecondSlotOpen);
+                  if (!isSecondSlotOpen) resetSecondSlot();
+                }}
               >
-                <button
-                  onClick={() => {
-                    setIsSecondSlotOpen(!isSecondSlotOpen);
-                    if (!isSecondSlotOpen) resetSecondSlot();
-                  }}
-                  className={`small-assign-button ${isSecondSlotOpen ? "assign-red" : "assign-blue"}`}
-                >
+                <div className={`small-assign-button ${isSecondSlotOpen ? "assign-red" : "assign-blue"}`}>
                   <Icon icon={<MdMoveDown />} />
-                </button>
+                </div>
               </Tooltip>
             ) : null}
 
@@ -107,8 +105,8 @@ const AssignElement: React.FC<AssignElementProps> = ({ element, onRemove, onChan
         )}
 
         {!isEditingManually ? (
-          <Tooltip content={t("serviceFlow.popup.assignManualEdit")}>
-            <div onClick={enableManualEdit} onKeyDown={enableManualEdit} className="small-assign-button assign-blue">
+          <Tooltip content={t("serviceFlow.popup.assignManualEdit")} onButtonClick={enableManualEdit}>
+            <div className="small-assign-button assign-blue">
               <Icon icon={<MdEdit />} />
             </div>
           </Tooltip>

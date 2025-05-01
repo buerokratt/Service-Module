@@ -8,11 +8,7 @@ export const stringToTemplate = (value: string | number) => {
 
 export const templateToString = (value: string | number) => {
   const valueString = String(value);
-  if (
-    valueString.length < 3 ||
-    valueString.substring(0, 2) !== "${" ||
-    valueString.charAt(valueString.length - 1) !== "}"
-  ) {
+  if (valueString.length < 3 || !isTemplate(value)) {
     throw new Error("Input is not a template");
   }
 
