@@ -2,7 +2,7 @@ import { CSSProperties, FC, DragEvent, ReactNode } from "react";
 import Box from "../Box";
 import { Assign, StepType } from "types";
 import useServiceStore from "store/new-services.store";
-import { encodeDragData } from "utils/component-util";
+import { ASSIGN_DRAG_TYPE, encodeDragData } from "utils/component-util";
 
 type OutputElementBoxProps = {
   readonly children: ReactNode;

@@ -1,5 +1,7 @@
 import { Step } from "types";
 
+// todo remove
+export const ASSIGN_DRAG_TYPE = "text/plain";
 const UPPERCASE_PREFIX = "^{";
 const UPPERCASE_SUFFIX = "}^";
 
@@ -10,9 +12,14 @@ export const onDragStart = (event: React.DragEvent<HTMLDivElement>, step: Step) 
   event.dataTransfer.effectAllowed = "move";
 };
 
+// todo comment
 export const getDragData = (event: React.DragEvent<HTMLDivElement>) => {
   event.preventDefault();
-  // todo clean up?
+  console.log("igor TYPES", event.dataTransfer.types);
+  // console.log("IGOR event.dataTransfer.getData", event.dataTransfer.getData(ASSIGN_DRAG_TYPE));
+
+  // if (!event.dataTransfer.getData(ASSIGN_DRAG_TYPE)) return;
+
   return JSON.parse(decodeDragData(event.dataTransfer.types[0]));
 };
 
