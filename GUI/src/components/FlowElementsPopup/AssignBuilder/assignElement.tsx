@@ -29,6 +29,7 @@ const AssignElement: React.FC<AssignElementProps> = ({ element, onRemove, onChan
 
   const changeManualInputValue = (e: React.DragEvent<HTMLInputElement>) => {
     console.log("changeManualInputValue", e);
+    e.preventDefault();
     const data = getDragData(e);
     onChange({ ...element, value: data.value });
   };
@@ -77,10 +78,11 @@ const AssignElement: React.FC<AssignElementProps> = ({ element, onRemove, onChan
             onChange={changeValue}
             label=""
             hideLabel
-            onDrop={(e) => {
-              console.log("onDrop", e);
-              changeManualInputValue(e);
+            onDragOver={(e) => {
+              e.preventDefault();
+              e.dataTransfer.dropEffect = "move";
             }}
+            onDrop={changeManualInputValue}
           />
         ) : (
           <Track gap={3} isFlex>
