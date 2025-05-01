@@ -117,7 +117,7 @@ const DragInput = ({ onChange, element, disallowedId }: DragInputProps): ReactNo
       // Disable focus, text cursor and everything related to keyboard input
       tabIndex={-1}
       onFocus={(e) => e.target.blur()}
-      // todo better event firing less often
+      // Have to use onDragOver since onDragEnter is broken in Firefox
       onDragOver={(e) => {
         e.preventDefault();
         const data = getDragData(e);
