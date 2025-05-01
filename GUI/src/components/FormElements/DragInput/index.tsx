@@ -118,9 +118,6 @@ const DragInput = ({ onChange, element, disallowedId }: DragInputProps): ReactNo
       // todo better event firing less often
       onDragOver={(e) => {
         const data = getDragData(e);
-        // if (!data) return;
-
-        console.log("disallowedId", disallowedId, "data", data);
 
         inputRef.current?.classList.add(disallowedId === data.id ? styles.dragHoverDisabled : styles.dragHover);
         if (disallowedId === data.id) setPlaceholder(t("serviceFlow.popup.assignToSelfNotAllowed"));
