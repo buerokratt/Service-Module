@@ -16,7 +16,7 @@ export const getDragData = (event: React.DragEvent<HTMLDivElement>) => {
   return JSON.parse(decodeDragData(event.dataTransfer.types[0]));
 };
 
-// Below is a workaround to get the data in drag events in Chrome
+// Below is a workaround to get the data in drag events
 // https://stackoverflow.com/questions/28487352/dragndrop-datatransfer-getdata-empty
 export const encodeDragData = (str: string): string => {
   return str.replace(/([A-Z]+)/g, `${UPPERCASE_PREFIX}$1${UPPERCASE_SUFFIX}`);
