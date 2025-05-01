@@ -115,12 +115,9 @@ const DragInput = ({ onChange, element, disallowedId }: DragInputProps): ReactNo
       // Disable focus, text cursor and everything related to keyboard input
       tabIndex={-1}
       onFocus={(e) => e.target.blur()}
-      // todo better event firing less often
       onDragOver={(e) => {
         const data = getDragData(e);
-        // if (!data) return;
-
-        console.log("disallowedId", disallowedId, "data", data);
+        if (!data) return;
 
         inputRef.current?.classList.add(disallowedId === data.id ? styles.dragHoverDisabled : styles.dragHover);
         if (disallowedId === data.id) setPlaceholder(t("serviceFlow.popup.assignToSelfNotAllowed"));
