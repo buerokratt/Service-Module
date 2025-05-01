@@ -103,14 +103,12 @@ const DragInput = ({ onChange, element, disallowedId }: DragInputProps): ReactNo
       label=""
       className={styles.dragInput}
       onDrop={(e) => {
-        e.preventDefault();
         const data = getDragData(e);
 
         if (disallowedId === data.id) {
           resetPlaceholder();
           return;
         }
-
         onChange({ ...data, value: updateArrayIndex(data.value, arrayIndex) });
         setText(data.key);
       }}
@@ -119,7 +117,6 @@ const DragInput = ({ onChange, element, disallowedId }: DragInputProps): ReactNo
       onFocus={(e) => e.target.blur()}
       // todo better event firing less often
       onDragOver={(e) => {
-        e.preventDefault();
         const data = getDragData(e);
 
         inputRef.current?.classList.add(disallowedId === data.id ? styles.dragHoverDisabled : styles.dragHover);

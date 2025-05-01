@@ -11,6 +11,7 @@ export const onDragStart = (event: React.DragEvent<HTMLDivElement>, step: Step) 
 };
 
 export const getDragData = (event: React.DragEvent<HTMLDivElement>) => {
+  event.preventDefault();
   // todo clean up?
   return JSON.parse(decodeDragData(event.dataTransfer.types[0]));
 };
