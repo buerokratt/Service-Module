@@ -28,6 +28,7 @@ const AssignElement: React.FC<AssignElementProps> = ({ element, onRemove, onChan
   };
 
   const changeManualInputValue = (e: React.DragEvent<HTMLInputElement>) => {
+    console.log("changeManualInputValue", e);
     const data = getDragData(e);
     onChange({ ...element, value: data.value });
   };
@@ -59,7 +60,15 @@ const AssignElement: React.FC<AssignElementProps> = ({ element, onRemove, onChan
 
   return (
     <Track gap={16} isFlex>
-      <FormInput value={element.key} name="key" onChange={changeKey} label="" hideLabel />:
+      <FormInput
+        value={element.key}
+        name="key"
+        onChange={changeKey}
+        label=""
+        hideLabel
+        onDrop={(e) => e.preventDefault()}
+      />
+      :
       <Track style={{ flex: "1 0 75%", justifyContent: "flex-end" }}>
         {isEditingManually ? (
           <FormInput
@@ -68,7 +77,10 @@ const AssignElement: React.FC<AssignElementProps> = ({ element, onRemove, onChan
             onChange={changeValue}
             label=""
             hideLabel
-            onDrop={changeManualInputValue}
+            onDrop={(e) => {
+              console.log("onDrop", e);
+              changeManualInputValue(e);
+            }}
           />
         ) : (
           <Track gap={3} isFlex>
