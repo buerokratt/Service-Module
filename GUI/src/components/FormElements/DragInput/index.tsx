@@ -43,8 +43,6 @@ const DragInput = ({ onChange, element, id }: DragInputProps): ReactNode => {
     setPlaceholder(t("serviceFlow.popup.dragElementHere"));
   };
 
-  // todo change related assigns on value update
-
   useEffect(() => {
     if (!element) return;
 
