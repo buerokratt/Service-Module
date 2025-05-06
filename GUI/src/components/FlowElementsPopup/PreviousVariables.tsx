@@ -48,6 +48,9 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
     createDateTemplate(v4(), "yesterday", DATE_CONSTANTS.YESTERDAY),
     createDateTemplate(v4(), "tomorrow", DATE_CONSTANTS.TOMORROW),
     createDateTemplate(v4(), "custom date time", DATE_CONSTANTS.CUSTOM),
+    createDateTemplate(v4(), "Year Month Day format", DATE_CONSTANTS.TODAY),
+    createDateTemplate(v4(), "Day Month Year format", DATE_CONSTANTS.DMY),
+    createDateTemplate(v4(), "Custom Format", DATE_CONSTANTS.CUSTOM_FORMAT),
   ];
 
   useEffect(() => {
