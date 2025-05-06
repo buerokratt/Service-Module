@@ -18,16 +18,16 @@ const getArrayIndex = (value: string): number => {
 const updateArrayIndex = (value: string, index?: number): string => {
   let base = templateToString(value);
   base = base.replace(ARRAY_INDEX_PATTERN, "");
-  return stringToTemplate(index ? `${base}[${index}]` : base);
+  return stringToTemplate(index !== undefined ? `${base}[${index}]` : base);
 };
 
 interface DragInputProps {
   element: Assign | undefined;
-  disallowedId: string;
+  id: string;
   onChange: (data: Assign) => void;
 }
 
-const DragInput = ({ onChange, element, disallowedId }: DragInputProps): ReactNode => {
+const DragInput = ({ onChange, element, id }: DragInputProps): ReactNode => {
   const [all, setAll] = useState(false);
   const [arrayIndex, setArrayIndex] = useState(0);
   const [text, setText] = useState(element?.key ?? "");
@@ -76,7 +76,7 @@ const DragInput = ({ onChange, element, disallowedId }: DragInputProps): ReactNo
               )}
               <div className={styles.arrayAll}>
                 <input
-                  id="all"
+                  id={`${id}-all`}
                   type="checkbox"
                   checked={all}
                   onChange={(e) => {
@@ -84,7 +84,7 @@ const DragInput = ({ onChange, element, disallowedId }: DragInputProps): ReactNo
                     onChange({ ...element, value: updateArrayIndex(element.value) });
                   }}
                 />
-                <label htmlFor="all">{t("serviceFlow.popup.all")}</label>
+                <label htmlFor={`${id}-all`}>{t("serviceFlow.popup.all")}</label>
               </div>
             </div>
           ) : (
@@ -105,7 +105,7 @@ const DragInput = ({ onChange, element, disallowedId }: DragInputProps): ReactNo
       onDrop={(e) => {
         const data = getDragData(e);
 
-        if (disallowedId === data.id) {
+        if (id === data.id) {
           inputRef.current?.classList.add(styles.dragHoverDisabled);
           setPlaceholder(t("serviceFlow.popup.assignToSelfNotAllowed"));
           setTimeout(() => {
@@ -113,8 +113,8 @@ const DragInput = ({ onChange, element, disallowedId }: DragInputProps): ReactNo
           }, 800);
           return;
         }
+        onChange({ ...data, value: isArray(data.data) ? updateArrayIndex(data.value, 0) : data.value });
 
-        onChange({ ...data, value: updateArrayIndex(data.value, arrayIndex) });
         setText(data.key);
       }}
       // Disable focus, text cursor and everything related to keyboard input
