@@ -6,6 +6,7 @@ import "../styles.scss";
 import { stringToTemplate, templateToString } from "utils/string-util";
 import { isArray, isObject } from "utils/object-util";
 import { t } from "i18next";
+import { getDragData } from "utils/component-util";
 
 interface AssignElementProps {
   element: Assign;
@@ -24,6 +25,11 @@ const AssignElement: React.FC<AssignElementProps> = ({ element, onRemove, onChan
 
   const changeValue = (e: React.ChangeEvent<HTMLInputElement>) => {
     onChange({ ...element, value: e.target.value });
+  };
+
+  const changeManualInputValue = (e: React.DragEvent<HTMLInputElement>) => {
+    const data = getDragData(e);
+    onChange({ ...element, value: data.value });
   };
 
   const changeFirstSlot = (data: Assign) => {
@@ -53,42 +59,54 @@ const AssignElement: React.FC<AssignElementProps> = ({ element, onRemove, onChan
 
   return (
     <Track gap={16} isFlex>
-      <FormInput value={element.key} name="key" onChange={changeKey} label="" hideLabel />:
+      <FormInput
+        value={element.key}
+        name="key"
+        onChange={changeKey}
+        onDrop={(e) => e.preventDefault()}
+        label=""
+        hideLabel
+      />
+      :
       <Track style={{ flex: "1 0 75%", justifyContent: "flex-end" }}>
         {isEditingManually ? (
-          <FormInput value={element.value} name="value" onChange={changeValue} label="" hideLabel />
+          <FormInput
+            value={element.value}
+            name="value"
+            onChange={changeValue}
+            label=""
+            hideLabel
+            onDrop={changeManualInputValue}
+          />
         ) : (
           <Track gap={3} isFlex>
-            <DragInput disallowedId={element.id} element={slots[0]} onChange={(value) => changeFirstSlot(value)} />
+            <DragInput id={element.id} element={slots[0]} onChange={changeFirstSlot} />
 
-            {slots.length && isObject(slots[0]?.data) && !isArray(slots[0]?.data) ? (
+            {slots.length && isObject(slots[0].data) && !isArray(slots[0].data) ? (
               <Tooltip
                 content={t(
                   isSecondSlotOpen ? "serviceFlow.popup.removeValueAssignment" : "serviceFlow.popup.assignAsValue"
                 )}
+                onButtonClick={() => {
+                  setIsSecondSlotOpen(!isSecondSlotOpen);
+                  if (!isSecondSlotOpen) resetSecondSlot();
+                }}
               >
-                <button
-                  onClick={() => {
-                    setIsSecondSlotOpen(!isSecondSlotOpen);
-                    if (!isSecondSlotOpen) resetSecondSlot();
-                  }}
-                  className={`small-assign-button ${isSecondSlotOpen ? "assign-red" : "assign-blue"}`}
-                >
+                <div className={`small-assign-button ${isSecondSlotOpen ? "assign-red" : "assign-blue"}`}>
                   <Icon icon={<MdMoveDown />} />
-                </button>
+                </div>
               </Tooltip>
             ) : null}
-            {isSecondSlotOpen ? (
-              <DragInput disallowedId={element.id} element={slots[1]} onChange={(value) => changeSecondSlot(value)} />
-            ) : null}
+
+            {isSecondSlotOpen ? <DragInput id={element.id} element={slots[1]} onChange={changeSecondSlot} /> : null}
           </Track>
         )}
 
         {!isEditingManually ? (
-          <Tooltip content={t("serviceFlow.popup.assignManualEdit")}>
-            <button onClick={enableManualEdit} className="small-assign-button assign-blue">
+          <Tooltip content={t("serviceFlow.popup.assignManualEdit")} onButtonClick={enableManualEdit}>
+            <div className="small-assign-button assign-blue">
               <Icon icon={<MdEdit />} />
-            </button>
+            </div>
           </Tooltip>
         ) : null}
 
