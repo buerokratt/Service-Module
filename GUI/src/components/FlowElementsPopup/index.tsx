@@ -321,7 +321,7 @@ const FlowElementsPopup: React.FC = () => {
               {stepType === StepType.Textfield && (
                 <TextfieldTestContent
                   placeholders={textfieldMessagePlaceholders}
-                  message={textfieldMessage || node.data.message}
+                  message={textfieldMessage ?? node.data.message}
                 />
               )}
               {stepType === StepType.OpenWebpage && (
