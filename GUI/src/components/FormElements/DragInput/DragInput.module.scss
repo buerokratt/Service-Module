@@ -10,6 +10,8 @@
 
 .array {
   display: flex;
+  // Breaks in Firefox if not explicitly set
+  height: 20px;
 
   .arrayIndex {
     height: 5px;
@@ -21,6 +23,8 @@
 
   .arrayAll {
     @include veera-checkbox;
+
+    display: flex;
 
     input[type="checkbox"] {
       + label {
