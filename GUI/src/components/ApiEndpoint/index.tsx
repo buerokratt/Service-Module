@@ -46,11 +46,16 @@ const ApiEndpoint: FC<ApiEndpointProps> = ({ step }) => {
     if (endpoint.isCommon) {
       setIsGettingRelatedServices(true);
 
-      const services = (await axios.get<RelatedService[]>(getServicesByEndpointId(endpoint.id, id))).data;
-      if (services.length > 0) {
-        setRelatedServices(services);
-      } else {
-        setShowDeletePopup(true);
+      try {
+        const services = (await axios.get<RelatedService[]>(getServicesByEndpointId(endpoint.id, id))).data;
+        if (services.length > 0) {
+          setRelatedServices(services);
+        } else {
+          setShowDeletePopup(true);
+        }
+      } catch (error) {
+        console.error(`Error getting related services: ${error}`);
+        useToastStore.getState().error({ title: t("serviceFlow.apiElements.deleteError") });
       }
 
       setIsGettingRelatedServices(false);
