@@ -299,6 +299,7 @@
     },
     "previousVariables": {
       "assignElements": "Määra elemendid",
+      "dates": "Kuupäevad",
       "noName": "<Nimeta>"
     },
     "flow": "Teenusvoog",
