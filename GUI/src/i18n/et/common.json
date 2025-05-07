@@ -300,7 +300,28 @@
     "previousVariables": {
       "assignElements": "Määra elemendid",
       "dates": "Kuupäevad",
-      "noName": "<Nimeta>"
+      "noName": "<Nimeta>",
+      "helpers": {
+        "title": "Tööriistad",
+        "map": "Muuda elemente",
+        "filter": "Filtreeri",
+        "find": "Leia",
+        "length": "Loenda",
+        "sort": "Sorteeri",
+        "join": "Ühenda tekst",
+        "split": "Jaga tekst",
+        "slice": "Lõika loend",
+        "tooltip": {
+          "map": "Rakenda reegel iga loendi elemendi kohta\n\nNäide: {{example}}\nInput: {{input}}\nOutput: {{output}}",
+          "filter": "Säilita ainult need elemendid, mis vastavad tingimusele\n\nNäide: {{example}}\nInput: {{input}}\nOutput: {{output}}",
+          "find": "Leia esimene element, mis vastab tingimusele\n\nNäide: {{example}}\nInput: {{input}}\nOutput: {{output}}",
+          "length": "Loenda, mitu elementi on loendis või sõnes\n\nNäide: {{example}}\nInput: {{input}}\nOutput: {{output}}",
+          "sort": "Sorteeri elemendid loendis\n\nNäide: {{example}}\nInput: {{input}}\nOutput: {{output}}",
+          "join": "Ühenda loendi elemendid üheks tekstiks\n\nNäide: {{example}}\nInput: {{input}}\nOutput: {{output}}",
+          "split": "Jaga tekst loendiks eraldaja alusel\n\nNäide: {{example}}\nInput: {{input}}\nOutput: {{output}}",
+          "slice": "Võta osa loendist\n\nNäide: {{example}}\nInput: {{input}}\nOutput: {{output}}"
+        }
+      }
     },
     "flow": "Teenusvoog",
     "placeholderNode": "Lohista järgmine samm voogu",
