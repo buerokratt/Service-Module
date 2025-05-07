@@ -16,11 +16,11 @@ type EndpointCardProps = {
 };
 
 const ApiEndpointCard: FC<EndpointCardProps> = ({ endpoint, isDeletable = true, isNameDisabled = false }) => {
-  const { 
-    onNameChange, 
-    deleteEndpoint, 
-    changeServiceEndpointType, 
-    getAvailableRequestValues, 
+  const {
+    onNameChange,
+    deleteEndpoint,
+    changeServiceEndpointType,
+    getAvailableRequestValues,
     setIsCommonEndpoint,
     isCommonEndpoint,
   } = useServiceStore();
@@ -41,7 +41,7 @@ const ApiEndpointCard: FC<EndpointCardProps> = ({ endpoint, isDeletable = true, 
     if (endpoint.hasTestEnv) setTestEnvExists(true);
   }, [endpoint.hasTestEnv]);
 
-  const requestValues = useMemo(() => getAvailableRequestValues(endpoint.id),[]);
+  const requestValues = useMemo(() => getAvailableRequestValues(endpoint.id), []);
 
   return (
     <Tabs.Root
@@ -61,11 +61,12 @@ const ApiEndpointCard: FC<EndpointCardProps> = ({ endpoint, isDeletable = true, 
             {t(testEnvExists ? "newService.endpoint.testEnv" : "newService.endpoint.addTestEnv")}
           </Tabs.Trigger>
         </Tabs.List>
-        { isDeletable &&<Button appearance="text" onClick={() => deleteEndpoint(endpoint.id)} style={{ color: "#9799A4" }}>
-          <Icon icon={<MdDeleteOutline />} size="medium" />
-          {t("overview.delete")}
-        </Button>
-      }
+        {isDeletable && (
+          <Button appearance="text" onClick={() => deleteEndpoint(endpoint.id)} style={{ color: "#9799A4" }}>
+            <Icon icon={<MdDeleteOutline />} size="medium" />
+            {t("overview.delete")}
+          </Button>
+        )}
       </Track>
       {[EndpointEnv.Live, EndpointEnv.Test].map((env) => {
         return (
@@ -80,7 +81,7 @@ const ApiEndpointCard: FC<EndpointCardProps> = ({ endpoint, isDeletable = true, 
                   disabled={selectedTab === EndpointEnv.Test}
                   onSelectionChange={(selection) => {
                     setOption(selection);
-                    changeServiceEndpointType(endpoint.id, selection?.value ?? '');
+                    changeServiceEndpointType(endpoint.id, selection?.value ?? "");
                   }}
                   defaultValue={option?.value}
                 />
@@ -120,7 +121,7 @@ const ApiEndpointCard: FC<EndpointCardProps> = ({ endpoint, isDeletable = true, 
               )}
               {option?.value && (
                 <Track gap={16}>
-                  <label htmlFor="isCommon">{t("global.common")}</label>
+                  <label htmlFor="isCommon">{t("newService.endpoint.publicEndpoint")}</label>
                   <Switch
                     name="isCommon"
                     label=""
@@ -128,7 +129,7 @@ const ApiEndpointCard: FC<EndpointCardProps> = ({ endpoint, isDeletable = true, 
                     offLabel={t("global.no").toString()}
                     value={isCommonEndpoint(endpoint.id)}
                     checked={isCommonEndpoint(endpoint.id)}
-                    onCheckedChange={value => setIsCommonEndpoint(endpoint.id, value)}
+                    onCheckedChange={(value) => setIsCommonEndpoint(endpoint.id, value)}
                   />
                 </Track>
               )}

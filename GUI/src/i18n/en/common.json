@@ -49,7 +49,6 @@
     "testService": "Test service",
     "cancel": "Cancel",
     "close": "Close",
-    "common": "Common",
     "errorMessage": "There is no access to the service. Try again later.",
     "none": "None",
     "statusClarification": "Status clarification"
@@ -212,6 +211,7 @@
       "live": "Live endpoint",
       "name": "Endpoint name",
       "params": "Params",
+      "publicEndpoint": "Public endpoint",
       "required": "Variable is required",
       "single": "Endpoint",
       "testEnv": "Test environment",
