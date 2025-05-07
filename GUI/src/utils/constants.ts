@@ -26,20 +26,20 @@ export const getHelperTooltips = () => {
   const { t } = useTranslation();
   return [
     t("serviceFlow.previousVariables.helpers.tooltip.map", {
-      example: "list.map(x => x * 2)",
+      example: "list.map(x ARROW x * 2)",
       input: "[1, 2, 3]",
       output: "[2, 4, 6]",
-    }) ?? "",
+    }).replace("ARROW", "=>") ?? "",
     t("serviceFlow.previousVariables.helpers.tooltip.filter", {
-      example: "list.filter(x => x > 10)",
+      example: "list.filter(x ARROW x BIGGER 10)",
       input: "[5, 10, 15, 20]",
       output: "[15, 20]",
-    }) ?? "",
+    }).replace("ARROW", "=>").replace('BIGGER', '>') ?? "",
     t("serviceFlow.previousVariables.helpers.tooltip.find", {
-      example: "list.find(x => x.id === 2)",
+      example: "list.find(x ARROW x.id === 2)",
       input: "[{id: 1}, {id: 2}]",
       output: "{id: 2}",
-    }) ?? "",
+    }).replace("ARROW", "=>") ?? "",
     t("serviceFlow.previousVariables.helpers.tooltip.length", {
       example: "list.length",
       input: "[a, b, c]",
