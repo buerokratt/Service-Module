@@ -193,7 +193,7 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
           for (const [key, value] of Object.entries(response)) {
             chips.push({
               name: key,
-              value: `${endpoint.name.replace(" ", "_")}_res.${key}`,
+              value: `${endpoint.name.replace(" ", "_")}_res.response.body.${key}`,
               data: value,
             });
           }
@@ -665,19 +665,11 @@ const getConnectedNodes = (reactFlowInstance: any, nodeId: string) => {
   return { edgesFromNode, edgesFromNextNode };
 };
 
-const determineChildrenNodes = (
-  reactFlowInstance: any,
-  edgesFromNode: string[],
-  edgesFromNextNode: string[]
-) => {
+const determineChildrenNodes = (reactFlowInstance: any, edgesFromNode: string[], edgesFromNextNode: string[]) => {
   if (edgesFromNextNode.length > 0) {
-    return reactFlowInstance
-      .getNodes()
-      .filter((node: any) => edgesFromNextNode.includes(node.id));
+    return reactFlowInstance.getNodes().filter((node: any) => edgesFromNextNode.includes(node.id));
   }
-  return reactFlowInstance
-    .getNodes()
-    .filter((node: any) => edgesFromNode.includes(node.id));
+  return reactFlowInstance.getNodes().filter((node: any) => edgesFromNode.includes(node.id));
 };
 
 const handlePlaceholderNodes = (children: any[], nodes: any[]) => {
