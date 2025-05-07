@@ -80,9 +80,9 @@ const AssignElement: React.FC<AssignElementProps> = ({ element, onRemove, onChan
           />
         ) : (
           <Track gap={3} isFlex>
-            <DragInput disallowedId={element.id} element={slots[0]} onChange={changeFirstSlot} />
+            <DragInput id={element.id} element={slots[0]} onChange={changeFirstSlot} />
 
-            {slots.length && isObject(slots[0]?.data) && !isArray(slots[0]?.data) ? (
+            {slots.length && isObject(slots[0].data) && !isArray(slots[0].data) ? (
               <Tooltip
                 content={t(
                   isSecondSlotOpen ? "serviceFlow.popup.removeValueAssignment" : "serviceFlow.popup.assignAsValue"
@@ -98,9 +98,7 @@ const AssignElement: React.FC<AssignElementProps> = ({ element, onRemove, onChan
               </Tooltip>
             ) : null}
 
-            {isSecondSlotOpen ? (
-              <DragInput disallowedId={element.id} element={slots[1]} onChange={changeSecondSlot} />
-            ) : null}
+            {isSecondSlotOpen ? <DragInput id={element.id} element={slots[1]} onChange={changeSecondSlot} /> : null}
           </Track>
         )}
 
