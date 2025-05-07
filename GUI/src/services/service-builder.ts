@@ -9,6 +9,7 @@ import useServiceStore from "store/new-services.store";
 import useToastStore from "store/toasts.store";
 import { RawData, Step, StepType } from "types";
 import { EndpointData, EndpointEnv, EndpointType, EndpointVariableData } from "types/endpoint";
+import { v4 } from "uuid";
 
 // refactor this file later
 
@@ -598,15 +599,24 @@ export const saveFlow = async ({
           return handleInputStep(parentNode, finishedFlow, parentStepName, steps, updatedEdges, nodes, parentNodeId);
         }
 
-        return finishedFlow.set(
+        const nextStep = childNode ? `${childNode.data.stepType}-${childNodeId}` : undefined;
+        // TODO: remove temporary log step logic later
+        const logStep = `log-step-${v4()}`;
+        const template = getTemplate(
+          steps,
+          parentNode,
           parentStepName,
-          getTemplate(
-            steps,
-            parentNode,
-            parentStepName,
-            childNode ? `${childNode.data.stepType}-${childNodeId}` : undefined
-          )
+          parentNode.data.stepType === StepType.UserDefined ? logStep : nextStep
         );
+
+        finishedFlow.set(parentStepName, template);
+
+        if (parentNode.data.stepType === StepType.UserDefined) {
+          finishedFlow.set(logStep, {
+            log: "${" + template.result + "}",
+            next: nextStep,
+          });
+        }
       });
     } catch (e: any) {
       useToastStore.getState().error({
@@ -736,15 +746,22 @@ function handleConditionStep(
   });
 }
 
-function handleAssignStep(parentNode: Node, finishedFlow: Map<any, any>, parentStepName: string, childNode: Node | undefined, childNodeId: any) {
+function handleAssignStep(
+  parentNode: Node,
+  finishedFlow: Map<any, any>,
+  parentStepName: string,
+  childNode: Node | undefined,
+  childNodeId: any
+) {
   const invalidElementsExist = hasInvalidElements(parentNode.data.assignElements ?? []);
-  const isInvalid = parentNode.data?.assignElements === undefined ||
+  const isInvalid =
+    parentNode.data?.assignElements === undefined ||
     invalidElementsExist ||
     parentNode.data?.assignElements.length === 0;
 
-    if (isInvalid) {
-      throw new Error(i18next.t("toast.missing-assign-elements") ?? "Error");
-    }
+  if (isInvalid) {
+    throw new Error(i18next.t("toast.missing-assign-elements") ?? "Error");
+  }
 
   finishedFlow.set(parentStepName, {
     assign: parentNode.data.assignElements.reduce((acc: any, e: any) => {
