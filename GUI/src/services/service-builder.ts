@@ -602,13 +602,6 @@ export const saveFlow = async ({
         const nextStep = childNode ? `${childNode.data.stepType}-${childNodeId}` : undefined;
         // TODO: remove temporary log step logic later
         const logStep = `log-step-${v4()}`;
-
-        // let nextStep: string | undefined;
-        // if (childNode) {
-        //   nextStep =
-        //     parentNode.data.stepType === StepType.UserDefined ? logStep : `${childNode.data.stepType}-${childNodeId}`;
-        // }
-
         const template = getTemplate(
           steps,
           parentNode,
