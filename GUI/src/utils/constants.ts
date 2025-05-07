@@ -1,7 +1,5 @@
 import { useTranslation } from "react-i18next";
 
-const { t } = useTranslation();
-
 export enum DATE_CONSTANTS {
   TODAY = "new Date().toISOString().split('T')[0]",
   CURRENT_TIME = "new Date().toISOString().split('T')[1].replace('Z', '')",
@@ -24,46 +22,48 @@ export enum HELPERS_CONSTANTS {
   SLICE = "YOUR_LIST.slice(START_INDEX, END_INDEX)",
 };
 
-// First, define your tooltips separately
-export const HELPER_TOOLTIPS = {
-  MAP: t("serviceFlow.previousVariables.helpers.tooltip.map", {
-    example: "list.map(x => x * 2)",
-    input: "[1, 2, 3]",
-    output: "[2, 4, 6]",
-  }) ?? "",
-  FILTER: t("serviceFlow.previousVariables.helpers.tooltip.filter", {
-    example: "list.filter(x => x > 10)",
-    input: "[5, 10, 15, 20]",
-    output: "[15, 20]",
-  }) ?? "",
-  FIND: t("serviceFlow.previousVariables.helpers.tooltip.find", {
-    example: "list.find(x => x.id === 2)",
-    input: "[{id: 1}, {id: 2}]",
-    output: "{id: 2}",
-  }) ?? "",
-  LENGTH: t("serviceFlow.previousVariables.helpers.tooltip.length", {
-    example: "list.length",
-    input: "['a', 'b', 'c']",
-    output: "3",
-  }) ?? "",
-  SORT: t("serviceFlow.previousVariables.helpers.tooltip.sort", {
-    example: "list.sort()",
-    input: "[3, 1, 2]",
-    output: "[1, 2, 3]",
-  }) ?? "",
-  JOIN: t("serviceFlow.previousVariables.helpers.tooltip.join", {
-    example: "list.join(', ')",
-    input: "['a', 'b', 'c']",
-    output: "'a, b, c'",
-  }) ?? "",
-  SPLIT: t("serviceFlow.previousVariables.helpers.tooltip.split", {
-    example: "text.split(',')",
-    input: "'one,two,three'",
-    output: "['one', 'two', 'three']",
-  }) ?? "",
-  SLICE: t("serviceFlow.previousVariables.helpers.tooltip.slice", {
-    example: "list.slice(1, 4)",
-    input: "[10, 20, 30, 40, 50]",
-    output: "[20, 30, 40]",
-  }) ?? "",
+export const getHelperTooltips = () => {
+  const { t } = useTranslation();
+  return [
+    t("serviceFlow.previousVariables.helpers.tooltip.map", {
+      example: "list.map(x => x * 2)",
+      input: "[1, 2, 3]",
+      output: "[2, 4, 6]",
+    }) ?? "",
+    t("serviceFlow.previousVariables.helpers.tooltip.filter", {
+      example: "list.filter(x => x > 10)",
+      input: "[5, 10, 15, 20]",
+      output: "[15, 20]",
+    }) ?? "",
+    t("serviceFlow.previousVariables.helpers.tooltip.find", {
+      example: "list.find(x => x.id === 2)",
+      input: "[{id: 1}, {id: 2}]",
+      output: "{id: 2}",
+    }) ?? "",
+    t("serviceFlow.previousVariables.helpers.tooltip.length", {
+      example: "list.length",
+      input: "[a, b, c]",
+      output: "3",
+    }) ?? "",
+    t("serviceFlow.previousVariables.helpers.tooltip.sort", {
+      example: "list.sort()",
+      input: "[3, 1, 2]",
+      output: "[1, 2, 3]",
+    }) ?? "",
+    t("serviceFlow.previousVariables.helpers.tooltip.join", {
+      example: "list.join( , )",
+      input: "[a, b, c]",
+      output: "a, b, c",
+    }) ?? "",
+    t("serviceFlow.previousVariables.helpers.tooltip.split", {
+      example: "text.split( , )",
+      input: "one,two,three",
+      output: "[one, two, three]",
+    }) ?? "",
+    t("serviceFlow.previousVariables.helpers.tooltip.slice", {
+      example: "list.slice(1, 4)",
+      input: "[10, 20, 30, 40, 50]",
+      output: "[20, 30, 40]",
+    }) ?? "",
+  ];
 };

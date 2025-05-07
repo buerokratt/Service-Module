@@ -11,6 +11,7 @@ import { stringToTemplate, templateToString } from "utils/string-util";
 import { getTypeColor, isObject } from "utils/object-util";
 import Tooltip from "../Tooltip";
 import { v4 } from "uuid";
+import { getHelperTooltips } from "utils/constants";
 import { datesVariables, helperVariables } from "resources/variables-constants";
 
 type PreviousVariablesProps = {
@@ -34,6 +35,13 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
   const [assignedObjectTree, setAssignedObjectTree] = useState<{ data: unknown; path: string | number } | null>(null);
   // New elements added in Assign node before saving
   const newAssignElements = useServiceStore((state) => state.assignElements);
+  const helperVariablesWithTooltips = helperVariables.map((variable, index) => {
+    console.log(getHelperTooltips()[index]);
+    return {
+      ...variable,
+      tooltip: getHelperTooltips()[index]
+    };
+  });
 
   useEffect(() => {
     const previousNodes = nodes.slice(
@@ -93,8 +101,8 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
       />
 
       <VariableSection
-        title={t("serviceFlow.previousVariables.helpers")}
-        variables={[...helperVariables]}
+        title={t("serviceFlow.previousVariables.helpers.title")}
+        variables={[...helperVariablesWithTooltips]}
         assignedObjectTree={assignedObjectTree}
         setAssignedObjectTree={setAssignedObjectTree}
         popupBodyCss={popupBodyCss}
@@ -196,7 +204,10 @@ const VariableSection = ({
           const typeColor = getTypeColor(variable.value);
 
           return isObject(variable.data) && variable.id !== INPUT_ELEMENT_KEY ? (
-            <Tooltip content={variable.tooltip ? `${variable.tooltip}` : `${variable.value} : ${typeColor.type}`} key={variable.id}>
+            <Tooltip
+              content={variable.tooltip ? `${variable.value}\n\n${variable.tooltip}` : `${variable.value} : ${typeColor.type}`}
+              key={variable.id}
+            >
               <OutputElementBox
                 className="tooltip"
                 dragData={variable}
@@ -213,17 +224,17 @@ const VariableSection = ({
                   );
                 }}
               >
-                {assignedObjectTree?.path === variable.value ? variable.key + " ▲" : variable.key + " ▼"}
+                {assignedObjectTree?.path === variable.value ? t(variable.key) + " ▲" : t(variable.key) + " ▼"}
               </OutputElementBox>
             </Tooltip>
           ) : (
-            <Tooltip content={variable.tooltip ? `${variable.tooltip}` : `${variable.value} : ${typeColor.type}`} key={variable.id}>
+            <Tooltip content={variable.tooltip? `${variable.value}\n\n${variable.tooltip}` : `${variable.value} : ${typeColor.type}`} key={variable.id}>
               <OutputElementBox
                 dragData={variable.key ? variable : undefined}
                 style={{ cursor: variable.key ? "grab" : "default" }}
                 borderColor={typeColor.color}
               >
-                {variable.key.length > 0 ? variable.key : t("serviceFlow.previousVariables.noName")}
+                {variable.key.length > 0 ? t(variable.key) : t("serviceFlow.previousVariables.noName")}
               </OutputElementBox>
             </Tooltip>
           );

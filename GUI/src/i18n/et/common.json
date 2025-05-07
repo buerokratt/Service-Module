@@ -312,14 +312,14 @@
         "split": "Jaga tekst",
         "slice": "Lõika loend",
         "tooltip": {
-          "map": "Rakenda reegel iga loendi elemendi kohta\n\nNäide: {{example}}\nInput: {{input}}\nOutput: {{output}}",
-          "filter": "Säilita ainult need elemendid, mis vastavad tingimusele\n\nNäide: {{example}}\nInput: {{input}}\nOutput: {{output}}",
-          "find": "Leia esimene element, mis vastab tingimusele\n\nNäide: {{example}}\nInput: {{input}}\nOutput: {{output}}",
-          "length": "Loenda, mitu elementi on loendis või sõnes\n\nNäide: {{example}}\nInput: {{input}}\nOutput: {{output}}",
-          "sort": "Sorteeri elemendid loendis\n\nNäide: {{example}}\nInput: {{input}}\nOutput: {{output}}",
-          "join": "Ühenda loendi elemendid üheks tekstiks\n\nNäide: {{example}}\nInput: {{input}}\nOutput: {{output}}",
-          "split": "Jaga tekst loendiks eraldaja alusel\n\nNäide: {{example}}\nInput: {{input}}\nOutput: {{output}}",
-          "slice": "Võta osa loendist\n\nNäide: {{example}}\nInput: {{input}}\nOutput: {{output}}"
+          "map": "Rakenda reegel iga loendi elemendi kohta\n\nNäide: {{example}}\nSisend: {{input}}\nVäljund: {{output}}",
+          "filter": "Säilita ainult need elemendid, mis vastavad tingimusele\n\nNäide: {{example}}\nSisend: {{input}}\nVäljund: {{output}}",
+          "find": "Leia esimene element, mis vastab tingimusele\n\nNäide: {{example}}\nSisend: {{input}}\nVäljund: {{output}}",
+          "length": "Loenda, mitu elementi on loendis või sõnes\n\nNäide: {{example}}\nSisend: {{input}}\nVäljund: {{output}}",
+          "sort": "Sorteeri elemendid loendis\n\nNäide: {{example}}\nSisend: {{input}}\nVäljund: {{output}}",
+          "join": "Ühenda loendi elemendid üheks tekstiks\n\nNäide: {{example}}\nSisend: {{input}}\nVäljund: {{output}}",
+          "split": "Jaga tekst loendiks eraldaja alusel\n\nNäide: {{example}}\nSisend: {{input}}\nVäljund: {{output}}",
+          "slice": "Võta osa loendist\n\nNäide: {{example}}\nSisend: {{input}}\nVäljund: {{output}}"
         }
       }
     },

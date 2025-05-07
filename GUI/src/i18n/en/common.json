@@ -314,7 +314,7 @@
         "tooltip": {
           "map": "Apply a rule to each item in a list\n\nExample: {{example}}\nInput: {{input}}\nOutput: {{output}}",
           "filter": "Keep only items that match a condition\n\nExample: {{example}}\nInput: {{input}}\nOutput: {{output}}",
-          "find": "Get the first item that matches a condition\n\nExample:{{example}}\nInput: {{input}}\nOutput: {{output}}",
+          "find": "Get the first item that matches a condition\n\nExample: {{example}}\nInput: {{input}}\nOutput: {{output}}",
           "length": "Count how many items are in a list or string\n\nExample: {{example}}\nInput: {{input}}\nOutput: {{output}}",
           "sort": "Order the items in a list\n\nExample: {{example}}\nInput: {{input}}\nOutput: {{output}}",
           "join": "Turn a list into a single text string\n\nExample: {{example}}\nInput: {{input}}\nOutput: {{output}}",

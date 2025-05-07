@@ -1,6 +1,5 @@
-import { useTranslation } from "react-i18next";
 import { Assign } from "types";
-import { DATE_CONSTANTS, HELPER_TOOLTIPS, HELPERS_CONSTANTS } from "utils/constants";
+import { DATE_CONSTANTS, getHelperTooltips, HELPERS_CONSTANTS } from "utils/constants";
 import { stringToTemplate } from "utils/string-util";
 import { v4 } from "uuid";
 
@@ -10,8 +9,6 @@ const createTemplate = (id: string, key: string, value: string, tooltip: string 
   value: stringToTemplate(value),
   tooltip,
 });
-
-const { t } = useTranslation();
 
 export const datesVariables: Assign[] = [
   createTemplate(v4(), "current date", DATE_CONSTANTS.TODAY),
@@ -26,14 +23,14 @@ export const datesVariables: Assign[] = [
 ];
 
 export const helperVariables: Assign[] = [
-  createTemplate(v4(), t("serviceFlow.previousVariables.helpers.map"), HELPERS_CONSTANTS.MAP, HELPER_TOOLTIPS.MAP),
-  createTemplate(v4(), t("serviceFlow.previousVariables.helpers.filter"), HELPERS_CONSTANTS.FILTER, HELPER_TOOLTIPS.FILTER),
-  createTemplate(v4(), t("serviceFlow.previousVariables.helpers.find"), HELPERS_CONSTANTS.FIND, HELPER_TOOLTIPS.FIND),
-  createTemplate(v4(), t("serviceFlow.previousVariables.helpers.length"), HELPERS_CONSTANTS.LENGTH, HELPER_TOOLTIPS.LENGTH),
-  createTemplate(v4(), t("serviceFlow.previousVariables.helpers.sort"), HELPERS_CONSTANTS.SORT, HELPER_TOOLTIPS.SORT),
-  createTemplate(v4(), t("serviceFlow.previousVariables.helpers.join"), HELPERS_CONSTANTS.JOIN, HELPER_TOOLTIPS.JOIN),
-  createTemplate(v4(), t("serviceFlow.previousVariables.helpers.split"), HELPERS_CONSTANTS.SPLIT, HELPER_TOOLTIPS.SPLIT),
-  createTemplate(v4(), t("serviceFlow.previousVariables.helpers.slice"), HELPERS_CONSTANTS.SLICE, HELPER_TOOLTIPS.SLICE),
+  createTemplate(v4(), "serviceFlow.previousVariables.helpers.map", HELPERS_CONSTANTS.MAP),
+  createTemplate(v4(), "serviceFlow.previousVariables.helpers.filter", HELPERS_CONSTANTS.FILTER),
+  createTemplate(v4(), "serviceFlow.previousVariables.helpers.find", HELPERS_CONSTANTS.FIND),
+  createTemplate(v4(), "serviceFlow.previousVariables.helpers.length", HELPERS_CONSTANTS.LENGTH),
+  createTemplate(v4(), "serviceFlow.previousVariables.helpers.sort", HELPERS_CONSTANTS.SORT),
+  createTemplate(v4(), "serviceFlow.previousVariables.helpers.join", HELPERS_CONSTANTS.JOIN),
+  createTemplate(v4(), "serviceFlow.previousVariables.helpers.split", HELPERS_CONSTANTS.SPLIT),
+  createTemplate(v4(), "serviceFlow.previousVariables.helpers.slice", HELPERS_CONSTANTS.SLICE),
 ];
 
 
