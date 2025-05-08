@@ -29,9 +29,17 @@ type ObjectTreeProps = {
   style?: CSSProperties;
 };
 
+const splitPath = (path: string) => {
+  if (path.includes("response.body")) {
+    const [first, ...rest] = path.split("response.body");
+    return [`${first}response.body`, ...rest.join("").split(".").filter(Boolean)];
+  }
+  return path.split(".");
+};
+
 export const ObjectTree: FC<ObjectTreeProps> = ({ path, data, style }) => {
   // Consider using global state if this component gets more complex
-  const pathArray = String(path).split(".");
+  const pathArray = splitPath(String(path));
   const root = pathArray.pop()!;
   const [roundedValues, setRoundedValues] = useState<Map<string, number>>(new Map());
 
