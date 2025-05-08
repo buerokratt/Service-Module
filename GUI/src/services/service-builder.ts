@@ -212,6 +212,7 @@ const rawDataIfVariablesMissing = (
   if (Object.keys(data).length > 0) return data;
   const rawData =
     endpoint[key]?.rawData[env === EndpointEnv.Live ? "value" : "testValue"] ?? endpoint[key]?.rawData.value ?? "";
+  if (rawData === "") return "";  
   try {
     assignNestedRawVariables(JSON.parse(rawData), key, "", data);
     return data;
