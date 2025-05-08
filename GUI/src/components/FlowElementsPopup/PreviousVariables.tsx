@@ -93,7 +93,7 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
       {assignedVariables.length > 0 && (
         <VariableSection
           title={t("serviceFlow.previousVariables.assignElements")}
-          variables={[...assignedVariables, ...newAssignElements]}
+          variables={[...assignedVariables]}
           assignedObjectTree={assignedObjectTree}
           setAssignedObjectTree={setAssignedObjectTree}
           popupBodyCss={popupBodyCss}
