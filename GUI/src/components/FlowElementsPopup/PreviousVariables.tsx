@@ -36,7 +36,6 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
   // New elements added in Assign node before saving
   const newAssignElements = useServiceStore((state) => state.assignElements);
   const helperVariablesWithTooltips = helperVariables.map((variable, index) => {
-    console.log(getHelperTooltips()[index]);
     return {
       ...variable,
       tooltip: getHelperTooltips()[index]
