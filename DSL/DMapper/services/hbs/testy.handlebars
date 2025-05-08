@@ -1,9 +1,0 @@
-[
-  {{#each chat_messages_res}}
-    {
-      {{#each this}}
-        "{{@key}}": "{{this}}"{{#unless @last}},{{/unless}}
-      {{/each}},
-    }{{#unless @last}},{{/unless}}
-  {{/each}}
-]
