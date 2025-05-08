@@ -49,7 +49,6 @@
     "testService": "Testi teenust",
     "cancel": "Tühista",
     "close": "Sulge",
-    "common": "Üldteenus",
     "errorMessage": "Teenusele puudub ligipääs. Proovi hiljem uuesti.",
     "none": "Puudub",
     "statusClarification": "Staatuse täpsustus"
@@ -211,6 +210,7 @@
       "insert": "Sisesta API otspunkt..",
       "live": "Toodangukeskkonna otspunkt",
       "name": "Otspunkti nimetus",
+      "publicEndpoint": "Avalik otspunkt",
       "params": "Parameetrid",
       "required": "Muutuja on kohustuslik",
       "single": "Otspunkt",
