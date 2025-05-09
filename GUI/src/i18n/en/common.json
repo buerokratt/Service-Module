@@ -49,7 +49,6 @@
     "testService": "Test service",
     "cancel": "Cancel",
     "close": "Close",
-    "common": "Common",
     "errorMessage": "There is no access to the service. Try again later.",
     "none": "None",
     "statusClarification": "Status clarification"
@@ -212,6 +211,7 @@
       "live": "Live endpoint",
       "name": "Endpoint name",
       "params": "Params",
+      "publicEndpoint": "Public endpoint",
       "required": "Variable is required",
       "single": "Endpoint",
       "testEnv": "Test environment",
@@ -300,7 +300,28 @@
     "previousVariables": {
       "assignElements": "Assign Elements",
       "dates": "Dates",
-      "noName": "<No name>"
+      "noName": "<No name>",
+      "helpers": {
+        "title": "Tools",
+        "map": "Change items",
+        "filter": "Filter items",
+        "find": "Find item",
+        "length": "Count",
+        "sort": "Sort",
+        "join": "Join text",
+        "split": "Split text",
+        "slice": "Cut text",
+        "tooltip": {
+          "map": "Apply a rule to each item in a list\n\nExample: {{example}}\nInput: {{input}}\nOutput: {{output}}",
+          "filter": "Keep only items that match a condition\n\nExample: {{example}}\nInput: {{input}}\nOutput: {{output}}",
+          "find": "Get the first item that matches a condition\n\nExample: {{example}}\nInput: {{input}}\nOutput: {{output}}",
+          "length": "Count how many items are in a list or string\n\nExample: {{example}}\nInput: {{input}}\nOutput: {{output}}",
+          "sort": "Order the items in a list\n\nExample: {{example}}\nInput: {{input}}\nOutput: {{output}}",
+          "join": "Turn a list into a single text string\n\nExample: {{example}}\nInput: {{input}}\nOutput: {{output}}",
+          "split": "Split text into a list by separator\n\nExample: {{example}}\nInput: {{input}}\nOutput: {{output}}",
+          "slice": "Take a portion of a list\n\nExample: {{example}}\nInput: {{input}}\nOutput: {{output}}"
+        }
+      }
     },
     "flow": "Service flow",
     "placeholderNode": "Drag the next step into the flow",

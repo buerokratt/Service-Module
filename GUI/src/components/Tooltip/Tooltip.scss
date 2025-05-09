@@ -4,6 +4,9 @@
 
 .tooltip {
   z-index: 1000;
+  white-space: pre-line;
+  max-width: 500px;
+  word-wrap: break-word;
   background-color: get-color(white);
   padding: 4px;
   border-radius: 4px;

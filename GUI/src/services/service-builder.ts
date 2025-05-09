@@ -212,6 +212,7 @@ const rawDataIfVariablesMissing = (
   if (Object.keys(data).length > 0) return data;
   const rawData =
     endpoint[key]?.rawData[env === EndpointEnv.Live ? "value" : "testValue"] ?? endpoint[key]?.rawData.value ?? "";
+  if (rawData === "") return "";  
   try {
     assignNestedRawVariables(JSON.parse(rawData), key, "", data);
     return data;
@@ -600,23 +601,9 @@ export const saveFlow = async ({
         }
 
         const nextStep = childNode ? `${childNode.data.stepType}-${childNodeId}` : undefined;
-        // TODO: remove temporary log step logic later
-        const logStep = `log-step-${v4()}`;
-        const template = getTemplate(
-          steps,
-          parentNode,
-          parentStepName,
-          parentNode.data.stepType === StepType.UserDefined ? logStep : nextStep
-        );
+        const template = getTemplate(steps, parentNode, parentStepName, nextStep);
 
         finishedFlow.set(parentStepName, template);
-
-        if (parentNode.data.stepType === StepType.UserDefined) {
-          finishedFlow.set(logStep, {
-            log: "${" + template.result + "}",
-            next: nextStep,
-          });
-        }
       });
     } catch (e: any) {
       useToastStore.getState().error({

@@ -10,8 +10,9 @@ import { ObjectTree } from "./ObjectTree";
 import { stringToTemplate, templateToString } from "utils/string-util";
 import { getTypeColor, isObject } from "utils/object-util";
 import Tooltip from "../Tooltip";
-import { DATE_CONSTANTS } from "utils/constants";
 import { v4 } from "uuid";
+import { getHelperTooltips } from "utils/constants";
+import { datesVariables, helperVariables } from "resources/variables-constants";
 
 type PreviousVariablesProps = {
   readonly nodeId: string;
@@ -34,24 +35,12 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
   const [assignedObjectTree, setAssignedObjectTree] = useState<{ data: unknown; path: string | number } | null>(null);
   // New elements added in Assign node before saving
   const newAssignElements = useServiceStore((state) => state.assignElements);
-
-  const createDateTemplate = (id: string, key: string, value: string): Assign => ({
-    id,
-    key,
-    value: stringToTemplate(value),
+  const helperVariablesWithTooltips = helperVariables.map((variable, index) => {
+    return {
+      ...variable,
+      tooltip: getHelperTooltips()[index]
+    };
   });
-
-  const dates: Assign[] = [
-    createDateTemplate(v4(), "current date", DATE_CONSTANTS.TODAY),
-    createDateTemplate(v4(), "current time", DATE_CONSTANTS.CURRENT_TIME),
-    createDateTemplate(v4(), "current date & time", DATE_CONSTANTS.NOW),
-    createDateTemplate(v4(), "yesterday", DATE_CONSTANTS.YESTERDAY),
-    createDateTemplate(v4(), "tomorrow", DATE_CONSTANTS.TOMORROW),
-    createDateTemplate(v4(), "custom date time", DATE_CONSTANTS.CUSTOM),
-    createDateTemplate(v4(), "Year Month Day format", DATE_CONSTANTS.TODAY),
-    createDateTemplate(v4(), "Day Month Year format", DATE_CONSTANTS.DMY),
-    createDateTemplate(v4(), "Custom Format", DATE_CONSTANTS.CUSTOM_FORMAT),
-  ];
 
   useEffect(() => {
     const previousNodes = nodes.slice(
@@ -93,7 +82,7 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
       {assignedVariables.length > 0 && (
         <VariableSection
           title={t("serviceFlow.previousVariables.assignElements")}
-          variables={[...assignedVariables, ...newAssignElements]}
+          variables={[...assignedVariables]}
           assignedObjectTree={assignedObjectTree}
           setAssignedObjectTree={setAssignedObjectTree}
           popupBodyCss={popupBodyCss}
@@ -103,7 +92,16 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
 
       <VariableSection
         title={t("serviceFlow.previousVariables.dates")}
-        variables={[...dates]}
+        variables={[...datesVariables]}
+        assignedObjectTree={assignedObjectTree}
+        setAssignedObjectTree={setAssignedObjectTree}
+        popupBodyCss={popupBodyCss}
+        border={border}
+      />
+
+      <VariableSection
+        title={t("serviceFlow.previousVariables.helpers.title")}
+        variables={[...helperVariablesWithTooltips]}
         assignedObjectTree={assignedObjectTree}
         setAssignedObjectTree={setAssignedObjectTree}
         popupBodyCss={popupBodyCss}
@@ -205,7 +203,10 @@ const VariableSection = ({
           const typeColor = getTypeColor(variable.value);
 
           return isObject(variable.data) && variable.id !== INPUT_ELEMENT_KEY ? (
-            <Tooltip content={`${variable.value} : ${typeColor.type}`} key={variable.id}>
+            <Tooltip
+              content={variable.tooltip ? `${variable.value}\n\n${variable.tooltip}` : `${variable.value} : ${typeColor.type}`}
+              key={variable.id}
+            >
               <OutputElementBox
                 className="tooltip"
                 dragData={variable}
@@ -222,17 +223,17 @@ const VariableSection = ({
                   );
                 }}
               >
-                {assignedObjectTree?.path === variable.value ? variable.key + " ▲" : variable.key + " ▼"}
+                {assignedObjectTree?.path === variable.value ? t(variable.key) + " ▲" : t(variable.key) + " ▼"}
               </OutputElementBox>
             </Tooltip>
           ) : (
-            <Tooltip content={`${variable.value} : ${typeColor.type}`} key={variable.id}>
+            <Tooltip content={variable.tooltip? `${variable.value}\n\n${variable.tooltip}` : `${variable.value} : ${typeColor.type}`} key={variable.id}>
               <OutputElementBox
                 dragData={variable.key ? variable : undefined}
                 style={{ cursor: variable.key ? "grab" : "default" }}
                 borderColor={typeColor.color}
               >
-                {variable.key.length > 0 ? variable.key : t("serviceFlow.previousVariables.noName")}
+                {variable.key.length > 0 ? t(variable.key) : t("serviceFlow.previousVariables.noName")}
               </OutputElementBox>
             </Tooltip>
           );

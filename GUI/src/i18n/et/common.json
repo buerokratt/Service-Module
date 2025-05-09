@@ -49,7 +49,6 @@
     "testService": "Testi teenust",
     "cancel": "Tühista",
     "close": "Sulge",
-    "common": "Üldteenus",
     "errorMessage": "Teenusele puudub ligipääs. Proovi hiljem uuesti.",
     "none": "Puudub",
     "statusClarification": "Staatuse täpsustus"
@@ -211,6 +210,7 @@
       "insert": "Sisesta API otspunkt..",
       "live": "Toodangukeskkonna otspunkt",
       "name": "Otspunkti nimetus",
+      "publicEndpoint": "Avalik otspunkt",
       "params": "Parameetrid",
       "required": "Muutuja on kohustuslik",
       "single": "Otspunkt",
@@ -300,7 +300,28 @@
     "previousVariables": {
       "assignElements": "Määra elemendid",
       "dates": "Kuupäevad",
-      "noName": "<Nimeta>"
+      "noName": "<Nimeta>",
+      "helpers": {
+        "title": "Tööriistad",
+        "map": "Muuda elemente",
+        "filter": "Filtreeri",
+        "find": "Leia",
+        "length": "Loenda",
+        "sort": "Sorteeri",
+        "join": "Ühenda tekst",
+        "split": "Jaga tekst",
+        "slice": "Lõika loend",
+        "tooltip": {
+          "map": "Rakenda reegel iga loendi elemendi kohta\n\nNäide: {{example}}\nSisend: {{input}}\nVäljund: {{output}}",
+          "filter": "Säilita ainult need elemendid, mis vastavad tingimusele\n\nNäide: {{example}}\nSisend: {{input}}\nVäljund: {{output}}",
+          "find": "Leia esimene element, mis vastab tingimusele\n\nNäide: {{example}}\nSisend: {{input}}\nVäljund: {{output}}",
+          "length": "Loenda, mitu elementi on loendis või sõnes\n\nNäide: {{example}}\nSisend: {{input}}\nVäljund: {{output}}",
+          "sort": "Sorteeri elemendid loendis\n\nNäide: {{example}}\nSisend: {{input}}\nVäljund: {{output}}",
+          "join": "Ühenda loendi elemendid üheks tekstiks\n\nNäide: {{example}}\nSisend: {{input}}\nVäljund: {{output}}",
+          "split": "Jaga tekst loendiks eraldaja alusel\n\nNäide: {{example}}\nSisend: {{input}}\nVäljund: {{output}}",
+          "slice": "Võta osa loendist\n\nNäide: {{example}}\nSisend: {{input}}\nVäljund: {{output}}"
+        }
+      }
     },
     "flow": "Teenusvoog",
     "placeholderNode": "Lohista järgmine samm voogu",
