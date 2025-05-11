@@ -299,7 +299,18 @@
     },
     "previousVariables": {
       "assignElements": "Assign Elements",
-      "dates": "Dates",
+      "dates": {
+        "title": "Dates",
+        "currentDate": "Current date",
+        "currentTime": "Current time",
+        "currentDateAndTime": "Current date & time",
+        "yesterday": "Yesterday",
+        "tomorrow": "Tomorrow",
+        "customDateTime": "Custom date & time",
+        "yearMonthDayFormat": "Year Month Day format",
+        "dayMonthYearFormat": "Day Month Year format",
+        "customFormat": "Custom format"
+      },
       "noName": "<No name>",
       "helpers": {
         "title": "Tools",
