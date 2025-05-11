@@ -11,7 +11,7 @@ const createTemplate = (id: string, key: string, value: string, tooltip: string 
 });
 
 const datesTrPath = "serviceFlow.previousVariables.dates";
-const helperTrPath = "serviceFlow.previousVariables.helpers";
+const helpersTrPath = "serviceFlow.previousVariables.helpers";
 
 export const datesVariables: Assign[] = [
   createTemplate(v4(), `${datesTrPath}.currentDate`, DATE_CONSTANTS.TODAY),
@@ -26,14 +26,14 @@ export const datesVariables: Assign[] = [
 ];
 
 export const helperVariables: Assign[] = [
-  createTemplate(v4(), `${helperTrPath}.map`, HELPERS_CONSTANTS.MAP),
-  createTemplate(v4(), `${helperTrPath}.filter`, HELPERS_CONSTANTS.FILTER),
-  createTemplate(v4(), `${helperTrPath}.find`, HELPERS_CONSTANTS.FIND),
-  createTemplate(v4(), `${helperTrPath}.length`, HELPERS_CONSTANTS.LENGTH),
-  createTemplate(v4(), `${helperTrPath}.sort`, HELPERS_CONSTANTS.SORT),
-  createTemplate(v4(), `${helperTrPath}.join`, HELPERS_CONSTANTS.JOIN),
-  createTemplate(v4(), `${helperTrPath}.split`, HELPERS_CONSTANTS.SPLIT),
-  createTemplate(v4(), `${helperTrPath}.slice`, HELPERS_CONSTANTS.SLICE),
+  createTemplate(v4(), `${helpersTrPath}.map`, HELPERS_CONSTANTS.MAP),
+  createTemplate(v4(), `${helpersTrPath}.filter`, HELPERS_CONSTANTS.FILTER),
+  createTemplate(v4(), `${helpersTrPath}.find`, HELPERS_CONSTANTS.FIND),
+  createTemplate(v4(), `${helpersTrPath}.length`, HELPERS_CONSTANTS.LENGTH),
+  createTemplate(v4(), `${helpersTrPath}.sort`, HELPERS_CONSTANTS.SORT),
+  createTemplate(v4(), `${helpersTrPath}.join`, HELPERS_CONSTANTS.JOIN),
+  createTemplate(v4(), `${helpersTrPath}.split`, HELPERS_CONSTANTS.SPLIT),
+  createTemplate(v4(), `${helpersTrPath}.slice`, HELPERS_CONSTANTS.SLICE),
 ];
 
 
