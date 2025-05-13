@@ -26,50 +26,59 @@ export enum HELPERS_CONSTANTS {
 
 export const getHelperTooltips = () => {
   const { t } = useTranslation();
+  const helpersPath = "serviceFlow.previousVariables.helpers.tooltip";
+
+  const createTooltip = (key: string, replacements: Record<string, string> = {}) => {
+    return (
+      t(`${helpersPath}.${key}`, replacements)
+        .replaceAll(/ARROW/g, "=>")
+        .replaceAll(/BIGGER/g, ">")
+        .replaceAll(/COMMA/g, ",") ?? ""
+    );
+  };
+
   return [
-    t("serviceFlow.previousVariables.helpers.tooltip.map", {
+    createTooltip("map", {
       example: "list.map(x ARROW x * 2)",
       input: "[1, 2, 3]",
       output: "[2, 4, 6]",
-    }).replace("ARROW", "=>") ?? "",
-    t("serviceFlow.previousVariables.helpers.tooltip.filter", {
+    }),
+    createTooltip("filter", {
       example: "list.filter(x ARROW x BIGGER 10)",
       input: "[5, 10, 15, 20]",
       output: "[15, 20]",
-    })
-      .replace("ARROW", "=>")
-      .replace("BIGGER", ">") ?? "",
-    t("serviceFlow.previousVariables.helpers.tooltip.find", {
+    }),
+    createTooltip("find", {
       example: "list.find(x ARROW x.id === 2)",
       input: "[{id: 1}, {id: 2}]",
       output: "{id: 2}",
-    }).replace("ARROW", "=>") ?? "",
-    t("serviceFlow.previousVariables.helpers.tooltip.length", {
+    }),
+    createTooltip("length", {
       example: "list.length",
       input: "[a, b, c]",
       output: "3",
-    }) ?? "",
-    t("serviceFlow.previousVariables.helpers.tooltip.sort", {
+    }),
+    createTooltip("sort", {
       example: "list.sort()",
       input: "[3, 1, 2]",
       output: "[1, 2, 3]",
-    }) ?? "",
-    t("serviceFlow.previousVariables.helpers.tooltip.join", {
-      example: "list.join( , )",
+    }),
+    createTooltip("join", {
+      example: "list.join(COMMA)",
       input: "[a, b, c]",
       output: "a, b, c",
-    }) ?? "",
-    t("serviceFlow.previousVariables.helpers.tooltip.split", {
-      example: "text.split( , )",
+    }),
+    createTooltip("split", {
+      example: "text.split(COMMA)",
       input: "one,two,three",
       output: "[one, two, three]",
-    }) ?? "",
-    t("serviceFlow.previousVariables.helpers.tooltip.slice", {
+    }),
+    createTooltip("slice", {
       example: "list.slice(1, 4)",
       input: "[10, 20, 30, 40, 50]",
       output: "[20, 30, 40]",
-    }) ?? "",
-    t("serviceFlow.previousVariables.helpers.tooltip.reduce", {
+    }),
+    createTooltip("reduce", {
       example: "list.reduce((total, num) ARROW total + num, 0)",
       input: "[1, 2, 3, 4, 5]",
       output: "15",
@@ -81,13 +90,13 @@ export const getHelperTooltips = () => {
       input3:
         "[ { startDate: 2025-01-01, name: [{language: EE, text: uusaasta}] }, { startDate: 2025-02-24, name: [{language: EE, text: iseseisvuspäev}] } ]",
       output3: "Kõik riigipühad käesoleval aastal on:\n2025-01-01 - uusaasta\n2025-02-24 - iseseisvuspäev",
-    }).replaceAll("ARROW", "=>") ?? "",
-    t("serviceFlow.previousVariables.helpers.tooltip.mapAndJoin", {
+    }),
+    createTooltip("mapAndJoin", {
       example:
         "Kõik riigipühad käesoleval aastal on:\n${list.map((item) ARROW item.startDate +  -  + item.name[0].text).join(\\n)}",
       input:
         "[ { startDate: 2025-01-01, name: [{language: EE, text: uusaasta}] }, { startDate: 2025-02-24, name: [{language: EE, text: iseseisvuspäev}] } ]",
       output: "Kõik riigipühad käesoleval aastal on:\n2025-01-01 - uusaasta\n2025-02-24 - iseseisvuspäev",
-    }).replace("ARROW", "=>") ?? "",
+    }),
   ];
 };
