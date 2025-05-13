@@ -20,6 +20,8 @@ export enum HELPERS_CONSTANTS {
   JOIN = "YOUR_LIST.join(',')",
   SPLIT = "YOUR_TEXT.split(',')",
   SLICE = "YOUR_LIST.slice(START_INDEX, END_INDEX)",
+  REDUCE = "YOUR_LIST.reduce((str, item, i) => str + (i ? 'YOUR_DELIMITER' : '') + item, 'YOUR_INITIAL_VALUE')",
+  MAP_AND_JOIN = "YOUR_LIST.map((item) => item).join('YOUR_DELIMITER')",
 };
 
 export const getHelperTooltips = () => {
@@ -34,7 +36,9 @@ export const getHelperTooltips = () => {
       example: "list.filter(x ARROW x BIGGER 10)",
       input: "[5, 10, 15, 20]",
       output: "[15, 20]",
-    }).replace("ARROW", "=>").replace('BIGGER', '>') ?? "",
+    })
+      .replace("ARROW", "=>")
+      .replace("BIGGER", ">") ?? "",
     t("serviceFlow.previousVariables.helpers.tooltip.find", {
       example: "list.find(x ARROW x.id === 2)",
       input: "[{id: 1}, {id: 2}]",
@@ -65,5 +69,25 @@ export const getHelperTooltips = () => {
       input: "[10, 20, 30, 40, 50]",
       output: "[20, 30, 40]",
     }) ?? "",
+    t("serviceFlow.previousVariables.helpers.tooltip.reduce", {
+      example: "list.reduce((total, num) ARROW total + num, 0)",
+      input: "[1, 2, 3, 4, 5]",
+      output: "15",
+      example2: "list.reduce((flat, row) ARROW flat.concat(row), [])",
+      input2: "[[1, 2], [3, 4], [5, 6]]",
+      output2: "[1, 2, 3, 4, 5, 6]",
+      example3:
+        "list.reduce((str, item, i) ARROW str + (i ? \\n : ``) + item.startDate +  -  + item.name[0].text, Kõik riigipühad käesoleval aastal on:\\n)",
+      input3:
+        "[ { startDate: 2025-01-01, name: [{language: EE, text: uusaasta}] }, { startDate: 2025-02-24, name: [{language: EE, text: iseseisvuspäev}] } ]",
+      output3: "Kõik riigipühad käesoleval aastal on:\n2025-01-01 - uusaasta\n2025-02-24 - iseseisvuspäev",
+    }).replaceAll("ARROW", "=>") ?? "",
+    t("serviceFlow.previousVariables.helpers.tooltip.mapAndJoin", {
+      example:
+        "Kõik riigipühad käesoleval aastal on:\n${list.map((item) ARROW item.startDate +  -  + item.name[0].text).join(\\n)}",
+      input:
+        "[ { startDate: 2025-01-01, name: [{language: EE, text: uusaasta}] }, { startDate: 2025-02-24, name: [{language: EE, text: iseseisvuspäev}] } ]",
+      output: "Kõik riigipühad käesoleval aastal on:\n2025-01-01 - uusaasta\n2025-02-24 - iseseisvuspäev",
+    }).replace("ARROW", "=>") ?? "",
   ];
 };

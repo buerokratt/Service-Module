@@ -31,6 +31,8 @@ export const helperVariables: Assign[] = [
   createTemplate(v4(), "serviceFlow.previousVariables.helpers.join", HELPERS_CONSTANTS.JOIN),
   createTemplate(v4(), "serviceFlow.previousVariables.helpers.split", HELPERS_CONSTANTS.SPLIT),
   createTemplate(v4(), "serviceFlow.previousVariables.helpers.slice", HELPERS_CONSTANTS.SLICE),
+  createTemplate(v4(), "serviceFlow.previousVariables.helpers.reduce", HELPERS_CONSTANTS.REDUCE),
+  createTemplate(v4(), "serviceFlow.previousVariables.helpers.mapAndJoin", HELPERS_CONSTANTS.MAP_AND_JOIN),
 ];
 
 

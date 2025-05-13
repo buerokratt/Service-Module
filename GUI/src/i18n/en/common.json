@@ -311,6 +311,8 @@
         "join": "Join text",
         "split": "Split text",
         "slice": "Cut text",
+        "reduce": "Combine items",
+        "mapAndJoin": "Change and join items",
         "tooltip": {
           "map": "Apply a rule to each item in a list\n\nExample: {{example}}\nInput: {{input}}\nOutput: {{output}}",
           "filter": "Keep only items that match a condition\n\nExample: {{example}}\nInput: {{input}}\nOutput: {{output}}",
@@ -319,7 +321,9 @@
           "sort": "Order the items in a list\n\nExample: {{example}}\nInput: {{input}}\nOutput: {{output}}",
           "join": "Turn a list into a single text string\n\nExample: {{example}}\nInput: {{input}}\nOutput: {{output}}",
           "split": "Split text into a list by separator\n\nExample: {{example}}\nInput: {{input}}\nOutput: {{output}}",
-          "slice": "Take a portion of a list\n\nExample: {{example}}\nInput: {{input}}\nOutput: {{output}}"
+          "slice": "Take a portion of a list\n\nExample: {{example}}\nInput: {{input}}\nOutput: {{output}}",
+          "reduce": "Combine all items into one result using a rule\n\nSum Numbers in List:\nExample: {{example}}\nInput: {{input}}\nOutput: {{output}}\n\nFlatten a List:\nExample: {{example2}}\nInput: {{input2}}\nOutput: {{output2}}\n\nLoop through a List:\nExample: {{example3}}\n\nInput: {{input3}}\n\nOutput: {{output3}}",
+          "mapAndJoin": "Change each item, then combine into text\n\nExample: {{example}}\n\nInput: {{input}}\n\nOutput: {{output}}"
         }
       }
     },
