@@ -71,9 +71,16 @@ Currently, Header and Main Navigation used as external components, they are defi
 
 ### Database setup
 
+To use the local services database, do the following:
+
+1. Open `docker-compose.yml`, find `resql` service and change the value of environment variable `sqlms.datasources.[0].jdbcUrl` to `jdbc:postgresql://database:5432/services_db`.
+2. Run `./migrate.sh` to run migrations.
+3. Start the project normally with `docker compose up -d`.
+
+Extras:
+
 - For setting up the users database initially, run
   `docker run --platform linux/amd64 --network=bykstack riaee/byk-users-db:liquibase20220615 --url=jdbc:postgresql://database:5432/users_db --username=byk --password=01234 --changelog-file=./master.yml update`
-- Run migrations added in this repository by running the helper script `./migrate.sh`
 - When creating new migrations, use the helper `./create-migration.sh name-of-migration` which will create a timestamped file in the correct directory and add the required headers
 
 ### Open Search
