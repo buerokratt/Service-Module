@@ -299,8 +299,19 @@
     },
     "previousVariables": {
       "assignElements": "Määra elemendid",
-      "dates": "Kuupäevad",
       "noName": "<Nimeta>",
+      "dates": {
+        "title": "Kuupäevad",
+        "currentDate": "Praegune kuupäev",
+        "currentTime": "Praegune aeg",
+        "currentDateAndTime": "Praegune kuupäev ja kellaaeg",
+        "yesterday": "Eile",
+        "tomorrow": "Homme",
+        "customDateTime": "Kohandatud kuupäev ja kellaaeg",
+        "yearMonthDayFormat": "Aasta Kuu Päeva formaat",
+        "dayMonthYearFormat": "Päev Kuu Aasta formaat",
+        "customFormat": "Kohandatud vorming"
+      },
       "helpers": {
         "title": "Tööriistad",
         "map": "Muuda elemente",
