@@ -69,7 +69,13 @@ const NewServicePage: React.FC = () => {
                 name="name"
                 label=""
                 value={name}
-                onChange={(e) => useServiceStore.getState().changeServiceName(e.target.value)}
+                onChange={(e) => {
+                   const value = e.target.value.trim();
+                   const hasSpecialCharacters = /[^\p{L}\p{N} ]/u;
+                   if (!hasSpecialCharacters.test(value) && !value.startsWith(" ")) {
+                     useServiceStore.getState().changeServiceName(e.target.value);}
+                   }
+                }
               />
             </div>
             <div>
