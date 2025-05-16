@@ -10,7 +10,7 @@ type AssignContentProps = {
 
 const AssignContent: FC<AssignContentProps> = ({ nodeId }) => {
   const nodes = useServiceStore((state) => state.nodes);
-  const currentNodeElements = nodes.find((node) => node.id === nodeId)?.data?.assignElements ?? [];
+  const currentNodeElements = nodes.findLast((node) => node.id === nodeId)?.data?.assignElements ?? [];
 
   return (
     <Track direction="vertical" align="stretch">

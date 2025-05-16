@@ -91,7 +91,7 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
       )}
 
       <VariableSection
-        title={t("serviceFlow.previousVariables.dates")}
+        title={t("serviceFlow.previousVariables.dates.title")}
         variables={[...datesVariables]}
         assignedObjectTree={assignedObjectTree}
         setAssignedObjectTree={setAssignedObjectTree}
