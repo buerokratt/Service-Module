@@ -34,6 +34,6 @@ export const helperVariables: Assign[] = [
   createTemplate(v4(), `${helpersTrPath}.join`, HELPERS_CONSTANTS.JOIN),
   createTemplate(v4(), `${helpersTrPath}.split`, HELPERS_CONSTANTS.SPLIT),
   createTemplate(v4(), `${helpersTrPath}.slice`, HELPERS_CONSTANTS.SLICE),
+  createTemplate(v4(), `${helpersTrPath}.reduce`, HELPERS_CONSTANTS.REDUCE),
+  createTemplate(v4(), `${helpersTrPath}.mapAndJoin`, HELPERS_CONSTANTS.MAP_AND_JOIN),
 ];
-
-
