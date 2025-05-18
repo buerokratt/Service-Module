@@ -69,6 +69,16 @@ Currently, Header and Main Navigation used as external components, they are defi
  "@buerokrat-ria/styles": "^0.0.1"
 ```
 
+### Linting and formatting
+
+#### SQL
+
+The repository uses [SQLFluff](https://sqlfluff.com/) for linting and formatting SQL files. To use SQLFluff:
+
+1. Install SQLFluff: `pipx install sqlfluff`.
+2. Run `sqlfluff lint`.
+3. Additionally, using an IDE extension is highly recommended. For [VSCode](https://marketplace.visualstudio.com/items?itemName=dorzey.vscode-sqlfluff) or [Jetbrains editors](https://plugins.jetbrains.com/plugin/20494-sqlfluff-linter-community-edition).
+
 ### Database setup
 
 To use the local services database, do the following:
