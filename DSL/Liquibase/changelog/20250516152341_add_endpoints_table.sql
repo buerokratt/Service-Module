@@ -1,11 +1,15 @@
 -- liquibase formatted sql
--- changeset IgorKrupenja:20250516152341 
+-- changeset IgorKrupenja:20250516152341
+
+ALTER TABLE services DROP COLUMN endpoints;
+
+CREATE TYPE "ENDPOINT_TYPE" AS ENUM ('openAPI', 'custom');
+
 CREATE TABLE endpoints (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     service_ids UUID [] NOT NULL,
     name TEXT NOT NULL,
-    -- todo enum?
-    type TEXT NOT NULL,
+    type ENDPOINT_TYPE NOT NULL,
     file_name TEXT NOT NULL,
     is_common BOOLEAN NOT NULL DEFAULT FALSE,
     definitions JSONB NOT NULL DEFAULT '[]',
