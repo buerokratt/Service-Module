@@ -127,37 +127,40 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
   setIsYesNoQuestion: (value: boolean) => set({ isYesNoQuestion: value }),
   changeAssignNode: (assignElements) => {
     const { nodes } = get();
-
-    const elementsById = new Map(
+    const elementsMap = new Map(
       nodes
         .filter((node) => node.data.stepType === StepType.Assign)
-        .flatMap((node) => node.data?.assignElements ?? [])
+        .flatMap((node) => node.data?.assignElements || [])
         .map((element) => [element.id, element])
     );
 
-    assignElements.forEach((updatedElement) => {
-      const existingElement = elementsById.get(updatedElement.id);
-      if (!existingElement) return;
+    assignElements.forEach(
+      (updated) => elementsMap.get(updated.id) && Object.assign(elementsMap.get(updated.id), updated)
+    );
 
-      Object.assign(existingElement, updatedElement);
-
+    const updateRefs = () =>
       nodes
-        .filter((node) => node.data.stepType === StepType.Assign && node.data.assignElements)
-        .forEach((node) => {
-          node.data.assignElements.forEach((element: any) => {
-            element.slots?.forEach((slot: any) => {
-              if (slot.id === updatedElement.id) {
-                Object.assign(slot, {
-                  ...updatedElement,
-                  id: slot.id,
-                  key: slot.key,
-                });
-              }
-            });
-          });
-        });
-    });
+        .filter((node) => node.data.stepType === StepType.Assign)
+        .some((node) =>
+          node.data.assignElements?.some((element: any) => {
+            const checkSlots = (slots: any) =>
+              slots.some((slot: any) => {
+                const ref = elementsMap.get(slot.id);
+                if (!ref) return false;
 
+                const changed = slot.value !== ref.value || JSON.stringify(slot.slots) !== JSON.stringify(ref.slots);
+                if (changed) Object.assign(slot, { ...ref, id: slot.id, key: slot.key });
+                if (slot.slots) checkSlots(slot.slots);
+                return changed;
+              });
+
+            const slotsChanged = element.slots && checkSlots(element.slots);
+            if (element.slots?.length) element.value = element.slots[0].value;
+            return slotsChanged;
+          })
+        );
+
+    while (updateRefs()) {}
     set({ assignElements });
   },
   changeRulesNode: (rules) => set({ rules }),
