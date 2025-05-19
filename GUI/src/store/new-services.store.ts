@@ -130,7 +130,7 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
     const elementsMap = new Map(
       nodes
         .filter((node) => node.data.stepType === StepType.Assign)
-        .flatMap((node) => node.data?.assignElements || [])
+        .flatMap((node) => node.data?.assignElements ?? [])
         .map((element) => [element.id, element])
     );
 
@@ -160,7 +160,7 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
           })
         );
 
-    while (updateRefs()) {}
+    while (updateRefs()) { /* logic to do while refs are being updated */}
     set({ assignElements });
   },
   changeRulesNode: (rules) => set({ rules }),
