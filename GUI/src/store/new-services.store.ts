@@ -131,7 +131,7 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
     const elementsById = new Map(
       nodes
         .filter((node) => node.data.stepType === StepType.Assign)
-        .flatMap((node) => node.data?.assignElements || [])
+        .flatMap((node) => node.data?.assignElements ?? [])
         .map((element) => [element.id, element])
     );
 
