@@ -125,7 +125,41 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
   isYesNoQuestion: false,
   endpointsResponseVariables: [],
   setIsYesNoQuestion: (value: boolean) => set({ isYesNoQuestion: value }),
-  changeAssignNode: (assignElements) => set({ assignElements: assignElements }),
+  changeAssignNode: (assignElements) => {
+    const { nodes } = get();
+
+    const elementsById = new Map(
+      nodes
+        .filter((node) => node.data.stepType === StepType.Assign)
+        .flatMap((node) => node.data?.assignElements || [])
+        .map((element) => [element.id, element])
+    );
+
+    assignElements.forEach((updatedElement) => {
+      const existingElement = elementsById.get(updatedElement.id);
+      if (!existingElement) return;
+
+      Object.assign(existingElement, updatedElement);
+
+      nodes
+        .filter((node) => node.data.stepType === StepType.Assign && node.data.assignElements)
+        .forEach((node) => {
+          node.data.assignElements.forEach((element: any) => {
+            element.slots?.forEach((slot: any) => {
+              if (slot.id === updatedElement.id) {
+                Object.assign(slot, {
+                  ...updatedElement,
+                  id: slot.id,
+                  key: slot.key,
+                });
+              }
+            });
+          });
+        });
+    });
+
+    set({ assignElements });
+  },
   changeRulesNode: (rules) => set({ rules }),
   disableTestButton: () =>
     set({
