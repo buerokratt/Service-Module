@@ -125,7 +125,68 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
   isYesNoQuestion: false,
   endpointsResponseVariables: [],
   setIsYesNoQuestion: (value: boolean) => set({ isYesNoQuestion: value }),
-  changeAssignNode: (assignElements) => set({ assignElements: assignElements }),
+  changeAssignNode: (assignElements) => {
+    const { nodes } = get();
+    const elementsMap = new Map(
+      nodes
+        .filter((node) => node.data.stepType === StepType.Assign)
+        .flatMap((node) => node.data?.assignElements ?? [])
+        .map((element) => [element.id, element])
+    );
+
+    assignElements.forEach(
+      (updated) => elementsMap.get(updated.id) && Object.assign(elementsMap.get(updated.id), updated)
+    );
+   
+    const hasChangedSlot = (slot: any, elementsMap: Map<any, any>): boolean => {
+      const ref = elementsMap.get(slot.id);
+      if (!ref) return false;
+
+      const valueChanged = slot.value !== ref.value;
+      const slotsChanged = JSON.stringify(slot.slots) !== JSON.stringify(ref.slots);
+      const changed = valueChanged || slotsChanged;
+
+      if (changed) {
+        Object.assign(slot, { ...ref, id: slot.id, key: slot.key });
+      }
+
+      if (slot.slots) {
+        checkSlots(slot.slots, elementsMap);
+      }
+
+      return changed;
+    };
+
+    const checkSlots = (slots: any[], elementsMap: Map<any, any>): boolean => {
+      return slots.some((slot) => hasChangedSlot(slot, elementsMap));
+    };
+
+    const processElement = (element: any, elementsMap: Map<any, any>): boolean => {
+      const slotsChanged = element.slots && checkSlots(element.slots, elementsMap);
+
+      if (element.slots?.length) {
+        element.value = element.slots[0].value;
+      }
+
+      return slotsChanged;
+    };
+
+    const hasChangedElements = (node: any, elementsMap: Map<any, any>): boolean => {
+      return node.data.assignElements?.some((element: any) => processElement(element, elementsMap)) ?? false;
+    };
+
+    const getAssignNodes = (nodes: any[]): any[] => {
+      return nodes.filter((node) => node.data.stepType === StepType.Assign);
+    };
+
+    const updateRefs = (): boolean => {
+      const assignNodes = getAssignNodes(nodes);
+      return assignNodes.some((node) => hasChangedElements(node, elementsMap));
+    };
+
+    while (updateRefs()) { /* logic to do while refs are being updated */}
+    set({ assignElements });
+  },
   changeRulesNode: (rules) => set({ rules }),
   disableTestButton: () =>
     set({
