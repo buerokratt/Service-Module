@@ -45,8 +45,8 @@ services:
       - database
     environment:
       - sqlms.datasources.[0].name=byk
-      # - sqlms.datasources.[0].jdbcUrl=jdbc:postgresql://database:5432/services_db // For Local Use
-      - sqlms.datasources.[0].jdbcUrl=jdbc:postgresql://171.22.247.13:5435/services_db
+      - sqlms.datasources.[0].jdbcUrl=jdbc:postgresql://database:5432/services_db // For Local Use
+      # - sqlms.datasources.[0].jdbcUrl=jdbc:postgresql://171.22.247.13:5435/services_db
       - sqlms.datasources.[0].username=byk
       - sqlms.datasources.[0].password=01234
       - logging.level.org.springframework.boot=INFO
@@ -74,7 +74,7 @@ services:
     ports:
       - 8088:8088
     volumes:
-       - ./DSL/Resql:/DSL
+      - ./DSL/Resql:/DSL
     networks:
       - bykstack
 
@@ -94,7 +94,7 @@ services:
     ports:
       - 8089:8089
     volumes:
-       - ./DSL/Resql:/DSL
+      - ./DSL/Resql:/DSL
     networks:
       - bykstack
 
@@ -210,7 +210,7 @@ services:
     ports:
       - 3010:3010
     networks:
-      - bykstack    
+      - bykstack
 
   opensearch:
     image: opensearchproject/opensearch:2.11.1
