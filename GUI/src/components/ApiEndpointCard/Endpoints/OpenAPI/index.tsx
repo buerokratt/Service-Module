@@ -216,7 +216,7 @@ const EndpointOpenAPI: React.FC<EndpointOpenAPIProps> = ({
     setOpenApiEndpoints(paths);
     setEndpoints((prevEndpoints) => {
       prevEndpoints.map((prevEndpoint) => {
-        if (prevEndpoint.id !== endpoint.id) return prevEndpoint;
+        if (prevEndpoint.endpointId !== endpoint.endpointId) return prevEndpoint;
         prevEndpoint.definitions = paths;
         prevEndpoint.openApiUrl = openApiUrl;
         return prevEndpoint;
@@ -243,7 +243,7 @@ const EndpointOpenAPI: React.FC<EndpointOpenAPIProps> = ({
     if (!openApiEndpointId) return;
     setEndpoints((prevEndpoints) => {
       return prevEndpoints.map((prevEndpoint) => {
-        if (prevEndpoint.id !== endpoint.id) return prevEndpoint;
+        if (prevEndpoint.endpointId !== endpoint.endpointId) return prevEndpoint;
         updateEndpoint(prevEndpoint, data, openApiEndpointId);
         return prevEndpoint;
       });
@@ -290,7 +290,7 @@ const EndpointOpenAPI: React.FC<EndpointOpenAPIProps> = ({
     newSelectedEndpoint: EndpointDefinition | undefined
   ) => {
     return prevEndpoints.map((prevEndpoint) => {
-      if (prevEndpoint.id !== endpoint.id) return prevEndpoint;
+      if (prevEndpoint.endpointId !== endpoint.endpointId) return prevEndpoint;
       prevEndpoint.definitions.map((definedEndpoint) => {
         definedEndpoint.isSelected = definedEndpoint === newSelectedEndpoint;
         return definedEndpoint;

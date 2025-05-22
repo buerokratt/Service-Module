@@ -2,7 +2,7 @@ import { EndpointDefinition } from "./endpoint-definition";
 import { EndpointType } from "./endpoint-type";
 
 export type EndpointData = {
-  id: string;
+  endpointId: string;
   name: string;
   fileName?: string;
   type?: EndpointType;

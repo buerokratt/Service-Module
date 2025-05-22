@@ -6,7 +6,7 @@ WITH LatestEndpoints AS (
   ORDER BY e.id, e.created_at DESC
 )
 SELECT
-  id,
+  endpoint_id,
   name,
   type,
   file_name,

@@ -48,7 +48,7 @@ update_endpoint:
   args:
     url: "[#SERVICE_RESQL]/endpoints/update_endpoint"
     body:
-      id: ${id}
+      endpointId: ${id}
       name: ${incoming.body.name}
       fileName: ${incoming.body.fileName}
       type: ${incoming.body.type}

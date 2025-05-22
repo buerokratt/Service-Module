@@ -38,7 +38,7 @@ create_endpoint:
   args:
     url: "[#SERVICE_RESQL]/endpoints/create_endpoint"
     body:
-      id: ${incoming.body.id}
+      endpointId: ${incoming.body.id}
       name: ${incoming.body.name}
       fileName: ${incoming.body.fileName}
       type: ${incoming.body.type}

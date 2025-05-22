@@ -1,9 +1,9 @@
 WITH existing AS (
-  SELECT service_ids FROM endpoints WHERE id = :id::uuid ORDER BY created_at DESC LIMIT 1
+  SELECT service_ids FROM endpoints WHERE endpoint_id = :endpointId::uuid ORDER BY created_at DESC LIMIT 1
 )
-INSERT INTO endpoints (id, service_ids, name, type, file_name, is_common, definitions)
+INSERT INTO endpoints (endpoint_id, service_ids, name, type, file_name, is_common, definitions)
 VALUES (
-  :id::uuid,
+  :endpointId::uuid,
   (
     SELECT
       CASE

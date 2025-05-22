@@ -121,7 +121,7 @@ const NewServicePage: React.FC = () => {
         </Card>
 
         {endpoints.map((endpoint) => (
-          <ApiEndpointCard key={endpoint.id} endpoint={endpoint} />
+          <ApiEndpointCard key={endpoint.endpointId} endpoint={endpoint} />
         ))}
         <Button appearance="text" onClick={useServiceStore.getState().addEndpoint}>
           {t("newService.endpoint.add")}

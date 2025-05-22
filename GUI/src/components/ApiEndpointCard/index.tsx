@@ -42,7 +42,7 @@ const ApiEndpointCard: FC<EndpointCardProps> = ({ endpoint, isDeletable = true, 
     if (endpoint.hasTestEnv) setTestEnvExists(true);
   }, [endpoint.hasTestEnv]);
 
-  const requestValues = useMemo(() => getAvailableRequestValues(endpoint.id), []);
+  const requestValues = useMemo(() => getAvailableRequestValues(endpoint.endpointId), []);
 
   return (
     <Tabs.Root
@@ -63,7 +63,7 @@ const ApiEndpointCard: FC<EndpointCardProps> = ({ endpoint, isDeletable = true, 
           </Tabs.Trigger>
         </Tabs.List>
         {isDeletable && (
-          <Button appearance="text" onClick={() => deleteEndpoint(endpoint.id)} style={{ color: "#9799A4" }}>
+          <Button appearance="text" onClick={() => deleteEndpoint(endpoint.endpointId)} style={{ color: "#9799A4" }}>
             <Icon icon={<MdDeleteOutline />} size="medium" />
             {t("overview.delete")}
           </Button>
@@ -82,7 +82,7 @@ const ApiEndpointCard: FC<EndpointCardProps> = ({ endpoint, isDeletable = true, 
                   disabled={selectedTab === EndpointEnv.Test}
                   onSelectionChange={(selection) => {
                     setOption(selection);
-                    changeServiceEndpointType(endpoint.id, (selection?.value ?? "custom") as EndpointType);
+                    changeServiceEndpointType(endpoint.endpointId, (selection?.value ?? "custom") as EndpointType);
                   }}
                   defaultValue={option?.value}
                 />
@@ -96,7 +96,7 @@ const ApiEndpointCard: FC<EndpointCardProps> = ({ endpoint, isDeletable = true, 
                     value={endpointName}
                     disabled={isNameDisabled || selectedTab === EndpointEnv.Test}
                     onChange={(e) => {
-                      onNameChange(endpoint.id, endpointName, e.target.value);
+                      onNameChange(endpoint.endpointId, endpointName, e.target.value);
                       setEndpointName(e.target.value);
                     }}
                   />
@@ -128,9 +128,9 @@ const ApiEndpointCard: FC<EndpointCardProps> = ({ endpoint, isDeletable = true, 
                     label=""
                     onLabel={t("global.yes").toString()}
                     offLabel={t("global.no").toString()}
-                    value={isCommonEndpoint(endpoint.id)}
-                    checked={isCommonEndpoint(endpoint.id)}
-                    onCheckedChange={(value) => setIsCommonEndpoint(endpoint.id, value)}
+                    value={isCommonEndpoint(endpoint.endpointId)}
+                    checked={isCommonEndpoint(endpoint.endpointId)}
+                    onCheckedChange={(value) => setIsCommonEndpoint(endpoint.endpointId, value)}
                   />
                 </Track>
               )}

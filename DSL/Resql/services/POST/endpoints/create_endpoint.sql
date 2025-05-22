@@ -1,5 +1,5 @@
 INSERT INTO endpoints (
-    id,
+    endpoint_id,
     service_ids,
     name,
     type,
@@ -8,7 +8,7 @@ INSERT INTO endpoints (
     definitions
 )
 VALUES (
-    :id::uuid,
+    :endpointId::uuid,
     CASE
       -- Common endpoints are not linked to any services initially
       -- They are linked with services when enpoints are added to the flow structure 

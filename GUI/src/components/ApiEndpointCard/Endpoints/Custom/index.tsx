@@ -148,7 +148,7 @@ const EndpointCustom: React.FC<EndpointCustomProps> = ({
         endpointData={endpoint.definitions[0]}
         requestTab={requestTab}
         setRequestTab={setRequestTab}
-        parentEndpointId={endpoint.id}
+        parentEndpointId={endpoint.endpointId}
         onParametersChange={(parameters) => {
           const url = new URL(endpoint.definitions[0].url ?? "");
           url.searchParams.forEach((_, key) => {

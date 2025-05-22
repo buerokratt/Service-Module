@@ -296,13 +296,12 @@ const assignEndpointVariables = (
 export async function saveEndpoints(
   endpoints: EndpointData[],
   name: string,
+  // TODO: In the future, get ID from state instead of passing it around as a param
   serviceId: string,
   onSuccess?: () => void,
   onError?: (e: any) => void
 ) {
   const tasks: Promise<any>[] = [];
-  // todo likely use this instead of passing param
-  const id = useServiceStore.getState().serviceId;
 
   for (const endpoint of endpoints) {
     endpoint.serviceId = serviceId;
@@ -340,11 +339,10 @@ export async function saveEndpoints(
   endpoints.forEach((endpoint) => {
     // todo remove
     console.log("igor endpoint", endpoint);
-    console.log("igor id", id);
     if (endpoint.isNew) {
       tasks.push(createEndpointAndUpdateState(endpoint));
     } else {
-      tasks.push(axios.post(updateEndpoint(endpoint.id), endpoint));
+      tasks.push(axios.post(updateEndpoint(endpoint.endpointId), endpoint));
     }
   });
 
@@ -360,7 +358,7 @@ async function createEndpointAndUpdateState(endpoint: EndpointData): Promise<any
     });
     useServiceStore
       .getState()
-      .setEndpoints((prev) => prev.map((ep) => (ep.id === endpoint.id ? { ...ep, isNew: false } : ep)));
+      .setEndpoints((prev) => prev.map((ep) => (ep.endpointId === endpoint.endpointId ? { ...ep, isNew: false } : ep)));
     return response;
   } catch (error) {
     // Propagate error so Promise.all can catch it
@@ -1073,7 +1071,7 @@ const getDefinedEndpointStep = (steps: Step[], node: Node) => {
 };
 
 const getEndpointName = (endpoint: EndpointData) => {
-  return `${(endpoint.name.trim().length ?? 0) > 0 ? endpoint?.name.replaceAll(" ", "_") : endpoint?.id}`;
+  return `${(endpoint.name.trim().length ?? 0) > 0 ? endpoint?.name.replaceAll(" ", "_") : endpoint?.endpointId}`;
 };
 
 export const saveDraft = async () => {
