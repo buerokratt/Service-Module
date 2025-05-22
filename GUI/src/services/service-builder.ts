@@ -291,17 +291,14 @@ const assignEndpointVariables = (
 export async function saveEndpoints(
   endpoints: EndpointData[],
   name: string,
-  id: string,
+  serviceId: string,
   onSuccess?: (e: any) => void,
   onError?: (e: any) => void
 ) {
   const tasks: Promise<any>[] = [];
-  // todo
-  // const serviceEndpoints = endpoints.filter((e) => e.serviceId === id || !e.hasOwnProperty("serviceId")).map((x) => x);
 
   for (const endpoint of endpoints) {
-    if (!endpoint) continue;
-    endpoint.serviceId = id;
+    endpoint.serviceId = serviceId;
     const selectedEndpointType = endpoint.definitions.find((e) => e.isSelected);
     if (!selectedEndpointType) continue;
 
@@ -339,11 +336,9 @@ export async function saveEndpoints(
     if (endpoint.isNew) {
       // todo create YAML
       // todo also remove isNew from state
-      // todo think about service IDs - no service ids initially for common?
-      // todo how to fetch services for flow - need to have with service IDs AND common
-      tasks.push(axios.post(createEndpoint(id), endpoint));
+      tasks.push(axios.post(createEndpoint(), endpoint));
     } else {
-      tasks.push(axios.post(updateEndpoint(id), endpoint));
+      tasks.push(axios.post(updateEndpoint(endpoint.id), endpoint));
     }
   });
 

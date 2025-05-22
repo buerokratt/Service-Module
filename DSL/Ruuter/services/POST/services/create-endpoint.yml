@@ -1,13 +1,16 @@
 declaration:
   call: declare
   version: 0.1
-  description: "Updates an existing endpoint"
+  description: "Creates a new endpoint"
   method: post
   accepts: json
   returns: json
   namespace: service
   allowlist:
     body:
+      - field: id
+        type: string
+        description: "Endpoint UUID"
       - field: name
         type: string
         description: "Endpoint name"
@@ -26,29 +29,16 @@ declaration:
       - field: definitions
         type: json
         description: "Endpoint definitions"
-    params:
-      - field: id
-        type: string
-        description: "Endpoint UUID"
 
-extract_request_data:
-  assign:
-    id: ${incoming.params.id}
-
-check_for_type:
-  switch:
-    - condition: ${id == null}
-      next: return_no_type_error
-
-log_igor_update:
+log_igor_create:
   log: ${incoming.body}
 
-update_endpoint:
+create_endpoint:
   call: http.post
   args:
-    url: "[#SERVICE_RESQL]/endpoints/update_endpoint"
+    url: "[#SERVICE_RESQL]/endpoints/create_endpoint"
     body:
-      id: ${id}
+      id: ${incoming.body.id}
       name: ${incoming.body.name}
       fileName: ${incoming.body.fileName}
       type: ${incoming.body.type}
@@ -58,10 +48,5 @@ update_endpoint:
 
 return_ok:
   status: 200
-  return: "Endpoint updated"
-  next: end
-
-return_no_type_error:
-  status: 400
-  return: "Please provide an endpoint ID"
+  return: "Endpoint created"
   next: end

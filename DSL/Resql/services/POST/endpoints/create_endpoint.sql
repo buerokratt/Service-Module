@@ -9,7 +9,12 @@ INSERT INTO endpoints (
 )
 VALUES (
     :id::uuid,
-    ARRAY[:serviceId::uuid],
+    CASE
+      -- Common endpoints are not linked to any services initially
+      -- They are linked with services when enpoints are added to the flow structure 
+      WHEN :isCommon IS TRUE THEN ARRAY[]::uuid[]
+      ELSE ARRAY[:serviceId::uuid]
+    END,
     :name,
     :type::endpoint_type,
     :fileName,

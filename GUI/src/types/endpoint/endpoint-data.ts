@@ -10,7 +10,6 @@ export type EndpointData = {
   isNew?: boolean;
   openApiUrl?: string;
   hasTestEnv?: boolean;
-  // todo can be removed? or use array?
   serviceId?: string;
   definitions: Endpoint[];
 };
