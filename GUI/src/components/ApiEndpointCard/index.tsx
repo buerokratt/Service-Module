@@ -29,7 +29,7 @@ const ApiEndpointCard: FC<EndpointCardProps> = ({ endpoint, isDeletable = true, 
   const [endpointName, setEndpointName] = useState<string>(endpoint.name);
   const [testEnvExists, setTestEnvExists] = useState<boolean>(false);
   const options: { label: string; value: EndpointType; name: string }[] = [
-    { label: "Open API", value: "openAPI", name: "da" },
+    { label: "Open API", value: "openApi", name: "da" },
     { label: "Custom endpoint", value: "custom", name: "da" },
   ];
   const [option, setOption] = useState<Option | null>(options.find((o) => o.value === endpoint.type) ?? null);

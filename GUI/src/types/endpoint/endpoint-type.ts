@@ -1,1 +1,1 @@
-export type EndpointType = "openAPI" | "custom";
+export type EndpointType = "openApi" | "custom";

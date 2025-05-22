@@ -3,7 +3,7 @@
 
 ALTER TABLE services DROP COLUMN endpoints;
 
-CREATE TYPE endpoint_type AS ENUM ('openAPI', 'custom');
+CREATE TYPE endpoint_type AS ENUM ('openApi', 'custom');
 
 CREATE TABLE endpoints (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
