@@ -180,7 +180,8 @@
       "noIntentsAvailable": "No intents available to be connected",
       "connectionQuestion": "Are you sure you want to connect to this intent?",
       "activate": "Activate",
-      "deactivate": "Deactivate"
+      "deactivate": "Deactivate",
+      "createNewIntent": "Create new intent"
     }
   },
   "connectionRequests": {

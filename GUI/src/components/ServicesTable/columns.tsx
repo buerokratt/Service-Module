@@ -4,7 +4,7 @@ import Label from "components/Label";
 import Tooltip from "components/Tooltip";
 import i18n from "i18n";
 import { IoCopyOutline } from "react-icons/io5";
-import { MdDeleteOutline, MdOutlineDescription, MdOutlineEdit } from "react-icons/md";
+import { MdDeleteOutline, MdOutlineArrowForward, MdOutlineDescription, MdOutlineEdit } from "react-icons/md";
 import { NavigateFunction } from "react-router-dom";
 import { ROUTES } from "resources/routes-constants";
 import useServiceListStore from "store/services.store";
@@ -19,6 +19,8 @@ interface GetColumnsConfig {
   hideDeletePopup: () => void;
   showStatePopup: (text: string) => void;
   showReadyPopup: () => void;
+  showIntentConnectionModal: () => void;
+  editService: () => void;
 }
 
 export const getColumns = ({
@@ -28,6 +30,8 @@ export const getColumns = ({
   hideDeletePopup,
   showStatePopup,
   showReadyPopup,
+  showIntentConnectionModal,
+  editService,
 }: GetColumnsConfig) => {
   const columnHelper = createColumnHelper<Service>();
   const userInfo = useStore.getState().userInfo;
@@ -85,6 +89,37 @@ export const getColumns = ({
         size: 320,
       },
     }),
+    columnHelper.accessor("linkedIntent", {
+      header: i18n.t("overview.service.linkedIntent") ?? "",
+      meta: {
+        size: 200,
+      },
+      cell: (props) => (
+        <Track justify="start">
+          {props.cell.getValue() ? (
+            <Button
+              style={{
+                textDecoration: props.row.original.state === ServiceState.Ready ? undefined : "none",
+                boxShadow: "none",
+              }}
+              appearance="text"
+              onClick={() => (props.row.original.state === ServiceState.Ready ? showIntentConnectionModal() : {})}
+            >
+              <label style={{ paddingLeft: "15px", color: "black" }}>{props.cell.getValue()}</label>
+            </Button>
+          ) : (
+            <Button
+              appearance="text"
+              onClick={() => showIntentConnectionModal()}
+              disabled={props.row.original.state === ServiceState.Draft}
+            >
+              <Icon icon={<MdOutlineArrowForward color="rgba(0, 0, 0, 0.54)" />} />
+              {i18n.t("overview.popup.connectToIntent")}
+            </Button>
+          )}
+        </Track>
+      ),
+    }),
     columnHelper.accessor("state", {
       header: i18n.t("overview.service.state") ?? "",
       meta: {
@@ -95,28 +130,16 @@ export const getColumns = ({
           justify="around"
           onClick={() => {
             useServiceListStore.getState().setSelectedService(props.row.original);
-            if (props.row.original.state === ServiceState.Ready) {
+            const state = props.row.original.state;
+            if (state === ServiceState.Ready && props.row.original.linkedIntent != "") {
               checkIntentConnection();
               showReadyPopup();
-            } else {
-              showStatePopup(getStatePopupContent(props.row.original.state));
             }
           }}
         >
           <Label type={getLabelType(props.row.original.state)}>
             {i18n.t(`overview.service.states.${props.row.original.state}`)}
           </Label>
-        </Track>
-      ),
-    }),
-    columnHelper.accessor("linkedIntent", {
-      header: i18n.t("overview.service.linkedIntent") ?? "",
-      meta: {
-        size: 200,
-      },
-      cell: (props) => (
-        <Track justify="center">
-          <label style={{ paddingRight: 40 }}>{props.cell.getValue()}</label>
         </Track>
       ),
     }),
@@ -129,12 +152,13 @@ export const getColumns = ({
         <Track align="right" justify="start">
           <Button
             appearance="text"
-            disabled={
-              isCommon === true && !userInfo?.authorities.includes("ROLE_ADMINISTRATOR")
-                ? true
-                : props.row.original.state === ServiceState.Active || props.row.original.state === ServiceState.Ready
-            }
-            onClick={() => navigate(ROUTES.replaceWithId(ROUTES.EDITSERVICE_ROUTE, props.row.original.serviceId))}
+            onClick={() => {
+              useServiceListStore.getState().setSelectedService(props.row.original);
+              if (props.row.original.state != ServiceState.Draft) {
+                editService();
+              }
+              navigate(ROUTES.replaceWithId(ROUTES.EDITSERVICE_ROUTE, props.row.original.serviceId));
+            }}
           >
             <Icon icon={<MdOutlineEdit />} size="medium" />
             {i18n.t("overview.edit")}
@@ -172,6 +196,10 @@ export const getColumns = ({
 
 const getLabelType = (serviceState: ServiceState) => {
   switch (serviceState) {
+    case ServiceState.Ready:
+      return "warning-dark";
+    case ServiceState.Active:
+      return "success-light";
     case ServiceState.Draft:
       return "disabled";
     case ServiceState.Inactive:

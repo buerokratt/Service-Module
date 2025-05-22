@@ -160,7 +160,7 @@
     },
     "popup": {
       "delete": "Kas olete kindel, et soovite teenuse kustutada?",
-      "setActive": "Kas olete kindel, et tahate teenuse aktiveerida?",
+      "setActive": "Kas oled kindel, et soovid teenuse aktiveerida?",
       "setReady": "Kas olete kindel, et soovite selle teenuse olekuks märkida Valmis?",
       "setDraft": "Kas olete kindel, et soovite selle teenuse olekuks märkida Mustand?",
       "setInactive": "Kas oled kindel, et tahate teenuse deaktiveerida?",
@@ -180,7 +180,8 @@
       "noIntentsAvailable": "Ühenduse loomiseks ei ole ühtegi teemat saadaval",
       "connectionQuestion": "Kas olete kindel, et soovite teenuse selle teemaga ühendada?",
       "activate": "Aktiveerige",
-      "deactivate": "Deaktiveerige"
+      "deactivate": "Deaktiveerige",
+      "createNewIntent": "Loo uus teema"
     }
   },
   "connectionRequests": {
