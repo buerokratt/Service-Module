@@ -342,7 +342,13 @@ export async function saveEndpoints(
     if (endpoint.isNew) {
       tasks.push(createEndpointAndUpdateState(endpoint));
     } else {
-      tasks.push(axios.post(updateEndpoint(endpoint.endpointId), endpoint));
+      tasks.push(
+        axios.post(updateEndpoint(endpoint.endpointId), {
+          ...endpoint,
+          // Stringify needed for Resql to save nested data in a proper parsable format
+          definitions: JSON.stringify(endpoint.definitions),
+        })
+      );
     }
   });
 

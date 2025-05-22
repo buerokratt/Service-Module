@@ -362,11 +362,9 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
 
       const structure = JSON.parse(serviceResponse.data.structure?.value ?? "{}");
       let endpoints = serviceResponse.data.endpoints.map((endpoint) => {
-        let parsedDefinitions = JSON.parse(endpoint.definitions.value);
-
         return {
           ...endpoint,
-          definitions: Array.isArray(parsedDefinitions) ? parsedDefinitions : [parsedDefinitions],
+          definitions: JSON.parse(endpoint.definitions.value),
         };
       });
       let edges = structure?.edges;
