@@ -24,6 +24,7 @@ import useTestServiceStore from "./test-services.store";
 import { Chip } from "types/chip";
 import { EndpointResponseVariable } from "types/endpoint/endpoint-response-variables";
 import { Assign } from "types/assign";
+import { EndpointType } from "types/endpoint/endpoint-type";
 
 interface ServiceStoreState {
   endpoints: EndpointData[];
@@ -72,7 +73,7 @@ interface ServiceStoreState {
   loadService: (id?: string) => Promise<void>;
   getAvailableRequestValues: (endpointId: string) => PreDefinedEndpointEnvVariables;
   onNameChange: (endpointId: string, oldName: string, newName: string) => void;
-  changeServiceEndpointType: (id: string, type: string) => void;
+  changeServiceEndpointType: (id: string, type: EndpointType) => void;
   mapEndpointsToSetps: () => Step[];
   selectedTab: EndpointEnv;
   setSelectedTab: (tab: EndpointEnv) => void;
@@ -137,7 +138,7 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
     assignElements.forEach(
       (updated) => elementsMap.get(updated.id) && Object.assign(elementsMap.get(updated.id), updated)
     );
-   
+
     const hasChangedSlot = (slot: any, elementsMap: Map<any, any>): boolean => {
       const ref = elementsMap.get(slot.id);
       if (!ref) return false;
@@ -184,7 +185,9 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
       return assignNodes.some((node) => hasChangedElements(node, elementsMap));
     };
 
-    while (updateRefs()) { /* logic to do while refs are being updated */}
+    while (updateRefs()) {
+      /* logic to do while refs are being updated */
+    }
     set({ assignElements });
   },
   changeRulesNode: (rules) => set({ rules }),
@@ -230,7 +233,7 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
       const endpointResponses = await Promise.all(
         get().endpoints.map(async (e) => {
           return Promise.all(
-            e.definedEndpoints.map(async (endpoint) => {
+            e.definitions.map(async (endpoint) => {
               const response = await axios.post(servicesRequestsExplain(), {
                 url: endpoint.url,
                 method: endpoint.methodType,
@@ -318,7 +321,7 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
     });
   },
   addEndpoint: () => {
-    const newEndpoint = { id: uuid(), name: "", definedEndpoints: [] };
+    const newEndpoint = { id: uuid(), name: "", definitions: [] };
     set((state) => ({ endpoints: [...state.endpoints, newEndpoint] }));
   },
   resetState: () => {
@@ -432,7 +435,7 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
       .map((endpoint) => ({
         id: endpoint.id,
         name: endpoint.name,
-        response: endpoint.definedEndpoints.find((x) => x.isSelected)?.response ?? [],
+        response: endpoint.definitions.find((x) => x.isSelected)?.response ?? [],
       }))
       .flatMap(({ id, name, response }) => response?.map((x) => `{{${name === "" ? id : name}.${x.name}}}`));
 
@@ -443,7 +446,7 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
   },
   onNameChange: (endpointId: string, oldName: string, newName: string) => {
     const endpoint = get().endpoints.find((x) => x.id === endpointId);
-    const response = endpoint?.definedEndpoints.find((x) => x.isSelected)?.response ?? [];
+    const response = endpoint?.definitions.find((x) => x.isSelected)?.response ?? [];
     const variables = response.map((x) => `{{${newName ?? x.id}.${x.name}}}`);
 
     const oldFilteredVariables = get().availableVariables.prod.filter(
@@ -466,13 +469,13 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
       },
     }));
   },
-  changeServiceEndpointType: (id: string, type: string) => {
+  changeServiceEndpointType: (id: string, type: EndpointType) => {
     const endpoints = get().endpoints.map((x) => {
       if (x.id !== id) return x;
       return {
         ...x,
         type,
-        definedEndpoints: [],
+        definitions: [],
       };
     });
 
@@ -481,7 +484,7 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
   mapEndpointsToSetps: (): Step[] => {
     return get()
       .endpoints.map((x) => ({
-        selected: x.definedEndpoints.find((e) => e.isSelected),
+        selected: x.definitions.find((e) => e.isSelected),
         endpoint: x,
       }))
       .filter((x) => !!x.selected)
@@ -506,9 +509,7 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
     const live = get().isLive() ? "value" : "testValue";
 
     const endpoints = JSON.parse(JSON.stringify(get().endpoints)) as EndpointData[];
-    const defEndpoint = endpoints
-      .find((x) => x.id === parentEndpointId)
-      ?.definedEndpoints.find((x) => x.id === endpointId);
+    const defEndpoint = endpoints.find((x) => x.id === parentEndpointId)?.definitions.find((x) => x.id === endpointId);
 
     for (const key in data) {
       if (defEndpoint?.[key as EndpointTab]) {
@@ -525,9 +526,7 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
 
     const live = get().isLive() ? "value" : "testValue";
     const endpoints = JSON.parse(JSON.stringify(get().endpoints)) as EndpointData[];
-    const defEndpoint = endpoints
-      .find((x) => x.id === parentEndpointId)
-      ?.definedEndpoints.find((x) => x.id === endpointId);
+    const defEndpoint = endpoints.find((x) => x.id === parentEndpointId)?.definitions.find((x) => x.id === endpointId);
 
     if (!defEndpoint) return;
 
@@ -674,15 +673,15 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
   },
   testUrl: async (endpoint, onError, onSuccess) => {
     try {
-      new URL(endpoint.definedEndpoints[0].url ?? "");
-      if (endpoint.definedEndpoints[0].methodType === "GET") {
+      new URL(endpoint.definitions[0].url ?? "");
+      if (endpoint.definitions[0].methodType === "GET") {
         await axios.post(getEndpointValidation(), {
-          url: endpoint.definedEndpoints[0].url ?? "",
+          url: endpoint.definitions[0].url ?? "",
           type: "GET",
         });
       } else {
         await axios.post(getEndpointValidation(), {
-          url: endpoint.definedEndpoints[0].url ?? "",
+          url: endpoint.definitions[0].url ?? "",
           type: "POST",
         });
       }

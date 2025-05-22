@@ -8,6 +8,7 @@ import "./ApiEndpointCard.scss";
 import { RequestTab } from "../../types";
 import { EndpointData, EndpointEnv, EndpointTab } from "../../types/endpoint";
 import useServiceStore from "store/new-services.store";
+import { EndpointType } from "types/endpoint/endpoint-type";
 
 type EndpointCardProps = {
   endpoint: EndpointData;
@@ -27,7 +28,7 @@ const ApiEndpointCard: FC<EndpointCardProps> = ({ endpoint, isDeletable = true, 
   const [selectedTab, setSelectedTab] = useState<EndpointEnv>(EndpointEnv.Live);
   const [endpointName, setEndpointName] = useState<string>(endpoint.name);
   const [testEnvExists, setTestEnvExists] = useState<boolean>(false);
-  const options = [
+  const options: { label: string; value: EndpointType; name: string }[] = [
     { label: "Open API", value: "openAPI", name: "da" },
     { label: "Custom endpoint", value: "custom", name: "da" },
   ];
@@ -81,7 +82,7 @@ const ApiEndpointCard: FC<EndpointCardProps> = ({ endpoint, isDeletable = true, 
                   disabled={selectedTab === EndpointEnv.Test}
                   onSelectionChange={(selection) => {
                     setOption(selection);
-                    changeServiceEndpointType(endpoint.id, selection?.value ?? "");
+                    changeServiceEndpointType(endpoint.id, (selection?.value ?? "custom") as EndpointType);
                   }}
                   defaultValue={option?.value}
                 />

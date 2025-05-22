@@ -5,7 +5,7 @@ import * as Tabs from "@radix-ui/react-tabs";
 import DataTable from "../../../DataTable";
 import { RequestTab } from "../../../../types";
 import {
-  EndpointType,
+  Endpoint,
   EndpointData,
   EndpointTab,
   EndpointVariableData,
@@ -22,7 +22,7 @@ import { PaginationState, SortingState } from "@tanstack/react-table";
 
 type RequestVariablesProps = {
   disableRawData?: boolean;
-  endpointData: EndpointType;
+  endpointData: Endpoint;
   parentEndpointId?: string;
   isLive: boolean;
   requestValues: PreDefinedEndpointEnvVariables;
@@ -187,7 +187,7 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
     setEndpoints((prevEndpoints: EndpointData[]) => {
       const newEndpoints: EndpointData[] = [];
       for (const prevEndpoint of prevEndpoints) {
-        const defEndpoint = prevEndpoint.definedEndpoints.find((x) => x.id === endpointData.id);
+        const defEndpoint = prevEndpoint.definitions.find((x) => x.id === endpointData.id);
         const endpoint = defEndpoint?.[requestTab.tab];
 
         if (defEndpoint && endpoint) {

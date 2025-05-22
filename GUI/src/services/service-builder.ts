@@ -8,7 +8,7 @@ import { createNewService, editService, jsonToYml, testService, updateServiceEnd
 import useServiceStore from "store/new-services.store";
 import useToastStore from "store/toasts.store";
 import { RawData, Step, StepType } from "types";
-import { EndpointData, EndpointEnv, EndpointType, EndpointVariableData } from "types/endpoint";
+import { EndpointData, EndpointEnv, Endpoint, EndpointVariableData } from "types/endpoint";
 import { v4 } from "uuid";
 
 // refactor this file later
@@ -89,7 +89,7 @@ const getNestedRawData = (data: { [key: string]: any }, key: string, path: strin
 
 // Since we currently cannot mark variables as sensitive from GUI, we set all as sensitive
 const saveEndpointInfo = async (
-  selectedEndpoint: EndpointType,
+  selectedEndpoint: Endpoint,
   env: EndpointEnv,
   endpointName: string,
   endpoint: EndpointData
@@ -133,12 +133,7 @@ const saveEndpointInfo = async (
     .catch(console.log);
 };
 
-const saveEndpointConfig = async (
-  endpoint: EndpointType,
-  env: EndpointEnv,
-  endpointName: string,
-  data: EndpointData
-) => {
+const saveEndpointConfig = async (endpoint: Endpoint, env: EndpointEnv, endpointName: string, data: EndpointData) => {
   const headers = rawDataIfVariablesMissing(
     endpoint,
     "headers",
@@ -204,7 +199,7 @@ const saveEndpointConfig = async (
 };
 
 const rawDataIfVariablesMissing = (
-  endpoint: EndpointType,
+  endpoint: Endpoint,
   key: "headers" | "body" | "params",
   env: EndpointEnv,
   data: { [key: string]: string }
@@ -212,7 +207,7 @@ const rawDataIfVariablesMissing = (
   if (Object.keys(data).length > 0) return data;
   const rawData =
     endpoint[key]?.rawData[env === EndpointEnv.Live ? "value" : "testValue"] ?? endpoint[key]?.rawData.value ?? "";
-  if (rawData === "") return "";  
+  if (rawData === "") return "";
   try {
     assignNestedRawVariables(JSON.parse(rawData), key, "", data);
     return data;
@@ -299,7 +294,7 @@ export async function saveEndpoints(
   for (const endpoint of serviceEndpoints) {
     if (!endpoint) continue;
     endpoint.serviceId = id;
-    const selectedEndpointType = endpoint.definedEndpoints.find((e) => e.isSelected);
+    const selectedEndpointType = endpoint.definitions.find((e) => e.isSelected);
     if (!selectedEndpointType) continue;
 
     const endpointName = `${name.replaceAll(" ", "_")}-${getEndpointName(endpoint)}`;
@@ -338,7 +333,7 @@ export async function saveEndpoints(
   await Promise.all(tasks).then(onSuccess).catch(onError);
 }
 
-const buildSteps = (endpointName: string, endpoint: EndpointData, selectedEndpointType: EndpointType) => {
+const buildSteps = (endpointName: string, endpoint: EndpointData, selectedEndpointType: Endpoint) => {
   const steps = new Map();
   steps.set("extract_request_data", {
     assign: {
@@ -1005,7 +1000,7 @@ const getTemplateDataFromNode = (node: Node): { templateName: string; body?: any
 const getDefinedEndpointStep = (steps: Step[], node: Node) => {
   const name = useServiceStore.getState().name;
   const endpoint = steps.find((e) => e.label === node.data.label)?.data;
-  const selectedEndpoint = endpoint?.definedEndpoints.find((e) => e.isSelected);
+  const selectedEndpoint = endpoint?.definitions.find((e) => e.isSelected);
   if (!selectedEndpoint || !endpoint) {
     return {
       return: "",

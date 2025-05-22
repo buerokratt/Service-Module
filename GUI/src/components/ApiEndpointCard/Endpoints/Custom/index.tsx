@@ -30,8 +30,8 @@ const EndpointCustom: React.FC<EndpointCustomProps> = ({
   const ref = useRef<HTMLInputElement>(null);
 
   // initial endpoint data
-  if (endpoint.definedEndpoints.length === 0) {
-    endpoint.definedEndpoints.push({
+  if (endpoint.definitions.length === 0) {
+    endpoint.definitions.push({
       id: uuid(),
       label: "",
       methodType: "GET",
@@ -78,9 +78,9 @@ const EndpointCustom: React.FC<EndpointCustomProps> = ({
                   { label: "POST", value: "POST" },
                 ]}
                 onSelectionChange={(selection) => {
-                  endpoint.definedEndpoints[0].methodType = selection?.value ?? "GET";
+                  endpoint.definitions[0].methodType = selection?.value ?? "GET";
                 }}
-                defaultValue={endpoint.definedEndpoints[0]?.methodType ?? "GET"}
+                defaultValue={endpoint.definitions[0]?.methodType ?? "GET"}
               />
             </div>
             <FormInput
@@ -88,11 +88,11 @@ const EndpointCustom: React.FC<EndpointCustomProps> = ({
               style={{ borderRadius: "0 4px 4px 0" }}
               name="endpointUrl"
               label=""
-              defaultValue={endpoint.definedEndpoints[0].url ?? ""}
-              value={endpoint.definedEndpoints[0].url ?? ""}
+              defaultValue={endpoint.definitions[0].url ?? ""}
+              value={endpoint.definitions[0].url ?? ""}
               onChange={(event) => {
                 const parsedUrl = parseURL(event.target.value);
-                endpoint.definedEndpoints[0].url = parsedUrl.url;
+                endpoint.definitions[0].url = parsedUrl.url;
                 const parameters: EndpointVariableData[] = [];
                 Object.keys(parsedUrl.params).forEach((key) => {
                   parameters.push({
@@ -104,7 +104,7 @@ const EndpointCustom: React.FC<EndpointCustomProps> = ({
                   });
                 });
 
-                endpoint.definedEndpoints[0].params = {
+                endpoint.definitions[0].params = {
                   variables: parameters,
                   rawData: {},
                 };
@@ -143,23 +143,23 @@ const EndpointCustom: React.FC<EndpointCustomProps> = ({
         key={key}
         requestValues={requestValues}
         isLive={isLive}
-        endpointData={endpoint.definedEndpoints[0]}
+        endpointData={endpoint.definitions[0]}
         requestTab={requestTab}
         setRequestTab={setRequestTab}
         parentEndpointId={endpoint.id}
         onParametersChange={(parameters) => {
-          const url = new URL(endpoint.definedEndpoints[0].url ?? "");
+          const url = new URL(endpoint.definitions[0].url ?? "");
           url.searchParams.forEach((_, key) => {
             url.searchParams.delete(key);
           });
           parameters.forEach((param: EndpointVariableData) => {
             url.searchParams.set(param.name, param.value ?? "");
           });
-          endpoint.definedEndpoints[0].params = {
+          endpoint.definitions[0].params = {
             variables: parameters,
             rawData: {},
           };
-          endpoint.definedEndpoints[0].url = url.href ?? "";
+          endpoint.definitions[0].url = url.href ?? "";
           if (ref?.current) {
             ref.current.value = url.href ?? "";
           }
