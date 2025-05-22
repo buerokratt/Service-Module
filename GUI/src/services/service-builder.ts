@@ -345,7 +345,6 @@ export async function saveEndpoints(
     } else {
       tasks.push(axios.post(updateEndpoint(id), endpoint));
     }
-    // tasks.push(axios.post(updateEndpoint(id), endpoint));
   });
 
   await Promise.all(tasks).then(onSuccess).catch(onError);
