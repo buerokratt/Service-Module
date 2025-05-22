@@ -25,6 +25,7 @@ import { Chip } from "types/chip";
 import { EndpointResponseVariable } from "types/endpoint/endpoint-response-variables";
 import { Assign } from "types/assign";
 import { EndpointType } from "types/endpoint/endpoint-type";
+import { get } from "react-hook-form";
 
 interface ServiceStoreState {
   endpoints: EndpointData[];
@@ -357,10 +358,19 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
     let nodes = get().nodes;
 
     if (id) {
-      const service = await axios.get<Service>(getServiceById(id));
+      const serviceResponse = await axios.get<Service>(getServiceById(id));
 
-      const structure = JSON.parse(service.data.structure?.value ?? "{}");
-      let endpoints = JSON.parse(service.data.endpoints?.value ?? "{}");
+      const structure = JSON.parse(serviceResponse.data.structure?.value ?? "{}");
+      let endpoints = serviceResponse.data.endpoints.map((endpoint) => {
+        let parsedDefinitions = JSON.parse(endpoint.definitions.value);
+
+        return {
+          ...endpoint,
+          definitions: Array.isArray(parsedDefinitions) ? parsedDefinitions : [parsedDefinitions],
+        };
+      });
+      // todo
+      // console.log("endpoints", endpoints);
       let edges = structure?.edges;
       nodes = structure?.nodes;
 
@@ -385,15 +395,15 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
       set({
         // todo ???
         // serviceId: id,
-        name: service.data.name,
-        isCommon: service.data.isCommon,
-        description: service.data.description,
-        slot: service.data.slot,
+        name: serviceResponse.data.name,
+        isCommon: serviceResponse.data.isCommon,
+        description: serviceResponse.data.description,
+        slot: serviceResponse.data.slot,
         edges,
         nodes,
         endpoints,
         isNewService: false,
-        serviceState: service.data.state,
+        serviceState: serviceResponse.data.state,
       });
     }
 

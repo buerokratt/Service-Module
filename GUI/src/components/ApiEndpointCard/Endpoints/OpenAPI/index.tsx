@@ -8,7 +8,7 @@ import { RequestTab, Option } from "../../../../types";
 import { ApiSpecProperty } from "../../../../types/api-spec-property";
 import {
   EndpointData,
-  Endpoint,
+  EndpointDefinition,
   EndpointVariableData,
   EndpointTab,
   PreDefinedEndpointEnvVariables,
@@ -32,10 +32,10 @@ const EndpointOpenAPI: React.FC<EndpointOpenAPIProps> = ({
   setRequestTab,
 }) => {
   const [openApiUrl, setOpenApiUrl] = useState<string>(endpoint.openApiUrl ?? "");
-  const [selectedEndpoint, setSelectedEndpoint] = useState<Endpoint | undefined>(
+  const [selectedEndpoint, setSelectedEndpoint] = useState<EndpointDefinition | undefined>(
     endpoint.definitions.find((e) => e.isSelected)
   );
-  const [openApiEndpoints, setOpenApiEndpoints] = useState<Endpoint[]>(endpoint.definitions ?? []);
+  const [openApiEndpoints, setOpenApiEndpoints] = useState<EndpointDefinition[]>(endpoint.definitions ?? []);
   const [key, setKey] = useState<number>(0);
   const { t } = useTranslation();
   const { setEndpoints } = useServiceStore();
@@ -155,7 +155,7 @@ const EndpointOpenAPI: React.FC<EndpointOpenAPIProps> = ({
     const result = await axios.post(getOpenApiSpec(), { url: openApiUrl });
     const apiSpec = result.data.response;
     const url = new URL(openApiUrl).origin + apiSpec.basePath;
-    const paths: Endpoint[] = [];
+    const paths: EndpointDefinition[] = [];
 
     Object.entries(apiSpec.paths).forEach(([path, endpointData]) => {
       Object.entries(endpointData as ApiSpecProperty).forEach(([method, data]: [string, ApiSpecProperty]) => {
@@ -264,7 +264,7 @@ const EndpointOpenAPI: React.FC<EndpointOpenAPIProps> = ({
     });
   };
 
-  const updateOpenApiEndpoint = (data: RequestVariablesTabsRowsData, openApiEndpoint: Endpoint) => {
+  const updateOpenApiEndpoint = (data: RequestVariablesTabsRowsData, openApiEndpoint: EndpointDefinition) => {
     for (const key in data) {
       openApiEndpoint[key as EndpointTab]?.variables.forEach((variable) => {
         if (["schema", "array"].includes(variable.type)) {
@@ -285,7 +285,10 @@ const EndpointOpenAPI: React.FC<EndpointOpenAPIProps> = ({
     setKey(key + 1);
   };
 
-  const updateSelectedEndpoint = (prevEndpoints: EndpointData[], newSelectedEndpoint: Endpoint | undefined) => {
+  const updateSelectedEndpoint = (
+    prevEndpoints: EndpointData[],
+    newSelectedEndpoint: EndpointDefinition | undefined
+  ) => {
     return prevEndpoints.map((prevEndpoint) => {
       if (prevEndpoint.id !== endpoint.id) return prevEndpoint;
       prevEndpoint.definitions.map((definedEndpoint) => {

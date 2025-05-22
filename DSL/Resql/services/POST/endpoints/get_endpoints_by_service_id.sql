@@ -9,8 +9,8 @@ SELECT
   id,
   name,
   type,
-  file_name AS "fileName",
-  is_common AS "isCommon",
+  file_name,
+  is_common,
   definitions
 FROM LatestEndpoints
 ORDER BY created_at DESC;

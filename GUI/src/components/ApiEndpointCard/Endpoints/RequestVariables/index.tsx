@@ -5,7 +5,7 @@ import * as Tabs from "@radix-ui/react-tabs";
 import DataTable from "../../../DataTable";
 import { RequestTab } from "../../../../types";
 import {
-  Endpoint,
+  EndpointDefinition,
   EndpointData,
   EndpointTab,
   EndpointVariableData,
@@ -22,7 +22,7 @@ import { PaginationState, SortingState } from "@tanstack/react-table";
 
 type RequestVariablesProps = {
   disableRawData?: boolean;
-  endpointData: Endpoint;
+  endpointData: EndpointDefinition;
   parentEndpointId?: string;
   isLive: boolean;
   requestValues: PreDefinedEndpointEnvVariables;
@@ -53,6 +53,8 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
 
   const [sorting, setSorting] = useState<SortingState>([]);
 
+  console.log("endpointData", endpointData);
+
   const constructRow = (id: number, data: EndpointVariableData, nestedLevel: number): RequestVariablesRowData => {
     const value = isLive ? data.value : data.testValue;
     return {
@@ -75,6 +77,7 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
       if (endpointData) {
         if (!endpointData[tab]) return tabsRowsData;
         let rowIdx = 0;
+        // todo variables undefined
         endpointData[tab]!.variables.forEach((variable) => {
           rows.push(constructRow(rowIdx, variable, 0));
           if (["schema", "array"].includes(variable.type)) {

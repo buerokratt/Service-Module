@@ -15,7 +15,7 @@ import {
 import useServiceStore from "store/new-services.store";
 import useToastStore from "store/toasts.store";
 import { RawData, Step, StepType } from "types";
-import { EndpointData, EndpointEnv, Endpoint, EndpointVariableData } from "types/endpoint";
+import { EndpointData, EndpointEnv, EndpointDefinition, EndpointVariableData } from "types/endpoint";
 import { v4 } from "uuid";
 
 // refactor this file later
@@ -96,7 +96,7 @@ const getNestedRawData = (data: { [key: string]: any }, key: string, path: strin
 
 // Since we currently cannot mark variables as sensitive from GUI, we set all as sensitive
 const saveEndpointInfo = async (
-  selectedEndpoint: Endpoint,
+  selectedEndpoint: EndpointDefinition,
   env: EndpointEnv,
   endpointName: string,
   endpoint: EndpointData
@@ -140,7 +140,12 @@ const saveEndpointInfo = async (
     .catch(console.log);
 };
 
-const saveEndpointConfig = async (endpoint: Endpoint, env: EndpointEnv, endpointName: string, data: EndpointData) => {
+const saveEndpointConfig = async (
+  endpoint: EndpointDefinition,
+  env: EndpointEnv,
+  endpointName: string,
+  data: EndpointData
+) => {
   const headers = rawDataIfVariablesMissing(
     endpoint,
     "headers",
@@ -206,7 +211,7 @@ const saveEndpointConfig = async (endpoint: Endpoint, env: EndpointEnv, endpoint
 };
 
 const rawDataIfVariablesMissing = (
-  endpoint: Endpoint,
+  endpoint: EndpointDefinition,
   key: "headers" | "body" | "params",
   env: EndpointEnv,
   data: { [key: string]: string }
@@ -296,6 +301,8 @@ export async function saveEndpoints(
   onError?: (e: any) => void
 ) {
   const tasks: Promise<any>[] = [];
+  // todo likely use this instead of passing param
+  const id = useServiceStore.getState().serviceId;
 
   for (const endpoint of endpoints) {
     endpoint.serviceId = serviceId;
@@ -333,6 +340,7 @@ export async function saveEndpoints(
   endpoints.forEach((endpoint) => {
     // todo remove
     console.log("igor endpoint", endpoint);
+    console.log("igor id", id);
     if (endpoint.isNew) {
       tasks.push(createEndpointAndUpdateState(endpoint));
     } else {
@@ -345,7 +353,10 @@ export async function saveEndpoints(
 
 async function createEndpointAndUpdateState(endpoint: EndpointData): Promise<any> {
   try {
-    const response = await axios.post(createEndpoint(), endpoint);
+    const response = await axios.post(createEndpoint(), {
+      ...endpoint,
+      definitions: JSON.stringify(endpoint.definitions),
+    });
     useServiceStore
       .getState()
       .setEndpoints((prev) => prev.map((ep) => (ep.id === endpoint.id ? { ...ep, isNew: false } : ep)));
@@ -356,7 +367,7 @@ async function createEndpointAndUpdateState(endpoint: EndpointData): Promise<any
   }
 }
 
-const buildSteps = (endpointName: string, endpoint: EndpointData, selectedEndpointType: Endpoint) => {
+const buildSteps = (endpointName: string, endpoint: EndpointData, selectedEndpointType: EndpointDefinition) => {
   const steps = new Map();
   steps.set("extract_request_data", {
     assign: {

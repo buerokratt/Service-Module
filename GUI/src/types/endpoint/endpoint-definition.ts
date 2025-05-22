@@ -2,7 +2,7 @@ import { RawData } from "../raw-data";
 import { EndpointType } from "./endpoint-type";
 import { EndpointVariableData } from "./endpoint-variable-data";
 
-export type Endpoint = {
+export type EndpointDefinition = {
   id: string;
   label: string;
   path: string;

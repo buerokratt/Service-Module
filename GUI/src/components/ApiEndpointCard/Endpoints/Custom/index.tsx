@@ -29,6 +29,8 @@ const EndpointCustom: React.FC<EndpointCustomProps> = ({
   const { setEndpoints, testUrl } = useServiceStore();
   const ref = useRef<HTMLInputElement>(null);
 
+  console.log("endpoint", endpoint);
+
   // initial endpoint data
   if (endpoint.definitions.length === 0) {
     endpoint.definitions.push({
@@ -88,8 +90,8 @@ const EndpointCustom: React.FC<EndpointCustomProps> = ({
               style={{ borderRadius: "0 4px 4px 0" }}
               name="endpointUrl"
               label=""
-              defaultValue={endpoint.definitions[0].url ?? ""}
-              value={endpoint.definitions[0].url ?? ""}
+              defaultValue={endpoint.definitions[0]?.url ?? ""}
+              value={endpoint.definitions[0]?.url ?? ""}
               onChange={(event) => {
                 const parsedUrl = parseURL(event.target.value);
                 endpoint.definitions[0].url = parsedUrl.url;
