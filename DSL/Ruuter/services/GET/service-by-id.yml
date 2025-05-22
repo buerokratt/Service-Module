@@ -23,12 +23,33 @@ get_service_by_id:
     url: "[#SERVICE_RESQL]/get-service-by-id"
     body:
       id: ${incoming.params.id}
-  result: results
+  result: service_results
+
+get_endpoints_by_service_id:
+  call: http.post
+  args:
+    url: "[#SERVICE_RESQL]/get-endpoints-by-service-id"
+    body:
+      id: ${incoming.params.id}
+  result: endpoints_results
+
+prepare_results:
+  assign:
+    results:
+      id: ${service_results.response.body.id}
+      name: ${service_results.response.body.name}
+      description: ${service_results.response.body.description}
+      slot: ${service_results.response.body.slot}
+      state: ${service_results.response.body.state}
+      type: ${service_results.response.body.type}
+      isCommon: ${service_results.response.body.isCommon}
+      structure: ${service_results.response.body.structure}
+      endpoints: ${endpoints_results.response.body}
 
 return_ok:
   status: 200
   wrapper: false
-  return: ${results.response.body}
+  return: ${results}
   next: end
 
 return_incorrect_request:
