@@ -7,8 +7,10 @@ export type EndpointData = {
   fileName?: string;
   type?: EndpointType;
   isCommon?: boolean;
+  isNew?: boolean;
   openApiUrl?: string;
   hasTestEnv?: boolean;
+  // todo can be removed? or use array?
   serviceId?: string;
   definitions: Endpoint[];
 };

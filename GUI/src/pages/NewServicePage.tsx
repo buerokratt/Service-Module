@@ -70,12 +70,12 @@ const NewServicePage: React.FC = () => {
                 label=""
                 value={name}
                 onChange={(e) => {
-                   const value = e.target.value.trim();
-                   const hasSpecialCharacters = /[^\p{L}\p{N} ]/u;
-                   if (!hasSpecialCharacters.test(value) && !value.startsWith(" ")) {
-                     useServiceStore.getState().changeServiceName(e.target.value);}
-                   }
-                }
+                  const value = e.target.value.trim();
+                  const hasSpecialCharacters = /[^\p{L}\p{N} ]/u;
+                  if (!hasSpecialCharacters.test(value) && !value.startsWith(" ")) {
+                    useServiceStore.getState().changeServiceName(e.target.value);
+                  }
+                }}
               />
             </div>
             <div>
@@ -120,11 +120,9 @@ const NewServicePage: React.FC = () => {
           </Track>
         </Card>
 
-        {endpoints
-          .filter((endpoint) => endpoint.serviceId === id || !endpoint.hasOwnProperty("serviceId"))
-          .map((endpoint) => (
-            <ApiEndpointCard key={endpoint.id} endpoint={endpoint} />
-          ))}
+        {endpoints.map((endpoint) => (
+          <ApiEndpointCard key={endpoint.id} endpoint={endpoint} />
+        ))}
         <Button appearance="text" onClick={useServiceStore.getState().addEndpoint}>
           {t("newService.endpoint.add")}
         </Button>

@@ -1,7 +1,7 @@
 declaration:
   call: declare
   version: 0.1
-  description: "Decription placeholder for 'UPDATE-SERVICE-ENDPOINTS'"
+  description: "Updates an existing endpoint"
   method: post
   accepts: json
   returns: json
@@ -54,7 +54,6 @@ service_edit:
       name: ${incoming.body.name}
       fileName: ${incoming.body.fileName}
       type: ${incoming.body.type}
-      # todo missing
       isCommon: ${incoming.body.isCommon}
       serviceId: ${incoming.body.serviceId}
       definitions: ${incoming.body.definitions}

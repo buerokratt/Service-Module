@@ -4,7 +4,14 @@ import { Group, Rule } from "components/FlowElementsPopup/RuleBuilder/types";
 import i18next from "i18next";
 import { NodeHtmlMarkdown } from "node-html-markdown";
 import { Edge, Node } from "reactflow";
-import { createNewService, editService, jsonToYml, testService, updateEndpoint } from "resources/api-constants";
+import {
+  createEndpoint,
+  createNewService,
+  editService,
+  jsonToYml,
+  testService,
+  updateEndpoint,
+} from "resources/api-constants";
 import useServiceStore from "store/new-services.store";
 import useToastStore from "store/toasts.store";
 import { RawData, Step, StepType } from "types";
@@ -289,9 +296,10 @@ export async function saveEndpoints(
   onError?: (e: any) => void
 ) {
   const tasks: Promise<any>[] = [];
-  const serviceEndpoints = endpoints.filter((e) => e.serviceId === id || !e.hasOwnProperty("serviceId")).map((x) => x);
+  // todo
+  // const serviceEndpoints = endpoints.filter((e) => e.serviceId === id || !e.hasOwnProperty("serviceId")).map((x) => x);
 
-  for (const endpoint of serviceEndpoints) {
+  for (const endpoint of endpoints) {
     if (!endpoint) continue;
     endpoint.serviceId = id;
     const selectedEndpointType = endpoint.definitions.find((e) => e.isSelected);
@@ -328,7 +336,16 @@ export async function saveEndpoints(
   endpoints.forEach((endpoint) => {
     // todo remove
     console.log("igor endpoint", endpoint);
-    tasks.push(axios.post(updateEndpoint(id), endpoint));
+    if (endpoint.isNew) {
+      // todo create YAML
+      // todo also remove isNew from state
+      // todo think about service IDs - no service ids initially for common?
+      // todo how to fetch services for flow - need to have with service IDs AND common
+      tasks.push(axios.post(createEndpoint(id), endpoint));
+    } else {
+      tasks.push(axios.post(updateEndpoint(id), endpoint));
+    }
+    // tasks.push(axios.post(updateEndpoint(id), endpoint));
   });
 
   await Promise.all(tasks).then(onSuccess).catch(onError);
