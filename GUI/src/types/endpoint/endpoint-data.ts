@@ -8,7 +8,6 @@ export type EndpointData = {
   type?: EndpointType;
   isCommon?: boolean;
   openApiUrl?: string;
-  testEnvUrl?: string;
   hasTestEnv?: boolean;
   serviceId?: string;
   definitions: Endpoint[];
