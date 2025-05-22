@@ -105,12 +105,6 @@ get_service_by_id:
       id: ${id}
   result: old_service_result
 
-log_igor_edit_id:
-  log: ${id}
-
-log_igor_edit:
-  log: ${old_service_result.response.body}
-
 assign_values:
   assign:
     old_name: ${old_service_result.response.body[0].name}

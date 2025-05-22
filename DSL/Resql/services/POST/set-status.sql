@@ -18,6 +18,6 @@ SELECT
     is_common,
     structure
 FROM services
-WHERE service_id =: id
+WHERE service_id = :id
 ORDER BY id DESC
 LIMIT 1;

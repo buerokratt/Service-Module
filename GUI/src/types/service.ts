@@ -19,7 +19,7 @@ export interface Service {
   readonly structure: any;
   readonly endpoints: Array<
     Pick<EndpointData, "endpointId" | "name" | "type" | "fileName" | "isCommon"> & {
-      // Passing as JSON because ruuter cannot handle parsing properly
+      // Passing as JSON from Resql because ruuter cannot handle parsing properly
       definitions: EndpointDefinitionJson;
     }
   >;

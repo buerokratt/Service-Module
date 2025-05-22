@@ -36,8 +36,6 @@ const NewServicePage: React.FC = () => {
     queryFn: () => axios.get(getSlots()).then((res) => res.data.response),
   });
 
-  console.log("service ID component", useServiceStore.getState().serviceId);
-
   useEffect(() => {
     const name = intentName?.trim();
     if (name) {
@@ -72,12 +70,12 @@ const NewServicePage: React.FC = () => {
                 label=""
                 value={name}
                 onChange={(e) => {
-                  const value = e.target.value.trim();
-                  const hasSpecialCharacters = /[^\p{L}\p{N} ]/u;
-                  if (!hasSpecialCharacters.test(value) && !value.startsWith(" ")) {
-                    useServiceStore.getState().changeServiceName(e.target.value);
-                  }
-                }}
+                   const value = e.target.value.trim();
+                   const hasSpecialCharacters = /[^\p{L}\p{N} ]/u;
+                   if (!hasSpecialCharacters.test(value) && !value.startsWith(" ")) {
+                     useServiceStore.getState().changeServiceName(e.target.value);}
+                   }
+                }
               />
             </div>
             <div>
@@ -122,9 +120,11 @@ const NewServicePage: React.FC = () => {
           </Track>
         </Card>
 
-        {endpoints.map((endpoint) => (
-          <ApiEndpointCard key={endpoint.endpointId} endpoint={endpoint} />
-        ))}
+        {endpoints
+          .filter((endpoint) => endpoint.serviceId === id || !endpoint.hasOwnProperty("serviceId"))
+          .map((endpoint) => (
+            <ApiEndpointCard key={endpoint.id} endpoint={endpoint} />
+          ))}
         <Button appearance="text" onClick={useServiceStore.getState().addEndpoint}>
           {t("newService.endpoint.add")}
         </Button>

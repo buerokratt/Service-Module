@@ -1161,8 +1161,6 @@ export const editServiceInfo = async () => {
   const endPointsName = useServiceStore.getState().name;
   const slot = useServiceStore.getState().slot;
 
-  console.log("editServiceInfo ID", serviceId);
-
   const tasks: Promise<any>[] = [];
 
   tasks.push(

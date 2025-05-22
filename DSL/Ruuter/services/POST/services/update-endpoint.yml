@@ -40,9 +40,6 @@ check_for_type:
     - condition: ${id == null}
       next: return_no_type_error
 
-log_igor_update:
-  log: ${incoming.body}
-
 update_endpoint:
   call: http.post
   args:

@@ -30,9 +30,6 @@ declaration:
         type: json
         description: "Endpoint definitions"
 
-log_igor_create:
-  log: ${incoming.body}
-
 create_endpoint:
   call: http.post
   args:
