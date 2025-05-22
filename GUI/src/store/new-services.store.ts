@@ -357,10 +357,12 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
     let nodes = get().nodes;
 
     if (id) {
-      const service = await axios.get<Service[]>(getServiceById(id));
+      const service = await axios.get<Service>(getServiceById(id));
 
-      const structure = JSON.parse(service.data[0].structure?.value ?? "{}");
-      let endpoints = JSON.parse(service.data[0].endpoints?.value ?? "{}");
+      console.log("igor service", service.data);
+
+      const structure = JSON.parse(service.data.structure?.value ?? "{}");
+      let endpoints = JSON.parse(service.data.endpoints?.value ?? "{}");
       let edges = structure?.edges;
       nodes = structure?.nodes;
 
@@ -384,15 +386,15 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
 
       set({
         serviceId: id,
-        name: service.data[0].name,
-        isCommon: service.data[0].isCommon,
-        description: service.data[0].description,
-        slot: service.data[0].slot,
+        name: service.data.name,
+        isCommon: service.data.isCommon,
+        description: service.data.description,
+        slot: service.data.slot,
         edges,
         nodes,
         endpoints,
         isNewService: false,
-        serviceState: service.data[0].state,
+        serviceState: service.data.state,
       });
     }
 

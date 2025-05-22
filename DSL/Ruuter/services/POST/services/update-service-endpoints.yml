@@ -40,6 +40,10 @@ check_for_type:
     - condition: ${id == null}
       next: return_no_type_error
 
+log_igor:
+  log: ${incoming.body}
+
+# todo rename
 service_edit:
   call: http.post
   args:

@@ -33,17 +33,23 @@ get_endpoints_by_service_id:
       id: ${incoming.params.id}
   result: endpoints_results
 
+igor_log_endpoints:
+  log: ${endpoints_results.response.body}
+
+igor_log_service:
+  log: ${service_results.response.body[0]}
+
 prepare_results:
   assign:
     results:
-      id: ${service_results.response.body.id}
-      name: ${service_results.response.body.name}
-      description: ${service_results.response.body.description}
-      slot: ${service_results.response.body.slot}
-      state: ${service_results.response.body.state}
-      type: ${service_results.response.body.type}
-      isCommon: ${service_results.response.body.isCommon}
-      structure: ${service_results.response.body.structure}
+      id: ${service_results.response.body[0].id}
+      name: ${service_results.response.body[0].name}
+      description: ${service_results.response.body[0].description}
+      slot: ${service_results.response.body[0].slot}
+      state: ${service_results.response.body[0].state}
+      type: ${service_results.response.body[0].type}
+      isCommon: ${service_results.response.body[0].iscommon}
+      structure: ${service_results.response.body[0].structure}
       endpoints: ${endpoints_results.response.body}
 
 return_ok:

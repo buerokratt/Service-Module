@@ -325,6 +325,7 @@ export async function saveEndpoints(
   }
 
   endpoints.forEach((endpoint) => {
+    console.log("igor endpoint", endpoint);
     tasks.push(axios.post(updateEndpoint(id), endpoint));
   });
 
