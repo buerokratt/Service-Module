@@ -334,7 +334,6 @@ export async function saveEndpoints(
     // todo remove
     console.log("igor endpoint", endpoint);
     if (endpoint.isNew) {
-      // todo create YAML
       // todo also remove isNew from state
       tasks.push(axios.post(createEndpoint(), endpoint));
     } else {
