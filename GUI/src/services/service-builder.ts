@@ -334,20 +334,26 @@ export async function saveEndpoints(
     // todo remove
     console.log("igor endpoint", endpoint);
     if (endpoint.isNew) {
-      tasks.push(axios.post(createEndpoint(), endpoint));
-      tasks.push(
-        Promise.resolve().then(() => {
-          useServiceStore
-            .getState()
-            .setEndpoints((prev) => prev.map((ep) => (ep.id === endpoint.id ? { ...ep, isNew: false } : ep)));
-        })
-      );
+      tasks.push(createEndpointAndUpdateState(endpoint));
     } else {
       tasks.push(axios.post(updateEndpoint(endpoint.id), endpoint));
     }
   });
 
   await Promise.all(tasks).then(onSuccess).catch(onError);
+}
+
+async function createEndpointAndUpdateState(endpoint: EndpointData): Promise<any> {
+  try {
+    const response = await axios.post(createEndpoint(), endpoint);
+    useServiceStore
+      .getState()
+      .setEndpoints((prev) => prev.map((ep) => (ep.id === endpoint.id ? { ...ep, isNew: false } : ep)));
+    return response;
+  } catch (error) {
+    // Propagate error so Promise.all can catch it
+    throw error;
+  }
 }
 
 const buildSteps = (endpointName: string, endpoint: EndpointData, selectedEndpointType: Endpoint) => {
