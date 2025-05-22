@@ -43,11 +43,12 @@ check_for_type:
 log_igor:
   log: ${incoming.body}
 
+# todo rename file
 # todo rename + all other
 service_edit:
   call: http.post
   args:
-    url: "[#SERVICE_RESQL]/update-service-endpoints"
+    url: "[#SERVICE_RESQL]/endpoints/update_endpoint"
     body:
       id: ${id}
       name: ${incoming.body.name}

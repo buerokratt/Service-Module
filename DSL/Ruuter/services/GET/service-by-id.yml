@@ -28,7 +28,7 @@ get_service_by_id:
 get_endpoints_by_service_id:
   call: http.post
   args:
-    url: "[#SERVICE_RESQL]/get-endpoints-by-service-id"
+    url: "[#SERVICE_RESQL]/endpoints/get_endpoints_by_service_id"
     body:
       id: ${incoming.params.id}
   result: endpoints_results

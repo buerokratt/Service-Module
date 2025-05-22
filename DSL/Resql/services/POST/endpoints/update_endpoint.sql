@@ -23,4 +23,3 @@ VALUES (
   :isCommon,
   :definitions::jsonb
 );
--- todo rename file to update-endpoint.sql + all related
