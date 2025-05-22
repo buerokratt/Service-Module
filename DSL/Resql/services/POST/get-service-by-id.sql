@@ -7,7 +7,7 @@ WITH MaxService AS (
 SELECT
   id,
   name,
-  description,
+  description,  
   slot,
   current_state AS state,
   ruuter_type AS type,
