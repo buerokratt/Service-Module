@@ -25,7 +25,6 @@ import { Chip } from "types/chip";
 import { EndpointResponseVariable } from "types/endpoint/endpoint-response-variables";
 import { Assign } from "types/assign";
 import { EndpointType } from "types/endpoint/endpoint-type";
-import { get } from "react-hook-form";
 
 interface ServiceStoreState {
   endpoints: EndpointData[];
@@ -322,7 +321,7 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
     });
   },
   addEndpoint: () => {
-    const newEndpoint = { id: uuid(), name: "", definitions: [], isNew: true };
+    const newEndpoint = { endpointId: uuid(), name: "", definitions: [], isNew: true };
     set((state) => ({ endpoints: [...state.endpoints, newEndpoint] }));
   },
   resetState: () => {
@@ -389,6 +388,7 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
       });
 
       set({
+        serviceId: id,
         name: serviceResponse.data.name,
         isCommon: serviceResponse.data.isCommon,
         description: serviceResponse.data.description,

@@ -18,8 +18,8 @@ export interface Service {
   readonly slot: string;
   readonly structure: any;
   readonly endpoints: Array<
-    Pick<EndpointData, "id" | "name" | "type" | "fileName" | "isCommon"> & {
-      // Passing as JSON because ruuter cannot handle the parsing
+    Pick<EndpointData, "endpointId" | "name" | "type" | "fileName" | "isCommon"> & {
+      // Passing as JSON because ruuter cannot handle parsing properly
       definitions: EndpointDefinitionJson;
     }
   >;
