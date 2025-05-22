@@ -36,6 +36,8 @@ const NewServicePage: React.FC = () => {
     queryFn: () => axios.get(getSlots()).then((res) => res.data.response),
   });
 
+  console.log("service ID component", useServiceStore.getState().serviceId);
+
   useEffect(() => {
     const name = intentName?.trim();
     if (name) {

@@ -42,7 +42,7 @@ prepare_results:
       slot: ${service_results.response.body[0].slot}
       state: ${service_results.response.body[0].state}
       type: ${service_results.response.body[0].type}
-      isCommon: ${service_results.response.body[0].iscommon}
+      isCommon: ${service_results.response.body[0].isCommon}
       structure: ${service_results.response.body[0].structure}
       endpoints: ${endpoints_results.response.body}
 

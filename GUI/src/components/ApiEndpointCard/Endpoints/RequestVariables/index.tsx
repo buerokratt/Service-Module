@@ -53,8 +53,6 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
 
   const [sorting, setSorting] = useState<SortingState>([]);
 
-  console.log("endpointData", endpointData);
-
   const constructRow = (id: number, data: EndpointVariableData, nestedLevel: number): RequestVariablesRowData => {
     const value = isLive ? data.value : data.testValue;
     return {

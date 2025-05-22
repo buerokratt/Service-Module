@@ -337,8 +337,6 @@ export async function saveEndpoints(
   }
 
   endpoints.forEach((endpoint) => {
-    // todo remove
-    console.log("igor endpoint", endpoint);
     if (endpoint.isNew) {
       tasks.push(createEndpointAndUpdateState(endpoint));
     } else {
@@ -1162,6 +1160,8 @@ export const editServiceInfo = async () => {
   const serviceId = useServiceStore.getState().serviceId;
   const endPointsName = useServiceStore.getState().name;
   const slot = useServiceStore.getState().slot;
+
+  console.log("editServiceInfo ID", serviceId);
 
   const tasks: Promise<any>[] = [];
 

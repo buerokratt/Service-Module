@@ -29,8 +29,6 @@ const EndpointCustom: React.FC<EndpointCustomProps> = ({
   const { setEndpoints, testUrl } = useServiceStore();
   const ref = useRef<HTMLInputElement>(null);
 
-  console.log("endpoint", endpoint);
-
   // initial endpoint data
   if (endpoint.definitions.length === 0) {
     endpoint.definitions.push({
