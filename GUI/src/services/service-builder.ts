@@ -326,7 +326,7 @@ export async function saveEndpoints(
 
   tasks.push(
     axios.post(updateServiceEndpoints(id), {
-      endpoints: JSON.stringify(serviceEndpoints),
+      endpoints: serviceEndpoints,
     })
   );
 

@@ -12,3 +12,13 @@ export type EndpointData = {
   serviceId?: string;
   definitions: Endpoint[];
 };
+
+type Temp = {
+  id: string;
+  serviceId: string;
+  name: string;
+  type: EndpointType;
+  isCommon: boolean;
+  fileName: string;
+  definitions: Endpoint[];
+};
