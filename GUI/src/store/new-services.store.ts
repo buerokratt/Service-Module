@@ -359,8 +359,6 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
     if (id) {
       const service = await axios.get<Service>(getServiceById(id));
 
-      console.log("igor service", service.data);
-
       const structure = JSON.parse(service.data.structure?.value ?? "{}");
       let endpoints = JSON.parse(service.data.endpoints?.value ?? "{}");
       let edges = structure?.edges;

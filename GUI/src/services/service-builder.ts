@@ -305,6 +305,7 @@ export async function saveEndpoints(
     const steps = buildSteps(endpointName, endpoint, selectedEndpointType);
     const result = Object.fromEntries(steps.entries());
 
+    endpoint.isCommon = endpoint.isCommon ?? false;
     const isCommonPath = endpoint.isCommon ? "common/" : "";
 
     tasks.push(
@@ -325,6 +326,7 @@ export async function saveEndpoints(
   }
 
   endpoints.forEach((endpoint) => {
+    // todo remove
     console.log("igor endpoint", endpoint);
     tasks.push(axios.post(updateEndpoint(id), endpoint));
   });

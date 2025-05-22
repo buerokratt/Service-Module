@@ -43,7 +43,7 @@ check_for_type:
 log_igor:
   log: ${incoming.body}
 
-# todo rename
+# todo rename + all other
 service_edit:
   call: http.post
   args:
@@ -53,6 +53,7 @@ service_edit:
       name: ${incoming.body.name}
       fileName: ${incoming.body.fileName}
       type: ${incoming.body.type}
+      # todo missing
       isCommon: ${incoming.body.isCommon}
       serviceId: ${incoming.body.serviceId}
       definitions: ${incoming.body.definitions}
