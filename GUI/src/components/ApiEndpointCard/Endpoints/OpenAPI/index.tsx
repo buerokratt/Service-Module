@@ -256,11 +256,10 @@ const EndpointOpenAPI: React.FC<EndpointOpenAPIProps> = ({
     data: RequestVariablesTabsRowsData,
     openApiEndpointId?: string
   ) => {
-    prevEndpoint.definitions.map((openApiEndpoint) => {
+    prevEndpoint.definitions.forEach((openApiEndpoint) => {
       if (openApiEndpoint.id === openApiEndpointId) {
         updateOpenApiEndpoint(data, openApiEndpoint);
       }
-      return openApiEndpoint;
     });
   };
 
@@ -291,9 +290,8 @@ const EndpointOpenAPI: React.FC<EndpointOpenAPIProps> = ({
   ) => {
     return prevEndpoints.map((prevEndpoint) => {
       if (prevEndpoint.endpointId !== endpoint.endpointId) return prevEndpoint;
-      prevEndpoint.definitions.map((definedEndpoint) => {
+      prevEndpoint.definitions.forEach((definedEndpoint) => {
         definedEndpoint.isSelected = definedEndpoint === newSelectedEndpoint;
-        return definedEndpoint;
       });
       return prevEndpoint;
     });
