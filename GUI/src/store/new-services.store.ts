@@ -369,8 +369,6 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
           definitions: Array.isArray(parsedDefinitions) ? parsedDefinitions : [parsedDefinitions],
         };
       });
-      // todo
-      // console.log("endpoints", endpoints);
       let edges = structure?.edges;
       nodes = structure?.nodes;
 
@@ -393,8 +391,6 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
       });
 
       set({
-        // todo ???
-        // serviceId: id,
         name: serviceResponse.data.name,
         isCommon: serviceResponse.data.isCommon,
         description: serviceResponse.data.description,

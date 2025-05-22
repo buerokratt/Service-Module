@@ -77,7 +77,6 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
       if (endpointData) {
         if (!endpointData[tab]) return tabsRowsData;
         let rowIdx = 0;
-        // todo variables undefined
         endpointData[tab]!.variables.forEach((variable) => {
           rows.push(constructRow(rowIdx, variable, 0));
           if (["schema", "array"].includes(variable.type)) {

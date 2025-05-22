@@ -355,6 +355,7 @@ async function createEndpointAndUpdateState(endpoint: EndpointData): Promise<any
   try {
     const response = await axios.post(createEndpoint(), {
       ...endpoint,
+      // Stringify needed for Resql to save nested data in a proper parsable format
       definitions: JSON.stringify(endpoint.definitions),
     });
     useServiceStore
