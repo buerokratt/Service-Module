@@ -7,7 +7,6 @@ export type Endpoint = {
   label: string;
   path: string;
   methodType: string;
-  // todo maybe broken? try "openApi"
   type: EndpointType;
   dataType: "raw" | "custom";
   supported: boolean;

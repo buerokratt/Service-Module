@@ -13,6 +13,7 @@ export type EndpointData = {
   definitions: Endpoint[];
 };
 
+// todo remove
 type Temp = {
   id: string;
   serviceId: string;
