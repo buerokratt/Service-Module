@@ -4,7 +4,7 @@ import { Group, Rule } from "components/FlowElementsPopup/RuleBuilder/types";
 import i18next from "i18next";
 import { NodeHtmlMarkdown } from "node-html-markdown";
 import { Edge, Node } from "reactflow";
-import { createNewService, editService, jsonToYml, testService, updateServiceEndpoints } from "resources/api-constants";
+import { createNewService, editService, jsonToYml, testService, updateEndpoint } from "resources/api-constants";
 import useServiceStore from "store/new-services.store";
 import useToastStore from "store/toasts.store";
 import { RawData, Step, StepType } from "types";
@@ -324,11 +324,9 @@ export async function saveEndpoints(
     );
   }
 
-  tasks.push(
-    axios.post(updateServiceEndpoints(id), {
-      endpoints: serviceEndpoints,
-    })
-  );
+  endpoints.forEach((endpoint) => {
+    tasks.push(axios.post(updateEndpoint(id), endpoint));
+  });
 
   await Promise.all(tasks).then(onSuccess).catch(onError);
 }

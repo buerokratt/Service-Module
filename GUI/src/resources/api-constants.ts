@@ -34,5 +34,5 @@ export const getFaultyServices = (page: number, pageSize: number, sort: string, 
   `${baseUrl}/services/services-detailed/nok?page=${page}&page_size=${pageSize}&sort=${sort}&order=${order}`;
 export const trainingModuleTraining = (): string => `${trainingModuleBaseUrl}/treening/treeni-uus-mudel`;
 export const getServiceById = (id: string): string => `${baseUrl}/service-by-id?id=${id}`;
-export const updateServiceEndpoints = (id: string): string => `${baseUrl}/services/update-service-endpoints?id=${id}`;
+export const updateEndpoint = (id: string): string => `${baseUrl}/services/update-service-endpoints?id=${id}`;
 export const getSlots = (): string => `${baseUrl}/slots`;

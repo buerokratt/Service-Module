@@ -8,18 +8,32 @@ declaration:
   namespace: service
   allowlist:
     body:
-      - field: endpoints
+      - field: name
+        type: string
+        description: "Endpoint name"
+      - field: fileName
+        type: string
+        description: "Endpoint file name"
+      - field: type
+        type: string
+        description: "Endpoint type"
+      - field: isCommon
+        type: boolean
+        description: "Endpoint common status"
+      - field: serviceId
+        type: string
+        description: "Service UUID"
+      - field: definitions
         type: json
-        description: "Body field 'endpoints'"
+        description: "Endpoint definitions"
     params:
       - field: id
         type: string
-        description: "Parameter 'id'"
+        description: "Endpoint UUID"
 
 extract_request_data:
   assign:
     id: ${incoming.params.id}
-    endpoints: ${incoming.body.endpoints}
 
 check_for_type:
   switch:
@@ -32,7 +46,12 @@ service_edit:
     url: "[#SERVICE_RESQL]/update-service-endpoints"
     body:
       id: ${id}
-      endpoints: ${endpoints}
+      name: ${incoming.body.name}
+      fileName: ${incoming.body.fileName}
+      type: ${incoming.body.type}
+      isCommon: ${incoming.body.isCommon}
+      serviceId: ${incoming.body.serviceId}
+      definitions: ${incoming.body.definitions}
   result: editedService
 
 return_ok:
