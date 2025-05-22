@@ -292,7 +292,7 @@ export async function saveEndpoints(
   endpoints: EndpointData[],
   name: string,
   serviceId: string,
-  onSuccess?: (e: any) => void,
+  onSuccess?: () => void,
   onError?: (e: any) => void
 ) {
   const tasks: Promise<any>[] = [];
@@ -334,8 +334,14 @@ export async function saveEndpoints(
     // todo remove
     console.log("igor endpoint", endpoint);
     if (endpoint.isNew) {
-      // todo also remove isNew from state
       tasks.push(axios.post(createEndpoint(), endpoint));
+      tasks.push(
+        Promise.resolve().then(() => {
+          useServiceStore
+            .getState()
+            .setEndpoints((prev) => prev.map((ep) => (ep.id === endpoint.id ? { ...ep, isNew: false } : ep)));
+        })
+      );
     } else {
       tasks.push(axios.post(updateEndpoint(endpoint.id), endpoint));
     }
