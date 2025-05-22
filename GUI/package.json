@@ -4,7 +4,7 @@
   "type": "module",
   "private": true,
   "dependencies": {
-    "@buerokratt-ria/header": "^0.1.35",
+    "@buerokratt-ria/header": "^0.1.36",
     "@buerokratt-ria/menu": "^0.2.6",
     "@buerokratt-ria/styles": "^0.0.1",
     "@fontsource/roboto": "^4.5.8",
@@ -44,7 +44,7 @@
     "react-icons": "^4.7.1",
     "react-idle-timer": "^5.7.2",
     "react-json-tree": "^0.20.0",
-    "react-quill-new": "^3.4.6",
+    "react-quill": "^2.0.0",
     "react-router-dom": "^6.6.2",
     "react-textarea-autosize": "^8.4.0",
     "reactflow": "^11.7.0",
@@ -82,9 +82,9 @@
     "@types/uuid": "^9.0.1",
     "@vitejs/plugin-react": "^4.0.4",
     "vite": "^4.4.9",
+    "vite-plugin-env-compatible": "^1.1.1",
     "vite-plugin-svgr": "^3.2.0",
-    "vite-tsconfig-paths": "^4.2.0",
-    "vite-plugin-env-compatible": "^1.1.1"
+    "vite-tsconfig-paths": "^4.2.0"
   },
   "msw": {
     "workerDirectory": "public"

@@ -299,8 +299,19 @@
     },
     "previousVariables": {
       "assignElements": "Määra elemendid",
-      "dates": "Kuupäevad",
       "noName": "<Nimeta>",
+      "dates": {
+        "title": "Kuupäevad",
+        "currentDate": "Praegune kuupäev",
+        "currentTime": "Praegune aeg",
+        "currentDateAndTime": "Praegune kuupäev ja kellaaeg",
+        "yesterday": "Eile",
+        "tomorrow": "Homme",
+        "customDateTime": "Kohandatud kuupäev ja kellaaeg",
+        "yearMonthDayFormat": "Aasta Kuu Päeva formaat",
+        "dayMonthYearFormat": "Päev Kuu Aasta formaat",
+        "customFormat": "Kohandatud vorming"
+      },
       "helpers": {
         "title": "Tööriistad",
         "map": "Muuda elemente",
@@ -311,6 +322,8 @@
         "join": "Ühenda tekst",
         "split": "Jaga tekst",
         "slice": "Lõika loend",
+        "reduce": "Kombineeri üksused",
+        "mapAndJoin": "Muuda ja ühenda üksusi",
         "tooltip": {
           "map": "Rakenda reegel iga loendi elemendi kohta\n\nNäide: {{example}}\nSisend: {{input}}\nVäljund: {{output}}",
           "filter": "Säilita ainult need elemendid, mis vastavad tingimusele\n\nNäide: {{example}}\nSisend: {{input}}\nVäljund: {{output}}",
@@ -319,7 +332,9 @@
           "sort": "Sorteeri elemendid loendis\n\nNäide: {{example}}\nSisend: {{input}}\nVäljund: {{output}}",
           "join": "Ühenda loendi elemendid üheks tekstiks\n\nNäide: {{example}}\nSisend: {{input}}\nVäljund: {{output}}",
           "split": "Jaga tekst loendiks eraldaja alusel\n\nNäide: {{example}}\nSisend: {{input}}\nVäljund: {{output}}",
-          "slice": "Võta osa loendist\n\nNäide: {{example}}\nSisend: {{input}}\nVäljund: {{output}}"
+          "slice": "Võta osa loendist\n\nNäide: {{example}}\nSisend: {{input}}\nVäljund: {{output}}",
+          "reduce": "Ühendage kõik üksused reegli abil üheks tulemuseks\n\nLoendis olevad summad:\nNäide: {{example}}\nSisend: {{input}}\nVäljund: {{output}}\n\nLoendi tasandamine:\nNäide: {{example2}}\nSisend: {{input2}}\nVäljund: {{output2}}\n\nSirvige loendit:\nNäide: {{example3}}\n\nSisend: {{input3}}\n\nVäljund: {{output3}}",
+          "mapAndJoin": "Muutke iga üksust ja ühendage seejärel tekstiks\n\nNäide: {{example}}\n\nSisend: {{input}}\n\nVäljund: {{output}}"
         }
       }
     },

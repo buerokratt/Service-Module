@@ -5,7 +5,7 @@ import { Assign } from "types";
 import { t } from "i18next";
 import { getDragData } from "utils/component-util";
 import { getTypeColor, isArray } from "utils/object-util";
-import { stringToTemplate, templateToString } from "utils/string-util";
+import { isTemplate, stringToTemplate, templateToString } from "utils/string-util";
 
 const ARRAY_INDEX_PATTERN = /\[\d+\]$/;
 
@@ -50,7 +50,7 @@ const DragInput = ({ onChange, element, id }: DragInputProps): ReactNode => {
 
   if (element) {
     return (
-      <Tooltip content={templateToString(element.value)}>
+      <Tooltip content={isTemplate(element.value) ? templateToString(element.value) : element.value}>
         <OutputElementBox borderColor={getTypeColor(element?.data).color} className={styles.element}>
           {isArray(element.data) ? (
             <div className={styles.array}>
