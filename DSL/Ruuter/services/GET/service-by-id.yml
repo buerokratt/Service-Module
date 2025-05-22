@@ -33,12 +33,6 @@ get_endpoints_by_service_id:
       id: ${incoming.params.id}
   result: endpoints_results
 
-igor_log_endpoints:
-  log: ${endpoints_results.response.body}
-
-igor_log_service:
-  log: ${service_results.response.body[0]}
-
 prepare_results:
   assign:
     results:
