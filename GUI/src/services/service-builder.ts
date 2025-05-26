@@ -296,7 +296,6 @@ const assignEndpointVariables = (
 export async function saveEndpoints(
   endpoints: EndpointData[],
   name: string,
-  // TODO: In the future, get ID from state instead of passing it around as a param
   serviceId: string,
   onSuccess?: () => void,
   onError?: (e: any) => void
@@ -354,20 +353,15 @@ export async function saveEndpoints(
 }
 
 async function createEndpointAndUpdateState(endpoint: EndpointData): Promise<any> {
-  try {
-    const response = await axios.post(createEndpoint(), {
-      ...endpoint,
-      // Stringify needed for Resql to save nested data in a proper parsable format
-      definitions: JSON.stringify(endpoint.definitions),
-    });
-    useServiceStore
-      .getState()
-      .setEndpoints((prev) => prev.map((ep) => (ep.endpointId === endpoint.endpointId ? { ...ep, isNew: false } : ep)));
-    return response;
-  } catch (error) {
-    // Propagate error so Promise.all can catch it
-    throw error;
-  }
+  const response = await axios.post(createEndpoint(), {
+    ...endpoint,
+    // Stringify needed for Resql to save nested data in a proper parsable format
+    definitions: JSON.stringify(endpoint.definitions),
+  });
+  useServiceStore
+    .getState()
+    .setEndpoints((prev) => prev.map((ep) => (ep.endpointId === endpoint.endpointId ? { ...ep, isNew: false } : ep)));
+  return response;
 }
 
 const buildSteps = (endpointName: string, endpoint: EndpointData, selectedEndpointType: EndpointDefinition) => {
