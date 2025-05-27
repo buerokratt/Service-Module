@@ -36,7 +36,7 @@ check_for_required_parameters:
 get_current_status:
   call: http.get
   args:
-    url: "[#SERVICE_RESQL]/service/status"
+    url: "[#SERVICE_RESQL]/service/get_service_status_by_id"
     query:
       id: ${id}
   result: status_res
@@ -57,7 +57,7 @@ check_status:
 set_status:
   call: http.post
   args:
-    url: "[#SERVICE_RESQL]/service/set-status"
+    url: "[#SERVICE_RESQL]/service/update_service_status"
     body:
       id: ${id}
       new_state: ${new_state}
@@ -67,7 +67,7 @@ set_status:
 set_plain_status:
   call: http.post
   args:
-    url: "[#SERVICE_RESQL]/service/set-status"
+    url: "[#SERVICE_RESQL]/service/update_service_status"
     body:
       id: ${id}
       new_state: ${new_state}

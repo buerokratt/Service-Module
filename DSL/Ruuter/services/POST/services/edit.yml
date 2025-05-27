@@ -100,7 +100,7 @@ check_type:
 get_service_by_id:
   call: http.get
   args:
-    url: "[#SERVICE_RESQL]/service/get-service-by-id"
+    url: "[#SERVICE_RESQL]/service/get_service_by_id"
     query:
       id: ${id}
   result: old_service_result
@@ -146,7 +146,7 @@ check_result:
 service_edit:
   call: http.post
   args:
-    url: "[#SERVICE_RESQL]/service/edit"
+    url: "[#SERVICE_RESQL]/service/update_service"
     body:
       id: ${id}
       name: ${name}

@@ -21,7 +21,7 @@ declaration:
 get_services_list:
   call: http.get
   args:
-    url: "[#SERVICE_RESQL]/service/get-services-list"
+    url: "[#SERVICE_RESQL]/service/list_services"
     query:
       page: ${incoming.body.page}
       page_size: ${incoming.body.page_size}

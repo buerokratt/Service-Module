@@ -10,7 +10,7 @@ declaration:
 get_services_list:
   call: http.get
   args:
-    url: "[#SERVICE_RESQL]/service/get-active-services-list"
+    url: "[#SERVICE_RESQL]/service/list_active_services"
   result: results
 
 return_ok:

@@ -23,7 +23,7 @@ check_for_parameters:
 get_services_by_endpoint_id:
   call: http.get
   args:
-    url: "[#SERVICE_RESQL]/service/get-services-by-endpoint-id"
+    url: "[#SERVICE_RESQL]/service/list_services_by_endpoint_id"
     query:
       endpoint_id: ${incoming.params.endpointId}
       excluded_service_id: ${incoming.params.excludedServiceId}

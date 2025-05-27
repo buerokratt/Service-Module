@@ -10,7 +10,7 @@ declaration:
 updateSettings:
   call: http.get
   args:
-    url: "[#SERVICE_RESQL]/service/get-settings"
+    url: "[#SERVICE_RESQL]/service/list_service_settings"
   result: results
 
 returnSuccess:

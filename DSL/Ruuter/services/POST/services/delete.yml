@@ -31,7 +31,7 @@ extract_request_data:
 get_status_name:
   call: http.get
   args:
-    url: "[#SERVICE_RESQL]/service/get-service-name-by-id"
+    url: "[#SERVICE_RESQL]/service/get_service_name_by_id"
     query:
       id: ${id}
   result: name_res
@@ -40,7 +40,7 @@ get_status_name:
 get_current_status:
   call: http.get
   args:
-    url: "[#SERVICE_RESQL]/service/status"
+    url: "[#SERVICE_RESQL]/service/get_service_status_by_id"
     query:
       id: ${id}
   result: status_res
@@ -60,7 +60,7 @@ assign_old_path:
 delete_service:
   call: http.post
   args:
-    url: "[#SERVICE_RESQL]/service/delete-service"
+    url: "[#SERVICE_RESQL]/service/delete_service"
     body:
       id: ${id}
   result: res

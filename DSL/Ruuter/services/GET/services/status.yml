@@ -15,7 +15,7 @@ declaration:
 get_status:
   call: http.get
   args:
-    url: "[#SERVICE_RESQL]/service/status"
+    url: "[#SERVICE_RESQL]/service/get_service_status_by_id"
     query:
       id: ${incoming.params.id}
   result: res
