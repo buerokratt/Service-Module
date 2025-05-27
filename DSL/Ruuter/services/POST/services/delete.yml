@@ -108,7 +108,7 @@ delete_endpoints:
 check_for_intent_connection:
   call: http.get
   args:
-    url: "[#SERVICE_TRAINING_RESQL]/service_management/get-service-trigger"
+    url: "[#SERVICE_TRAINING_RESQL]/service_management/get_service_trigger_by_id"
     query:
       serviceId: ${id}
   result: connection_res
@@ -123,7 +123,7 @@ check_is_connected_to_intents_or_has_requests:
 delete_intent_connection:
   call: http.post
   args:
-    url: "[#SERVICE_TRAINING_RESQL]/service_management/add-service-trigger"
+    url: "[#SERVICE_TRAINING_RESQL]/service_management/create_service_trigger"
     body:
       serviceId: ${id}
       intent: ${connection_res.response.body[0].intent}

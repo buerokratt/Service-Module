@@ -19,7 +19,7 @@ extract_request_data:
 check_for_intent_connection:
   call: http.get
   args:
-    url: "[#SERVICE_TRAINING_RESQL]/service_management/get-service-trigger"
+    url: "[#SERVICE_TRAINING_RESQL]/service_management/get_service_trigger_by_id"
     query:
       serviceId: ${serviceId}
   result: res

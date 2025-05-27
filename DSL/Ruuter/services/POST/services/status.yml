@@ -145,7 +145,7 @@ draft_service:
 check_for_intent_connection:
   call: http.get
   args:
-    url: "[#SERVICE_TRAINING_RESQL]/service_management/get-service-trigger"
+    url: "[#SERVICE_TRAINING_RESQL]/service_management/get_service_trigger_by_id"
     query:
       serviceId: ${id}
   result: connection_res
@@ -173,7 +173,7 @@ unlink_service_from_intent_in_rasa_domain:
 delete_intent_connection:
   call: http.post
   args:
-    url: "[#SERVICE_TRAINING_RESQL]/service_management/add-service-trigger"
+    url: "[#SERVICE_TRAINING_RESQL]/service_management/create_service_trigger"
     body:
       serviceId: ${id}
       intent: ${connection_res.response.body[0].intent}

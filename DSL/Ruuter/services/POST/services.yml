@@ -36,7 +36,7 @@ assign_services_result:
 get_approved_triggers:
   call: http.get
   args:
-    url: "[#SERVICE_TRAINING_RESQL]/service_management/get-approved-tiggers"
+    url: "[#SERVICE_TRAINING_RESQL]/service_management/list_approved_triggers"
   result: triggers_res
 
 assign_training_result:
