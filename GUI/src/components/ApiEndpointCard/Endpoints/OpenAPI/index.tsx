@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { getOpenApiSpec } from "../../../../resources/api-constants";
 import { Button, FormInput, FormSelect, RequestVariables, Track } from "../../..";
 import { useTranslation } from "react-i18next";
-import axios from "axios";
 import { v4 as uuid } from "uuid";
 import { RequestTab, Option } from "../../../../types";
 import { ApiSpecProperty } from "../../../../types/api-spec-property";
@@ -15,6 +14,7 @@ import {
 } from "../../../../types/endpoint";
 import { RequestVariablesRowData, RequestVariablesTabsRowsData } from "../../../../types/request-variables";
 import useServiceStore from "store/new-services.store";
+import api from "../../../../services/api-dev";
 
 type EndpointOpenAPIProps = {
   endpoint: EndpointData;
@@ -152,7 +152,7 @@ const EndpointOpenAPI: React.FC<EndpointOpenAPIProps> = ({
   };
 
   const fetchOpenApiSpecMock = async () => {
-    const result = await axios.post(getOpenApiSpec(), { url: openApiUrl });
+    const result = await api.post(getOpenApiSpec(), { url: openApiUrl });
     const apiSpec = result.data.response;
     const url = new URL(openApiUrl).origin + apiSpec.basePath;
     const paths: EndpointType[] = [];

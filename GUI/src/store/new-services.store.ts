@@ -1,4 +1,3 @@
-import axios from "axios";
 import { create } from "zustand";
 import { v4 as uuid } from "uuid";
 import { Edge, EdgeChange, Node, NodeChange, ReactFlowInstance, applyEdgeChanges, applyNodeChanges } from "reactflow";
@@ -9,8 +8,9 @@ import {
   getServiceById,
   getTaraAuthResponseVariables,
   servicesRequestsExplain,
+  userStepPreferences,
 } from "resources/api-constants";
-import { Service, ServiceState, Step, StepType } from "types";
+import { Service, ServiceState, Step, StepPreference, StepType } from "types";
 import { RequestVariablesTabsRawData, RequestVariablesTabsRowsData } from "types/request-variables";
 import useToastStore from "./toasts.store";
 import i18next from "i18next";
@@ -24,7 +24,7 @@ import useTestServiceStore from "./test-services.store";
 import { Chip } from "types/chip";
 import { EndpointResponseVariable } from "types/endpoint/endpoint-response-variables";
 import { Assign } from "types/assign";
-
+import api from "../services/api-dev";
 interface ServiceStoreState {
   endpoints: EndpointData[];
   name: string;
@@ -39,6 +39,7 @@ interface ServiceStoreState {
   assignElements: Assign[];
   rules: GroupOrRule[];
   isYesNoQuestion: boolean;
+  stepPreferences: StepPreference[];
   endpointsResponseVariables: EndpointResponseVariable[];
   setIsYesNoQuestion: (value: boolean) => void;
   changeAssignNode: (assign: Assign[]) => void;
@@ -61,6 +62,7 @@ interface ServiceStoreState {
   setIsCommonEndpoint: (id: string, isCommon: boolean) => void;
   setDescription: (description: string) => void;
   setSlot: (slot: string) => void;
+  setStepPreferences: (stepPreferences: StepPreference[]) => void;
   loadEndpointsResponseVariables: () => void;
   setSecrets: (newSecrets: PreDefinedEndpointEnvVariables) => void;
   addProductionVariables: (variables: string[]) => void;
@@ -70,6 +72,7 @@ interface ServiceStoreState {
   loadSecretVariables: () => Promise<void>;
   loadTaraVariables: () => Promise<void>;
   loadService: (id?: string) => Promise<void>;
+  loadStepPreferences: () => Promise<void>;
   getAvailableRequestValues: (endpointId: string) => PreDefinedEndpointEnvVariables;
   onNameChange: (endpointId: string, oldName: string, newName: string) => void;
   changeServiceEndpointType: (id: string, type: string) => void;
@@ -123,6 +126,7 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
   assignElements: [],
   rules: [],
   isYesNoQuestion: false,
+  stepPreferences: [],
   endpointsResponseVariables: [],
   setIsYesNoQuestion: (value: boolean) => set({ isYesNoQuestion: value }),
   changeAssignNode: (assignElements) => {
@@ -231,7 +235,7 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
         get().endpoints.map(async (e) => {
           return Promise.all(
             e.definedEndpoints.map(async (endpoint) => {
-              const response = await axios.post(servicesRequestsExplain(), {
+              const response = await api.post(servicesRequestsExplain(), {
                 url: endpoint.url,
                 method: endpoint.methodType,
                 headers: extractMapValues(endpoint.headers),
@@ -283,6 +287,7 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
   changeServiceName: (name: string) => set({ name }),
   setDescription: (description: string) => set({ description }),
   setSlot: (slot: string) => set({ slot }),
+  setStepPreferences: (stepPreferences: StepPreference[]) => set({ stepPreferences }),
   isCommon: false,
   setIsCommon: (isCommon: boolean) => set({ isCommon }),
   isCommonEndpoint: (id: string) => {
@@ -354,7 +359,7 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
     let nodes = get().nodes;
 
     if (id) {
-      const service = await axios.get<Service[]>(getServiceById(id));
+      const service = await api.get<Service[]>(getServiceById(id));
 
       const structure = JSON.parse(service.data[0].structure?.value ?? "{}");
       let endpoints = JSON.parse(service.data[0].endpoints?.value ?? "{}");
@@ -405,8 +410,16 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
 
     get().addProductionVariables(variables);
   },
+  loadStepPreferences: async () => {
+    try {
+      const response = await api.get<{ response: StepPreference[] }>(userStepPreferences());
+      set({ stepPreferences: response.data.response });
+    } catch (error) {
+      console.error("Failed to load step preferences:", error);
+    }
+  },
   loadSecretVariables: async () => {
-    const result = await axios.get(getSecretVariables());
+    const result = await api.get(getSecretVariables());
     const data: { prod: string[]; test: string[] } = result.data;
     data.prod = data.prod.map((v) => `{{${v}}}`);
     data.test = data.test.filter((x) => !data.prod.includes(x)).map((v) => `{{${v}}}`);
@@ -421,7 +434,7 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
     get().addTestVariables(data.test);
   },
   loadTaraVariables: async () => {
-    const result = await axios.post(getTaraAuthResponseVariables());
+    const result = await api.post(getTaraAuthResponseVariables());
     const data: { [key: string]: any } = result.data?.response?.body ?? {};
     const taraVariables = Object.keys(data).map((key) => `{{TARA.${key}}}`);
     get().addProductionVariables(taraVariables);
@@ -676,12 +689,12 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
     try {
       new URL(endpoint.definedEndpoints[0].url ?? "");
       if (endpoint.definedEndpoints[0].methodType === "GET") {
-        await axios.post(getEndpointValidation(), {
+        await api.post(getEndpointValidation(), {
           url: endpoint.definedEndpoints[0].url ?? "",
           type: "GET",
         });
       } else {
-        await axios.post(getEndpointValidation(), {
+        await api.post(getEndpointValidation(), {
           url: endpoint.definedEndpoints[0].url ?? "",
           type: "POST",
         });

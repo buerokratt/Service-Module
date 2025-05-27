@@ -8,3 +8,11 @@ export interface Step {
   action?: string;
   data?: EndpointData;
 }
+
+export interface StepPreference {
+  readonly id: number;
+  step: string;
+  ordinality: number;
+  pinned: boolean;
+  active: boolean;
+}

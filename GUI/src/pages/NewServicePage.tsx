@@ -18,8 +18,8 @@ import useStore from "store/store";
 import useServiceStore from "store/new-services.store";
 import withAuthorization, { ROLES } from "hoc/with-authorization";
 import { useQuery } from "@tanstack/react-query";
-import axios from "axios";
 import { getSlots } from "resources/api-constants";
+import api from "../services/api-dev";
 
 const NewServicePage: React.FC = () => {
   const { t } = useTranslation();
@@ -33,7 +33,7 @@ const NewServicePage: React.FC = () => {
   const { intentName, id } = useParams();
   const { data: slots } = useQuery<string[]>({
     queryKey: ["slots"],
-    queryFn: () => axios.get(getSlots()).then((res) => res.data.response),
+    queryFn: () => api.get(getSlots()).then((res) => res.data.response),
   });
 
   useEffect(() => {

@@ -10,6 +10,7 @@ import useToastStore from "store/toasts.store";
 import { RawData, Step, StepType } from "types";
 import { EndpointData, EndpointEnv, EndpointType, EndpointVariableData } from "types/endpoint";
 import { v4 } from "uuid";
+import api from "../services/api-dev";
 
 // refactor this file later
 
@@ -313,7 +314,7 @@ export async function saveEndpoints(
     const isCommonPath = endpoint.isCommon ? "common/" : "";
 
     tasks.push(
-      axios.post(
+      api.post(
         jsonToYml(),
         { result },
         {
@@ -330,7 +331,7 @@ export async function saveEndpoints(
   }
 
   tasks.push(
-    axios.post(updateServiceEndpoints(id), {
+    api.post(updateServiceEndpoints(id), {
       endpoints: JSON.stringify(serviceEndpoints),
     })
   );
@@ -1132,7 +1133,7 @@ export const editServiceInfo = async () => {
   const tasks: Promise<any>[] = [];
 
   tasks.push(
-    axios.post(editService(serviceId), {
+    api.post(editService(serviceId), {
       name,
       description,
       slot,
@@ -1162,7 +1163,7 @@ export const runServiceTest = async () => {
   const state = useServiceStore.getState().serviceState;
 
   try {
-    await axios.post(testService(state, name), {});
+    await api.post(testService(state, name), {});
     useToastStore.getState().success({
       title: i18next.t("newService.toast.testResultSuccess"),
     });
