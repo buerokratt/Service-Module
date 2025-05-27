@@ -29,7 +29,7 @@ check_for_type:
 service_edit:
   call: http.post
   args:
-    url: "[#SERVICE_RESQL]/update-service-endpoints"
+    url: "[#SERVICE_RESQL]/service/update-service-endpoints"
     body:
       id: ${id}
       endpoints: ${endpoints}

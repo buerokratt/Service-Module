@@ -54,7 +54,7 @@ extract_request_data:
 service_add:
   call: http.post
   args:
-    url: "[#SERVICE_RESQL]/add"
+    url: "[#SERVICE_RESQL]/service/add"
     body:
       name: ${name}
       description: ${description}
