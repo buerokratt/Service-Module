@@ -30,7 +30,7 @@ extract_request_data:
 login_user:
   call: http.get
   args:
-    url: "[#SERVICE_USERS_RESQL]/auth_users/get-user-by-login"
+    url: "[#SERVICE_USERS_RESQL]/auth_users/get_user_by_login"
     query:
       login: ${login}
       password: ${password}
@@ -46,7 +46,7 @@ check_login_result:
 get_session_length:
   call: http.get
   args:
-    url: "[#SERVICE_USERS_RESQL]/config/get-configuration"
+    url: "[#SERVICE_USERS_RESQL]/config/get_configuration"
     query:
       key: "session_length"
   result: session_result
