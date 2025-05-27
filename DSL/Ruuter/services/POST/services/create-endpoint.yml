@@ -30,6 +30,9 @@ declaration:
         type: json
         description: "Endpoint definitions"
 
+log_endpoint_data:
+  log: ${incoming.body}
+
 create_endpoint:
   call: http.post
   args:

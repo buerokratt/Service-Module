@@ -308,6 +308,7 @@ export async function saveEndpoints(
     if (!selectedEndpointType) continue;
 
     const endpointName = `${name.replaceAll(" ", "_")}-${getEndpointName(endpoint)}`;
+    console.log("endpointName", endpointName);
     endpoint.fileName = endpointName;
     for (const env of [EndpointEnv.Live, EndpointEnv.Test]) {
       await saveEndpointInfo(selectedEndpointType, env, endpointName, endpoint);
