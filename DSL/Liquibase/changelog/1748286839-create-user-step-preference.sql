@@ -6,5 +6,6 @@ CREATE TABLE user_step_preference (
     step step_type NOT NULL,
     ordinality int NOT NULL DEFAULT 0,
     active boolean NOT NULL DEFAULT true,
-    pinned boolean NOT NULL DEFAULT false
+    pinned boolean NOT NULL DEFAULT false,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );

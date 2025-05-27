@@ -1,8 +1,23 @@
-SELECT DISTINCT ON (step)
-  step,
-  "ordinality",
-  pinned,
-  active
-FROM user_step_preference
-WHERE user_id_code = :user_id_code
-ORDER BY step, id DESC, "ordinality" ASC;
+WITH latest_steps AS (
+    SELECT 
+        step,
+        "ordinality",
+        active,
+        pinned,
+        created_at,
+        ROW_NUMBER() OVER (
+            PARTITION BY user_id_code, step 
+            ORDER BY created_at DESC
+        ) AS rn
+    FROM user_step_preference
+)
+SELECT 
+    step,
+    "ordinality",
+    active,
+    pinned
+FROM latest_steps
+WHERE rn = 1
+ORDER BY 
+    "ordinality",
+    created_at DESC;
