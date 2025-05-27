@@ -16,6 +16,9 @@ extract_request_data:
   assign:
     name: ${incoming.body.name}
 
+igor_log_inner:
+  log: ${name}
+
 delete_get_endpoints:
   call: http.post
   args:
