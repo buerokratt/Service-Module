@@ -20,21 +20,25 @@ check_for_parameters:
     - condition: ${incoming.params == null || incoming.params.endpointId == null}
       next: return_incorrect_request
 
-get_services_by_endpoint_id:
+get_service_ids_by_endpoint_id:
   call: http.post
   args:
     url: "[#SERVICE_RESQL]/endpoints/get_service_ids_by_endpoint_id"
     body:
       endpointId: ${incoming.params.endpointId}
-  result: service_ids
+  result: service_id_result
+
+assign_service_ids:
+  assign:
+    service_ids: ${service_id_result.response.body[0].serviceIds}
 
 get_services_by_ids:
   call: http.post
   args:
     url: "[#SERVICE_RESQL]/services/get_services_by_ids"
     body:
-      serviceIds: ${service_ids.response.body.filter((id) => id !== incoming.params.excludedServiceId)}
-  result: services
+      serviceIds: ${service_ids.filter((id) => id !== incoming.params.excludedServiceId)}
+  result: results
 
 return_ok:
   status: 200
