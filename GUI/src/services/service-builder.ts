@@ -1107,7 +1107,7 @@ export const saveDraft = async () => {
   return true;
 };
 
-export const saveFlowClick = async ({ supressToast = false }: { supressToast?: boolean } = {}) => {
+export const saveFlowClick = async () => {
   const name = useServiceStore.getState().serviceNameDashed();
   const serviceId = useServiceStore.getState().serviceId;
   const description = useServiceStore.getState().description;
@@ -1124,21 +1124,17 @@ export const saveFlowClick = async ({ supressToast = false }: { supressToast?: b
     edges,
     nodes,
     onSuccess: () => {
-      if (!supressToast) {
-        useToastStore.getState().success({
-          title: i18next.t("newService.toast.success"),
-          message: i18next.t("newService.toast.savedSuccessfully"),
-        });
-      }
+      useToastStore.getState().success({
+        title: i18next.t("newService.toast.success"),
+        message: i18next.t("newService.toast.savedSuccessfully"),
+      });
       useServiceStore.getState().enableTestButton();
     },
     onError: (e) => {
-      if (!supressToast) {
-        useToastStore.getState().error({
-          title: i18next.t("toast.cannot-save-flow"),
-          message: e?.message,
-        });
-      }
+      useToastStore.getState().error({
+        title: i18next.t("toast.cannot-save-flow"),
+        message: e?.message,
+      });
     },
     description,
     slot,

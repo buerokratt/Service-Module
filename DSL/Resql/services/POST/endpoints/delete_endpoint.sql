@@ -22,6 +22,6 @@ SELECT
     created_at, 
     updated_at
 FROM endpoints
-WHERE endpoint_id = :id
+WHERE endpoint_id = :id::uuid
 ORDER BY id DESC
 LIMIT 1;
