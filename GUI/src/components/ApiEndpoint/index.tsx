@@ -47,7 +47,7 @@ const ApiEndpoint: FC<ApiEndpointProps> = ({ step }) => {
       setIsGettingRelatedServices(true);
 
       try {
-        const services = (await axios.get<RelatedService[]>(getServicesByEndpointId(endpoint.id, id))).data;
+        const services = (await axios.get<RelatedService[]>(getServicesByEndpointId(endpoint.endpointId, id))).data;
         if (services.length > 0) {
           setRelatedServices(services);
         } else {
@@ -68,10 +68,10 @@ const ApiEndpoint: FC<ApiEndpointProps> = ({ step }) => {
     if (!endpoint) return;
 
     try {
-      deleteEndpoint(endpoint.id);
+      deleteEndpoint(endpoint.endpointId);
 
       const nodeIdsToDelete = nodes
-        .filter((node) => node.type === "customNode" && node.data.originalDefinedNodeId === endpoint.id)
+        .filter((node) => node.type === "customNode" && node.data.originalDefinedNodeId === endpoint.endpointId)
         .map((node) => node.id);
       nodeIdsToDelete.forEach((nodeId) => useServiceStore.getState().onDelete(nodeId));
 

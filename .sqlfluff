@@ -1,2 +1,3 @@
 [sqlfluff]
 dialect = postgres
+rules = L010,L011

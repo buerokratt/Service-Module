@@ -3,10 +3,11 @@
 
 ALTER TABLE services DROP COLUMN endpoints;
 
-CREATE TYPE "ENDPOINT_TYPE" AS ENUM ('openAPI', 'custom');
+CREATE TYPE endpoint_type AS ENUM ('openApi', 'custom');
 
 CREATE TABLE endpoints (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    id BIGSERIAL PRIMARY KEY,
+    endpoint_id UUID NOT NULL,
     service_ids UUID [] NOT NULL,
     name TEXT NOT NULL,
     type ENDPOINT_TYPE NOT NULL,
@@ -18,7 +19,8 @@ CREATE TABLE endpoints (
     updated_at TIMESTAMP DEFAULT current_timestamp
 );
 
-CREATE INDEX idx_endpoints_is_common ON endpoints (is_common);
+CREATE INDEX idx_endpoints_endpoint_id ON endpoints (endpoint_id);
 CREATE INDEX idx_endpoints_service_ids ON endpoints USING gin (service_ids);
-CREATE INDEX idx_endpoints_created_at ON endpoints (created_at);
+CREATE INDEX idx_endpoints_is_common ON endpoints (is_common);
 CREATE INDEX idx_endpoints_deleted ON endpoints (deleted);
+CREATE INDEX idx_endpoints_created_at ON endpoints (created_at);
