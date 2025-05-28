@@ -1,3 +1,45 @@
+/*
+declaration:
+  version: 0.1
+  description: "Fetch paginated and sorted list of latest non-common, non-deleted services with total page count"
+  method: get
+  namespace: service
+  returns: json
+  allowlist:
+    query:
+      - field: page
+        type: number
+        description: "Current page number (1-based)"
+      - field: page_size
+        type: number
+        description: "Number of items per page"
+      - field: sorting
+        type: string
+        enum: ['id asc', 'name asc', 'name desc', 'state asc', 'state desc']
+        description: "Sorting criteria for the result set"
+  response:
+    fields:
+      - field: name
+        type: string
+        description: "Name of the service"
+      - field: description
+        type: string
+        description: "Description of the service"
+      - field: state
+        type: string
+        enum: ['active', 'inactive', 'draft', 'ready']
+        description: "Current state of the service"
+      - field: type
+        type: string
+        enum: ['GET', 'POST']
+        description: "Ruuter type associated with the service"
+      - field: service_id
+        type: string
+        description: "Service identifier"
+      - field: total_pages
+        type: number
+        description: "Total number of pages available for the given page size"
+*/
 WITH MaxServices AS (
   SELECT MAX(id) AS maxId
   FROM services
