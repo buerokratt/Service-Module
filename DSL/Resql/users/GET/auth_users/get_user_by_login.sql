@@ -37,18 +37,14 @@ declaration:
           enum: ['ROLE_ADMINISTRATOR', 'ROLE_SERVICE_MANAGER', 'ROLE_CUSTOMER_SUPPORT_AGENT', 'ROLE_CHATBOT_TRAINER', 'ROLE_ANALYST', 'ROLE_UNAUTHENTICATED']
         description: "List of authority roles assigned to the user"
 */
-SELECT u.login,
-       u.first_name,
-       u.last_name,
-       u.id_code,
-       u.display_name,
-       ua.authority_name AS authorities
-FROM "user" u
-         INNER JOIN (SELECT authority_name, user_id
-                     FROM user_authority AS ua
-                     WHERE ua.id IN (SELECT max(id)
-                                     FROM user_authority
-                                     GROUP BY user_id)) ua ON u.id_code = ua.user_id
+SELECT id_code
+FROM "user"
 WHERE login = :login
-  AND password_hash = :password
-  AND array_length(authority_name, 1) > 0;
+    AND password_hash = :password
+    AND id IN (
+        SELECT DISTINCT ON (id_code) id
+        FROM "user"
+        ORDER BY id_code, created DESC
+    )
+    AND status != 'deleted'
+LIMIT 1;

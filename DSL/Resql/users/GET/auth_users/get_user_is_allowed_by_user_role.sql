@@ -24,7 +24,7 @@ SELECT COALESCE(
       SELECT array_agg(UPPER(authorities))::text [] AS "user_roles"
       FROM (
           SELECT unnest(authority_name) AS authorities
-          FROM public.user_authority
+          FROM denormalized_user_data
           WHERE user_id = :userId::text
           ORDER BY authorities ASC
         ) AS _
