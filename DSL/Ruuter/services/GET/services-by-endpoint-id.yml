@@ -37,7 +37,8 @@ get_services_by_ids:
   args:
     url: "[#SERVICE_RESQL]/services/get_services_by_ids"
     body:
-      serviceIds: ${service_ids.filter((id) => id !== incoming.params.excludedServiceId)}
+      # Converting to string to prevent issues with Resql
+      serviceIds: ${service_ids.filter((id) => id !== incoming.params.excludedServiceId).join(",")}
   result: results
 
 return_ok:
