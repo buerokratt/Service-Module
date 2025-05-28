@@ -31,3 +31,12 @@ SET created_at = NOW() - make_interval(
 ALTER TABLE services_settings DROP COLUMN id;
 ALTER TABLE services_settings RENAME COLUMN uuid_id TO id;
 ALTER TABLE services_settings ADD PRIMARY KEY (id);
+
+
+-- Modify request_logs table
+ALTER TABLE request_logs ADD COLUMN uuid_id UUID DEFAULT gen_random_uuid();
+ALTER TABLE request_logs DROP CONSTRAINT IF EXISTS request_logs_pkey;
+
+ALTER TABLE request_logs DROP COLUMN id;
+ALTER TABLE request_logs RENAME COLUMN uuid_id TO id;
+ALTER TABLE request_logs ADD PRIMARY KEY (id);
