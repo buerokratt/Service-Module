@@ -7,34 +7,20 @@ import { ReactFlowProvider } from "reactflow";
 import "reactflow/dist/style.css";
 import { saveFlowClick } from "services/service-builder";
 import useServiceStore from "store/new-services.store";
-import { Box, Button, Collapsible, FlowElementsPopup, NewServiceHeader, Track } from "../components";
+import { Collapsible, FlowElementsPopup, NewServiceHeader, StepElement, Track } from "../components";
 import FlowBuilder from "../components/FlowBuilder/FlowBuilder";
 import { ROUTES } from "../resources/routes-constants";
-import { Step, StepType } from "../types";
+import { Step, stepsLabels, StepType } from "../types";
 import "./ServiceFlowPage.scss";
 
 import ApiEndpoint from "components/ApiEndpoint";
-import { onDragStart } from "utils/component-util";
 import { closestCorners, DndContext, DragEndEvent, DragOverlay, KeyboardSensor, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
-import { arrayMove, SortableContext, sortableKeyboardCoordinates, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable";
-import UserItem from "./userItem";
+import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from "@dnd-kit/sortable";
 
 const ServiceFlowPage: FC = () => {
   const { t } = useTranslation();
 
-  const [allElements, setAllElements] = useState<Step[]>([
-    { id: 10, label: t("serviceFlow.element.taraAuthentication"), type: StepType.Auth },
-    { id: 20, label: t("serviceFlow.element.textfield"), type: StepType.Textfield },
-    { id: 30, label: t("serviceFlow.element.clientInput"), type: StepType.Input },
-    { id: 40, label: t("serviceFlow.element.assign"), type: StepType.Assign },
-    { id: 50, label: t("serviceFlow.element.condition"), type: StepType.Condition },
-    { id: 60, label: t("serviceFlow.element.rasaRules"), type: StepType.RasaRules },
-    { id: 70, label: t("serviceFlow.element.openNewWebpage"), type: StepType.OpenWebpage },
-    { id: 80, label: t("serviceFlow.element.fileGeneration"), type: StepType.FileGenerate },
-    { id: 90, label: t("serviceFlow.element.fileSigning"), type: StepType.FileSign },
-    { id: 100, label: t("serviceFlow.element.conversationEnd"), type: StepType.FinishingStepEnd },
-    { id: 110, label: t("serviceFlow.element.redirectConversationToSupport"), type: StepType.FinishingStepRedirect },
-  ]);
+  const [allElements, setAllElements] = useState<Step[]>([]);
 
   const navigate = useNavigate();
   const description = useServiceStore((state) => state.description);
@@ -57,21 +43,37 @@ const ServiceFlowPage: FC = () => {
   const nodes = useServiceStore((state) => state.nodes);
   const stepPreferences = useServiceStore((state) => state.stepPreferences);
 
+  useEffect(() => {
+    const elements: Step[] = [];
+    stepPreferences.forEach((preference, index) => {
+      elements.push({
+        id: index,
+        label: t(`${stepsLabels[preference.step as StepType]}`),
+        type: preference.step as StepType,
+        ordinality: preference.ordinality,
+        pinned: preference.pinned,
+        active: preference.active,
+      });
+    });
+    setAllElements(elements);
+  }, [stepPreferences]);
+
   const setNodes = useServiceStore((state) => state.setNodes);
 
   const contentStyle: CSSProperties = { overflowY: "auto", maxHeight: "40vh" };
 
   function handleDragEnd(event: DragEndEvent) {
     const { active, over } = event;
-
+    
     if (over && active.id !== over.id) {
       setAllElements((items) => {
         const oldIndex = items.findIndex((item) => item.id === active.id);
         const newIndex = items.findIndex((item) => item.id === over.id);
-        console.log(arrayMove(items, oldIndex, newIndex));
         return arrayMove(items, oldIndex, newIndex);
       });
+      
     }
+    setActiveElement(null);
   }
 
   const sensors = useSensors(
@@ -81,6 +83,11 @@ const ServiceFlowPage: FC = () => {
     })
   );
 
+  const [activeElement, setActiveElement] = useState<Step | null>(null);
+  const handleDragStart = (event: any) => {
+    const step = event.active.data.current?.step as Step;
+    setActiveElement(step);
+  };
   
   return (
     <>
@@ -119,29 +126,25 @@ const ServiceFlowPage: FC = () => {
                 </Collapsible>
               )}
               {allElements && (
-                <Collapsible title={t("serviceFlow.allElements")} contentStyle={contentStyle}>
-                  <DndContext
-                    onDragEnd={handleDragEnd}
-                    collisionDetection={closestCorners}
-                    sensors={sensors}
-                    modifiers={[]}
-                  >
-                    {/* <DragOverlay> */}
-                      <Track direction="vertical" align="stretch" gap={4}>
-                        <SortableContext items={allElements} strategy={verticalListSortingStrategy}>
-                          {allElements.map((step) => (
-                            <UserItem
-                              step={step}
-                              // onDragStart={(event) => onDragStart(event, step)}
-                              // draggable
-                            ></UserItem>
-                          ))}
-                        </SortableContext>
-                      </Track>
-                    {/* </DragOverlay> */}
-                    <DragOverlay></DragOverlay>
-                  </DndContext>
-                </Collapsible>
+                <DndContext
+                  sensors={sensors}
+                  collisionDetection={closestCorners}
+                  onDragEnd={handleDragEnd}
+                  onDragStart={handleDragStart}
+                >
+                  <Collapsible title={t("serviceFlow.allElements")} contentStyle={contentStyle}>
+                    <Track direction="vertical" align="stretch" gap={4}>
+                      <SortableContext items={allElements} strategy={verticalListSortingStrategy}>
+                        {allElements.map((task) => (
+                          <StepElement key={task.id} step={task} />
+                        ))}
+                      </SortableContext>
+                    </Track>
+                  </Collapsible>
+                  <DragOverlay>
+                    {activeElement ? <StepElement key={activeElement.id} step={activeElement} /> : null}
+                  </DragOverlay>
+                </DndContext>
               )}
             </Track>
           </div>
