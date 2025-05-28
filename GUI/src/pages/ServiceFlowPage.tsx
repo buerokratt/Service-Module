@@ -1,6 +1,6 @@
 import Chat from "components/chat/chat";
 import withAuthorization, { ROLES } from "hoc/with-authorization";
-import { act, CSSProperties, FC, useEffect, useMemo, useState } from "react";
+import { CSSProperties, FC, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useParams } from "react-router-dom";
 import { ReactFlowProvider } from "reactflow";

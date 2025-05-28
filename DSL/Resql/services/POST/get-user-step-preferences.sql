@@ -17,5 +17,5 @@ SELECT
 FROM latest_steps
 WHERE rn = 1
 ORDER BY 
-    "ordinality",
+    "ordinality" ASC,
     created_at DESC;

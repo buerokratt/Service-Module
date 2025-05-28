@@ -31,13 +31,17 @@ const StepElement: FC<StepElementProps> = ({ step, activeStep }) => {
         draggable
       >
         <Track gap={5} align={"center"}>
-          <div
-            style={{ display: "flex", alignItems: "center" }}
+          <button
+            style={{
+              display: "flex",
+              alignItems: "center",
+              cursor: "move",
+            }}
             {...listeners}
             onClick={(e) => e.stopPropagation()}
           >
-            <Icon icon={<MdDragIndicator />} size="medium" />
-          </div>
+            <Icon icon={<MdDragIndicator size={16} />} size="medium" />
+          </button>
           {step.label}
         </Track>
       </Box>
