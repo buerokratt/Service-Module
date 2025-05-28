@@ -1,6 +1,6 @@
 import Chat from "components/chat/chat";
 import withAuthorization, { ROLES } from "hoc/with-authorization";
-import { CSSProperties, FC, useEffect, useMemo, useState } from "react";
+import { act, CSSProperties, FC, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useParams } from "react-router-dom";
 import { ReactFlowProvider } from "reactflow";
@@ -14,8 +14,11 @@ import { Step, stepsLabels, StepType } from "../types";
 import "./ServiceFlowPage.scss";
 
 import ApiEndpoint from "components/ApiEndpoint";
-import { closestCorners, DndContext, DragEndEvent, DragOverlay, KeyboardSensor, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
+import { closestCorners, DndContext, DragEndEvent, DragOverlay, DragStartEvent, KeyboardSensor, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from "@dnd-kit/sortable";
+import { restrictToWindowEdges } from "@dnd-kit/modifiers";
+import api from "../services/api-dev";
+import { userStepPreferences } from "resources/api-constants";
 
 const ServiceFlowPage: FC = () => {
   const { t } = useTranslation();
@@ -51,7 +54,6 @@ const ServiceFlowPage: FC = () => {
         label: t(`${stepsLabels[preference.step as StepType]}`),
         type: preference.step as StepType,
         ordinality: preference.ordinality,
-        pinned: preference.pinned,
         active: preference.active,
       });
     });
@@ -60,7 +62,15 @@ const ServiceFlowPage: FC = () => {
 
   const setNodes = useServiceStore((state) => state.setNodes);
 
-  const contentStyle: CSSProperties = { overflowY: "auto", maxHeight: "40vh" };
+  const contentStyle: CSSProperties = { overflowY: "auto", maxHeight: "245px" };
+
+  function updateStepPreference(step: Step, ordinality: number) {
+    api.post(userStepPreferences(), {
+      step: step.type,
+      ordinality,
+      active: step.active,
+    });
+  }
 
   function handleDragEnd(event: DragEndEvent) {
     const { active, over } = event;
@@ -69,6 +79,7 @@ const ServiceFlowPage: FC = () => {
       setAllElements((items) => {
         const oldIndex = items.findIndex((item) => item.id === active.id);
         const newIndex = items.findIndex((item) => item.id === over.id);
+        updateStepPreference(active.data.current?.step as Step, newIndex);
         return arrayMove(items, oldIndex, newIndex);
       });
       
@@ -84,7 +95,7 @@ const ServiceFlowPage: FC = () => {
   );
 
   const [activeElement, setActiveElement] = useState<Step | null>(null);
-  const handleDragStart = (event: any) => {
+  const handleDragStart = (event: DragStartEvent) => {
     const step = event.active.data.current?.step as Step;
     setActiveElement(step);
   };
@@ -127,6 +138,7 @@ const ServiceFlowPage: FC = () => {
               )}
               {allElements && (
                 <DndContext
+                  modifiers={[restrictToWindowEdges]}
                   sensors={sensors}
                   collisionDetection={closestCorners}
                   onDragEnd={handleDragEnd}
@@ -135,8 +147,8 @@ const ServiceFlowPage: FC = () => {
                   <Collapsible title={t("serviceFlow.allElements")} contentStyle={contentStyle}>
                     <Track direction="vertical" align="stretch" gap={4}>
                       <SortableContext items={allElements} strategy={verticalListSortingStrategy}>
-                        {allElements.map((task) => (
-                          <StepElement key={task.id} step={task} />
+                        {allElements.map((element) => (
+                          <StepElement key={element.id} step={element} activeStep={activeElement} />
                         ))}
                       </SortableContext>
                     </Track>

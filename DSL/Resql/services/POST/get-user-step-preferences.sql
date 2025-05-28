@@ -3,7 +3,6 @@ WITH latest_steps AS (
         step,
         "ordinality",
         active,
-        pinned,
         created_at,
         ROW_NUMBER() OVER (
             PARTITION BY user_id_code, step 
@@ -14,8 +13,7 @@ WITH latest_steps AS (
 SELECT 
     step,
     "ordinality",
-    active,
-    pinned
+    active
 FROM latest_steps
 WHERE rn = 1
 ORDER BY 

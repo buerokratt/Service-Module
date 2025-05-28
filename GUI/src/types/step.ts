@@ -8,7 +8,6 @@ export interface Step {
   action?: string;
   data?: EndpointData;
   ordinality?: number;
-  pinned?: boolean;
   active?: boolean;
 }
 
@@ -16,7 +15,6 @@ export interface StepPreference {
   readonly id: number;
   step: string;
   ordinality: number;
-  pinned: boolean;
   active: boolean;
 }
 

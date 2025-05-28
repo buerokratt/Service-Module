@@ -14,9 +14,6 @@ declaration:
       - field: ordinality
         type: number
         description: "Body field 'ordinality'"
-      - field: pinned
-        type: boolean
-        description: "Body field 'pinned'"
       - field: active
         type: boolean
         description: "Body field 'active'"  
@@ -25,7 +22,6 @@ extractRequestData:
   assign:
     step: ${incoming.body.step}
     ordinality: ${incoming.body.ordinality}
-    pinned: ${incoming.body.pinned}
     active: ${incoming.body.active}    
 
 get_user_info:
@@ -55,7 +51,6 @@ update_user_step_preferences:
     body:
       step: ${step}
       ordinality: ${ordinality}
-      pinned: ${pinned}
       active: ${active}
       user_id_code: ${idCode}
   result: update_preferences_res
