@@ -318,8 +318,8 @@ export async function saveEndpoints(
     if (
       // Always save a single serviceId for common endpoints
       !endpoint.isCommon ||
-      // For non-common endpoints, only save IDs if added to the flow
-      // This way we can track which endpoints can be safely deleted
+      // For non-common endpoints, only save service IDs if endpoint is added to the flow
+      // This way we can track which common endpoints are unused and can be safely deleted
       nodes.some((node) => node.type === "customNode" && node.data.originalDefinedNodeId === endpoint.endpointId)
     ) {
       endpoint.serviceId = serviceId;
