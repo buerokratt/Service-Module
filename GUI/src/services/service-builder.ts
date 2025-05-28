@@ -301,9 +301,9 @@ export async function saveEndpoints(
   onError?: (e: any) => void
 ) {
   const tasks: Promise<any>[] = [];
+  const nodes = useServiceStore.getState().nodes;
 
   for (const endpoint of endpoints) {
-    endpoint.serviceId = serviceId;
     const selectedEndpointType = endpoint.definitions.find((e) => e.isSelected);
     if (!selectedEndpointType) continue;
 
@@ -315,6 +315,15 @@ export async function saveEndpoints(
     const steps = buildSteps(endpointName, endpoint, selectedEndpointType);
     const result = Object.fromEntries(steps.entries());
 
+    if (
+      // Always save a single serviceId for common endpoints
+      !endpoint.isCommon ||
+      // For non-common endpoints, only save IDs if added to the flow
+      // This way we can track which endpoints can be safely deleted
+      nodes.some((node) => node.type === "customNode" && node.data.originalDefinedNodeId === endpoint.endpointId)
+    ) {
+      endpoint.serviceId = serviceId;
+    }
     endpoint.isCommon = endpoint.isCommon ?? false;
     const isCommonPath = endpoint.isCommon ? "common/" : "";
 
@@ -341,7 +350,6 @@ export async function saveEndpoints(
     } else {
       tasks.push(
         axios.post(updateEndpoint(endpoint.endpointId), {
-          // todo handle serviceIds here. only update if added to the flow AND only if common
           ...endpoint,
           // Stringify needed for Resql to save nested data in a proper parsable format
           definitions: JSON.stringify(endpoint.definitions),
