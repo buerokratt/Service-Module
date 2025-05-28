@@ -17,9 +17,9 @@ declaration:
         description: "Most recent value associated with the setting name"
 */
 WITH MaxServicesSettings AS (
-  SELECT MAX(id) AS maxId
+  SELECT DISTINCT ON (name) id as maxId
   FROM services_settings
-  GROUP BY name
+  ORDER BY created_at DESC
 )
 SELECT name, value
 FROM services_settings
