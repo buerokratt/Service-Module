@@ -1,3 +1,44 @@
+/*
+declaration:
+  version: 0.1
+  description: "Fetch paginated and sorted list of pending service trigger requests, excluding those from service_manager role"
+  method: get
+  namespace: service_management
+  returns: json
+  allowlist:
+    query:
+      - field: page
+        type: number
+        description: "Current page number (1-based index)"
+      - field: page_size
+        type: number
+        description: "Number of items per page"
+      - field: sorting
+        type: string
+        enum: ['intent asc', 'intent desc', 'serviceName asc', 'serviceName desc', 'requestedAt asc', 'requestedAt desc']
+        description: "Sorting criteria for the result set"
+  response:
+    fields:
+      - field: intent
+        type: string
+        description: "Triggering intent"
+      - field: service
+        type: string
+        description: "Service identifier associated with the trigger"
+      - field: service_name
+        type: string
+        description: "Name of the service"
+      - field: requested_at
+        type: timestamp
+        description: "Timestamp of the latest trigger request"
+      - field: author_role
+        type: string
+        enum: ['backoffice-user', 'end-user', 'Bürokratt', 'buerokratt']
+        description: "Role of the author who submitted the trigger"
+      - field: total_pages
+        type: number
+        description: "Total number of pages based on the given page size"
+*/
 SELECT intent,
        service,
        MAX(service_name) AS service_name,

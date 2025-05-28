@@ -1,4 +1,24 @@
-
+/*
+declaration:
+  version: 0.1
+  description: "Fetch the most recent approved trigger entries for each unique combination of intent, service, and service name"
+  method: get
+  namespace: service_management
+  returns: json
+  allowlist:
+    query: []
+  response:
+    fields:
+      - field: intent
+        type: string
+        description: "Triggering intent"
+      - field: service
+        type: string
+        description: "Service identifier associated with the trigger"
+      - field: created
+        type: timestamp
+        description: "Timestamp when the trigger was created"
+*/
 SELECT intent,
        service,
        created

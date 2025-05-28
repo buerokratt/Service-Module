@@ -1,3 +1,37 @@
+/*
+declaration:
+  version: 0.1
+  description: "Fetch paginated and sorted list of service-compatible intents not yet connected to any pending or approved service trigger"
+  method: get
+  namespace: byk
+  returns: json
+  allowlist:
+    query:
+      - field: page
+        type: number
+        description: "Current page number (1-based)"
+      - field: page_size
+        type: number
+        description: "Number of items per page"
+      - field: sorting
+        type: string
+        enum: ['intent asc', 'intent desc']
+        description: "Sorting criteria for the result set"
+      - field: search
+        type: string
+        description: "Optional case-insensitive search string to filter intent names"
+  response:
+    fields:
+      - field: intent
+        type: string
+        description: "Name of the intent not currently connected to any pending or approved trigger"
+      - field: total_pages
+        type: number
+        description: "Total number of pages available for the current filter and page size"
+      - field: created
+        type: timestamp
+        description: "Timestamp of the most recent version of the intent"
+*/
 WITH connected_intents AS (
     SELECT intent,
            service,
