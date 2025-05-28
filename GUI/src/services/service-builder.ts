@@ -341,7 +341,7 @@ export async function saveEndpoints(
     } else {
       tasks.push(
         axios.post(updateEndpoint(endpoint.endpointId), {
-          // todo handle serviceIds here. only update if added to the flow
+          // todo handle serviceIds here. only update if added to the flow AND only if common
           ...endpoint,
           // Stringify needed for Resql to save nested data in a proper parsable format
           definitions: JSON.stringify(endpoint.definitions),
