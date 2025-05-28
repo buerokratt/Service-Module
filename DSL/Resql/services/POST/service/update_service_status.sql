@@ -17,18 +17,15 @@ declaration:
   response:
     fields: []
 */
-INSERT INTO services (name, description, slot, ruuter_type, current_state, service_id, is_common, structure, endpoints)
-SELECT
-  name,
-  description,
-  slot,
-  ruuter_type,
-  :new_state::service_state,
-  service_id,
-  is_common,
-  structure,
-  endpoints
+SELECT copy_row_with_modifications(
+    'services',
+    'id', '', id,
+    ARRAY[
+        'current_state', '::SERVICE_STATE', :new_state,
+        'updated_at', '::TIMESTAMP WITH TIME ZONE', NOW()::VARCHAR
+    ]::VARCHAR[]
+)
 FROM services
 WHERE service_id = :id
-ORDER BY id DESC
+ORDER BY updated_at DESC
 LIMIT 1;

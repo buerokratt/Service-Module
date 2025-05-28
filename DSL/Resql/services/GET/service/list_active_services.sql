@@ -30,4 +30,4 @@ SELECT id,
   ruuter_type AS type
 FROM services
 WHERE current_state = 'active'
-ORDER BY id ASC;
+ORDER BY updated_at ASC;

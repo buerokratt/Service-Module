@@ -46,9 +46,10 @@ declaration:
         description: "Identifier linking this service to its group"
 */
 WITH MaxService AS (
-  SELECT MAX(id) AS maxId
+  SELECT id AS maxId
   FROM services
   WHERE service_id = :id
+  ORDER BY updated_at DESC
   LIMIT 1
 )
 SELECT
@@ -80,4 +81,4 @@ JOIN (
   ) subquery
 ) subquery ON true
 WHERE NOT deleted
-ORDER BY id ASC;
+ORDER BY updated_at ASC;

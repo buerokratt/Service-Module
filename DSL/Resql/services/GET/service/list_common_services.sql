@@ -43,11 +43,6 @@ declaration:
         type: number
         description: "Total number of pages available for the given page size"
 */
-WITH MaxServices AS (
-  SELECT MAX(id) AS maxId
-  FROM services
-  GROUP BY service_id
-)
 SELECT
   name,
   description,
@@ -59,7 +54,7 @@ SELECT
 FROM services
 WHERE NOT deleted AND is_common
 ORDER BY 
-   CASE WHEN :sorting = 'id asc' THEN id END ASC,
+   CASE WHEN :sorting = 'id asc' THEN updated_at END ASC,
    CASE WHEN :sorting = 'name asc' THEN name END ASC,
    CASE WHEN :sorting = 'name desc' THEN name END DESC,
    CASE WHEN :sorting = 'state asc' THEN current_state END ASC,

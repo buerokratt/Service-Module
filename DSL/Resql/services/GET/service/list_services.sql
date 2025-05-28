@@ -41,9 +41,9 @@ declaration:
         description: "Total number of pages available for the given page size"
 */
 WITH MaxServices AS (
-  SELECT MAX(id) AS maxId
+  SELECT DISTINCT ON (service_id) id as maxId
   FROM services
-  GROUP BY service_id
+  ORDER BY service_id, updated_at DESC
 )
 SELECT
   name,
@@ -56,7 +56,7 @@ FROM services
 JOIN MaxServices ON id = maxId
 WHERE NOT deleted AND NOT is_common
 ORDER BY 
-   CASE WHEN :sorting = 'id asc' THEN id END ASC,
+   CASE WHEN :sorting = 'id asc' THEN updated_at END ASC,
    CASE WHEN :sorting = 'name asc' THEN name END ASC,
    CASE WHEN :sorting = 'name desc' THEN name END DESC,
    CASE WHEN :sorting = 'state asc' THEN current_state END ASC,

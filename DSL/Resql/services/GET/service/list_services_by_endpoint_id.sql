@@ -23,10 +23,10 @@ declaration:
         description: "Service identifier"
 */
 WITH latest_services AS (
-    SELECT DISTINCT ON (service_id) id, name, service_id, structure
+    SELECT DISTINCT ON (service_id) name, service_id, structure
     FROM services
     WHERE deleted IS false
-    ORDER BY service_id, id DESC
+    ORDER BY service_id, updated_at DESC
 )
 SELECT name, service_id
 FROM latest_services
