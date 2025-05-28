@@ -19,7 +19,7 @@ declaration:
 WITH MaxServicesSettings AS (
   SELECT DISTINCT ON (name) id as maxId
   FROM services_settings
-  ORDER BY created_at DESC
+  ORDER BY name, created_at DESC
 )
 SELECT name, value
 FROM services_settings
