@@ -16,6 +16,6 @@ SELECT
     active
 FROM latest_steps
 WHERE rn = 1
-ORDER BY 
-    "ordinality" ASC,
-    created_at DESC;
+ORDER by 
+    ordinality ASC,
+    created_at ASC;
