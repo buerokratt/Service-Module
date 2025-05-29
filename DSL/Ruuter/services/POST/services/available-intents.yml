@@ -21,7 +21,7 @@ declaration:
 get_available_intents:
   call: http.get
   args:
-    url: "[#SERVICE_TRAINING_RESQL]/byk/list_available_intents"
+    url: "[#SERVICE_TRAINING_RESQL]/intent_management/list_available_intents"
     query:
       page: ${incoming.body.page}
       page_size: ${incoming.body.page_size}

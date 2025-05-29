@@ -3,7 +3,7 @@ declaration:
   version: 0.1
   description: "Fetch paginated and sorted list of service-compatible intents not yet connected to any pending or approved service trigger"
   method: get
-  namespace: byk
+  namespace: intent_management
   returns: json
   allowlist:
     query:
