@@ -247,6 +247,7 @@
       "clientInput": "Client input",
       "assign": "Assign",
       "condition": "Condition",
+      "multiChoiceQuestion": "Multi-Choice Question",
       "openNewWebpage": "Open new webpage",
       "fileGeneration": "File generation",
       "fileSigning": "File signing",

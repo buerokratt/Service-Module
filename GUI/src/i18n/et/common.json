@@ -247,6 +247,7 @@
       "clientInput": "Kliendi sisend",
       "assign": "Määra",
       "condition": "Tingimus",
+      "multiChoiceQuestion": "Mitmevalikuline küsimus",
       "openNewWebpage": "Uue veebilehe avamine",
       "fileGeneration": "Faili genereerimine",
       "fileSigning": "Faili allkirjastamine",

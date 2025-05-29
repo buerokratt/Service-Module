@@ -366,6 +366,10 @@ export const onDrop = (
         : matchingPlaceholder.id;
     const newPlaceholderId = Math.max(...useServiceStore.getState().nodes.map((node) => +node.id)) + 2;
 
+    const baseY = matchingPlaceholder.position.y + EDGE_LENGTH * 1.5;
+    const baseX = matchingPlaceholder.position.x;
+    const widthOffset = (matchingPlaceholder.width ?? 0) * 0.75;
+
     useServiceStore.getState().setEdges((prevEdges) => {
       // Point edge from previous node to new node
       const newEdges = [...prevEdges];
@@ -416,7 +420,7 @@ export const onDrop = (
         );
       }
 
-      if (StepType.Input === type || StepType.Condition === type) {
+      if (type === StepType.Input || type === StepType.Condition || type === StepType.MultiChoiceQuestion) {
         newEdges.push(
           buildEdge({
             id: `edge-${newNodeId}-${newPlaceholderId + 2}`,
@@ -460,13 +464,15 @@ export const onDrop = (
           stepType: type,
           clientInputId: type === StepType.Input ? parseInt(nodeLabel.split("-")[1].trim()) : undefined,
           conditionId: type === StepType.Condition ? parseInt(nodeLabel.split("-")[1].trim()) : undefined,
+          multiChoiceQuestionId:
+            type === StepType.MultiChoiceQuestion ? parseInt(nodeLabel.split("-")[1].trim()) : undefined,
           assignId: type === StepType.Assign ? parseInt(nodeLabel.split("-")[1].trim()) : undefined,
           readonly: [
             StepType.Auth,
             StepType.FinishingStepEnd,
             StepType.FinishingStepRedirect,
           ].includes(type),
-          childrenCount: type === StepType.Input || type === StepType.Condition ? 2 : 1,
+          childrenCount: type === StepType.Input || type === StepType.Condition || type === StepType.MultiChoiceQuestion ? 2 : 1, // TODO: To be adjusted to match the buttons added in multi-choice question
           setClickedNode: useServiceStore.getState().setClickedNode,
           message: setDefaultMessages(type),
           originalDefinedNodeId: type === StepType.UserDefined ? originalDefinedNodeId : undefined,
@@ -479,7 +485,7 @@ export const onDrop = (
     ];
 
     if (
-      ![StepType.Input, StepType.Condition, StepType.FinishingStepEnd, StepType.FinishingStepRedirect].includes(type)
+      ![StepType.Input, StepType.Condition, StepType.MultiChoiceQuestion, StepType.FinishingStepEnd, StepType.FinishingStepRedirect].includes(type)
     ) {
       // Add placeholder right below new node
       newNodes.push(
@@ -494,28 +500,25 @@ export const onDrop = (
       );
     }
 
-    if (StepType.Input === type || StepType.Condition === type) {
-      newNodes.push(
-        buildPlaceholder({
-          id: `${newPlaceholderId + 1}`,
-          label: "serviceFlow.placeholderNodeSuccess",
-          position: {
-            y: matchingPlaceholder.position.y + EDGE_LENGTH * 1.5,
-            x: matchingPlaceholder.position.x - (matchingPlaceholder.width ?? 0) * 0.75,
-          },
-        })
-      );
+    if ([StepType.MultiChoiceQuestion, StepType.Input, StepType.Condition].includes(type)) {
+      const labels =
+        type === StepType.MultiChoiceQuestion
+          ? ["global.yes", "global.no", 'global.ne'] // TODO: To be adjusted to match the buttons added in the step
+          : ["serviceFlow.placeholderNodeSuccess", "serviceFlow.placeholderNodeFailure"];
 
-      newNodes.push(
-        buildPlaceholder({
-          id: `${newPlaceholderId + 2}`,
-          label: "serviceFlow.placeholderNodeFailure",
-          position: {
-            y: matchingPlaceholder.position.y + EDGE_LENGTH * 1.5,
-            x: matchingPlaceholder.position.x + (matchingPlaceholder.width ?? 0) * 0.75,
-          },
-        })
-      );
+      const middleIndex = Math.floor(labels.length / 2);
+      const spacing = widthOffset * 1.5;
+
+      labels.forEach((label, index) => {
+        const offset = (index - middleIndex + (labels.length % 2 === 0 ? 0.5 : 0)) * spacing;
+        newNodes.push(
+          buildPlaceholder({
+            id: `${newPlaceholderId + (index + 1)}`,
+            label: label,
+            position: { y: baseY, x: baseX + offset },
+          })
+        );
+      });
     }
 
     return newNodes;
@@ -604,6 +607,8 @@ function getNodeLabel(type: StepType, nodes: Node[], label: string) {
       return `${label} - ${(lastNode?.clientInputId ?? 0) + 1}`;
     case StepType.Condition:
       return `${label} - ${(lastNode?.conditionId ?? 0) + 1}`;
+    case StepType.MultiChoiceQuestion:
+      return `${label} - ${(lastNode?.multiChoiceQuestionId ?? 0) + 1}`;
     case StepType.Assign:
       return `${label} - ${(lastNode?.assignId ?? 0) + 1}`;
     default:

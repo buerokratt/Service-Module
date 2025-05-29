@@ -9,7 +9,6 @@ import useServiceStore from "store/new-services.store";
 import useToastStore from "store/toasts.store";
 import { RawData, Step, StepType } from "types";
 import { EndpointData, EndpointEnv, EndpointType, EndpointVariableData } from "types/endpoint";
-import { v4 } from "uuid";
 
 // refactor this file later
 
@@ -528,6 +527,7 @@ export const saveFlow = async ({
           break;
         case StepType.Input:
         case StepType.Condition:
+        case StepType.MultiChoiceQuestion:  
           if (followingNode?.type === "placeholder" && !allRelations.includes(node.id)) {
             allRelations.push(node.id);
             return;
@@ -599,6 +599,8 @@ export const saveFlow = async ({
         if (parentNode.data.stepType === StepType.Input) {
           return handleInputStep(parentNode, finishedFlow, parentStepName, steps, updatedEdges, nodes, parentNodeId);
         }
+
+        //TODO: Handle Saving Multi Choice Question Step
 
         const nextStep = childNode ? `${childNode.data.stepType}-${childNodeId}` : undefined;
         const template = getTemplate(steps, parentNode, parentStepName, nextStep);
