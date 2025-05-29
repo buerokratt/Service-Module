@@ -76,6 +76,12 @@ const ServicesTable: FC<ServicesTableProps> = ({ isCommon = false }) => {
           setIsReadyStatusChecking(true);
           setIsReadyPopupVisible(true);
         },
+        showIntentConnectionModal: () => {
+          setIsIntentConnectionPopupVisible(true);
+        },
+        editService: () => {
+          changeServiceState(false, true);
+        },
       }),
     []
   );
@@ -195,7 +201,7 @@ const ServicesTable: FC<ServicesTableProps> = ({ isCommon = false }) => {
               <Button appearance="secondary" onClick={() => setIsReadyPopupVisible(false)}>
                 {t("overview.cancel")}
               </Button>
-              {readyPopupText != t("overview.popup.connectionPending").toString() && (
+              {readyPopupText != t("overview.popup.connectionPending").toString() && readyPopupText != t("overview.popup.setActive").toString() && (
                 <Button onClick={() => changeServiceState()}>{t("overview.popup.setToDraft")}</Button>
               )}
               {getActiveAndConnectionButton()}

@@ -6,6 +6,7 @@ import useServiceStore from "store/services.store";
 import { Button, DataTable, Dialog, FormInput, Icon, Modal, Track } from "components";
 import { Intent } from "types/Intent";
 import i18n from "i18n";
+import { Link } from "react-router-dom";
 
 type ConnectServiceToIntentModelProps = {
   onModalClose: () => void;
@@ -62,7 +63,7 @@ const ConnectServiceToIntentModel: FC<ConnectServiceToIntentModelProps> = ({ onM
         }}
       >
         <FormInput
-          label={t("overview.popup.searchIntents")}
+          label={t("overview.popup.searchIntents").toString()}
           name="search"
           placeholder={t("overview.popup.searchIntents") + "..."}
           hideLabel
@@ -83,7 +84,6 @@ const ConnectServiceToIntentModel: FC<ConnectServiceToIntentModelProps> = ({ onM
         <DataTable
           data={intents}
           columns={intentColumns}
-          filterable
           sortable
           sorting={sorting}
           pagination={pagination}
@@ -100,6 +100,21 @@ const ConnectServiceToIntentModel: FC<ConnectServiceToIntentModelProps> = ({ onM
           pagesCount={intents[intents.length - 1]?.totalPages ?? 1}
         />
       )}
+      <Track
+        justify="between"
+        style={{
+          margin: "10px -16px 0 -16px",
+          padding: "16px 25px 0 25px",
+          borderTop: "1px solid #D2D3D8",
+        }}
+      >
+        <Link style={{ color: "#005aa3" }} to={import.meta.env.REACT_APP_INTENT_CREATION_PATH}>
+          {`+ ${t("overview.popup.createNewIntent")}`}
+        </Link>
+        <Button appearance="error" onClick={onModalClose}>
+          {t("global.cancel")}
+        </Button>
+      </Track>
       {showConfirmationModal && (
         <Modal title={t("overview.popup.connectionQuestion")} onClose={() => setShowConfirmationModal(false)}>
           <Track justify="end" gap={16}>
