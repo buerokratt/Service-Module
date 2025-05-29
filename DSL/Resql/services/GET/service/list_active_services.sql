@@ -24,10 +24,11 @@ declaration:
         enum: ['GET', 'POST']
         description: "Ruuter type associated with the service"
 */
-SELECT id,
-  name,
-  current_state AS state,
-  ruuter_type AS type
+SELECT
+    id,
+    name,
+    current_state AS state,
+    ruuter_type AS type
 FROM services
 WHERE current_state = 'active'
 ORDER BY updated_at ASC;

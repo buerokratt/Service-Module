@@ -29,4 +29,6 @@ declaration:
     fields: []
 */
 INSERT INTO service_trigger (intent, service, status, author_role, service_name)
-VALUES (:intent, :serviceId, :status::trigger_status, :authorRole::author_role, :serviceName)
+VALUES (
+    :intent, :serviceId, :status::TRIGGER_STATUS, :authorRole::AUTHOR_ROLE, :serviceName
+)

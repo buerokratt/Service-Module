@@ -22,16 +22,23 @@ declaration:
         type: string
         description: "Service identifier"
 */
-WITH latest_services AS (
-    SELECT DISTINCT ON (service_id) name, service_id, structure
-    FROM services
-    WHERE deleted IS false
-    ORDER BY service_id, updated_at DESC
-)
-SELECT name, service_id
+WITH
+    latest_services AS (
+        SELECT DISTINCT ON (service_id)
+            name,
+            service_id,
+            structure
+        FROM services
+        WHERE deleted IS false
+        ORDER BY service_id ASC, updated_at DESC
+    )
+
+SELECT
+    name,
+    service_id
 FROM latest_services
-WHERE jsonb_path_exists(
-        structure::jsonb,
-        ('$.**.originalDefinedNodeId ? (@ == "' || :endpoint_id || '")')::jsonpath
-      )
-  AND (:excluded_service_id::text IS NULL OR service_id != :excluded_service_id);
+WHERE JSONB_PATH_EXISTS(
+    structure::JSONB,
+    ('$.**.originalDefinedNodeId ? (@ == "' || :endpoint_id || '")')::JSONPATH
+)
+AND (:excluded_service_id::TEXT IS null OR service_id != :excluded_service_id);

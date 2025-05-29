@@ -26,17 +26,18 @@ declaration:
   response:
     fields: []
 */
-SELECT copy_row_with_modifications(
-    'services',
-    'id', '', id,
-    ARRAY[
-        'name', '', :name,
-        'description', '', :description,
-        'slot', '', :slot,
-        'structure', '::JSON', :structure,
-        'updated_at', '::TIMESTAMP WITH TIME ZONE', NOW()::VARCHAR
-    ]::VARCHAR[]
-)
+SELECT
+    COPY_ROW_WITH_MODIFICATIONS(
+        'services',
+        'id', '', id,
+        ARRAY[
+            'name', '', :name,
+            'description', '', :description,
+            'slot', '', :slot,
+            'structure', '::JSON', :structure,
+            'updated_at', '::TIMESTAMP WITH TIME ZONE', NOW()::VARCHAR
+        ]::VARCHAR []
+    )
 FROM services
 WHERE service_id = :id
 ORDER BY updated_at DESC

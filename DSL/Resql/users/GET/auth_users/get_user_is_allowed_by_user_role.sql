@@ -21,21 +21,22 @@ declaration:
 */
 SELECT COALESCE(
     (
-      SELECT array_agg(UPPER(authorities))::text [] AS "user_roles"
-      FROM (
-          SELECT unnest(authority_name) AS authorities
-          FROM public.user_authority
-          WHERE user_id = :userId::text
-          ORDER BY authorities ASC
+        SELECT ARRAY_AGG(UPPER(authorities))::TEXT [] AS user_roles
+        FROM (
+            SELECT UNNEST(authority_name) AS authorities
+            FROM public.user_authority
+            WHERE user_id = :userId::TEXT
+            ORDER BY authorities ASC
         ) AS _
     ) && (
-      SELECT (
-          SELECT array_agg(UPPER(allowedRole))::text [] AS "roles"
-          FROM(
-              SELECT unnest(string_to_array(:allowedRoles, ',')::text []) AS allowedRole
-              ORDER BY allowedRole ASC
-            ) as __
+        SELECT(
+            SELECT ARRAY_AGG(UPPER(allowed_role))::TEXT [] AS roles
+            FROM (
+                SELECT
+                    UNNEST(STRING_TO_ARRAY(:allowedRoles, ',')::TEXT []) AS allowed_role
+                ORDER BY allowed_role ASC
+            ) AS __
         )
     ),
     FALSE
-  ) AS "is_allowed";
+) AS is_allowed;

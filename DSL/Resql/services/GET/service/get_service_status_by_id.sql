@@ -20,7 +20,10 @@ declaration:
         enum: ['GET', 'POST']
         description: "Ruuter type associated with the most recent service version"
 */
-SELECT current_state, ruuter_type FROM services
+SELECT
+    current_state,
+    ruuter_type
+FROM services
 WHERE service_id = :id
 ORDER BY updated_at DESC
 LIMIT 1;

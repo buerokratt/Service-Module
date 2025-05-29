@@ -16,11 +16,15 @@ declaration:
         type: string
         description: "Most recent value associated with the setting name"
 */
-WITH MaxServicesSettings AS (
-  SELECT DISTINCT ON (name) id as maxId
-  FROM services_settings
-  ORDER BY name, created_at DESC
-)
-SELECT name, value
+WITH
+    max_services_settings AS (
+        SELECT DISTINCT ON (name) id AS max_id
+        FROM services_settings
+        ORDER BY name ASC, created_at DESC
+    )
+
+SELECT
+    name,
+    value
 FROM services_settings
-JOIN MaxServicesSettings ON id = maxId;
+    INNER JOIN max_services_settings ON id = max_id;
