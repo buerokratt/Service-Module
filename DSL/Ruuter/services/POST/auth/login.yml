@@ -34,27 +34,12 @@ login_user:
     query:
       login: ${login}
       password: ${password}
-  result: login_results
+  result: results
   next: check_login_result  
 
 check_login_result:
   switch:
-    - condition: ${login_results.response.body.length != 0}
-      next: get_user_with_roles
-  next: return_user_not_found
-
-get_user_with_roles:
-  call: http.get
-  args:
-    url: "[#SERVICE_USERS_RESQL]/auth_users/get_user_with_roles"
-    query:
-      login: ${login_results.response.body[0].id_code}
-  result: results
-  next: check_authority_roles
-
-check_authority_roles:
-  switch:
-    - condition: ${login_results.response.body[0].authorities.length != 0}
+    - condition: ${results.response.body.length != 0}
       next: get_session_length
   next: return_user_not_found
 

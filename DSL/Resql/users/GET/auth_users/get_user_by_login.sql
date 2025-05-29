@@ -37,14 +37,21 @@ declaration:
           enum: ['ROLE_ADMINISTRATOR', 'ROLE_SERVICE_MANAGER', 'ROLE_CUSTOMER_SUPPORT_AGENT', 'ROLE_CHATBOT_TRAINER', 'ROLE_ANALYST', 'ROLE_UNAUTHENTICATED']
         description: "List of authority roles assigned to the user"
 */
-SELECT id_code
-FROM "user"
-WHERE login = :login
+SELECT
+    login,
+    first_name,
+    last_name,
+    id_code,
+    display_name,
+    authority_name AS authorities
+FROM denormalized_user_data
+WHERE
+    login = :login
     AND password_hash = :password
-    AND id IN (
-        SELECT DISTINCT ON (id_code) id
-        FROM "user"
-        ORDER BY id_code, created DESC
+    AND array_length(authority_name, 1) > 0
+    AND created = (
+        SELECT max(created)
+        FROM denormalized_user_data d2
+        WHERE d2.user_id = d1.user_id
     )
-    AND status != 'deleted'
 LIMIT 1;
