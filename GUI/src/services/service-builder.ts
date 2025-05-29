@@ -4,11 +4,19 @@ import { Group, Rule } from "components/FlowElementsPopup/RuleBuilder/types";
 import i18next from "i18next";
 import { NodeHtmlMarkdown } from "node-html-markdown";
 import { Edge, Node } from "reactflow";
-import { createNewService, editService, jsonToYml, testService, updateServiceEndpoints } from "resources/api-constants";
+import {
+  createEndpoint,
+  createNewService,
+  editService,
+  jsonToYml,
+  testService,
+  updateEndpoint,
+} from "resources/api-constants";
 import useServiceStore from "store/new-services.store";
 import useToastStore from "store/toasts.store";
 import { RawData, Step, StepType } from "types";
-import { EndpointData, EndpointEnv, EndpointType, EndpointVariableData } from "types/endpoint";
+import { EndpointData, EndpointEnv, EndpointDefinition, EndpointVariableData } from "types/endpoint";
+import { v4 } from "uuid";
 
 // refactor this file later
 
@@ -88,7 +96,7 @@ const getNestedRawData = (data: { [key: string]: any }, key: string, path: strin
 
 // Since we currently cannot mark variables as sensitive from GUI, we set all as sensitive
 const saveEndpointInfo = async (
-  selectedEndpoint: EndpointType,
+  selectedEndpoint: EndpointDefinition,
   env: EndpointEnv,
   endpointName: string,
   endpoint: EndpointData
@@ -133,7 +141,7 @@ const saveEndpointInfo = async (
 };
 
 const saveEndpointConfig = async (
-  endpoint: EndpointType,
+  endpoint: EndpointDefinition,
   env: EndpointEnv,
   endpointName: string,
   data: EndpointData
@@ -203,7 +211,7 @@ const saveEndpointConfig = async (
 };
 
 const rawDataIfVariablesMissing = (
-  endpoint: EndpointType,
+  endpoint: EndpointDefinition,
   key: "headers" | "body" | "params",
   env: EndpointEnv,
   data: { [key: string]: string }
@@ -211,6 +219,7 @@ const rawDataIfVariablesMissing = (
   if (Object.keys(data).length > 0) return data;
   const rawData =
     endpoint[key]?.rawData[env === EndpointEnv.Live ? "value" : "testValue"] ?? endpoint[key]?.rawData.value ?? "";
+  if (rawData === "") return "";
   try {
     assignNestedRawVariables(JSON.parse(rawData), key, "", data);
     return data;
@@ -287,17 +296,15 @@ const assignEndpointVariables = (
 export async function saveEndpoints(
   endpoints: EndpointData[],
   name: string,
-  id: string,
-  onSuccess?: (e: any) => void,
+  serviceId: string,
+  onSuccess?: () => void,
   onError?: (e: any) => void
 ) {
   const tasks: Promise<any>[] = [];
-  const serviceEndpoints = endpoints.filter((e) => e.serviceId === id || !e.hasOwnProperty("serviceId")).map((x) => x);
+  const nodes = useServiceStore.getState().nodes;
 
-  for (const endpoint of serviceEndpoints) {
-    if (!endpoint) continue;
-    endpoint.serviceId = id;
-    const selectedEndpointType = endpoint.definedEndpoints.find((e) => e.isSelected);
+  for (const endpoint of endpoints) {
+    const selectedEndpointType = endpoint.definitions.find((e) => e.isSelected);
     if (!selectedEndpointType) continue;
 
     const endpointName = `${name.replaceAll(" ", "_")}-${getEndpointName(endpoint)}`;
@@ -308,6 +315,16 @@ export async function saveEndpoints(
     const steps = buildSteps(endpointName, endpoint, selectedEndpointType);
     const result = Object.fromEntries(steps.entries());
 
+    if (
+      // Always save a single serviceId for common endpoints
+      !endpoint.isCommon ||
+      // For non-common endpoints, only save service IDs if endpoint is added to the flow
+      // This way we can track which common endpoints are unused and can be safely deleted
+      nodes.some((node) => node.type === "customNode" && node.data.originalDefinedNodeId === endpoint.endpointId)
+    ) {
+      endpoint.serviceId = serviceId;
+    }
+    endpoint.isCommon = endpoint.isCommon ?? false;
     const isCommonPath = endpoint.isCommon ? "common/" : "";
 
     tasks.push(
@@ -327,16 +344,36 @@ export async function saveEndpoints(
     );
   }
 
-  tasks.push(
-    axios.post(updateServiceEndpoints(id), {
-      endpoints: JSON.stringify(serviceEndpoints),
-    })
-  );
+  endpoints.forEach((endpoint) => {
+    if (endpoint.isNew) {
+      tasks.push(createEndpointAndUpdateState(endpoint));
+    } else {
+      tasks.push(
+        axios.post(updateEndpoint(endpoint.endpointId), {
+          ...endpoint,
+          // Stringify needed for Resql to save nested data in a proper parsable format
+          definitions: JSON.stringify(endpoint.definitions),
+        })
+      );
+    }
+  });
 
   await Promise.all(tasks).then(onSuccess).catch(onError);
 }
 
-const buildSteps = (endpointName: string, endpoint: EndpointData, selectedEndpointType: EndpointType) => {
+async function createEndpointAndUpdateState(endpoint: EndpointData): Promise<any> {
+  const response = await axios.post(createEndpoint(), {
+    ...endpoint,
+    // Stringify needed for Resql to save nested data in a proper parsable format
+    definitions: JSON.stringify(endpoint.definitions),
+  });
+  useServiceStore
+    .getState()
+    .setEndpoints((prev) => prev.map((ep) => (ep.endpointId === endpoint.endpointId ? { ...ep, isNew: false } : ep)));
+  return response;
+}
+
+const buildSteps = (endpointName: string, endpoint: EndpointData, selectedEndpointType: EndpointDefinition) => {
   const steps = new Map();
   steps.set("extract_request_data", {
     assign: {
@@ -598,15 +635,10 @@ export const saveFlow = async ({
           return handleInputStep(parentNode, finishedFlow, parentStepName, steps, updatedEdges, nodes, parentNodeId);
         }
 
-        return finishedFlow.set(
-          parentStepName,
-          getTemplate(
-            steps,
-            parentNode,
-            parentStepName,
-            childNode ? `${childNode.data.stepType}-${childNodeId}` : undefined
-          )
-        );
+        const nextStep = childNode ? `${childNode.data.stepType}-${childNodeId}` : undefined;
+        const template = getTemplate(steps, parentNode, parentStepName, nextStep);
+
+        finishedFlow.set(parentStepName, template);
       });
     } catch (e: any) {
       useToastStore.getState().error({
@@ -626,8 +658,8 @@ export const saveFlow = async ({
         body: {
           data: {
             botMessages: "${[res]}",
-            chatId: "${chatId} ?? ''",
-            authorId: "${authorId} ?? ''",
+            chatId: "${chatId ?? ''}",
+            authorId: "${authorId ?? ''}",
             authorFirstName: "",
             authorLastName: "",
             authorTimestamp: "${new Date().toISOString()}",
@@ -736,15 +768,22 @@ function handleConditionStep(
   });
 }
 
-function handleAssignStep(parentNode: Node, finishedFlow: Map<any, any>, parentStepName: string, childNode: Node | undefined, childNodeId: any) {
+function handleAssignStep(
+  parentNode: Node,
+  finishedFlow: Map<any, any>,
+  parentStepName: string,
+  childNode: Node | undefined,
+  childNodeId: any
+) {
   const invalidElementsExist = hasInvalidElements(parentNode.data.assignElements ?? []);
-  const isInvalid = parentNode.data?.assignElements === undefined ||
+  const isInvalid =
+    parentNode.data?.assignElements === undefined ||
     invalidElementsExist ||
     parentNode.data?.assignElements.length === 0;
 
-    if (isInvalid) {
-      throw new Error(i18next.t("toast.missing-assign-elements") ?? "Error");
-    }
+  if (isInvalid) {
+    throw new Error(i18next.t("toast.missing-assign-elements") ?? "Error");
+  }
 
   finishedFlow.set(parentStepName, {
     assign: parentNode.data.assignElements.reduce((acc: any, e: any) => {
@@ -1001,7 +1040,7 @@ const getTemplateDataFromNode = (node: Node): { templateName: string; body?: any
 const getDefinedEndpointStep = (steps: Step[], node: Node) => {
   const name = useServiceStore.getState().name;
   const endpoint = steps.find((e) => e.label === node.data.label)?.data;
-  const selectedEndpoint = endpoint?.definedEndpoints.find((e) => e.isSelected);
+  const selectedEndpoint = endpoint?.definitions.find((e) => e.isSelected);
   if (!selectedEndpoint || !endpoint) {
     return {
       return: "",
@@ -1039,7 +1078,7 @@ const getDefinedEndpointStep = (steps: Step[], node: Node) => {
 };
 
 const getEndpointName = (endpoint: EndpointData) => {
-  return `${(endpoint.name.trim().length ?? 0) > 0 ? endpoint?.name.replaceAll(" ", "_") : endpoint?.id}`;
+  return `${(endpoint.name.trim().length ?? 0) > 0 ? endpoint?.name.replaceAll(" ", "_") : endpoint?.endpointId}`;
 };
 
 export const saveDraft = async () => {
@@ -1076,7 +1115,7 @@ export const saveDraft = async () => {
   return true;
 };
 
-export const saveFlowClick = async ({ supressToast = false }: { supressToast?: boolean } = {}) => {
+export const saveFlowClick = async () => {
   const name = useServiceStore.getState().serviceNameDashed();
   const serviceId = useServiceStore.getState().serviceId;
   const description = useServiceStore.getState().description;
@@ -1093,21 +1132,17 @@ export const saveFlowClick = async ({ supressToast = false }: { supressToast?: b
     edges,
     nodes,
     onSuccess: () => {
-      if (!supressToast) {
-        useToastStore.getState().success({
-          title: i18next.t("newService.toast.success"),
-          message: i18next.t("newService.toast.savedSuccessfully"),
-        });
-      }
+      useToastStore.getState().success({
+        title: i18next.t("newService.toast.success"),
+        message: i18next.t("newService.toast.savedSuccessfully"),
+      });
       useServiceStore.getState().enableTestButton();
     },
     onError: (e) => {
-      if (!supressToast) {
-        useToastStore.getState().error({
-          title: i18next.t("toast.cannot-save-flow"),
-          message: e?.message,
-        });
-      }
+      useToastStore.getState().error({
+        title: i18next.t("toast.cannot-save-flow"),
+        message: e?.message,
+      });
     },
     description,
     slot,

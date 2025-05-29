@@ -23,7 +23,7 @@ import FileSignContent from "./FileSignContent";
 import "./styles.scss";
 import ConditionContent from "./ConditionContent";
 import AssignContent from "./AssignContent";
-import { templateToString } from "utils/string-util";
+import { isTemplate, stringToTemplate, templateToString } from "utils/string-util";
 import { getValueByPath } from "utils/object-util";
 import ApiContent from "./ApiContent";
 import { saveEndpoints } from "services/service-builder";
@@ -121,7 +121,12 @@ const FlowElementsPopup: React.FC = () => {
     if (stepType === StepType.Assign) {
       const flatEndpointVariables = endpointsVariables.map((endpoint) => endpoint.chips).flat();
       assignElements.forEach((element) => {
-        // Values are saved as templates for backwards compatibility
+        // Convert simple values such as "some input" to simple string
+        if (!isTemplate(element.value)) {
+          element.value = stringToTemplate('"' + element.value + '"');
+          return;
+        }
+
         const fullPath = templateToString(element.value);
         const endpointVariable = flatEndpointVariables.find((variable) => fullPath.startsWith(String(variable.value)));
 
@@ -159,7 +164,7 @@ const FlowElementsPopup: React.FC = () => {
 
     try {
       const finder = (e: any) => e.name === node.data.label || node.data.label.includes(e.name);
-      const endpoint = endpoints.find(finder)?.definedEndpoints[0];
+      const endpoint = endpoints.find(finder)?.definitions[0];
 
       if (!endpoint) return;
 
@@ -316,7 +321,7 @@ const FlowElementsPopup: React.FC = () => {
               {stepType === StepType.Textfield && (
                 <TextfieldTestContent
                   placeholders={textfieldMessagePlaceholders}
-                  message={textfieldMessage || node.data.message}
+                  message={textfieldMessage ?? node.data.message}
                 />
               )}
               {stepType === StepType.OpenWebpage && (

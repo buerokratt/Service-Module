@@ -8,6 +8,7 @@ import "./ApiEndpointCard.scss";
 import { RequestTab } from "../../types";
 import { EndpointData, EndpointEnv, EndpointTab } from "../../types/endpoint";
 import useServiceStore from "store/new-services.store";
+import { EndpointType } from "types/endpoint/endpoint-type";
 
 type EndpointCardProps = {
   endpoint: EndpointData;
@@ -16,19 +17,19 @@ type EndpointCardProps = {
 };
 
 const ApiEndpointCard: FC<EndpointCardProps> = ({ endpoint, isDeletable = true, isNameDisabled = false }) => {
-  const { 
-    onNameChange, 
-    deleteEndpoint, 
-    changeServiceEndpointType, 
-    getAvailableRequestValues, 
+  const {
+    onNameChange,
+    deleteEndpoint,
+    changeServiceEndpointType,
+    getAvailableRequestValues,
     setIsCommonEndpoint,
     isCommonEndpoint,
   } = useServiceStore();
   const [selectedTab, setSelectedTab] = useState<EndpointEnv>(EndpointEnv.Live);
   const [endpointName, setEndpointName] = useState<string>(endpoint.name);
   const [testEnvExists, setTestEnvExists] = useState<boolean>(false);
-  const options = [
-    { label: "Open API", value: "openAPI", name: "da" },
+  const options: { label: string; value: EndpointType; name: string }[] = [
+    { label: "Open API", value: "openApi", name: "da" },
     { label: "Custom endpoint", value: "custom", name: "da" },
   ];
   const [option, setOption] = useState<Option | null>(options.find((o) => o.value === endpoint.type) ?? null);
@@ -41,7 +42,7 @@ const ApiEndpointCard: FC<EndpointCardProps> = ({ endpoint, isDeletable = true, 
     if (endpoint.hasTestEnv) setTestEnvExists(true);
   }, [endpoint.hasTestEnv]);
 
-  const requestValues = useMemo(() => getAvailableRequestValues(endpoint.id),[]);
+  const requestValues = useMemo(() => getAvailableRequestValues(endpoint.endpointId), []);
 
   return (
     <Tabs.Root
@@ -61,11 +62,12 @@ const ApiEndpointCard: FC<EndpointCardProps> = ({ endpoint, isDeletable = true, 
             {t(testEnvExists ? "newService.endpoint.testEnv" : "newService.endpoint.addTestEnv")}
           </Tabs.Trigger>
         </Tabs.List>
-        { isDeletable &&<Button appearance="text" onClick={() => deleteEndpoint(endpoint.id)} style={{ color: "#9799A4" }}>
-          <Icon icon={<MdDeleteOutline />} size="medium" />
-          {t("overview.delete")}
-        </Button>
-      }
+        {isDeletable && (
+          <Button appearance="text" onClick={() => deleteEndpoint(endpoint.endpointId)} style={{ color: "#9799A4" }}>
+            <Icon icon={<MdDeleteOutline />} size="medium" />
+            {t("overview.delete")}
+          </Button>
+        )}
       </Track>
       {[EndpointEnv.Live, EndpointEnv.Test].map((env) => {
         return (
@@ -80,7 +82,7 @@ const ApiEndpointCard: FC<EndpointCardProps> = ({ endpoint, isDeletable = true, 
                   disabled={selectedTab === EndpointEnv.Test}
                   onSelectionChange={(selection) => {
                     setOption(selection);
-                    changeServiceEndpointType(endpoint.id, selection?.value ?? '');
+                    changeServiceEndpointType(endpoint.endpointId, (selection?.value ?? "custom") as EndpointType);
                   }}
                   defaultValue={option?.value}
                 />
@@ -94,7 +96,7 @@ const ApiEndpointCard: FC<EndpointCardProps> = ({ endpoint, isDeletable = true, 
                     value={endpointName}
                     disabled={isNameDisabled || selectedTab === EndpointEnv.Test}
                     onChange={(e) => {
-                      onNameChange(endpoint.id, endpointName, e.target.value);
+                      onNameChange(endpoint.endpointId, endpointName, e.target.value);
                       setEndpointName(e.target.value);
                     }}
                   />
@@ -120,15 +122,15 @@ const ApiEndpointCard: FC<EndpointCardProps> = ({ endpoint, isDeletable = true, 
               )}
               {option?.value && (
                 <Track gap={16}>
-                  <label htmlFor="isCommon">{t("global.common")}</label>
+                  <label htmlFor="isCommon">{t("newService.endpoint.publicEndpoint")}</label>
                   <Switch
                     name="isCommon"
                     label=""
                     onLabel={t("global.yes").toString()}
                     offLabel={t("global.no").toString()}
-                    value={isCommonEndpoint(endpoint.id)}
-                    checked={isCommonEndpoint(endpoint.id)}
-                    onCheckedChange={value => setIsCommonEndpoint(endpoint.id, value)}
+                    value={isCommonEndpoint(endpoint.endpointId)}
+                    checked={isCommonEndpoint(endpoint.endpointId)}
+                    onCheckedChange={(value) => setIsCommonEndpoint(endpoint.endpointId, value)}
                   />
                 </Track>
               )}

@@ -3,8 +3,9 @@ import { FormInput, OutputElementBox, Tooltip } from "components";
 import styles from "./DragInput.module.scss";
 import { Assign } from "types";
 import { t } from "i18next";
+import { getDragData } from "utils/component-util";
 import { getTypeColor, isArray } from "utils/object-util";
-import { stringToTemplate, templateToString } from "utils/string-util";
+import { isTemplate, stringToTemplate, templateToString } from "utils/string-util";
 
 const ARRAY_INDEX_PATTERN = /\[\d+\]$/;
 
@@ -17,21 +18,16 @@ const getArrayIndex = (value: string): number => {
 const updateArrayIndex = (value: string, index?: number): string => {
   let base = templateToString(value);
   base = base.replace(ARRAY_INDEX_PATTERN, "");
-  return stringToTemplate(index ? `${base}[${index}]` : base);
-};
-
-const getDragData = (e: React.DragEvent<HTMLInputElement>) => {
-  e.preventDefault();
-  return JSON.parse(e.dataTransfer.getData("text/plain")) as Assign;
+  return stringToTemplate(index !== undefined ? `${base}[${index}]` : base);
 };
 
 interface DragInputProps {
   element: Assign | undefined;
-  disallowedId: string;
+  id: string;
   onChange: (data: Assign) => void;
 }
 
-const DragInput = ({ onChange, element, disallowedId }: DragInputProps): ReactNode => {
+const DragInput = ({ onChange, element, id }: DragInputProps): ReactNode => {
   const [all, setAll] = useState(false);
   const [arrayIndex, setArrayIndex] = useState(0);
   const [text, setText] = useState(element?.key ?? "");
@@ -54,7 +50,7 @@ const DragInput = ({ onChange, element, disallowedId }: DragInputProps): ReactNo
 
   if (element) {
     return (
-      <Tooltip content={templateToString(element.value)}>
+      <Tooltip content={isTemplate(element.value) ? templateToString(element.value) : element.value}>
         <OutputElementBox borderColor={getTypeColor(element?.data).color} className={styles.element}>
           {isArray(element.data) ? (
             <div className={styles.array}>
@@ -78,9 +74,9 @@ const DragInput = ({ onChange, element, disallowedId }: DragInputProps): ReactNo
               ) : (
                 <></>
               )}
-              <span className={styles.arrayAll}>
+              <div className={styles.arrayAll}>
                 <input
-                  id="all"
+                  id={`${id}-all`}
                   type="checkbox"
                   checked={all}
                   onChange={(e) => {
@@ -88,8 +84,8 @@ const DragInput = ({ onChange, element, disallowedId }: DragInputProps): ReactNo
                     onChange({ ...element, value: updateArrayIndex(element.value) });
                   }}
                 />
-                <label htmlFor="all">{t("serviceFlow.popup.all")}</label>
-              </span>
+                <label htmlFor={`${id}-all`}>{t("serviceFlow.popup.all")}</label>
+              </div>
             </div>
           ) : (
             text
@@ -109,21 +105,26 @@ const DragInput = ({ onChange, element, disallowedId }: DragInputProps): ReactNo
       onDrop={(e) => {
         const data = getDragData(e);
 
-        if (disallowedId === data.id) {
-          resetPlaceholder();
+        if (id === data.id) {
+          inputRef.current?.classList.add(styles.dragHoverDisabled);
+          setPlaceholder(t("serviceFlow.popup.assignToSelfNotAllowed"));
+          setTimeout(() => {
+            resetPlaceholder();
+          }, 800);
           return;
         }
-        onChange({ ...data, value: updateArrayIndex(data.value, arrayIndex) });
+        onChange({ ...data, value: isArray(data.data) ? updateArrayIndex(data.value, 0) : data.value });
+
         setText(data.key);
       }}
       // Disable focus, text cursor and everything related to keyboard input
       tabIndex={-1}
       onFocus={(e) => e.target.blur()}
+      // Have to use onDragOver since onDragEnter is broken in Firefox
       onDragOver={(e) => {
-        const data = getDragData(e);
-
-        inputRef.current?.classList.add(disallowedId === data.id ? styles.dragHoverDisabled : styles.dragHover);
-        if (disallowedId === data.id) setPlaceholder(t("serviceFlow.popup.assignToSelfNotAllowed"));
+        // Prevents text cursor from appearing inside input
+        e.preventDefault();
+        inputRef.current?.classList.add(styles.dragHover);
       }}
       onDragLeave={resetPlaceholder}
     />

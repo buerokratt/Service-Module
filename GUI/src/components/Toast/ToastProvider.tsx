@@ -4,6 +4,7 @@ import * as RadixToast from '@radix-ui/react-toast'
 
 import Toast from './index'
 import useToastStore from 'store/toasts.store'
+import {POPUP_DURATION} from "../../constants/consts";
 
 export const ToastProvider: FC<PropsWithChildren> = ({ children }) => {
   const { t } = useTranslation();
@@ -13,7 +14,7 @@ export const ToastProvider: FC<PropsWithChildren> = ({ children }) => {
     <RadixToast.Provider
       swipeDirection="right"
       label={t('global.notification') ?? 'Notification'}
-      duration={2000}
+      duration={POPUP_DURATION * 1000}
     >
       {children}
       {toasts.map((toast) => <Toast key={toast.id} toast={toast} />)}
