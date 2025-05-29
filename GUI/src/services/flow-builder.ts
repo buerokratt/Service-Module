@@ -503,7 +503,7 @@ export const onDrop = (
     if ([StepType.MultiChoiceQuestion, StepType.Input, StepType.Condition].includes(type)) {
       const labels =
         type === StepType.MultiChoiceQuestion
-          ? ["global.yes", "global.no", 'global.ne'] // TODO: To be adjusted to match the buttons added in the step
+          ? ["global.yes", "global.no"] // TODO: To be adjusted to match the buttons added in the step
           : ["serviceFlow.placeholderNodeSuccess", "serviceFlow.placeholderNodeFailure"];
 
       const middleIndex = Math.floor(labels.length / 2);
