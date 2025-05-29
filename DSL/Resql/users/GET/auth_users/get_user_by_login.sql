@@ -44,7 +44,7 @@ SELECT
     id_code,
     display_name,
     authority_name AS authorities
-FROM denormalized_user_data
+FROM denormalized_user_data d1
 WHERE
     login = :login
     AND password_hash = :password
