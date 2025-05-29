@@ -1,0 +1,3 @@
+timestamp,level,statuscode,content,serviceid,elements,environment
+'2025-05-29 13:23:34.345332 +00:00'::TIMESTAMP WITH TIME ZONE,info,0,"''",fc8e27f2-bcf5-4970-881d-4430acadd307,,TEST
+'2025-05-29 13:23:34.345332 +00:00'::TIMESTAMP WITH TIME ZONE,info,0,"''",1fe01073-21c8-41ab-af75-47dc91105e9f,,TEST
