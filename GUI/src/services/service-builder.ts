@@ -301,9 +301,9 @@ export async function saveEndpoints(
   onError?: (e: any) => void
 ) {
   const tasks: Promise<any>[] = [];
+  const nodes = useServiceStore.getState().nodes;
 
   for (const endpoint of endpoints) {
-    endpoint.serviceId = serviceId;
     const selectedEndpointType = endpoint.definitions.find((e) => e.isSelected);
     if (!selectedEndpointType) continue;
 
@@ -315,6 +315,15 @@ export async function saveEndpoints(
     const steps = buildSteps(endpointName, endpoint, selectedEndpointType);
     const result = Object.fromEntries(steps.entries());
 
+    if (
+      // Always save a single serviceId for common endpoints
+      !endpoint.isCommon ||
+      // For non-common endpoints, only save service IDs if endpoint is added to the flow
+      // This way we can track which common endpoints are unused and can be safely deleted
+      nodes.some((node) => node.type === "customNode" && node.data.originalDefinedNodeId === endpoint.endpointId)
+    ) {
+      endpoint.serviceId = serviceId;
+    }
     endpoint.isCommon = endpoint.isCommon ?? false;
     const isCommonPath = endpoint.isCommon ? "common/" : "";
 
@@ -1106,7 +1115,7 @@ export const saveDraft = async () => {
   return true;
 };
 
-export const saveFlowClick = async ({ supressToast = false }: { supressToast?: boolean } = {}) => {
+export const saveFlowClick = async () => {
   const name = useServiceStore.getState().serviceNameDashed();
   const serviceId = useServiceStore.getState().serviceId;
   const description = useServiceStore.getState().description;
@@ -1123,21 +1132,17 @@ export const saveFlowClick = async ({ supressToast = false }: { supressToast?: b
     edges,
     nodes,
     onSuccess: () => {
-      if (!supressToast) {
-        useToastStore.getState().success({
-          title: i18next.t("newService.toast.success"),
-          message: i18next.t("newService.toast.savedSuccessfully"),
-        });
-      }
+      useToastStore.getState().success({
+        title: i18next.t("newService.toast.success"),
+        message: i18next.t("newService.toast.savedSuccessfully"),
+      });
       useServiceStore.getState().enableTestButton();
     },
     onError: (e) => {
-      if (!supressToast) {
-        useToastStore.getState().error({
-          title: i18next.t("toast.cannot-save-flow"),
-          message: e?.message,
-        });
-      }
+      useToastStore.getState().error({
+        title: i18next.t("toast.cannot-save-flow"),
+        message: e?.message,
+      });
     },
     description,
     slot,

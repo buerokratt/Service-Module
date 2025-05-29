@@ -2,8 +2,7 @@ WITH LatestEndpoints AS (
   SELECT DISTINCT ON (e.endpoint_id) e.*
   FROM endpoints AS e
   WHERE (e.service_ids @> ARRAY[:id]::uuid[] OR e.is_common = true)
-    AND NOT e.deleted
-  ORDER BY e.endpoint_id, e.created_at DESC
+  ORDER BY e.endpoint_id, e.id DESC
 )
 SELECT
   endpoint_id,
@@ -13,4 +12,5 @@ SELECT
   is_common,
   definitions
 FROM LatestEndpoints
-ORDER BY created_at DESC;
+WHERE deleted IS FALSE
+ORDER BY id DESC;

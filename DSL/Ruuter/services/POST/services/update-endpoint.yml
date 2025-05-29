@@ -50,7 +50,7 @@ update_endpoint:
       fileName: ${incoming.body.fileName}
       type: ${incoming.body.type}
       isCommon: ${incoming.body.isCommon}
-      serviceId: ${incoming.body.serviceId}
+      serviceId: ${incoming.body.serviceId ?? ''}
       definitions: ${incoming.body.definitions}
 
 return_ok:

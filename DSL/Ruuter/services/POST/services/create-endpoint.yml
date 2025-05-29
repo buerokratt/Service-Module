@@ -8,7 +8,7 @@ declaration:
   namespace: service
   allowlist:
     body:
-      - field: id
+      - field: endpointId
         type: string
         description: "Endpoint UUID"
       - field: name
@@ -35,12 +35,12 @@ create_endpoint:
   args:
     url: "[#SERVICE_RESQL]/endpoints/create_endpoint"
     body:
-      endpointId: ${incoming.body.id}
+      endpointId: ${incoming.body.endpointId}
       name: ${incoming.body.name}
       fileName: ${incoming.body.fileName}
       type: ${incoming.body.type}
       isCommon: ${incoming.body.isCommon}
-      serviceId: ${incoming.body.serviceId}
+      serviceId: ${incoming.body.serviceId ?? ''}
       definitions: ${incoming.body.definitions}
 
 return_ok:
