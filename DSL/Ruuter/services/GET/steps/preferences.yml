@@ -58,11 +58,11 @@ refetch_user_step_preferences:
   result: refetched_preferences
 
 return_refetched_preferences:
-  return: ${refetched_preferences.response.body}
+  return: ${refetched_preferences.response.body[0].steps}
   next: end
 
 return_preferences:
-  return: ${preferences.response.body}
+  return: ${preferences.response.body[0].steps}
   next: end
 
 return_unauthorized:

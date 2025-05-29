@@ -1,2 +1,2 @@
-INSERT INTO user_step_preference(step, "ordinality", active, user_id_code)
-VALUES(:step::step_type, :ordinality, :active, :user_id_code);
+INSERT INTO user_step_preference(steps, user_id_code)
+VALUES(:steps::step_type[], :user_id_code);

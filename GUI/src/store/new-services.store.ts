@@ -10,7 +10,7 @@ import {
   servicesRequestsExplain,
   userStepPreferences,
 } from "resources/api-constants";
-import { Service, ServiceState, Step, StepPreference, StepType } from "types";
+import { Service, ServiceState, Step, StepType } from "types";
 import { RequestVariablesTabsRawData, RequestVariablesTabsRowsData } from "types/request-variables";
 import useToastStore from "./toasts.store";
 import i18next from "i18next";
@@ -39,7 +39,7 @@ interface ServiceStoreState {
   assignElements: Assign[];
   rules: GroupOrRule[];
   isYesNoQuestion: boolean;
-  stepPreferences: StepPreference[];
+  stepPreferences: string[];
   endpointsResponseVariables: EndpointResponseVariable[];
   setIsYesNoQuestion: (value: boolean) => void;
   changeAssignNode: (assign: Assign[]) => void;
@@ -62,7 +62,7 @@ interface ServiceStoreState {
   setIsCommonEndpoint: (id: string, isCommon: boolean) => void;
   setDescription: (description: string) => void;
   setSlot: (slot: string) => void;
-  setStepPreferences: (stepPreferences: StepPreference[]) => void;
+  setStepPreferences: (stepPreferences: string[]) => void;
   loadEndpointsResponseVariables: () => void;
   setSecrets: (newSecrets: PreDefinedEndpointEnvVariables) => void;
   addProductionVariables: (variables: string[]) => void;
@@ -287,7 +287,7 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
   changeServiceName: (name: string) => set({ name }),
   setDescription: (description: string) => set({ description }),
   setSlot: (slot: string) => set({ slot }),
-  setStepPreferences: (stepPreferences: StepPreference[]) => set({ stepPreferences }),
+  setStepPreferences: (stepPreferences: string[]) => set({ stepPreferences }),
   isCommon: false,
   setIsCommon: (isCommon: boolean) => set({ isCommon }),
   isCommonEndpoint: (id: string) => {
@@ -412,7 +412,7 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
   },
   loadStepPreferences: async () => {
     try {
-      const response = await api.get<{ response: StepPreference[] }>(userStepPreferences());
+      const response = await api.get<{ response: string[] }>(userStepPreferences());
       set({ stepPreferences: response.data.response });
     } catch (error) {
       console.error("Failed to load step preferences:", error);

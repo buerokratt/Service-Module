@@ -51,10 +51,8 @@ const ServiceFlowPage: FC = () => {
     stepPreferences.forEach((preference, index) => {
       elements.push({
         id: index,
-        label: t(`${stepsLabels[preference.step as StepType]}`),
-        type: preference.step as StepType,
-        ordinality: preference.ordinality,
-        active: preference.active,
+        label: t(`${stepsLabels[preference as StepType]}`),
+        type: preference as StepType
       });
     });
     setAllElements(elements);
@@ -64,11 +62,9 @@ const ServiceFlowPage: FC = () => {
 
   const contentStyle: CSSProperties = { overflowY: "auto", maxHeight: "245px" };
 
-  function updateStepPreference(step: Step, ordinality: number) {
+  function updateStepPreference(steps: Step[]) {
     api.post(userStepPreferences(), {
-      step: step.type,
-      ordinality,
-      active: step.active,
+      steps: steps.map((e) => e.type),
     });
   }
 
@@ -76,13 +72,13 @@ const ServiceFlowPage: FC = () => {
     const { active, over } = event;
     
     if (over && active.id !== over.id) {
-      setAllElements((items) => {
-        const oldIndex = items.findIndex((item) => item.id === active.id);
-        const newIndex = items.findIndex((item) => item.id === over.id);
-        updateStepPreference(active.data.current?.step as Step, newIndex);
-        return arrayMove(items, oldIndex, newIndex);
-      });
-      
+      setAllElements((elements) => {
+        const oldIndex = elements.findIndex((item) => item.id === active.id);
+        const newIndex = elements.findIndex((item) => item.id === over.id);
+        const newElements = arrayMove(elements, oldIndex, newIndex);
+        updateStepPreference(newElements); 
+        return newElements;
+      });  
     }
     setActiveElement(null);
   }

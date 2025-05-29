@@ -7,15 +7,6 @@ export interface Step {
   type: StepType;
   action?: string;
   data?: EndpointData;
-  ordinality?: number;
-  active?: boolean;
-}
-
-export interface StepPreference {
-  readonly id: number;
-  step: string;
-  ordinality: number;
-  active: boolean;
 }
 
 export const stepsLabels: Record<StepType, string> = {

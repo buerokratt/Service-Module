@@ -8,21 +8,13 @@ declaration:
   namespace: service
   allowlist:
     body:
-      - field: step
+      - field: steps
         type: string
-        description: "Body field 'step'"
-      - field: ordinality
-        type: number
-        description: "Body field 'ordinality'"
-      - field: active
-        type: boolean
-        description: "Body field 'active'"  
+        description: "Body field 'steps'"
 
 extractRequestData:
   assign:
-    step: ${incoming.body.step}
-    ordinality: ${incoming.body.ordinality}
-    active: ${incoming.body.active}    
+    steps: ${incoming.body.steps.join(",")} 
 
 get_user_info:
   call: http.post
@@ -49,9 +41,7 @@ update_user_step_preferences:
   args:
     url: "[#SERVICE_RESQL]/update-user-step-preferences"
     body:
-      step: ${step}
-      ordinality: ${ordinality}
-      active: ${active}
+      steps: "{${steps}}"
       user_id_code: ${idCode}
   result: update_preferences_res
 
@@ -64,7 +54,7 @@ get_user_step_preferences:
   result: preferences
 
 return_preferences:
-  return: ${preferences.response.body}
+  return: ${preferences.response.body[0].steps}
   next: end
 
 return_unauthorized:

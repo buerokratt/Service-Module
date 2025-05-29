@@ -3,8 +3,6 @@
 CREATE TABLE user_step_preference (
     id BIGSERIAL PRIMARY KEY,
     user_id_code TEXT NOT NULL,
-    step step_type NOT NULL,
-    ordinality int NOT NULL DEFAULT 0,
-    active boolean NOT NULL DEFAULT true,
+    steps step_type[] NOT NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
