@@ -9,6 +9,7 @@ import { MdEdit, MdDeleteOutline, MdCheck } from "react-icons/md";
 // todo extract somewhere else
 const MAX_BUTTONS = 4;
 // todo disable save if 2 btn only
+// todo why red ! mark?
 
 // todo - Mati buttons UI
 export interface MultiChoiceQuestionContentProps {
@@ -96,11 +97,8 @@ const MultiChoiceQuestionContent: FC<MultiChoiceQuestionContentProps> = ({
                       flex: 1,
                     }}
                   >
-                    <Button
-                    // disabled
-                    >
-                      {btn.title || t("serviceFlow.multiChoiceQuestion.ellipsis")}
-                    </Button>
+                    {/* todo style */}
+                    <Button>{btn.title.length > 0 ? btn.title : t("serviceFlow.multiChoiceQuestion.ellipsis")}</Button>
                   </div>
                   <Button
                     appearance="icon"
