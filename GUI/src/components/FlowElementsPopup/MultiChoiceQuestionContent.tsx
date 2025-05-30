@@ -70,7 +70,9 @@ const MultiChoiceQuestionContent: FC<MultiChoiceQuestionContentProps> = ({
           hideLabel
           onBlur={() => setHasQuestionError(!question.length)}
         />
-        {hasQuestionError && <FormError>{t("serviceFlow.multiChoiceQuestion.questionError")}</FormError>}
+        {hasQuestionError && (
+          <FormError style={{ marginTop: 2 }}>{t("serviceFlow.multiChoiceQuestion.questionError")}</FormError>
+        )}
       </div>
       <div style={{ marginTop: 16 }}>
         <div style={{ fontWeight: 500 }}>{t("serviceFlow.multiChoiceQuestion.userChoices")}</div>
@@ -141,7 +143,7 @@ const MultiChoiceQuestionContent: FC<MultiChoiceQuestionContentProps> = ({
           </Button>
         </Track>
         {buttons.length >= maxButtons && (
-          <FormError>
+          <FormError style={{ marginTop: 2 }}>
             {t("serviceFlow.multiChoiceQuestion.maxButtonsStart")}
             {maxButtons}
             {t("serviceFlow.multiChoiceQuestion.maxButtonsEnd")}
