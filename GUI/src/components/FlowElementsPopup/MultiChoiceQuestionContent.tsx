@@ -9,7 +9,6 @@ import "./styles.scss";
 
 const maxButtons = parseInt(process.env.REACT_APP_MULTI_CHOICE_QUESTION_MAX_BUTTONS || "4");
 // todo disable save if 2 btn only
-// todo why red ! mark?
 
 export interface MultiChoiceQuestionContentProps {
   question: string;
