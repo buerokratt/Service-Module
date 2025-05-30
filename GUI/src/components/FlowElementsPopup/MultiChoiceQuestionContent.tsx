@@ -45,16 +45,10 @@ const MultiChoiceQuestionContent: FC<MultiChoiceQuestionContentProps> = ({
 
   const handleDelete = (idx: number) => {
     setButtons(buttons.filter((_, i) => i !== idx));
-    if (editingIndex === idx) {
-      setEditingIndex(null);
-      setEditValue("");
-    }
   };
 
   const handleAdd = () => {
-    if (buttons.length < MAX_BUTTONS) {
-      setButtons([...buttons, { title: "", payload: "" }]);
-    }
+    setButtons([...buttons, { title: "", payload: "" }]);
   };
 
   return (
@@ -146,6 +140,7 @@ const MultiChoiceQuestionContent: FC<MultiChoiceQuestionContentProps> = ({
           >
             {t("serviceFlow.multiChoiceQuestion.addButton")}
           </Button>
+          {/* todo hardcoded value of 4 */}
           {buttons.length >= MAX_BUTTONS && (
             <span style={{ color: "#9799A4", fontSize: 13 }}>{t("serviceFlow.multiChoiceQuestion.maxButtons")}</span>
           )}
