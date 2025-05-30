@@ -7,13 +7,12 @@ import Icon from "../Icon";
 import { MdEdit, MdDeleteOutline, MdCheck } from "react-icons/md";
 import "./styles.scss";
 
-// todo extract somewhere else
-const MAX_BUTTONS = 4;
+const maxButtons = parseInt(process.env.REACT_APP_MULTI_CHOICE_QUESTION_MAX_BUTTONS || "4");
 // todo disable save if 2 btn only
 // todo why red ! mark?
 
-// todo - Mati buttons UI
-// todo button text languages - including default values
+// todo state is not reset on removing btn
+
 export interface MultiChoiceQuestionContentProps {
   question: string;
   buttons: { title: string; payload: string }[];
@@ -127,14 +126,17 @@ const MultiChoiceQuestionContent: FC<MultiChoiceQuestionContentProps> = ({
           <Button
             appearance="secondary"
             onClick={handleAdd}
-            disabled={buttons.length >= MAX_BUTTONS}
+            disabled={buttons.length >= maxButtons}
             aria-label={t("serviceFlow.multiChoiceQuestion.addButton")!}
           >
             {t("serviceFlow.multiChoiceQuestion.addButton")}
           </Button>
-          {/* todo hardcoded value of 4 */}
-          {buttons.length >= MAX_BUTTONS && (
-            <span style={{ color: "#9799A4", fontSize: 13 }}>{t("serviceFlow.multiChoiceQuestion.maxButtons")}</span>
+          {buttons.length >= maxButtons && (
+            <span style={{ color: "#9799A4", fontSize: 13 }}>
+              {t("serviceFlow.multiChoiceQuestion.maxButtonsStart")}
+              {maxButtons}
+              {t("serviceFlow.multiChoiceQuestion.maxButtonsEnd")}
+            </span>
           )}
         </Track>
       </div>

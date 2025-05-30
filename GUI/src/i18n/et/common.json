@@ -258,7 +258,8 @@
       "multiChoiceQuestion": {
         "questionPlaceholder": "Sisesta küsimus",
         "addButton": "Lisa nupp +",
-        "maxButtons": "Maksimaalselt 4 nuppu lubatud.",
+        "maxButtonsStart": "Maksimaalselt ",
+        "maxButtonsEnd": " nuppu lubatud.",
         "ellipsis": "...",
         "edit": "Muuda",
         "delete": "Kustuta",

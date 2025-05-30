@@ -357,7 +357,8 @@
     "multiChoiceQuestion": {
       "questionPlaceholder": "Enter a question",
       "addButton": "Add button +",
-      "maxButtons": "Maximum 4 buttons allowed.",
+      "maxButtonsStart": "Maximum ",
+      "maxButtonsEnd": " buttons allowed.",
       "ellipsis": "...",
       "edit": "Edit",
       "delete": "Delete",
