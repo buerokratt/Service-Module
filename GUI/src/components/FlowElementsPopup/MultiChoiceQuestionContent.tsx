@@ -24,6 +24,7 @@ const MultiChoiceQuestionContent = () => {
   const [buttons, setButtons] = useState<{ title: string; payload: string }[]>(
     defaultQuestion.buttons.length > 0 ? defaultQuestion.buttons : []
   );
+  // todo do i need this?//
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [editValue, setEditValue] = useState<string>("");
 
