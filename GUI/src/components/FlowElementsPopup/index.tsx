@@ -131,9 +131,6 @@ const FlowElementsPopup: React.FC = () => {
       },
     };
 
-    // todo remove
-    console.log("SAVE updatedNode", updatedNode);
-
     if (stepType === StepType.Input || stepType === StepType.Condition) {
       updatedNode.data.rules = rules;
     }
