@@ -43,6 +43,7 @@ const FlowElementsPopup: React.FC = () => {
   const { t } = useTranslation();
   const [selectedTab, setSelectedTab] = useState<string | null>(null);
   const [isJsonRequestVisible, setIsJsonRequestVisible] = useState(false);
+  const [isSaveEnabled, setIsSaveEnabled] = useState(true);
   const [jsonRequestContent, setJsonRequestContent] = useState<any>(null);
   const node = useServiceStore((state) => state.selectedNode);
 
@@ -263,7 +264,9 @@ const FlowElementsPopup: React.FC = () => {
                 {t("global.cancel")}
               </Button>
             )}
-            <Button onClick={handleSaveClick}>{t(isReadonly ? "global.close" : "global.save")}</Button>
+            <Button disabled={!isSaveEnabled} onClick={handleSaveClick}>
+              {t(isReadonly ? "global.close" : "global.save")}
+            </Button>
           </Track>
         </Track>
       }
@@ -342,6 +345,7 @@ const FlowElementsPopup: React.FC = () => {
                 buttons={multiChoiceQuestionButtons}
                 setQuestion={setMultiChoiceQuestionQuestion}
                 setButtons={setMultiChoiceQuestionButtons}
+                setIsSaveEnabled={setIsSaveEnabled}
               />
             )}
             <JsonRequestContent isVisible={isJsonRequestVisible} jsonContent={jsonRequestContent} />

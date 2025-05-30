@@ -15,6 +15,7 @@ export interface MultiChoiceQuestionContentProps {
   buttons: { title: string; payload: string }[];
   setQuestion: (q: string) => void;
   setButtons: (b: { title: string; payload: string }[]) => void;
+  setIsSaveEnabled: (b: boolean) => void;
 }
 
 const MultiChoiceQuestionContent: FC<MultiChoiceQuestionContentProps> = ({
@@ -22,9 +23,9 @@ const MultiChoiceQuestionContent: FC<MultiChoiceQuestionContentProps> = ({
   buttons,
   setQuestion,
   setButtons,
+  setIsSaveEnabled,
 }) => {
   const { t } = useTranslation();
-  const [hasQuestionError, setHasQuestionError] = useState(false);
   const [editIndex, setEditIndex] = useState<number | null>(null);
   const [editValue, setEditValue] = useState<string>("");
 
@@ -42,15 +43,19 @@ const MultiChoiceQuestionContent: FC<MultiChoiceQuestionContentProps> = ({
   };
 
   const handleDelete = (idx: number) => {
-    setButtons(buttons.filter((_, i) => i !== idx));
+    const newButtons = buttons.filter((_, i) => i !== idx);
+    setButtons(newButtons);
     if (editIndex === idx) {
       setEditIndex(null);
       setEditValue("");
     }
+    setIsSaveEnabled(newButtons.length > 1 && !!question.length);
   };
 
   const handleAdd = () => {
-    setButtons([...buttons, { title: "", payload: "" }]);
+    const newButtons = [...buttons, { title: "", payload: "" }];
+    setButtons(newButtons);
+    setIsSaveEnabled(newButtons.length > 1 && !!question.length);
   };
 
   return (
@@ -63,14 +68,13 @@ const MultiChoiceQuestionContent: FC<MultiChoiceQuestionContentProps> = ({
           value={question}
           onChange={(e) => {
             setQuestion(e.target.value);
-            if (e.target.value.length) setHasQuestionError(false);
+            setIsSaveEnabled(buttons.length > 1 && !!e.target.value.length);
           }}
           maxRows={3}
           minRows={2}
           hideLabel
-          onBlur={() => setHasQuestionError(!question.length)}
         />
-        {hasQuestionError && (
+        {!question.length && (
           <FormError style={{ marginTop: 2 }}>{t("serviceFlow.multiChoiceQuestion.questionError")}</FormError>
         )}
       </div>
