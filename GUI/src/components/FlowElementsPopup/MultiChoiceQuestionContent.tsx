@@ -11,8 +11,6 @@ const maxButtons = parseInt(process.env.REACT_APP_MULTI_CHOICE_QUESTION_MAX_BUTT
 // todo disable save if 2 btn only
 // todo why red ! mark?
 
-// todo state is not reset on removing btn
-
 export interface MultiChoiceQuestionContentProps {
   question: string;
   buttons: { title: string; payload: string }[];

@@ -34,6 +34,11 @@ import { NodeDataProps } from "types/service-flow";
 import { Node } from "reactflow";
 import { MultiChoiceQuestionButton } from "types/multi-choice-question";
 
+const defaultMultiChoiceQuestionButtons = [
+  { title: "Yes", payload: "" },
+  { title: "No", payload: "" },
+];
+
 const FlowElementsPopup: React.FC = () => {
   const { t } = useTranslation();
   const [selectedTab, setSelectedTab] = useState<string | null>(null);
@@ -72,10 +77,7 @@ const FlowElementsPopup: React.FC = () => {
     node?.data.multiChoiceQuestion?.question ?? ""
   );
   const [multiChoiceQuestionButtons, setMultiChoiceQuestionButtons] = useState<MultiChoiceQuestionButton[]>(
-    node?.data.multiChoiceQuestion?.buttons ?? [
-      { title: "Yes", payload: "" },
-      { title: "No", payload: "" },
-    ]
+    node?.data.multiChoiceQuestion?.buttons ?? defaultMultiChoiceQuestionButtons
   );
 
   const stepType = node?.data.stepType;
@@ -109,6 +111,8 @@ const FlowElementsPopup: React.FC = () => {
     setFileName(null);
     setFileContent(null);
     setTextfieldMessagePlaceholders({});
+    setMultiChoiceQuestionQuestion("");
+    setMultiChoiceQuestionButtons(defaultMultiChoiceQuestionButtons);
     useServiceStore.getState().resetSelectedNode();
     useServiceStore.getState().resetRules();
     useServiceStore.getState().resetAssign();
