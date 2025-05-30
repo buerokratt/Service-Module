@@ -43,6 +43,10 @@ const MultiChoiceQuestionContent: FC<MultiChoiceQuestionContentProps> = ({
 
   const handleDelete = (idx: number) => {
     setButtons(buttons.filter((_, i) => i !== idx));
+    if (editIndex === idx) {
+      setEditIndex(null);
+      setEditValue("");
+    }
   };
 
   const handleAdd = () => {
