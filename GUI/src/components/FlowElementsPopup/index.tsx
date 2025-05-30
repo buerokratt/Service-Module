@@ -332,7 +332,14 @@ const FlowElementsPopup: React.FC = () => {
                 endpoint={endpoints.find((e) => e.name === node.data.label || node.data.label.includes(e.name))}
               />
             )}
-            {stepType === StepType.MultiChoiceQuestion && <MultiChoiceQuestionContent />}
+            {stepType === StepType.MultiChoiceQuestion && (
+              <MultiChoiceQuestionContent
+                question={multiChoiceQuestion.question}
+                buttons={multiChoiceQuestion.buttons}
+                setQuestion={(q) => setMultiChoiceQuestion({ ...multiChoiceQuestion, question: q })}
+                setButtons={(btns) => setMultiChoiceQuestion({ ...multiChoiceQuestion, buttons: btns })}
+              />
+            )}
             <JsonRequestContent isVisible={isJsonRequestVisible} jsonContent={jsonRequestContent} />
           </Tabs.Content>
           {!isReadonly && (

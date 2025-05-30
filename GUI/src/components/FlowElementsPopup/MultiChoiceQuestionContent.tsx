@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, FC } from "react";
 import { useTranslation } from "react-i18next";
 import { FormTextarea, FormInput } from "../FormElements";
 import Track from "../Track";
@@ -9,36 +9,22 @@ import { MultiChoiceQuestion } from "types/service-flow";
 
 const MAX_BUTTONS = 4;
 
-const defaultQuestion: MultiChoiceQuestion = {
-  question: "",
-  buttons: [
-    { title: "Yes", payload: "" },
-    { title: "No", payload: "" },
-  ],
-};
+export interface MultiChoiceQuestionContentProps {
+  question: string;
+  buttons: { title: string; payload: string }[];
+  setQuestion: (q: string) => void;
+  setButtons: (b: { title: string; payload: string }[]) => void;
+}
 
-const MultiChoiceQuestionContent = () => {
+const MultiChoiceQuestionContent: FC<MultiChoiceQuestionContentProps> = ({
+  question,
+  buttons,
+  setQuestion,
+  setButtons,
+}) => {
   const { t } = useTranslation();
-
-  const [question, setQuestion] = useState<string>(defaultQuestion.question);
-  const [buttons, setButtons] = useState<{ title: string; payload: string }[]>(
-    defaultQuestion.buttons.length > 0 ? defaultQuestion.buttons : []
-  );
-  // todo do i need this?//
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [editValue, setEditValue] = useState<string>("");
-
-  // Sync with parent on change
-  //   React.useEffect(() => {
-  //     useServiceStore.getState().setSelectedNodeData({
-  //       ...node.data,
-  //       multiChoiceQuestion: {
-  //         question,
-  //         buttons,
-  //       },
-  //     });
-  //     // eslint-disable-next-line
-  //   }, [question, buttons]);
 
   const handleEdit = (idx: number) => {
     setEditingIndex(idx);
@@ -76,7 +62,7 @@ const MultiChoiceQuestionContent = () => {
         name="multiChoiceQuestion-question"
         label=""
         placeholder={t("serviceFlow.multiChoiceQuestion.questionPlaceholder")!}
-        defaultValue={question}
+        value={question}
         onChange={(e) => setQuestion(e.target.value)}
         maxRows={3}
         minRows={2}
@@ -103,7 +89,12 @@ const MultiChoiceQuestionContent = () => {
                     style={{ minWidth: 120, flex: 1 }}
                     hideLabel
                   />
-                  <Button appearance="icon" size="s" onClick={() => handleEditSave(idx)} aria-label={t("global.save")}>
+                  <Button
+                    appearance="icon"
+                    size="s"
+                    onClick={() => handleEditSave(idx)}
+                    aria-label={t("global.save") || undefined}
+                  >
                     <Icon icon={<MdCheck />} size="medium" />
                   </Button>
                 </>
@@ -124,7 +115,7 @@ const MultiChoiceQuestionContent = () => {
                       appearance="icon"
                       size="s"
                       onClick={() => handleEdit(idx)}
-                      aria-label={t("serviceFlow.multiChoiceQuestion.edit")}
+                      aria-label={t("serviceFlow.multiChoiceQuestion.edit") || undefined}
                     >
                       <Icon icon={<MdEdit />} size="medium" />
                     </Button>
@@ -132,7 +123,7 @@ const MultiChoiceQuestionContent = () => {
                       appearance="icon"
                       size="s"
                       onClick={() => handleDelete(idx)}
-                      aria-label={t("serviceFlow.multiChoiceQuestion.delete")}
+                      aria-label={t("serviceFlow.multiChoiceQuestion.delete") || undefined}
                     >
                       <Icon icon={<MdDeleteOutline />} size="medium" />
                     </Button>
@@ -147,7 +138,7 @@ const MultiChoiceQuestionContent = () => {
             appearance="secondary"
             onClick={handleAdd}
             disabled={buttons.length >= MAX_BUTTONS}
-            aria-label={t("serviceFlow.multiChoiceQuestion.addButton")}
+            aria-label={t("serviceFlow.multiChoiceQuestion.addButton") || undefined}
           >
             {t("serviceFlow.multiChoiceQuestion.addButton")}
           </Button>
