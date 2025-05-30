@@ -30,8 +30,9 @@ import { saveEndpoints } from "services/service-builder";
 import useToastStore from "store/toasts.store";
 import i18next from "i18next";
 import MultiChoiceQuestionContent from "./MultiChoiceQuestionContent";
-import { MultiChoiceQuestionButton, NodeDataProps } from "types/service-flow";
+import { NodeDataProps } from "types/service-flow";
 import { Node } from "reactflow";
+import { MultiChoiceQuestionButton } from "types/multi-choice-question";
 
 const FlowElementsPopup: React.FC = () => {
   const { t } = useTranslation();
