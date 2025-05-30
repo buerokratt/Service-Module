@@ -255,7 +255,15 @@
       "rules": "Reeglid",
       "rasaRules": "Rasa reeglid",
       "siga": "Allkirjastamine",
-      "multiChoiceQuestion": "Mitmevalikuline küsimus"
+      "multiChoiceQuestion": {
+        "questionPlaceholder": "Sisesta oma küsimus siia...",
+        "buttonTitlePlaceholder": "Nupu pealkiri...",
+        "edit": "Muuda",
+        "delete": "Kustuta",
+        "addButton": "+ Lisa nupp",
+        "maxButtons": "Maksimaalselt 4 nuppu lubatud.",
+        "ellipsis": "..."
+      }
     },
     "popup": {
       "messageLabel": "Sõnum",

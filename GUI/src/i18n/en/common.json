@@ -354,6 +354,15 @@
       "deleteSuccess": "API element deleted successfully",
       "deleteError": "Failed to delete API element"
     },
+    "multiChoiceQuestion": {
+      "questionPlaceholder": "Enter your question here...",
+      "buttonTitlePlaceholder": "Button title...",
+      "edit": "Edit",
+      "delete": "Delete",
+      "addButton": "+ Add button",
+      "maxButtons": "Maximum 4 buttons allowed.",
+      "ellipsis": "..."
+    },
     "tabs": {
       "setup": "Setup",
       "test": "Test"
