@@ -71,7 +71,10 @@ const FlowElementsPopup: React.FC = () => {
     // todo extract default somewhere else?
     node?.data.multiChoiceQuestion ?? {
       question: "",
-      buttons: [],
+      buttons: [
+        { title: "Yes", payload: "" },
+        { title: "No", payload: "" },
+      ],
     }
   );
 
