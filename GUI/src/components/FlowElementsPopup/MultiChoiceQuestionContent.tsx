@@ -27,11 +27,11 @@ const MultiChoiceQuestionContent: FC<MultiChoiceQuestionContentProps> = ({
   setButtons,
 }) => {
   const { t } = useTranslation();
-  const [editingIndex, setEditingIndex] = useState<number | null>(null);
+  const [editIndex, setEditIndex] = useState<number | null>(null);
   const [editValue, setEditValue] = useState<string>("");
 
   const handleEdit = (idx: number) => {
-    setEditingIndex(idx);
+    setEditIndex(idx);
     setEditValue(buttons[idx].title);
   };
 
@@ -39,7 +39,7 @@ const MultiChoiceQuestionContent: FC<MultiChoiceQuestionContentProps> = ({
     const newButtons = [...buttons];
     newButtons[idx] = { ...newButtons[idx], title: editValue };
     setButtons(newButtons);
-    setEditingIndex(null);
+    setEditIndex(null);
     setEditValue("");
   };
 
@@ -71,7 +71,7 @@ const MultiChoiceQuestionContent: FC<MultiChoiceQuestionContentProps> = ({
         <Track direction="vertical" gap={8} style={{ marginTop: 8 }}>
           {buttons.map((btn, idx) => (
             <Track key={idx} gap={8} align="center" style={{ width: "100%" }}>
-              {editingIndex === idx ? (
+              {editIndex === idx ? (
                 <>
                   <FormInput
                     name={`button-title-${idx}`}
@@ -82,7 +82,7 @@ const MultiChoiceQuestionContent: FC<MultiChoiceQuestionContentProps> = ({
                     autoFocus
                     onKeyDown={(e) => {
                       if (e.key === "Enter") handleEditSave(idx);
-                      if (e.key === "Escape") setEditingIndex(null);
+                      if (e.key === "Escape") setEditIndex(null);
                     }}
                     style={{ minWidth: 120, flex: 1 }}
                     hideLabel
