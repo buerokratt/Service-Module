@@ -7,6 +7,7 @@ http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.1.xsd">
         <loadData
                 file="changelog/data/test-fixtures/request_logs.csv"
                 tableName="request_logs"
+                schemaName="services"
         >
             <column name="timestamp" type="COMPUTED"/>
             <column name="content" type="COMPUTED"/>
