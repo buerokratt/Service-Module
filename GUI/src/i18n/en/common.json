@@ -360,7 +360,8 @@
       "maxButtons": "Maximum 4 buttons allowed.",
       "ellipsis": "...",
       "edit": "Edit",
-      "delete": "Delete"
+      "delete": "Delete",
+      "userChoices": "User choices:"
     },
     "tabs": {
       "setup": "Setup",

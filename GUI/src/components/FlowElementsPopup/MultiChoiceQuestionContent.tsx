@@ -64,7 +64,7 @@ const MultiChoiceQuestionContent: FC<MultiChoiceQuestionContentProps> = ({
         hideLabel
       />
       <div style={{ marginTop: 16 }}>
-        <label style={{ fontWeight: 500 }}>{t("serviceFlow.popup.action")}</label>
+        <label style={{ fontWeight: 500 }}>{t("serviceFlow.multiChoiceQuestion.userChoices")}</label>
         <Track direction="vertical" gap={8} style={{ marginTop: 8 }}>
           {buttons.map((btn, idx) => (
             <Track key={idx} gap={8} align="center" style={{ width: "100%" }}>

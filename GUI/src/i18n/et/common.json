@@ -261,7 +261,8 @@
         "maxButtons": "Maksimaalselt 4 nuppu lubatud.",
         "ellipsis": "...",
         "edit": "Muuda",
-        "delete": "Kustuta"
+        "delete": "Kustuta",
+        "userChoices": "Lõppkasutaja valikud:"
       }
     },
     "popup": {
