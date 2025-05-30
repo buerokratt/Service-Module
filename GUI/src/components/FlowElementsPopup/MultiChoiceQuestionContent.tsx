@@ -6,9 +6,9 @@ import Button from "../Button";
 import Icon from "../Icon";
 import { MdEdit, MdDeleteOutline, MdCheck } from "react-icons/md";
 import "./styles.scss";
+import FormError from "components/FormElements/FormError";
 
 const maxButtons = parseInt(process.env.REACT_APP_MULTI_CHOICE_QUESTION_MAX_BUTTONS || "4");
-// todo disable save if 2 btn only
 
 export interface MultiChoiceQuestionContentProps {
   question: string;
@@ -24,6 +24,7 @@ const MultiChoiceQuestionContent: FC<MultiChoiceQuestionContentProps> = ({
   setButtons,
 }) => {
   const { t } = useTranslation();
+  const [hasQuestionError, setHasQuestionError] = useState(false);
   const [editIndex, setEditIndex] = useState<number | null>(null);
   const [editValue, setEditValue] = useState<string>("");
 
@@ -53,17 +54,24 @@ const MultiChoiceQuestionContent: FC<MultiChoiceQuestionContentProps> = ({
   };
 
   return (
-    <Track direction="vertical" align="stretch" gap={16} style={{ width: "100%", padding: 16 }}>
-      <FormTextarea
-        name="multiChoiceQuestion-question"
-        label=""
-        placeholder={t("serviceFlow.multiChoiceQuestion.questionPlaceholder")!}
-        value={question}
-        onChange={(e) => setQuestion(e.target.value)}
-        maxRows={3}
-        minRows={2}
-        hideLabel
-      />
+    <Track direction="vertical" align="stretch" style={{ width: "100%", padding: 16 }}>
+      <div>
+        <FormTextarea
+          name="multiChoiceQuestion-question"
+          label=""
+          placeholder={t("serviceFlow.multiChoiceQuestion.questionPlaceholder")!}
+          value={question}
+          onChange={(e) => {
+            setQuestion(e.target.value);
+            if (e.target.value.length) setHasQuestionError(false);
+          }}
+          maxRows={3}
+          minRows={2}
+          hideLabel
+          onBlur={() => setHasQuestionError(!question.length)}
+        />
+        {hasQuestionError && <FormError>{t("serviceFlow.multiChoiceQuestion.questionError")}</FormError>}
+      </div>
       <div style={{ marginTop: 16 }}>
         <div style={{ fontWeight: 500 }}>{t("serviceFlow.multiChoiceQuestion.userChoices")}</div>
         <Track direction="vertical" gap={8} style={{ marginTop: 8 }}>
@@ -97,7 +105,6 @@ const MultiChoiceQuestionContent: FC<MultiChoiceQuestionContentProps> = ({
                       flex: 1,
                     }}
                   >
-                    {/* todo style */}
                     <Button disabled className="multiple-choice-question-button">
                       {btn.title.length > 0 ? btn.title : t("serviceFlow.multiChoiceQuestion.ellipsis")}
                     </Button>
@@ -132,14 +139,14 @@ const MultiChoiceQuestionContent: FC<MultiChoiceQuestionContentProps> = ({
           >
             {t("serviceFlow.multiChoiceQuestion.addButton")}
           </Button>
-          {buttons.length >= maxButtons && (
-            <span style={{ color: "#9799A4", fontSize: 13 }}>
-              {t("serviceFlow.multiChoiceQuestion.maxButtonsStart")}
-              {maxButtons}
-              {t("serviceFlow.multiChoiceQuestion.maxButtonsEnd")}
-            </span>
-          )}
         </Track>
+        {buttons.length >= maxButtons && (
+          <FormError>
+            {t("serviceFlow.multiChoiceQuestion.maxButtonsStart")}
+            {maxButtons}
+            {t("serviceFlow.multiChoiceQuestion.maxButtonsEnd")}
+          </FormError>
+        )}
       </div>
     </Track>
   );
