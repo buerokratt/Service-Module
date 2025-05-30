@@ -5,6 +5,7 @@ import Track from "../Track";
 import Button from "../Button";
 import Icon from "../Icon";
 import { MdEdit, MdDeleteOutline, MdCheck } from "react-icons/md";
+import "./styles.scss";
 
 // todo extract somewhere else
 const MAX_BUTTONS = 4;
@@ -12,14 +13,13 @@ const MAX_BUTTONS = 4;
 // todo why red ! mark?
 
 // todo - Mati buttons UI
+// todo button text languages - including default values
 export interface MultiChoiceQuestionContentProps {
   question: string;
   buttons: { title: string; payload: string }[];
   setQuestion: (q: string) => void;
   setButtons: (b: { title: string; payload: string }[]) => void;
 }
-
-// todo button text languages - including default values
 
 const MultiChoiceQuestionContent: FC<MultiChoiceQuestionContentProps> = ({
   question,
@@ -65,7 +65,7 @@ const MultiChoiceQuestionContent: FC<MultiChoiceQuestionContentProps> = ({
         hideLabel
       />
       <div style={{ marginTop: 16 }}>
-        <label style={{ fontWeight: 500 }}>{t("serviceFlow.multiChoiceQuestion.userChoices")}</label>
+        <div style={{ fontWeight: 500 }}>{t("serviceFlow.multiChoiceQuestion.userChoices")}</div>
         <Track direction="vertical" gap={8} style={{ marginTop: 8 }}>
           {buttons.map((btn, idx) => (
             <Track key={idx} gap={8} align="center" style={{ width: "100%" }}>
@@ -98,7 +98,9 @@ const MultiChoiceQuestionContent: FC<MultiChoiceQuestionContentProps> = ({
                     }}
                   >
                     {/* todo style */}
-                    <Button>{btn.title.length > 0 ? btn.title : t("serviceFlow.multiChoiceQuestion.ellipsis")}</Button>
+                    <Button disabled className="multiple-choice-question-button">
+                      {btn.title.length > 0 ? btn.title : t("serviceFlow.multiChoiceQuestion.ellipsis")}
+                    </Button>
                   </div>
                   <Button
                     appearance="icon"
