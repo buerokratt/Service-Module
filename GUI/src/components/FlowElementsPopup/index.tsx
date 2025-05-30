@@ -30,6 +30,8 @@ import { saveEndpoints } from "services/service-builder";
 import useToastStore from "store/toasts.store";
 import i18next from "i18next";
 import MultiChoiceQuestionContent from "./MultiChoiceQuestionContent";
+import { NodeDataProps } from "types/service-flow";
+import { Node } from "reactflow";
 
 const FlowElementsPopup: React.FC = () => {
   const { t } = useTranslation();
@@ -103,7 +105,7 @@ const FlowElementsPopup: React.FC = () => {
   };
 
   const handleSaveClick = () => {
-    const updatedNode = {
+    const updatedNode: Node<NodeDataProps> = {
       ...node,
       data: {
         ...node.data,
@@ -115,6 +117,8 @@ const FlowElementsPopup: React.FC = () => {
         signOption: signOption ?? node.data?.signOption,
       },
     };
+
+    console.log("updatedNode", updatedNode);
 
     if (stepType === StepType.Input || stepType === StepType.Condition) {
       updatedNode.data.rules = rules;
@@ -155,7 +159,7 @@ const FlowElementsPopup: React.FC = () => {
     }
 
     if (stepType === StepType.MultiChoiceQuestion) {
-      // todo implement
+      // todo implement, maybe pass node
       saveMultiChoiceQuestion();
     }
 

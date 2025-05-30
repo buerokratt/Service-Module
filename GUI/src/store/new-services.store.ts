@@ -647,6 +647,7 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
     get().setEdges((eds) => applyEdgeChanges(changes, eds));
   },
   resetSelectedNode: () => set({ selectedNode: null }),
+  // todo implement here too
   handlePopupSave: (updatedNode) => {
     const selectedNode = get().selectedNode;
     get().resetSelectedNode();

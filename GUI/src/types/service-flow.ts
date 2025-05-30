@@ -44,6 +44,15 @@ export type NodeDataProps = {
   signOption?: any;
   rules?: any;
   assignElements?: any;
+  multiChoiceQuestion?: MultiChoiceQuestion;
+};
+
+export type MultiChoiceQuestion = {
+  question: string;
+  buttons: {
+    title: string;
+    payload: string;
+  }[];
 };
 
 export const initialNodes: Node[] = [
