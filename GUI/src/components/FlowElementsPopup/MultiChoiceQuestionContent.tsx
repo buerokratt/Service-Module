@@ -90,34 +90,34 @@ const MultiChoiceQuestionContent: FC<MultiChoiceQuestionContentProps> = ({
                 </>
               ) : (
                 <>
-                  <span
+                  <div
                     style={{
                       minWidth: 120,
                       flex: 1,
-                      fontStyle: btn.title ? undefined : "italic",
-                      color: btn.title ? undefined : "#9799A4",
                     }}
                   >
-                    {btn.title || t("serviceFlow.multiChoiceQuestion.ellipsis")}
-                  </span>
-                  <>
                     <Button
-                      appearance="icon"
-                      size="s"
-                      onClick={() => handleEdit(idx)}
-                      aria-label={t("serviceFlow.multiChoiceQuestion.edit")!}
+                    // disabled
                     >
-                      <Icon icon={<MdEdit />} size="medium" />
+                      {btn.title || t("serviceFlow.multiChoiceQuestion.ellipsis")}
                     </Button>
-                    <Button
-                      appearance="icon"
-                      size="s"
-                      onClick={() => handleDelete(idx)}
-                      aria-label={t("serviceFlow.multiChoiceQuestion.delete")!}
-                    >
-                      <Icon icon={<MdDeleteOutline />} size="medium" />
-                    </Button>
-                  </>
+                  </div>
+                  <Button
+                    appearance="icon"
+                    size="s"
+                    onClick={() => handleEdit(idx)}
+                    aria-label={t("serviceFlow.multiChoiceQuestion.edit")!}
+                  >
+                    <Icon icon={<MdEdit />} size="medium" />
+                  </Button>
+                  <Button
+                    appearance="icon"
+                    size="s"
+                    onClick={() => handleDelete(idx)}
+                    aria-label={t("serviceFlow.multiChoiceQuestion.delete")!}
+                  >
+                    <Icon icon={<MdDeleteOutline />} size="medium" />
+                  </Button>
                 </>
               )}
             </Track>
