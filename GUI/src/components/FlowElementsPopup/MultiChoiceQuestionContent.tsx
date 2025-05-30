@@ -9,16 +9,16 @@ import { MultiChoiceQuestion } from "types/service-flow";
 
 const MAX_BUTTONS = 4;
 
+const defaultQuestion: MultiChoiceQuestion = {
+  question: "",
+  buttons: [
+    { title: "Yes", payload: "" },
+    { title: "No", payload: "" },
+  ],
+};
+
 const MultiChoiceQuestionContent = () => {
   const { t } = useTranslation();
-
-  const defaultQuestion: MultiChoiceQuestion = {
-    question: "",
-    buttons: [
-      { title: "Yes", payload: "" },
-      { title: "No", payload: "" },
-    ],
-  };
 
   const [question, setQuestion] = useState<string>(defaultQuestion.question);
   const [buttons, setButtons] = useState<{ title: string; payload: string }[]>(
