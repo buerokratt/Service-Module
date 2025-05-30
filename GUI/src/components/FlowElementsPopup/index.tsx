@@ -67,9 +67,7 @@ const FlowElementsPopup: React.FC = () => {
   // StepType.FileSign
   const [signOption, setSignOption] = useState<{ label: string; value: string } | null>(node?.data.signOption ?? null);
   // StepType.MultiChoiceQuestion
-  // todo does not work - logic!
   const [multiChoiceQuestion, setMultiChoiceQuestion] = useState<MultiChoiceQuestion>(
-    // todo extract default somewhere else? currently duplicated in MultiChoiceQuestionContent
     node?.data.multiChoiceQuestion ?? {
       question: "",
       buttons: [

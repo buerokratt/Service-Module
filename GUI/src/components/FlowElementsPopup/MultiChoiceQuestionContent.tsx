@@ -5,9 +5,10 @@ import Track from "../Track";
 import Button from "../Button";
 import Icon from "../Icon";
 import { MdEdit, MdDeleteOutline, MdCheck } from "react-icons/md";
-import { MultiChoiceQuestion } from "types/service-flow";
 
+// todo extract somewhere else
 const MAX_BUTTONS = 4;
+// todo disable save if 2 btn only
 
 export interface MultiChoiceQuestionContentProps {
   question: string;
