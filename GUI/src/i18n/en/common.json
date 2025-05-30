@@ -254,7 +254,8 @@
       "redirectConversationToSupport": "Direct to Customer Support",
       "rules": "Rules",
       "rasaRules": "Rasa Rules",
-      "siga": "SiGa"
+      "siga": "SiGa",
+      "multiChoiceQuestion": "Multi-choice question"
     },
     "popup": {
       "messageLabel": "Message",

@@ -254,7 +254,8 @@
       "redirectConversationToSupport": "Klienditeenindusse suunamine",
       "rules": "Reeglid",
       "rasaRules": "Rasa reeglid",
-      "siga": "Allkirjastamine"
+      "siga": "Allkirjastamine",
+      "multiChoiceQuestion": "Mitmevalikuline küsimus"
     },
     "popup": {
       "messageLabel": "Sõnum",

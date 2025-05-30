@@ -64,6 +64,7 @@ const FlowElementsPopup: React.FC = () => {
   const [fileContent, setFileContent] = useState<string | null>(null);
   // StepType.FileSign
   const [signOption, setSignOption] = useState<{ label: string; value: string } | null>(node?.data.signOption ?? null);
+  // StepType.MultiChoiceQuestion
 
   const stepType = node?.data.stepType;
 
@@ -153,6 +154,11 @@ const FlowElementsPopup: React.FC = () => {
       saveApiEndpoints();
     }
 
+    if (stepType === StepType.MultiChoiceQuestion) {
+      // todo implement
+      saveMultiChoiceQuestion();
+    }
+
     useServiceStore.getState().handlePopupSave(updatedNode);
     onClose();
   };
@@ -224,6 +230,10 @@ const FlowElementsPopup: React.FC = () => {
       }
     );
     return true;
+  };
+
+  const saveMultiChoiceQuestion = () => {
+    // todo implement
   };
 
   return (
@@ -307,8 +317,7 @@ const FlowElementsPopup: React.FC = () => {
             )}
             {stepType === StepType.FinishingStepEnd && <EndConversationContent />}
             {stepType === StepType.RasaRules && <RasaRulesContent />}
-            {/* todo fix this */}
-            {/* {stepType === StepType.Assign && <AssignContent nodeId={node.id} />} */}
+            {stepType === StepType.Assign && <AssignContent nodeId={node.id} />}
             {stepType === StepType.Condition && <ConditionContent nodeId={node.id} />}
             {stepType === StepType.UserDefined && (
               <ApiContent
@@ -316,9 +325,7 @@ const FlowElementsPopup: React.FC = () => {
                 endpoint={endpoints.find((e) => e.name === node.data.label || node.data.label.includes(e.name))}
               />
             )}
-            {/* todo fix this */}
-            {stepType === StepType.Assign && <MultiChoiceQuestionContent />}
-            {/* {stepType === StepType.MultiChoiceQuestion && <MultiChoiceQuestionContent />} */}
+            {stepType === StepType.MultiChoiceQuestion && <MultiChoiceQuestionContent />}
             <JsonRequestContent isVisible={isJsonRequestVisible} jsonContent={jsonRequestContent} />
           </Tabs.Content>
           {!isReadonly && (
