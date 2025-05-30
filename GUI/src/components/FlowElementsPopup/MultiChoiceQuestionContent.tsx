@@ -7,8 +7,9 @@ import Icon from "../Icon";
 import { MdEdit, MdDeleteOutline, MdCheck } from "react-icons/md";
 import "./styles.scss";
 import FormError from "components/FormElements/FormError";
+import { v4 } from "uuid";
 
-const maxButtons = parseInt(process.env.REACT_APP_MULTI_CHOICE_QUESTION_MAX_BUTTONS || "4");
+const maxButtons = parseInt(process.env.REACT_APP_MULTI_CHOICE_QUESTION_MAX_BUTTONS ?? "4");
 
 export interface MultiChoiceQuestionContentProps {
   question: string;
@@ -82,7 +83,7 @@ const MultiChoiceQuestionContent: FC<MultiChoiceQuestionContentProps> = ({
         <div style={{ fontWeight: 500 }}>{t("serviceFlow.multiChoiceQuestion.userChoices")}</div>
         <Track direction="vertical" gap={8} style={{ marginTop: 8 }}>
           {buttons.map((btn, idx) => (
-            <Track key={idx} gap={8} align="center" style={{ width: "100%" }}>
+            <Track key={v4()} gap={8} align="center" style={{ width: "100%" }}>
               {editIndex === idx ? (
                 <>
                   <FormInput
