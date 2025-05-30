@@ -261,6 +261,7 @@
         "addButton": "Lisa nupp +",
         "maxButtonsStart": "Maksimaalselt ",
         "maxButtonsEnd": " nuppu lubatud.",
+        "minButtons": "Vähemalt 2 nuppu on vajalik.",
         "ellipsis": "...",
         "edit": "Muuda",
         "delete": "Kustuta",

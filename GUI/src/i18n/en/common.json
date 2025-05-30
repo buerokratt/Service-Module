@@ -360,6 +360,7 @@
       "addButton": "Add button +",
       "maxButtonsStart": "Maximum ",
       "maxButtonsEnd": " buttons allowed.",
+      "minButtons": "At least 2 buttons are required.",
       "ellipsis": "...",
       "edit": "Edit",
       "delete": "Delete",

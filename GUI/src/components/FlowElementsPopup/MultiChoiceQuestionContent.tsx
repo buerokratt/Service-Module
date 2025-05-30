@@ -153,6 +153,9 @@ const MultiChoiceQuestionContent: FC<MultiChoiceQuestionContentProps> = ({
             {t("serviceFlow.multiChoiceQuestion.maxButtonsEnd")}
           </FormError>
         )}
+        {buttons.length < 2 && (
+          <FormError style={{ marginTop: 2 }}>{t("serviceFlow.multiChoiceQuestion.minButtons")}</FormError>
+        )}
       </div>
     </Track>
   );
