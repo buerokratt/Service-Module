@@ -30,7 +30,7 @@ import { saveEndpoints } from "services/service-builder";
 import useToastStore from "store/toasts.store";
 import i18next from "i18next";
 import MultiChoiceQuestionContent from "./MultiChoiceQuestionContent";
-import { NodeDataProps } from "types/service-flow";
+import { MultiChoiceQuestion, NodeDataProps } from "types/service-flow";
 import { Node } from "reactflow";
 
 const FlowElementsPopup: React.FC = () => {
@@ -67,6 +67,13 @@ const FlowElementsPopup: React.FC = () => {
   // StepType.FileSign
   const [signOption, setSignOption] = useState<{ label: string; value: string } | null>(node?.data.signOption ?? null);
   // StepType.MultiChoiceQuestion
+  const [multiChoiceQuestion, setMultiChoiceQuestion] = useState<MultiChoiceQuestion>(
+    // todo extract default somewhere else?
+    node?.data.multiChoiceQuestion ?? {
+      question: "",
+      buttons: [],
+    }
+  );
 
   const stepType = node?.data.stepType;
 
@@ -115,6 +122,7 @@ const FlowElementsPopup: React.FC = () => {
         fileName: fileName ?? node.data?.fileName,
         fileContent: fileContent ?? node.data?.fileContent,
         signOption: signOption ?? node.data?.signOption,
+        multiChoiceQuestion: multiChoiceQuestion ?? node.data?.multiChoiceQuestion,
       },
     };
 
@@ -156,11 +164,6 @@ const FlowElementsPopup: React.FC = () => {
 
     if (stepType === StepType.UserDefined) {
       saveApiEndpoints();
-    }
-
-    if (stepType === StepType.MultiChoiceQuestion) {
-      // todo implement, maybe pass node
-      saveMultiChoiceQuestion();
     }
 
     useServiceStore.getState().handlePopupSave(updatedNode);
