@@ -67,14 +67,14 @@ const FlowElementsPopup: React.FC = () => {
   // StepType.FileSign
   const [signOption, setSignOption] = useState<{ label: string; value: string } | null>(node?.data.signOption ?? null);
   // StepType.MultiChoiceQuestion
-  const [multiChoiceQuestion, setMultiChoiceQuestion] = useState<MultiChoiceQuestion>(
-    node?.data.multiChoiceQuestion ?? {
-      question: "",
-      buttons: [
-        { title: "Yes", payload: "" },
-        { title: "No", payload: "" },
-      ],
-    }
+  const [multiChoiceQuestionQuestion, setMultiChoiceQuestionQuestion] = useState<string>(
+    node?.data.multiChoiceQuestion?.question ?? ""
+  );
+  const [multiChoiceQuestionButtons, setMultiChoiceQuestionButtons] = useState<{ title: string; payload: string }[]>(
+    node?.data.multiChoiceQuestion?.buttons ?? [
+      { title: "Yes", payload: "" },
+      { title: "No", payload: "" },
+    ]
   );
 
   const stepType = node?.data.stepType;
@@ -124,11 +124,15 @@ const FlowElementsPopup: React.FC = () => {
         fileName: fileName ?? node.data?.fileName,
         fileContent: fileContent ?? node.data?.fileContent,
         signOption: signOption ?? node.data?.signOption,
-        multiChoiceQuestion: multiChoiceQuestion ?? node.data?.multiChoiceQuestion,
+        multiChoiceQuestion: {
+          question: multiChoiceQuestionQuestion,
+          buttons: multiChoiceQuestionButtons,
+        },
       },
     };
 
-    console.log("updatedNode", updatedNode);
+    // todo remove
+    console.log("SAVE updatedNode", updatedNode);
 
     if (stepType === StepType.Input || stepType === StepType.Condition) {
       updatedNode.data.rules = rules;
@@ -332,10 +336,10 @@ const FlowElementsPopup: React.FC = () => {
             )}
             {stepType === StepType.MultiChoiceQuestion && (
               <MultiChoiceQuestionContent
-                question={multiChoiceQuestion.question}
-                buttons={multiChoiceQuestion.buttons}
-                setQuestion={(q) => setMultiChoiceQuestion({ ...multiChoiceQuestion, question: q })}
-                setButtons={(btns) => setMultiChoiceQuestion({ ...multiChoiceQuestion, buttons: btns })}
+                question={multiChoiceQuestionQuestion}
+                buttons={multiChoiceQuestionButtons}
+                setQuestion={setMultiChoiceQuestionQuestion}
+                setButtons={setMultiChoiceQuestionButtons}
               />
             )}
             <JsonRequestContent isVisible={isJsonRequestVisible} jsonContent={jsonRequestContent} />
