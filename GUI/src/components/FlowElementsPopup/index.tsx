@@ -69,7 +69,7 @@ const FlowElementsPopup: React.FC = () => {
   // StepType.MultiChoiceQuestion
   // todo does not work - logic!
   const [multiChoiceQuestion, setMultiChoiceQuestion] = useState<MultiChoiceQuestion>(
-    // todo extract default somewhere else?
+    // todo extract default somewhere else? currently duplicated in MultiChoiceQuestionContent
     node?.data.multiChoiceQuestion ?? {
       question: "",
       buttons: [
