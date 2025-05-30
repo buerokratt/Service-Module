@@ -28,7 +28,7 @@ declaration:
   response:
     fields: []
 */
-INSERT INTO service_trigger (intent, service, status, author_role, service_name)
+INSERT INTO service_management.service_trigger (intent, service, status, author_role, service_name)
 VALUES (
     :intent, :serviceId, :status::TRIGGER_STATUS, :authorRole::AUTHOR_ROLE, :serviceName
 )

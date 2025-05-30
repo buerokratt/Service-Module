@@ -48,7 +48,7 @@ declaration:
 WITH
     max_service AS (
         SELECT id AS max_id
-        FROM services
+        FROM services.services
         WHERE service_id = :id
         ORDER BY updated_at DESC
         LIMIT 1
@@ -65,7 +65,7 @@ SELECT
     structure::JSON,
     subquery.endpoints::JSON AS endpoints,
     service_id
-FROM services
+FROM services.services
     INNER JOIN max_service ON id = max_id
     INNER JOIN (
         SELECT JSONB_AGG(endpoint) AS endpoints
@@ -73,11 +73,11 @@ FROM services
             SELECT DISTINCT endpoint
             FROM (
                 SELECT endpoint::JSONB
-                FROM services, JSON_ARRAY_ELEMENTS(endpoints) AS endpoint
+                FROM services.services, JSON_ARRAY_ELEMENTS(endpoints) AS endpoint
                 WHERE (endpoint ->> 'isCommon')::BOOLEAN = true
                 UNION
                 SELECT endpoint::JSONB
-                FROM services, JSON_ARRAY_ELEMENTS(endpoints) AS endpoint, max_service
+                FROM services.services, JSON_ARRAY_ELEMENTS(endpoints) AS endpoint, max_service
                 WHERE id = max_id
             ) AS combined_endpoints
         ) AS subquery

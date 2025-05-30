@@ -45,7 +45,7 @@ SELECT intent,
        MAX(created) AS requested_at,
        MAX(author_role) as author_role,
        CEIL(COUNT(*) OVER() / :page_size::DECIMAL) AS total_pages
-FROM service_trigger
+FROM service_management.service_trigger
 GROUP BY intent,
          service    
 HAVING MAX(status) = 'pending'

@@ -19,12 +19,12 @@ declaration:
 WITH
     max_services_settings AS (
         SELECT DISTINCT ON (name) id AS max_id
-        FROM services_settings
+        FROM services.services_settings
         ORDER BY name ASC, created_at DESC
     )
 
 SELECT
     name,
     value
-FROM services_settings
+FROM services.services_settings
     INNER JOIN max_services_settings ON id = max_id;

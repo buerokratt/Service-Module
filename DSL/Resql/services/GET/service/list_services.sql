@@ -43,7 +43,7 @@ declaration:
 WITH
     max_services AS (
         SELECT DISTINCT ON (service_id) id AS max_id
-        FROM services
+        FROM services.services
         ORDER BY service_id ASC, updated_at DESC
     )
 
@@ -54,7 +54,7 @@ SELECT
     ruuter_type AS type,
     service_id,
     CEIL(COUNT(*) OVER () / :page_size::DECIMAL) AS total_pages
-FROM services
+FROM services.services
     INNER JOIN max_services ON id = max_id
 WHERE NOT deleted AND NOT is_common
 ORDER BY

@@ -28,7 +28,7 @@ WITH
             name,
             service_id,
             structure
-        FROM services
+        FROM services.services
         WHERE deleted IS false
         ORDER BY service_id ASC, updated_at DESC
     )

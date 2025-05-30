@@ -33,7 +33,7 @@ declaration:
   response:
     fields: []
 */
-INSERT INTO services (
+INSERT INTO services.services (
     name, description, slot, service_id, ruuter_type, is_common, structure
 )
 VALUES (

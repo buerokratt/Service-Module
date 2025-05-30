@@ -16,7 +16,7 @@ declaration:
         type: string
         description: "Name of the most recent service with the given service_id"
 */
-SELECT name FROM services
+SELECT name FROM services.services
 WHERE service_id = :id
 ORDER BY updated_at DESC
 LIMIT 1;

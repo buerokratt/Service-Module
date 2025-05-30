@@ -40,7 +40,7 @@ WITH
             service_name,
             status,
             created
-        FROM service_trigger
+        FROM service_management.service_trigger
         WHERE (
             intent,
             service,
@@ -51,7 +51,7 @@ WITH
                 service,
                 service_name,
                 MAX(created)
-            FROM service_trigger
+            FROM service_management.service_trigger
             GROUP BY
                 intent,
                 service,
@@ -69,7 +69,7 @@ WITH
                 PARTITION BY intent
                 ORDER BY created DESC
             ) AS rn
-        FROM intent
+        FROM intent_management.intent
     )
 
 SELECT

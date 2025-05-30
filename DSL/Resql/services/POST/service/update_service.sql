@@ -28,7 +28,7 @@ declaration:
 */
 SELECT
     COPY_ROW_WITH_MODIFICATIONS(
-        'services',
+        'services.services',
         'id', '', id,
         ARRAY[
             'name', '', :name,
@@ -38,7 +38,7 @@ SELECT
             'updated_at', '::TIMESTAMP WITH TIME ZONE', NOW()::VARCHAR
         ]::VARCHAR []
     )
-FROM services
+FROM services.services
 WHERE service_id = :id
 ORDER BY updated_at DESC
 LIMIT 1;

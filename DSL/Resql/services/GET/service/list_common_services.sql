@@ -51,7 +51,7 @@ SELECT
     is_common AS isCommon, --noqa
     service_id,
     CEIL(COUNT(*) OVER () / :page_size::DECIMAL) AS total_pages
-FROM services
+FROM services.services
 WHERE NOT deleted AND is_common
 ORDER BY
     CASE WHEN :sorting = 'id asc' THEN updated_at END ASC,

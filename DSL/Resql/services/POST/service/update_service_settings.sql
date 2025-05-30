@@ -17,5 +17,5 @@ declaration:
   response:
     fields: []
 */
-INSERT INTO services_settings (name, value)
+INSERT INTO services.services_settings (name, value)
 VALUES (:name, :value);

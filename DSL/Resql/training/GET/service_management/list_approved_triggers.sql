@@ -22,7 +22,7 @@ declaration:
 SELECT intent,
        service,
        created
-FROM service_trigger
+FROM service_management.service_trigger
 WHERE (intent,
        service,
        service_name,
@@ -31,7 +31,7 @@ WHERE (intent,
             service,
             service_name,
             max(created)
-     FROM service_trigger
+     FROM service_management.service_trigger
      GROUP BY intent,
               service,
               service_name)
