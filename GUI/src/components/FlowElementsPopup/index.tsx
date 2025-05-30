@@ -30,7 +30,7 @@ import { saveEndpoints } from "services/service-builder";
 import useToastStore from "store/toasts.store";
 import i18next from "i18next";
 import MultiChoiceQuestionContent from "./MultiChoiceQuestionContent";
-import { MultiChoiceQuestion, NodeDataProps } from "types/service-flow";
+import { MultiChoiceQuestionButton, NodeDataProps } from "types/service-flow";
 import { Node } from "reactflow";
 
 const FlowElementsPopup: React.FC = () => {
@@ -70,7 +70,7 @@ const FlowElementsPopup: React.FC = () => {
   const [multiChoiceQuestionQuestion, setMultiChoiceQuestionQuestion] = useState<string>(
     node?.data.multiChoiceQuestion?.question ?? ""
   );
-  const [multiChoiceQuestionButtons, setMultiChoiceQuestionButtons] = useState<{ title: string; payload: string }[]>(
+  const [multiChoiceQuestionButtons, setMultiChoiceQuestionButtons] = useState<MultiChoiceQuestionButton[]>(
     node?.data.multiChoiceQuestion?.buttons ?? [
       { title: "Yes", payload: "" },
       { title: "No", payload: "" },
