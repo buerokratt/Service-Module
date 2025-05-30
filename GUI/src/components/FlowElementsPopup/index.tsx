@@ -164,7 +164,7 @@ const FlowElementsPopup: React.FC = () => {
 
     try {
       const finder = (e: any) => e.name === node.data.label || node.data.label.includes(e.name);
-      const endpoint = endpoints.find(finder)?.definedEndpoints[0];
+      const endpoint = endpoints.find(finder)?.definitions[0];
 
       if (!endpoint) return;
 
