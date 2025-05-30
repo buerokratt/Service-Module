@@ -108,16 +108,16 @@ const MultiChoiceQuestionContent: FC<MultiChoiceQuestionContentProps> = ({
                   >
                     <Icon icon={<MdEdit />} size="medium" />
                   </Button>
-                  <Button
-                    appearance="icon"
-                    size="s"
-                    onClick={() => handleDelete(idx)}
-                    aria-label={t("serviceFlow.multiChoiceQuestion.delete")!}
-                  >
-                    <Icon icon={<MdDeleteOutline />} size="medium" />
-                  </Button>
                 </>
               )}
+              <Button
+                appearance="icon"
+                size="s"
+                onClick={() => handleDelete(idx)}
+                aria-label={t("serviceFlow.multiChoiceQuestion.delete")!}
+              >
+                <Icon icon={<MdDeleteOutline />} size="medium" />
+              </Button>
             </Track>
           ))}
         </Track>
