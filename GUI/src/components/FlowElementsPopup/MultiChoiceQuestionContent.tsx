@@ -11,7 +11,6 @@ const MAX_BUTTONS = 4;
 // todo disable save if 2 btn only
 
 // todo - Mati buttons UI
-// todo translations and misc style
 export interface MultiChoiceQuestionContentProps {
   question: string;
   buttons: { title: string; payload: string }[];
