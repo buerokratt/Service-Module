@@ -33,7 +33,7 @@ declaration:
 create_endpoint:
   call: http.post
   args:
-    url: "[#SERVICE_RESQL]/endpoints/create_endpoint"
+    url: "[#SERVICE_RESQL]/endpoint/create_endpoint"
     body:
       endpointId: ${incoming.body.endpointId}
       name: ${incoming.body.name}

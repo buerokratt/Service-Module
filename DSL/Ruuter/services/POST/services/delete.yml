@@ -99,7 +99,7 @@ check_result:
 delete_endpoints_by_service_id:
   call: http.post
   args:
-    url: "[#SERVICE_RESQL]/endpoints/delete_endpoints_by_service_id"
+    url: "[#SERVICE_RESQL]/endpoint/delete_endpoints_by_service_id"
     body:
       serviceId: ${id}
   next: delete_endpoint_files

@@ -43,7 +43,7 @@ check_for_type:
 update_endpoint:
   call: http.post
   args:
-    url: "[#SERVICE_RESQL]/endpoints/update_endpoint"
+    url: "[#SERVICE_RESQL]/endpoint/update_endpoint"
     body:
       endpointId: ${id}
       name: ${incoming.body.name}

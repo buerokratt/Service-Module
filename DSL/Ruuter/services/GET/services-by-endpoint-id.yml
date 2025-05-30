@@ -21,10 +21,10 @@ check_for_parameters:
       next: return_incorrect_request
 
 get_service_ids_by_endpoint_id:
-  call: http.post
+  call: http.get
   args:
-    url: "[#SERVICE_RESQL]/endpoints/get_service_ids_by_endpoint_id"
-    body:
+    url: "[#SERVICE_RESQL]/endpoint/get_service_ids_by_endpoint_id"
+    query:
       endpointId: ${incoming.params.endpointId}
   result: service_id_result
 
@@ -33,10 +33,10 @@ assign_service_ids:
     service_ids: ${service_id_result.response.body[0].serviceIds}
 
 get_services_by_ids:
-  call: http.post
+  call: http.get
   args:
-    url: "[#SERVICE_RESQL]/services/get_services_by_ids"
-    body:
+    url: "[#SERVICE_RESQL]/service/get_services_by_ids"
+    query:
       # Converting to string to prevent issues with Resql
       serviceIds: ${service_ids.filter((id) => id !== incoming.params.excludedServiceId).join(",")}
   result: results

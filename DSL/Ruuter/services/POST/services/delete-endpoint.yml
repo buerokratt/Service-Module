@@ -15,7 +15,7 @@ declaration:
 delete_endpoint:
   call: http.post
   args:
-    url: "[#SERVICE_RESQL]/endpoints/delete_endpoint"
+    url: "[#SERVICE_RESQL]/endpoint/delete_endpoint"
     body:
       id: ${incoming.body.id}
 

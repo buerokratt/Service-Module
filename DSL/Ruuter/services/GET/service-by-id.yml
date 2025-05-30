@@ -26,10 +26,10 @@ get_service_by_id:
   result: service_results
 
 get_endpoints_by_service_id:
-  call: http.post
+  call: http.get
   args:
-    url: "[#SERVICE_RESQL]/endpoints/get_endpoints_by_service_id"
-    body:
+    url: "[#SERVICE_RESQL]/endpoint/get_endpoints_by_service_id"
+    query:
       id: ${incoming.params.id}
   result: endpoints_results
 
