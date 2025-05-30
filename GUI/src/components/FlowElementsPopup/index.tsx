@@ -29,6 +29,7 @@ import ApiContent from "./ApiContent";
 import { saveEndpoints } from "services/service-builder";
 import useToastStore from "store/toasts.store";
 import i18next from "i18next";
+import MultiChoiceQuestionContent from "./MultiChoiceQuestionContent";
 
 const FlowElementsPopup: React.FC = () => {
   const { t } = useTranslation();
@@ -306,7 +307,8 @@ const FlowElementsPopup: React.FC = () => {
             )}
             {stepType === StepType.FinishingStepEnd && <EndConversationContent />}
             {stepType === StepType.RasaRules && <RasaRulesContent />}
-            {stepType === StepType.Assign && <AssignContent nodeId={node.id} />}
+            {/* todo fix this */}
+            {/* {stepType === StepType.Assign && <AssignContent nodeId={node.id} />} */}
             {stepType === StepType.Condition && <ConditionContent nodeId={node.id} />}
             {stepType === StepType.UserDefined && (
               <ApiContent
@@ -314,6 +316,9 @@ const FlowElementsPopup: React.FC = () => {
                 endpoint={endpoints.find((e) => e.name === node.data.label || node.data.label.includes(e.name))}
               />
             )}
+            {/* todo fix this */}
+            {stepType === StepType.Assign && <MultiChoiceQuestionContent />}
+            {/* {stepType === StepType.MultiChoiceQuestion && <MultiChoiceQuestionContent />} */}
             <JsonRequestContent isVisible={isJsonRequestVisible} jsonContent={jsonRequestContent} />
           </Tabs.Content>
           {!isReadonly && (
