@@ -19,6 +19,8 @@ export interface MultiChoiceQuestionContentProps {
   setButtons: (b: { title: string; payload: string }[]) => void;
 }
 
+// todo button text languages - including default values
+
 const MultiChoiceQuestionContent: FC<MultiChoiceQuestionContentProps> = ({
   question,
   buttons,
@@ -52,9 +54,6 @@ const MultiChoiceQuestionContent: FC<MultiChoiceQuestionContentProps> = ({
 
   return (
     <Track direction="vertical" align="stretch" gap={16} style={{ width: "100%", padding: 16 }}>
-      <label htmlFor="multiChoiceQuestion-question" style={{ marginBottom: 8 }}>
-        {t("serviceFlow.popup.messageLabel")}
-      </label>
       <FormTextarea
         name="multiChoiceQuestion-question"
         label=""
@@ -75,7 +74,7 @@ const MultiChoiceQuestionContent: FC<MultiChoiceQuestionContentProps> = ({
                   <FormInput
                     name={`button-title-${idx}`}
                     label=""
-                    placeholder={t("serviceFlow.multiChoiceQuestion.buttonTitlePlaceholder")!}
+                    placeholder={t("serviceFlow.multiChoiceQuestion.ellipsis")!}
                     value={editValue}
                     onChange={(e) => setEditValue(e.target.value)}
                     autoFocus
@@ -86,12 +85,7 @@ const MultiChoiceQuestionContent: FC<MultiChoiceQuestionContentProps> = ({
                     style={{ minWidth: 120, flex: 1 }}
                     hideLabel
                   />
-                  <Button
-                    appearance="icon"
-                    size="s"
-                    onClick={() => handleEditSave(idx)}
-                    aria-label={t("global.save") || undefined}
-                  >
+                  <Button appearance="icon" size="s" onClick={() => handleEditSave(idx)} aria-label={t("global.save")!}>
                     <Icon icon={<MdCheck />} size="medium" />
                   </Button>
                 </>
@@ -112,7 +106,7 @@ const MultiChoiceQuestionContent: FC<MultiChoiceQuestionContentProps> = ({
                       appearance="icon"
                       size="s"
                       onClick={() => handleEdit(idx)}
-                      aria-label={t("serviceFlow.multiChoiceQuestion.edit") || undefined}
+                      aria-label={t("serviceFlow.multiChoiceQuestion.edit")!}
                     >
                       <Icon icon={<MdEdit />} size="medium" />
                     </Button>
@@ -120,7 +114,7 @@ const MultiChoiceQuestionContent: FC<MultiChoiceQuestionContentProps> = ({
                       appearance="icon"
                       size="s"
                       onClick={() => handleDelete(idx)}
-                      aria-label={t("serviceFlow.multiChoiceQuestion.delete") || undefined}
+                      aria-label={t("serviceFlow.multiChoiceQuestion.delete")!}
                     >
                       <Icon icon={<MdDeleteOutline />} size="medium" />
                     </Button>
@@ -135,7 +129,7 @@ const MultiChoiceQuestionContent: FC<MultiChoiceQuestionContentProps> = ({
             appearance="secondary"
             onClick={handleAdd}
             disabled={buttons.length >= MAX_BUTTONS}
-            aria-label={t("serviceFlow.multiChoiceQuestion.addButton") || undefined}
+            aria-label={t("serviceFlow.multiChoiceQuestion.addButton")!}
           >
             {t("serviceFlow.multiChoiceQuestion.addButton")}
           </Button>
