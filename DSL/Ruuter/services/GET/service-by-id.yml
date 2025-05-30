@@ -18,18 +18,18 @@ check_for_parameters:
       next: return_incorrect_request
 
 get_service_by_id:
-  call: http.post
+  call: http.get
   args:
-    url: "[#SERVICE_RESQL]/get-service-by-id"
-    body:
+    url: "[#SERVICE_RESQL]/service/get-service-by-id"
+    query:
       id: ${incoming.params.id}
   result: service_results
 
 get_endpoints_by_service_id:
-  call: http.post
+  call: http.get
   args:
-    url: "[#SERVICE_RESQL]/endpoints/get_endpoints_by_service_id"
-    body:
+    url: "[#SERVICE_RESQL]/endpoint/get_endpoints_by_service_id"
+    query:
       id: ${incoming.params.id}
   result: endpoints_results
 

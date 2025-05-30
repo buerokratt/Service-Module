@@ -32,10 +32,10 @@ check_for_required_parameters:
   next: fetch_user_roles_from_db
 
 fetch_user_roles_from_db:
-  call: http.post
+  call: http.get
   args:
-    url: "[#SERVICE_RESQL_USERS]:[#SERVICE_RESQL_USERS_PORT]/is-user-roles-allowed"
-    body:
+    url: "[#SERVICE_RESQL_USERS]:[#SERVICE_RESQL_USERS_PORT]/auth_users/is-user-roles-allowed"
+    query:
       userId: ${userId}
       allowedRoles: ${allowedRoles}
   result: result

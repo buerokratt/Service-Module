@@ -29,19 +29,19 @@ extract_request_data:
   next: get_status_name
 
 get_status_name:
-  call: http.post
+  call: http.get
   args:
-    url: "[#SERVICE_RESQL]/get-service-name-by-id"
-    body:
+    url: "[#SERVICE_RESQL]/service/get-service-name-by-id"
+    query:
       id: ${id}
   result: name_res
   next: get_current_status
 
 get_current_status:
-  call: http.post
+  call: http.get
   args:
-    url: "[#SERVICE_RESQL]/status"
-    body:
+    url: "[#SERVICE_RESQL]/service/status"
+    query:
       id: ${id}
   result: status_res
   next: check_status
@@ -60,7 +60,7 @@ assign_old_path:
 delete_service:
   call: http.post
   args:
-    url: "[#SERVICE_RESQL]/delete-service"
+    url: "[#SERVICE_RESQL]/service/delete-service"
     body:
       id: ${id}
   result: res
@@ -99,7 +99,7 @@ check_result:
 delete_endpoints_by_service_id:
   call: http.post
   args:
-    url: "[#SERVICE_RESQL]/endpoints/delete_endpoints_by_service_id"
+    url: "[#SERVICE_RESQL]/endpoint/delete_endpoints_by_service_id"
     body:
       serviceId: ${id}
   next: delete_endpoint_files
@@ -113,10 +113,10 @@ delete_endpoint_files:
   next: check_for_intent_connection
 
 check_for_intent_connection:
-  call: http.post
+  call: http.get
   args:
-    url: "[#SERVICE_TRAINING_RESQL]/get-service-trigger"
-    body:
+    url: "[#SERVICE_TRAINING_RESQL]/service_management/get-service-trigger"
+    query:
       serviceId: ${id}
   result: connection_res
   next: check_is_connected_to_intents_or_has_requests
@@ -130,7 +130,7 @@ check_is_connected_to_intents_or_has_requests:
 delete_intent_connection:
   call: http.post
   args:
-    url: "[#SERVICE_TRAINING_RESQL]/add-service-trigger"
+    url: "[#SERVICE_TRAINING_RESQL]/service_management/add-service-trigger"
     body:
       serviceId: ${id}
       intent: ${connection_res.response.body[0].intent}

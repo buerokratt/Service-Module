@@ -18,7 +18,7 @@ declaration:
 updateSettings:
   call: http.post
   args:
-    url: "[#SERVICE_RESQL]/update-settings"
+    url: "[#SERVICE_RESQL]/service/update-settings"
     body:
       name: ${incoming.body.name}
       value: ${incoming.body.value}

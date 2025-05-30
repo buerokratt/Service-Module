@@ -8,9 +8,9 @@ declaration:
   namespace: service
 
 get_services_list:
-  call: http.post
+  call: http.get
   args:
-    url: "[#SERVICE_RESQL]/get-active-services-list"
+    url: "[#SERVICE_RESQL]/service/get-active-services-list"
   result: results
 
 return_ok:

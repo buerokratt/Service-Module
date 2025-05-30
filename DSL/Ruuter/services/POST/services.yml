@@ -19,10 +19,10 @@ declaration:
         description: "Body field 'sorting'"
 
 get_services_list:
-  call: http.post
+  call: http.get
   args:
-    url: "[#SERVICE_RESQL]/get-services-list"
-    body:
+    url: "[#SERVICE_RESQL]/service/get-services-list"
+    query:
       page: ${incoming.body.page}
       page_size: ${incoming.body.page_size}
       sorting: ${incoming.body.sorting}
@@ -34,9 +34,9 @@ assign_services_result:
     services: ${services_res.response.body}
 
 get_approved_triggers:
-  call: http.post
+  call: http.get
   args:
-    url: "[#SERVICE_TRAINING_RESQL]/get-approved-tiggers"
+    url: "[#SERVICE_TRAINING_RESQL]/service_management/get-approved-tiggers"
   result: triggers_res
 
 assign_training_result:
