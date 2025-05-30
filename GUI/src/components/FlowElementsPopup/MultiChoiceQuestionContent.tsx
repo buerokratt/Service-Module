@@ -10,7 +10,7 @@ import { MdEdit, MdDeleteOutline, MdCheck } from "react-icons/md";
 const MAX_BUTTONS = 4;
 // todo disable save if 2 btn only
 
-// todo - MAti buttons UI
+// todo - Mati buttons UI
 // todo translations and misc style
 export interface MultiChoiceQuestionContentProps {
   question: string;
