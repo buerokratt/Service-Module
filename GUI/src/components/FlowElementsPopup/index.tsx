@@ -239,10 +239,6 @@ const FlowElementsPopup: React.FC = () => {
     return true;
   };
 
-  const saveMultiChoiceQuestion = () => {
-    // todo implement
-  };
-
   return (
     <Popup
       style={{ maxWidth: 700 }}
