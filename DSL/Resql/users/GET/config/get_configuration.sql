@@ -30,11 +30,11 @@ SELECT
     key,
     value,
     created
-FROM config.configuration
+FROM config.configuration AS c_1
 WHERE
     key = :key
-    AND id IN (
-        SELECT MAX(id) FROM config.configuration
-        GROUP BY key
+    AND created = (
+        SELECT MAX(created) FROM config.configuration AS c_2
+        WHERE c_1.key = c_2.key
     )
     AND NOT deleted;

@@ -20,9 +20,9 @@ declaration:
 SELECT
     COPY_ROW_WITH_MODIFICATIONS(
         'services.services',
-        'id', '', id,
+        'id', '::UUID', id::VARCHAR,
         ARRAY[
-            'enpoints', '::JSON', :endpoints,
+            'endpoints', '::JSON', :endpoints,
             'updated_at', '::TIMESTAMP WITH TIME ZONE', NOW()::VARCHAR
         ]::VARCHAR []
     )

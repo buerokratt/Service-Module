@@ -21,12 +21,12 @@ declaration:
 */
 SELECT COALESCE(
     (
-        SELECT ARRAY_AGG(UPPER(authorities))::TEXT [] AS user_roles
+        SELECT ARRAY_AGG(UPPER(authorities::TEXT))::TEXT [] AS user_roles
         FROM (
             SELECT UNNEST(authority_name) AS authorities
-            FROM auth_users.user_authority
-            WHERE user_id = :userId::TEXT
-            ORDER BY authorities ASC
+            FROM auth_users.denormalized_user_data
+            WHERE id_code = :userId::TEXT
+            ORDER BY UNNEST(authority_name)::TEXT ASC
         ) AS _
     ) && (
         SELECT(

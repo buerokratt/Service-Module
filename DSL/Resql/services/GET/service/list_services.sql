@@ -63,4 +63,4 @@ ORDER BY
     CASE WHEN :sorting = 'name desc' THEN name END DESC,
     CASE WHEN :sorting = 'state asc' THEN current_state END ASC,
     CASE WHEN :sorting = 'state desc' THEN current_state END DESC
-OFFSET ((GREATEST(:page::INTEGER, 1) - 1) * :page_siz::INTEGER) LIMIT :page_size::INTEGER;
+OFFSET ((GREATEST(:page::INTEGER, 1) - 1) * :page_size::INTEGER) LIMIT :page_size::INTEGER;

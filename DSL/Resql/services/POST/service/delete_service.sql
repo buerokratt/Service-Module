@@ -17,7 +17,7 @@ declaration:
 SELECT
     COPY_ROW_WITH_MODIFICATIONS(
         'services.services',
-        'id', '', id,
+        'id', '::UUID', id::VARCHAR,
         ARRAY[
             'deleted', '::BOOLEAN', 'true',
             'updated_at', '::TIMESTAMP WITH TIME ZONE', NOW()::VARCHAR

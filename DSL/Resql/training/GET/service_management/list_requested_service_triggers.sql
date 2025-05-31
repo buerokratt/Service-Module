@@ -57,4 +57,4 @@ ORDER BY
    CASE WHEN :sorting = 'serviceName desc' THEN MAX(service_name) END DESC,
    CASE WHEN :sorting = 'requestedAt asc' THEN MAX(created) END ASC,
    CASE WHEN :sorting = 'requestedAt desc' THEN MAX(created) END DESC
-OFFSET ((GREATEST(:page, 1) - 1) * :page_size) LIMIT :page_size;
+OFFSET ((GREATEST(:page::INTEGER, 1) - 1) * :page_size::INTEGER) LIMIT :page_size::INTEGER;

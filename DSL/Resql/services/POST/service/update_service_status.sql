@@ -20,7 +20,7 @@ declaration:
 SELECT
     COPY_ROW_WITH_MODIFICATIONS(
         'services.services',
-        'id', '', id,
+        'id', '::UUID', id::VARCHAR,
         ARRAY[
             'current_state', '::SERVICE_STATE', :new_state,
             'updated_at', '::TIMESTAMP WITH TIME ZONE', NOW()::VARCHAR

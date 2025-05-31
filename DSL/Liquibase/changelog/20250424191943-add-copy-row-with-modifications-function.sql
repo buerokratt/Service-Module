@@ -1,11 +1,11 @@
 -- liquibase formatted sql
 -- changeset Artsiom Beida:20250424191943 ignore:true
-CREATE OR REPLACE FUNCTION copy_row_with_modifications(
+CREATE OR REPLACE FUNCTION COPY_ROW_WITH_MODIFICATIONS(
     table_name_to_copy_from VARCHAR,
     id_column_name VARCHAR,
     id_column_conversion_expression VARCHAR,
     id_to_copy VARCHAR,
-    modifications VARCHAR[]
+    modifications VARCHAR []
 ) RETURNS VARCHAR LANGUAGE plpgsql AS '
 DECLARE
     columns VARCHAR [];

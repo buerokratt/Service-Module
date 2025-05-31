@@ -29,7 +29,7 @@ declaration:
 SELECT
     COPY_ROW_WITH_MODIFICATIONS(
         'services.services',
-        'id', '', id,
+        'id', '::UUID', id::VARCHAR,
         ARRAY[
             'name', '', :name,
             'description', '', :description,
