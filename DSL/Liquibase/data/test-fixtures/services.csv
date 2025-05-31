@@ -1,0 +1,6 @@
+name,description,created_at,updated_at,ruuter_type,current_state,service_id,is_common,deleted,structure,endpoints,slot
+1,old description,'2025-05-29 13:16:10.336657 +00:00'::TIMESTAMP WITH TIME ZONE,'2025-05-29 13:16:10.336657 +00:00'::TIMESTAMP WITH TIME ZONE,GET,draft,fc8e27f2-bcf5-4970-881d-4430acadd307,false,false,'{}'::JSON,'[]'::JSON,''
+2,new description,'2025-05-29 13:16:10.336657 +00:00'::TIMESTAMP WITH TIME ZONE,'2025-05-31 13:16:39.848000 +00:00'::TIMESTAMP WITH TIME ZONE,GET,draft,1fe01073-21c8-41ab-af75-47dc91105e9f,false,false,'{}'::JSON,'[]'::JSON,''
+2,old description,'2025-05-29 13:16:10.336657 +00:00'::TIMESTAMP WITH TIME ZONE,'2025-05-30 13:16:39.848000 +00:00'::TIMESTAMP WITH TIME ZONE,GET,draft,1fe01073-21c8-41ab-af75-47dc91105e9f,false,false,'{}'::JSON,'[]'::JSON,''
+1,new description,'2025-05-29 13:16:10.336657 +00:00'::TIMESTAMP WITH TIME ZONE,'2025-05-30 13:16:39.848000 +00:00'::TIMESTAMP WITH TIME ZONE,GET,draft,fc8e27f2-bcf5-4970-881d-4430acadd307,false,false,'{}'::JSON,'[]'::JSON,''
+2,old description,'2025-05-29 13:16:10.336657 +00:00'::TIMESTAMP WITH TIME ZONE,'2025-05-29 13:16:10.336000 +00:00'::TIMESTAMP WITH TIME ZONE,GET,draft,1fe01073-21c8-41ab-af75-47dc91105e9f,false,false,'{}'::JSON,'[]'::JSON,''

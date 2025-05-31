@@ -48,7 +48,7 @@ link_intent_to_service_in_rasa_domain:
 add_connection_request:
   call: http.post
   args:
-    url: "[#SERVICE_TRAINING_RESQL]/add-service-trigger"
+    url: "[#SERVICE_TRAINING_RESQL]/service_management/create_service_trigger"
     body:
       serviceId: ${serviceId}
       intent: ${intent}

@@ -19,10 +19,10 @@ declaration:
         description: "Body field 'sorting'"
 
 get_available_intents:
-  call: http.post
+  call: http.get
   args:
-    url: "[#SERVICE_TRAINING_RESQL]/get-available-intents"
-    body:
+    url: "[#SERVICE_TRAINING_RESQL]/intent_management/list_available_intents"
+    query:
       page: ${incoming.body.page}
       page_size: ${incoming.body.page_size}
       sorting: ${incoming.body.sorting}

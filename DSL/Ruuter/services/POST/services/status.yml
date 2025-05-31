@@ -34,10 +34,10 @@ check_for_required_parameters:
   next: get_current_status
 
 get_current_status:
-  call: http.post
+  call: http.get
   args:
-    url: "[#SERVICE_RESQL]/status"
-    body:
+    url: "[#SERVICE_RESQL]/service/get_service_status_by_id"
+    query:
       id: ${id}
   result: status_res
   next: assign_old_status_and_path
@@ -57,7 +57,7 @@ check_status:
 set_status:
   call: http.post
   args:
-    url: "[#SERVICE_RESQL]/set-status"
+    url: "[#SERVICE_RESQL]/service/update_service_status"
     body:
       id: ${id}
       new_state: ${new_state}
@@ -67,7 +67,7 @@ set_status:
 set_plain_status:
   call: http.post
   args:
-    url: "[#SERVICE_RESQL]/set-status"
+    url: "[#SERVICE_RESQL]/service/update_service_status"
     body:
       id: ${id}
       new_state: ${new_state}
@@ -75,10 +75,10 @@ set_plain_status:
   next: return_ok
 
 get_status_name:
-  call: http.post
+  call: http.get
   args:
-    url: "[#SERVICE_RESQL]/get-service-name-by-id"
-    body:
+    url: "[#SERVICE_RESQL]/service/get-service-name-by-id"
+    query:
       id: ${id}
   result: name_res
   next: assign_values
@@ -143,10 +143,10 @@ draft_service:
   next: check_for_intent_connection
 
 check_for_intent_connection:
-  call: http.post
+  call: http.get
   args:
-    url: "[#SERVICE_TRAINING_RESQL]/get-service-trigger"
-    body:
+    url: "[#SERVICE_TRAINING_RESQL]/service_management/get_service_trigger_by_id"
+    query:
       serviceId: ${id}
   result: connection_res
   next: check_is_connected_to_intents_or_has_requests
@@ -173,7 +173,7 @@ unlink_service_from_intent_in_rasa_domain:
 delete_intent_connection:
   call: http.post
   args:
-    url: "[#SERVICE_TRAINING_RESQL]/add-service-trigger"
+    url: "[#SERVICE_TRAINING_RESQL]/service_management/create_service_trigger"
     body:
       serviceId: ${id}
       intent: ${connection_res.response.body[0].intent}

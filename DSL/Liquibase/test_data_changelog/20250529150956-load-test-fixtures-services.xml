@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.1.xsd">
+    <changeSet id="20250529150956" author="Artsiom Beida" context="@test">
+        <loadData
+                file="changelog/data/test-fixtures/services.csv"
+                tableName="services"
+                schemaName="services"
+        >
+            <column name="created_at" type="COMPUTED"/>
+            <column name="updated_at" type="COMPUTED"/>
+            <column name="structure" type="COMPUTED"/>
+            <column name="endpoints" type="COMPUTED"/>
+            <column name="ruuter_type" type="other" />
+            <column name="current_state" type="other" />
+        </loadData>
+    </changeSet>
+</databaseChangeLog>

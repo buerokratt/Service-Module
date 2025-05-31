@@ -21,10 +21,10 @@ check_for_parameters:
       next: return_incorrect_request
 
 get_services_by_endpoint_id:
-  call: http.post
+  call: http.get
   args:
-    url: "[#SERVICE_RESQL]/get-services-by-endpoint-id"
-    body:
+    url: "[#SERVICE_RESQL]/service/list_services_by_endpoint_id"
+    query:
       endpoint_id: ${incoming.params.endpointId}
       excluded_service_id: ${incoming.params.excludedServiceId}
   result: results

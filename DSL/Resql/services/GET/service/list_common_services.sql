@@ -1,0 +1,62 @@
+/*
+declaration:
+  version: 0.1
+  description: "Fetch paginated list of common, non-deleted services with sorting and total pages calculation"
+  method: get
+  namespace: service
+  returns: json
+  allowlist:
+    query:
+      - field: page
+        type: number
+        description: "Current page number (1-based)"
+      - field: page_size
+        type: number
+        description: "Number of items per page"
+      - field: sorting
+        type: string
+        enum: ['id asc', 'name asc', 'name desc', 'state asc', 'state desc']
+        description: "Sorting criteria for the result set"
+  response:
+    fields:
+      - field: name
+        type: string
+        description: "Name of the service"
+      - field: description
+        type: string
+        description: "Description of the service"
+      - field: state
+        type: string
+        enum: ['active', 'inactive', 'draft', 'ready']
+        description: "Current state of the service"
+      - field: type
+        type: string
+        enum: ['GET', 'POST']
+        description: "Ruuter type associated with the service"
+      - field: isCommon
+        type: boolean
+        description: "Indicates whether the service is marked as common"
+      - field: service_id
+        type: string
+        description: "Service identifier"
+      - field: total_pages
+        type: number
+        description: "Total number of pages available for the given page size"
+*/
+SELECT
+    name,
+    description,
+    current_state AS state,
+    ruuter_type AS type,
+    is_common AS isCommon, --noqa
+    service_id,
+    CEIL(COUNT(*) OVER () / :page_size::DECIMAL) AS total_pages
+FROM services.services
+WHERE NOT deleted AND is_common
+ORDER BY
+    CASE WHEN :sorting = 'id asc' THEN updated_at END ASC,
+    CASE WHEN :sorting = 'name asc' THEN name END ASC,
+    CASE WHEN :sorting = 'name desc' THEN name END DESC,
+    CASE WHEN :sorting = 'state asc' THEN current_state END ASC,
+    CASE WHEN :sorting = 'state desc' THEN current_state END DESC
+OFFSET ((GREATEST(:page::INTEGER, 1) - 1) * :page_size::INTEGER) LIMIT :page_size::INTEGER;
