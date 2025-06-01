@@ -32,6 +32,10 @@ type NodeDataProps = {
     originalDefinedNodeId?: string;
     rules?: Group;
     assignElements?: Assign[];
+    multiChoiceQuestion?: {
+      question: string;
+      options: { label: string; value: string }[];
+    };
   };
 };
 
@@ -67,7 +71,10 @@ const StepNode: FC<NodeDataProps> = ({ data }) => {
       const invalidRulesExist = hasInvalidRules(data.rules?.children || []);
       return data.rules?.children === undefined || invalidRulesExist || data.rules?.children.length === 0;
     }
-    if (data.stepType === StepType.UserDefined || data.stepType === StepType.MultiChoiceQuestion) return;
+    if (data.stepType === StepType.MultiChoiceQuestion) {
+      return !data?.multiChoiceQuestion?.question;
+    }
+    if (data.stepType === StepType.UserDefined) return;
     if (data.stepType === StepType.OpenWebpage) return !data.link || !data.linkText;
     if (data.stepType === StepType.FileGenerate) return !data.fileName || !data.fileContent;
     if (data.stepType === StepType.FileSign) return !data.signOption;
