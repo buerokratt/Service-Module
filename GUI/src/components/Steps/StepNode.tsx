@@ -6,6 +6,7 @@ import { StepType } from "../../types";
 import useServiceStore from "store/new-services.store";
 import { Group, Rule } from "components/FlowElementsPopup/RuleBuilder/types";
 import { Assign } from "types/assign";
+import { MultiChoiceQuestion } from "types/multi-choice-question";
 
 type NodeDataProps = {
   data: {
@@ -32,10 +33,7 @@ type NodeDataProps = {
     originalDefinedNodeId?: string;
     rules?: Group;
     assignElements?: Assign[];
-    multiChoiceQuestion?: {
-      question: string;
-      options: { label: string; value: string }[];
-    };
+    multiChoiceQuestion?: MultiChoiceQuestion;
   };
 };
 
@@ -72,7 +70,7 @@ const StepNode: FC<NodeDataProps> = ({ data }) => {
       return data.rules?.children === undefined || invalidRulesExist || data.rules?.children.length === 0;
     }
     if (data.stepType === StepType.MultiChoiceQuestion) {
-      return !data?.multiChoiceQuestion?.question;
+      return !data?.multiChoiceQuestion?.question || data.multiChoiceQuestion?.buttons?.find((e) => e.title === "") != undefined;
     }
     if (data.stepType === StepType.UserDefined) return;
     if (data.stepType === StepType.OpenWebpage) return !data.link || !data.linkText;
