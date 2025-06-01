@@ -8,12 +8,10 @@ import { MdEdit, MdDeleteOutline, MdCheck } from "react-icons/md";
 import "./styles.scss";
 import FormError from "components/FormElements/FormError";
 import { v4 } from "uuid";
-import { MultiChoiceQuestion } from "types/multi-choice-question";
 
 const maxButtons = parseInt(process.env.REACT_APP_MULTI_CHOICE_QUESTION_MAX_BUTTONS ?? "4");
 
 export interface MultiChoiceQuestionContentProps {
-  readonly nodeData: MultiChoiceQuestion | undefined;
   question: string;
   buttons: { title: string; payload: string }[];
   setQuestion: (q: string) => void;
@@ -22,7 +20,6 @@ export interface MultiChoiceQuestionContentProps {
 }
 
 const MultiChoiceQuestionContent: FC<MultiChoiceQuestionContentProps> = ({
-  nodeData,
   question,
   buttons,
   setQuestion,
@@ -69,7 +66,7 @@ const MultiChoiceQuestionContent: FC<MultiChoiceQuestionContentProps> = ({
           name="multiChoiceQuestion-question"
           label=""
           placeholder={t("serviceFlow.multiChoiceQuestion.questionPlaceholder")!}
-          defaultValue={nodeData?.question ?? ""}
+          defaultValue={question}
           onChange={(e) => {
             setQuestion(e.target.value);
             setIsSaveEnabled(buttons.length > 1 && !!e.target.value.length);
@@ -78,7 +75,7 @@ const MultiChoiceQuestionContent: FC<MultiChoiceQuestionContentProps> = ({
           minRows={2}
           hideLabel
         />
-        {!(nodeData?.question ?? "").length && (
+        {!question.length && (
           <FormError style={{ marginTop: 2 }}>{t("serviceFlow.multiChoiceQuestion.questionError")}</FormError>
         )}
       </div>

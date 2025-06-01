@@ -97,6 +97,14 @@ const FlowElementsPopup: React.FC = () => {
     useServiceStore.getState().changeAssignNode(node.data.assignElements);
   }, [stepType === StepType.Assign]);
 
+  useEffect(() => {
+    if (!node) return
+    setMultiChoiceQuestionQuestion(node?.data?.multiChoiceQuestion?.question ?? "");
+    setMultiChoiceQuestionButtons(
+      node?.data?.multiChoiceQuestion?.buttons ?? defaultMultiChoiceQuestionButtons
+    );
+  }, [stepType === StepType.MultiChoiceQuestion]);
+
   if (!node) return <></>;
 
   const title = node.data.label;
@@ -341,7 +349,6 @@ const FlowElementsPopup: React.FC = () => {
             )}
             {stepType === StepType.MultiChoiceQuestion && (
               <MultiChoiceQuestionContent
-                nodeData={node.data.multiChoiceQuestion}
                 question={multiChoiceQuestionQuestion}
                 buttons={multiChoiceQuestionButtons}
                 setQuestion={setMultiChoiceQuestionQuestion}
