@@ -16,5 +16,4 @@ export enum StepType {
   UserDefined = "user-defined",
   RasaRules = "rasa-rules",
   SiGa = "siga",
-  MultiChoiceQuestion = "multi-choice-question",
 }
