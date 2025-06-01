@@ -255,7 +255,19 @@
       "redirectConversationToSupport": "Klienditeenindusse suunamine",
       "rules": "Reeglid",
       "rasaRules": "Rasa reeglid",
-      "siga": "Allkirjastamine"
+      "siga": "Allkirjastamine",
+      "multiChoiceQuestion": {
+        "questionPlaceholder": "Sisesta küsimus",
+        "questionError": "Küsimus on kohustuslik",
+        "addButton": "Lisa nupp +",
+        "maxButtonsStart": "Maksimaalselt ",
+        "maxButtonsEnd": " nuppu lubatud.",
+        "minButtons": "Vähemalt 2 nuppu on vajalik.",
+        "ellipsis": "...",
+        "edit": "Muuda",
+        "delete": "Kustuta",
+        "userChoices": "Lõppkasutaja valikud:"
+      }
     },
     "popup": {
       "messageLabel": "Sõnum",

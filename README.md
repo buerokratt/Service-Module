@@ -69,11 +69,28 @@ Currently, Header and Main Navigation used as external components, they are defi
  "@buerokrat-ria/styles": "^0.0.1"
 ```
 
+### Linting and formatting
+
+#### SQL
+
+The repository uses [SQLFluff](https://sqlfluff.com/) for linting and formatting SQL files. To use SQLFluff:
+
+1. Install SQLFluff: `pipx install sqlfluff`.
+2. Run `sqlfluff lint <some-path>`.
+3. Additionally, using an IDE extension is highly recommended. For [VSCode](https://marketplace.visualstudio.com/items?itemName=dorzey.vscode-sqlfluff) or [Jetbrains editors](https://plugins.jetbrains.com/plugin/20494-sqlfluff-linter-community-edition).
+
 ### Database setup
+
+To use the local services database, do the following:
+
+1. Open `docker-compose.yml`, find `resql` service and change the value of environment variable `sqlms.datasources.[0].jdbcUrl` to `jdbc:postgresql://database:5432/services_db`.
+2. Run `./migrate.sh` to run migrations.
+3. Start the project normally with `docker compose up -d`.
+
+Extras:
 
 - For setting up the users database initially, run
   `docker run --platform linux/amd64 --network=bykstack riaee/byk-users-db:liquibase20220615 --url=jdbc:postgresql://database:5432/users_db --username=byk --password=01234 --changelog-file=./master.yml update`
-- Run migrations added in this repository by running the helper script `./migrate.sh`
 - When creating new migrations, use the helper `./create-migration.sh name-of-migration` which will create a timestamped file in the correct directory and add the required headers
 
 ### Open Search

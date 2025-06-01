@@ -25,6 +25,7 @@ const ServiceFlowPage: FC = () => {
       { id: 20, label: t("serviceFlow.element.textfield"), type: StepType.Textfield },
       { id: 30, label: t("serviceFlow.element.clientInput"), type: StepType.Input },
       { id: 40, label: t("serviceFlow.element.assign"), type: StepType.Assign },
+      { id: 41, label: t("serviceFlow.element.multiChoiceQuestion"), type: StepType.MultiChoiceQuestion },
       { id: 50, label: t("serviceFlow.element.condition"), type: StepType.Condition },
       { id: 60, label: t("serviceFlow.element.multiChoiceQuestion"), type: StepType.MultiChoiceQuestion },
       { id: 70, label: t("serviceFlow.element.rasaRules"), type: StepType.RasaRules },
@@ -90,8 +91,8 @@ const ServiceFlowPage: FC = () => {
               {steps && (
                 <Collapsible title={t("serviceFlow.apiElements.title")} contentStyle={contentStyle}>
                   <Track direction="vertical" align="stretch" gap={4}>
-                    {steps.map((step, index) => (
-                      <ApiEndpoint step={step} key={index} />
+                    {steps.map((step) => (
+                      <ApiEndpoint step={step} key={step.id} />
                     ))}
                   </Track>
                 </Collapsible>

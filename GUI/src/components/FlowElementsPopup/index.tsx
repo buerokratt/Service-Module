@@ -29,11 +29,21 @@ import ApiContent from "./ApiContent";
 import { saveEndpoints } from "services/service-builder";
 import useToastStore from "store/toasts.store";
 import i18next from "i18next";
+import MultiChoiceQuestionContent from "./MultiChoiceQuestionContent";
+import { NodeDataProps } from "types/service-flow";
+import { Node } from "reactflow";
+import { MultiChoiceQuestionButton } from "types/multi-choice-question";
+
+const defaultMultiChoiceQuestionButtons = [
+  { title: "Yes", payload: "" },
+  { title: "No", payload: "" },
+];
 
 const FlowElementsPopup: React.FC = () => {
   const { t } = useTranslation();
   const [selectedTab, setSelectedTab] = useState<string | null>(null);
   const [isJsonRequestVisible, setIsJsonRequestVisible] = useState(false);
+  const [isSaveEnabled, setIsSaveEnabled] = useState(true);
   const [jsonRequestContent, setJsonRequestContent] = useState<any>(null);
   const node = useServiceStore((state) => state.selectedNode);
 
@@ -63,6 +73,13 @@ const FlowElementsPopup: React.FC = () => {
   const [fileContent, setFileContent] = useState<string | null>(null);
   // StepType.FileSign
   const [signOption, setSignOption] = useState<{ label: string; value: string } | null>(node?.data.signOption ?? null);
+  // StepType.MultiChoiceQuestion
+  const [multiChoiceQuestionQuestion, setMultiChoiceQuestionQuestion] = useState<string>(
+    node?.data.multiChoiceQuestion?.question ?? ""
+  );
+  const [multiChoiceQuestionButtons, setMultiChoiceQuestionButtons] = useState<MultiChoiceQuestionButton[]>(
+    node?.data.multiChoiceQuestion?.buttons ?? defaultMultiChoiceQuestionButtons
+  );
 
   const stepType = node?.data.stepType;
 
@@ -95,13 +112,15 @@ const FlowElementsPopup: React.FC = () => {
     setFileName(null);
     setFileContent(null);
     setTextfieldMessagePlaceholders({});
+    setMultiChoiceQuestionQuestion("");
+    setMultiChoiceQuestionButtons(defaultMultiChoiceQuestionButtons);
     useServiceStore.getState().resetSelectedNode();
     useServiceStore.getState().resetRules();
     useServiceStore.getState().resetAssign();
   };
 
   const handleSaveClick = () => {
-    const updatedNode = {
+    const updatedNode: Node<NodeDataProps> = {
       ...node,
       data: {
         ...node.data,
@@ -111,6 +130,10 @@ const FlowElementsPopup: React.FC = () => {
         fileName: fileName ?? node.data?.fileName,
         fileContent: fileContent ?? node.data?.fileContent,
         signOption: signOption ?? node.data?.signOption,
+        multiChoiceQuestion: {
+          question: multiChoiceQuestionQuestion,
+          buttons: multiChoiceQuestionButtons,
+        },
       },
     };
 
@@ -164,7 +187,7 @@ const FlowElementsPopup: React.FC = () => {
 
     try {
       const finder = (e: any) => e.name === node.data.label || node.data.label.includes(e.name);
-      const endpoint = endpoints.find(finder)?.definedEndpoints[0];
+      const endpoint = endpoints.find(finder)?.definitions[0];
 
       if (!endpoint) return;
 
@@ -241,7 +264,9 @@ const FlowElementsPopup: React.FC = () => {
                 {t("global.cancel")}
               </Button>
             )}
-            <Button onClick={handleSaveClick}>{t(isReadonly ? "global.close" : "global.save")}</Button>
+            <Button disabled={!isSaveEnabled} onClick={handleSaveClick}>
+              {t(isReadonly ? "global.close" : "global.save")}
+            </Button>
           </Track>
         </Track>
       }
@@ -312,6 +337,15 @@ const FlowElementsPopup: React.FC = () => {
               <ApiContent
                 nodeId={node.id}
                 endpoint={endpoints.find((e) => e.name === node.data.label || node.data.label.includes(e.name))}
+              />
+            )}
+            {stepType === StepType.MultiChoiceQuestion && (
+              <MultiChoiceQuestionContent
+                question={multiChoiceQuestionQuestion}
+                buttons={multiChoiceQuestionButtons}
+                setQuestion={setMultiChoiceQuestionQuestion}
+                setButtons={setMultiChoiceQuestionButtons}
+                setIsSaveEnabled={setIsSaveEnabled}
               />
             )}
             <JsonRequestContent isVisible={isJsonRequestVisible} jsonContent={jsonRequestContent} />

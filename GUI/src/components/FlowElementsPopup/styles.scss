@@ -189,3 +189,9 @@ li:not(:has(> div > div)) .object-tree-chip {
     }
   }
 }
+
+.multiple-choice-question-button {
+  background-color: get-color(sapphire-blue-10) !important;
+  height: 36px !important;
+  cursor: default !important;
+}
