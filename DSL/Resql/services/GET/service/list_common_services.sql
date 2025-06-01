@@ -43,6 +43,12 @@ declaration:
         type: number
         description: "Total number of pages available for the given page size"
 */
+WITH
+    max_services AS (
+        SELECT DISTINCT ON (service_id) id AS max_id
+        FROM services.services
+        ORDER BY service_id ASC, updated_at DESC
+    )
 SELECT
     name,
     description,
@@ -51,7 +57,8 @@ SELECT
     is_common AS isCommon, --noqa
     service_id,
     CEIL(COUNT(*) OVER () / :page_size::DECIMAL) AS total_pages
-FROM services.services
+FROM services.services AS s1
+INNER JOIN max_services ON s1.id = max_services.max_id
 WHERE NOT deleted AND is_common
 ORDER BY
     CASE WHEN :sorting = 'id asc' THEN updated_at END ASC,
