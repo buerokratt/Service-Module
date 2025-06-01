@@ -66,7 +66,7 @@ const MultiChoiceQuestionContent: FC<MultiChoiceQuestionContentProps> = ({
           name="multiChoiceQuestion-question"
           label=""
           placeholder={t("serviceFlow.multiChoiceQuestion.questionPlaceholder")!}
-          defaultValue={question}
+          value={question}
           onChange={(e) => {
             setQuestion(e.target.value);
             setIsSaveEnabled(buttons.length > 1 && !!e.target.value.length);
