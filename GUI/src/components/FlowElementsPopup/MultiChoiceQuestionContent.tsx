@@ -71,7 +71,8 @@ const MultiChoiceQuestionContent: FC<MultiChoiceQuestionContentProps> = ({
             setQuestion(e.target.value);
             setIsSaveEnabled(buttons.length > 1 && !!e.target.value.length);
           }}
-          maxRows={3}
+          style={{ resize: "none", width: "100%" }}
+          maxRows={5}
           minRows={2}
           hideLabel
         />

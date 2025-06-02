@@ -46,6 +46,7 @@ export type NodeDataProps = {
   rules?: any;
   assignElements?: any;
   multiChoiceQuestion?: MultiChoiceQuestion;
+  childrenCount?: number;
 };
 
 export const initialNodes: Node[] = [

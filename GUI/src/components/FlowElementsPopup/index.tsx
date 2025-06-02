@@ -30,9 +30,10 @@ import { saveEndpoints } from "services/service-builder";
 import useToastStore from "store/toasts.store";
 import i18next from "i18next";
 import MultiChoiceQuestionContent from "./MultiChoiceQuestionContent";
-import { NodeDataProps } from "types/service-flow";
+import { EDGE_LENGTH, NodeDataProps } from "types/service-flow";
 import { Node } from "reactflow";
 import { MultiChoiceQuestionButton } from "types/multi-choice-question";
+import { buildEdge, buildPlaceholder } from "services/flow-builder";
 
 const defaultMultiChoiceQuestionButtons = [
   { title: "Yes", payload: "" },
@@ -142,11 +143,16 @@ const FlowElementsPopup: React.FC = () => {
           question: multiChoiceQuestionQuestion,
           buttons: multiChoiceQuestionButtons,
         },
+        childrenCount: stepType === StepType.MultiChoiceQuestion ? multiChoiceQuestionButtons.length : node.data?.childrenCount ?? 0,
       },
     };
 
     if (stepType === StepType.Input || stepType === StepType.Condition) {
       updatedNode.data.rules = rules;
+    }
+
+    if (stepType === StepType.MultiChoiceQuestion) {
+      saveMultiChoicePopup(updatedNode);
     }
 
     if (stepType === StepType.Assign) {
@@ -255,6 +261,67 @@ const FlowElementsPopup: React.FC = () => {
     );
     return true;
   };
+
+  const saveMultiChoicePopup = (updatedNode: Node<NodeDataProps>) => {
+    const reactFlowInstance = useServiceStore.getState().reactFlowInstance;
+    const nodeId = updatedNode.id;
+    const buttonPlaceholders = reactFlowInstance
+      ?.getEdges()
+      .filter((edge) => edge.source === nodeId)
+      .map((edge) => edge.target);
+    let filteredNodes = reactFlowInstance?.getNodes().filter((node) => !buttonPlaceholders?.includes(node.id));
+    const filteredEdges = reactFlowInstance?.getEdges().filter((edge) => !buttonPlaceholders?.includes(edge.target));
+
+    const newPlaceholderId = Math.max(...useServiceStore.getState().nodes.map((node) => +node.id)) + 2;
+
+    const baseY = updatedNode.position.y + EDGE_LENGTH * 1.5;
+    const baseX = updatedNode.position.x;
+    const widthOffset = (updatedNode.width ?? 0) * 0.75;
+
+    const buttons = updatedNode.data.multiChoiceQuestion?.buttons ?? [];
+
+    // Update the node data with the new buttons count
+    filteredNodes = filteredNodes?.map((node) =>
+      node.id === updatedNode.id
+        ? {
+            ...node,
+            data: {
+              ...node.data,
+              childrenCount: buttons.length,
+            },
+          }
+        : node
+    );
+
+    const middleIndex = Math.floor(buttons.length / 2);
+    const spacing = widthOffset * 1.7;
+
+    // Create placeholder nodes for each button and edges connecting them
+    buttons.forEach((button, index) => {
+      const offset = (index - middleIndex + (buttons.length % 2 === 0 ? 0.5 : 0)) * spacing;
+      const placeholderId = `${newPlaceholderId + (index + 1)}`;
+      filteredNodes?.push(
+        buildPlaceholder({
+          id: placeholderId,
+          label: button.title ?? "",
+          position: { y: baseY, x: baseX + offset },
+        })
+      );
+
+      filteredEdges?.push(
+        buildEdge({
+          id: `edge-${nodeId}-${newPlaceholderId + (index + 1)}`,
+          source: nodeId,
+          sourceHandle: `handle-${nodeId}-${index}`,
+          target: placeholderId,
+        })
+      );
+    });
+
+    // Update Nodes and Edges in the store
+    useServiceStore.getState().setNodes(filteredNodes ?? []);
+    useServiceStore.getState().setEdges(filteredEdges ?? []);
+  }
 
   return (
     <Popup
