@@ -247,7 +247,7 @@
       "clientInput": "Client input",
       "assign": "Assign",
       "condition": "Condition",
-      "multiChoiceQuestion": "Multi-Choice Question",
+      "multiChoiceQuestion": "Multi-choice question",
       "openNewWebpage": "Open new webpage",
       "fileGeneration": "File generation",
       "fileSigning": "File signing",
@@ -255,8 +255,7 @@
       "redirectConversationToSupport": "Direct to Customer Support",
       "rules": "Rules",
       "rasaRules": "Rasa Rules",
-      "siga": "SiGa",
-      "multiChoiceQuestion": "Multi-choice question"
+      "siga": "SiGa"
     },
     "popup": {
       "messageLabel": "Message",
