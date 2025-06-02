@@ -7,17 +7,18 @@ import './Popup.scss';
 
 type DialogProps = HTMLAttributes<HTMLDivElement> & {
   title: string;
+  description?: string;
   footer?: ReactNode;
   hasDefaultBody?: boolean;
   onClose: () => void;
-}
+};
 
-const Popup: FC<PropsWithChildren<DialogProps>> = ({ title, footer, onClose, hasDefaultBody = true, children, ...rest }) => {
+const Popup: FC<PropsWithChildren<DialogProps>> = ({ title, description, footer, onClose, hasDefaultBody = true, children, ...rest }) => {
   return (
     <RadixDialog.Root defaultOpen={true} onOpenChange={onClose}>
       <RadixDialog.Portal>
         <RadixDialog.Overlay className='popup__overlay' />
-        <RadixDialog.Content className='popup' {...rest}>
+        <RadixDialog.Content className='popup' aria-describedby={description ? "dialog-description" : undefined} {...rest}>
           <div className='popup__header'>
             <RadixDialog.Title className='h3 popup__title'>{title}</RadixDialog.Title>
             <RadixDialog.Close asChild>
