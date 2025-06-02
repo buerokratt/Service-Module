@@ -36,3 +36,4 @@ export const trainingModuleTraining = (): string => `${trainingModuleBaseUrl}/tr
 export const getServiceById = (id: string): string => `${baseUrl}/service-by-id?id=${id}`;
 export const updateServiceEndpoints = (id: string): string => `${baseUrl}/services/update-service-endpoints?id=${id}`;
 export const getSlots = (): string => `${baseUrl}/slots`;
+export const userStepPreferences = (): string => `${baseUrl}/steps/preferences`;

@@ -18,6 +18,7 @@ import { EndpointData } from "types/endpoint";
 import { onDragStart } from "utils/component-util";
 import apiIconTag from "../../assets/images/api-icon-tag.svg";
 import styles from "./ApiEndpoint.module.scss";
+import api from "../../services/api-dev";
 
 interface RelatedService {
   serviceId: string;
@@ -47,7 +48,7 @@ const ApiEndpoint: FC<ApiEndpointProps> = ({ step }) => {
       setIsGettingRelatedServices(true);
 
       try {
-        const services = (await axios.get<RelatedService[]>(getServicesByEndpointId(endpoint.id, id))).data;
+        const services = (await api.get<RelatedService[]>(getServicesByEndpointId(endpoint.id, id))).data;
         if (services.length > 0) {
           setRelatedServices(services);
         } else {

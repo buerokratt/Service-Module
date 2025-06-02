@@ -41,6 +41,7 @@ import EndpointCustom from "./ApiEndpointCard/Endpoints/Custom";
 import RequestVariables from "./ApiEndpointCard/Endpoints/RequestVariables";
 import VariableCell from "./ApiEndpointCard/Endpoints/RequestVariables/VariableCell";
 import ValueCell from "./ApiEndpointCard/Endpoints/RequestVariables/ValueCell";
+import StepElement from "./StepElement";
 
 export {
   Box,
@@ -84,4 +85,5 @@ export {
   FlowElementsPopup,
   VariableCell,
   ValueCell,
+  StepElement,
 };

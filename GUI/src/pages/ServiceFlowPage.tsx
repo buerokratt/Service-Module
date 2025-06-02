@@ -1,40 +1,29 @@
 import Chat from "components/chat/chat";
 import withAuthorization, { ROLES } from "hoc/with-authorization";
-import { CSSProperties, FC, useEffect, useMemo } from "react";
+import { CSSProperties, FC, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useParams } from "react-router-dom";
 import { ReactFlowProvider } from "reactflow";
 import "reactflow/dist/style.css";
 import { saveFlowClick } from "services/service-builder";
 import useServiceStore from "store/new-services.store";
-import { Box, Collapsible, FlowElementsPopup, NewServiceHeader, Track } from "../components";
+import { Collapsible, FlowElementsPopup, NewServiceHeader, StepElement, Track } from "../components";
 import FlowBuilder from "../components/FlowBuilder/FlowBuilder";
 import { ROUTES } from "../resources/routes-constants";
-import { Step, StepType } from "../types";
+import { Step, stepsLabels, StepType } from "../types";
 import "./ServiceFlowPage.scss";
 
 import ApiEndpoint from "components/ApiEndpoint";
-import { onDragStart } from "utils/component-util";
+import { closestCorners, DndContext, DragEndEvent, DragOverlay, DragStartEvent, KeyboardSensor, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
+import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from "@dnd-kit/sortable";
+import { restrictToWindowEdges } from "@dnd-kit/modifiers";
+import api from "../services/api-dev";
+import { userStepPreferences } from "resources/api-constants";
 
 const ServiceFlowPage: FC = () => {
   const { t } = useTranslation();
 
-  const allElements: Step[] = useMemo(
-    () => [
-      { id: 10, label: t("serviceFlow.element.taraAuthentication"), type: StepType.Auth },
-      { id: 20, label: t("serviceFlow.element.textfield"), type: StepType.Textfield },
-      { id: 30, label: t("serviceFlow.element.clientInput"), type: StepType.Input },
-      { id: 40, label: t("serviceFlow.element.assign"), type: StepType.Assign },
-      { id: 50, label: t("serviceFlow.element.condition"), type: StepType.Condition },
-      { id: 60, label: t("serviceFlow.element.rasaRules"), type: StepType.RasaRules },
-      { id: 70, label: t("serviceFlow.element.openNewWebpage"), type: StepType.OpenWebpage },
-      { id: 80, label: t("serviceFlow.element.fileGeneration"), type: StepType.FileGenerate },
-      { id: 90, label: t("serviceFlow.element.fileSigning"), type: StepType.FileSign },
-      { id: 100, label: t("serviceFlow.element.conversationEnd"), type: StepType.FinishingStepEnd },
-      { id: 110, label: t("serviceFlow.element.redirectConversationToSupport"), type: StepType.FinishingStepRedirect },
-    ],
-    [t]
-  );
+  const [allElements, setAllElements] = useState<Step[]>([]);
 
   const navigate = useNavigate();
   const description = useServiceStore((state) => state.description);
@@ -50,15 +39,63 @@ const ServiceFlowPage: FC = () => {
       .then(() => {
         useServiceStore.getState().loadEndpointsResponseVariables();
       });
+    useServiceStore.getState().loadStepPreferences();  
   }, []);
 
   const edges = useServiceStore((state) => state.edges);
   const nodes = useServiceStore((state) => state.nodes);
+  const stepPreferences = useServiceStore((state) => state.stepPreferences);
+
+  useEffect(() => {
+    const elements: Step[] = [];
+    stepPreferences.forEach((preference, index) => {
+      elements.push({
+        id: index,
+        label: t(`${stepsLabels[preference as StepType]}`),
+        type: preference as StepType
+      });
+    });
+    setAllElements(elements);
+  }, [stepPreferences]);
 
   const setNodes = useServiceStore((state) => state.setNodes);
 
-  const contentStyle: CSSProperties = { overflowY: "auto", maxHeight: "40vh" };
+  const contentStyle: CSSProperties = { overflowY: "auto", maxHeight: "245px" };
 
+  function updateStepPreference(steps: Step[]) {
+    api.post(userStepPreferences(), {
+      steps: steps.map((e) => e.type),
+    });
+  }
+
+  function handleDragEnd(event: DragEndEvent) {
+    const { active, over } = event;
+    
+    if (over && active.id !== over.id) {
+      setAllElements((elements) => {
+        const oldIndex = elements.findIndex((item) => item.id === active.id);
+        const newIndex = elements.findIndex((item) => item.id === over.id);
+        const newElements = arrayMove(elements, oldIndex, newIndex);
+        updateStepPreference(newElements); 
+        return newElements;
+      });  
+    }
+    setActiveElement(null);
+  }
+
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
+  const [activeElement, setActiveElement] = useState<Step | null>(null);
+  const handleDragStart = (event: DragStartEvent) => {
+    const step = event.active.data.current?.step as Step;
+    setActiveElement(step);
+  };
+  
   return (
     <>
       <NewServiceHeader
@@ -96,24 +133,26 @@ const ServiceFlowPage: FC = () => {
                 </Collapsible>
               )}
               {allElements && (
-                <Collapsible title={t("serviceFlow.allElements")} contentStyle={contentStyle}>
-                  <Track direction="vertical" align="stretch" gap={4}>
-                    {allElements.map((step) => (
-                      <Box
-                        key={step.id}
-                        color={
-                          [StepType.FinishingStepEnd, StepType.FinishingStepRedirect].includes(step.type)
-                            ? "red"
-                            : "blue"
-                        }
-                        onDragStart={(event) => onDragStart(event, step)}
-                        draggable
-                      >
-                        {step.label}
-                      </Box>
-                    ))}
-                  </Track>
-                </Collapsible>
+                <DndContext
+                  modifiers={[restrictToWindowEdges]}
+                  sensors={sensors}
+                  collisionDetection={closestCorners}
+                  onDragEnd={handleDragEnd}
+                  onDragStart={handleDragStart}
+                >
+                  <Collapsible title={t("serviceFlow.allElements")} contentStyle={contentStyle}>
+                    <Track direction="vertical" align="stretch" gap={4}>
+                      <SortableContext items={allElements} strategy={verticalListSortingStrategy}>
+                        {allElements.map((element) => (
+                          <StepElement key={element.id} step={element} activeStep={activeElement} />
+                        ))}
+                      </SortableContext>
+                    </Track>
+                  </Collapsible>
+                  <DragOverlay>
+                    {activeElement ? <StepElement key={activeElement.id} step={activeElement} /> : null}
+                  </DragOverlay>
+                </DndContext>
               )}
             </Track>
           </div>

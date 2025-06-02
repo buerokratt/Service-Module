@@ -29,6 +29,7 @@ import ApiContent from "./ApiContent";
 import { saveEndpoints } from "services/service-builder";
 import useToastStore from "store/toasts.store";
 import i18next from "i18next";
+import api from "../../services/api-dev";
 
 const FlowElementsPopup: React.FC = () => {
   const { t } = useTranslation();
@@ -168,7 +169,7 @@ const FlowElementsPopup: React.FC = () => {
 
       if (!endpoint) return;
 
-      const response = await axios.post(servicesRequestsExplain(), {
+      const response = await api.post(servicesRequestsExplain(), {
         url: endpoint.url,
         method: endpoint.methodType,
         headers: extractMapValues(endpoint.headers),
