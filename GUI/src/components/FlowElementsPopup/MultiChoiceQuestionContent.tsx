@@ -8,6 +8,8 @@ import { MdEdit, MdDeleteOutline, MdCheck } from "react-icons/md";
 import "./styles.scss";
 import FormError from "components/FormElements/FormError";
 import { v4 } from "uuid";
+import useServiceStore from "store/new-services.store";
+import useServiceListStore from "store/services.store";
 
 const maxButtons = parseInt(process.env.REACT_APP_MULTI_CHOICE_QUESTION_MAX_BUTTONS ?? "4");
 
@@ -29,6 +31,9 @@ const MultiChoiceQuestionContent: FC<MultiChoiceQuestionContentProps> = ({
   const { t } = useTranslation();
   const [editIndex, setEditIndex] = useState<number | null>(null);
   const [editValue, setEditValue] = useState<string>("");
+  const node = useServiceStore((state) => state.selectedNode);
+  const serviceName = useServiceStore((state) => state.serviceNameDashed());
+  const selectedService = useServiceListStore((state) => state.selectedService);
 
   const handleEdit = (idx: number) => {
     setEditIndex(idx);
@@ -54,7 +59,7 @@ const MultiChoiceQuestionContent: FC<MultiChoiceQuestionContentProps> = ({
   };
 
   const handleAdd = () => {
-    const newButtons = [...buttons, { title: "", payload: "" }];
+    const newButtons = [...buttons, { title: "", payload: `#service, /${selectedService?.type ?? 'POST'}/services/active/${serviceName}-mcq-${node?.data.label[node?.data.label.length - 1]}-${buttons.length}` }];
     setButtons(newButtons);
     setIsSaveEnabled(newButtons.length > 1 && !!question.length);
   };

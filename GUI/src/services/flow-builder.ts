@@ -339,13 +339,6 @@ export const onDrop = (
     event.dataTransfer.getData("application/reactflow-type") as StepType,
     event.dataTransfer.getData("application/reactflow-originalDefinedNodeId"),
   ];
-  
-  if (type === StepType.FinishingStepEnd || type === StepType.FinishingStepRedirect) {
-    const currentNodeStepTypes = reactFlowInstance.getNodes().map((node) => node.data.stepType);
-    if (currentNodeStepTypes.includes(type)) {
-      return;
-    }
-  }
 
   const position = reactFlowInstance.screenToFlowPosition({
     x: event.clientX,
@@ -471,7 +464,7 @@ export const onDrop = (
           clientInputId: type === StepType.Input ? parseInt(nodeLabel.split("-")[1].trim()) : undefined,
           conditionId: type === StepType.Condition ? parseInt(nodeLabel.split("-")[1].trim()) : undefined,
           multiChoiceQuestionId:
-            type === StepType.MultiChoiceQuestion ? parseInt(nodeLabel.split("-")[1].trim()) : undefined,
+            type === StepType.MultiChoiceQuestion ? parseInt(nodeLabel.split("-")[2].trim()) : undefined,
           assignId: type === StepType.Assign ? parseInt(nodeLabel.split("-")[1].trim()) : undefined,
           readonly: [
             StepType.Auth,

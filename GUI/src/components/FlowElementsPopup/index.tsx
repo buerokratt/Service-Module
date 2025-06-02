@@ -34,11 +34,8 @@ import { EDGE_LENGTH, NodeDataProps } from "types/service-flow";
 import { Node } from "reactflow";
 import { MultiChoiceQuestionButton } from "types/multi-choice-question";
 import { buildEdge, buildPlaceholder } from "services/flow-builder";
+import useServiceListStore from "store/services.store";
 
-const defaultMultiChoiceQuestionButtons = [
-  { title: "Yes", payload: "" },
-  { title: "No", payload: "" },
-];
 
 const FlowElementsPopup: React.FC = () => {
   const { t } = useTranslation();
@@ -47,13 +44,26 @@ const FlowElementsPopup: React.FC = () => {
   const [isSaveEnabled, setIsSaveEnabled] = useState(true);
   const [jsonRequestContent, setJsonRequestContent] = useState<any>(null);
   const node = useServiceStore((state) => state.selectedNode);
+  const selectedService = useServiceListStore((state) => state.selectedService);
 
   const isUserDefinedNode = node?.data?.stepType === "user-defined";
 
+  const serviceName = useServiceStore((state) => state.serviceNameDashed());
   const endpoints = useServiceStore((state) => state.endpoints);
   const rules = useServiceStore((state) => state.rules);
   const assignElements = useServiceStore((state) => state.assignElements);
   const endpointsVariables = useServiceStore((state) => state.endpointsResponseVariables);
+
+  const defaultMultiChoiceQuestionButtons = [
+    {
+      title: "Yes",
+      payload: `#service, /${selectedService?.type ?? 'POST'}/services/active/${serviceName}-mcq-${node?.data.label[node?.data.label.length - 1]}-0`,
+    },
+    {
+      title: "No",
+      payload: `#service, /${selectedService?.type ?? 'POST'}/services/active/${serviceName}-mcq-${node?.data.label[node?.data.label.length - 1]}-1`,
+    },
+  ];
 
   useEffect(() => {
     if (node) node.data.rules = rules;
@@ -99,11 +109,9 @@ const FlowElementsPopup: React.FC = () => {
   }, [stepType === StepType.Assign]);
 
   useEffect(() => {
-    if (!node) return
+    if (!node) return;
     setMultiChoiceQuestionQuestion(node?.data?.multiChoiceQuestion?.question ?? "");
-    setMultiChoiceQuestionButtons(
-      node?.data?.multiChoiceQuestion?.buttons ?? defaultMultiChoiceQuestionButtons
-    );
+    setMultiChoiceQuestionButtons(node?.data?.multiChoiceQuestion?.buttons ?? defaultMultiChoiceQuestionButtons);
   }, [stepType === StepType.MultiChoiceQuestion]);
 
   if (!node) return <></>;
@@ -321,7 +329,7 @@ const FlowElementsPopup: React.FC = () => {
     // Update Nodes and Edges in the store
     useServiceStore.getState().setNodes(filteredNodes ?? []);
     useServiceStore.getState().setEdges(filteredEdges ?? []);
-  }
+  };
 
   return (
     <Popup
