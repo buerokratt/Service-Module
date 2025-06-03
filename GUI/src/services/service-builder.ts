@@ -16,7 +16,6 @@ import useServiceStore from "store/new-services.store";
 import useToastStore from "store/toasts.store";
 import { RawData, Step, StepType } from "types";
 import { EndpointData, EndpointEnv, EndpointDefinition, EndpointVariableData } from "types/endpoint";
-import { v4 } from "uuid";
 
 // refactor this file later
 

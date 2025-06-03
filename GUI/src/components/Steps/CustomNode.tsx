@@ -30,9 +30,6 @@ const CustomNode: FC<NodeProps & NodeDataProps> = (props) => {
   const { t } = useTranslation();
   const { data, isConnectable, id, selected } = props;
   const shouldOffsetHandles = data.childrenCount > 1;
-  const handleOffset = 25;
-  let offsetLeft = handleOffset * Math.floor(data.childrenCount / 2);
-  if (data.childrenCount % 2 === 0) offsetLeft -= handleOffset / 2;
 
   const updateNodeInternals = useUpdateNodeInternals();
  

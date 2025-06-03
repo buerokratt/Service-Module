@@ -66,7 +66,7 @@ const StepNode: FC<NodeDataProps> = ({ data }) => {
         });
       };
 
-      const invalidRulesExist = hasInvalidRules(data.rules?.children || []);
+      const invalidRulesExist = hasInvalidRules(data.rules?.children ?? []);
       return data.rules?.children === undefined || invalidRulesExist || data.rules?.children.length === 0;
     }
     if (data.stepType === StepType.MultiChoiceQuestion) {
@@ -84,11 +84,11 @@ const StepNode: FC<NodeDataProps> = ({ data }) => {
         });
       };
 
-      const invalidElementsExist = hasInvalidElements(data.assignElements || []);
+      const invalidElementsExist = hasInvalidElements(data.assignElements ?? []);
       return data?.assignElements === undefined || invalidElementsExist || data?.assignElements.length === 0;
     }
 
-    return !(data.readonly || !!data.message?.length);
+    return !(data.readonly ?? !!data.message?.length);
   };
 
   const updateIsTestedAndPassed = async () => {
@@ -185,7 +185,7 @@ const TestStatue = ({
   isStepInvalid,
 }: {
   isTestedAndPassed: boolean | null;
-  isStepInvalid: () => boolean;
+  isStepInvalid: () => boolean | undefined;
 }) => {
   if (isTestedAndPassed) return <CheckBadge />;
   if (isStepInvalid()) return <ExclamationBadge />;

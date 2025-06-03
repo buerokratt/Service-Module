@@ -1,4 +1,3 @@
-import { useTranslation } from "react-i18next";
 import { Node, Edge, MarkerType, XYPosition, NodeChange, NodeDimensionChange } from "reactflow";
 import useServiceStore from "store/new-services.store";
 import { ConditionRuleType, StepType } from "types";
