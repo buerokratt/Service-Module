@@ -96,7 +96,7 @@ const StepNode: FC<NodeDataProps> = ({ data }) => {
       return;
     }
 
-    const endpoint = endpoints.find((x) => x.id === data.originalDefinedNodeId);
+    const endpoint = endpoints.find((x) => x.endpointId === data.originalDefinedNodeId);
 
     if (!endpoint) {
       setIsTestedAndPassed(false);

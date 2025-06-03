@@ -1,4 +1,11 @@
+import { EndpointData } from "./endpoint";
 import { ServiceState } from "./service-state";
+
+export type EndpointDefinitionJson = {
+  type: string;
+  value: string;
+  null: boolean;
+};
 
 export interface Service {
   readonly id: number;
@@ -10,7 +17,12 @@ export interface Service {
   readonly description?: string;
   readonly slot: string;
   readonly structure: any;
-  readonly endpoints: any;
+  readonly endpoints: Array<
+    Pick<EndpointData, "endpointId" | "name" | "type" | "fileName" | "isCommon"> & {
+      // Passing as JSON from Resql because ruuter cannot handle parsing properly
+      definitions: EndpointDefinitionJson;
+    }
+  >;
   readonly serviceId: string;
   readonly linkedIntent: string;
   readonly totalPages: number;

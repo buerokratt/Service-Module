@@ -254,7 +254,8 @@
       "redirectConversationToSupport": "Direct to Customer Support",
       "rules": "Rules",
       "rasaRules": "Rasa Rules",
-      "siga": "SiGa"
+      "siga": "SiGa",
+      "multiChoiceQuestion": "Multi-choice question"
     },
     "popup": {
       "messageLabel": "Message",
@@ -352,6 +353,18 @@
       "deleteConfirmationMessage": "Are you sure you want to delete this API element?",
       "deleteSuccess": "API element deleted successfully",
       "deleteError": "Failed to delete API element"
+    },
+    "multiChoiceQuestion": {
+      "questionPlaceholder": "Enter a question",
+      "questionError": "Question is required",
+      "addButton": "Add button +",
+      "maxButtonsStart": "Maximum ",
+      "maxButtonsEnd": " buttons allowed.",
+      "minButtons": "At least 2 buttons are required.",
+      "ellipsis": "...",
+      "edit": "Edit",
+      "delete": "Delete",
+      "userChoices": "User choices:"
     },
     "tabs": {
       "setup": "Setup",
