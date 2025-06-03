@@ -18,6 +18,7 @@ delete_endpoint:
     url: "[#SERVICE_RESQL]/endpoints/delete_endpoint"
     body:
       id: ${incoming.body.id}
+  result: res
 
 return_ok:
   status: 200

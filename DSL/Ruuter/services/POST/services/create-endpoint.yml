@@ -42,6 +42,7 @@ create_endpoint:
       isCommon: ${incoming.body.isCommon}
       serviceId: ${incoming.body.serviceId ?? ''}
       definitions: ${incoming.body.definitions}
+  result: res
 
 return_ok:
   status: 200
