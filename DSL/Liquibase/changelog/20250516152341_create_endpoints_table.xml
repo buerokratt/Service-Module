@@ -9,9 +9,9 @@
                         http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-latest.xsd">
 
     <changeSet id="20250516152341" author="IgorKrupenja">
-        <sqlFile path="changelog/changelog/migrations/20250516152341_create_endpoints_table.sql" />
+        <sqlFile path="changelog/migrations/20250516152341_create_endpoints_table.sql" />
         <rollback>
-            <sqlFile path="changelog/changelog/migrations/rollback/20250516152341_rollback.sql" />
+            <sqlFile path="changelog/migrations/rollback/20250516152341_rollback.sql" />
         </rollback>
     </changeSet>
 </databaseChangeLog>
