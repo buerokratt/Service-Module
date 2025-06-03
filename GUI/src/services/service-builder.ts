@@ -635,8 +635,6 @@ export const saveFlow = async ({
           return handleInputStep(parentNode, finishedFlow, parentStepName, steps, updatedEdges, nodes, parentNodeId);
         }
 
-        //TODO: Handle Saving Multi Choice Question Step
-
         const nextStep = childNode ? `${childNode.data.stepType}-${childNodeId}` : undefined;
         const template = getTemplate(steps, parentNode, parentStepName, nextStep);
 
