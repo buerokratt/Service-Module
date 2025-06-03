@@ -88,7 +88,7 @@ const StepNode: FC<NodeDataProps> = ({ data }) => {
       return data?.assignElements === undefined || invalidElementsExist || data?.assignElements.length === 0;
     }
 
-    return !(data.readonly ?? !!data.message?.length);
+    return !(data.readonly || !!data.message?.length);
   };
 
   const updateIsTestedAndPassed = async () => {

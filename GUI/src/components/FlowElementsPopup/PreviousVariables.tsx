@@ -25,7 +25,7 @@ const INPUT_ELEMENT_KEY = "-1";
 const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
   const { t } = useTranslation();
   let endpointsVariables = useServiceStore((state) => state.endpointsResponseVariables);
-  const nodes = useServiceStore((state) => state.nodes);
+  const nodes = useServiceStore((state) => state.nodes.filter((node) => node.type != "placeholder"));
   const [endpoints, setEndpoints] = useState<EndpointResponseVariable[]>([]);
   const [assignedVariables, setAssignedVariables] = useState<Assign[]>([]);
   const [endpointsObjectTree, setEndpointsObjectTree] = useState<{
@@ -43,10 +43,13 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
   });
 
   useEffect(() => {
-    const previousNodes = nodes.slice(
-      0,
-      nodes.findIndex((node) => node.id === nodeId)
+    const currentNodeIndex = nodes.findIndex((node) => node.id === nodeId);
+
+    let startIndex = nodes.findLastIndex(
+      (node, i) => i < currentNodeIndex && node.data.stepType === StepType.MultiChoiceQuestion
     );
+
+    const previousNodes = nodes.slice(startIndex, currentNodeIndex);
 
     // Get Endpoints variables
     const endpointNodes = previousNodes.filter((node) => node.data.stepType === StepType.UserDefined);
