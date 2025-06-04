@@ -6,6 +6,7 @@ CREATE TYPE step_type AS ENUM (
     'input',
     'assign',
     'condition',
+    'multi-choice-question',
     'open-webpage',
     'file-generate',
     'file-sign',

@@ -24,6 +24,7 @@ import useTestServiceStore from "./test-services.store";
 import { Chip } from "types/chip";
 import { EndpointResponseVariable } from "types/endpoint/endpoint-response-variables";
 import { Assign } from "types/assign";
+import { EndpointType } from "types/endpoint/endpoint-type";
 import api from "../services/api-dev";
 interface ServiceStoreState {
   endpoints: EndpointData[];
@@ -75,7 +76,7 @@ interface ServiceStoreState {
   loadStepPreferences: () => Promise<void>;
   getAvailableRequestValues: (endpointId: string) => PreDefinedEndpointEnvVariables;
   onNameChange: (endpointId: string, oldName: string, newName: string) => void;
-  changeServiceEndpointType: (id: string, type: string) => void;
+  changeServiceEndpointType: (id: string, type: EndpointType) => void;
   mapEndpointsToSetps: () => Step[];
   selectedTab: EndpointEnv;
   setSelectedTab: (tab: EndpointEnv) => void;
@@ -141,7 +142,7 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
     assignElements.forEach(
       (updated) => elementsMap.get(updated.id) && Object.assign(elementsMap.get(updated.id), updated)
     );
-   
+
     const hasChangedSlot = (slot: any, elementsMap: Map<any, any>): boolean => {
       const ref = elementsMap.get(slot.id);
       if (!ref) return false;
@@ -188,7 +189,9 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
       return assignNodes.some((node) => hasChangedElements(node, elementsMap));
     };
 
-    while (updateRefs()) { /* logic to do while refs are being updated */}
+    while (updateRefs()) {
+      /* logic to do while refs are being updated */
+    }
     set({ assignElements });
   },
   changeRulesNode: (rules) => set({ rules }),
@@ -281,7 +284,7 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
   vaildServiceInfo: () => !!get().name && !!get().description,
   serviceNameDashed: () => get().name.trim().replace(" ", "_"),
   deleteEndpoint: (id: string) => {
-    const newEndpoints = get().endpoints.filter((x) => x.id !== id);
+    const newEndpoints = get().endpoints.filter((x) => x.endpointId !== id);
     set({ endpoints: newEndpoints });
   },
   changeServiceName: (name: string) => set({ name }),
@@ -291,12 +294,12 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
   isCommon: false,
   setIsCommon: (isCommon: boolean) => set({ isCommon }),
   isCommonEndpoint: (id: string) => {
-    const endpoint = get().endpoints.find((x) => x.id === id);
+    const endpoint = get().endpoints.find((x) => x.endpointId === id);
     return endpoint?.isCommon ?? false;
   },
   setIsCommonEndpoint: (id: string, isCommon: boolean) => {
     const endpoints = get().endpoints.map((x) => {
-      if (x.id !== id) return x;
+      if (x.endpointId !== id) return x;
       return {
         ...x,
         isCommon,
@@ -323,7 +326,7 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
     });
   },
   addEndpoint: () => {
-    const newEndpoint = { id: uuid(), name: "", definedEndpoints: [] };
+    const newEndpoint = { endpointId: uuid(), name: "", definitions: [], isNew: true };
     set((state) => ({ endpoints: [...state.endpoints, newEndpoint] }));
   },
   resetState: () => {
@@ -361,8 +364,13 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
     if (id) {
       const service = await api.get<Service[]>(getServiceById(id));
 
-      const structure = JSON.parse(service.data[0].structure?.value ?? "{}");
-      let endpoints = JSON.parse(service.data[0].endpoints?.value ?? "{}");
+      const structure = JSON.parse(serviceResponse.data.structure?.value ?? "{}");
+      let endpoints = serviceResponse.data.endpoints.map((endpoint) => {
+        return {
+          ...endpoint,
+          definitions: JSON.parse(endpoint.definitions.value),
+        };
+      });
       let edges = structure?.edges;
       nodes = structure?.nodes;
 
@@ -386,15 +394,15 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
 
       set({
         serviceId: id,
-        name: service.data[0].name,
-        isCommon: service.data[0].isCommon,
-        description: service.data[0].description,
-        slot: service.data[0].slot,
+        name: serviceResponse.data.name,
+        isCommon: serviceResponse.data.isCommon,
+        description: serviceResponse.data.description,
+        slot: serviceResponse.data.slot,
         edges,
         nodes,
         endpoints,
         isNewService: false,
-        serviceState: service.data[0].state,
+        serviceState: serviceResponse.data.state,
       });
     }
 
@@ -441,11 +449,11 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
   },
   getAvailableRequestValues: (endpointId: string) => {
     const variables = get()
-      .endpoints.filter((endpoint) => endpoint.id !== endpointId)
+      .endpoints.filter((endpoint) => endpoint.endpointId !== endpointId)
       .map((endpoint) => ({
-        id: endpoint.id,
+        id: endpoint.endpointId,
         name: endpoint.name,
-        response: endpoint.definedEndpoints.find((x) => x.isSelected)?.response ?? [],
+        response: endpoint.definitions.find((x) => x.isSelected)?.response ?? [],
       }))
       .flatMap(({ id, name, response }) => response?.map((x) => `{{${name === "" ? id : name}.${x.name}}}`));
 
@@ -455,8 +463,8 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
     };
   },
   onNameChange: (endpointId: string, oldName: string, newName: string) => {
-    const endpoint = get().endpoints.find((x) => x.id === endpointId);
-    const response = endpoint?.definedEndpoints.find((x) => x.isSelected)?.response ?? [];
+    const endpoint = get().endpoints.find((x) => x.endpointId === endpointId);
+    const response = endpoint?.definitions.find((x) => x.isSelected)?.response ?? [];
     const variables = response.map((x) => `{{${newName ?? x.id}.${x.name}}}`);
 
     const oldFilteredVariables = get().availableVariables.prod.filter(
@@ -464,7 +472,7 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
     );
 
     const newEndpoints = get().endpoints.map((x) => {
-      if (x.id !== endpointId) return x;
+      if (x.endpointId !== endpointId) return x;
       return {
         ...x,
         name: newName,
@@ -479,13 +487,13 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
       },
     }));
   },
-  changeServiceEndpointType: (id: string, type: string) => {
+  changeServiceEndpointType: (id: string, type: EndpointType) => {
     const endpoints = get().endpoints.map((x) => {
-      if (x.id !== id) return x;
+      if (x.endpointId !== id) return x;
       return {
         ...x,
         type,
-        definedEndpoints: [],
+        definitions: [],
       };
     });
 
@@ -494,7 +502,7 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
   mapEndpointsToSetps: (): Step[] => {
     return get()
       .endpoints.map((x) => ({
-        selected: x.definedEndpoints.find((e) => e.isSelected),
+        selected: x.definitions.find((e) => e.isSelected),
         endpoint: x,
       }))
       .filter((x) => !!x.selected)
@@ -520,8 +528,8 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
 
     const endpoints = JSON.parse(JSON.stringify(get().endpoints)) as EndpointData[];
     const defEndpoint = endpoints
-      .find((x) => x.id === parentEndpointId)
-      ?.definedEndpoints.find((x) => x.id === endpointId);
+      .find((x) => x.endpointId === parentEndpointId)
+      ?.definitions.find((x) => x.id === endpointId);
 
     for (const key in data) {
       if (defEndpoint?.[key as EndpointTab]) {
@@ -539,8 +547,8 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
     const live = get().isLive() ? "value" : "testValue";
     const endpoints = JSON.parse(JSON.stringify(get().endpoints)) as EndpointData[];
     const defEndpoint = endpoints
-      .find((x) => x.id === parentEndpointId)
-      ?.definedEndpoints.find((x) => x.id === endpointId);
+      .find((x) => x.endpointId === parentEndpointId)
+      ?.definitions.find((x) => x.id === endpointId);
 
     if (!defEndpoint) return;
 
@@ -666,7 +674,8 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
           prevNode.data.linkText != updatedNode.data.linkText ||
           prevNode.data.fileName != updatedNode.data.fileName ||
           prevNode.data.fileContent != updatedNode.data.fileContent ||
-          prevNode.data.signOption != updatedNode.data.signOption
+          prevNode.data.signOption != updatedNode.data.signOption ||
+          prevNode.data.multiChoiceQuestion != updatedNode.data.multiChoiceQuestion
         ) {
           useServiceStore.getState().disableTestButton();
         }
@@ -680,6 +689,7 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
             fileName: updatedNode.data.fileName,
             fileContent: updatedNode.data.fileContent,
             signOption: updatedNode.data.signOption,
+            multiChoiceQuestion: updatedNode.data.multiChoiceQuestion,
           },
         };
       })

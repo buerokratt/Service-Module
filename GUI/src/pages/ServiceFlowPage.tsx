@@ -126,8 +126,8 @@ const ServiceFlowPage: FC = () => {
               {steps && (
                 <Collapsible title={t("serviceFlow.apiElements.title")} contentStyle={contentStyle}>
                   <Track direction="vertical" align="stretch" gap={4}>
-                    {steps.map((step, index) => (
-                      <ApiEndpoint step={step} key={index} />
+                    {steps.map((step) => (
+                      <ApiEndpoint step={step} key={step.id} />
                     ))}
                   </Track>
                 </Collapsible>

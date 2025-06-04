@@ -4,6 +4,7 @@ export enum StepType {
   Input = "input",
   Assign = "assign",
   Condition = "condition",
+  MultiChoiceQuestion = "multi-choice-question",
   RuleDefinition = "rule-definition",
   OpenWebpage = "open-webpage",
   FileGenerate = "file-generate",

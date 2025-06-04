@@ -248,6 +248,7 @@
       "clientInput": "Kliendi sisend",
       "assign": "Määra",
       "condition": "Tingimus",
+      "multiChoiceQuestion": "Mitmevalikuline küsimus",
       "openNewWebpage": "Uue veebilehe avamine",
       "fileGeneration": "Faili genereerimine",
       "fileSigning": "Faili allkirjastamine",
@@ -353,6 +354,19 @@
       "deleteConfirmationMessage": "Kas olete kindel, et soovite kustutada API elementi?",
       "deleteSuccess": "API element kustutatud",
       "deleteError": "API elementi kustutamine ebaõnnestus"
+    },
+    "multiChoiceQuestion": {
+      "title": "Mitmevalikuline küsimus",
+      "questionPlaceholder": "Sisesta küsimus",
+      "questionError": "Küsimus on kohustuslik",
+      "addButton": "Lisa nupp +",
+      "maxButtonsStart": "Maksimaalselt ",
+      "maxButtonsEnd": " nuppu lubatud.",
+      "minButtons": "Vähemalt 2 nuppu on vajalik.",
+      "ellipsis": "...",
+      "edit": "Muuda",
+      "delete": "Kustuta",
+      "userChoices": "Lõppkasutaja valikud:"
     },
     "tabs": {
       "setup": "Seadistamine",

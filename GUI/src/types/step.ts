@@ -15,6 +15,7 @@ export const stepsLabels: Record<StepType, string> = {
   [StepType.Input]: "serviceFlow.element.clientInput",
   [StepType.Assign]: "serviceFlow.element.assign",
   [StepType.Condition]: "serviceFlow.element.condition",
+  [StepType.MultiChoiceQuestion]: "serviceFlow.element.multiChoiceQuestion",
   [StepType.RuleDefinition]: "serviceFlow.element.ruleDefinition",
   [StepType.OpenWebpage]: "serviceFlow.element.openNewWebpage",
   [StepType.FileGenerate]: "serviceFlow.element.fileGeneration",
