@@ -676,6 +676,7 @@ function getYamlContent(nodes: Node[], edges: Edge[], steps: Step[]): any {
       chatId: "${incoming.body.chatId}",
       authorId: "${incoming.body.authorId}",
       input: "${incoming.body.input}",
+      buttons: [],
       res: {
         result: "",
       },
@@ -721,6 +722,10 @@ function getYamlContent(nodes: Node[], edges: Edge[], steps: Step[]): any {
         return handleInputStep(parentNode, finishedFlow, parentStepName, steps, updatedEdges, nodes, parentNodeId);
       }
 
+      if (parentNode.data.stepType === StepType.MultiChoiceQuestion) {
+        return handleMultiChoiceQuestion(finishedFlow, parentStepName, parentNode, childNode, childNodeId);
+      }
+
       const nextStep = childNode ? `${childNode.data.stepType}-${childNodeId}` : undefined;
       const template = getTemplate(steps, parentNode, parentStepName, nextStep);
 
@@ -749,6 +754,7 @@ function getYamlContent(nodes: Node[], edges: Edge[], steps: Step[]): any {
           authorLastName: "",
           authorTimestamp: "${new Date().toISOString()}",
           created: "${new Date().toISOString()}",
+          buttons: "${buttons ?? []}",
         },
       },
     },
@@ -939,6 +945,25 @@ function handleInputStep(
     )
   );
 }
+
+function handleMultiChoiceQuestion(
+  finishedFlow: Map<any, any>,
+  parentStepName: string,
+  parentNode: Node,
+  childNode: Node | undefined,
+  childNodeId: any
+) {
+  return finishedFlow.set(parentStepName, {
+    assign: {
+      buttons: parentNode.data.multiChoiceQuestion.buttons ?? [],
+      res: {
+        result: parentNode.data?.multiChoiceQuestion.question ?? "",
+      },
+    },
+    next: childNode ? `${childNode.data.stepType}-${childNodeId}` : "formatMessages",
+  });
+}
+
 
 function skipPlaceholderNodes(nodes: Node[], edges: Edge[]) {
   const nodeMap = nodes.reduce((map: any, node: any) => {
