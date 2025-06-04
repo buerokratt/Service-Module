@@ -102,6 +102,7 @@ delete_endpoints_by_service_id:
     url: "[#SERVICE_RESQL]/endpoints/delete_endpoints_by_service_id"
     body:
       serviceId: ${id}
+  result: delete_endpoint_results    
   next: delete_endpoint_files
 
 delete_endpoint_files:
@@ -110,7 +111,17 @@ delete_endpoint_files:
     url: "[#SERVICE_RUUTER]/services/delete-endpoint-files"
     body:
       name: ${name_res.response.body[0].name}
-  next: check_for_intent_connection
+  result: delete_endpoint_files_results    
+  next: delete_mcq_files
+
+delete_mcq_files:
+  call: http.post
+  args:
+    url: "[#SERVICE_DMAPPER]/file-manager/delete-all-that-starts-with"
+    body:
+      path: "[#RUUTER_SERVICES_PATH]/${ruuter_type}/[#RUUTER_SERVICES_DIR_PATH]/${old_file_status_path}"
+      keyword: "${name_res.response.body[0].name}_"
+  result: check_for_intent_connection
 
 check_for_intent_connection:
   call: http.post
