@@ -34,7 +34,7 @@ const PlaceholderNode: FC = (props: any) => {
   return (
     <>
       <Handle type="target" position={Position.Top} />
-      <p style={{ textAlign: "center" }}>{label ? t(label) : t("serviceFlow.placeholderNode")}</p>
+      <p style={{ textAlign: "center" }}>{label ?? t("serviceFlow.placeholderNode")}</p>
       {bottomHandles()}
     </>
   );

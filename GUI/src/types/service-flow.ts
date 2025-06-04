@@ -1,3 +1,4 @@
+import { MultiChoiceQuestion } from "./multi-choice-question";
 import { StepType } from "./step-type.enum";
 import { MarkerType, Node } from "reactflow";
 
@@ -44,6 +45,8 @@ export type NodeDataProps = {
   signOption?: any;
   rules?: any;
   assignElements?: any;
+  multiChoiceQuestion?: MultiChoiceQuestion;
+  childrenCount?: number;
 };
 
 export const initialNodes: Node[] = [

@@ -9,8 +9,7 @@ import { FC, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { MdDeleteOutline } from "react-icons/md";
 import { Link, useParams } from "react-router-dom";
-import { getServicesByEndpointId } from "resources/api-constants";
-import { saveFlowClick } from "services/service-builder";
+import { deleteEndpoint, getServicesByEndpointId } from "resources/api-constants";
 import useServiceStore from "store/new-services.store";
 import useToastStore from "store/toasts.store";
 import { Step, StepType } from "types";
@@ -39,7 +38,7 @@ const ApiEndpoint: FC<ApiEndpointProps> = ({ step }) => {
 
   const nodes = useServiceStore((state) => state.nodes);
 
-  const { deleteEndpoint } = useServiceStore();
+  const { deleteEndpoint: deleteEndpointFromStore } = useServiceStore();
 
   const canDeleteEndpoint = async (endpoint: EndpointData | undefined) => {
     if (!endpoint) return;
@@ -69,14 +68,14 @@ const ApiEndpoint: FC<ApiEndpointProps> = ({ step }) => {
     if (!endpoint) return;
 
     try {
-      deleteEndpoint(endpoint.id);
+      deleteEndpointFromStore(endpoint.endpointId);
 
       const nodeIdsToDelete = nodes
-        .filter((node) => node.type === "customNode" && node.data.originalDefinedNodeId === endpoint.id)
+        .filter((node) => node.type === "customNode" && node.data.originalDefinedNodeId === endpoint.endpointId)
         .map((node) => node.id);
       nodeIdsToDelete.forEach((nodeId) => useServiceStore.getState().onDelete(nodeId));
 
-      saveFlowClick({ supressToast: true });
+      await axios.post(deleteEndpoint(), { id: endpoint.endpointId });
       useToastStore.getState().success({ title: t("serviceFlow.apiElements.deleteSuccess") });
     } catch (error) {
       console.error(`Error deleting API endpoint: ${error}`);

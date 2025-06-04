@@ -1,5 +1,5 @@
-import { Dispatch, FC, SetStateAction } from "react";
-import { Handle, NodeProps, Position } from "reactflow";
+import { Dispatch, FC, SetStateAction, useEffect } from "react";
+import { Handle, NodeProps, Position, useUpdateNodeInternals } from "reactflow";
 import { useTranslation } from "react-i18next";
 import { MdDeleteOutline, MdOutlineEdit, MdOutlineRemoveRedEye } from "react-icons/md";
 import StepNode from "./StepNode";
@@ -30,9 +30,12 @@ const CustomNode: FC<NodeProps & NodeDataProps> = (props) => {
   const { t } = useTranslation();
   const { data, isConnectable, id, selected } = props;
   const shouldOffsetHandles = data.childrenCount > 1;
-  const handleOffset = 25;
-  let offsetLeft = handleOffset * Math.floor(data.childrenCount / 2);
-  if (data.childrenCount % 2 === 0) offsetLeft -= handleOffset / 2;
+
+  const updateNodeInternals = useUpdateNodeInternals();
+ 
+  useEffect(() => {
+    updateNodeInternals(id);
+  }, [data.childrenCount]);
 
   const isFinishingStep = () => {
     return data.type === "finishing-step";
@@ -48,7 +51,14 @@ const CustomNode: FC<NodeProps & NodeDataProps> = (props) => {
             type="source"
             position={Position.Bottom}
             isConnectable={isConnectable}
-            style={shouldOffsetHandles ? { marginLeft: -offsetLeft + i * handleOffset } : {}}
+            style={
+              shouldOffsetHandles
+                ? {
+                    left: `${(100 / (data.childrenCount + 1)) * (i + 1)}%`,
+                    visibility: isFinishingStep() ? "hidden" : "visible",
+                  }
+                : {}
+            }
             hidden={isFinishingStep()}
           />
         ))}

@@ -120,6 +120,18 @@ activate_service:
       file_path: "[#RUUTER_SERVICES_PATH]/${ruuter_type}/[#RUUTER_SERVICES_DIR_PATH]/${old_file_status_path}/${name + old_file_end}"
       new_path: "[#RUUTER_SERVICES_PATH]/${ruuter_type}/[#RUUTER_SERVICES_DIR_PATH]/active/${name}.yml"
   result: activate_service_result
+  next: activate_all_mcq_services
+ 
+activate_all_mcq_services:
+  call: http.post
+  args:
+    url: "[#SERVICE_DMAPPER]/file-manager/move-all-that-starts-with"
+    body:
+      file_path: "[#RUUTER_SERVICES_PATH]/${ruuter_type}/[#RUUTER_SERVICES_DIR_PATH]/${old_file_status_path}"
+      new_path: "[#RUUTER_SERVICES_PATH]/${ruuter_type}/[#RUUTER_SERVICES_DIR_PATH]/active"
+      keyword: "${name}_"
+      format: "yml"
+  result: active_move_results
   next: return_ok
 
 deactivate_service:
@@ -130,6 +142,18 @@ deactivate_service:
       file_path: "[#RUUTER_SERVICES_PATH]/${ruuter_type}/[#RUUTER_SERVICES_DIR_PATH]/${old_file_status_path}/${name + old_file_end}"
       new_path: "[#RUUTER_SERVICES_PATH]/${ruuter_type}/[#RUUTER_SERVICES_DIR_PATH]/inactive/${name}.tmp"
   result: deactivate_service_result
+  next: dactivate_all_mcq_services
+
+dactivate_all_mcq_services:
+  call: http.post
+  args:
+    url: "[#SERVICE_DMAPPER]/file-manager/move-all-that-starts-with"
+    body:
+      file_path: "[#RUUTER_SERVICES_PATH]/${ruuter_type}/[#RUUTER_SERVICES_DIR_PATH]/${old_file_status_path}"
+      new_path: "[#RUUTER_SERVICES_PATH]/${ruuter_type}/[#RUUTER_SERVICES_DIR_PATH]/inactive"
+      keyword: "${name}_"
+      format: "tmp"
+  result: inactive_move_results
   next: return_ok
 
 draft_service:
@@ -140,6 +164,18 @@ draft_service:
       file_path: "[#RUUTER_SERVICES_PATH]/${ruuter_type}/[#RUUTER_SERVICES_DIR_PATH]/${old_file_status_path}/${name + old_file_end}"
       new_path: "[#RUUTER_SERVICES_PATH]/${ruuter_type}/[#RUUTER_SERVICES_DIR_PATH]/draft/${name}.tmp"
   result: draft_service_result
+  next: draft_all_mcq_services
+
+draft_all_mcq_services:
+  call: http.post
+  args:
+    url: "[#SERVICE_DMAPPER]/file-manager/move-all-that-starts-with"
+    body:
+      file_path: "[#RUUTER_SERVICES_PATH]/${ruuter_type}/[#RUUTER_SERVICES_DIR_PATH]/${old_file_status_path}"
+      new_path: "[#RUUTER_SERVICES_PATH]/${ruuter_type}/[#RUUTER_SERVICES_DIR_PATH]/draft"
+      keyword: "${name}_"
+      format: "tmp"
+  result: inactive_move_results
   next: check_for_intent_connection
 
 check_for_intent_connection:
