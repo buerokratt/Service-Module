@@ -15,8 +15,7 @@ import {
 import useServiceStore from "store/new-services.store";
 import useToastStore from "store/toasts.store";
 import { RawData, Step, StepType } from "types";
-import { EndpointData, EndpointEnv, EndpointType, EndpointVariableData } from "types/endpoint";
-import { v4 } from "uuid";
+import { EndpointData, EndpointDefinition, EndpointEnv, EndpointVariableData } from "types/endpoint";
 import api from "../services/api-dev";
 
 // refactor this file later
@@ -350,7 +349,7 @@ export async function saveEndpoints(
       tasks.push(createEndpointAndUpdateState(endpoint));
     } else {
       tasks.push(
-        axios.post(updateEndpoint(endpoint.endpointId), {
+        api.post(updateEndpoint(endpoint.endpointId), {
           ...endpoint,
           // Stringify needed for Resql to save nested data in a proper parsable format
           definitions: JSON.stringify(endpoint.definitions),
@@ -363,7 +362,7 @@ export async function saveEndpoints(
 }
 
 async function createEndpointAndUpdateState(endpoint: EndpointData): Promise<any> {
-  const response = await axios.post(createEndpoint(), {
+  const response = await api.post(createEndpoint(), {
     ...endpoint,
     // Stringify needed for Resql to save nested data in a proper parsable format
     definitions: JSON.stringify(endpoint.definitions),

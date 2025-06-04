@@ -75,7 +75,7 @@ const ApiEndpoint: FC<ApiEndpointProps> = ({ step }) => {
         .map((node) => node.id);
       nodeIdsToDelete.forEach((nodeId) => useServiceStore.getState().onDelete(nodeId));
 
-      await axios.post(deleteEndpoint(), { id: endpoint.endpointId });
+      await api.post(deleteEndpoint(), { id: endpoint.endpointId });
       useToastStore.getState().success({ title: t("serviceFlow.apiElements.deleteSuccess") });
     } catch (error) {
       console.error(`Error deleting API endpoint: ${error}`);
