@@ -1,4 +1,3 @@
-import { useTranslation } from "react-i18next";
 import { Node, Edge, MarkerType, XYPosition, NodeChange, NodeDimensionChange } from "reactflow";
 import useServiceStore from "store/new-services.store";
 import { ConditionRuleType, StepType } from "types";
@@ -296,18 +295,24 @@ export const onNodeDrag = (_event: React.MouseEvent, draggedNode: Node) => {
 
   useServiceStore.getState().setNodes((prevNodes) =>
     prevNodes.map((prevNode) => {
-      if (placeholders.length === 2) {
-        if (prevNode.id === placeholders[0].id) {
-          prevNode.position.y = draggedNode.position.y + EDGE_LENGTH * 2;
-          prevNode.position.x = draggedNode.position.x - (draggedNode.width ?? 0) * 0.75;
+      const placeholderIndex = placeholders.findIndex((p) => p.id === prevNode.id);
+      if (placeholderIndex >= 0) {
+        const totalPlaceholders = placeholders.length;
+        const baseY = draggedNode.position.y + EDGE_LENGTH * 1.5;
+        const baseX = draggedNode.position.x;
+        const widthOffset = (draggedNode.width ?? 0) * 0.75;
+        const spacing = widthOffset * 1.7;
+
+        if (totalPlaceholders === 1) {
+          prevNode.position.x = baseX;
+          prevNode.position.y = baseY + (draggedNode.height ?? 0);
+        } else {
+          const middleIndex = Math.floor(totalPlaceholders / 2);
+          const offset = (placeholderIndex - middleIndex + (totalPlaceholders % 2 === 0 ? 0.5 : 0)) * spacing;
+
+          prevNode.position.x = baseX + offset;
+          prevNode.position.y = baseY;
         }
-        if (prevNode.id === placeholders[1].id) {
-          prevNode.position.y = draggedNode.position.y + EDGE_LENGTH * 2;
-          prevNode.position.x = draggedNode.position.x + (draggedNode.width ?? 0) * 0.75;
-        }
-      } else if (prevNode.id === placeholders[0].id) {
-        prevNode.position.x = draggedNode.position.x;
-        prevNode.position.y = EDGE_LENGTH + draggedNode.position.y + (draggedNode.height ?? 0);
       }
       return prevNode;
     })
@@ -333,13 +338,6 @@ export const onDrop = (
     event.dataTransfer.getData("application/reactflow-type") as StepType,
     event.dataTransfer.getData("application/reactflow-originalDefinedNodeId"),
   ];
-  
-  if (type === StepType.FinishingStepEnd || type === StepType.FinishingStepRedirect) {
-    const currentNodeStepTypes = reactFlowInstance.getNodes().map((node) => node.data.stepType);
-    if (currentNodeStepTypes.includes(type)) {
-      return;
-    }
-  }
 
   const position = reactFlowInstance.screenToFlowPosition({
     x: event.clientX,
@@ -365,6 +363,10 @@ export const onDrop = (
         ? `${Math.max(...useServiceStore.getState().nodes.map((node) => +node.id)) + 1}`
         : matchingPlaceholder.id;
     const newPlaceholderId = Math.max(...useServiceStore.getState().nodes.map((node) => +node.id)) + 2;
+
+    const baseY = matchingPlaceholder.position.y + EDGE_LENGTH * 1.5;
+    const baseX = matchingPlaceholder.position.x;
+    const widthOffset = (matchingPlaceholder.width ?? 0) * 0.75;
 
     useServiceStore.getState().setEdges((prevEdges) => {
       // Point edge from previous node to new node
@@ -416,7 +418,7 @@ export const onDrop = (
         );
       }
 
-      if (StepType.Input === type || StepType.Condition === type) {
+      if (type === StepType.Input || type === StepType.Condition || type === StepType.MultiChoiceQuestion) {
         newEdges.push(
           buildEdge({
             id: `edge-${newNodeId}-${newPlaceholderId + 2}`,
@@ -460,13 +462,15 @@ export const onDrop = (
           stepType: type,
           clientInputId: type === StepType.Input ? parseInt(nodeLabel.split("-")[1].trim()) : undefined,
           conditionId: type === StepType.Condition ? parseInt(nodeLabel.split("-")[1].trim()) : undefined,
+          multiChoiceQuestionId:
+            type === StepType.MultiChoiceQuestion ? parseInt(nodeLabel.split("-")[2].trim()) : undefined,
           assignId: type === StepType.Assign ? parseInt(nodeLabel.split("-")[1].trim()) : undefined,
           readonly: [
             StepType.Auth,
             StepType.FinishingStepEnd,
             StepType.FinishingStepRedirect,
           ].includes(type),
-          childrenCount: type === StepType.Input || type === StepType.Condition ? 2 : 1,
+          childrenCount: type === StepType.Input || type === StepType.Condition || type === StepType.MultiChoiceQuestion ? 2 : 1,
           setClickedNode: useServiceStore.getState().setClickedNode,
           message: setDefaultMessages(type),
           originalDefinedNodeId: type === StepType.UserDefined ? originalDefinedNodeId : undefined,
@@ -479,7 +483,7 @@ export const onDrop = (
     ];
 
     if (
-      ![StepType.Input, StepType.Condition, StepType.FinishingStepEnd, StepType.FinishingStepRedirect].includes(type)
+      ![StepType.Input, StepType.Condition, StepType.MultiChoiceQuestion, StepType.FinishingStepEnd, StepType.FinishingStepRedirect].includes(type)
     ) {
       // Add placeholder right below new node
       newNodes.push(
@@ -494,28 +498,25 @@ export const onDrop = (
       );
     }
 
-    if (StepType.Input === type || StepType.Condition === type) {
-      newNodes.push(
-        buildPlaceholder({
-          id: `${newPlaceholderId + 1}`,
-          label: "serviceFlow.placeholderNodeSuccess",
-          position: {
-            y: matchingPlaceholder.position.y + EDGE_LENGTH * 1.5,
-            x: matchingPlaceholder.position.x - (matchingPlaceholder.width ?? 0) * 0.75,
-          },
-        })
-      );
+    if ([StepType.MultiChoiceQuestion, StepType.Input, StepType.Condition].includes(type)) {
+      const labels =
+        type === StepType.MultiChoiceQuestion
+          ? ["Yes", "No"]
+          : ["serviceFlow.placeholderNodeSuccess", "serviceFlow.placeholderNodeFailure"];
 
-      newNodes.push(
-        buildPlaceholder({
-          id: `${newPlaceholderId + 2}`,
-          label: "serviceFlow.placeholderNodeFailure",
-          position: {
-            y: matchingPlaceholder.position.y + EDGE_LENGTH * 1.5,
-            x: matchingPlaceholder.position.x + (matchingPlaceholder.width ?? 0) * 0.75,
-          },
-        })
-      );
+      const middleIndex = Math.floor(labels.length / 2);
+      const spacing = widthOffset * 1.7;
+
+      labels.forEach((label, index) => {
+        const offset = (index - middleIndex + (labels.length % 2 === 0 ? 0.5 : 0)) * spacing;
+        newNodes.push(
+          buildPlaceholder({
+            id: `${newPlaceholderId + (index + 1)}`,
+            label: label,
+            position: { y: baseY, x: baseX + offset },
+          })
+        );
+      });
     }
 
     return newNodes;
@@ -604,6 +605,8 @@ function getNodeLabel(type: StepType, nodes: Node[], label: string) {
       return `${label} - ${(lastNode?.clientInputId ?? 0) + 1}`;
     case StepType.Condition:
       return `${label} - ${(lastNode?.conditionId ?? 0) + 1}`;
+    case StepType.MultiChoiceQuestion:
+      return `${label} - ${(lastNode?.multiChoiceQuestionId ?? 0) + 1}`;
     case StepType.Assign:
       return `${label} - ${(lastNode?.assignId ?? 0) + 1}`;
     default:

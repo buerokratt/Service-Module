@@ -6,12 +6,14 @@ import { StepType } from "../../types";
 import useServiceStore from "store/new-services.store";
 import { Group, Rule } from "components/FlowElementsPopup/RuleBuilder/types";
 import { Assign } from "types/assign";
+import { MultiChoiceQuestion } from "types/multi-choice-question";
 
 type NodeDataProps = {
   data: {
     childrenCount: number;
     clientInputId: number;
     conditionId: number;
+    multiChoiceQuestionId: number;
     assignId: number;
     label: string;
     onDelete: (id: string) => void;
@@ -31,6 +33,7 @@ type NodeDataProps = {
     originalDefinedNodeId?: string;
     rules?: Group;
     assignElements?: Assign[];
+    multiChoiceQuestion?: MultiChoiceQuestion;
   };
 };
 
@@ -63,8 +66,11 @@ const StepNode: FC<NodeDataProps> = ({ data }) => {
         });
       };
 
-      const invalidRulesExist = hasInvalidRules(data.rules?.children || []);
+      const invalidRulesExist = hasInvalidRules(data.rules?.children ?? []);
       return data.rules?.children === undefined || invalidRulesExist || data.rules?.children.length === 0;
+    }
+    if (data.stepType === StepType.MultiChoiceQuestion) {
+      return !data?.multiChoiceQuestion?.question || data.multiChoiceQuestion?.buttons?.find((e) => e.title === "") != undefined;
     }
     if (data.stepType === StepType.UserDefined) return;
     if (data.stepType === StepType.OpenWebpage) return !data.link || !data.linkText;
@@ -78,11 +84,11 @@ const StepNode: FC<NodeDataProps> = ({ data }) => {
         });
       };
 
-      const invalidElementsExist = hasInvalidElements(data.assignElements || []);
+      const invalidElementsExist = hasInvalidElements(data.assignElements ?? []);
       return data?.assignElements === undefined || invalidElementsExist || data?.assignElements.length === 0;
     }
 
-    return !(data.readonly || !!data.message?.length);
+    return !data.readonly && !data.message?.length;
   };
 
   const updateIsTestedAndPassed = async () => {
@@ -126,6 +132,9 @@ const StepNode: FC<NodeDataProps> = ({ data }) => {
       </p>
       {data.stepType === StepType.Textfield && (
         <div style={boldText} dangerouslySetInnerHTML={createMarkup(data.message ?? "")}></div>
+      )}
+      {data.stepType === StepType.MultiChoiceQuestion && (
+        <div style={boldText} dangerouslySetInnerHTML={createMarkup(data.multiChoiceQuestion?.question ?? "")}></div>
       )}
       {data.stepType === StepType.Auth && <p style={boldText}>"{t("serviceFlow.popup.loginWithTARA")}"</p>}
       {data.stepType === StepType.Input && (
@@ -179,7 +188,7 @@ const TestStatue = ({
   isStepInvalid,
 }: {
   isTestedAndPassed: boolean | null;
-  isStepInvalid: () => boolean;
+  isStepInvalid: () => boolean | undefined;
 }) => {
   if (isTestedAndPassed) return <CheckBadge />;
   if (isStepInvalid()) return <ExclamationBadge />;
