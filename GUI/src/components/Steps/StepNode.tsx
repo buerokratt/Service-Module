@@ -88,7 +88,7 @@ const StepNode: FC<NodeDataProps> = ({ data }) => {
       return data?.assignElements === undefined || invalidElementsExist || data?.assignElements.length === 0;
     }
 
-    return !(data.readonly || !!data.message?.length);
+    return !data.readonly && !data.message?.length;
   };
 
   const updateIsTestedAndPassed = async () => {
@@ -132,6 +132,9 @@ const StepNode: FC<NodeDataProps> = ({ data }) => {
       </p>
       {data.stepType === StepType.Textfield && (
         <div style={boldText} dangerouslySetInnerHTML={createMarkup(data.message ?? "")}></div>
+      )}
+      {data.stepType === StepType.MultiChoiceQuestion && (
+        <div style={boldText} dangerouslySetInnerHTML={createMarkup(data.multiChoiceQuestion?.question ?? "")}></div>
       )}
       {data.stepType === StepType.Auth && <p style={boldText}>"{t("serviceFlow.popup.loginWithTARA")}"</p>}
       {data.stepType === StepType.Input && (
