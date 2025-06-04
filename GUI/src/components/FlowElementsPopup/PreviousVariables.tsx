@@ -1,6 +1,6 @@
 import React, { CSSProperties, FC, useEffect, useState } from "react";
 import Track from "../Track";
-import useServiceStore from "store/new-services.store";
+import useServiceStore from "../../store/new-services.store";
 import { EndpointResponseVariable } from "types/endpoint/endpoint-response-variables";
 import OutputElementBox from "components/OutputElementBox";
 import { StepType } from "types";
@@ -13,6 +13,7 @@ import Tooltip from "../Tooltip";
 import { v4 } from "uuid";
 import { getHelperTooltips } from "utils/constants";
 import { datesVariables, helperVariables } from "resources/variables-constants";
+import { Node, Edge } from "reactflow";
 
 type PreviousVariablesProps = {
   readonly nodeId: string;
@@ -25,7 +26,8 @@ const INPUT_ELEMENT_KEY = "-1";
 const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
   const { t } = useTranslation();
   let endpointsVariables = useServiceStore((state) => state.endpointsResponseVariables);
-  const nodes = useServiceStore((state) => state.nodes.filter((node) => node.type != "placeholder"));
+  const nodes = useServiceStore((state) => state.nodes);
+  const edges = useServiceStore((state) => state.edges);
   const [endpoints, setEndpoints] = useState<EndpointResponseVariable[]>([]);
   const [assignedVariables, setAssignedVariables] = useState<Assign[]>([]);
   const [endpointsObjectTree, setEndpointsObjectTree] = useState<{
@@ -44,12 +46,17 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
 
   useEffect(() => {
     const currentNodeIndex = nodes.findIndex((node) => node.id === nodeId);
+    const currentNode = nodes[currentNodeIndex];
 
     let startIndex = nodes.findLastIndex(
       (node, i) => i < currentNodeIndex && node.data.stepType === StepType.MultiChoiceQuestion
     );
 
-    const previousNodes = nodes.slice(startIndex, currentNodeIndex);
+    let previousNodes = nodes.slice(startIndex === -1 ? 0 : startIndex, currentNodeIndex);
+
+    if (startIndex != -1) {
+      previousNodes = getCurrentBranchNodesUp(nodes, edges, currentNode);
+    }
 
     // Get Endpoints variables
     const endpointNodes = previousNodes.filter((node) => node.data.stepType === StepType.UserDefined);
@@ -71,6 +78,26 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
 
     setAssignedVariables([...assignElements, inputElement, ...newAssignElements]);
   }, [endpointsVariables, newAssignElements]);
+
+  function getCurrentBranchNodesUp(nodes: Node[], edges: Edge[], currentNode: Node) {
+    const branchNodes: Node[] = [];
+    let parentNode: Node | undefined = getParentNode(nodes, edges, currentNode);
+
+    while (parentNode) {
+      if (parentNode.data?.stepType === StepType.MultiChoiceQuestion) {
+        break;
+      }
+      branchNodes.unshift(parentNode);
+      parentNode = getParentNode(nodes, edges, parentNode);
+    }
+
+    return branchNodes;
+  }
+
+  function getParentNode(nodes: Node[], edges: Edge[], node: Node): Node | undefined {
+    const parentEdge = edges.findLast((edge) => edge.target === node.id);
+    return parentEdge ? nodes.findLast((n) => n.id === parentEdge.source) : undefined;
+  }
 
   const popupBodyCss: CSSProperties = {
     padding: 16,
