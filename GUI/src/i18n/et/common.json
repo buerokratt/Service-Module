@@ -51,7 +51,8 @@
     "close": "Sulge",
     "errorMessage": "Teenusele puudub ligipääs. Proovi hiljem uuesti.",
     "none": "Puudub",
-    "statusClarification": "Staatuse täpsustus"
+    "statusClarification": "Staatuse täpsustus",
+    "loading": "Laadimine"
   },
   "menu": {
     "overview": "Ülevaade",

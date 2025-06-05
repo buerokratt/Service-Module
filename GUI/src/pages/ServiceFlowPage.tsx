@@ -19,11 +19,13 @@ import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSo
 import { restrictToWindowEdges } from "@dnd-kit/modifiers";
 import api from "../services/api-dev";
 import { userStepPreferences } from "resources/api-constants";
+import { Mosaic } from "react-loading-indicators";
 
 const ServiceFlowPage: FC = () => {
   const { t } = useTranslation();
 
   const [allElements, setAllElements] = useState<Step[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
 
   const navigate = useNavigate();
   const description = useServiceStore((state) => state.description);
@@ -33,13 +35,16 @@ const ServiceFlowPage: FC = () => {
 
   useEffect(() => {
     if (!id) return;
+    setLoading(true);
     useServiceStore
       .getState()
       .loadService(id)
       .then(() => {
         useServiceStore.getState().loadEndpointsResponseVariables();
-      });
-    useServiceStore.getState().loadStepPreferences();  
+        useServiceStore.getState().loadStepPreferences().then(() => {
+          setLoading(false);
+        });  
+      }); 
   }, []);
 
   const edges = useServiceStore((state) => state.edges);
@@ -103,63 +108,71 @@ const ServiceFlowPage: FC = () => {
         saveDraftOnClick={() => saveFlowClick()}
         continueOnClick={() => navigate(ROUTES.OVERVIEW_ROUTE)}
       />
-      <h1 style={{ paddingLeft: 16, paddingTop: 16 }}>
-        {t("serviceFlow.flow")} "{name}"
-      </h1>
-      <h5
-        style={{
-          paddingLeft: 16,
-          paddingBottom: 5,
-          wordBreak: "break-all",
-          textOverflow: "ellipsis",
-          overflow: "hidden",
-          whiteSpace: "nowrap",
-        }}
-      >
-        {description}
-      </h5>
-      <FlowElementsPopup />
-      <ReactFlowProvider>
-        <div className="graph">
-          <div className="graph__controls">
-            <Track direction="vertical" gap={16} align="stretch">
-              {steps && (
-                <Collapsible title={t("serviceFlow.apiElements.title")} contentStyle={contentStyle}>
-                  <Track direction="vertical" align="stretch" gap={4}>
-                    {steps.map((step) => (
-                      <ApiEndpoint step={step} key={step.id} />
-                    ))}
-                  </Track>
-                </Collapsible>
-              )}
-              {allElements && (
-                <DndContext
-                  modifiers={[restrictToWindowEdges]}
-                  sensors={sensors}
-                  collisionDetection={closestCorners}
-                  onDragEnd={handleDragEnd}
-                  onDragStart={handleDragStart}
-                >
-                  <Collapsible title={t("serviceFlow.allElements")} contentStyle={contentStyle}>
-                    <Track direction="vertical" align="stretch" gap={4}>
-                      <SortableContext items={allElements} strategy={verticalListSortingStrategy}>
-                        {allElements.map((element) => (
-                          <StepElement key={element.id} step={element} activeStep={activeElement} />
-                        ))}
-                      </SortableContext>
-                    </Track>
-                  </Collapsible>
-                  <DragOverlay>
-                    {activeElement ? <StepElement key={activeElement.id} step={activeElement} /> : null}
-                  </DragOverlay>
-                </DndContext>
-              )}
-            </Track>
-          </div>
-          <FlowBuilder description={description} nodes={nodes} setNodes={setNodes} edges={edges} />
-          <Chat />
+      {loading ? (
+        <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100%" }}>
+          <Mosaic color="#005aa3" size="medium" text={`${t('global.loading')}...`} textColor="black" style={{ textAlign: "end" }} />
         </div>
-      </ReactFlowProvider>
+      ) : (
+        <>
+          <h1 style={{ paddingLeft: 16, paddingTop: 16 }}>
+            {t("serviceFlow.flow")} "{name}"
+          </h1>
+          <h5
+            style={{
+              paddingLeft: 16,
+              paddingBottom: 5,
+              wordBreak: "break-all",
+              textOverflow: "ellipsis",
+              overflow: "hidden",
+              whiteSpace: "nowrap",
+            }}
+          >
+            {description}
+          </h5>
+          <FlowElementsPopup />
+          <ReactFlowProvider>
+            <div className="graph">
+              <div className="graph__controls">
+                <Track direction="vertical" gap={16} align="stretch">
+                  {steps && (
+                    <Collapsible title={t("serviceFlow.apiElements.title")} contentStyle={contentStyle}>
+                      <Track direction="vertical" align="stretch" gap={4}>
+                        {steps.map((step) => (
+                          <ApiEndpoint step={step} key={step.id} />
+                        ))}
+                      </Track>
+                    </Collapsible>
+                  )}
+                  {allElements && (
+                    <DndContext
+                      modifiers={[restrictToWindowEdges]}
+                      sensors={sensors}
+                      collisionDetection={closestCorners}
+                      onDragEnd={handleDragEnd}
+                      onDragStart={handleDragStart}
+                    >
+                      <Collapsible title={t("serviceFlow.allElements")} contentStyle={contentStyle}>
+                        <Track direction="vertical" align="stretch" gap={4}>
+                          <SortableContext items={allElements} strategy={verticalListSortingStrategy}>
+                            {allElements.map((element) => (
+                              <StepElement key={element.id} step={element} activeStep={activeElement} />
+                            ))}
+                          </SortableContext>
+                        </Track>
+                      </Collapsible>
+                      <DragOverlay>
+                        {activeElement ? <StepElement key={activeElement.id} step={activeElement} /> : null}
+                      </DragOverlay>
+                    </DndContext>
+                  )}
+                </Track>
+              </div>
+              <FlowBuilder description={description} nodes={nodes} setNodes={setNodes} edges={edges} />
+              <Chat />
+            </div>
+          </ReactFlowProvider>
+        </>
+      )}
     </>
   );
 };

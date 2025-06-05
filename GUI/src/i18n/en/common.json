@@ -51,7 +51,8 @@
     "close": "Close",
     "errorMessage": "There is no access to the service. Try again later.",
     "none": "None",
-    "statusClarification": "Status clarification"
+    "statusClarification": "Status clarification",
+    "loading": "Loading"
   },
   "menu": {
     "overview": "Overview",
