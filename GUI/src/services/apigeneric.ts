@@ -9,7 +9,7 @@ const instance = axios.create({
         Testcookie: '',
         'Cache-Control': 'no-cache, no-store, must-revalidate',
     },
-    withCredentials: false,
+    withCredentials: true,
 });
 
 instance.interceptors.request.use((config) => {
