@@ -247,6 +247,7 @@
       "clientInput": "Kliendi sisend",
       "assign": "Määra",
       "condition": "Tingimus",
+      "multiChoiceQuestion": "Mitmevalikuline küsimus",
       "openNewWebpage": "Uue veebilehe avamine",
       "fileGeneration": "Faili genereerimine",
       "fileSigning": "Faili allkirjastamine",
@@ -254,19 +255,7 @@
       "redirectConversationToSupport": "Klienditeenindusse suunamine",
       "rules": "Reeglid",
       "rasaRules": "Rasa reeglid",
-      "siga": "Allkirjastamine",
-      "multiChoiceQuestion": {
-        "questionPlaceholder": "Sisesta küsimus",
-        "questionError": "Küsimus on kohustuslik",
-        "addButton": "Lisa nupp +",
-        "maxButtonsStart": "Maksimaalselt ",
-        "maxButtonsEnd": " nuppu lubatud.",
-        "minButtons": "Vähemalt 2 nuppu on vajalik.",
-        "ellipsis": "...",
-        "edit": "Muuda",
-        "delete": "Kustuta",
-        "userChoices": "Lõppkasutaja valikud:"
-      }
+      "siga": "Allkirjastamine"
     },
     "popup": {
       "messageLabel": "Sõnum",
@@ -364,6 +353,19 @@
       "deleteConfirmationMessage": "Kas olete kindel, et soovite kustutada API elementi?",
       "deleteSuccess": "API element kustutatud",
       "deleteError": "API elementi kustutamine ebaõnnestus"
+    },
+    "multiChoiceQuestion": {
+      "title": "Mitmevalikuline küsimus",
+      "questionPlaceholder": "Sisesta küsimus",
+      "questionError": "Küsimus on kohustuslik",
+      "addButton": "Lisa nupp +",
+      "maxButtonsStart": "Maksimaalselt ",
+      "maxButtonsEnd": " nuppu lubatud.",
+      "minButtons": "Vähemalt 2 nuppu on vajalik.",
+      "ellipsis": "...",
+      "edit": "Muuda",
+      "delete": "Kustuta",
+      "userChoices": "Lõppkasutaja valikud:"
     },
     "tabs": {
       "setup": "Seadistamine",

@@ -4,6 +4,7 @@ export enum StepType {
   Input = "input",
   Assign = "assign",
   Condition = "condition",
+  MultiChoiceQuestion = "multi-choice-question",
   RuleDefinition = "rule-definition",
   OpenWebpage = "open-webpage",
   FileGenerate = "file-generate",
@@ -15,5 +16,4 @@ export enum StepType {
   UserDefined = "user-defined",
   RasaRules = "rasa-rules",
   SiGa = "siga",
-  MultiChoiceQuestion = "multi-choice-question",
 }
