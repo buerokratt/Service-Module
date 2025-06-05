@@ -225,6 +225,7 @@
     "trainingModuleSetup": "Avaleht",
     "serviceSetup": "Teenuse seadistamine",
     "serviceFlowCreation": "Teenusvoo loomine",
+    "connectToIntent": "Ühenda teemaga",
     "name": "Nimetus",
     "description": "Kirjeldus",
     "uses": "Teenus kasutab",

@@ -225,6 +225,7 @@
     "trainingModuleSetup": "Training module setup",
     "serviceSetup": "Service setup",
     "serviceFlowCreation": "Service flow creation",
+    "connectToIntent": "Connect to intent",
     "name": "Name",
     "description": "Description",
     "uses": "Service uses",

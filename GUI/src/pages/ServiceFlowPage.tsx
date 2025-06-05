@@ -99,7 +99,7 @@ const ServiceFlowPage: FC = () => {
   return (
     <>
       <NewServiceHeader
-        activeStep={3}
+        activeStep={1}
         saveDraftOnClick={() => saveFlowClick()}
         continueOnClick={() => navigate(ROUTES.OVERVIEW_ROUTE)}
       />
