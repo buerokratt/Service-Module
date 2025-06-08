@@ -61,7 +61,6 @@
 
   &__menu {
     display: none;
-    position: absolute;
     top: 100%;
     left: 0;
     right: 0;
@@ -72,10 +71,23 @@
     z-index: 9998;
     max-height: 320px;
     overflow: auto;
+
+    &--absolute {
+      position: absolute;
+    }
+
+    &--relative {
+      position: relative;
+    }
   }
 
   &__option {
     padding: 8px 15px;
+
+    &--selected {
+      background-color: get-color(black-coral-0);
+      color: get-color(black-coral-20);
+    }
 
     &[aria-selected="true"] {
       background-color: get-color(sapphire-blue-10);

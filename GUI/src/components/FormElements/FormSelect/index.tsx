@@ -11,30 +11,34 @@ type FormSelectProps = SelectHTMLAttributes<HTMLSelectElement> & {
   label: string;
   name: string;
   hideLabel?: boolean;
-  placeholder?: string,
+  placeholder?: string;
   options: {
     label: string;
     value: string;
   }[];
-  onSelectionChange?: (selection: { label: string, value: string } | null) => void;
-}
-
-const itemToString = (item: ({ label: string, value: string } | null)) => {
-  return item ? item.value : '';
+  onSelectionChange?: (selection: { label: string; value: string } | null) => void;
+  isOpen?: boolean;
+  isMenuAbsolute?: boolean;
+  menuPosition?: "absolute" | "relative";
 };
 
-const FormSelect: FC<FormSelectProps> = (
-  {
-    label,
-    hideLabel,
-    options,
-    disabled,
-    placeholder,
-    defaultValue,
-    onSelectionChange,
-    ...rest
-  },
-) => {
+const itemToString = (item: { label: string; value: string } | null) => {
+  return item ? item.value : "";
+};
+
+const FormSelect: FC<FormSelectProps> = ({
+  label,
+  hideLabel,
+  options,
+  disabled,
+  placeholder,
+  defaultValue,
+  onSelectionChange,
+  isOpen: isMenuOpen = false,
+  isMenuAbsolute = true,
+  menuPosition = 'absolute',
+  ...rest
+}) => {
   const id = useId();
   const { t } = useTranslation();
   const defaultSelected = options.find((o) => o.value === defaultValue) || null;
@@ -55,13 +59,14 @@ const FormSelect: FC<FormSelectProps> = (
       setSelectedItem(newSelectedItem ?? null);
       if (onSelectionChange) onSelectionChange(newSelectedItem ?? null);
     },
+    defaultIsOpen: isMenuOpen,
   });
 
   const selectClasses = clsx(
     'select',
   );
 
-  const placeholderValue = placeholder || t('global.choose');
+  const placeholderValue = placeholder ?? t('global.choose');
 
   return (
     <div className={selectClasses}>
@@ -71,7 +76,7 @@ const FormSelect: FC<FormSelectProps> = (
           {selectedItem?.label ?? placeholderValue}
           <Icon label='Dropdown icon' size='medium' icon={<MdArrowDropDown color='#5D6071' />} />
         </div>
-        <ul className='select__menu' {...getMenuProps()}>
+        <ul className={`select__menu select__menu--${menuPosition}`} {...getMenuProps()}>
           {isOpen && (
             options.map((item, index) => (
               <li className={clsx('select__option', { 'select__option--selected': highlightedIndex === index })}
@@ -85,6 +90,5 @@ const FormSelect: FC<FormSelectProps> = (
     </div>
   );
 };
-
 
 export default FormSelect;

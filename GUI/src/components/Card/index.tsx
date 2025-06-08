@@ -1,22 +1,39 @@
 import React, { FC, PropsWithChildren, ReactNode } from 'react';
+import clsx from 'clsx';
 
 import './Card.scss';
 
 type CardProps = {
   header?: ReactNode;
   footer?: ReactNode;
-}
+  borderless?: boolean;
+  isHeaderLight?: boolean;
+  isBodyDivided?: boolean;
+  isScrollable?: boolean;
+  isBackground?: boolean;
+};
 
-const Card: FC<PropsWithChildren<CardProps>> = ({ header, footer, children }) => {
+const Card: FC<PropsWithChildren<CardProps>> = ({
+  header,
+  footer,
+  borderless,
+  isHeaderLight,
+  isBodyDivided,
+  isScrollable = false,
+  isBackground = false,
+  children,
+}) => {
   return (
-    <div className='card'>
-      {header && <div className='card__header'>{header}</div>}
-      <div className='card__body'>
-        {children}
-      </div>
-      {footer && (
-        <div className='card__footer'>{footer}</div>
-      )}
+    <div
+      className={clsx("card", {
+        "card--borderless": borderless,
+        "card--scrollable": isScrollable,
+        "card--transparent": isBackground,
+      })}
+    >
+      {header && <div className={`card__header ${isHeaderLight ? "white" : ""}`}>{header}</div>}
+      <div className={`card__body ${isBodyDivided ? "divided" : ""}`}>{children}</div>
+      {footer && <div className="card__footer">{footer}</div>}
     </div>
   );
 };

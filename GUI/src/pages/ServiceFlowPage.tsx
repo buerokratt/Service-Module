@@ -7,7 +7,7 @@ import { ReactFlowProvider } from "reactflow";
 import "reactflow/dist/style.css";
 import { saveFlowClick } from "services/service-builder";
 import useServiceStore from "store/new-services.store";
-import { Collapsible, FlowElementsPopup, NewServiceHeader, StepElement, Track } from "../components";
+import { Button, Card, Collapsible, FlowElementsPopup, FormInput, FormSelect, Icon, Label, NewServiceHeader, StepElement, Track } from "../components";
 import FlowBuilder from "../components/FlowBuilder/FlowBuilder";
 import { ROUTES } from "../resources/routes-constants";
 import { Step, stepsLabels, StepType } from "../types";
@@ -20,6 +20,8 @@ import { restrictToWindowEdges } from "@dnd-kit/modifiers";
 import api from "../services/api-dev";
 import { userStepPreferences } from "resources/api-constants";
 import { Mosaic } from "react-loading-indicators";
+import { MdOutlineEdit } from "react-icons/md";
+import ChooseSlotModel from "./Integration/ChooseSlotModel";
 
 const ServiceFlowPage: FC = () => {
   const { t } = useTranslation();
@@ -28,9 +30,12 @@ const ServiceFlowPage: FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
 
   const navigate = useNavigate();
-  const description = useServiceStore((state) => state.description);
-  const steps = useServiceStore((state) => state.mapEndpointsToSetps());
   const name = useServiceStore((state) => state.serviceNameDashed());
+  const description = useServiceStore((state) => state.description);
+  const slot = useServiceStore((state) => state.slot);
+  const steps = useServiceStore((state) => state.mapEndpointsToSetps());
+  const [isChooseSlotsModalVisible, setIsChooseSlotsModalVisible] = useState(false);
+
   const { id } = useParams();
 
   useEffect(() => {
@@ -114,21 +119,95 @@ const ServiceFlowPage: FC = () => {
         </div>
       ) : (
         <>
-          <h1 style={{ paddingLeft: 16, paddingTop: 16 }}>
-            {t("serviceFlow.flow")} "{name}"
-          </h1>
-          <h5
-            style={{
-              paddingLeft: 16,
-              paddingBottom: 5,
-              wordBreak: "break-all",
-              textOverflow: "ellipsis",
-              overflow: "hidden",
-              whiteSpace: "nowrap",
-            }}
-          >
-            {description}
-          </h5>
+          <Card isBodyDivided={true} borderless={true} isBackground={true}>
+            <Track style={{ alignItems: "center", gap: 8, width: "100%" }}>
+              <div>
+                <FormInput
+                  name={""}
+                  placeholder={t("newService.title").toString()}
+                  value={name}
+                  onChange={(e) => {
+                    const value = e.target.value.trim();
+                    const hasSpecialCharacters = /[^\p{L}\p{N} ]/u;
+                    if (!hasSpecialCharacters.test(value) && !value.startsWith(" ")) {
+                      useServiceStore.getState().changeServiceName(e.target.value);
+                    }
+                  }}
+                  style={{
+                    minWidth: "250px",
+                    width: "20vw",
+                    backgroundColor: "transparent",
+                    border: "none",
+                    fontSize: "1.5em",
+                  }}
+                />
+              </div>
+              <Button appearance="text" onClick={() => {}} style={{ boxShadow: "none" }} disabled={true}>
+                <Icon icon={<MdOutlineEdit color="#686868" />} size="medium" />
+              </Button>
+              {!name && <label style={{ color: "#d73e3e" }}>{t("newService.titleRequired")}</label>}
+            </Track>
+            <Track style={{ alignItems: "center", gap: 8, width: "100%" }}>
+              <div>
+                <FormInput
+                  name={""}
+                  placeholder={t("newService.description").toString()}
+                  value={description}
+                  onChange={(e) => useServiceStore.getState().setDescription(e.target.value)}
+                  style={{
+                    minWidth: "250px",
+                    width: "20vw",
+                    backgroundColor: "transparent",
+                    border: "none",
+                    textOverflow: "ellipsis",
+                  }}
+                />
+              </div>
+              <Button appearance="text" onClick={() => {}} style={{ boxShadow: "none" }}>
+                <Icon icon={<MdOutlineEdit color="#686868" />} size="medium" />
+              </Button>
+            </Track>
+            <Track style={{ alignItems: "center", gap: 8, width: "fit-content" }}>
+              <FormInput
+                name={""}
+                placeholder={t("newService.chooseMemorySlots").toString()}
+                value={""}
+                readOnly={true}
+                onClick={() => setIsChooseSlotsModalVisible(true)}
+                style={{
+                  minWidth: slot ? "112px":  '250px',
+                  width: slot ? "12vw" : "20vw",
+                  backgroundColor: "transparent",
+                  border: "none",
+                  textOverflow: "ellipsis",
+                  cursor: "pointer",
+                }}
+              />
+              {slot && (
+                <button
+                  style={{
+                    border: "1px solid",
+                    padding: "7px",
+                    fontSize: "0.9em",
+                    minWidth: "130px",
+                    maxWidth: "130px",
+                    whiteSpace: "nowrap",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    display: "inline-block",
+                  }}
+                  onClick={() => {
+                    setIsChooseSlotsModalVisible(true);
+                  }}
+                >
+                  {slot ?? ""}
+                </button>
+              )}
+              <Button appearance="text" onClick={() => {}} style={{ boxShadow: "none" }}>
+                <Icon icon={<MdOutlineEdit color="#686868" />} size="medium" />
+              </Button>
+            </Track>
+          </Card>
           <FlowElementsPopup />
           <ReactFlowProvider>
             <div className="graph">
@@ -171,6 +250,7 @@ const ServiceFlowPage: FC = () => {
               <Chat />
             </div>
           </ReactFlowProvider>
+          {isChooseSlotsModalVisible && <ChooseSlotModel onModalClose={() => setIsChooseSlotsModalVisible(false)} />}
         </>
       )}
     </>
