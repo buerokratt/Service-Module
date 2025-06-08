@@ -7,7 +7,7 @@ import { ReactFlowProvider } from "reactflow";
 import "reactflow/dist/style.css";
 import { saveFlowClick } from "services/service-builder";
 import useServiceStore from "store/new-services.store";
-import { Button, Card, Collapsible, FlowElementsPopup, FormInput, FormSelect, Icon, Label, NewServiceHeader, StepElement, Track } from "../components";
+import { Button, Card, Collapsible, FlowElementsPopup, FormInput, Icon, NewServiceHeader, StepElement, Track } from "../components";
 import FlowBuilder from "../components/FlowBuilder/FlowBuilder";
 import { ROUTES } from "../resources/routes-constants";
 import { Step, stepsLabels, StepType } from "../types";
