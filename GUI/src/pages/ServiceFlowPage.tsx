@@ -1,6 +1,6 @@
 import Chat from "components/chat/chat";
 import withAuthorization, { ROLES } from "hoc/with-authorization";
-import { CSSProperties, FC, useEffect, useState } from "react";
+import { CSSProperties, FC, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useParams } from "react-router-dom";
 import { ReactFlowProvider } from "reactflow";
@@ -22,6 +22,9 @@ import { userStepPreferences } from "resources/api-constants";
 import { Mosaic } from "react-loading-indicators";
 import { MdOutlineEdit } from "react-icons/md";
 import ChooseSlotModel from "./Integration/ChooseSlotModel";
+import ConnectServiceToIntentModel from "./Integration/ConnectServiceToIntentModel";
+import { Intent } from "types/Intent";
+import useServiceListStore from "store/services.store";
 
 const ServiceFlowPage: FC = () => {
   const { t } = useTranslation();
@@ -35,11 +38,16 @@ const ServiceFlowPage: FC = () => {
   const slot = useServiceStore((state) => state.slot);
   const steps = useServiceStore((state) => state.mapEndpointsToSetps());
   const [isChooseSlotsModalVisible, setIsChooseSlotsModalVisible] = useState(false);
+  const [isIntentConnectionModalVisible, setIsIntentConnectionModalVisible] = useState(false);
+  const [activeStep, setActiveStep] = useState(1);
 
   const { id } = useParams();
 
   useEffect(() => {
-    if (!id) return;
+    if (!id) {
+      useServiceStore.getState().loadStepPreferences();
+      return;
+    }
     setLoading(true);
     useServiceStore
       .getState()
@@ -105,17 +113,54 @@ const ServiceFlowPage: FC = () => {
     const step = event.active.data.current?.step as Step;
     setActiveElement(step);
   };
+  const titleRef = useRef<HTMLInputElement>(null);
+  const descriptionRef = useRef<HTMLInputElement>(null);
+
+  function getEditingButton(onClick: () => void) {
+    return (
+      <Button appearance="text" onClick={onClick} style={{ boxShadow: "none" }}>
+        <Icon icon={<MdOutlineEdit color="#686868" />} size="medium" />
+      </Button>
+    );
+  }
+
+  const requestServiceIntentConnection = (intent: string) => {
+    useServiceListStore.getState().requestServiceIntentConnection(
+      () => setIsIntentConnectionModalVisible(false),
+      t("overview.service.toast.connectedToIntentSuccessfully"),
+      t("overview.service.toast.failed.failedToConnectToIntent"),
+      intent,
+      {
+        pageIndex: 0,
+        pageSize: 10,
+      },
+      []
+    );
+  };
   
   return (
     <>
       <NewServiceHeader
-        activeStep={1}
-        saveDraftOnClick={() => saveFlowClick()}
-        continueOnClick={() => navigate(ROUTES.OVERVIEW_ROUTE)}
+        activeStep={activeStep}
+        deleteOnClick={() => {}}
+        continueOnClick={() => {
+          if (activeStep === 1) {
+            useServiceStore.getState().onContinueClick().then(() => {
+              setActiveStep(2);
+              setIsIntentConnectionModalVisible(true);
+            });
+          }
+        }}
       />
       {loading ? (
         <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100%" }}>
-          <Mosaic color="#005aa3" size="medium" text={`${t('global.loading')}...`} textColor="black" style={{ textAlign: "end" }} />
+          <Mosaic
+            color="#005aa3"
+            size="medium"
+            text={`${t("global.loading")}...`}
+            textColor="black"
+            style={{ textAlign: "end" }}
+          />
         </div>
       ) : (
         <>
@@ -123,6 +168,7 @@ const ServiceFlowPage: FC = () => {
             <Track style={{ alignItems: "center", gap: 8, width: "100%" }}>
               <div>
                 <FormInput
+                  ref={titleRef}
                   name={""}
                   placeholder={t("newService.title").toString()}
                   value={name}
@@ -142,14 +188,15 @@ const ServiceFlowPage: FC = () => {
                   }}
                 />
               </div>
-              <Button appearance="text" onClick={() => {}} style={{ boxShadow: "none" }} disabled={true}>
-                <Icon icon={<MdOutlineEdit color="#686868" />} size="medium" />
-              </Button>
+              {getEditingButton(() => {
+                titleRef?.current?.focus();
+              })}
               {!name && <label style={{ color: "#d73e3e" }}>{t("newService.titleRequired")}</label>}
             </Track>
             <Track style={{ alignItems: "center", gap: 8, width: "100%" }}>
               <div>
                 <FormInput
+                  ref={descriptionRef}
                   name={""}
                   placeholder={t("newService.description").toString()}
                   value={description}
@@ -163,9 +210,9 @@ const ServiceFlowPage: FC = () => {
                   }}
                 />
               </div>
-              <Button appearance="text" onClick={() => {}} style={{ boxShadow: "none" }}>
-                <Icon icon={<MdOutlineEdit color="#686868" />} size="medium" />
-              </Button>
+              {getEditingButton(() => {
+                descriptionRef?.current?.focus();
+              })}
             </Track>
             <Track style={{ alignItems: "center", gap: 8, width: "fit-content" }}>
               <FormInput
@@ -175,7 +222,7 @@ const ServiceFlowPage: FC = () => {
                 readOnly={true}
                 onClick={() => setIsChooseSlotsModalVisible(true)}
                 style={{
-                  minWidth: slot ? "112px":  '250px',
+                  minWidth: slot ? "112px" : "250px",
                   width: slot ? "12vw" : "20vw",
                   backgroundColor: "transparent",
                   border: "none",
@@ -203,9 +250,9 @@ const ServiceFlowPage: FC = () => {
                   {slot ?? ""}
                 </button>
               )}
-              <Button appearance="text" onClick={() => {}} style={{ boxShadow: "none" }}>
-                <Icon icon={<MdOutlineEdit color="#686868" />} size="medium" />
-              </Button>
+              {getEditingButton(() => {
+                setIsChooseSlotsModalVisible(true);
+              })}
             </Track>
           </Card>
           <FlowElementsPopup />
@@ -251,6 +298,18 @@ const ServiceFlowPage: FC = () => {
             </div>
           </ReactFlowProvider>
           {isChooseSlotsModalVisible && <ChooseSlotModel onModalClose={() => setIsChooseSlotsModalVisible(false)} />}
+          {isIntentConnectionModalVisible && (
+            <ConnectServiceToIntentModel
+              onModalClose={() => setIsIntentConnectionModalVisible(false)}
+              onConnect={(intent: Intent) => requestServiceIntentConnection(intent.intent)}
+              canCancel={false}
+              canSkip={true}
+              onSkip={() => {
+                navigate(ROUTES.OVERVIEW_ROUTE, { replace: true });
+                useServiceStore.getState().resetState();
+              }}
+            />
+          )}
         </>
       )}
     </>

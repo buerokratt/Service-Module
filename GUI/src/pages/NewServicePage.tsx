@@ -53,9 +53,8 @@ const NewServicePage: React.FC = () => {
       customHeader={
         <NewServiceHeader
           activeStep={2}
-          saveDraftOnClick={() => saveDraft()}
-          isSaveButtonEnabled={endpoints.length > 0}
-          continueOnClick={() => useServiceStore.getState().onContinueClick(navigate)}
+          deleteOnClick={() => {}}
+          continueOnClick={() => {}}
         />
       }
     >

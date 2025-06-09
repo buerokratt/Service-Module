@@ -2,7 +2,6 @@ import React, { FC } from "react";
 import { t } from "i18next";
 import { Button, HeaderStepCounter, Track } from "..";
 import useServiceStore from "store/new-services.store";
-import { runServiceTest } from "services/service-builder";
 import "@buerokratt-ria/header/src/Header.scss";
 import { ROUTES } from "resources/routes-constants";
 import { useNavigate } from "react-router-dom";
@@ -10,14 +9,10 @@ import { useNavigate } from "react-router-dom";
 type NewServiceHeaderProps = {
   activeStep: number;
   continueOnClick: () => void;
-  saveDraftOnClick: () => void;
+  deleteOnClick: () => void;
 };
 
-const NewServiceHeader: FC<NewServiceHeaderProps> = ({
-  activeStep,
-  continueOnClick,
-  saveDraftOnClick,
-}) => {
+const NewServiceHeader: FC<NewServiceHeaderProps> = ({ activeStep, continueOnClick, deleteOnClick }) => {
   const name = useServiceStore((state) => state.serviceNameDashed());
   const navigate = useNavigate();
 
@@ -35,7 +30,7 @@ const NewServiceHeader: FC<NewServiceHeaderProps> = ({
           <h1 style={{ whiteSpace: "nowrap", color: "black" }}>{`< ${t("menu.backToServiceListing")}`}</h1>
         </Button>
         <HeaderStepCounter activeStep={activeStep} />
-        <Button appearance="error" onClick={() => {}}>
+        <Button appearance="error" onClick={deleteOnClick}>
           {t("serviceFlow.apiElements.delete")}
         </Button>
         <Button onClick={continueOnClick} disabled={!name}>
