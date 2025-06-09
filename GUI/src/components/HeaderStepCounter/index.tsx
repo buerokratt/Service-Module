@@ -24,29 +24,17 @@ const HeaderStepCounter: FC<StepCounterProps> = ({ activeStep }) => {
 
   return (
     <Track className="header-step-counter" gap={24}>
-      <Step 
+      <Step
         step={1}
         activeStep={activeStep}
-        name={t("newService.trainingModuleSetup")} 
-        onClick={() => navigate(ROUTES.OVERVIEW_ROUTE)}
+        name={t("newService.serviceFlowCreation")}
+        onClick={() => useServiceStore.getState().onContinueClick(navigate)}
       />
       <Step
         step={2}
         activeStep={activeStep}
-        name={t("newService.serviceSetup")}
-        onClick={() => {
-          if(id) {
-            navigate(ROUTES.replaceWithId(ROUTES.EDITSERVICE_ROUTE, id));
-          } else {
-            navigate(ROUTES.NEWSERVICE_ROUTE);
-          }
-        }}
-      />
-      <Step
-        step={3}
-        activeStep={activeStep}
-        name={t("newService.serviceFlowCreation")}
-        onClick={() => useServiceStore.getState().onContinueClick(navigate)}
+        name={t("newService.connectToIntent")}
+        onClick={() => {}}
       />
     </Track>
   );

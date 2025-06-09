@@ -51,13 +51,15 @@
     "close": "Close",
     "errorMessage": "There is no access to the service. Try again later.",
     "none": "None",
-    "statusClarification": "Status clarification"
+    "statusClarification": "Status clarification",
+    "loading": "Loading"
   },
   "menu": {
     "overview": "Overview",
     "flowbuilder": "Flow Builder",
     "services": "Services",
     "newService": "New Service",
+    "backToServiceListing": "Back to service listing",
     "close": "Close menu",
     "intents": "Intents",
     "auto-services": "Automatic Services",
@@ -178,6 +180,7 @@
       "connectionPending": "Connection to intent request is pending, would you like to cancel it?",
       "cancelRequest": "Cancel request",
       "noIntentsAvailable": "No intents available to be connected",
+      "noSlotsAvailable": "No slots available",
       "connectionQuestion": "Are you sure you want to connect to this intent?",
       "activate": "Activate",
       "deactivate": "Deactivate",
@@ -225,7 +228,9 @@
     "trainingModuleSetup": "Training module setup",
     "serviceSetup": "Service setup",
     "serviceFlowCreation": "Service flow creation",
+    "connectToIntent": "Connect to intent",
     "name": "Name",
+    "title": "Title",
     "description": "Description",
     "uses": "Service uses",
     "toast": {
@@ -239,7 +244,9 @@
       "saveConfigFailed": "Failed to save config",
       "testResultSuccess": "Test result- success",
       "testResultError": "Test result - error"
-    }
+    },
+    "titleRequired": "Title is mandatory",
+    "chooseMemorySlots": "Choose memory slots"
   },
   "serviceFlow": {
     "element": {

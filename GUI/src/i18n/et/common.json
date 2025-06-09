@@ -51,13 +51,15 @@
     "close": "Sulge",
     "errorMessage": "Teenusele puudub ligipääs. Proovi hiljem uuesti.",
     "none": "Puudub",
-    "statusClarification": "Staatuse täpsustus"
+    "statusClarification": "Staatuse täpsustus",
+    "loading": "Laadimine"
   },
   "menu": {
     "overview": "Ülevaade",
     "flowbuilder": "Flow Builder",
     "services": "Teenused",
     "newService": "Uus teenus",
+    "backToServiceListing": "Tagasi teenuste lehele",
     "close": "Sulge menüü",
     "intents": "Teemad",
     "auto-services": "Ühendustaotlused",
@@ -178,6 +180,7 @@
       "connectionPending": "Teenuse teemaga ühendamise taotlus on ootel. Kas soovite selle tühistada?",
       "cancelRequest": "Tühista taotlus",
       "noIntentsAvailable": "Ühenduse loomiseks ei ole ühtegi teemat saadaval",
+      "noSlotsAvailable": "Ühtegi pesa pole saadaval",
       "connectionQuestion": "Kas olete kindel, et soovite teenuse selle teemaga ühendada?",
       "activate": "Aktiveerige",
       "deactivate": "Deaktiveerige",
@@ -225,7 +228,9 @@
     "trainingModuleSetup": "Avaleht",
     "serviceSetup": "Teenuse seadistamine",
     "serviceFlowCreation": "Teenusvoo loomine",
+    "connectToIntent": "Ühenda teemaga",
     "name": "Nimetus",
+    "title": "Pealkiri",
     "description": "Kirjeldus",
     "uses": "Teenus kasutab",
     "toast": {
@@ -239,7 +244,9 @@
       "saveConfigFailed": "Seadete salvestamine ebaõnnestus",
       "testResultSuccess": "Testi tulemus - edu",
       "testResultError": "Testi tulemus - viga"
-    }
+    },
+    "titleRequired": "Pealkiri on kohustuslik",
+    "chooseMemorySlots": "Vali mälukohad"
   },
   "serviceFlow": {
     "element": {

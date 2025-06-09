@@ -26,6 +26,7 @@ import { EndpointResponseVariable } from "types/endpoint/endpoint-response-varia
 import { Assign } from "types/assign";
 import { EndpointType } from "types/endpoint/endpoint-type";
 import api from "../services/api-dev";
+
 interface ServiceStoreState {
   endpoints: EndpointData[];
   name: string;
@@ -237,7 +238,7 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
       const endpointResponses = await Promise.all(
         get().endpoints.map(async (e) => {
           return Promise.all(
-            e.definedEndpoints.map(async (endpoint) => {
+            e.definitions.map(async (endpoint) => {
               const response = await api.post(servicesRequestsExplain(), {
                 url: endpoint.url,
                 method: endpoint.methodType,
@@ -362,7 +363,7 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
     let nodes = get().nodes;
 
     if (id) {
-      const service = await api.get<Service[]>(getServiceById(id));
+      const serviceResponse = await api.get<Service>(getServiceById(id));
 
       const structure = JSON.parse(serviceResponse.data.structure?.value ?? "{}");
       let endpoints = serviceResponse.data.endpoints.map((endpoint) => {
@@ -697,15 +698,15 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
   },
   testUrl: async (endpoint, onError, onSuccess) => {
     try {
-      new URL(endpoint.definedEndpoints[0].url ?? "");
-      if (endpoint.definedEndpoints[0].methodType === "GET") {
+      new URL(endpoint.definitions[0].url ?? "");
+      if (endpoint.definitions[0].methodType === "GET") {
         await api.post(getEndpointValidation(), {
-          url: endpoint.definedEndpoints[0].url ?? "",
+          url: endpoint.definitions[0].url ?? "",
           type: "GET",
         });
       } else {
         await api.post(getEndpointValidation(), {
-          url: endpoint.definedEndpoints[0].url ?? "",
+          url: endpoint.definitions[0].url ?? "",
           type: "POST",
         });
       }
