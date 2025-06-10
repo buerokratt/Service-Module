@@ -4,6 +4,6 @@
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.1.xsd">
     <changeSet id="20250601033822" author="ahmer-mt">
-        <sqlFile path="changelog/changelog/20250601033822-update-services-deleted-updated-at.sql" />
+        <sqlFile path="changelog/20250601033822-update-services-deleted-updated-at.sql" />
     </changeSet>
 </databaseChangeLog>
