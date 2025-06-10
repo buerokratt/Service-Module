@@ -4,9 +4,9 @@
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.1.xsd">
     <changeSet id="20250530230335" author="athar-mt">
-        <sqlFile path="changelog/20250530230335-create-separate-schemas.sql" />
+        <sqlFile path="changelog/changelog/20250530230335-create-separate-schemas.sql" />
         <rollback>
-            <sqlFile path="changelog/20250530230335-rollback.sql" />
+            <sqlFile path="changelog/changelog/20250530230335-rollback.sql" />
         </rollback>
     </changeSet>
 </databaseChangeLog>
