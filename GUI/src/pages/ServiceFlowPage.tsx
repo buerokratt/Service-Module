@@ -300,7 +300,11 @@ const ServiceFlowPage: FC = () => {
           {isChooseSlotsModalVisible && <ChooseSlotModel onModalClose={() => setIsChooseSlotsModalVisible(false)} />}
           {isIntentConnectionModalVisible && (
             <ConnectServiceToIntentModel
-              onModalClose={() => setIsIntentConnectionModalVisible(false)}
+              onModalClose={() => {
+                // To be done: Change Status to draft
+                setIsIntentConnectionModalVisible(false);
+                setActiveStep(1);
+              }}
               onConnect={(intent: Intent) => requestServiceIntentConnection(intent.intent)}
               canCancel={false}
               canSkip={true}

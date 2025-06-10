@@ -20,9 +20,9 @@ const Button: FC<PropsWithChildren<ButtonProps>> = ({
   const ref = useRef<HTMLButtonElement>(null);
 
   const buttonClasses = clsx("btn", `btn--${appearance}`, `btn--${size}`, disabled && "btn--disabled", className);
-
+  const isDisabled: boolean = disabled || appearance === "loading";
   return (
-    <button className={buttonClasses} ref={ref} disabled={disabled || appearance === "loading"} {...rest}>
+    <button className={buttonClasses} ref={ref} disabled={isDisabled} {...rest}>
       {children}
     </button>
   );

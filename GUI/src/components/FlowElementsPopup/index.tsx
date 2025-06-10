@@ -12,7 +12,6 @@ import TextfieldTestContent from "./TextfieldTestContent";
 import DefaultMessageContent from "./DefaultMessageContent";
 import EndConversationContent from "./EndConversationContent";
 import JsonRequestContent from "./JsonRequestContent";
-import axios from "axios";
 import { servicesRequestsExplain } from "../../resources/api-constants";
 import OpenWebPageContent from "./OpenWebPageContent";
 import OpenWebPageTestContent from "./OpenWebPageTestContent";
