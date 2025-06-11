@@ -154,9 +154,6 @@ export const getColumns = ({
             appearance="text"
             onClick={() => {
               useServiceListStore.getState().setSelectedService(props.row.original);
-              if (props.row.original.state != ServiceState.Draft) {
-                editService();
-              }
               navigate(ROUTES.replaceWithId(ROUTES.EDITSERVICE_ROUTE, props.row.original.serviceId));
             }}
           >

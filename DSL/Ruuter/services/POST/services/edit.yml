@@ -28,7 +28,10 @@ declaration:
         description: "Body field 'type'"
       - field: updateServiceDb
         type: boolean
-        description: "Body field 'updateServiceDb'"    
+        description: "Body field 'updateServiceDb'"
+      - field: state
+        type: string
+        description: "Body field 'state'"  
     params:
       - field: id
         type: string
@@ -43,10 +46,12 @@ extract_request_data:
     type: ${incoming.body.type}
     content: ${incoming.body.content}
     structure: ${incoming.body.structure}
+    updateServiceDb: ${incoming.body.updateServiceDb}
+    state: ${incoming.body.state}
 
 check_for_update_service_db:
   switch:
-    - condition: ${incoming.body.updateServiceDb === true}
+    - condition: ${updateServiceDb=== true}
       next: delete_all_mcq_files
   next: check_for_content
 
@@ -118,7 +123,7 @@ check_type:
 
 check_if_update_service_db:
   switch:
-    - condition: ${incoming.body.updateServiceDb === true}
+    - condition: ${updateServiceDb === true}
       next: get_service_by_id
   next: return_ok
 
@@ -178,6 +183,7 @@ service_edit:
       description: ${description}
       slot: ${slot}
       structure: ${new_structure}
+      state: ${state ?? 'draft'}
   result: editedService
 
 return_ok:
@@ -187,8 +193,8 @@ return_ok:
   next: end
 
 return_bad_request:
-  status: 400
-  return: ${err_result.response.body.message}
+  status: 200
+  return: "Error while editing service"
   next: end
 
 return_incorrect_request:

@@ -1,20 +1,26 @@
-import React, { FC } from "react";
+import React, { FC, useState } from "react";
 import { t } from "i18next";
 import { Button, HeaderStepCounter, Track } from "..";
 import useServiceStore from "store/new-services.store";
 import "@buerokratt-ria/header/src/Header.scss";
 import { ROUTES } from "resources/routes-constants";
 import { useNavigate } from "react-router-dom";
+import useServiceListStore from "../../store/services.store";
+import { ServiceState } from "types";
+import { deleteService } from "resources/api-constants";
+import api from "../../services/api-dev";
 
 type NewServiceHeaderProps = {
   activeStep: number;
   continueOnClick: () => void;
-  deleteOnClick: () => void;
 };
 
-const NewServiceHeader: FC<NewServiceHeaderProps> = ({ activeStep, continueOnClick, deleteOnClick }) => {
+const NewServiceHeader: FC<NewServiceHeaderProps> = ({ activeStep, continueOnClick }) => {
   const name = useServiceStore((state) => state.serviceNameDashed());
+  const serviceState = useServiceStore((state) => state.serviceState);
+  const selectedService = useServiceListStore((state) => state.selectedService);
   const navigate = useNavigate();
+  const [isDeleting, setIsDeleting] = useState(false);
 
   return (
     <header className="header" style={{ paddingLeft: 24 }}>
@@ -30,7 +36,23 @@ const NewServiceHeader: FC<NewServiceHeaderProps> = ({ activeStep, continueOnCli
           <h1 style={{ whiteSpace: "nowrap", color: "black" }}>{`< ${t("menu.backToServiceListing")}`}</h1>
         </Button>
         <HeaderStepCounter activeStep={activeStep} />
-        <Button appearance="error" onClick={deleteOnClick}>
+        <Button appearance={isDeleting ? 'loading' : 'error'} disabled={serviceState !== ServiceState.Draft} onClick={() => {
+          setIsDeleting(true);
+           api
+             .post(deleteService(), {
+               id: selectedService?.serviceId,
+               type: selectedService?.type,
+             })
+             .then(() => {
+               navigate(ROUTES.OVERVIEW_ROUTE, { replace: true });
+               useServiceStore.getState().resetState();
+               setIsDeleting(false);
+             })
+             .catch((error) => {
+               setIsDeleting(false);
+               console.error(error);
+             });
+        }}>
           {t("serviceFlow.apiElements.delete")}
         </Button>
         <Button onClick={continueOnClick} disabled={!name}>

@@ -610,6 +610,7 @@ async function saveService(
         isCommon,
         structure: JSON.stringify({ edges, nodes }),
         updateServiceDb: updateServiceDb,
+        state: 'ready'
       },
       {
         params: {
@@ -1276,6 +1277,8 @@ export const editServiceInfo = async () => {
       description,
       slot,
       type: "POST",
+      updateServiceDb: true,
+      state: 'ready',
     })
   );
 

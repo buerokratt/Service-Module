@@ -5,9 +5,8 @@ import { useTranslation } from "react-i18next";
 import { useNavigate, useParams } from "react-router-dom";
 import { ReactFlowProvider } from "reactflow";
 import "reactflow/dist/style.css";
-import { saveFlowClick } from "services/service-builder";
 import useServiceStore from "store/new-services.store";
-import { Button, Card, Collapsible, FlowElementsPopup, FormInput, Icon, NewServiceHeader, StepElement, Track } from "../components";
+import { Button, Card, Collapsible, FlowElementsPopup, FormInput, Icon, NewServiceHeader, StepElement, Switch, Track } from "../components";
 import FlowBuilder from "../components/FlowBuilder/FlowBuilder";
 import { ROUTES } from "../resources/routes-constants";
 import { Step, stepsLabels, StepType } from "../types";
@@ -18,7 +17,7 @@ import { closestCorners, DndContext, DragEndEvent, DragOverlay, DragStartEvent, 
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { restrictToWindowEdges } from "@dnd-kit/modifiers";
 import api from "../services/api-dev";
-import { userStepPreferences } from "resources/api-constants";
+import { changeServiceStatus, userStepPreferences } from "resources/api-constants";
 import { Mosaic } from "react-loading-indicators";
 import { MdOutlineEdit } from "react-icons/md";
 import ChooseSlotModel from "./Integration/ChooseSlotModel";
@@ -40,6 +39,8 @@ const ServiceFlowPage: FC = () => {
   const [isChooseSlotsModalVisible, setIsChooseSlotsModalVisible] = useState(false);
   const [isIntentConnectionModalVisible, setIsIntentConnectionModalVisible] = useState(false);
   const [activeStep, setActiveStep] = useState(1);
+  const selectedService = useServiceListStore((state) => state.selectedService);
+  const isCommon = useServiceStore((state) => state.isCommon);
 
   const { id } = useParams();
 
@@ -125,30 +126,45 @@ const ServiceFlowPage: FC = () => {
   }
 
   const requestServiceIntentConnection = (intent: string) => {
-    useServiceListStore.getState().requestServiceIntentConnection(
-      () => setIsIntentConnectionModalVisible(false),
-      t("overview.service.toast.connectedToIntentSuccessfully"),
-      t("overview.service.toast.failed.failedToConnectToIntent"),
-      intent,
-      {
-        pageIndex: 0,
-        pageSize: 10,
-      },
-      []
-    );
+    useServiceListStore
+      .getState()
+      .requestServiceIntentConnection(
+        () => setIsIntentConnectionModalVisible(false),
+        t("overview.service.toast.connectedToIntentSuccessfully"),
+        t("overview.service.toast.failed.failedToConnectToIntent"),
+        intent,
+        {
+          pageIndex: 0,
+          pageSize: 10,
+        },
+        []
+      )
+      .then(() => {
+        navigate(ROUTES.OVERVIEW_ROUTE, { replace: true });
+        useServiceStore.getState().resetState();
+      })
+      .catch((error) => {
+        console.error(error);
+      });
   };
   
   return (
     <>
       <NewServiceHeader
         activeStep={activeStep}
-        deleteOnClick={() => {}}
         continueOnClick={() => {
           if (activeStep === 1) {
-            useServiceStore.getState().onContinueClick().then(() => {
-              setActiveStep(2);
-              setIsIntentConnectionModalVisible(true);
-            });
+            useServiceStore
+              .getState()
+              .onContinueClick()
+              .then(() => {
+                setActiveStep(2);
+                setIsIntentConnectionModalVisible(true);
+                useServiceStore.getState().loadService(id);
+              })
+              .catch((error) => {
+                console.error(error);
+              });
           }
         }}
       />
@@ -214,45 +230,58 @@ const ServiceFlowPage: FC = () => {
                 descriptionRef?.current?.focus();
               })}
             </Track>
-            <Track style={{ alignItems: "center", gap: 8, width: "fit-content" }}>
-              <FormInput
-                name={""}
-                placeholder={t("newService.chooseMemorySlots").toString()}
-                value={""}
-                readOnly={true}
-                onClick={() => setIsChooseSlotsModalVisible(true)}
-                style={{
-                  minWidth: slot ? "112px" : "250px",
-                  width: slot ? "12vw" : "20vw",
-                  backgroundColor: "transparent",
-                  border: "none",
-                  textOverflow: "ellipsis",
-                  cursor: "pointer",
-                }}
-              />
-              {slot && (
-                <button
+            <Track style={{ alignItems: "center", gap: 8, width: "100%" }}>
+              <div style={{ flexDirection: "row", display: "flex", alignItems: "center" }}>
+                <FormInput
+                  name={""}
+                  placeholder={t("newService.chooseMemorySlots").toString()}
+                  value={""}
+                  readOnly={true}
+                  onClick={() => setIsChooseSlotsModalVisible(true)}
                   style={{
-                    border: "1px solid",
-                    padding: "7px",
-                    fontSize: "0.9em",
-                    minWidth: "130px",
-                    maxWidth: "130px",
-                    whiteSpace: "nowrap",
-                    overflow: "hidden",
+                    minWidth: slot ? "130px" : "250px",
+                    width: slot ? "17vw" : "20vw",
+                    backgroundColor: "transparent",
+                    border: "none",
                     textOverflow: "ellipsis",
-                    display: "inline-block",
+                    cursor: "pointer",
                   }}
-                  onClick={() => {
-                    setIsChooseSlotsModalVisible(true);
-                  }}
-                >
-                  {slot ?? ""}
-                </button>
-              )}
+                />
+                {slot && (
+                  <button
+                    style={{
+                      border: "1px solid",
+                      padding: "7px",
+                      fontSize: "0.9em",
+                      minWidth: "130px",
+                      maxWidth: "130px",
+                      whiteSpace: "nowrap",
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      display: "inline-block",
+                    }}
+                    onClick={() => {
+                      setIsChooseSlotsModalVisible(true);
+                    }}
+                  >
+                    {slot ?? ""}
+                  </button>
+                )}
+              </div>
               {getEditingButton(() => {
                 setIsChooseSlotsModalVisible(true);
               })}
+            </Track>
+            <Track style={{ paddingLeft: '26px'}}>
+              <Switch
+                name="isCommon"
+                label={t("newService.isCommon")}
+                onLabel={t("global.yes").toString()}
+                offLabel={t("global.no").toString()}
+                value={isCommon}
+                checked={isCommon}
+                onCheckedChange={(e) => useServiceStore.getState().setIsCommon(e)}
+              />
             </Track>
           </Card>
           <FlowElementsPopup />
@@ -301,9 +330,20 @@ const ServiceFlowPage: FC = () => {
           {isIntentConnectionModalVisible && (
             <ConnectServiceToIntentModel
               onModalClose={() => {
-                // To be done: Change Status to draft
-                setIsIntentConnectionModalVisible(false);
-                setActiveStep(1);
+                api
+                  .post(changeServiceStatus(), {
+                    id: selectedService?.serviceId ?? "",
+                    state: "draft",
+                    type: selectedService?.type ?? "POST",
+                  })
+                  .then(() => {
+                    setIsIntentConnectionModalVisible(false);
+                    setActiveStep(1);
+                    useServiceStore.getState().loadService(id);
+                  })
+                  .catch((error) => {
+                    console.error(error);
+                  });
               }}
               onConnect={(intent: Intent) => requestServiceIntentConnection(intent.intent)}
               canCancel={false}

@@ -235,7 +235,7 @@ return_incorrect_request:
   next: end
 
 return_same_state_update:
-  status: 400
+  status: 200
   return: "Service is already in this state"
   next: end
 

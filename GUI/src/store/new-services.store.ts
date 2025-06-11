@@ -73,7 +73,7 @@ interface ServiceStoreState {
   addEndpoint: () => void;
   loadSecretVariables: () => Promise<void>;
   loadTaraVariables: () => Promise<void>;
-  loadService: (id?: string) => Promise<void>;
+  loadService: (id?: string, resetState?: boolean) => Promise<void>;
   loadStepPreferences: () => Promise<void>;
   getAvailableRequestValues: (endpointId: string) => PreDefinedEndpointEnvVariables;
   onNameChange: (endpointId: string, oldName: string, newName: string) => void;
@@ -358,8 +358,10 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
   },
   resetAssign: () => set({ assignElements: [] }),
   resetRules: () => set({ rules: [], isYesNoQuestion: false }),
-  loadService: async (id) => {
-    get().resetState();
+  loadService: async (id, resetState) => {
+    if (resetState === true) {
+      get().resetState();
+    }
     let nodes = get().nodes;
 
     if (id) {
