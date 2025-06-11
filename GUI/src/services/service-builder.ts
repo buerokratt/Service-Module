@@ -1,4 +1,3 @@
-import axios from "axios";
 import { Assign } from "types/assign";
 import { Group, Rule } from "components/FlowElementsPopup/RuleBuilder/types";
 import i18next from "i18next";
@@ -124,7 +123,7 @@ const saveEndpointInfo = async (
   });
   const result = Object.fromEntries(steps.entries());
 
-  await axios
+  await api
     .post(
       jsonToYml(),
       { result },
@@ -194,7 +193,7 @@ const saveEndpointConfig = async (
   steps.set("return_value", { wrapper: false, return: "${sensitive}" });
   const result = Object.fromEntries(steps.entries());
 
-  await axios
+  await api
     .post(
       jsonToYml(),
       { result },
@@ -598,7 +597,7 @@ async function saveService(
   onError?: (e: any) => void
 ) {
   const { isNewService, serviceId, name, description, slot, isCommon, edges, nodes } = config;
-  await axios
+  await api
     .post(
       isNewService ? createNewService() : editService(serviceId),
       {
@@ -611,6 +610,7 @@ async function saveService(
         isCommon,
         structure: JSON.stringify({ edges, nodes }),
         updateServiceDb: updateServiceDb,
+        state: 'ready'
       },
       {
         params: {
@@ -1277,6 +1277,8 @@ export const editServiceInfo = async () => {
       description,
       slot,
       type: "POST",
+      updateServiceDb: true,
+      state: 'ready',
     })
   );
 

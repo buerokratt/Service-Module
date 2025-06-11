@@ -13,7 +13,6 @@ import {
   Switch,
   FormSelect,
 } from "../components";
-import { saveDraft } from "services/service-builder";
 import useStore from "store/store";
 import useServiceStore from "store/new-services.store";
 import withAuthorization, { ROLES } from "hoc/with-authorization";
@@ -23,7 +22,6 @@ import api from "../services/api-dev";
 
 const NewServicePage: React.FC = () => {
   const { t } = useTranslation();
-  const navigate = useNavigate();
   const userInfo = useStore((state) => state.userInfo);
   const endpoints = useServiceStore((state) => state.endpoints);
   const isCommon = useServiceStore((state) => state.isCommon);
@@ -44,7 +42,7 @@ const NewServicePage: React.FC = () => {
   }, [intentName]);
 
   useEffect(() => {
-    useServiceStore.getState().loadService(id);
+    useServiceStore.getState().loadService(id, true);
   }, [id]);
 
   return (
@@ -53,9 +51,7 @@ const NewServicePage: React.FC = () => {
       customHeader={
         <NewServiceHeader
           activeStep={2}
-          saveDraftOnClick={() => saveDraft()}
-          isSaveButtonEnabled={endpoints.length > 0}
-          continueOnClick={() => useServiceStore.getState().onContinueClick(navigate)}
+          continueOnClick={() => {}}
         />
       }
     >
@@ -123,7 +119,7 @@ const NewServicePage: React.FC = () => {
         {endpoints
           .filter((endpoint) => endpoint.serviceId === id || !endpoint.hasOwnProperty("serviceId"))
           .map((endpoint) => (
-            <ApiEndpointCard key={endpoint.id} endpoint={endpoint} />
+            <ApiEndpointCard key={endpoint.endpointId} endpoint={endpoint} />
           ))}
         <Button appearance="text" onClick={useServiceStore.getState().addEndpoint}>
           {t("newService.endpoint.add")}

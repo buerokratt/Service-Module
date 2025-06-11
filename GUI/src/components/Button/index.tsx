@@ -4,7 +4,7 @@ import clsx from "clsx";
 import "./Button.scss";
 
 type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
-  appearance?: "primary" | "secondary" | "text" | "icon" | "error" | "success";
+  appearance?: "primary" | "secondary" | "text" | "icon" | "error" | "success" | "loading";
   size?: "m" | "s";
   className?: string;
 };
@@ -20,9 +20,9 @@ const Button: FC<PropsWithChildren<ButtonProps>> = ({
   const ref = useRef<HTMLButtonElement>(null);
 
   const buttonClasses = clsx("btn", `btn--${appearance}`, `btn--${size}`, disabled && "btn--disabled", className);
-
+  const isDisabled: boolean = disabled || appearance === "loading";
   return (
-    <button className={buttonClasses} ref={ref} disabled={disabled} {...rest}>
+    <button className={buttonClasses} ref={ref} disabled={isDisabled} {...rest}>
       {children}
     </button>
   );

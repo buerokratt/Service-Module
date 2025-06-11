@@ -52,7 +52,8 @@
     "errorMessage": "There is no access to the service. Try again later.",
     "none": "None",
     "statusClarification": "Status clarification",
-    "loading": "Loading"
+    "loading": "Loading",
+    "skip": "Skip"
   },
   "menu": {
     "overview": "Overview",

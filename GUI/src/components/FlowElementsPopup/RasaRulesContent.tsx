@@ -1,6 +1,5 @@
 import { FC, useEffect, useState } from "react";
 import Track from "../Track";
-import axios from "axios";
 import { getDomainFile } from "../../resources/api-constants";
 import { FormInput, FormSelect } from "../FormElements";
 import Button from "../Button";
@@ -22,7 +21,7 @@ const RasaRulesContent: FC = () => {
   return (
     <>
       <Track direction="horizontal" align="left" style={{ width: '100%', padding: 16 }} gap={16}>
-        <FormInput name={"name"} label={t("serviceFlow.popup.name")} placeholder={t("serviceFlow.popup.name") + ""} />
+        <FormInput name={"name"} label={t("serviceFlow.popup.name").toString()} placeholder={t("serviceFlow.popup.name") + ""} />
       </Track>
       {
         rules.map((rule, index) => (

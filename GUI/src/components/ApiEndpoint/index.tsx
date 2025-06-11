@@ -1,4 +1,3 @@
-import axios from "axios";
 import clsx from "clsx";
 import Box from "components/Box";
 import Button from "components/Button";

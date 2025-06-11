@@ -52,7 +52,8 @@
     "errorMessage": "Teenusele puudub ligipääs. Proovi hiljem uuesti.",
     "none": "Puudub",
     "statusClarification": "Staatuse täpsustus",
-    "loading": "Laadimine"
+    "loading": "Laadimine",
+    "skip": "Jäta vahele"
   },
   "menu": {
     "overview": "Ülevaade",

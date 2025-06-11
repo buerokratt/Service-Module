@@ -11,9 +11,12 @@ import { Link } from "react-router-dom";
 type ConnectServiceToIntentModelProps = {
   onModalClose: () => void;
   onConnect: (intent: Intent) => void;
+  canCancel?: boolean;
+  canSkip?: boolean;
+  onSkip?: () => void;
 };
 
-const ConnectServiceToIntentModel: FC<ConnectServiceToIntentModelProps> = ({ onModalClose, onConnect }) => {
+const ConnectServiceToIntentModel: FC<ConnectServiceToIntentModelProps> = ({ onModalClose, onConnect, canCancel = true, canSkip = false, onSkip }) => {
   const { t } = useTranslation();
   const [filter, setFilter] = useState("");
   const [pagination, setPagination] = useState<PaginationState>({
@@ -111,9 +114,14 @@ const ConnectServiceToIntentModel: FC<ConnectServiceToIntentModelProps> = ({ onM
         <Link style={{ color: "#005aa3" }} to={import.meta.env.REACT_APP_INTENT_CREATION_PATH}>
           {`+ ${t("overview.popup.createNewIntent")}`}
         </Link>
-        <Button appearance="error" onClick={onModalClose}>
-          {t("global.cancel")}
-        </Button>
+        <Track gap={15}>
+          {canCancel && (
+            <Button appearance="error" onClick={onModalClose}>
+              {t("global.cancel")}
+            </Button>
+          )}
+          {canSkip && <Button onClick={onSkip}>{t("global.skip")}</Button>}
+        </Track>
       </Track>
       {showConfirmationModal && (
         <Modal title={t("overview.popup.connectionQuestion")} onClose={() => setShowConfirmationModal(false)}>

@@ -71,6 +71,7 @@ service_add:
       ruuter_type: ${type}
       service_id: ${serviceId}
       is_common: ${isCommon}
+      state: "ready"
       structure: ${structure}
   result: createdService
   next: convert_json_content_to_yml

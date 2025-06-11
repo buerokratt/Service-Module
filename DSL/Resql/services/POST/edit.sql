@@ -4,7 +4,7 @@ SELECT
   :description,
   :slot,
   ruuter_type,
-  current_state,
+  :state::service_state,
   service_id,
   is_common,
   :structure::json

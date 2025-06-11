@@ -73,7 +73,7 @@ interface ServiceStoreState {
   addEndpoint: () => void;
   loadSecretVariables: () => Promise<void>;
   loadTaraVariables: () => Promise<void>;
-  loadService: (id?: string) => Promise<void>;
+  loadService: (id?: string, resetState?: boolean) => Promise<void>;
   loadStepPreferences: () => Promise<void>;
   getAvailableRequestValues: (endpointId: string) => PreDefinedEndpointEnvVariables;
   onNameChange: (endpointId: string, oldName: string, newName: string) => void;
@@ -91,7 +91,7 @@ interface ServiceStoreState {
   resetState: () => void;
   resetAssign: () => void;
   resetRules: () => void;
-  onContinueClick: (navigate: NavigateFunction) => Promise<void>;
+  onContinueClick: () => Promise<void>;
   selectedNode: Node<NodeDataProps> | null;
   setSelectedNode: (node: Node<NodeDataProps> | null | undefined) => void;
   resetSelectedNode: () => void;
@@ -282,7 +282,7 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
   getFlatVariables: () => {
     return [...get().availableVariables.prod, ...get().availableVariables.test];
   },
-  vaildServiceInfo: () => !!get().name && !!get().description,
+  vaildServiceInfo: () => !!get().name,
   serviceNameDashed: () => get().name.trim().replace(" ", "_"),
   deleteEndpoint: (id: string) => {
     const newEndpoints = get().endpoints.filter((x) => x.endpointId !== id);
@@ -358,8 +358,10 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
   },
   resetAssign: () => set({ assignElements: [] }),
   resetRules: () => set({ rules: [], isYesNoQuestion: false }),
-  loadService: async (id) => {
-    get().resetState();
+  loadService: async (id, resetState) => {
+    if (resetState === true) {
+      get().resetState();
+    }
     let nodes = get().nodes;
 
     if (id) {
@@ -584,7 +586,7 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
   },
   reactFlowInstance: null,
   setReactFlowInstance: (reactFlowInstance) => set({ reactFlowInstance }),
-  onContinueClick: async (navigate) => {
+  onContinueClick: async () => {
     const vaildServiceInfo = get().vaildServiceInfo();
 
     if (!vaildServiceInfo) {
@@ -603,8 +605,6 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
     } else {
       await editServiceInfo();
     }
-
-    navigate(ROUTES.replaceWithId(ROUTES.FLOW_ROUTE, get().serviceId));
   },
   selectedNode: null,
   setSelectedNode: (node) => set({ selectedNode: node }),
