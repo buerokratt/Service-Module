@@ -1,6 +1,14 @@
 import { create } from "zustand";
 import { v4 as uuid } from "uuid";
-import { Edge, EdgeChange, Node, NodeChange, ReactFlowInstance, applyEdgeChanges, applyNodeChanges } from "reactflow";
+import {
+  Edge,
+  EdgeChange,
+  Node,
+  NodeChange,
+  ReactFlowInstance,
+  applyEdgeChanges,
+  applyNodeChanges,
+} from "@xyflow/react";
 import { EndpointData, EndpointEnv, EndpointTab, PreDefinedEndpointEnvVariables } from "types/endpoint";
 import {
   getEndpointValidation,
@@ -17,7 +25,7 @@ import i18next from "i18next";
 import { ROUTES } from "resources/routes-constants";
 import { NavigateFunction } from "react-router-dom";
 import { editServiceInfo, saveFlowClick } from "services/service-builder";
-import { NodeDataProps, initialEdge, initialNodes } from "types/service-flow";
+import { NodeDataProps, initialEdges, initialNodes } from "types/service-flow";
 import { alignNodesInCaseAnyGotOverlapped, buildPlaceholder, updateFlowInputRules } from "services/flow-builder";
 import { GroupOrRule } from "components/FlowElementsPopup/RuleBuilder/types";
 import useTestServiceStore from "./test-services.store";
@@ -119,7 +127,7 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
   slot: "",
   serviceId: uuid(),
   description: "",
-  edges: [initialEdge],
+  edges: initialEdges,
   nodes: initialNodes,
   isNewService: true,
   serviceState: ServiceState.Draft,
@@ -343,7 +351,7 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
       reactFlowInstance: null,
       selectedTab: EndpointEnv.Live,
       isNewService: true,
-      edges: [initialEdge],
+      edges: initialEdges,
       nodes: initialNodes,
       isTestButtonEnabled: true,
       assignElements: [],
@@ -377,7 +385,7 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
       let edges = structure?.edges;
       nodes = structure?.nodes;
 
-      if (!edges || edges.length === 0) edges = [initialEdge];
+      if (!edges || edges.length === 0) edges = initialEdges;
 
       if (!nodes || nodes.length === 0) nodes = initialNodes;
 

@@ -1,6 +1,6 @@
 import { FC } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Handle, Position } from 'reactflow';
+import { Handle, Position } from "@xyflow/react";
 
 const PlaceholderNode: FC = (props: any) => {
   const { t } = useTranslation();
