@@ -1,4 +1,4 @@
-import { Node } from "reactflow";
+import { Node } from "@xyflow/react";
 import useServiceStore from "store/new-services.store";
 import useTestServiceStore from "store/test-services.store";
 import { StepType } from "types";

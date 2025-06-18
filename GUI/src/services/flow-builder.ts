@@ -1,4 +1,4 @@
-import { Node, Edge, MarkerType, XYPosition, NodeChange, NodeDimensionChange } from "reactflow";
+import { Node, Edge, MarkerType, XYPosition, NodeChange, NodeDimensionChange } from "@xyflow/react";
 import useServiceStore from "store/new-services.store";
 import { ConditionRuleType, StepType } from "types";
 import { GRID_UNIT, EDGE_LENGTH } from "types/service-flow";

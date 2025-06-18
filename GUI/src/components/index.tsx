@@ -1,6 +1,6 @@
 import Button from "./Button";
 import Collapsible from "./Collapsible";
-import FlowBuilder from "./FlowBuilder/FlowBuilder";
+import FlowBuilder from "./Flow/FlowBuilder";
 import Box from "./Box";
 import Card from "./Card";
 import Dialog from "./Dialog";

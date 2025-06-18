@@ -2,7 +2,7 @@ import { Assign } from "types/assign";
 import { Group, Rule } from "components/FlowElementsPopup/RuleBuilder/types";
 import i18next from "i18next";
 import { NodeHtmlMarkdown } from "node-html-markdown";
-import { Edge, Node } from "reactflow";
+import { Edge, Node } from "@xyflow/react";
 import {
   createEndpoint,
   createNewService,
@@ -742,7 +742,7 @@ function getYamlContent(nodes: Node[], edges: Edge[], steps: Step[]): any {
   finishedFlow.set("formatMessages", {
     call: "http.post",
     args: {
-      url: `${import.meta.env.REACT_APP_SERVICE_DMAPPER}/bot_responses_to_messages`,
+      url: "[#SERVICE_DMAPPER_HBS]/bot_responses_to_messages",
       headers: {
         type: "json",
       },

@@ -1,34 +1,9 @@
 import { MultiChoiceQuestion } from "./multi-choice-question";
 import { StepType } from "./step-type.enum";
-import { MarkerType, Node } from "reactflow";
+import { Edge, Node } from "@xyflow/react";
 
 export const GRID_UNIT = 16;
 export const EDGE_LENGTH = 5 * GRID_UNIT;
-
-export const initialPlaceholder = {
-  id: "2",
-  type: "placeholder",
-  position: {
-    x: 3 * GRID_UNIT,
-    y: 8 * GRID_UNIT,
-  },
-  data: {
-    type: "placeholder",
-  },
-  className: "placeholder",
-  selectable: false,
-  draggable: false,
-};
-
-export const initialEdge = {
-  type: "smoothstep",
-  id: "edge-1-2",
-  source: "1",
-  target: "2",
-  markerEnd: {
-    type: MarkerType.ArrowClosed,
-  },
-};
 
 export type NodeDataProps = {
   label: string;
@@ -52,15 +27,63 @@ export type NodeDataProps = {
 export const initialNodes: Node[] = [
   {
     id: "1",
-    type: "startNode",
+    type: "start",
     position: {
-      x: 13.5 * GRID_UNIT,
-      y: GRID_UNIT,
+      x: 0,
+      y: 0,
     },
-    data: {},
+    data: {
+      type: "start",
+    },
     className: "start",
     selectable: false,
     draggable: false,
   },
-  initialPlaceholder,
+  {
+    id: "2",
+    data: { label: "🌮 Taco" },
+    position: { x: 0, y: 150 },
+    type: "step",
+  },
+  {
+    id: "3",
+    data: { label: "🌮 Taco" },
+    position: { x: 0, y: 150 },
+    type: "step",
+  },
+  {
+    id: "4",
+    type: "placeholder",
+    position: {
+      x: 0,
+      y: 150,
+    },
+    data: {
+      type: "placeholder",
+      label: "+",
+    },
+    className: "placeholder",
+    width: 20,
+  },
+];
+
+export const initialEdges: Edge[] = [
+  {
+    id: "1=>2",
+    source: "1",
+    target: "2",
+    type: "placeholder",
+  },
+  {
+    id: "2=>3",
+    source: "2",
+    target: "3",
+    type: "step",
+  },
+  {
+    id: "3=>4",
+    source: "3",
+    target: "4",
+    type: "placeholder",
+  },
 ];
