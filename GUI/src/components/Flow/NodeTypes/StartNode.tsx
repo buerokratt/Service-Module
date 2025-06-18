@@ -1,5 +1,4 @@
 import { FC, memo } from 'react';
-import { MdChevronRight, MdPlayCircleFilled } from "react-icons/md";
 import { Handle, Position } from '@xyflow/react';
 import { IoChevronDown } from 'react-icons/io5';
 

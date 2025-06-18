@@ -75,7 +75,7 @@ function useLayout() {
       return {
         id: node.id,
         // this is where the node currently is placed
-        from: getNode(node.id)?.position || node.position,
+        from: getNode(node.id)?.position ?? node.position,
         // this is where we want the node to be placed
         to: node.position,
         node,

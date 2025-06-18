@@ -1,6 +1,6 @@
 import { MultiChoiceQuestion } from "./multi-choice-question";
 import { StepType } from "./step-type.enum";
-import { Edge, MarkerType, Node } from "@xyflow/react";
+import { Edge, Node } from "@xyflow/react";
 
 export const GRID_UNIT = 16;
 export const EDGE_LENGTH = 5 * GRID_UNIT;

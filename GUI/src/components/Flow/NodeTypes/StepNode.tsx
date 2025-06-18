@@ -1,15 +1,10 @@
 import { memo } from 'react';
 import { Handle, Position, NodeProps, BuiltInNode } from '@xyflow/react';
 
-import useNodeClickHandler from '../../../hooks/flow/useNodeClick';
-
 const StepNode = ({ id, data }: NodeProps<BuiltInNode>) => {
-  // see the hook implementation for details of the click handler
-  // calling onClick adds a child node to this node
-  const onClick = useNodeClickHandler(id);
 
   return (
-    <div onClick={onClick} title="click to add a child node">
+    <div title="click to add a child node">
       {data.label}
       <Handle type="target" position={Position.Top} isConnectable={false} />
       <Handle type="source" position={Position.Bottom} isConnectable={false} />
