@@ -353,6 +353,7 @@
     "placeholderNodeSuccess": "Lohistage edusamm voogu",
     "placeholderNodeFailure": "Lohistage tõrkeetapp voogu",
     "allElements": "Üldelemendid",
+    "serviceInfo": "Teenuse teave",
     "apiElements": {
       "title": "API elemendid",
       "delete": "Kustuta",

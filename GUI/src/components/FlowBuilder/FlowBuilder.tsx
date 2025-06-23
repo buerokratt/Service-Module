@@ -1,12 +1,6 @@
 import React, { FC, useCallback, useRef } from "react";
-import ReactFlow, {
-  Background,
-  Controls,
-  Edge,
-  MiniMap,
-  Node,
-} from "reactflow";
-import "reactflow/dist/style.css";
+import { ReactFlow, Background, Controls, Edge, MiniMap, Node, ProOptions } from "@xyflow/react";
+import "@xyflow/react/dist/style.css";
 import CustomNode from "../Steps/CustomNode";
 import PlaceholderNode from "../Steps/PlaceholderNode";
 import { StepType } from "../../types";
@@ -26,14 +20,12 @@ type FlowBuilderProps = {
   nodes: Node[];
   edges: Edge[];
   setNodes: (nodes: Node[] | ((prev: Node[]) => Node[])) => void;
-  description: string;
 };
 
 const FlowBuilder: FC<FlowBuilderProps> = ({
   nodes,
   setNodes,
   edges,
-  description,
 }) => {
   const { t } = useTranslation();
 
@@ -93,31 +85,30 @@ const FlowBuilder: FC<FlowBuilderProps> = ({
   }
 
   return (
-    <div className={description.length > 0 ? "graph__bodyWithDescription" : "graph__body"} ref={reactFlowWrapper}>
-      <ReactFlow
-        nodes={nodes}
-        edges={edges}
-        onNodesChange={useServiceStore.getState().onNodesChange}
-        onEdgesChange={useServiceStore.getState().onEdgesChange}
-        snapToGrid
-        snapGrid={[GRID_UNIT, GRID_UNIT]}
-        defaultViewport={{ x: 38 * GRID_UNIT, y: 3 * GRID_UNIT, zoom: 0 }}
-        panOnScroll
-        nodeTypes={nodeTypes}
-        onInit={setReactFlowInstance}
-        onDragOver={onDragOver}
-        onDrop={(event) => onDrop(event, reactFlowWrapper, setDefaultMessages)}
-        onNodeDrag={onNodeDrag}
-        onNodeDragStop={onNodeDragStop}
-        onNodeDragStart={onNodeDragStart}
-        onNodeMouseEnter={onNodeMouseEnter}
-        onNodeMouseLeave={onNodeMouseLeave}
-      >
-        <Controls />
-        <MiniMap />
-        <Background color="#D2D3D8" gap={16} lineWidth={2} />
-      </ReactFlow>
-    </div>
+    <ReactFlow
+      nodes={nodes}
+      edges={edges}
+      onNodesChange={useServiceStore.getState().onNodesChange}
+      onEdgesChange={useServiceStore.getState().onEdgesChange}
+      snapToGrid
+      snapGrid={[GRID_UNIT, GRID_UNIT]}
+      proOptions={{ hideAttribution: true }}
+      defaultViewport={{ x: 38 * GRID_UNIT, y: 3 * GRID_UNIT, zoom: 0 }}
+      panOnScroll
+      nodeTypes={nodeTypes}
+      onInit={setReactFlowInstance}
+      onDragOver={onDragOver}
+      onDrop={(event) => onDrop(event, reactFlowWrapper, setDefaultMessages)}
+      onNodeDrag={onNodeDrag}
+      onNodeDragStop={onNodeDragStop}
+      onNodeDragStart={onNodeDragStart}
+      onNodeMouseEnter={onNodeMouseEnter}
+      onNodeMouseLeave={onNodeMouseLeave}
+    >
+      <MiniMap />
+      <Background color="#D2D3D8" gap={16} lineWidth={9} />
+      <Controls orientation="horizontal" showInteractive={false} />
+    </ReactFlow>
   );
 };
 

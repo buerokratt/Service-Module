@@ -1,13 +1,13 @@
 import { FC } from "react";
-import { MdPlayCircleFilled } from "react-icons/md";
-import { Handle, Position } from "reactflow";
+import { Handle, Position } from "@xyflow/react";
+import { IoChevronDown } from "react-icons/io5";
 
 const StartNode: FC = () => {
   return (
-    <>
-      <MdPlayCircleFilled />
+    <div>
+      <IoChevronDown size={45} />
       <Handle type="source" position={Position.Bottom} />
-    </>
+    </div>
   );
 };
 

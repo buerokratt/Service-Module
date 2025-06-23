@@ -1,6 +1,6 @@
 import { MultiChoiceQuestion } from "./multi-choice-question";
 import { StepType } from "./step-type.enum";
-import { MarkerType, Node } from "reactflow";
+import { Edge, MarkerType, Node } from "@xyflow/react";
 
 export const GRID_UNIT = 16;
 export const EDGE_LENGTH = 5 * GRID_UNIT;
@@ -9,8 +9,8 @@ export const initialPlaceholder = {
   id: "2",
   type: "placeholder",
   position: {
-    x: 3 * GRID_UNIT,
-    y: 8 * GRID_UNIT,
+    x: 11.12 * GRID_UNIT,
+    y: 9 * GRID_UNIT,
   },
   data: {
     type: "placeholder",
@@ -20,15 +20,17 @@ export const initialPlaceholder = {
   draggable: false,
 };
 
-export const initialEdge = {
-  type: "smoothstep",
-  id: "edge-1-2",
-  source: "1",
-  target: "2",
-  markerEnd: {
-    type: MarkerType.ArrowClosed,
+export const initialEdges: Edge[] = [
+  {
+    type: "smoothstep",
+    id: "edge-1-2",
+    source: "1",
+    target: "2",
+    markerEnd: {
+      type: MarkerType.ArrowClosed,
+    },
   },
-};
+];
 
 export type NodeDataProps = {
   label: string;

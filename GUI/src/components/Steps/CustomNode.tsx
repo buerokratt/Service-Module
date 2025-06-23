@@ -1,5 +1,5 @@
 import { Dispatch, FC, SetStateAction, useEffect } from "react";
-import { Handle, NodeProps, Position, useUpdateNodeInternals } from "reactflow";
+import { Handle, NodeProps, Position, useUpdateNodeInternals } from "@xyflow/react";
 import { useTranslation } from "react-i18next";
 import { MdDeleteOutline, MdOutlineEdit, MdOutlineRemoveRedEye } from "react-icons/md";
 import StepNode from "./StepNode";

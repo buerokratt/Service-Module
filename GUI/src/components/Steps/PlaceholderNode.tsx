@@ -1,6 +1,6 @@
 import { FC } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Handle, Position } from 'reactflow';
+import { Handle, Position } from "@xyflow/react";
 
 const PlaceholderNode: FC = (props: any) => {
   const { t } = useTranslation();
@@ -34,7 +34,7 @@ const PlaceholderNode: FC = (props: any) => {
   return (
     <>
       <Handle type="target" position={Position.Top} />
-      <p style={{ textAlign: "center" }}>{label ?? t("serviceFlow.placeholderNode")}</p>
+      <p style={{ textAlign: "center" }}>{label ?? '+'}</p>
       {bottomHandles()}
     </>
   );

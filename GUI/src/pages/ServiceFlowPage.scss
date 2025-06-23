@@ -81,14 +81,23 @@
       color: get-color(white);
       border: 0;
       min-width: revert;
+      padding-top: 20px;
     }
 
     &.placeholder {
       background-color: get-color(extra-light);
-      border: dashed 1px get-color(black-coral-10);
+      border: solid 1px get-color(black-coral-10);
+      min-width: 140px;
+      max-width: 354px;
+      width: 140px;
+      cursor: pointer;
 
       p {
         color: get-color(black-coral-6);
+      }
+
+      &:hover {
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
       }
     }
 

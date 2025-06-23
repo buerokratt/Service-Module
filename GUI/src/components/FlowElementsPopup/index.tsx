@@ -30,7 +30,7 @@ import useToastStore from "store/toasts.store";
 import i18next from "i18next";
 import MultiChoiceQuestionContent from "./MultiChoiceQuestionContent";
 import { EDGE_LENGTH, NodeDataProps } from "types/service-flow";
-import { Node } from "reactflow";
+import { Node } from "@xyflow/react";
 import { MultiChoiceQuestionButton } from "types/multi-choice-question";
 import { buildEdge, buildPlaceholder } from "services/flow-builder";
 import useServiceListStore from "store/services.store";
