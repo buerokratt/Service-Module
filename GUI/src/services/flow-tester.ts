@@ -18,7 +18,7 @@ export const testServiceFlow = async () => {
       return;
     }
 
-    if(currentNode.type === "customNode") {
+    if (currentNode.type === "custom") {
       await performActionBasedOnNode(currentNode);
     } 
 

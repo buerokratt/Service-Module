@@ -70,7 +70,7 @@ const ApiEndpoint: FC<ApiEndpointProps> = ({ step }) => {
       deleteEndpointFromStore(endpoint.endpointId);
 
       const nodeIdsToDelete = nodes
-        .filter((node) => node.type === "customNode" && node.data.originalDefinedNodeId === endpoint.endpointId)
+        .filter((node) => node.type === "custom" && node.data.originalDefinedNodeId === endpoint.endpointId)
         .map((node) => node.id);
       nodeIdsToDelete.forEach((nodeId) => useServiceStore.getState().onDelete(nodeId));
 

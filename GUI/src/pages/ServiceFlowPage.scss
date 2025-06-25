@@ -50,9 +50,15 @@
     color: get-color(black);
     font-size: $veera-font-size-100;
     line-height: $veera-line-height-500;
-    min-width: 400px;
-    max-width: 354px;
+    min-width: 350px;
+    max-width: 350px;
     width: 100%;
+
+    &.selected {
+      &.step {
+        border: 1px solid get-color(sapphire-blue-2);
+      }
+    }
 
     &-default {
       width: 320px;

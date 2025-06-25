@@ -4,16 +4,8 @@ import { Edge, Node } from "@xyflow/react";
 
 export const GRID_UNIT = 16;
 export const EDGE_LENGTH = 5 * GRID_UNIT;
-
-export const initialEdges: Edge[] = [
-  {
-    type: "step",
-    id: "edge-1-2",
-    source: "1",
-    target: "2",
-    animated: true,
-  },
-];
+const startNodeId = crypto.randomUUID();
+const ghostNodeId = crypto.randomUUID();
 
 export type NodeDataProps = {
   label: string;
@@ -36,25 +28,25 @@ export type NodeDataProps = {
 
 export const initialNodes: Node[] = [
   {
-    id: "1",
+    id: startNodeId,
     type: "start",
     position: {
-      x: 13.5 * GRID_UNIT,
-      y: GRID_UNIT,
+      x: 0,
+      y: 0,
     },
     data: {
-      type: "start"
+      type: "start",
     },
     className: "start",
     selectable: false,
     draggable: false,
   },
   {
-    id: "2",
+    id: ghostNodeId,
     type: "ghost",
     position: {
-      x: 3 * GRID_UNIT,
-      y: 11 * GRID_UNIT,
+      x: 0,
+      y: 150,
     },
     data: {
       type: "ghost",
@@ -62,5 +54,16 @@ export const initialNodes: Node[] = [
     className: "ghost",
     selectable: false,
     draggable: false,
+  },
+];
+
+export const initialEdges: Edge[] = [
+  {
+    type: "step",
+    id: `edge-${startNodeId}-${ghostNodeId}`,
+    source: startNodeId,
+    target: ghostNodeId,
+    animated: true,
+    deletable: false,
   },
 ];
