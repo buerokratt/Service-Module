@@ -86,10 +86,15 @@
 
     &.placeholder {
       background-color: get-color(extra-light);
-      border: solid 1px get-color(black-coral-10);
+      border: dashed 1px get-color(black-coral-10);
       min-width: 140px;
       max-width: 354px;
+      padding-left: 0;
+      padding-right: 0;
+      padding-top: 0;
+      padding-bottom: 0;
       width: 140px;
+      height: 35px;
       cursor: pointer;
 
       p {

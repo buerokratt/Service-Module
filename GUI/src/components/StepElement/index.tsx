@@ -4,21 +4,19 @@ import { Box, Icon, Track } from "components";
 import { FC } from "react";
 import { MdDragIndicator } from "react-icons/md";
 import { Step, StepType } from "types";
-import { onDragStart } from "utils/component-util";
 
 interface StepElementProps {
   readonly step: Step;
-  readonly activeStep?: Step | null;
+  onClick: (step: Step) => void;
 }
 
-const StepElement: FC<StepElementProps> = ({ step, activeStep }) => {
+const StepElement: FC<StepElementProps> = ({ step, onClick }) => {
   const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: step.id, data: { step } });
 
   const style = {
     transition,
     transform: CSS.Transform.toString(transform),
-    cursor: "grab",
-    opacity: step.id === activeStep?.id ? 0 : 1,
+    cursor: "pointer",
   };
   
   return (
@@ -27,8 +25,8 @@ const StepElement: FC<StepElementProps> = ({ step, activeStep }) => {
         {...attributes}
         key={step.id}
         color={[StepType.FinishingStepEnd, StepType.FinishingStepRedirect].includes(step.type) ? "red" : "blue"}
-        onDragStart={(event) => onDragStart(event, step)}
-        draggable
+        onClick={() => onClick(step)}
+        draggable={false}
       >
         <Track gap={5} align={"center"}>
           <button

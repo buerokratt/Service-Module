@@ -352,6 +352,7 @@
     "placeholderNode": "Lohista järgmine samm voogu",
     "placeholderNodeSuccess": "Lohistage edusamm voogu",
     "placeholderNodeFailure": "Lohistage tõrkeetapp voogu",
+    "elements": "Elemendid",
     "allElements": "Üldelemendid",
     "serviceInfo": "Teenuse teave",
     "apiElements": {

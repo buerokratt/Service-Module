@@ -1,0 +1,30 @@
+@import 'src/styles/tools/spacing';
+@import 'src/styles/tools/color';
+@import 'src/styles/settings/variables/other';
+@import 'src/styles/settings/variables/typography';
+
+.dropdown {
+    background-color: white;
+    border-radius: 6px;
+    box-shadow: 0px 10px 38px -10px rgba(22, 23, 24, 0.35);
+    width: 360px;
+    z-index: 1000;
+  
+    &__header {
+      padding: get-spacing(haapsalu);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      border-radius: $veera-radius-m $veera-radius-m 0 0;
+      background-color: get-color(black-coral-0);
+      border-bottom: 1px solid get-color(black-coral-2);
+    }
+  
+    &__title {
+      font-size: large;
+    }
+  
+    &__content {
+      padding: 10px;
+    }
+  }

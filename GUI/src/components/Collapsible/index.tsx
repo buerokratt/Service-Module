@@ -33,7 +33,7 @@ const Collapsible: FC<PropsWithChildren<CollapsibleProps>> = ({
       }}
     >
       <RadixCollapsible.Trigger asChild className="collapsible__trigger">
-        <button>
+        <button onClick={(e) => e.stopPropagation()}>
           <Icon icon={open ? <MdOutlineIndeterminateCheckBox /> : <MdOutlineAddBox />} size="medium" />
           <h3 className="h6">{title}</h3>
         </button>

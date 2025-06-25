@@ -352,6 +352,7 @@
     "placeholderNode": "Drag the next step into the flow",
     "placeholderNodeSuccess": "Drag the success step into the flow",
     "placeholderNodeFailure": "Drag the failure step into the flow",
+    "elements": "Elements",
     "allElements": "All elements",
     "serviceInfo": "Service info",
     "apiElements": {

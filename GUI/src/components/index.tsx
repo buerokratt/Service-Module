@@ -42,6 +42,7 @@ import RequestVariables from "./ApiEndpointCard/Endpoints/RequestVariables";
 import VariableCell from "./ApiEndpointCard/Endpoints/RequestVariables/VariableCell";
 import ValueCell from "./ApiEndpointCard/Endpoints/RequestVariables/ValueCell";
 import StepElement from "./StepElement";
+import Dropdown from "./Dropdown";
 
 export {
   Box,
@@ -86,4 +87,5 @@ export {
   VariableCell,
   ValueCell,
   StepElement,
+  Dropdown,
 };
