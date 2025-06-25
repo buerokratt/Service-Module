@@ -1,20 +1,13 @@
 import React, { FC, useCallback, useRef } from "react";
-import { ReactFlow, Background, Controls, Edge, MiniMap, Node, ProOptions } from "@xyflow/react";
+import { ReactFlow, Background, Controls, Edge, MiniMap, Node } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
-import CustomNode from "../Steps/CustomNode";
-import PlaceholderNode from "../Steps/PlaceholderNode";
 import { StepType } from "../../types";
-import StartNode from "../Steps/StartNode";
 import { useTranslation } from "react-i18next";
 import useServiceStore from "store/new-services.store";
 import { onDrop, onFlowNodeDragStop, onNodeDrag } from "services/flow-builder";
 import { GRID_UNIT } from "types/service-flow";
-
-const nodeTypes = {
-  startNode: StartNode,
-  customNode: CustomNode,
-  placeholder: PlaceholderNode,
-};
+import edgeTypes from "components/Flow/EdgeTypes";
+import nodeTypes from "components/Flow/NodeTypes";
 
 type FlowBuilderProps = {
   nodes: Node[];
@@ -96,6 +89,7 @@ const FlowBuilder: FC<FlowBuilderProps> = ({
       defaultViewport={{ x: 38 * GRID_UNIT, y: 3 * GRID_UNIT, zoom: 0 }}
       panOnScroll
       nodeTypes={nodeTypes}
+      edgeTypes={edgeTypes}
       onInit={setReactFlowInstance}
       onDragOver={onDragOver}
       onDrop={(event) => onDrop(event, reactFlowWrapper, setDefaultMessages)}

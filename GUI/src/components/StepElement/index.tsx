@@ -15,8 +15,7 @@ const StepElement: FC<StepElementProps> = ({ step, onClick }) => {
 
   const style = {
     transition,
-    transform: CSS.Transform.toString(transform),
-    cursor: "pointer",
+    transform: CSS.Transform.toString(transform)
   };
   
   return (
@@ -24,6 +23,7 @@ const StepElement: FC<StepElementProps> = ({ step, onClick }) => {
       <Box
         {...attributes}
         key={step.id}
+        style={{cursor: "pointer"}}
         color={[StepType.FinishingStepEnd, StepType.FinishingStepRedirect].includes(step.type) ? "red" : "blue"}
         onClick={() => onClick(step)}
         draggable={false}

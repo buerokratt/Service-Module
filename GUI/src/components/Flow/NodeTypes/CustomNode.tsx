@@ -3,9 +3,12 @@ import { Handle, NodeProps, Position, useUpdateNodeInternals } from "@xyflow/rea
 import { useTranslation } from "react-i18next";
 import { MdDeleteOutline, MdOutlineEdit, MdOutlineRemoveRedEye } from "react-icons/md";
 import StepNode from "./StepNode";
-import { Box, Button, Icon, Track } from "../";
-import { StepType } from "../../types";
 import "./Node.scss";
+import { StepType } from "types";
+import Box from "components/Box";
+import Button from "components/Button";
+import Icon from "components/Icon";
+import Track from "components/Track";
 
 type NodeDataProps = {
   data: {

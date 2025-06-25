@@ -45,7 +45,7 @@ export const testServiceFlow = async () => {
 
 function findStartNode(): Node | undefined {
   const nodes = useServiceStore.getState().nodes;
-  return nodes.find(x => x.type === "startNode");
+  return nodes.find(x => x.type === "start");
 }
 
 function findNextNodes(node: Node): Node[] {

@@ -136,14 +136,23 @@
 
   &__edge-path {
     stroke: get-color(black-coral-10);
-    stroke-width: 2px;
+    stroke-width: 1.5px;
   }
+}
 
-  &__arrowhead {
-    polyline {
-      stroke: get-color(black-coral-10);
-      fill: get-color(black-coral-10);
-      stroke-linejoin: bevel;
-    }
-  }
+.edge-button {
+  pointer-events: all;
+  cursor: pointer;
+  position: absolute;
+  background: white;
+  color: #777;
+  border-radius: 4px;
+  width: 80px;
+  height: 25px;
+  text-align: center;
+  border: #777 0.5px solid;
+}
+
+.edge-button:hover {
+  box-shadow: 1px 2px 4px rgba(0, 0, 0, 0.1);
 }
