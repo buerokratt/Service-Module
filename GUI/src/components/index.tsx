@@ -1,6 +1,5 @@
 import Button from "./Button";
 import Collapsible from "./Collapsible";
-import FlowBuilder from "./FlowBuilder/FlowBuilder";
 import Box from "./Box";
 import Card from "./Card";
 import Dialog from "./Dialog";
@@ -43,6 +42,7 @@ import VariableCell from "./ApiEndpointCard/Endpoints/RequestVariables/VariableC
 import ValueCell from "./ApiEndpointCard/Endpoints/RequestVariables/ValueCell";
 import StepElement from "./StepElement";
 import Dropdown from "./Dropdown";
+import FlowBuilder from "./FlowBuilder/FlowBuilder";
 
 export {
   Box,
