@@ -70,7 +70,7 @@ const FlowBuilder: FC<FlowBuilderProps> = ({
       prevNodes.map((prevNode) => {
         if (prevNode.type === "customNode" && prevNode.data === node.data) {
           prevNode.selected = false;
-          prevNode.className = prevNode.data.type;
+          prevNode.className = typeof prevNode.data.type === "string" ? prevNode.data.type : undefined;
         }
         return prevNode;
       })
@@ -91,13 +91,13 @@ const FlowBuilder: FC<FlowBuilderProps> = ({
       nodeTypes={nodeTypes}
       edgeTypes={edgeTypes}
       onInit={setReactFlowInstance}
-      onDragOver={onDragOver}
-      onDrop={(event) => onDrop(event, reactFlowWrapper, setDefaultMessages)}
-      onNodeDrag={onNodeDrag}
-      onNodeDragStop={onNodeDragStop}
-      onNodeDragStart={onNodeDragStart}
-      onNodeMouseEnter={onNodeMouseEnter}
-      onNodeMouseLeave={onNodeMouseLeave}
+      // onDragOver={onDragOver}
+      // onDrop={(event) => onDrop(event, reactFlowWrapper, setDefaultMessages)}
+      // onNodeDrag={onNodeDrag}
+      // onNodeDragStop={onNodeDragStop}
+      // onNodeDragStart={onNodeDragStart}
+      // onNodeMouseEnter={onNodeMouseEnter}
+      // onNodeMouseLeave={onNodeMouseLeave}
     >
       <MiniMap />
       <Background color="#D2D3D8" gap={16} lineWidth={9} />

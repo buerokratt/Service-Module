@@ -23,6 +23,7 @@ import {
 } from "@dnd-kit/core";
 import { userStepPreferences } from "resources/api-constants";
 import api from "services/api";
+import useEdgeAdd from "hooks/flow/useEdgeAdd";
 
 function CustomEdge({
   id,
@@ -53,6 +54,8 @@ function CustomEdge({
   const contentStyle: CSSProperties = { overflowY: "auto", maxHeight: "245px" };
 
   const stepPreferences = useServiceStore((state) => state.stepPreferences);
+
+  const onEdgeAdd = useEdgeAdd(id);
 
   useEffect(() => {
     const elements: Step[] = [];
@@ -139,6 +142,7 @@ function CustomEdge({
                         key={element.id}
                         step={element}
                         onClick={(step) => {
+                          onEdgeAdd(step);
                           setDropdownOpen(false);
                         }}
                       />
