@@ -40,7 +40,7 @@ function useLayout() {
     const transitions = targetNodes.map((node) => {
       return {
         id: node.id,
-        from: getNode(node.id)?.position || node.position,
+        from: getNode(node.id)?.position ?? node.position,
         to: node.position,
         node,
       };

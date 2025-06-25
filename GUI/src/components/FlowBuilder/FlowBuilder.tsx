@@ -9,7 +9,6 @@ import useLayout from "hooks/flow/useLayout";
 type FlowBuilderProps = {
   nodes: Node[];
   edges: Edge[];
-  setNodes: (nodes: Node[] | ((prev: Node[]) => Node[])) => void;
 };
 
 const FlowBuilder: FC<FlowBuilderProps> = ({
@@ -22,29 +21,36 @@ const FlowBuilder: FC<FlowBuilderProps> = ({
 
   const onConnect = useCallback((params: any) => setEdges((eds) => addEdge(params, eds)), []);
 
+  const getRemainingEdges = (acc: any, connectedEdges: any[]) => {
+    return acc.filter((edge: any) => !connectedEdges.includes(edge));
+  };
+
+  const createNewEdges = (incomers: any[], outgoers: any[], getNode: Function) => {
+    return incomers.flatMap(({ id: source }) =>
+      outgoers.map(({ id: target }) => ({
+        id: `${source}->${target}`,
+        source,
+        target,
+        type: "step",
+        animated: getNode(target)?.type === "ghost",
+      }))
+    );
+  };
+
+  const processDeletedNode = (acc: any, node: any, nodes: any[], edges: any[], getNode: Function) => {
+    const incomers = getIncomers(node, nodes, edges);
+    const outgoers = getOutgoers(node, nodes, edges);
+    const connectedEdges = getConnectedEdges([node], edges);
+
+    const remainingEdges = getRemainingEdges(acc, connectedEdges);
+    const createdEdges = createNewEdges(incomers, outgoers, getNode);
+
+    return [...remainingEdges, ...createdEdges];
+  };
+
   const onNodesDelete = useCallback(
     (deleted: any) => {
-      setEdges(
-        deleted.reduce((acc: any, node: any) => {
-          const incomers = getIncomers(node, nodes, edges);
-          const outgoers = getOutgoers(node, nodes, edges);
-          const connectedEdges = getConnectedEdges([node], edges);
-
-          const remainingEdges = acc.filter((edge: any) => !connectedEdges.includes(edge));
-
-          const createdEdges = incomers.flatMap(({ id: source }) =>
-            outgoers.map(({ id: target }) => ({
-              id: `${source}->${target}`,
-              source,
-              target,
-              type: "step",
-              animated: getNode(target)?.type === "ghost",
-            }))
-          );
-
-          return [...remainingEdges, ...createdEdges];
-        }, edges)
-      );
+      setEdges(deleted.reduce((acc: any, node: any) => processDeletedNode(acc, node, nodes, edges, getNode), edges));
     },
     [nodes, edges]
   );

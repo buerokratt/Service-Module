@@ -69,8 +69,6 @@ const ServiceFlowPage: FC = () => {
   const edges = useServiceStore((state) => state.edges);
   const nodes = useServiceStore((state) => state.nodes);
 
-  const setNodes = useServiceStore((state) => state.setNodes);
-
   const titleRef = useRef<HTMLInputElement>(null);
   const descriptionRef = useRef<HTMLInputElement>(null);
 
@@ -251,7 +249,7 @@ const ServiceFlowPage: FC = () => {
           <FlowElementsPopup />
           <ReactFlowProvider>
             <div style={{ width: "100%", height: `${isInfoOpen ? 55 : 84.5}%` }}>
-              <FlowBuilder nodes={nodes} setNodes={setNodes} edges={edges} />
+              <FlowBuilder nodes={nodes} edges={edges} />
             </div>
             <Chat />
           </ReactFlowProvider>
