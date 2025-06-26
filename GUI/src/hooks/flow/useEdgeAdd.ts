@@ -58,7 +58,11 @@ function useEdgeAdd(id: string) {
 
     setNodes((nodes) => {
       const targetNodeIndex = nodes.findIndex((node) => node.id === edge.target);
-      return [...nodes.slice(0, targetNodeIndex), insertNode, ...nodes.slice(targetNodeIndex)];
+      const shouldReplace = stepType === StepType.FinishingStepEnd || stepType === StepType.FinishingStepRedirect;
+
+      return shouldReplace
+        ? [...nodes.slice(0, targetNodeIndex), insertNode]
+        : [...nodes.slice(0, targetNodeIndex), insertNode, ...nodes.slice(targetNodeIndex)];
     });
   };
   return handleEdgeClick;

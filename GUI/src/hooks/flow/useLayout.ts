@@ -10,7 +10,7 @@ const layout = tree<Node>()
 const options = { duration: 300 };
 
 function layoutNodes(nodes: Node[], edges: Edge[]): Node[] {
-  if (nodes.length === 0 || edges.length === 0) {
+  if (nodes.length === 0) {
     return [];
   }
 
@@ -77,7 +77,7 @@ function useLayout() {
         t.stop();
 
         if (!initial.current) {
-          fitView({ duration: 200, padding: 2 });
+          fitView({ duration: 200, padding: 3 });
         }
         initial.current = false;
       }
