@@ -5,7 +5,7 @@ import { IoChevronDown } from "react-icons/io5";
 const StartNode: FC = () => {
   const connections = useNodeConnections();
   return (
-    <div>
+    <div className="start-node">
       <IoChevronDown size={45} />
       <Handle type="source" position={Position.Bottom} isConnectable={connections.length < 1} />
     </div>

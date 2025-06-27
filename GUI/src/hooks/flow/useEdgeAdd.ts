@@ -1,4 +1,4 @@
-import { useReactFlow } from "@xyflow/react";
+import { Edge, Node, useReactFlow } from "@xyflow/react";
 import useServiceStore from "store/new-services.store";
 import { Step, StepType } from "types";
 import { getNodeLabel } from "utils/flow-utils";
@@ -54,15 +54,67 @@ function useEdgeAdd(id: string) {
       deletable: getNode(edge.target)?.type != "ghost",
     };
 
-    setEdges((edges) => edges.filter((e) => e.id !== id).concat([sourceEdge, targetEdge]));
+    // Determine labels based on step type
+    const labels = stepType === StepType.MultiChoiceQuestion ? ["Yes", "No"] : ["Success", "Failure"];
+
+    const ghostNodes: Node[] = [];
+    // Create ghost nodes and edges based on labels
+    // const ghostNodes: Node[] = labels.map((label, i) => {
+    //   // if (i === 0) {
+    //   // } else {
+    //     const ghostNodeId = crypto.randomUUID();
+    //     return {
+    //       id: ghostNodeId,
+    //       type: "ghost",
+    //       position: {
+    //         x: targetNode.position.x + 150 * (i + 1),
+    //         y: targetNode.position.y + (i % 2 === 0 ? 0 : 100), // Stagger vertically for even/odd
+    //       },
+    //       data: {
+    //         type: "ghost",
+    //         label: label, // Add the label to the ghost node data
+    //       },
+    //       className: "ghost",
+    //       selectable: false,
+    //       draggable: false,
+    //     };
+    //   //}
+    // });
+
+    const ghostEdges: Edge[] = []; 
+    // const ghostEdges: Edge[] = ghostNodes.map((ghostNode, i) => {
+    //   return {
+    //     id: `${newNodeId}->${ghostNode.id}`,
+    //     source: newNodeId,
+    //     target: ghostNode.id,
+    //     type: "step",
+    //     animated: true,
+    //     label: labels[i], // Add label to the edge
+    //     deletable: false,
+    //     data: {
+    //       index: i,
+    //       label: labels[i],
+    //     },
+    //   };
+    // });
+
+    setEdges((edges) => {
+      const newEdges = edges.filter((e) => e.id !== id).concat([sourceEdge, targetEdge, ...ghostEdges]);
+      return newEdges;
+    });
 
     setNodes((nodes) => {
       const targetNodeIndex = nodes.findIndex((node) => node.id === edge.target);
       const shouldReplace = stepType === StepType.FinishingStepEnd || stepType === StepType.FinishingStepRedirect;
 
-      return shouldReplace
+      const newNodes = shouldReplace
         ? [...nodes.slice(0, targetNodeIndex), insertNode]
         : [...nodes.slice(0, targetNodeIndex), insertNode, ...nodes.slice(targetNodeIndex)];
+
+      const newNodeIndex = newNodes.findIndex((node) => node.id === newNodeId);
+      newNodes.splice(newNodeIndex + 1, 0, ...ghostNodes);
+
+      return newNodes;
     });
   };
   return handleEdgeClick;
