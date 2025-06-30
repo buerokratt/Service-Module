@@ -1,13 +1,11 @@
-import { NodeTypes } from '@xyflow/react';
+import CustomNode from "./CustomNode";
+import GhostNode from "./GhostNode";
+import StartNode from "./StartNode";
 
-import PlaceholderNode from './PlaceholderNode';
-import StepNode from './StepNode';
-import StartNode from './StartNode';
-
-const nodeTypes: NodeTypes = {
+export const nodeTypes = {
   start: StartNode,
-  step: StepNode,
-  placeholder: PlaceholderNode,
+  custom: CustomNode,
+  ghost: GhostNode,
 };
 
 export default nodeTypes;

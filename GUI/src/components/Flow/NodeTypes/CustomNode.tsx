@@ -1,11 +1,12 @@
 import { Dispatch, FC, SetStateAction, useEffect } from "react";
 import { Handle, NodeProps, Position, useUpdateNodeInternals } from "@xyflow/react";
-import { useTranslation } from "react-i18next";
 import { MdDeleteOutline, MdOutlineEdit, MdOutlineRemoveRedEye } from "react-icons/md";
 import StepNode from "./StepNode";
-import { Box, Button, Icon, Track } from "../";
-import { StepType } from "../../types";
 import "./Node.scss";
+import { StepType } from "types";
+import Button from "components/Button";
+import Icon from "components/Icon";
+import Track from "components/Track";
 
 type NodeDataProps = {
   data: {
@@ -27,12 +28,11 @@ const boxTypeColors: { [key: string]: any } = {
 };
 
 const CustomNode: FC<NodeProps & NodeDataProps> = (props) => {
-  const { t } = useTranslation();
-  const { data, isConnectable, id, selected } = props;
+  const { data, isConnectable, id } = props;
   const shouldOffsetHandles = data.childrenCount > 1;
 
   const updateNodeInternals = useUpdateNodeInternals();
- 
+
   useEffect(() => {
     updateNodeInternals(id);
   }, [data.childrenCount]);
@@ -66,43 +66,28 @@ const CustomNode: FC<NodeProps & NodeDataProps> = (props) => {
     );
   };
 
-  if (!selected) {
-    return (
-      <>
-        <Handle type="target" position={Position.Top} isConnectable={isConnectable} />
-        <StepNode data={data} />
-        {bottomHandles()}
-      </>
-    );
-  }
-
   return (
-    <div className="selected">
-      <Handle type="target" position={Position.Top} isConnectable={isConnectable} style={{ display: "none" }} />
-
-      <Box color={boxTypeColors[data.type]}>
-        <StepNode data={data} />
-        {data.stepType !== "rule" && (
-          <Track style={{ position: "fixed", top: 8, right: 8 }}>
-            <Button
-              appearance="text"
-              onClick={() => {
-                data.setClickedNode(id);
-                data.onEdit(id);
-              }}
-            >
-              <Icon icon={data.readonly ? <MdOutlineRemoveRedEye /> : <MdOutlineEdit />} size="medium" />
-              {t(data.readonly ? "global.view" : "overview.edit")}
-            </Button>
-            <Button appearance="text" onClick={() => data.onDelete(id, true)}>
-              <Icon icon={<MdDeleteOutline />} size="medium" />
-              {t("overview.delete")}
-            </Button>
-          </Track>
-        )}
-      </Box>
+    <>
+      <Handle type="target" position={Position.Top} isConnectable={isConnectable} />
+      <StepNode data={data} />
+      {data.stepType !== "rule" && (
+        <Track style={{ position: "fixed", top: 8, right: 8 }}>
+          <Button
+            appearance="text"
+            onClick={() => {
+              data.setClickedNode(id);
+              data.onEdit(id);
+            }}
+          >
+            <Icon icon={data.readonly ? <MdOutlineRemoveRedEye /> : <MdOutlineEdit />} size="medium" />
+          </Button>
+          <Button appearance="text" onClick={() => data.onDelete(id, true)}>
+            <Icon icon={<MdDeleteOutline />} size="medium" />
+          </Button>
+        </Track>
+      )}
       {bottomHandles()}
-    </div>
+    </>
   );
 };
 

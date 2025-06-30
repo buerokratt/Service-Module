@@ -319,7 +319,7 @@ export async function saveEndpoints(
       !endpoint.isCommon ||
       // For non-common endpoints, only save service IDs if endpoint is added to the flow
       // This way we can track which common endpoints are unused and can be safely deleted
-      nodes.some((node) => node.type === "customNode" && node.data.originalDefinedNodeId === endpoint.endpointId)
+      nodes.some((node) => node.type === "custom" && node.data.originalDefinedNodeId === endpoint.endpointId)
     ) {
       endpoint.serviceId = serviceId;
     }
@@ -698,7 +698,7 @@ function getYamlContent(nodes: Node[], edges: Edge[], steps: Step[]): any {
       const parentNode = nodes.findLast((node) => node.id === parentNodeId);
       if (
         !parentNode ||
-        parentNode.type !== "customNode" ||
+        parentNode.type !== "custom" ||
         [StepType.Rule, StepType.RuleDefinition].includes(parentNode.data.stepType)
       ) {
         return;
@@ -938,7 +938,7 @@ function handleInputStep(
                   }}`
                 : `\${${clientInput} == ${clientInputYesOrNo(node.data.label)}}`,
             nextStep:
-              followingNode?.type === "customNode"
+              followingNode?.type === "custom"
                 ? `${followingNode.data.stepType}-${followingNode.id}`
                 : "service-end",
           };

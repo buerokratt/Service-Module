@@ -110,7 +110,7 @@ export const buildRuleWithPlaceholder = ({
         x: positionX + offset,
         y: positionY,
       },
-      type: "customNode",
+      type: "custom",
       data: {
         label,
         onDelete: useServiceStore.getState().onDelete,
@@ -453,7 +453,7 @@ export const onDrop = (
                 x: matchingPlaceholder.position.x,
               }
             : matchingPlaceholder.position,
-        type: "customNode",
+        type: "custom",
         data: {
           label: nodeLabel,
           onDelete: useServiceStore.getState().onDelete,

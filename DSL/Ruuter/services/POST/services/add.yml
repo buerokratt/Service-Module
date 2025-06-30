@@ -27,7 +27,7 @@ declaration:
         type: string
         description: "Body field 'serviceId'"
       - field: structure
-        type: json
+        type: object
         description: "Body field 'structure'"
       - field: type
         type: string

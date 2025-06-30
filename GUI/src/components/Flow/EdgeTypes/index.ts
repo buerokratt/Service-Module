@@ -1,9 +1,7 @@
-import PlaceholderEdge from './PlaceholderEdge';
-import StepEdge from "./StepEdge";
+import CustomEdge from "./CustomEdge";
 
 export const edgeTypes = {
-  placeholder: PlaceholderEdge,
-  step: StepEdge,
+  step: CustomEdge,
 };
 
 export default edgeTypes;

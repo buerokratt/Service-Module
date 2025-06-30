@@ -1,23 +1,27 @@
 import Chat from "components/chat/chat";
 import withAuthorization, { ROLES } from "hoc/with-authorization";
-import { CSSProperties, FC, useEffect, useRef, useState } from "react";
+import { FC, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useParams } from "react-router-dom";
 import { ReactFlowProvider } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import useServiceStore from "store/new-services.store";
-import { Button, Card, Collapsible, FlowElementsPopup, FormInput, Icon, NewServiceHeader, StepElement, Switch, Track } from "../components";
-import FlowBuilder from "../components/Flow/FlowBuilder";
+import {
+  Button,
+  Card,
+  Collapsible,
+  FlowBuilder,
+  FlowElementsPopup,
+  FormInput,
+  Icon,
+  NewServiceHeader,
+  Switch,
+  Track,
+} from "../components";
 import { ROUTES } from "../resources/routes-constants";
-import { Step, stepsLabels, StepType } from "../types";
 import "./ServiceFlowPage.scss";
-
-import ApiEndpoint from "components/ApiEndpoint";
-import { closestCorners, DndContext, DragEndEvent, DragOverlay, DragStartEvent, KeyboardSensor, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
-import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from "@dnd-kit/sortable";
-import { restrictToWindowEdges } from "@dnd-kit/modifiers";
 import api from "../services/api-dev";
-import { changeServiceStatus, userStepPreferences } from "resources/api-constants";
+import { changeServiceStatus } from "resources/api-constants";
 import { Mosaic } from "react-loading-indicators";
 import { MdOutlineEdit } from "react-icons/md";
 import ChooseSlotModel from "./Integration/ChooseSlotModel";
@@ -27,15 +31,12 @@ import useServiceListStore from "store/services.store";
 
 const ServiceFlowPage: FC = () => {
   const { t } = useTranslation();
-
-  const [allElements, setAllElements] = useState<Step[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
 
   const navigate = useNavigate();
   const name = useServiceStore((state) => state.serviceNameDashed());
   const description = useServiceStore((state) => state.description);
   const slot = useServiceStore((state) => state.slot);
-  const steps = useServiceStore((state) => state.mapEndpointsToSetps());
   const [isChooseSlotsModalVisible, setIsChooseSlotsModalVisible] = useState(false);
   const [isIntentConnectionModalVisible, setIsIntentConnectionModalVisible] = useState(false);
   const [activeStep, setActiveStep] = useState(1);
@@ -56,65 +57,18 @@ const ServiceFlowPage: FC = () => {
       .loadService(id)
       .then(() => {
         useServiceStore.getState().loadEndpointsResponseVariables();
-        useServiceStore.getState().loadStepPreferences().then(() => {
-          setLoading(false);
-        });  
-      }); 
+        useServiceStore
+          .getState()
+          .loadStepPreferences()
+          .then(() => {
+            setLoading(false);
+          });
+      });
   }, []);
 
   const edges = useServiceStore((state) => state.edges);
   const nodes = useServiceStore((state) => state.nodes);
-  const stepPreferences = useServiceStore((state) => state.stepPreferences);
 
-  useEffect(() => {
-    const elements: Step[] = [];
-    stepPreferences.forEach((preference, index) => {
-      elements.push({
-        id: index,
-        label: t(`${stepsLabels[preference as StepType]}`),
-        type: preference as StepType
-      });
-    });
-    setAllElements(elements);
-  }, [stepPreferences]);
-
-  const setNodes = useServiceStore((state) => state.setNodes);
-
-  const contentStyle: CSSProperties = { overflowY: "auto", maxHeight: "245px" };
-
-  function updateStepPreference(steps: Step[]) {
-    api.post(userStepPreferences(), {
-      steps: steps.map((e) => e.type),
-    });
-  }
-
-  function handleDragEnd(event: DragEndEvent) {
-    const { active, over } = event;
-    
-    if (over && active.id !== over.id) {
-      setAllElements((elements) => {
-        const oldIndex = elements.findIndex((item) => item.id === active.id);
-        const newIndex = elements.findIndex((item) => item.id === over.id);
-        const newElements = arrayMove(elements, oldIndex, newIndex);
-        updateStepPreference(newElements); 
-        return newElements;
-      });  
-    }
-    setActiveElement(null);
-  }
-
-  const sensors = useSensors(
-    useSensor(PointerSensor),
-    useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates,
-    })
-  );
-
-  const [activeElement, setActiveElement] = useState<Step | null>(null);
-  const handleDragStart = (event: DragStartEvent) => {
-    const step = event.active.data.current?.step as Step;
-    setActiveElement(step);
-  };
   const titleRef = useRef<HTMLInputElement>(null);
   const descriptionRef = useRef<HTMLInputElement>(null);
 
@@ -148,7 +102,7 @@ const ServiceFlowPage: FC = () => {
         console.error(error);
       });
   };
-  
+
   return (
     <>
       <NewServiceHeader
@@ -294,43 +248,8 @@ const ServiceFlowPage: FC = () => {
           </Collapsible>
           <FlowElementsPopup />
           <ReactFlowProvider>
-            {/* <div className="graph__controls">
-                <Track direction="vertical" gap={16} align="stretch">
-                  {steps && (
-                    <Collapsible title={t("serviceFlow.apiElements.title")} contentStyle={contentStyle}>
-                      <Track direction="vertical" align="stretch" gap={4}>
-                        {steps.map((step) => (
-                          <ApiEndpoint step={step} key={step.id} />
-                        ))}
-                      </Track>
-                    </Collapsible>
-                  )}
-                  {allElements && (
-                    <DndContext
-                      modifiers={[restrictToWindowEdges]}
-                      sensors={sensors}
-                      collisionDetection={closestCorners}
-                      onDragEnd={handleDragEnd}
-                      onDragStart={handleDragStart}
-                    >
-                      <Collapsible title={t("serviceFlow.allElements")} contentStyle={contentStyle}>
-                        <Track direction="vertical" align="stretch" gap={4}>
-                          <SortableContext items={allElements} strategy={verticalListSortingStrategy}>
-                            {allElements.map((element) => (
-                              <StepElement key={element.id} step={element} activeStep={activeElement} />
-                            ))}
-                          </SortableContext>
-                        </Track>
-                      </Collapsible>
-                      <DragOverlay>
-                        {activeElement ? <StepElement key={activeElement.id} step={activeElement} /> : null}
-                      </DragOverlay>
-                    </DndContext>
-                  )}
-                </Track>
-              </div> */}
-            <div style={{ width: "100%", height: `${isInfoOpen ? 55 : 84.5}%`}}>
-              <FlowBuilder description={description} nodes={nodes} setNodes={setNodes} edges={edges} />
+            <div style={{ width: "100%", height: `${isInfoOpen ? 55 : 84.5}%` }}>
+              <FlowBuilder nodes={nodes} edges={edges} />
             </div>
             <Chat />
           </ReactFlowProvider>
