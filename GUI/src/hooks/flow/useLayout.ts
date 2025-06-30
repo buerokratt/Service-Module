@@ -4,7 +4,7 @@ import { stratify, tree } from "d3-hierarchy";
 import { timer } from "d3-timer";
 
 const layout = tree<Node>()
-  .nodeSize([350, 180])
+  .nodeSize([400, 180])
   .separation(() => 1);
 
 const options = { duration: 300 };

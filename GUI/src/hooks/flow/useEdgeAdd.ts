@@ -54,49 +54,43 @@ function useEdgeAdd(id: string) {
       deletable: getNode(edge.target)?.type != "ghost",
     };
 
-    // Determine labels based on step type
-    const labels = stepType === StepType.MultiChoiceQuestion ? ["Yes", "No"] : ["Success", "Failure"];
+    let ghostNodes: Node[] = [];
+    let ghostEdges: Edge[] = []; 
 
-    const ghostNodes: Node[] = [];
-    // Create ghost nodes and edges based on labels
-    // const ghostNodes: Node[] = labels.map((label, i) => {
-    //   // if (i === 0) {
-    //   // } else {
-    //     const ghostNodeId = crypto.randomUUID();
-    //     return {
-    //       id: ghostNodeId,
-    //       type: "ghost",
-    //       position: {
-    //         x: targetNode.position.x + 150 * (i + 1),
-    //         y: targetNode.position.y + (i % 2 === 0 ? 0 : 100), // Stagger vertically for even/odd
-    //       },
-    //       data: {
-    //         type: "ghost",
-    //         label: label, // Add the label to the ghost node data
-    //       },
-    //       className: "ghost",
-    //       selectable: false,
-    //       draggable: false,
-    //     };
-    //   //}
-    // });
-
-    const ghostEdges: Edge[] = []; 
-    // const ghostEdges: Edge[] = ghostNodes.map((ghostNode, i) => {
-    //   return {
-    //     id: `${newNodeId}->${ghostNode.id}`,
-    //     source: newNodeId,
-    //     target: ghostNode.id,
-    //     type: "step",
-    //     animated: true,
-    //     label: labels[i], // Add label to the edge
-    //     deletable: false,
-    //     data: {
-    //       index: i,
-    //       label: labels[i],
-    //     },
-    //   };
-    // });
+    if (stepType === StepType.MultiChoiceQuestion || stepType === StepType.Condition || stepType === StepType.Input) {
+      const labels = stepType === StepType.MultiChoiceQuestion ? ["Yes", "No"] : ["Success", "Failure"];
+      ghostNodes = labels.map((label, i) => {
+        const ghostNodeId = crypto.randomUUID();
+        return {
+          id: ghostNodeId,
+          type: "ghost",
+          position: {
+            x: targetNode.position.x + 150 * (i + 1),
+            y: targetNode.position.y + (i % 2 === 0 ? 0 : 100)
+          },
+          data: {
+            type: "ghost",
+          },
+          className: "ghost",
+          selectable: false,
+          draggable: false,
+        };
+      });
+      ghostEdges = ghostNodes.map((ghostNode, i) => {
+        return {
+          id: `${newNodeId}->${ghostNode.id}`,
+          source: newNodeId,
+          target: ghostNode.id,
+          type: "step",
+          animated: true,
+          deletable: false,
+          data: {
+            index: i,
+            label: labels[i],
+          },
+        };
+      });
+    }
 
     setEdges((edges) => {
       const newEdges = edges.filter((e) => e.id !== id).concat([sourceEdge, targetEdge, ...ghostEdges]);
@@ -105,7 +99,12 @@ function useEdgeAdd(id: string) {
 
     setNodes((nodes) => {
       const targetNodeIndex = nodes.findIndex((node) => node.id === edge.target);
-      const shouldReplace = stepType === StepType.FinishingStepEnd || stepType === StepType.FinishingStepRedirect;
+      const shouldReplace =
+        stepType === StepType.FinishingStepEnd ||
+        stepType === StepType.FinishingStepRedirect ||
+        stepType === StepType.MultiChoiceQuestion ||
+        stepType === StepType.Condition ||
+        stepType === StepType.Input;
 
       const newNodes = shouldReplace
         ? [...nodes.slice(0, targetNodeIndex), insertNode]
