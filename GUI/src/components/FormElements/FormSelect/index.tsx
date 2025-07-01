@@ -1,4 +1,4 @@
-import React, { FC, SelectHTMLAttributes, useId, useState } from 'react';
+import React, { FC, SelectHTMLAttributes, useEffect, useId, useState } from 'react';
 import { useSelect } from 'downshift';
 import clsx from 'clsx';
 import { useTranslation } from 'react-i18next';
@@ -56,6 +56,12 @@ const FormSelect: FC<FormSelectProps> = (
       if (onSelectionChange) onSelectionChange(newSelectedItem ?? null);
     },
   });
+
+  useEffect(() => {
+    if (defaultValue) {
+      setSelectedItem(options.find((o) => o.value === defaultValue) ?? null);
+    }
+  }, [defaultValue, options]);
 
   const selectClasses = clsx(
     'select',
