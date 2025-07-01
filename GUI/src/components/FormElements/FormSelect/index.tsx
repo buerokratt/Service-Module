@@ -37,7 +37,6 @@ const FormSelect: FC<FormSelectProps> = (
   },
 ) => {
   const id = useId();
-  const { t } = useTranslation();
   const defaultSelected = options.find((o) => o.value === defaultValue) ?? null;
   const [selectedItem, setSelectedItem] = useState<{ label: string, value: string } | null>(defaultSelected);
   const {
