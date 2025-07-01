@@ -21,10 +21,7 @@ INSERT INTO endpoints (
 )
 SELECT
     endpoint_id,
-    ARRAY(
-        SELECT unnest(service_ids) 
-        WHERE unnest(service_ids) != :serviceId::uuid
-    ) AS service_ids,
+    array_remove(service_ids, :serviceId::uuid) AS service_ids,
     name,
     type,
     file_name,
