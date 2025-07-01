@@ -1,7 +1,6 @@
 import React, { FC, SelectHTMLAttributes, useEffect, useId, useState } from 'react';
 import { useSelect } from 'downshift';
 import clsx from 'clsx';
-import { useTranslation } from 'react-i18next';
 import { MdArrowDropDown } from 'react-icons/md';
 
 import { Icon } from '../../../components';
