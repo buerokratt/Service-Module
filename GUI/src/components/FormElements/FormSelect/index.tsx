@@ -1,11 +1,11 @@
-import React, { FC, SelectHTMLAttributes, useId, useState } from 'react';
+import React, { FC, SelectHTMLAttributes, useEffect, useId, useState } from 'react';
 import { useSelect } from 'downshift';
 import clsx from 'clsx';
-import { useTranslation } from 'react-i18next';
 import { MdArrowDropDown } from 'react-icons/md';
 
 import { Icon } from '../../../components';
 import './FormSelect.scss';
+import { t } from 'i18next';
 
 type FormSelectProps = SelectHTMLAttributes<HTMLSelectElement> & {
   label: string;
@@ -29,15 +29,14 @@ const FormSelect: FC<FormSelectProps> = (
     hideLabel,
     options,
     disabled,
-    placeholder,
+    placeholder = t('global.choose').toString(),
     defaultValue,
     onSelectionChange,
     ...rest
   },
 ) => {
   const id = useId();
-  const { t } = useTranslation();
-  const defaultSelected = options.find((o) => o.value === defaultValue) || null;
+  const defaultSelected = options.find((o) => o.value === defaultValue) ?? null;
   const [selectedItem, setSelectedItem] = useState<{ label: string, value: string } | null>(defaultSelected);
   const {
     isOpen,
@@ -57,18 +56,22 @@ const FormSelect: FC<FormSelectProps> = (
     },
   });
 
+  useEffect(() => {
+    if (defaultValue) {
+      setSelectedItem(options.find((o) => o.value === defaultValue) ?? null);
+    }
+  }, [defaultValue, options]);
+
   const selectClasses = clsx(
     'select',
   );
-
-  const placeholderValue = placeholder || t('global.choose');
 
   return (
     <div className={selectClasses}>
       {label && !hideLabel && <label htmlFor={id} className='select__label' {...getLabelProps()}>{label}</label>}
       <div className='select__wrapper'>
         <div className={`select__trigger ${disabled && 'select__trigger--disabled'}`} {...getToggleButtonProps()} style={{ color: selectedItem?.label ? '#1A1B1F' : '#5D6071' }} {...rest} >
-          {selectedItem?.label ?? placeholderValue}
+          {selectedItem?.label ?? placeholder}
           <Icon label='Dropdown icon' size='medium' icon={<MdArrowDropDown color='#5D6071' />} />
         </div>
         <ul className='select__menu' {...getMenuProps()}>
