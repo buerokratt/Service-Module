@@ -13,8 +13,8 @@ import {
 import { Service, ServiceState, Step, StepType } from "types";
 import { RequestVariablesTabsRawData, RequestVariablesTabsRowsData } from "types/request-variables";
 import useToastStore from "./toasts.store";
-import i18next from "i18next";
-import { editServiceInfo, saveFlowClick } from "services/service-builder";
+import i18next, { t } from "i18next";
+import { saveEndpoints, saveFlowClick } from "services/service-builder";
 import { NodeDataProps, initialEdges, initialNodes } from "types/service-flow";
 import { alignNodesInCaseAnyGotOverlapped, updateFlowInputRules } from "services/flow-builder";
 import { GroupOrRule } from "components/FlowElementsPopup/RuleBuilder/types";
@@ -89,6 +89,7 @@ interface ServiceStoreState {
   resetState: () => void;
   resetAssign: () => void;
   resetRules: () => void;
+  onServiceSave: () => Promise<void>;
   onContinueClick: () => Promise<void>;
   selectedNode: Node<NodeDataProps> | null;
   setSelectedNode: (node: Node<NodeDataProps> | null | undefined) => void;
@@ -584,6 +585,26 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
   },
   reactFlowInstance: null,
   setReactFlowInstance: (reactFlowInstance) => set({ reactFlowInstance }),
+  onServiceSave: async () => {
+    const endpoints = get().endpoints;
+    const name = get().serviceNameDashed();
+    const id = get().serviceId;
+
+    await saveEndpoints(
+      endpoints,
+      !name ? t("newService.defaultServiceName").toString() : name,
+      id,
+      async () => {
+        await saveFlowClick();
+      },
+      (e) => {
+        useToastStore.getState().error({
+          title: i18next.t("newService.toast.failed"),
+          message: i18next.t("newService.toast.saveFailed"),
+        });
+      }
+    );
+  },
   onContinueClick: async () => {
     const vaildServiceInfo = get().vaildServiceInfo();
 
@@ -595,13 +616,12 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
       return;
     }
 
-    if (get().isNewService) {
-      await saveFlowClick();
-      set({
-        isNewService: false,
-      });
-    } else {
-      await editServiceInfo();
+    const { isNewService, onServiceSave } = get();
+
+    await onServiceSave();
+
+    if (isNewService) {
+      set({ isNewService: false });
     }
   },
   selectedNode: null,

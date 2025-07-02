@@ -20,6 +20,7 @@ const NewServiceHeader: FC<NewServiceHeaderProps> = ({ activeStep, continueOnCli
   const serviceState = useServiceStore((state) => state.serviceState);
   const selectedService = useServiceListStore((state) => state.selectedService);
   const navigate = useNavigate();
+  const [isSaving, setIsSaving] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
 
   return (
@@ -36,24 +37,38 @@ const NewServiceHeader: FC<NewServiceHeaderProps> = ({ activeStep, continueOnCli
           <h1 style={{ whiteSpace: "nowrap", color: "black" }}>{`< ${t("menu.backToServiceListing")}`}</h1>
         </Button>
         <HeaderStepCounter activeStep={activeStep} />
-        <Button appearance={isDeleting ? 'loading' : 'error'} disabled={serviceState !== ServiceState.Draft} onClick={() => {
-          setIsDeleting(true);
-           api
-             .post(deleteService(), {
-               id: selectedService?.serviceId,
-               type: selectedService?.type,
-             })
-             .then(() => {
-               navigate(ROUTES.OVERVIEW_ROUTE, { replace: true });
-               useServiceStore.getState().resetState();
-               setIsDeleting(false);
-             })
-             .catch((error) => {
-               setIsDeleting(false);
-               console.error(error);
-             });
-        }}>
+        <Button
+          appearance={isDeleting ? "loading" : "error"}
+          disabled={serviceState !== ServiceState.Draft}
+          onClick={() => {
+            setIsDeleting(true);
+            api
+              .post(deleteService(), {
+                id: selectedService?.serviceId,
+                type: selectedService?.type,
+              })
+              .then(() => {
+                navigate(ROUTES.OVERVIEW_ROUTE, { replace: true });
+                useServiceStore.getState().resetState();
+                setIsDeleting(false);
+              })
+              .catch((error) => {
+                setIsDeleting(false);
+                console.error(error);
+              });
+          }}
+        >
           {t("serviceFlow.apiElements.delete")}
+        </Button>
+        <Button
+          appearance={isSaving ? "loading" : "primary"}
+          onClick={async () => {
+            setIsSaving(true);
+            await useServiceStore.getState().onServiceSave();
+            setIsSaving(false);
+          }}
+        >
+          {t("global.save")}
         </Button>
         <Button onClick={continueOnClick} disabled={!name}>
           {t("global.continue")}
