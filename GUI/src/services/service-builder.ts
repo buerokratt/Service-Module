@@ -1,6 +1,6 @@
 import { Assign } from "types/assign";
 import { Group, Rule } from "components/FlowElementsPopup/RuleBuilder/types";
-import i18next from "i18next";
+import i18next, { t } from "i18next";
 import { NodeHtmlMarkdown } from "node-html-markdown";
 import { Edge, Node } from "@xyflow/react";
 import {
@@ -1191,18 +1191,9 @@ const getEndpointName = (endpoint: EndpointData) => {
 };
 
 export const saveDraft = async () => {
-  const vaildServiceInfo = useServiceStore.getState().vaildServiceInfo();
   const endpoints = useServiceStore.getState().endpoints;
-  const name = useServiceStore.getState().name;
+  const name = useServiceStore.getState().serviceNameDashed();
   const id = useServiceStore.getState().serviceId;
-
-  if (!vaildServiceInfo) {
-    useToastStore.getState().error({
-      title: i18next.t("newService.toast.missingFields"),
-      message: i18next.t("newService.toast.serviceMissingFields"),
-    });
-    return;
-  }
 
   await saveEndpoints(
     endpoints,
@@ -1237,7 +1228,7 @@ export const saveFlowClick = async () => {
 
   await saveFlow({
     steps,
-    name,
+    name: !name ? t("newService.defaultServiceName").toString() : name,
     edges,
     nodes,
     onSuccess: () => {
@@ -1249,7 +1240,7 @@ export const saveFlowClick = async () => {
     },
     onError: (e) => {
       useToastStore.getState().error({
-        title: i18next.t("toast.cannot-save-flow"),
+        title: i18next.t("newService.toast.failed"),
         message: e?.message,
       });
     },

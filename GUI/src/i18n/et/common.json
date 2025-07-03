@@ -234,6 +234,7 @@
     "title": "Pealkiri",
     "description": "Kirjeldus",
     "uses": "Teenus kasutab",
+    "defaultServiceName": "nimetu_teenus",
     "toast": {
       "serviceMissingFields": "Nõutav on teenuse nimi ja kirjeldus",
       "missingFields": "Puuduvad väljad",
