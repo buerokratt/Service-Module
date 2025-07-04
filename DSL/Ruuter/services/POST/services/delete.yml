@@ -102,7 +102,16 @@ delete_endpoints_by_service_id:
     url: "[#SERVICE_RESQL]/endpoints/delete_endpoints_by_service_id"
     body:
       serviceId: ${id}
-  result: delete_endpoint_results    
+  result: delete_endpoint_results
+  next: remove_service_from_common_endpoints
+
+remove_service_from_common_endpoints:
+  call: http.post
+  args:
+    url: "[#SERVICE_RESQL]/endpoints/remove_service_from_common_endpoints"
+    body:
+      serviceId: ${id}
+  result: remove_service_from_common_endpoints_results
   next: delete_endpoint_files
 
 delete_endpoint_files:
@@ -111,7 +120,7 @@ delete_endpoint_files:
     url: "[#SERVICE_RUUTER]/services/delete-endpoint-files"
     body:
       name: ${name_res.response.body[0].name}
-  result: delete_endpoint_files_results    
+  result: delete_endpoint_files_results
   next: delete_mcq_files
 
 delete_mcq_files:
