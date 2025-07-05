@@ -17,6 +17,9 @@ declaration:
       - field: sorting
         type: string
         description: "Body field 'sorting'"
+      - field: search
+        type: string
+        description: "Body field 'search'"
 
 get_available_intents:
   call: http.post

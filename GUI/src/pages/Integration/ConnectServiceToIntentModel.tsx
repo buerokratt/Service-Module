@@ -33,7 +33,7 @@ const ConnectServiceToIntentModel: FC<ConnectServiceToIntentModelProps> = ({ onM
       .getState()
       .loadAvailableIntentsList(
         (requests: Intent[]) => setIntents(requests),
-        t("overview.toast.failed.availableIntents"),
+        t("overview.service.toast.failed.availableIntents"),
         pagination,
         sorting,
         search
