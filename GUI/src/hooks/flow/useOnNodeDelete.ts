@@ -8,16 +8,19 @@ const getRemainingEdges = (allEdges: Edge[], edgesToRemove: Edge[]): Edge[] =>
 const isGhostNode = (nodes: Node[], targetId: string): boolean =>
   nodes.some((n) => n.id === targetId && n.type === "ghost");
 
-const createNewEdges = (incomers: Node[], outgoers: Node[], nodes: Node[]): Edge[] =>
+const createNewEdges = (incomers: Node[], outgoers: Node[], nodes: Node[], connectedEdges: Edge[]): Edge[] =>
   incomers.flatMap(({ id: source }) =>
-    outgoers.map(({ id: target }) => ({
-      id: `${source}->${target}`,
-      source,
-      target,
-      type: "step",
-      animated: isGhostNode(nodes, target),
-      deletable: !isGhostNode(nodes, target),
-    }))
+    outgoers.map(({ id: target }) => {
+      return {
+        id: `${source}->${target}`,
+        source,
+        target,
+        type: "step",
+        animated: isGhostNode(nodes, target),
+        deletable: !isGhostNode(nodes, target),
+        label: connectedEdges.find((edge) => edge.source === source)?.label ?? "+",
+      };
+    })
   );
   
 const processDeletedNodes = (
@@ -58,9 +61,15 @@ const processDeletedNodes = (
       updatedNodes = updatedNodes.filter((n) => n.id !== node.id);
     }
 
-    const newEdges = createNewEdges(incomers, outgoers, updatedNodes);
+    const newEdges = createNewEdges(incomers, outgoers, updatedNodes, getConnectedEdges([node], updatedEdges));
     updatedEdges = [...getRemainingEdges(updatedEdges, getConnectedEdges([node], updatedEdges)), ...newEdges];
   }
+
+  updatedNodes = updatedNodes.filter((node) => {
+    const incomers = getIncomers(node, updatedNodes, updatedEdges);
+    const outgoers = getOutgoers(node, updatedNodes, updatedEdges);
+    return incomers.length > 0 || outgoers.length > 0;
+  });
 
   setNodes(updatedNodes);
   return updatedEdges;
