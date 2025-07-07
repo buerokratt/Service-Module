@@ -137,8 +137,7 @@ const ServiceFlowPage: FC = () => {
         <>
           <Collapsible
             title={t("serviceFlow.serviceInfo")}
-            // defaultOpen={!id} Todo: uncomment this line when the service is not created yet
-            defaultOpen={false}
+            defaultOpen={!id}
             contentStyle={{ padding: "0" }}
             onStateChange={(open) => setIsInfoOpen(open)}
           >
