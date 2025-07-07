@@ -65,11 +65,12 @@ const processDeletedNodes = (
     updatedEdges = [...getRemainingEdges(updatedEdges, getConnectedEdges([node], updatedEdges)), ...newEdges];
   }
 
-  updatedNodes = updatedNodes.filter((node) => {
-    const incomers = getIncomers(node, updatedNodes, updatedEdges);
-    const outgoers = getOutgoers(node, updatedNodes, updatedEdges);
-    return incomers.length > 0 || outgoers.length > 0;
-  });
+  updatedNodes = updatedNodes.filter(
+    (node) =>
+      node.type !== "ghost" ||
+      getIncomers(node, updatedNodes, updatedEdges).length > 0 ||
+      getOutgoers(node, updatedNodes, updatedEdges).length > 0
+  );
 
   setNodes(updatedNodes);
   return updatedEdges;
