@@ -275,7 +275,6 @@ const FlowElementsPopup: React.FC = () => {
 
     const currentButtons = originalNode.data.multiChoiceQuestion?.buttons ?? defaultMultiChoiceQuestionButtons;
     const newButtons = updatedNode.data.multiChoiceQuestion?.buttons ?? [];
-    const currentButtonTitles = currentButtons.map((btn) => btn.title);
     const newButtonTitles = newButtons.map((btn) => btn.title);
 
     const edges = instance.getEdges();
@@ -302,7 +301,7 @@ const FlowElementsPopup: React.FC = () => {
 
     const edgesToRemove = connectedEdges.filter((edge) => {
       if (!edge.label) return false;
-      const currentLabel = renamedButtons.get(edge.label as string) || edge.label;
+      const currentLabel = renamedButtons.get(edge.label as string) ?? edge.label;
       return !newButtonTitles.includes(currentLabel as string);
     });
 
