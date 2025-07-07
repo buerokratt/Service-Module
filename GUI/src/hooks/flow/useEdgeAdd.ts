@@ -6,7 +6,7 @@ import { getNodeLabel } from "utils/flow-utils";
 function useEdgeAdd(id: string) {
   const { setEdges, setNodes, getNodes, getNode, getEdge } = useReactFlow();
 
-  const handleEdgeClick = (step: Step) => {
+  const handleEdgeClick = async (step: Step) => {
     const edge = getEdge(id);
     if (!edge) return;
 
@@ -43,39 +43,41 @@ function useEdgeAdd(id: string) {
       source: edge.source,
       target: newNodeId,
       type: "step",
+      label: edge.label
     };
 
-    const targetEdge = {
-      id: `${newNodeId}->${edge.target}`,
-      source: newNodeId,
-      target: edge.target,
-      type: "step",
-      animated: getNode(edge.target)?.type === "ghost",
-      deletable: getNode(edge.target)?.type != "ghost",
-    };
+    let targetEdge: Edge | null = null;
+
+    if (stepType != StepType.FinishingStepEnd && stepType != StepType.FinishingStepRedirect) {
+      targetEdge = {
+        id: `${newNodeId}->${edge.target}`,
+        source: newNodeId,
+        target: edge.target,
+        type: "step",
+        animated: getNode(edge.target)?.type === "ghost",
+        deletable: getNode(edge.target)?.type != "ghost",
+        label: edge.label,
+      };
+    }
 
     let ghostNodes: Node[] = [];
     let ghostEdges: Edge[] = []; 
 
     if (stepType === StepType.MultiChoiceQuestion || stepType === StepType.Condition || stepType === StepType.Input) {
       const labels = stepType === StepType.MultiChoiceQuestion ? ["Yes", "No"] : ["Success", "Failure"];
-      ghostNodes = labels.map((label, i) => {
-        const ghostNodeId = crypto.randomUUID();
-        return {
-          id: ghostNodeId,
-          type: "ghost",
-          position: {
-            x: targetNode.position.x + 150 * (i + 1),
-            y: targetNode.position.y + (i % 2 === 0 ? 0 : 100)
-          },
-          data: {
-            type: "ghost",
-          },
-          className: "ghost",
-          selectable: false,
-          draggable: false,
-        };
-      });
+      ghostNodes = labels.slice(1).map((_, i) => ({
+        id: crypto.randomUUID(),
+        type: "ghost",
+        position: {
+          x: targetNode.position.x + 150 * (i + 2),
+          y: targetNode.position.y + (i % 2 === 0 ? 0 : 100),
+        },
+        data: { type: "ghost" },
+        className: "ghost",
+        selectable: false,
+        draggable: false,
+      }));
+
       ghostEdges = ghostNodes.map((ghostNode, i) => {
         return {
           id: `${newNodeId}->${ghostNode.id}`,
@@ -84,31 +86,25 @@ function useEdgeAdd(id: string) {
           type: "step",
           animated: true,
           deletable: false,
-          data: {
-            index: i,
-            label: labels[i],
-          },
+          label: labels[i],
         };
       });
+
+      if (targetEdge) {
+        targetEdge.label = labels[labels.length - 1] ?? "+";
+      }
     }
 
+    let newEdges: Edge[] = []
+
     setEdges((edges) => {
-      const newEdges = edges.filter((e) => e.id !== id).concat([sourceEdge, targetEdge, ...ghostEdges]);
+      newEdges = edges.filter((e) => e.id !== id).concat([sourceEdge], targetEdge ?? [], ghostEdges);
       return newEdges;
     });
 
     setNodes((nodes) => {
       const targetNodeIndex = nodes.findIndex((node) => node.id === edge.target);
-      const shouldReplace =
-        stepType === StepType.FinishingStepEnd ||
-        stepType === StepType.FinishingStepRedirect ||
-        stepType === StepType.MultiChoiceQuestion ||
-        stepType === StepType.Condition ||
-        stepType === StepType.Input;
-
-      const newNodes = shouldReplace
-        ? [...nodes.slice(0, targetNodeIndex), insertNode]
-        : [...nodes.slice(0, targetNodeIndex), insertNode, ...nodes.slice(targetNodeIndex)];
+      const newNodes = [...nodes.slice(0, targetNodeIndex), insertNode, ...nodes.slice(targetNodeIndex)];
 
       const newNodeIndex = newNodes.findIndex((node) => node.id === newNodeId);
       newNodes.splice(newNodeIndex + 1, 0, ...ghostNodes);

@@ -61,7 +61,7 @@ const FlowBuilder: FC<FlowBuilderProps> = ({
       fitView
       fitViewOptions={{ padding: 5 }}
       isValidConnection={isValidConnection}
-      defaultEdgeOptions={{ type: "step" }}
+      defaultEdgeOptions={{ type: "step", deletable: false }}
     >
       <MiniMap />
       <Background color="#D2D3D8" gap={16} lineWidth={9} />
