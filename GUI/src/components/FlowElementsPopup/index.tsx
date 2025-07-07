@@ -30,7 +30,7 @@ import useToastStore from "store/toasts.store";
 import i18next from "i18next";
 import MultiChoiceQuestionContent from "./MultiChoiceQuestionContent";
 import { EDGE_LENGTH, NodeDataProps } from "types/service-flow";
-import { Node } from "@xyflow/react";
+import { Edge, getConnectedEdges, getIncomers, getOutgoers, Node } from "@xyflow/react";
 import { MultiChoiceQuestionButton } from "types/multi-choice-question";
 import { buildEdge, buildPlaceholder } from "services/flow-builder";
 import useServiceListStore from "store/services.store";
@@ -151,7 +151,6 @@ const FlowElementsPopup: React.FC = () => {
           question: multiChoiceQuestionQuestion,
           buttons: multiChoiceQuestionButtons,
         },
-        childrenCount: stepType === StepType.MultiChoiceQuestion ? multiChoiceQuestionButtons.length : node.data?.childrenCount ?? 0,
       },
     };
 
@@ -160,7 +159,7 @@ const FlowElementsPopup: React.FC = () => {
     }
 
     if (stepType === StepType.MultiChoiceQuestion) {
-      saveMultiChoicePopup(updatedNode);
+      saveMultiChoicePopup(node, updatedNode);
     }
 
     if (stepType === StepType.Assign) {
@@ -270,65 +269,87 @@ const FlowElementsPopup: React.FC = () => {
     return true;
   };
 
-  const saveMultiChoicePopup = (updatedNode: Node<NodeDataProps>) => {
-    const reactFlowInstance = useServiceStore.getState().reactFlowInstance;
-    const nodeId = updatedNode.id;
-    const buttonPlaceholders = reactFlowInstance
-      ?.getEdges()
-      .filter((edge) => edge.source === nodeId)
-      .map((edge) => edge.target);
-    let filteredNodes = reactFlowInstance?.getNodes().filter((node) => !buttonPlaceholders?.includes(node.id));
-    const filteredEdges = reactFlowInstance?.getEdges().filter((edge) => !buttonPlaceholders?.includes(edge.target));
+  const saveMultiChoicePopup = (originalNode: Node<NodeDataProps>, updatedNode: Node<NodeDataProps>) => {
+    const instance = useServiceStore.getState().reactFlowInstance;
+    if (!instance) return;
 
-    const newPlaceholderId = Math.max(...useServiceStore.getState().nodes.map((node) => +node.id)) + 2;
+    const currentButtons = originalNode.data.multiChoiceQuestion?.buttons ?? defaultMultiChoiceQuestionButtons;
+    const newButtons = updatedNode.data.multiChoiceQuestion?.buttons ?? [];
+    const currentButtonTitles = currentButtons.map((btn) => btn.title);
+    const newButtonTitles = newButtons.map((btn) => btn.title);
 
-    const baseY = updatedNode.position.y + EDGE_LENGTH * 1.5;
-    const baseX = updatedNode.position.x;
-    const widthOffset = (updatedNode.width ?? 0) * 0.75;
+    const edges = instance.getEdges();
+    const nodes = instance.getNodes();
 
-    const buttons = updatedNode.data.multiChoiceQuestion?.buttons ?? [];
+    const connectedEdges = getConnectedEdges([originalNode], edges);
 
-    // Update the node data with the new buttons count
-    filteredNodes = filteredNodes?.map((node) =>
-      node.id === updatedNode.id
-        ? {
-            ...node,
-            data: {
-              ...node.data,
-              childrenCount: buttons.length,
-            },
-          }
-        : node
-    );
-
-    const middleIndex = Math.floor(buttons.length / 2);
-    const spacing = widthOffset * 1.7;
-
-    // Create placeholder nodes for each button and edges connecting them
-    buttons.forEach((button, index) => {
-      const offset = (index - middleIndex + (buttons.length % 2 === 0 ? 0.5 : 0)) * spacing;
-      const placeholderId = `${newPlaceholderId + (index + 1)}`;
-      filteredNodes?.push(
-        buildPlaceholder({
-          id: placeholderId,
-          label: button.title ?? "",
-          position: { y: baseY, x: baseX + offset },
-        })
-      );
-
-      filteredEdges?.push(
-        buildEdge({
-          id: `edge-${nodeId}-${newPlaceholderId + (index + 1)}`,
-          source: nodeId,
-          sourceHandle: `handle-${nodeId}-${index}`,
-          target: placeholderId,
-        })
-      );
+    const renamedButtons = new Map<string, string>();
+    currentButtons.forEach((oldBtn, index) => {
+      if (index < newButtons.length && oldBtn.title !== newButtons[index].title) {
+        renamedButtons.set(oldBtn.title, newButtons[index].title);
+      }
     });
 
-    // Update Nodes and Edges in the store
-    useServiceStore.getState().setNodes(filteredNodes ?? []);
-    useServiceStore.getState().setEdges(filteredEdges ?? []);
+    const updatedEdges = edges.map((edge) => {
+      if (!edge.label || !connectedEdges.some((ce) => ce.id === edge.id)) return edge;
+
+      const newLabel = renamedButtons.get(edge.label as string);
+      if (newLabel) {
+        return { ...edge, label: newLabel };
+      }
+      return edge;
+    });
+
+    const edgesToRemove = connectedEdges.filter((edge) => {
+      if (!edge.label) return false;
+      const currentLabel = renamedButtons.get(edge.label as string) || edge.label;
+      return !newButtonTitles.includes(currentLabel as string);
+    });
+
+    const existingEdgeLabels = updatedEdges
+      .filter((edge) => connectedEdges.some((ce) => ce.id === edge.id))
+      .map((edge) => edge.label)
+      .filter(Boolean);
+
+    const buttonsNeedingEdges = newButtons.filter((btn) => !existingEdgeLabels.includes(btn.title));
+
+    const filteredEdges = updatedEdges.filter((e) => !edgesToRemove.some((edgeToRemove) => edgeToRemove.id === e.id));
+
+    const newEdges = buttonsNeedingEdges.map((button) => {
+      const newEdge: Edge = {
+        id: `${originalNode.id}->${crypto.randomUUID()}`,
+        source: originalNode.id,
+        target: crypto.randomUUID(),
+        type: "step",
+        animated: true,
+        deletable: false,
+        label: button.title,
+      };
+      return newEdge;
+    });
+
+    const newGhostNodes = newEdges.map((edge) => ({
+      id: edge.target,
+      type: "ghost",
+      position: { x: originalNode.position.x, y: originalNode.position.y },
+      data: { type: "ghost" },
+      className: "ghost",
+      selectable: false,
+      draggable: false,
+    }));
+
+    let finalNodes = [...nodes.filter((n) => n.id !== updatedNode.id), updatedNode, ...newGhostNodes];
+    let finalEdges = [...filteredEdges, ...newEdges];
+
+    finalNodes = finalNodes.filter(
+      (node) =>
+        node.type !== "ghost" ||
+        getIncomers(node, finalNodes, finalEdges).length > 0 ||
+        getOutgoers(node, finalNodes, finalEdges).length > 0
+    );
+
+    instance.setNodes(finalNodes);
+    instance.setEdges(finalEdges);
   };
 
   return (
@@ -343,7 +364,10 @@ const FlowElementsPopup: React.FC = () => {
           </Button>
           <Track gap={16}>
             {!isReadonly && (
-              <Button appearance="secondary" onClick={onClose}>
+              <Button
+                appearance="secondary"
+                onClick={onClose}
+              >
                 {t("global.cancel")}
               </Button>
             )}
