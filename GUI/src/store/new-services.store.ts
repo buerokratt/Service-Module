@@ -630,9 +630,8 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
     const reactFlowInstance = get().reactFlowInstance;
     if (!reactFlowInstance) return;
     const node = reactFlowInstance.getNode(selectedNodeId);
-    get().setSelectedNode(node);
+    get().setSelectedNode(node as Node<NodeDataProps>);
   },
-
   onDelete: (id) => {
     getReactFlowInstance(get()).deleteElements({ nodes: [get().nodes.find((n) => n.id === id)], edges: [] });
   },

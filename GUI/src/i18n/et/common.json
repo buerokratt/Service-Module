@@ -53,7 +53,9 @@
     "none": "Puudub",
     "statusClarification": "Staatuse täpsustus",
     "loading": "Laadimine",
-    "skip": "Jäta vahele"
+    "skip": "Jäta vahele",
+    "delete": "Kustuta",
+    "keepIt": "Jäta alles"
   },
   "menu": {
     "overview": "Ülevaade",
@@ -185,7 +187,8 @@
       "connectionQuestion": "Kas olete kindel, et soovite teenuse selle teemaga ühendada?",
       "activate": "Aktiveerige",
       "deactivate": "Deaktiveerige",
-      "createNewIntent": "Loo uus teema"
+      "createNewIntent": "Loo uus teema",
+      "deleteNodeConnections": "Kas soovid kustutada kõik loogikateed, mis on seotud selle plokiga, või jätta need alles?"
     }
   },
   "connectionRequests": {

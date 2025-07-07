@@ -56,7 +56,6 @@ function useEdgeAdd(id: string) {
         type: "step",
         animated: getNode(edge.target)?.type === "ghost",
         deletable: getNode(edge.target)?.type != "ghost",
-        label: edge.label,
       };
     }
 

@@ -53,7 +53,9 @@
     "none": "None",
     "statusClarification": "Status clarification",
     "loading": "Loading",
-    "skip": "Skip"
+    "skip": "Skip",
+    "delete": "Delete",
+    "keepIt": "Keep it"
   },
   "menu": {
     "overview": "Overview",
@@ -185,7 +187,8 @@
       "connectionQuestion": "Are you sure you want to connect to this intent?",
       "activate": "Activate",
       "deactivate": "Deactivate",
-      "createNewIntent": "Create new intent"
+      "createNewIntent": "Create new intent",
+      "deleteNodeConnections": "Would you like to also delete all the logic paths connected to this node or leave them hanging?"
     }
   },
   "connectionRequests": {
