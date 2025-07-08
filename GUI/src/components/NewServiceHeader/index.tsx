@@ -71,7 +71,7 @@ const NewServiceHeader: FC<NewServiceHeaderProps> = ({ activeStep, continueOnCli
           {t("global.save")}
         </Button>
         <Button onClick={continueOnClick} disabled={!name}>
-          {t("global.continue")}
+          {t("global.confirm")}
         </Button>
       </Track>
     </header>

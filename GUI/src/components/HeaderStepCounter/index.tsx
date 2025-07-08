@@ -28,12 +28,6 @@ const HeaderStepCounter: FC<StepCounterProps> = ({ activeStep }) => {
         name={t("newService.serviceFlowCreation")}
         onClick={() => {}}
       />
-      <Step
-        step={2}
-        activeStep={activeStep}
-        name={t("newService.connectToIntent")}
-        onClick={() => {}}
-      />
     </Track>
   );
 };
