@@ -137,7 +137,7 @@ const ServiceFlowPage: FC = () => {
         <>
           <Collapsible
             title={t("serviceFlow.serviceInfo")}
-            defaultOpen={false}
+            defaultOpen={!id}
             contentStyle={{ padding: "0" }}
             onStateChange={(open) => setIsInfoOpen(open)}
           >

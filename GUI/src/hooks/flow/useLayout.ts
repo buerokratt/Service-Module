@@ -14,13 +14,45 @@ function layoutNodes(nodes: Node[], edges: Edge[]): Node[] {
     return [];
   }
 
-  const hierarchy = stratify<Node>()
-    .id((d) => d.id)
-    .parentId((d: Node) => edges.find((e: Edge) => e.target === d.id)?.source)(nodes);
+  const nodesCopy = [...nodes];
+  const edgesCopy = [...edges];
 
+  const rootNodes = nodesCopy.filter((node) => !edgesCopy.some((edge) => edge.target === node.id));
 
-  const root = layout(hierarchy);
-  return root.descendants().map((d) => ({ ...d.data, position: { x: d.x, y: d.y } }));
+  if (rootNodes.length > 1) {
+    const virtualRootId = "virtual-root";
+
+    nodesCopy.push({
+      id: virtualRootId,
+      type: "virtual",
+      data: {},
+      position: { x: 0, y: 0 },
+    });
+
+    rootNodes.forEach((root) => {
+      edgesCopy.push({
+        id: `virtual-edge-${root.id}`,
+        source: virtualRootId,
+        target: root.id,
+      });
+    });
+  }
+
+  try {
+    const hierarchy = stratify<Node>()
+      .id((d) => d.id)
+      .parentId((d: Node) => edgesCopy.find((e: Edge) => e.target === d.id)?.source)(nodesCopy);
+
+    const root = layout(hierarchy);
+
+    return root
+      .descendants()
+      .map((d) => ({ ...d.data, position: { x: d.x, y: d.y } }))
+      .filter((node) => node.id !== "virtual-root");
+  } catch (error) {
+    console.error("Error in hierarchy layout:", error);
+    return nodes;
+  }
 }
 
 const nodeCountSelector = (state: ReactFlowState) => state.nodeLookup.size;

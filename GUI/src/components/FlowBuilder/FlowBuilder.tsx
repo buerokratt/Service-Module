@@ -6,19 +6,22 @@ import edgeTypes from "components/Flow/EdgeTypes";
 import nodeTypes from "components/Flow/NodeTypes";
 import useLayout from "hooks/flow/useLayout";
 import { useOnNodesDelete } from "hooks/flow/useOnNodeDelete";
+import { Button, Modal, Track } from "components";
+import { useTranslation } from "react-i18next";
+import { StepType } from "types";
 
 type FlowBuilderProps = {
   nodes: Node[];
   edges: Edge[];
 };
 
-const FlowBuilder: FC<FlowBuilderProps> = ({
-  nodes,
-  edges,
-}) => {
+const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
   useLayout();
   const { getNodes, setEdges } = useReactFlow();
-  const setReactFlowInstance = useServiceStore(state => state.setReactFlowInstance);
+  const setReactFlowInstance = useServiceStore((state) => state.setReactFlowInstance);
+  const { t } = useTranslation();
+  const { onNodesDelete, isDeleteModalVisible, setIsDeleteModalVisible, onDeleteConfirmed, onKeepItConfirmed, hasConnectedNodes, setDeletedNodes } =
+    useOnNodesDelete();
 
   const onConnect = useCallback(({ source, target }: any) => {
     const nodes = getNodes();
@@ -41,31 +44,67 @@ const FlowBuilder: FC<FlowBuilderProps> = ({
     return connection.source !== connection.target;
   }, []);
 
-  const onNodesDelete = useOnNodesDelete();
-  
+  const onBeforeDelete = useCallback(
+    async ({ nodes: nodesToDelete }: { nodes: Node[]; edges: Edge[] }) => {
+      setDeletedNodes(null);
+      try {
+        if (nodesToDelete.length === 0 || 
+          ![StepType.MultiChoiceQuestion, StepType.Condition, StepType.Input]
+            .includes(nodesToDelete[0]?.data.stepType as StepType)) return true;
+
+        const shouldPreventDelete = hasConnectedNodes(nodesToDelete[0].id);
+        if (shouldPreventDelete) {
+          setDeletedNodes(nodesToDelete);
+          setIsDeleteModalVisible(true);
+        }
+        return !shouldPreventDelete;
+      } catch (error) {
+        console.error("Error in onBeforeDelete:", error);
+        return true;
+      }
+    },
+    [hasConnectedNodes]
+  );
+
   return (
-    <ReactFlow
-      nodes={nodes}
-      edges={edges}
-      onNodesChange={useServiceStore.getState().onNodesChange}
-      onEdgesChange={useServiceStore.getState().onEdgesChange}
-      snapToGrid
-      proOptions={{ hideAttribution: true }}
-      panOnScroll
-      nodeTypes={nodeTypes}
-      edgeTypes={edgeTypes}
-      onInit={setReactFlowInstance}
-      nodesDraggable={false}
-      onConnect={onConnect}
-      onNodesDelete={onNodesDelete}
-      fitView
-      fitViewOptions={{ padding: 5 }}
-      isValidConnection={isValidConnection}
-    >
-      <MiniMap />
-      <Background color="#D2D3D8" gap={16} lineWidth={9} />
-      <Controls orientation="horizontal" showInteractive={false} />
-    </ReactFlow>
+    <>
+      <ReactFlow
+        nodes={nodes}
+        edges={edges}
+        onNodesChange={useServiceStore.getState().onNodesChange}
+        onEdgesChange={useServiceStore.getState().onEdgesChange}
+        snapToGrid
+        proOptions={{ hideAttribution: true }}
+        panOnScroll
+        nodeTypes={nodeTypes}
+        edgeTypes={edgeTypes}
+        onInit={setReactFlowInstance}
+        nodesDraggable={false}
+        onConnect={onConnect}
+        onBeforeDelete={onBeforeDelete}
+        onNodesDelete={onNodesDelete}
+        fitView
+        fitViewOptions={{ padding: 5 }}
+        isValidConnection={isValidConnection}
+        defaultEdgeOptions={{ type: "step", deletable: false }}
+      >
+        <MiniMap />
+        <Background color="#D2D3D8" gap={16} lineWidth={9} />
+        <Controls orientation="horizontal" showInteractive={false} />
+      </ReactFlow>
+      {isDeleteModalVisible && (
+        <Modal title={t("overview.popup.deleteNodeConnections")} onClose={onKeepItConfirmed}>
+          <Track justify="end" gap={16}>
+            <Button appearance="primary" onClick={onDeleteConfirmed}>
+              {t("global.delete")}
+            </Button>
+            <Button appearance="primary" onClick={onKeepItConfirmed}>
+              {t("global.keepIt")}
+            </Button>
+          </Track>
+        </Modal>
+      )}
+    </>
   );
 };
 
