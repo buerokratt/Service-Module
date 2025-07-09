@@ -165,7 +165,7 @@
       }
     },
     "popup": {
-      "delete": "Kas olete kindel, et soovite teenuse kustutada?",
+      "delete": "Kas olete kindel, et soovite selle teenuse kustutada? Seda toimingut ei saa tagasi võtta.",
       "setActive": "Kas oled kindel, et soovid teenuse aktiveerida?",
       "setReady": "Kas olete kindel, et soovite selle teenuse olekuks märkida Valmis?",
       "setDraft": "Kas olete kindel, et soovite selle teenuse olekuks märkida Mustand?",

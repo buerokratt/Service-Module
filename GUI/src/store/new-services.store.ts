@@ -89,7 +89,7 @@ interface ServiceStoreState {
   resetState: () => void;
   resetAssign: () => void;
   resetRules: () => void;
-  onServiceSave: () => Promise<void>;
+  onServiceSave: (status: 'draft' | 'ready') => Promise<void>;
   onContinueClick: () => Promise<void>;
   selectedNode: Node<NodeDataProps> | null;
   setSelectedNode: (node: Node<NodeDataProps> | null | undefined) => void;
@@ -585,7 +585,7 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
   },
   reactFlowInstance: null,
   setReactFlowInstance: (reactFlowInstance) => set({ reactFlowInstance }),
-  onServiceSave: async () => {
+  onServiceSave: async (status: 'draft' | 'ready' = 'ready') => {
     const endpoints = get().endpoints;
     const name = get().serviceNameDashed();
     const id = get().serviceId;
@@ -595,7 +595,7 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
       !name ? t("newService.defaultServiceName").toString() : name,
       id,
       async () => {
-        await saveFlowClick();
+        await saveFlowClick(status);
       },
       (e) => {
         useToastStore.getState().error({
@@ -618,7 +618,7 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
 
     const { isNewService, onServiceSave } = get();
 
-    await onServiceSave();
+    await onServiceSave('ready');
 
     if (isNewService) {
       set({ isNewService: false });

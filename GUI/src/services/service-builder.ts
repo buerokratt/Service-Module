@@ -467,6 +467,7 @@ interface SaveFlowConfig {
   isCommon: boolean;
   serviceId: string;
   isNewService: boolean;
+  status: "draft" | "ready";
 }
 
 const hasInvalidRules = (elements: any[]): boolean => {
@@ -532,6 +533,7 @@ export const saveFlow = async ({
   isCommon,
   serviceId,
   isNewService,
+  status = "ready",
 }: SaveFlowConfig) => {
   try {
     
@@ -546,7 +548,7 @@ export const saveFlow = async ({
       yamlContent = getYamlContent(nodesUpToFirstMcq, edges, steps);
     }
 
-    await saveService(yamlContent, {name, serviceId, description, slot, isCommon, nodes, edges, isNewService} as SaveFlowConfig, true, onSuccess, onError);
+    await saveService(yamlContent, {name, serviceId, description, slot, isCommon, nodes, edges, isNewService} as SaveFlowConfig, true, status, onSuccess, onError);
     
     for (const mcqNode of mcqNodes) {
       const mcqEdges = edges.filter((edge) => edge.source === mcqNode.id);
@@ -573,7 +575,8 @@ export const saveFlow = async ({
         await saveService(
           getYamlContent(branchNodes, branchEdges, steps),
           { name: serviceName, serviceId, description, slot, isCommon, nodes, edges, isNewService } as SaveFlowConfig,
-          false
+          false,
+          status
         );
       }
     }
@@ -593,6 +596,7 @@ async function saveService(
   content: any,
   config: SaveFlowConfig,
   updateServiceDb: boolean,
+  status: "draft" | "ready" = 'ready',
   onSuccess?: (e: any) => void,
   onError?: (e: any) => void
 ) {
@@ -610,7 +614,7 @@ async function saveService(
         isCommon,
         structure: JSON.stringify({ edges, nodes }),
         updateServiceDb: updateServiceDb,
-        state: 'ready'
+        state: status,
       },
       {
         params: {
@@ -1215,7 +1219,7 @@ export const saveDraft = async () => {
   return true;
 };
 
-export const saveFlowClick = async () => {
+export const saveFlowClick = async (status: 'draft' | 'ready' = 'ready') => {
   const name = useServiceStore.getState().serviceNameDashed();
   const serviceId = useServiceStore.getState().serviceId;
   const description = useServiceStore.getState().description;
@@ -1249,6 +1253,7 @@ export const saveFlowClick = async () => {
     isCommon,
     serviceId,
     isNewService,
+    status,
   });
 };
 
