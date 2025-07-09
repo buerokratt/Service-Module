@@ -20,11 +20,12 @@ const Pointer = ({ color = "#c4c5cb" }) => (
 
 const HeaderStep: FC<HeaderStepProps> = ({ step, name, activeStep, onClick }) => {
   return (
-    <Track style={{ cursor: onClick ? "pointer" : "default" }} onClick={onClick}>
+    <Track style={{ cursor: onClick ? "pointer" : "default", width: '100%'}} onClick={onClick}>
       <Track
         gap={8}
         className={activeStep === step ? "active-step" : "in-active-step"}
-        style={{ padding: 8, height: 38 }}
+        justify="center"
+        style={{ padding: 8, height: 38, width: "100%" }}
       >
         <p className={"step-name"} style={{ whiteSpace: "nowrap" }}>
           {name}

@@ -20,14 +20,9 @@ import {
 } from "../components";
 import { ROUTES } from "../resources/routes-constants";
 import "./ServiceFlowPage.scss";
-import api from "../services/api-dev";
-import { changeServiceStatus } from "resources/api-constants";
 import { Mosaic } from "react-loading-indicators";
 import { MdOutlineEdit } from "react-icons/md";
 import ChooseSlotModel from "./Integration/ChooseSlotModel";
-import ConnectServiceToIntentModel from "./Integration/ConnectServiceToIntentModel";
-import { Intent } from "types/Intent";
-import useServiceListStore from "store/services.store";
 
 const ServiceFlowPage: FC = () => {
   const { t } = useTranslation();
@@ -38,9 +33,6 @@ const ServiceFlowPage: FC = () => {
   const description = useServiceStore((state) => state.description);
   const slot = useServiceStore((state) => state.slot);
   const [isChooseSlotsModalVisible, setIsChooseSlotsModalVisible] = useState(false);
-  const [isIntentConnectionModalVisible, setIsIntentConnectionModalVisible] = useState(false);
-  const [activeStep, setActiveStep] = useState(1);
-  const selectedService = useServiceListStore((state) => state.selectedService);
   const isCommon = useServiceStore((state) => state.isCommon);
   const [isInfoOpen, setIsInfoOpen] = useState(false);
 
@@ -80,47 +72,21 @@ const ServiceFlowPage: FC = () => {
     );
   }
 
-  const requestServiceIntentConnection = (intent: string) => {
-    useServiceListStore
-      .getState()
-      .requestServiceIntentConnection(
-        () => setIsIntentConnectionModalVisible(false),
-        t("overview.service.toast.connectedToIntentSuccessfully"),
-        t("overview.service.toast.failed.failedToConnectToIntent"),
-        intent,
-        {
-          pageIndex: 0,
-          pageSize: 10,
-        },
-        []
-      )
-      .then(() => {
-        navigate(ROUTES.OVERVIEW_ROUTE, { replace: true });
-        useServiceStore.getState().resetState();
-      })
-      .catch((error) => {
-        console.error(error);
-      });
-  };
-
   return (
     <>
       <NewServiceHeader
-        activeStep={activeStep}
+        activeStep={1}
         continueOnClick={() => {
-          if (activeStep === 1) {
-            useServiceStore
-              .getState()
-              .onContinueClick()
-              .then(() => {
-                setActiveStep(2);
-                setIsIntentConnectionModalVisible(true);
-                useServiceStore.getState().loadService(id);
-              })
-              .catch((error) => {
-                console.error(error);
-              });
-          }
+          useServiceStore
+            .getState()
+            .onContinueClick()
+            .then(() => {
+              navigate(ROUTES.OVERVIEW_ROUTE, { replace: true });
+              useServiceStore.getState().resetState();
+            })
+            .catch((error) => {
+              console.error(error);
+            });
         }}
       />
       {loading ? (
@@ -254,33 +220,6 @@ const ServiceFlowPage: FC = () => {
             <Chat />
           </ReactFlowProvider>
           {isChooseSlotsModalVisible && <ChooseSlotModel onModalClose={() => setIsChooseSlotsModalVisible(false)} />}
-          {isIntentConnectionModalVisible && (
-            <ConnectServiceToIntentModel
-              onModalClose={() => {
-                api
-                  .post(changeServiceStatus(), {
-                    id: selectedService?.serviceId ?? "",
-                    state: "draft",
-                    type: selectedService?.type ?? "POST",
-                  })
-                  .then(() => {
-                    setIsIntentConnectionModalVisible(false);
-                    setActiveStep(1);
-                    useServiceStore.getState().loadService(id);
-                  })
-                  .catch((error) => {
-                    console.error(error);
-                  });
-              }}
-              onConnect={(intent: Intent) => requestServiceIntentConnection(intent.intent)}
-              canCancel={false}
-              canSkip={true}
-              onSkip={() => {
-                navigate(ROUTES.OVERVIEW_ROUTE, { replace: true });
-                useServiceStore.getState().resetState();
-              }}
-            />
-          )}
         </>
       )}
     </>
