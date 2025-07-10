@@ -32,7 +32,7 @@ const MultiChoiceQuestionContent: FC<MultiChoiceQuestionContentProps> = ({
   const [editIndex, setEditIndex] = useState<number | null>(null);
   const [editValue, setEditValue] = useState<string>("");
   const node = useServiceStore((state) => state.selectedNode);
-  const serviceName = useServiceStore((state) => state.serviceNameDashed());
+  const serviceName = useServiceStore((state) => state.serviceNameDashed().replace(/_+$/, ""));
   const selectedService = useServiceListStore((state) => state.selectedService);
 
   const handleEdit = (idx: number) => {

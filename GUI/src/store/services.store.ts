@@ -153,9 +153,7 @@ const useServiceListStore = create<ServiceStoreState>((set, get, store) => ({
     });
   },
   changeServiceStateToDraft: async (service?: Service) => {
-    console.log("Changing service state to draft", service);
     const selectedService = service ?? get().selectedService;
-    console.log("Selected service for draft change:", selectedService);
     if (!selectedService) return;
     await api.post(changeServiceStatus(), {
       id: selectedService.serviceId,

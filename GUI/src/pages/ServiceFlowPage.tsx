@@ -131,10 +131,10 @@ const ServiceFlowPage: FC = () => {
                     placeholder={t("newService.title").toString()}
                     value={name}
                     onChange={(e) => {
-                      const value = e.target.value.trim();
-                      const hasSpecialCharacters = /[^\p{L}\p{N} ]/u;
+                      const value = e.target.value.trimStart().replaceAll(/_+/g, "_");
+                      const hasSpecialCharacters = /[^\p{L}\p{N}_ ]/u;
                       if (!hasSpecialCharacters.test(value) && !value.startsWith(" ")) {
-                        useServiceStore.getState().changeServiceName(e.target.value);
+                        useServiceStore.getState().changeServiceName(value);
                       }
                     }}
                     style={{

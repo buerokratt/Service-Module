@@ -283,7 +283,7 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
     return [...get().availableVariables.prod, ...get().availableVariables.test];
   },
   vaildServiceInfo: () => !!get().name,
-  serviceNameDashed: () => get().name.trim().replace(" ", "_"),
+  serviceNameDashed: () => get().name.replaceAll(" ", "_"),
   deleteEndpoint: (id: string) => {
     const newEndpoints = get().endpoints.filter((x) => x.endpointId !== id);
     set({ endpoints: newEndpoints });

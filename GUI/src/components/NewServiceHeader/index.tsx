@@ -17,7 +17,7 @@ type NewServiceHeaderProps = {
 };
 
 const NewServiceHeader: FC<NewServiceHeaderProps> = ({ activeStep, continueOnClick, saveOnClick }) => {
-  const name = useServiceStore((state) => state.serviceNameDashed());
+  const name = useServiceStore((state) => state.serviceNameDashed().replace(/_+$/, ""));
   const serviceState = useServiceStore((state) => state.serviceState);
   const selectedService = useServiceListStore((state) => state.selectedService);
   const navigate = useNavigate();

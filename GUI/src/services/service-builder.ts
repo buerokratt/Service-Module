@@ -604,11 +604,12 @@ async function saveService(
   onError?: (e: any) => void
 ) {
   const { isNewService, serviceId, name, description, slot, isCommon, edges, nodes } = config;
+  useServiceStore.getState().changeServiceName(name.replace(/_+$/, ""));
   await api
     .post(
       isNewService ? createNewService() : editService(serviceId),
       {
-        name,
+        name: name.replace(/_+$/, ""),
         serviceId,
         description,
         slot,
@@ -1065,7 +1066,7 @@ const getTemplateDataFromNode = (node: Node): { templateName: string; body?: any
 };
 
 const getDefinedEndpointStep = (steps: Step[], node: Node) => {
-  const name = useServiceStore.getState().name;
+  const name = useServiceStore.getState().name.replace(/_+$/, "");
   const endpoint = steps.find((e) => e.label === node.data.label)?.data;
   const selectedEndpoint = endpoint?.definitions.find((e) => e.isSelected);
   if (!selectedEndpoint || !endpoint) {
@@ -1110,7 +1111,7 @@ const getEndpointName = (endpoint: EndpointData) => {
 
 export const saveDraft = async () => {
   const endpoints = useServiceStore.getState().endpoints;
-  const name = useServiceStore.getState().serviceNameDashed();
+  const name = useServiceStore.getState().serviceNameDashed().replace(/_+$/, "");
   const id = useServiceStore.getState().serviceId;
 
   await saveEndpoints(
@@ -1134,7 +1135,7 @@ export const saveDraft = async () => {
 };
 
 export const saveFlowClick = async (status: 'draft' | 'ready' = 'ready') => {
-  const name = useServiceStore.getState().serviceNameDashed();
+  const name = useServiceStore.getState().serviceNameDashed().replace(/_+$/, "");
   const serviceId = useServiceStore.getState().serviceId;
   const description = useServiceStore.getState().description;
   const slot = useServiceStore.getState().slot;
@@ -1172,11 +1173,11 @@ export const saveFlowClick = async (status: 'draft' | 'ready' = 'ready') => {
 };
 
 export const editServiceInfo = async () => {
-  const name = useServiceStore.getState().serviceNameDashed();
+  const name = useServiceStore.getState().serviceNameDashed().replace(/_+$/, "");
   const description = useServiceStore.getState().description;
   const endpoints = useServiceStore.getState().endpoints;
   const serviceId = useServiceStore.getState().serviceId;
-  const endPointsName = useServiceStore.getState().name;
+  const endPointsName = useServiceStore.getState().serviceNameDashed().replace(/_+$/, "");
   const slot = useServiceStore.getState().slot;
 
   const tasks: Promise<any>[] = [];
@@ -1210,7 +1211,7 @@ export const editServiceInfo = async () => {
 };
 
 export const runServiceTest = async () => {
-  const name = useServiceStore.getState().serviceNameDashed();
+  const name = useServiceStore.getState().serviceNameDashed().replace(/_+$/, "");
   const state = useServiceStore.getState().serviceState;
 
   try {

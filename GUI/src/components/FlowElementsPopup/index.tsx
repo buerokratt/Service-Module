@@ -48,7 +48,7 @@ const FlowElementsPopup: React.FC = () => {
 
   const isUserDefinedNode = node?.data?.stepType === "user-defined";
 
-  const serviceName = useServiceStore((state) => state.serviceNameDashed());
+  const serviceName = useServiceStore((state) => state.serviceNameDashed().replace(/_+$/, ""));
   const endpoints = useServiceStore((state) => state.endpoints);
   const rules = useServiceStore((state) => state.rules);
   const assignElements = useServiceStore((state) => state.assignElements);
@@ -246,7 +246,7 @@ const FlowElementsPopup: React.FC = () => {
 
   const saveApiEndpoints = async () => {
     const endpoints = useServiceStore.getState().endpoints;
-    const name = useServiceStore.getState().name;
+    const name = useServiceStore.getState().name.replace(/_+$/, "");
     const id = useServiceStore.getState().serviceId;
 
     await saveEndpoints(
