@@ -47,4 +47,15 @@
   .file-name-extension {
     color: get-color(black-coral-6);
   }
+
+  .start-node {
+    height: 65px;
+    width: 65px;
+    border-radius: 50px;
+    background-color: get-color(sea-green-10);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-top: 5px;
+  }
 }

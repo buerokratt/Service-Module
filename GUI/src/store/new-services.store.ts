@@ -1,7 +1,6 @@
-import axios from "axios";
 import { create } from "zustand";
 import { v4 as uuid } from "uuid";
-import { Edge, EdgeChange, Node, NodeChange, ReactFlowInstance, applyEdgeChanges, applyNodeChanges } from "reactflow";
+import { Edge, EdgeChange, Node, NodeChange, ReactFlowInstance, applyEdgeChanges, applyNodeChanges } from "@xyflow/react";
 import { EndpointData, EndpointEnv, EndpointTab, PreDefinedEndpointEnvVariables } from "types/endpoint";
 import {
   getEndpointValidation,
@@ -9,22 +8,22 @@ import {
   getServiceById,
   getTaraAuthResponseVariables,
   servicesRequestsExplain,
+  userStepPreferences,
 } from "resources/api-constants";
 import { Service, ServiceState, Step, StepType } from "types";
 import { RequestVariablesTabsRawData, RequestVariablesTabsRowsData } from "types/request-variables";
 import useToastStore from "./toasts.store";
-import i18next from "i18next";
-import { ROUTES } from "resources/routes-constants";
-import { NavigateFunction } from "react-router-dom";
-import { editServiceInfo, saveFlowClick } from "services/service-builder";
-import { NodeDataProps, initialEdge, initialNodes } from "types/service-flow";
-import { alignNodesInCaseAnyGotOverlapped, buildPlaceholder, updateFlowInputRules } from "services/flow-builder";
+import i18next, { t } from "i18next";
+import { saveEndpoints, saveFlowClick } from "services/service-builder";
+import { NodeDataProps, initialEdges, initialNodes } from "types/service-flow";
+import { alignNodesInCaseAnyGotOverlapped, updateFlowInputRules } from "services/flow-builder";
 import { GroupOrRule } from "components/FlowElementsPopup/RuleBuilder/types";
 import useTestServiceStore from "./test-services.store";
 import { Chip } from "types/chip";
 import { EndpointResponseVariable } from "types/endpoint/endpoint-response-variables";
 import { Assign } from "types/assign";
 import { EndpointType } from "types/endpoint/endpoint-type";
+import api from "../services/api-dev";
 
 interface ServiceStoreState {
   endpoints: EndpointData[];
@@ -40,6 +39,7 @@ interface ServiceStoreState {
   assignElements: Assign[];
   rules: GroupOrRule[];
   isYesNoQuestion: boolean;
+  stepPreferences: string[];
   endpointsResponseVariables: EndpointResponseVariable[];
   setIsYesNoQuestion: (value: boolean) => void;
   changeAssignNode: (assign: Assign[]) => void;
@@ -62,6 +62,7 @@ interface ServiceStoreState {
   setIsCommonEndpoint: (id: string, isCommon: boolean) => void;
   setDescription: (description: string) => void;
   setSlot: (slot: string) => void;
+  setStepPreferences: (stepPreferences: string[]) => void;
   loadEndpointsResponseVariables: () => void;
   setSecrets: (newSecrets: PreDefinedEndpointEnvVariables) => void;
   addProductionVariables: (variables: string[]) => void;
@@ -70,7 +71,8 @@ interface ServiceStoreState {
   addEndpoint: () => void;
   loadSecretVariables: () => Promise<void>;
   loadTaraVariables: () => Promise<void>;
-  loadService: (id?: string) => Promise<void>;
+  loadService: (id?: string, resetState?: boolean) => Promise<void>;
+  loadStepPreferences: () => Promise<void>;
   getAvailableRequestValues: (endpointId: string) => PreDefinedEndpointEnvVariables;
   onNameChange: (endpointId: string, oldName: string, newName: string) => void;
   changeServiceEndpointType: (id: string, type: EndpointType) => void;
@@ -87,7 +89,8 @@ interface ServiceStoreState {
   resetState: () => void;
   resetAssign: () => void;
   resetRules: () => void;
-  onContinueClick: (navigate: NavigateFunction) => Promise<void>;
+  onServiceSave: (status: 'draft' | 'ready') => Promise<void>;
+  onContinueClick: () => Promise<void>;
   selectedNode: Node<NodeDataProps> | null;
   setSelectedNode: (node: Node<NodeDataProps> | null | undefined) => void;
   resetSelectedNode: () => void;
@@ -115,7 +118,7 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
   slot: "",
   serviceId: uuid(),
   description: "",
-  edges: [initialEdge],
+  edges: initialEdges,
   nodes: initialNodes,
   isNewService: true,
   serviceState: ServiceState.Draft,
@@ -124,6 +127,7 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
   assignElements: [],
   rules: [],
   isYesNoQuestion: false,
+  stepPreferences: [],
   endpointsResponseVariables: [],
   setIsYesNoQuestion: (value: boolean) => set({ isYesNoQuestion: value }),
   changeAssignNode: (assignElements) => {
@@ -234,7 +238,7 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
         get().endpoints.map(async (e) => {
           return Promise.all(
             e.definitions.map(async (endpoint) => {
-              const response = await axios.post(servicesRequestsExplain(), {
+              const response = await api.post(servicesRequestsExplain(), {
                 url: endpoint.url,
                 method: endpoint.methodType,
                 headers: extractMapValues(endpoint.headers),
@@ -277,7 +281,7 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
   getFlatVariables: () => {
     return [...get().availableVariables.prod, ...get().availableVariables.test];
   },
-  vaildServiceInfo: () => !!get().name && !!get().description,
+  vaildServiceInfo: () => !!get().name,
   serviceNameDashed: () => get().name.trim().replace(" ", "_"),
   deleteEndpoint: (id: string) => {
     const newEndpoints = get().endpoints.filter((x) => x.endpointId !== id);
@@ -286,6 +290,7 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
   changeServiceName: (name: string) => set({ name }),
   setDescription: (description: string) => set({ description }),
   setSlot: (slot: string) => set({ slot }),
+  setStepPreferences: (stepPreferences: string[]) => set({ stepPreferences }),
   isCommon: false,
   setIsCommon: (isCommon: boolean) => set({ isCommon }),
   isCommonEndpoint: (id: string) => {
@@ -337,7 +342,7 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
       reactFlowInstance: null,
       selectedTab: EndpointEnv.Live,
       isNewService: true,
-      edges: [initialEdge],
+      edges: initialEdges,
       nodes: initialNodes,
       isTestButtonEnabled: true,
       assignElements: [],
@@ -352,12 +357,14 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
   },
   resetAssign: () => set({ assignElements: [] }),
   resetRules: () => set({ rules: [], isYesNoQuestion: false }),
-  loadService: async (id) => {
-    get().resetState();
+  loadService: async (id, resetState) => {
+    if (resetState === true) {
+      get().resetState();
+    }
     let nodes = get().nodes;
 
     if (id) {
-      const serviceResponse = await axios.get<Service>(getServiceById(id));
+      const serviceResponse = await api.get<Service>(getServiceById(id));
 
       const structure = JSON.parse(serviceResponse.data.structure?.value ?? "{}");
       let endpoints = serviceResponse.data.endpoints.map((endpoint) => {
@@ -369,14 +376,14 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
       let edges = structure?.edges;
       nodes = structure?.nodes;
 
-      if (!edges || edges.length === 0) edges = [initialEdge];
+      if (!edges || edges.length === 0) edges = initialEdges;
 
       if (!nodes || nodes.length === 0) nodes = initialNodes;
 
       if (!endpoints || !(endpoints instanceof Array)) endpoints = [];
 
       nodes = nodes.map((node: any) => {
-        if (node.type !== "customNode") return node;
+        if (node.type !== "custom") return node;
         node.data = {
           ...node.data,
           onDelete: get().onDelete,
@@ -413,8 +420,16 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
 
     get().addProductionVariables(variables);
   },
+  loadStepPreferences: async () => {
+    try {
+      const response = await api.get<{ response: string[] }>(userStepPreferences());
+      set({ stepPreferences: response.data.response });
+    } catch (error) {
+      console.error("Failed to load step preferences:", error);
+    }
+  },
   loadSecretVariables: async () => {
-    const result = await axios.get(getSecretVariables());
+    const result = await api.get(getSecretVariables());
     const data: { prod: string[]; test: string[] } = result.data;
     data.prod = data.prod.map((v) => `{{${v}}}`);
     data.test = data.test.filter((x) => !data.prod.includes(x)).map((v) => `{{${v}}}`);
@@ -429,7 +444,7 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
     get().addTestVariables(data.test);
   },
   loadTaraVariables: async () => {
-    const result = await axios.post(getTaraAuthResponseVariables());
+    const result = await api.post(getTaraAuthResponseVariables());
     const data: { [key: string]: any } = result.data?.response?.body ?? {};
     const taraVariables = Object.keys(data).map((key) => `{{TARA.${key}}}`);
     get().addProductionVariables(taraVariables);
@@ -570,7 +585,27 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
   },
   reactFlowInstance: null,
   setReactFlowInstance: (reactFlowInstance) => set({ reactFlowInstance }),
-  onContinueClick: async (navigate) => {
+  onServiceSave: async (status: 'draft' | 'ready' = 'ready') => {
+    const endpoints = get().endpoints;
+    const name = get().serviceNameDashed();
+    const id = get().serviceId;
+
+    await saveEndpoints(
+      endpoints,
+      !name ? t("newService.defaultServiceName").toString() : name,
+      id,
+      async () => {
+        await saveFlowClick(status);
+      },
+      (e) => {
+        useToastStore.getState().error({
+          title: i18next.t("newService.toast.failed"),
+          message: i18next.t("newService.toast.saveFailed"),
+        });
+      }
+    );
+  },
+  onContinueClick: async () => {
     const vaildServiceInfo = get().vaildServiceInfo();
 
     if (!vaildServiceInfo) {
@@ -581,16 +616,13 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
       return;
     }
 
-    if (get().isNewService) {
-      await saveFlowClick();
-      set({
-        isNewService: false,
-      });
-    } else {
-      await editServiceInfo();
-    }
+    const { isNewService, onServiceSave } = get();
 
-    navigate(ROUTES.replaceWithId(ROUTES.FLOW_ROUTE, get().serviceId));
+    await onServiceSave('ready');
+
+    if (isNewService) {
+      set({ isNewService: false });
+    }
   },
   selectedNode: null,
   setSelectedNode: (node) => set({ selectedNode: node }),
@@ -598,40 +630,10 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
     const reactFlowInstance = get().reactFlowInstance;
     if (!reactFlowInstance) return;
     const node = reactFlowInstance.getNode(selectedNodeId);
-    get().setSelectedNode(node);
+    get().setSelectedNode(node as Node<NodeDataProps>);
   },
-
   onDelete: (id) => {
-    const state = get();
-    const reactFlowInstance = getReactFlowInstance(state);
-
-    // Get connected nodes and edges
-    const { edgesFromNode, edgesFromNextNode } = getConnectedNodes(reactFlowInstance, id);
-
-    // Determine children nodes
-    let children = determineChildrenNodes(reactFlowInstance, edgesFromNode, edgesFromNextNode);
-
-    // Start with removing the deleted node
-    let nodes = state.nodes.filter((x) => x.id !== id);
-
-    // Handle placeholder nodes if they exist
-    ({ children, nodes } = handlePlaceholderNodes(children, nodes));
-
-    // Handle child node (either existing or new placeholder)
-    const { child, nodes: updatedNodes } = handleChildNode(reactFlowInstance, children, nodes, id, state.nodes.length);
-    nodes = updatedNodes;
-
-    // Update edges (remove and redirect)
-    const edges = updateEdges(state.edges, id, child);
-
-    // Clean up orphaned nodes
-    nodes = cleanupOrphanedNodes(nodes, edges);
-
-    // Clean up intermediate nodes if needed
-    nodes = cleanupIntermediateNodes(nodes, edgesFromNode, edgesFromNextNode, state.nodes.length);
-
-    // Update edges and nodes
-    set({ edges, nodes });
+    getReactFlowInstance(get()).deleteElements({ nodes: [get().nodes.find((n) => n.id === id)], edges: [] });
   },
   clickedNode: null,
   setClickedNode: (clickedNode) => set({ clickedNode }),
@@ -686,12 +688,12 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
     try {
       new URL(endpoint.definitions[0].url ?? "");
       if (endpoint.definitions[0].methodType === "GET") {
-        await axios.post(getEndpointValidation(), {
+        await api.post(getEndpointValidation(), {
           url: endpoint.definitions[0].url ?? "",
           type: "GET",
         });
       } else {
-        await axios.post(getEndpointValidation(), {
+        await api.post(getEndpointValidation(), {
           url: endpoint.definitions[0].url ?? "",
           type: "POST",
         });
@@ -720,106 +722,6 @@ const getReactFlowInstance = (state: any) => {
   const instance = state.reactFlowInstance;
   if (!instance) throw new Error("React Flow instance not available");
   return instance;
-};
-
-const getConnectedNodes = (reactFlowInstance: any, nodeId: string) => {
-  const edgesFromNode = reactFlowInstance
-    .getEdges()
-    .filter((edge: any) => edge.source === nodeId)
-    .map((edge: any) => edge.target);
-
-  const edgesFromNextNode = reactFlowInstance
-    .getEdges()
-    .filter((edge: any) => edge.source === edgesFromNode[0])
-    .map((edge: any) => edge.target);
-
-  return { edgesFromNode, edgesFromNextNode };
-};
-
-const determineChildrenNodes = (reactFlowInstance: any, edgesFromNode: string[], edgesFromNextNode: string[]) => {
-  if (edgesFromNextNode.length > 0) {
-    return reactFlowInstance.getNodes().filter((node: any) => edgesFromNextNode.includes(node.id));
-  }
-  return reactFlowInstance.getNodes().filter((node: any) => edgesFromNode.includes(node.id));
-};
-
-const handlePlaceholderNodes = (children: any[], nodes: any[]) => {
-  if (children.length === 2) {
-    if (children[0].type === "placeholder") {
-      nodes = nodes.filter((x) => x.id !== children[0].id);
-      children.shift();
-    } else if (children[1].type === "placeholder") {
-      nodes = nodes.filter((x) => x.id !== children[1].id);
-      children.pop();
-    } else {
-      children = [];
-    }
-  }
-  return { children, nodes };
-};
-
-const handleChildNode = (
-  reactFlowInstance: any,
-  children: any[],
-  nodes: any[],
-  deletedNodeId: string,
-  stateNodesLength: number
-) => {
-  let child: any = undefined;
-
-  if (children.length === 1) {
-    child = children[0];
-  } else if (children.length === 0) {
-    const deletedNode = reactFlowInstance.getNodes().find((node: any) => node.id === deletedNodeId);
-    const deletedNodePosition = deletedNode?.position;
-    const deletedNodeStepType = deletedNode?.data.stepType;
-
-    if (
-      deletedNodeStepType !== StepType.FinishingStepEnd ||
-      (deletedNodeStepType !== StepType.FinishingStepRedirect && stateNodesLength <= 4)
-    ) {
-      const placeholder = buildPlaceholder({ id: deletedNodeId, position: deletedNodePosition });
-      nodes.push(placeholder);
-      child = placeholder;
-    }
-  }
-
-  return { child, nodes };
-};
-
-const updateEdges = (edges: any[], deletedNodeId: string, child: any) => {
-  return edges
-    .filter((x) => x.source !== deletedNodeId)
-    .map((x) => (x.target === deletedNodeId && child ? { ...x, target: child.id } : x));
-};
-
-const cleanupOrphanedNodes = (nodes: any[], edges: any[]) => {
-  return nodes.filter((x) => edges.find((y) => y.target === x.id || y.source === x.id));
-};
-
-const cleanupIntermediateNodes = (
-  nodes: any[],
-  edgesFromNode: string[],
-  edgesFromNextNode: string[],
-  stateNodesLength: number
-) => {
-  let updatedNodes = [...nodes];
-
-  if (edgesFromNextNode.length > 0) {
-    updatedNodes = updatedNodes.filter((x) => x.id !== edgesFromNode[0]);
-    if (edgesFromNextNode.length === 2) {
-      updatedNodes = updatedNodes.filter((x) => x.id !== edgesFromNode[1]);
-    }
-  }
-
-  if (edgesFromNode.length > 0 && stateNodesLength > 4) {
-    updatedNodes = updatedNodes.filter((x) => x.id !== edgesFromNode[0]);
-    if (edgesFromNode.length === 2) {
-      updatedNodes = updatedNodes.filter((x) => x.id !== edgesFromNode[1]);
-    }
-  }
-
-  return updatedNodes;
 };
 
 export default useServiceStore;

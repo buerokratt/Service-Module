@@ -1,5 +1,4 @@
 import { create } from "zustand";
-import axios from "axios";
 import {
   changeIntentConnection,
   changeServiceStatus,
@@ -16,6 +15,7 @@ import useToastStore from "./toasts.store";
 import { Trigger } from "types/Trigger";
 import { Intent } from "types/Intent";
 import { PaginationState, SortingState } from "@tanstack/react-table";
+import api from "../services/api-dev";
 
 interface ServiceStoreState {
   services: Service[];
@@ -80,7 +80,7 @@ const useServiceListStore = create<ServiceStoreState>((set, get, store) => ({
   loadServicesList: async (pagination, sorting) => {
     const order = sorting[0]?.desc ? "desc" : "asc";
     const sort = sorting.length === 0 ? "id asc" : sorting[0]?.id + " " + order;
-    const result = await axios.post(getServicesList(), {
+    const result = await api.post(getServicesList(), {
       page: pagination.pageIndex + 1,
       page_size: pagination.pageSize,
       sorting: sort,
@@ -111,7 +111,7 @@ const useServiceListStore = create<ServiceStoreState>((set, get, store) => ({
   loadCommonServicesList: async (pagination, sorting) => {
     const order = sorting[0]?.desc ? "desc" : "asc";
     const sort = sorting.length === 0 ? "id asc" : sorting[0]?.id + " " + order;
-    const result = await axios.post(getCommonServicesList(), {
+    const result = await api.post(getCommonServicesList(), {
       page: pagination.pageIndex + 1,
       page_size: pagination.pageSize,
       sorting: sort,
@@ -167,7 +167,7 @@ const useServiceListStore = create<ServiceStoreState>((set, get, store) => ({
         state = ServiceState.Active;
       else state = ServiceState.Draft;
 
-      await axios.post(changeServiceStatus(), {
+      await api.post(changeServiceStatus(), {
         id: selectedService.serviceId,
         state,
         type: selectedService.type,
@@ -189,7 +189,7 @@ const useServiceListStore = create<ServiceStoreState>((set, get, store) => ({
     if (!selectedService) return;
 
     try {
-      const res = await axios.post(changeIntentConnection(), {
+      const res = await api.post(changeIntentConnection(), {
         serviceId: selectedService.serviceId,
       });
       if (res.data.response) {
@@ -207,7 +207,7 @@ const useServiceListStore = create<ServiceStoreState>((set, get, store) => ({
     if (!selectedService) return;
 
     try {
-      await axios.post(deleteServiceApi(), {
+      await api.post(deleteServiceApi(), {
         id: selectedService?.serviceId,
         type: selectedService?.type,
       });
@@ -228,7 +228,7 @@ const useServiceListStore = create<ServiceStoreState>((set, get, store) => ({
     if (!selectedService) return;
 
     try {
-      await axios.post(requestServiceIntentConnection(), {
+      await api.post(requestServiceIntentConnection(), {
         serviceId: selectedService.serviceId,
         serviceName: selectedService.name,
         serviceMethod: selectedService.type,
@@ -248,7 +248,7 @@ const useServiceListStore = create<ServiceStoreState>((set, get, store) => ({
     try {
       const order = sorting[0]?.desc ? "desc" : "asc";
       const sort = sorting.length === 0 ? "requestedAt desc" : sorting[0]?.id + " " + order;
-      const requests = await axios.post(getConnectionRequests(), {
+      const requests = await api.post(getConnectionRequests(), {
         page: pagination.pageIndex + 1,
         page_size: pagination.pageSize,
         sorting: sort,
@@ -264,11 +264,11 @@ const useServiceListStore = create<ServiceStoreState>((set, get, store) => ({
     try {
       const order = sorting[0]?.desc ? "desc" : "asc";
       const sort = sorting.length === 0 ? "intent asc" : sorting[0]?.id + " " + order;
-      const requests = await axios.post(getAvailableIntents(), {
+      const requests = await api.post(getAvailableIntents(), {
         page: pagination.pageIndex + 1,
         page_size: pagination.pageSize,
         sorting: sort,
-        search: search
+        search: search,
       });
       onEnd(requests.data.response);
     } catch (error) {
@@ -279,7 +279,7 @@ const useServiceListStore = create<ServiceStoreState>((set, get, store) => ({
   },
   respondToConnectionRequest: async (onEnd, successMessage, errorMessage, status, request) => {
     try {
-      await axios.post(respondToConnectionRequest(), {
+      await api.post(respondToConnectionRequest(), {
         serviceId: request.service,
         serviceName: request.serviceName,
         serviceMethod: "POST",
@@ -296,7 +296,7 @@ const useServiceListStore = create<ServiceStoreState>((set, get, store) => ({
   },
   cancelConnectionRequest: async (onEnd, successMessage, errorMessage, request) => {
     try {
-      await axios.post(respondToConnectionRequest(), {
+      await api.post(respondToConnectionRequest(), {
         serviceId: request.service,
         serviceName: request.serviceName,
         serviceMethod: "POST",

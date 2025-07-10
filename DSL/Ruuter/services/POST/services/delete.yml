@@ -15,7 +15,6 @@ declaration:
         type: string
         description: "Body field 'type'"
 
-# TODO: Remove Service from bot so it won't be available for the user to use
 check_for_required_parameters:
   switch:
     - condition: ${incoming.body.id == null || incoming.body.type == null}
@@ -26,9 +25,9 @@ extract_request_data:
   assign:
     id: ${incoming.body.id}
     ruuter_type: ${incoming.body.type.toUpperCase()}
-  next: get_status_name
+  next: get_service_name
 
-get_status_name:
+get_service_name:
   call: http.post
   args:
     url: "[#SERVICE_RESQL]/get-service-name-by-id"
@@ -50,11 +49,18 @@ check_status:
   switch:
     - condition: ${status_res.response.body[0].currentState === 'active'}
       next: return_cannot_delete_active_service
+    - condition: ${status_res.response.body[0].currentState === 'ready'}
+      next: assign_draft_path  
   next: assign_old_path
 
 assign_old_path:
   assign:
     old_file_status_path: ${status_res.response.body[0].currentState}
+  next: delete_service
+
+assign_draft_path:
+  assign:
+    old_file_status_path: 'draft'
   next: delete_service
 
 delete_service:

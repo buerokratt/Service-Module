@@ -44,6 +44,7 @@
     "paginationNavigation": "Navigeeri",
     "choose": "Vali..",
     "continue": "Jätka",
+    "confirm": "Kinnita",
     "view": "Vaata",
     "save": "Salvesta",
     "testService": "Testi teenust",
@@ -51,13 +52,18 @@
     "close": "Sulge",
     "errorMessage": "Teenusele puudub ligipääs. Proovi hiljem uuesti.",
     "none": "Puudub",
-    "statusClarification": "Staatuse täpsustus"
+    "statusClarification": "Staatuse täpsustus",
+    "loading": "Laadimine",
+    "skip": "Jäta vahele",
+    "delete": "Kustuta",
+    "keepIt": "Jäta alles"
   },
   "menu": {
     "overview": "Ülevaade",
     "flowbuilder": "Flow Builder",
     "services": "Teenused",
     "newService": "Uus teenus",
+    "backToServiceListing": "Tagasi teenuste lehele",
     "close": "Sulge menüü",
     "intents": "Teemad",
     "auto-services": "Ühendustaotlused",
@@ -159,8 +165,8 @@
       }
     },
     "popup": {
-      "delete": "Kas olete kindel, et soovite teenuse kustutada?",
-      "setActive": "Kas olete kindel, et tahate teenuse aktiveerida?",
+      "delete": "Kas olete kindel, et soovite selle teenuse kustutada? Seda toimingut ei saa tagasi võtta.",
+      "setActive": "Kas oled kindel, et soovid teenuse aktiveerida?",
       "setReady": "Kas olete kindel, et soovite selle teenuse olekuks märkida Valmis?",
       "setDraft": "Kas olete kindel, et soovite selle teenuse olekuks märkida Mustand?",
       "setInactive": "Kas oled kindel, et tahate teenuse deaktiveerida?",
@@ -178,9 +184,12 @@
       "connectionPending": "Teenuse teemaga ühendamise taotlus on ootel. Kas soovite selle tühistada?",
       "cancelRequest": "Tühista taotlus",
       "noIntentsAvailable": "Ühenduse loomiseks ei ole ühtegi teemat saadaval",
+      "noSlotsAvailable": "Ühtegi pesa pole saadaval",
       "connectionQuestion": "Kas olete kindel, et soovite teenuse selle teemaga ühendada?",
       "activate": "Aktiveerige",
-      "deactivate": "Deaktiveerige"
+      "deactivate": "Deaktiveerige",
+      "createNewIntent": "Loo uus teema",
+      "deleteNodeConnections": "Kas soovid kustutada kõik loogikateed, mis on seotud selle plokiga, või jätta need alles?"
     }
   },
   "connectionRequests": {
@@ -224,9 +233,12 @@
     "trainingModuleSetup": "Avaleht",
     "serviceSetup": "Teenuse seadistamine",
     "serviceFlowCreation": "Teenusvoo loomine",
+    "connectToIntent": "Ühenda teemaga",
     "name": "Nimetus",
+    "title": "Pealkiri",
     "description": "Kirjeldus",
     "uses": "Teenus kasutab",
+    "defaultServiceName": "nimetu_teenus",
     "toast": {
       "serviceMissingFields": "Nõutav on teenuse nimi ja kirjeldus",
       "missingFields": "Puuduvad väljad",
@@ -238,7 +250,9 @@
       "saveConfigFailed": "Seadete salvestamine ebaõnnestus",
       "testResultSuccess": "Testi tulemus - edu",
       "testResultError": "Testi tulemus - viga"
-    }
+    },
+    "titleRequired": "Pealkiri on kohustuslik",
+    "chooseMemorySlots": "Vali mälukohad"
   },
   "serviceFlow": {
     "element": {
@@ -343,7 +357,9 @@
     "placeholderNode": "Lohista järgmine samm voogu",
     "placeholderNodeSuccess": "Lohistage edusamm voogu",
     "placeholderNodeFailure": "Lohistage tõrkeetapp voogu",
+    "elements": "Elemendid",
     "allElements": "Üldelemendid",
+    "serviceInfo": "Teenuse teave",
     "apiElements": {
       "title": "API elemendid",
       "delete": "Kustuta",

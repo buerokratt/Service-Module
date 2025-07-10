@@ -4,11 +4,11 @@ import { Button, Card, DataTable, Icon, Track } from "../components";
 import { PaginationState, Row, SortingState, createColumnHelper } from "@tanstack/react-table";
 import { MdOutlineRemoveRedEye } from "react-icons/md";
 import Popup from "../components/Popup";
-import axios from "axios";
 import { getFaultyServices } from "../resources/api-constants";
 import { format } from "date-fns";
 import i18n from "i18n";
 import withAuthorization, { ROLES } from "hoc/with-authorization";
+import api from "../services/api-dev";
 
 interface FaultyService {
   id: string;
@@ -56,7 +56,7 @@ const FaultyServicesPage: React.FC = () => {
       }
       order = sorting[0].desc ? "desc" : "asc";
     }
-    axios
+    api
       .get(getFaultyServices(pagination.pageIndex + 1, pagination.pageSize, sort, order))
       .then((res) => {
         setData(res.data[0]);

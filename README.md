@@ -30,8 +30,6 @@ This repo will primarily contain:
 
 - Clone [TIM](https://github.com/buerokratt/TIM)
 
-- Go to src -> main -> resources -> application.properties & modify security.allowlist.jwt value to `security.allowlist.jwt=ruuter,resql,resql_users,tim,tim-postgresql,node_server,data_mapper,gui_dev,127.0.0.1,::1`
-
 - Navigate to TIM and build the image `docker build -t tim .`
 
 - Clone [SiGA](https://github.com/open-eid/SiGa)
@@ -97,71 +95,6 @@ Extras:
 
 - To Initialize Open Search run `./deploy-opensearch.sh <URL> <AUTH> <Is Mock Allowed - Default false>`
 - To Use Opensearch locally run `./deploy-opensearch.sh http://localhost:9200 admin:admin true`
-
-### DataMapper
-
-[Changes based on this example](https://github.com/express-handlebars/express-handlebars/tree/master/examples/advanced)
-
-DataMapper directory:
-
-- create new directory: **lib**
-
-**Update server.js**
-
-```
-import * as helpers from "./lib/helpers.js";
-```
-
-```
-const hbs = create(); -> const hbs = create({ helpers });
-```
-
-```
-app.post('/hbs/*', (req, res) => {
-  res.render(req.params[0], req.body, function (_, response) {
-    if (req.get('type') === 'csv') {
-      res.json({ response });
-    } else if (req.get('type') === 'json') {
-      res.json(JSON.parse(response));
-    }
-  });
-});
-```
-
-To enable handlebars templates to receive a body and return a json
-
-- When Building a handlebars template make sure to add `layout:false` so that hbs response in the data-mapper will discard the html layout and only return the body data
-
-### DMapper helper functions
-
-- Add all the helper functions to **DSL/DMapper/lib/helpers.js**
-
-### DMapper problems
-
-- http://data_mapper:3005/js/generate/pdf
-  - Docker stops - PDF is not returned
-- **Possible solution- replace Data Mapper Dockerfile content with the following:**
-
-```
-FROM node:19-alpine
-
-RUN apk add --no-cache chromium
-ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
-ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
-
-ENV NODE_ENV development
-WORKDIR /workspace/app/
-
-COPY js js
-COPY views views
-COPY lib lib
-COPY package.json .
-COPY server.js .
-
-RUN npm i -g npm@latest
-RUN npm install
-ENTRYPOINT ["npm","start"]
-```
 
 ### TIM
 

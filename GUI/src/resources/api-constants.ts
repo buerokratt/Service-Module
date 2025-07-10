@@ -38,3 +38,4 @@ export const createEndpoint = (): string => `${baseUrl}/services/create-endpoint
 export const updateEndpoint = (id: string): string => `${baseUrl}/services/update-endpoint?id=${id}`;
 export const deleteEndpoint = (): string => `${baseUrl}/services/delete-endpoint`;
 export const getSlots = (): string => `${baseUrl}/slots`;
+export const userStepPreferences = (): string => `${baseUrl}/steps/preferences`;

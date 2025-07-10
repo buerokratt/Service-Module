@@ -5,7 +5,6 @@ import NotFoundPage from './pages/NotFoundPage'
 import OverviewPage from './pages/OverviewPage'
 import FaultyServicesPage from './pages/FaultyServicesPage'
 import { ROUTES } from './resources/routes-constants'
-import NewServicePage from './pages/NewServicePage'
 import ServiceFlowPage from './pages/ServiceFlowPage'
 import ServiceSettingPage from './pages/ServiceSettingPage'
 import './styles/main.scss'
@@ -16,9 +15,9 @@ const RootComponent: React.FC = () => {
     <Routes>
       <Route path={"/"} element={<Navigate to={ROUTES.OVERVIEW_ROUTE} />} />
       <Route index element={<Navigate to={ROUTES.OVERVIEW_ROUTE} />} />
-      <Route path={ROUTES.NEWSERVICE_ROUTE} element={<NewServicePage />} />
-      <Route path={ROUTES.NEWSERVICE_ROUTE_WITH_INTENT_NAME} element={<NewServicePage />} />
-      <Route path={ROUTES.EDITSERVICE_ROUTE} element={<NewServicePage />} />
+      <Route path={ROUTES.NEWSERVICE_ROUTE} element={<ServiceFlowPage />} />
+      <Route path={ROUTES.NEWSERVICE_ROUTE_WITH_INTENT_NAME} element={<ServiceFlowPage />} />
+      <Route path={ROUTES.EDITSERVICE_ROUTE} element={<ServiceFlowPage />} />
       <Route path={ROUTES.FLOW_ROUTE} element={<ServiceFlowPage />} />
       <Route element={<Layout />}>
         <Route path={"/service"} element={<Navigate to="/services/overview" />} />
