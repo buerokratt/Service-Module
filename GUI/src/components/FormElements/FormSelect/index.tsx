@@ -71,8 +71,6 @@ const FormSelect: FC<FormSelectProps> = ({
     'select',
   );
 
-  const placeholderValue = placeholder ?? t('global.choose');
-
   return (
     <div className={selectClasses}>
       {label && !hideLabel && <label htmlFor={id} className='select__label' {...getLabelProps()}>{label}</label>}
