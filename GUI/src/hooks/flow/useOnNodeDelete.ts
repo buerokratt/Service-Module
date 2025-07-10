@@ -84,7 +84,7 @@ const processDeletedNodes = (
   export const useOnNodesDelete = () => {
     const { getNodes, getEdges, setEdges, setNodes } = useReactFlow();
 
-    const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
+    const [isDeleteConnectionsModalVisible, setIsDeleteConnectionsModalVisible] = useState(false);
     const [nodeToDelete, setNodeToDelete] = useState<Node | null>(null);
 
     const hasConnectedNodes = useCallback(
@@ -108,7 +108,7 @@ const processDeletedNodes = (
 
       setEdges(processDeletedNodes(getEdges(), nodesToDelete, getNodes(), setNodes));
 
-      setIsDeleteModalVisible(false);
+      setIsDeleteConnectionsModalVisible(false);
       setNodeToDelete(null);
     }, [nodeToDelete, getNodes, getEdges, setEdges, setNodes]);
     
@@ -116,7 +116,7 @@ const processDeletedNodes = (
     const onKeepItConfirmed = useCallback(() => {
       if (!nodeToDelete) return;
       setEdges(processDeletedNodes(getEdges(), [nodeToDelete], getNodes(), setNodes));
-      setIsDeleteModalVisible(false);
+      setIsDeleteConnectionsModalVisible(false);
       setNodeToDelete(null);
     }, [nodeToDelete, getNodes, getEdges, setEdges, setNodes]);
 
@@ -135,7 +135,7 @@ const processDeletedNodes = (
             ) {
               if (hasConnectedNodes(deleted[0].id)) {
                 setNodeToDelete(deleted[0]);
-                setIsDeleteModalVisible(true);
+                setIsDeleteConnectionsModalVisible(true);
                 return;
               }
             }
@@ -147,8 +147,8 @@ const processDeletedNodes = (
         },
         [getNodes, getEdges, setEdges, setNodes, hasConnectedNodes]
       ),
-      isDeleteModalVisible,
-      setIsDeleteModalVisible,
+      isDeleteConnectionsModalVisible,
+      setIsDeleteConnectionsModalVisible,
       onDeleteConfirmed,
       onKeepItConfirmed,
       hasConnectedNodes,

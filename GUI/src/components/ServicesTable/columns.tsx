@@ -174,7 +174,7 @@ export const getColumns = ({
             disabled={
               isCommon === true && !userInfo?.authorities.includes("ROLE_ADMINISTRATOR")
                 ? true
-                : props.row.original.state === ServiceState.Active || props.row.original.state === ServiceState.Ready
+                : props.row.original.state != ServiceState.Draft && props.row.original.state != ServiceState.Ready
             }
             appearance="text"
             onClick={() => {
