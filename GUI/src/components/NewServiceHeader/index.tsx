@@ -54,6 +54,7 @@ const NewServiceHeader: FC<NewServiceHeaderProps> = ({ activeStep, continueOnCli
             onClick={async () => {
               setIsSaving(true);
               await useServiceStore.getState().onServiceSave("draft");
+              await useServiceListStore.getState().changeServiceStateToDraft();
               setIsSaving(false);
               saveOnClick();
             }}

@@ -18,7 +18,6 @@ declaration:
         type: string
         description: "Body field 'type'"
 
-# TODO: Change Service Status on bot so it can be activated or diactivated
 extract_request_data:
   assign:
     id: ${incoming.body.id}
@@ -50,8 +49,10 @@ assign_old_status_and_path:
 
 check_status:
   switch:
+    - condition: ${new_state === "draft"}
+      next: set_status
     - condition: ${status_res.response.body[0].currentState === new_state}
-      next: return_same_state_update
+      next: return_same_state_update  
   next: set_status
 
 set_status:
