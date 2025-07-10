@@ -23,6 +23,10 @@ declaration:
       - field: serviceSlot
         type: string
         description: "Slot input"
+    headers:
+      - field: cookie
+        type: string
+        description: "Cookie field"    
 
 extract_request_data:
   assign:
@@ -35,7 +39,7 @@ extract_request_data:
 link_intent_to_service_in_rasa_domain:
   call: http.post
   args:
-    url: "[#SERVICE_RUUTER]/services/domain-intent-service-link"
+    url: "[#SERVICE_RUUTER]/services/domain/intent-service-link"
     body:
       serviceMethod: ${serviceMethod}
       serviceName: ${serviceName}

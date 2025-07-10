@@ -97,7 +97,10 @@ const ServiceFlowPage: FC = () => {
             const serviceId = useServiceStore.getState().serviceId;
             const serviceResponse = await api.get<Service>(getServiceById(serviceId));
             useServiceListStore.getState().setSelectedService(serviceResponse.data);
+            await useServiceListStore.getState().changeServiceStateToDraft(serviceResponse.data);
             navigate(ROUTES.replaceWithId(ROUTES.EDITSERVICE_ROUTE, serviceId));
+          } else {
+            await useServiceListStore.getState().changeServiceStateToDraft();
           }
         }}
       />

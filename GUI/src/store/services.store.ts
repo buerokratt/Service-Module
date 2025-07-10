@@ -26,7 +26,7 @@ interface ServiceStoreState {
   deleteService: (id: string) => Promise<void>;
   selectedService: Service | undefined;
   setSelectedService: (service: Service) => void;
-  changeServiceStateToDraft: () => Promise<void>;
+  changeServiceStateToDraft: (service?: Service) => Promise<void>;
   changeServiceState: (
     onEnd: () => void,
     successMessage: string,
@@ -152,8 +152,10 @@ const useServiceListStore = create<ServiceStoreState>((set, get, store) => ({
       selectedService: service,
     });
   },
-  changeServiceStateToDraft: async () => {
-    const selectedService = get().selectedService;
+  changeServiceStateToDraft: async (service?: Service) => {
+    console.log("Changing service state to draft", service);
+    const selectedService = service ?? get().selectedService;
+    console.log("Selected service for draft change:", selectedService);
     if (!selectedService) return;
     await api.post(changeServiceStatus(), {
       id: selectedService.serviceId,

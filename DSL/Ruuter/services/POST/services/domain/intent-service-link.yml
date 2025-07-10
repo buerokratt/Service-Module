@@ -1,7 +1,7 @@
 declaration:
   call: declare
   version: 0.1
-  description: "Decription placeholder for 'domain-intent-service-link'"
+  description: "Decription placeholder for 'intent-service-link'"
   method: post
   accepts: json
   returns: json
