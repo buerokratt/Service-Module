@@ -56,7 +56,7 @@ check_status:
     - condition: ${new_state === "draft"}
       next: set_status
     - condition: ${status_res.response.body[0].currentState === new_state}
-      next: return_same_state_update  
+      next: return_same_state_update
   next: set_status
 
 set_status:
