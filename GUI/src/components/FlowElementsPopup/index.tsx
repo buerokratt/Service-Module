@@ -57,11 +57,11 @@ const FlowElementsPopup: React.FC = () => {
   const defaultMultiChoiceQuestionButtons = [
     {
       title: "Yes",
-      payload: `#service, /${selectedService?.type ?? 'POST'}/services/active/${serviceName}-mcq-${node?.data.label[node?.data.label.length - 1]}-0`,
+      payload: `#service, /${selectedService?.type ?? 'POST'}/services/active/${serviceName}_mcq_${node?.data.label[node?.data.label.length - 1]}_0`,
     },
     {
       title: "No",
-      payload: `#service, /${selectedService?.type ?? 'POST'}/services/active/${serviceName}-mcq-${node?.data.label[node?.data.label.length - 1]}-1`,
+      payload: `#service, /${selectedService?.type ?? 'POST'}/services/active/${serviceName}_mcq_${node?.data.label[node?.data.label.length - 1]}_1`,
     },
   ];
 

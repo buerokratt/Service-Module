@@ -442,6 +442,7 @@ export const onDrop = (
     nextNodes.forEach((node) => {
       node.position.y += EDGE_LENGTH * 1.5;
     });
+    const id = parseInt(nodeLabel.split("-").pop()?.trim() ?? '1');
     const newNodes = [
       ...previousNodes,
       {
@@ -460,11 +461,11 @@ export const onDrop = (
           onEdit: useServiceStore.getState().handleNodeEdit,
           type: [StepType.FinishingStepEnd, StepType.FinishingStepRedirect].includes(type) ? "finishing-step" : "step",
           stepType: type,
-          clientInputId: type === StepType.Input ? parseInt(nodeLabel.split("-")[1].trim()) : undefined,
-          conditionId: type === StepType.Condition ? parseInt(nodeLabel.split("-")[1].trim()) : undefined,
+          clientInputId: type === StepType.Input ? id : undefined,
+          conditionId: type === StepType.Condition ? id : undefined,
           multiChoiceQuestionId:
-            type === StepType.MultiChoiceQuestion ? parseInt(nodeLabel.split("-")[2].trim()) : undefined,
-          assignId: type === StepType.Assign ? parseInt(nodeLabel.split("-")[1].trim()) : undefined,
+            type === StepType.MultiChoiceQuestion ? id : undefined,
+          assignId: type === StepType.Assign ? id : undefined,
           readonly: [
             StepType.Auth,
             StepType.FinishingStepEnd,

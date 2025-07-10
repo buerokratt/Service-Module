@@ -27,7 +27,7 @@ declaration:
         type: string
         description: "Service UUID"
       - field: definitions
-        type: object
+        type: json
         description: "Endpoint definitions"
 
 create_endpoint:

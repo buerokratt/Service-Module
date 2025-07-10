@@ -51,7 +51,7 @@ extract_request_data:
 
 check_for_update_service_db:
   switch:
-    - condition: ${updateServiceDb=== true}
+    - condition: ${incoming.body.updateServiceDb === true}
       next: delete_all_mcq_files
   next: check_for_content
 
@@ -61,7 +61,7 @@ delete_all_mcq_files:
     url: "[#SERVICE_DMAPPER]/file-manager/delete-all-that-starts-with"
     body:
       path: "[#RUUTER_SERVICES_PATH]/${type}/services/draft"
-      keyword: "${name}-"
+      keyword: "${name}_"
   result: deleteRes
   next: check_for_content
 
@@ -123,7 +123,7 @@ check_type:
 
 check_if_update_service_db:
   switch:
-    - condition: ${updateServiceDb === true}
+    - condition: ${incoming.body.updateServiceDb === true}
       next: get_service_by_id
   next: return_ok
 
