@@ -17,10 +17,17 @@ export const templateToString = (value: string | number) => {
 };
 
 export const toSnakeCase = (value: string) => {
-  return value.toLowerCase().replace(/\s+/g, "_").replace(/-+/g, "_").replace(/_+/g, "_").trim();
+  return value.toLowerCase().trim().replace(/\s+/g, "_").replace(/-+/g, "_").replace(/_+/g, "_");
 };
 
 export const getLastDigits = (value: string) => {
-  const match = RegExp(/(\d+)$/).exec(value);
-  return match ? parseInt(match[0], 10) : 1;
+  let lastDigits = "";
+  for (let i = value.length - 1; i >= 0; i--) {
+    if (/\d/.test(value[i])) {
+      lastDigits = value[i] + lastDigits;
+    } else {
+      break;
+    }
+  }
+  return lastDigits ? parseInt(lastDigits, 10) : 1;
 };
