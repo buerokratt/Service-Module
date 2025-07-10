@@ -65,7 +65,7 @@ const MultiChoiceQuestionContent: FC<MultiChoiceQuestionContentProps> = ({
   };
 
   const handleAdd = () => {
-    const newButtons = [...buttons, { title: "", payload: `#service, /${selectedService?.type ?? 'POST'}/services/active/${serviceName}-mcq-${node?.data.label[node?.data.label.length - 1]}-${buttons.length}` }];
+    const newButtons = [...buttons, { title: "", payload: `#service, /${selectedService?.type ?? 'POST'}/services/active/${serviceName}_mcq_${node?.data.label[node?.data.label.length - 1]}_${buttons.length}` }];
     setButtons(newButtons);
     setIsSaveEnabled(newButtons.length > 1);
   };
