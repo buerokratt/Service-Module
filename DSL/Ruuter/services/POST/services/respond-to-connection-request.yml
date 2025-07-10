@@ -50,7 +50,9 @@ check_status:
 link_intent_to_service_in_rasa_domain:
   call: http.post
   args:
-    url: "[#SERVICE_RUUTER]/services/domain/intent-service-link"
+    url: "[#SERVICE_RUUTER]/services/domain-intent-service-link"
+    headers:
+      cookie: ${incoming.headers.cookie}
     body:
       serviceName: ${serviceName}
       serviceMethod: ${serviceMethod}
