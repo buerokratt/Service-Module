@@ -21,14 +21,17 @@ declaration:
         type: string
         description: "Body field 'name'"
       - field: structure
-        type: json
+        type: object
         description: "Body field 'structure'"
       - field: type
         type: string
         description: "Body field 'type'"
       - field: updateServiceDb
         type: boolean
-        description: "Body field 'updateServiceDb'"    
+        description: "Body field 'updateServiceDb'"
+      - field: state
+        type: string
+        description: "Body field 'state'"  
     params:
       - field: id
         type: string
@@ -43,6 +46,8 @@ extract_request_data:
     type: ${incoming.body.type}
     content: ${incoming.body.content}
     structure: ${incoming.body.structure}
+    updateServiceDb: ${incoming.body.updateServiceDb}
+    state: ${incoming.body.state}
 
 check_for_update_service_db:
   switch:
@@ -178,6 +183,7 @@ service_edit:
       description: ${description}
       slot: ${slot}
       structure: ${new_structure}
+      state: ${state ?? 'draft'}
   result: editedService
 
 return_ok:
@@ -187,8 +193,8 @@ return_ok:
   next: end
 
 return_bad_request:
-  status: 400
-  return: ${err_result.response.body.message}
+  status: 200
+  return: "Error while editing service"
   next: end
 
 return_incorrect_request:

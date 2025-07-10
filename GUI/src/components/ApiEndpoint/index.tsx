@@ -1,4 +1,3 @@
-import axios from "axios";
 import clsx from "clsx";
 import Box from "components/Box";
 import Button from "components/Button";
@@ -17,6 +16,7 @@ import { EndpointData } from "types/endpoint";
 import { onDragStart } from "utils/component-util";
 import apiIconTag from "../../assets/images/api-icon-tag.svg";
 import styles from "./ApiEndpoint.module.scss";
+import api from "../../services/api-dev";
 
 interface RelatedService {
   serviceId: string;
@@ -46,7 +46,7 @@ const ApiEndpoint: FC<ApiEndpointProps> = ({ step }) => {
       setIsGettingRelatedServices(true);
 
       try {
-        const services = (await axios.get<RelatedService[]>(getServicesByEndpointId(endpoint.endpointId, id))).data;
+        const services = (await api.get<RelatedService[]>(getServicesByEndpointId(endpoint.id, id))).data;
         if (services.length > 0) {
           setRelatedServices(services);
         } else {
@@ -70,11 +70,11 @@ const ApiEndpoint: FC<ApiEndpointProps> = ({ step }) => {
       deleteEndpointFromStore(endpoint.endpointId);
 
       const nodeIdsToDelete = nodes
-        .filter((node) => node.type === "customNode" && node.data.originalDefinedNodeId === endpoint.endpointId)
+        .filter((node) => node.type === "custom" && node.data.originalDefinedNodeId === endpoint.endpointId)
         .map((node) => node.id);
       nodeIdsToDelete.forEach((nodeId) => useServiceStore.getState().onDelete(nodeId));
 
-      await axios.post(deleteEndpoint(), { id: endpoint.endpointId });
+      await api.post(deleteEndpoint(), { id: endpoint.endpointId });
       useToastStore.getState().success({ title: t("serviceFlow.apiElements.deleteSuccess") });
     } catch (error) {
       console.error(`Error deleting API endpoint: ${error}`);

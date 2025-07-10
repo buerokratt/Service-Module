@@ -1,4 +1,4 @@
-import { Node } from "reactflow";
+import { Node } from "@xyflow/react";
 import useServiceStore from "store/new-services.store";
 import useTestServiceStore from "store/test-services.store";
 import { StepType } from "types";
@@ -18,7 +18,7 @@ export const testServiceFlow = async () => {
       return;
     }
 
-    if(currentNode.type === "customNode") {
+    if (currentNode.type === "custom") {
       await performActionBasedOnNode(currentNode);
     } 
 
@@ -45,7 +45,7 @@ export const testServiceFlow = async () => {
 
 function findStartNode(): Node | undefined {
   const nodes = useServiceStore.getState().nodes;
-  return nodes.find(x => x.type === "startNode");
+  return nodes.find(x => x.type === "start");
 }
 
 function findNextNodes(node: Node): Node[] {

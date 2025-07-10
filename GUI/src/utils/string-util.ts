@@ -15,3 +15,19 @@ export const templateToString = (value: string | number) => {
 
   return valueString.substring(2, valueString.length - 1);
 };
+
+export const toSnakeCase = (value: string) => {
+  return value.toLowerCase().trim().replace(/\s+/g, "_").replace(/-+/g, "_").replace(/_+/g, "_");
+};
+
+export const getLastDigits = (value: string) => {
+  let lastDigits = "";
+  for (let i = value.length - 1; i >= 0; i--) {
+    if (/\d/.test(value[i])) {
+      lastDigits = value[i] + lastDigits;
+    } else {
+      break;
+    }
+  }
+  return lastDigits ? parseInt(lastDigits, 10) : 1;
+};

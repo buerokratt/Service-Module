@@ -1,9 +1,8 @@
-import axios from "axios";
 import { Assign } from "types/assign";
 import { Group, Rule } from "components/FlowElementsPopup/RuleBuilder/types";
-import i18next from "i18next";
+import i18next, { t } from "i18next";
 import { NodeHtmlMarkdown } from "node-html-markdown";
-import { Edge, Node } from "reactflow";
+import { Edge, Node } from "@xyflow/react";
 import {
   createEndpoint,
   createNewService,
@@ -15,7 +14,10 @@ import {
 import useServiceStore from "store/new-services.store";
 import useToastStore from "store/toasts.store";
 import { RawData, Step, StepType } from "types";
-import { EndpointData, EndpointEnv, EndpointDefinition, EndpointVariableData } from "types/endpoint";
+import { EndpointData, EndpointDefinition, EndpointEnv, EndpointVariableData } from "types/endpoint";
+import api from "../services/api-dev";
+import { NodeDataProps } from "types/service-flow";
+import { getLastDigits, toSnakeCase } from "utils/string-util";
 
 // refactor this file later
 
@@ -123,7 +125,7 @@ const saveEndpointInfo = async (
   });
   const result = Object.fromEntries(steps.entries());
 
-  await axios
+  await api
     .post(
       jsonToYml(),
       { result },
@@ -193,7 +195,7 @@ const saveEndpointConfig = async (
   steps.set("return_value", { wrapper: false, return: "${sensitive}" });
   const result = Object.fromEntries(steps.entries());
 
-  await axios
+  await api
     .post(
       jsonToYml(),
       { result },
@@ -319,7 +321,7 @@ export async function saveEndpoints(
       !endpoint.isCommon ||
       // For non-common endpoints, only save service IDs if endpoint is added to the flow
       // This way we can track which common endpoints are unused and can be safely deleted
-      nodes.some((node) => node.type === "customNode" && node.data.originalDefinedNodeId === endpoint.endpointId)
+      nodes.some((node) => node.type === "custom" && node.data.originalDefinedNodeId === endpoint.endpointId)
     ) {
       endpoint.serviceId = serviceId;
     }
@@ -327,7 +329,7 @@ export async function saveEndpoints(
     const isCommonPath = endpoint.isCommon ? "common/" : "";
 
     tasks.push(
-      axios.post(
+      api.post(
         jsonToYml(),
         { result },
         {
@@ -348,7 +350,7 @@ export async function saveEndpoints(
       tasks.push(createEndpointAndUpdateState(endpoint));
     } else {
       tasks.push(
-        axios.post(updateEndpoint(endpoint.endpointId), {
+        api.post(updateEndpoint(endpoint.endpointId), {
           ...endpoint,
           // Stringify needed for Resql to save nested data in a proper parsable format
           definitions: JSON.stringify(endpoint.definitions),
@@ -361,7 +363,7 @@ export async function saveEndpoints(
 }
 
 async function createEndpointAndUpdateState(endpoint: EndpointData): Promise<any> {
-  const response = await axios.post(createEndpoint(), {
+  const response = await api.post(createEndpoint(), {
     ...endpoint,
     // Stringify needed for Resql to save nested data in a proper parsable format
     definitions: JSON.stringify(endpoint.definitions),
@@ -467,6 +469,7 @@ interface SaveFlowConfig {
   isCommon: boolean;
   serviceId: string;
   isNewService: boolean;
+  status: "draft" | "ready";
 }
 
 const hasInvalidRules = (elements: any[]): boolean => {
@@ -532,28 +535,28 @@ export const saveFlow = async ({
   isCommon,
   serviceId,
   isNewService,
+  status = "ready",
 }: SaveFlowConfig) => {
   try {
-    
-    let yamlContent = getYamlContent(nodes, edges, steps);
+    let yamlContent = getYamlContent(nodes, edges, steps, name, description);
 
     const mcqNodes = nodes.filter(
       (node) => node.data?.stepType === StepType.MultiChoiceQuestion
-    );
+    ) as Node<NodeDataProps>[];
 
     if (mcqNodes.length > 0) {
       const nodesUpToFirstMcq = nodes.slice(0, nodes.findIndex((node) => node.data?.stepType === StepType.MultiChoiceQuestion) + 1);
-      yamlContent = getYamlContent(nodesUpToFirstMcq, edges, steps);
+      yamlContent = getYamlContent(nodesUpToFirstMcq, edges, steps, name, description);
     }
 
-    await saveService(yamlContent, {name, serviceId, description, slot, isCommon, nodes, edges, isNewService} as SaveFlowConfig, true, onSuccess, onError);
+    await saveService(yamlContent, {name, serviceId, description, slot, isCommon, nodes, edges, isNewService} as SaveFlowConfig, true, status, onSuccess, onError);
     
     for (const mcqNode of mcqNodes) {
       const mcqEdges = edges.filter((edge) => edge.source === mcqNode.id);
 
       for (const edge of mcqEdges) {
         const placeholderNode = nodes.find((n) => n.id === edge.target);
-        if (!placeholderNode || placeholderNode.type !== "placeholder") continue;
+        if (!placeholderNode) continue;
 
         const nextEdge = edges.find((e) => e.source === placeholderNode.id);
         if (!nextEdge) continue;
@@ -561,19 +564,21 @@ export const saveFlow = async ({
         const nextNode = nodes.find((n) => n.id === nextEdge.target);
         if (!nextNode) continue;
 
-        const branchLabel = placeholderNode.data?.label ?? "branch";
-        const buttonIndex = mcqNode.data.multiChoiceQuestion.buttons.findIndex((e: any) => e.title === branchLabel);
+        const branchLabel = edges.find((e) => e.source === mcqNode.id)?.label ?? "branch";
+        const buttonIndex = mcqNode?.data?.multiChoiceQuestion?.buttons.findIndex((e: any) => e.title === branchLabel);
 
-        const serviceName = `${name}_mcq_${mcqNode.data.multiChoiceQuestionId}_${buttonIndex}`;
+        const mcqNodeId = getLastDigits(toSnakeCase(mcqNode.data.label ?? ""));
+        const serviceName = `${name}_mcq_${mcqNodeId}_${buttonIndex}`;
         const branchNodes = getBranchNodes(nodes, edges, nextNode);
         const branchEdges = edges.filter((edge) =>
           branchNodes.some((n: any) => n.id === edge.source || n.id === edge.target)
         );
 
         await saveService(
-          getYamlContent(branchNodes, branchEdges, steps),
+          getYamlContent(branchNodes, branchEdges, steps, serviceName, description),
           { name: serviceName, serviceId, description, slot, isCommon, nodes, edges, isNewService } as SaveFlowConfig,
-          false
+          false,
+          status
         );
       }
     }
@@ -593,11 +598,12 @@ async function saveService(
   content: any,
   config: SaveFlowConfig,
   updateServiceDb: boolean,
+  status: "draft" | "ready" = 'ready',
   onSuccess?: (e: any) => void,
   onError?: (e: any) => void
 ) {
   const { isNewService, serviceId, name, description, slot, isCommon, edges, nodes } = config;
-  await axios
+  await api
     .post(
       isNewService ? createNewService() : editService(serviceId),
       {
@@ -610,6 +616,7 @@ async function saveService(
         isCommon,
         structure: JSON.stringify({ edges, nodes }),
         updateServiceDb: updateServiceDb,
+        state: status,
       },
       {
         params: {
@@ -621,11 +628,10 @@ async function saveService(
     .catch(onError);
 }
 
-function getYamlContent(nodes: Node[], edges: Edge[], steps: Step[]): any {
+function getYamlContent(nodes: Node[], edges: Edge[], steps: Step[], name: string, description: string): any {
   const allRelations: any[] = [];
-  // find regular edges 1 -> 1
-  const updatedEdges = skipPlaceholderNodes(nodes, edges);
-  updatedEdges.forEach((edge) => {
+
+  edges.forEach((edge) => {
     const node = nodes.find((node) => node.id === edge.source);
     const followingNode = nodes.find((node) => node.id === edge.target);
     if (!node) return;
@@ -660,16 +666,26 @@ function getYamlContent(nodes: Node[], edges: Edge[], steps: Step[]): any {
       throw new Error(error);
     }
 
-    allRelations.push(`${edge.source}-${edge.target}`);
+    allRelations.push(`${edge.source},${edge.target}`);
   });
   // find finishing nodes
-  updatedEdges.forEach((edge) => {
-    const current = updatedEdges.find((lastEdge) => lastEdge.source === edge.source);
-    const nextStep = updatedEdges.find((lastEdge) => lastEdge.source === edge.target);
+  edges.forEach((edge) => {
+    const current = edges.find((lastEdge) => lastEdge.source === edge.source);
+    const nextStep = edges.find((lastEdge) => lastEdge.source === edge.target);
     if (!nextStep && current?.type !== "placeholder") allRelations.push(edge.target);
   });
 
   const finishedFlow = new Map();
+
+  finishedFlow.set("declaration", {
+    call: "declare",
+    version: 0.1,
+    description: description ?? `Description placeholder for '${name ?? ""}'`,
+    method: "post",
+    accepts: "json",
+    returns: "json",
+    namespace: "service",
+  });
 
   finishedFlow.set("prepare", {
     assign: {
@@ -693,18 +709,18 @@ function getYamlContent(nodes: Node[], edges: Edge[], steps: Step[]): any {
   });
   try {
     allRelations.forEach((r) => {
-      const [parentNodeId, childNodeId] = r.split("-");
-      const parentNode = nodes.findLast((node) => node.id === parentNodeId);
+      const [parentNodeId, childNodeId] = r.split(",");
+      const parentNode = nodes.findLast((node) => node.id === parentNodeId) as Node<NodeDataProps> | undefined;
       if (
         !parentNode ||
-        parentNode.type !== "customNode" ||
+        parentNode.type !== "custom" ||
         [StepType.Rule, StepType.RuleDefinition].includes(parentNode.data.stepType)
       ) {
         return;
       }
 
-      const childNode = nodes.find((node) => node.id === childNodeId);
-      const parentStepName = `${parentNode.data.stepType}-${parentNodeId}`;
+      const childNode = nodes.find((node) => node.id === childNodeId) as Node<NodeDataProps> | undefined;
+      const parentStepName = toSnakeCase(parentNode.data.label);
 
       if (parentNode.data.stepType === StepType.Textfield) {
         return handleTextField(finishedFlow, parentStepName, parentNode, childNode, childNodeId);
@@ -719,7 +735,7 @@ function getYamlContent(nodes: Node[], edges: Edge[], steps: Step[]): any {
       }
 
       if (parentNode.data.stepType === StepType.Input) {
-        return handleInputStep(parentNode, finishedFlow, parentStepName, steps, updatedEdges, nodes, parentNodeId);
+        return;
       }
 
       if (parentNode.data.stepType === StepType.MultiChoiceQuestion) {
@@ -803,7 +819,7 @@ function handleTextField(
   finishedFlow: Map<any, any>,
   parentStepName: string,
   parentNode: Node,
-  childNode: Node | undefined,
+  childNode: Node<NodeDataProps> | undefined,
   childNodeId: any
 ) {
   const htmlToMarkdown = new NodeHtmlMarkdown({
@@ -817,10 +833,14 @@ function handleTextField(
   finishedFlow.set(parentStepName, {
     assign: {
       res: {
-        result: `${htmlToMarkdown.translate(parentNode.data.message?.replace("{{", "${").replace("}}", "}"))}`,
+        result: `${htmlToMarkdown.translate(
+          typeof parentNode.data.message === "string"
+            ? parentNode.data.message.replace("{{", "${").replace("}}", "}")
+            : ""
+        )}`,
       },
     },
-    next: childNode ? `${childNode.data.stepType}-${childNodeId}` : childNodeId,
+    next: childNode ? toSnakeCase(childNode.data.label ?? "") : "formatMessages",
   });
 }
 
@@ -828,16 +848,16 @@ function handleConditionStep(
   allRelations: any[],
   parentNodeId: any,
   nodes: Node[],
-  parentNode: Node,
+  parentNode: Node<NodeDataProps>,
   finishedFlow: Map<any, any>,
   parentStepName: string
 ) {
   const conditionRelations: string[] = allRelations.filter((r) => r.startsWith(parentNodeId));
-  const firstChildNode = conditionRelations[0].split("-")[1];
-  const secondChildNode = conditionRelations[1].split("-")[1];
+  const firstChildNode = conditionRelations[0].split(",")[1];
+  const secondChildNode = conditionRelations[1].split(",")[1];
 
-  const firstChild = nodes.find((node) => node.id === firstChildNode);
-  const secondChild = nodes.find((node) => node.id === secondChildNode);
+  const firstChild = nodes.find((node) => node.id === firstChildNode) as Node<NodeDataProps> | undefined;
+  const secondChild = nodes.find((node) => node.id === secondChildNode) as Node<NodeDataProps> | undefined;
 
   const invalidRulesExist = hasInvalidRules(parentNode.data.rules?.children ?? []);
   const isInvalid =
@@ -850,18 +870,18 @@ function handleConditionStep(
     switch: [
       {
         condition: `\${${buildConditionString(parentNode.data.rules)}}`,
-        next: `${firstChild?.data.stepType}-${firstChildNode}`,
+        next: toSnakeCase(firstChild?.data?.label ?? "") ?? '',
       },
     ],
-    next: `${secondChild?.data.stepType}-${secondChildNode}`,
+    next: toSnakeCase(secondChild?.data?.label ?? "") ?? '',
   });
 }
 
 function handleAssignStep(
-  parentNode: Node,
+  parentNode: Node<NodeDataProps>,
   finishedFlow: Map<any, any>,
   parentStepName: string,
-  childNode: Node | undefined,
+  childNode: Node<NodeDataProps> | undefined,
   childNodeId: any
 ) {
   const invalidElementsExist = hasInvalidElements(parentNode.data.assignElements ?? []);
@@ -879,128 +899,26 @@ function handleAssignStep(
       acc[e.key] = e.value;
       return acc;
     }, {}),
-    next: childNode ? `${childNode.data.stepType}-${childNodeId}` : childNodeId,
+    next: childNode ? toSnakeCase(childNode.data.label ?? "") : "formatMessages",
   });
-}
-
-function handleInputStep(
-  parentNode: Node,
-  finishedFlow: Map<any, any>,
-  parentStepName: string,
-  steps: Step[],
-  updatedEdges: any[],
-  nodes: Node[],
-  parentNodeId: any
-) {
-  const invalidRulesExist = hasInvalidRules(parentNode.data.rules?.children ?? []);
-  const isInvalid =
-    parentNode.data.rules?.children === undefined || invalidRulesExist || parentNode.data.rules?.children.length === 0;
-  if (isInvalid) {
-    throw new Error(i18next.t("toast.missing-client_input-rules") ?? "Error");
-  }
-
-  const clientInput = `client_input_${parentNode.data.clientInputId}`;
-  const clientInputName = `${clientInput}-step`;
-  finishedFlow.set(parentStepName, getTemplate(steps, parentNode, clientInputName, `${clientInput}-assign`));
-  finishedFlow.set(`${clientInput}-assign`, {
-    assign: {
-      [clientInput]: `\${${clientInput}_result.input}`,
-    },
-    next: `${clientInput}-switch`,
-  });
-
-  const clientInputYesOrNo = (label: string) => (label === "rule 1" ? '"Yes"' : '"No"');
-
-  const findTargetNodeId = (node: Node) => updatedEdges.find((edge) => edge.source === node.id)?.target;
-  const findFollowingNode = (node: Node) => {
-    const target = findTargetNodeId(node);
-    return nodes.find((n) => n.id === target);
-  };
-
-  finishedFlow.set(
-    `${clientInput}-switch`,
-    getSwitchCase(
-      updatedEdges
-        .filter((e) => e.source === parentNodeId)
-        .map((e) => {
-          const node = nodes.find((node) => node.id === e.target);
-          if (!node) return e.target;
-          const matchingRule = parentNode.data?.rules?.children?.find(
-            (_: never, i: number) => `rule ${i + 1}` === node.data.label
-          );
-          const followingNode = findFollowingNode(node);
-          return {
-            case:
-              matchingRule && !["Yes", "No"].includes(matchingRule?.condition)
-                ? `\${${matchingRule.name.replace("{{", "").replace("}}", "")} ${matchingRule.condition} ${
-                    matchingRule.value
-                  }}`
-                : `\${${clientInput} == ${clientInputYesOrNo(node.data.label)}}`,
-            nextStep:
-              followingNode?.type === "customNode"
-                ? `${followingNode.data.stepType}-${followingNode.id}`
-                : "service-end",
-          };
-        })
-    )
-  );
 }
 
 function handleMultiChoiceQuestion(
   finishedFlow: Map<any, any>,
   parentStepName: string,
-  parentNode: Node,
-  childNode: Node | undefined,
+  parentNode: Node<NodeDataProps>,
+  childNode: Node<NodeDataProps> | undefined,
   childNodeId: any
 ) {
   return finishedFlow.set(parentStepName, {
     assign: {
-      buttons: parentNode.data.multiChoiceQuestion.buttons ?? [],
+      buttons: parentNode?.data?.multiChoiceQuestion?.buttons ?? [],
       res: {
-        result: parentNode.data?.multiChoiceQuestion.question ?? "",
+        result: parentNode?.data?.multiChoiceQuestion?.question ?? "",
       },
     },
-    next: childNode ? `${childNode.data.stepType}-${childNodeId}` : "formatMessages",
+    next: childNode ? toSnakeCase(childNode.data.label ?? "") : "formatMessages",
   });
-}
-
-
-function skipPlaceholderNodes(nodes: Node[], edges: Edge[]) {
-  const nodeMap = nodes.reduce((map: any, node: any) => {
-    map[node.id] = node;
-    return map;
-  }, {});
-
-  const edgeMap = edges.reduce((map: any, edge: any) => {
-    map[edge.source] ??= [];
-    map[edge.source].push(edge);
-    return map;
-  }, {});
-
-  function findNextNonPlaceholderNode(nodeId: any) {
-    let currentNodeId = nodeId;
-    while (nodeMap[currentNodeId] && nodeMap[currentNodeId]?.data?.type === "placeholder") {
-      const nextEdges = edgeMap[currentNodeId];
-      if (nextEdges && nextEdges.length > 0) {
-        currentNodeId = nextEdges[0].target;
-      } else {
-        break;
-      }
-    }
-    return currentNodeId;
-  }
-
-  const modifiedEdges = edges.map((edge: any) => {
-    const newTarget = findNextNonPlaceholderNode(edge.target);
-    return {
-      ...edge,
-      target: newTarget,
-    };
-  });
-
-  const finalEdges = modifiedEdges.filter((edge: any) => nodeMap[edge.target]?.data?.type !== "placeholder");
-
-  return finalEdges;
 }
 
 const getMapEntry = (value: string) => {
@@ -1190,18 +1108,9 @@ const getEndpointName = (endpoint: EndpointData) => {
 };
 
 export const saveDraft = async () => {
-  const vaildServiceInfo = useServiceStore.getState().vaildServiceInfo();
   const endpoints = useServiceStore.getState().endpoints;
-  const name = useServiceStore.getState().name;
+  const name = useServiceStore.getState().serviceNameDashed();
   const id = useServiceStore.getState().serviceId;
-
-  if (!vaildServiceInfo) {
-    useToastStore.getState().error({
-      title: i18next.t("newService.toast.missingFields"),
-      message: i18next.t("newService.toast.serviceMissingFields"),
-    });
-    return;
-  }
 
   await saveEndpoints(
     endpoints,
@@ -1223,7 +1132,7 @@ export const saveDraft = async () => {
   return true;
 };
 
-export const saveFlowClick = async () => {
+export const saveFlowClick = async (status: 'draft' | 'ready' = 'ready') => {
   const name = useServiceStore.getState().serviceNameDashed();
   const serviceId = useServiceStore.getState().serviceId;
   const description = useServiceStore.getState().description;
@@ -1236,7 +1145,7 @@ export const saveFlowClick = async () => {
 
   await saveFlow({
     steps,
-    name,
+    name: !name ? t("newService.defaultServiceName").toString() : name,
     edges,
     nodes,
     onSuccess: () => {
@@ -1248,7 +1157,7 @@ export const saveFlowClick = async () => {
     },
     onError: (e) => {
       useToastStore.getState().error({
-        title: i18next.t("toast.cannot-save-flow"),
+        title: i18next.t("newService.toast.failed"),
         message: e?.message,
       });
     },
@@ -1257,6 +1166,7 @@ export const saveFlowClick = async () => {
     isCommon,
     serviceId,
     isNewService,
+    status,
   });
 };
 
@@ -1271,11 +1181,13 @@ export const editServiceInfo = async () => {
   const tasks: Promise<any>[] = [];
 
   tasks.push(
-    axios.post(editService(serviceId), {
+    api.post(editService(serviceId), {
       name,
       description,
       slot,
       type: "POST",
+      updateServiceDb: true,
+      state: 'ready',
     })
   );
 
@@ -1301,7 +1213,7 @@ export const runServiceTest = async () => {
   const state = useServiceStore.getState().serviceState;
 
   try {
-    await axios.post(testService(state, name), {});
+    await api.post(testService(state, name), {});
     useToastStore.getState().success({
       title: i18next.t("newService.toast.testResultSuccess"),
     });

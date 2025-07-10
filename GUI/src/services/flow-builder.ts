@@ -1,4 +1,4 @@
-import { Node, Edge, MarkerType, XYPosition, NodeChange, NodeDimensionChange } from "reactflow";
+import { Node, Edge, MarkerType, XYPosition, NodeChange, NodeDimensionChange } from "@xyflow/react";
 import useServiceStore from "store/new-services.store";
 import { ConditionRuleType, StepType } from "types";
 import { GRID_UNIT, EDGE_LENGTH } from "types/service-flow";
@@ -110,7 +110,7 @@ export const buildRuleWithPlaceholder = ({
         x: positionX + offset,
         y: positionY,
       },
-      type: "customNode",
+      type: "custom",
       data: {
         label,
         onDelete: useServiceStore.getState().onDelete,
@@ -454,7 +454,7 @@ export const onDrop = (
                 x: matchingPlaceholder.position.x,
               }
             : matchingPlaceholder.position,
-        type: "customNode",
+        type: "custom",
         data: {
           label: nodeLabel,
           onDelete: useServiceStore.getState().onDelete,

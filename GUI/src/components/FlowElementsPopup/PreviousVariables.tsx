@@ -13,7 +13,7 @@ import Tooltip from "../Tooltip";
 import { v4 } from "uuid";
 import { getHelperTooltips } from "utils/constants";
 import { datesVariables, helperVariables } from "resources/variables-constants";
-import { Node, Edge } from "reactflow";
+import { Node, Edge } from "@xyflow/react";
 
 type PreviousVariablesProps = {
   readonly nodeId: string;

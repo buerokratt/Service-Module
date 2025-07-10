@@ -41,6 +41,12 @@ const MultiChoiceQuestionContent: FC<MultiChoiceQuestionContentProps> = ({
   };
 
   const handleEditSave = (idx: number) => {
+    const currentTitles = buttons.map((btn) => btn.title);
+    if (currentTitles.includes(editValue) || editValue === "") {
+      setEditIndex(null);
+      setEditValue("");
+      return;
+    }
     const newButtons = [...buttons];
     newButtons[idx] = { ...newButtons[idx], title: editValue };
     setButtons(newButtons);
@@ -55,13 +61,13 @@ const MultiChoiceQuestionContent: FC<MultiChoiceQuestionContentProps> = ({
       setEditIndex(null);
       setEditValue("");
     }
-    setIsSaveEnabled(newButtons.length > 1 && !!question.length);
+    setIsSaveEnabled(newButtons.length > 1);
   };
 
   const handleAdd = () => {
-    const newButtons = [...buttons, { title: "", payload: `#service, /${selectedService?.type ?? 'POST'}/services/active/${serviceName}_mcq_${node?.data.label[node?.data.label.length - 1]}_${buttons.length}` }];
+    const newButtons = [...buttons, { title: "", payload: `#service, /${selectedService?.type ?? 'POST'}/services/active/${serviceName}-mcq-${node?.data.label[node?.data.label.length - 1]}-${buttons.length}` }];
     setButtons(newButtons);
-    setIsSaveEnabled(newButtons.length > 1 && !!question.length);
+    setIsSaveEnabled(newButtons.length > 1);
   };
 
   return (
@@ -74,7 +80,7 @@ const MultiChoiceQuestionContent: FC<MultiChoiceQuestionContentProps> = ({
           value={question}
           onChange={(e) => {
             setQuestion(e.target.value);
-            setIsSaveEnabled(buttons.length > 1 && !!e.target.value.length);
+            setIsSaveEnabled(buttons.length > 1);
           }}
           style={{ resize: "none", width: "100%" }}
           maxRows={5}
