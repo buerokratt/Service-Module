@@ -24,6 +24,7 @@ import { EndpointResponseVariable } from "types/endpoint/endpoint-response-varia
 import { Assign } from "types/assign";
 import { EndpointType } from "types/endpoint/endpoint-type";
 import api from "../services/api-dev";
+import { format } from "date-fns";
 
 interface ServiceStoreState {
   endpoints: EndpointData[];
@@ -592,7 +593,7 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
 
     await saveEndpoints(
       endpoints,
-      !name ? t("newService.defaultServiceName").toString() : name,
+      !name ? `${t("newService.defaultServiceName").toString()}_${format(new Date(), 'dd_MM_yyyy_HH_mm_ss')}` : name,
       id,
       async () => {
         await saveFlowClick(status);

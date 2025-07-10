@@ -18,6 +18,7 @@ import { EndpointData, EndpointDefinition, EndpointEnv, EndpointVariableData } f
 import api from "../services/api-dev";
 import { NodeDataProps } from "types/service-flow";
 import { getLastDigits, toSnakeCase } from "utils/string-util";
+import { format } from "date-fns";
 
 // refactor this file later
 
@@ -1145,7 +1146,7 @@ export const saveFlowClick = async (status: 'draft' | 'ready' = 'ready') => {
 
   await saveFlow({
     steps,
-    name: !name ? t("newService.defaultServiceName").toString() : name,
+    name: !name ? `${t("newService.defaultServiceName").toString()}_${format(new Date(), 'dd_MM_yyyy_HH_mm_ss')}` : name,
     edges,
     nodes,
     onSuccess: () => {
