@@ -11,6 +11,7 @@ SELECT
   ruuter_type AS type,
   is_common AS isCommon,
   service_id,
+  slot,
   CEIL(COUNT(*) OVER() / :page_size::DECIMAL) AS total_pages
 FROM latest_services
 ORDER BY
