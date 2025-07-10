@@ -556,7 +556,7 @@ export const saveFlow = async ({
 
       for (const edge of mcqEdges) {
         const placeholderNode = nodes.find((n) => n.id === edge.target);
-        if (!placeholderNode || placeholderNode.type !== "placeholder") continue;
+        if (!placeholderNode) continue;
 
         const nextEdge = edges.find((e) => e.source === placeholderNode.id);
         if (!nextEdge) continue;
@@ -564,7 +564,7 @@ export const saveFlow = async ({
         const nextNode = nodes.find((n) => n.id === nextEdge.target);
         if (!nextNode) continue;
 
-        const branchLabel = placeholderNode.data?.label ?? "branch";
+        const branchLabel = edges.find((e) => e.source === mcqNode.id)?.label ?? "branch";
         const buttonIndex = mcqNode?.data?.multiChoiceQuestion?.buttons.findIndex((e: any) => e.title === branchLabel);
 
         const mcqNodeId = getLastDigits(toSnakeCase(mcqNode.data.label ?? ""));
