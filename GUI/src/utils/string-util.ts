@@ -15,3 +15,12 @@ export const templateToString = (value: string | number) => {
 
   return valueString.substring(2, valueString.length - 1);
 };
+
+export const toSnakeCase = (value: string) => {
+  return value.toLowerCase().replace(/\s+/g, "_").replace(/-+/g, "_").replace(/_+/g, "_").trim();
+};
+
+export const getLastDigits = (value: string) => {
+  const match = RegExp(/(\d+)$/).exec(value);
+  return match ? parseInt(match[0], 10) : 1;
+};
