@@ -2,9 +2,9 @@ import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Button, FormInput, Track } from "../components";
 import { getServiceSettings, saveServiceSettings } from "../resources/api-constants";
-import axios from "axios";
 import useToastStore from "store/toasts.store";
 import withAuthorization, { ROLES } from "hoc/with-authorization";
+import api from "../services/api-dev";
 
 const ServiceSettingPage: React.FC = () => {
   const [tryCount, setTryCount] = useState(0);
@@ -14,7 +14,7 @@ const ServiceSettingPage: React.FC = () => {
   const maxLimit = 100;
 
   useEffect(() => {
-    axios
+    api
       .get(getServiceSettings())
       .then((x) => {
         const settings = x.data.filter((x: any) => x.name === "maxInputTry");
@@ -31,7 +31,7 @@ const ServiceSettingPage: React.FC = () => {
   }, []);
 
   const handleSave = async (value: number) => {
-    axios
+    api
       .post(saveServiceSettings(), {
         name: "maxInputTry",
         value: value,
@@ -54,7 +54,7 @@ const ServiceSettingPage: React.FC = () => {
         <Track gap={8} direction="vertical" align="stretch">
           <Track gap={16}>
             <FormInput
-              label={t("settings.maxUserInputTryCount")}
+              label={t("settings.maxUserInputTryCount").toString()}
               name="maxInputTry"
               placeholder={t("settings.maxUserInputTryCount") + ""}
               type="number"

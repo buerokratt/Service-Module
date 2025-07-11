@@ -1,11 +1,11 @@
 import { FC, useEffect, useState } from "react";
 import Track from "../Track";
-import axios from "axios";
 import { getDomainFile } from "../../resources/api-constants";
 import { FormInput, FormSelect } from "../FormElements";
 import Button from "../Button";
 import { v4 as uuidv4 } from 'uuid';
 import { useTranslation } from "react-i18next";
+import api from "../../services/api-dev";
 
 const RasaRulesContent: FC = () => {
   const [config, setConfig] = useState<any>({})
@@ -13,7 +13,7 @@ const RasaRulesContent: FC = () => {
   const { t } = useTranslation()
 
   useEffect(() => {
-    axios.get(getDomainFile())
+    api.get(getDomainFile())
       .then(x => setConfig(x.data.response))
       .catch(err => console.log(err));
   }, [])
@@ -21,7 +21,7 @@ const RasaRulesContent: FC = () => {
   return (
     <>
       <Track direction="horizontal" align="left" style={{ width: '100%', padding: 16 }} gap={16}>
-        <FormInput name={"name"} label={t("serviceFlow.popup.name")} placeholder={t("serviceFlow.popup.name") + ""} />
+        <FormInput name={"name"} label={t("serviceFlow.popup.name").toString()} placeholder={t("serviceFlow.popup.name") + ""} />
       </Track>
       {
         rules.map((rule, index) => (

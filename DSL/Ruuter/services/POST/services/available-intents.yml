@@ -17,6 +17,9 @@ declaration:
       - field: sorting
         type: string
         description: "Body field 'sorting'"
+      - field: search
+        type: string
+        description: "Body field 'search'"
 
 get_available_intents:
   call: http.post
@@ -26,6 +29,7 @@ get_available_intents:
       page: ${incoming.body.page}
       page_size: ${incoming.body.page_size}
       sorting: ${incoming.body.sorting}
+      search: ${incoming.body.search}
   result: res
 
 return_result:

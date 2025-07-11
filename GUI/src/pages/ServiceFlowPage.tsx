@@ -1,145 +1,242 @@
-import { CSSProperties, FC, useEffect, useMemo } from "react";
-import { ReactFlowProvider } from "reactflow";
-import { useTranslation } from "react-i18next";
-import { useNavigate, useParams } from "react-router-dom";
-import { Box, Collapsible, NewServiceHeader, Track, FlowElementsPopup } from "../components";
-import FlowBuilder from "../components/FlowBuilder/FlowBuilder";
-import { ROUTES } from "../resources/routes-constants";
-import apiIconTag from "../assets/images/api-icon-tag.svg";
-import { StepType, Step } from "../types";
-import useServiceStore from "store/new-services.store";
-import { saveFlowClick } from "services/service-builder";
-import "reactflow/dist/style.css";
-import "./ServiceFlowPage.scss";
 import Chat from "components/chat/chat";
 import withAuthorization, { ROLES } from "hoc/with-authorization";
+import { FC, useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
+import { useNavigate, useParams } from "react-router-dom";
+import { ReactFlowProvider } from "@xyflow/react";
+import "@xyflow/react/dist/style.css";
+import useServiceStore from "store/new-services.store";
+import {
+  Button,
+  Card,
+  Collapsible,
+  FlowBuilder,
+  FlowElementsPopup,
+  FormInput,
+  Icon,
+  NewServiceHeader,
+  Switch,
+  Track,
+} from "../components";
+import { ROUTES } from "../resources/routes-constants";
+import "./ServiceFlowPage.scss";
+import { Mosaic } from "react-loading-indicators";
+import { MdOutlineEdit } from "react-icons/md";
+import ChooseSlotModel from "./Integration/ChooseSlotModel";
+import { Service } from "types";
+import { getServiceById } from "resources/api-constants";
+import useServiceListStore from "store/services.store";
+import api from "services/api";
 
 const ServiceFlowPage: FC = () => {
   const { t } = useTranslation();
-
-  const allElements: Step[] = useMemo(
-    () => [
-      { id: 10, label: t("serviceFlow.element.taraAuthentication"), type: StepType.Auth },
-      { id: 20, label: t("serviceFlow.element.textfield"), type: StepType.Textfield },
-      { id: 30, label: t("serviceFlow.element.clientInput"), type: StepType.Input },
-      { id: 40, label: t("serviceFlow.element.assign"), type: StepType.Assign },
-      { id: 50, label: t("serviceFlow.element.condition"), type: StepType.Condition },
-      { id: 60, label: t("serviceFlow.element.rasaRules"), type: StepType.RasaRules },
-      { id: 70, label: t("serviceFlow.element.openNewWebpage"), type: StepType.OpenWebpage },
-      { id: 80, label: t("serviceFlow.element.fileGeneration"), type: StepType.FileGenerate },
-      { id: 90, label: t("serviceFlow.element.fileSigning"), type: StepType.FileSign },
-      { id: 100, label: t("serviceFlow.element.conversationEnd"), type: StepType.FinishingStepEnd },
-      { id: 110, label: t("serviceFlow.element.redirectConversationToSupport"), type: StepType.FinishingStepRedirect },
-    ],
-    [t]
-  );
+  const [loading, setLoading] = useState<boolean>(false);
 
   const navigate = useNavigate();
-  const description = useServiceStore((state) => state.description);
-  const steps = useServiceStore((state) => state.mapEndpointsToSetps());
   const name = useServiceStore((state) => state.serviceNameDashed());
+  const description = useServiceStore((state) => state.description);
+  const slot = useServiceStore((state) => state.slot);
+  const [isChooseSlotsModalVisible, setIsChooseSlotsModalVisible] = useState(false);
+  const isCommon = useServiceStore((state) => state.isCommon);
+  const [isInfoOpen, setIsInfoOpen] = useState(false);
+
   const { id } = useParams();
 
   useEffect(() => {
-    if (!id) return;
+    if (!id) {
+      useServiceStore.getState().loadStepPreferences();
+      return;
+    }
+    setLoading(true);
     useServiceStore
       .getState()
       .loadService(id)
       .then(() => {
         useServiceStore.getState().loadEndpointsResponseVariables();
+        useServiceStore
+          .getState()
+          .loadStepPreferences()
+          .then(() => {
+            setLoading(false);
+          });
       });
   }, []);
 
   const edges = useServiceStore((state) => state.edges);
   const nodes = useServiceStore((state) => state.nodes);
 
-  const setNodes = useServiceStore((state) => state.setNodes);
+  const titleRef = useRef<HTMLInputElement>(null);
+  const descriptionRef = useRef<HTMLInputElement>(null);
 
-  const onDragStart = (event: React.DragEvent<HTMLDivElement>, step: Step) => {
-    event.dataTransfer.setData("application/reactflow-label", step.label);
-    event.dataTransfer.setData("application/reactflow-type", step.type);
-    event.dataTransfer.setData("application/reactflow-originalDefinedNodeId", step.data?.id ?? "");
-    event.dataTransfer.effectAllowed = "move";
-  };
-
-  const contentStyle: CSSProperties = { overflowY: "auto", maxHeight: "40vh" };
+  function getEditingButton(onClick: () => void) {
+    return (
+      <Button appearance="text" onClick={onClick} style={{ boxShadow: "none" }}>
+        <Icon icon={<MdOutlineEdit color="#686868" />} size="medium" />
+      </Button>
+    );
+  }
 
   return (
     <>
       <NewServiceHeader
-        activeStep={3}
-        saveDraftOnClick={() => saveFlowClick()}
-        continueOnClick={() => navigate(ROUTES.OVERVIEW_ROUTE)}
-      />
-      <h1 style={{ paddingLeft: 16, paddingTop: 16 }}>
-        {t("serviceFlow.flow")} "{name}"
-      </h1>
-      <h5
-        style={{
-          paddingLeft: 16,
-          paddingBottom: 5,
-          wordBreak: "break-all",
-          textOverflow: "ellipsis",
-          overflow: "hidden",
-          whiteSpace: "nowrap",
+        activeStep={1}
+        continueOnClick={() => {
+          useServiceStore
+            .getState()
+            .onContinueClick()
+            .then(() => {
+              navigate(ROUTES.OVERVIEW_ROUTE, { replace: true });
+              useServiceStore.getState().resetState();
+            })
+            .catch((error) => {
+              console.error(error);
+            });
         }}
-      >
-        {description}
-      </h5>
-      <FlowElementsPopup />
-      <ReactFlowProvider>
-        <div className="graph">
-          <div className="graph__controls">
-            <Track direction="vertical" gap={16} align="stretch">
-              {steps && (
-                <Collapsible title={t("serviceFlow.setupElements")} contentStyle={contentStyle}>
-                  <Track direction="vertical" align="stretch" gap={4}>
-                    {steps.map((step) => (
-                      <Box
-                        key={step.id}
-                        color={
-                          [StepType.FinishingStepEnd, StepType.FinishingStepRedirect].includes(step.type)
-                            ? "red"
-                            : "blue"
-                        }
-                        onDragStart={(event) => onDragStart(event, step)}
-                        draggable
-                      >
-                        <Track gap={8} style={{ overflow: "hidden" }}>
-                          {step.type === "user-defined" && <img alt="" src={apiIconTag} />}
-                          {step.label}
-                        </Track>
-                      </Box>
-                    ))}
-                  </Track>
-                </Collapsible>
-              )}
-              {allElements && (
-                <Collapsible title={t("serviceFlow.allElements")} contentStyle={contentStyle}>
-                  <Track direction="vertical" align="stretch" gap={4}>
-                    {allElements.map((step) => (
-                      <Box
-                        key={step.id}
-                        color={
-                          [StepType.FinishingStepEnd, StepType.FinishingStepRedirect].includes(step.type)
-                            ? "red"
-                            : "blue"
-                        }
-                        onDragStart={(event) => onDragStart(event, step)}
-                        draggable
-                      >
-                        {step.label}
-                      </Box>
-                    ))}
-                  </Track>
-                </Collapsible>
-              )}
-            </Track>
-          </div>
-          <FlowBuilder description={description} nodes={nodes} setNodes={setNodes} edges={edges} />
-          <Chat />
+        saveOnClick={async () => {
+          if (!id) {
+            const serviceId = useServiceStore.getState().serviceId;
+            const serviceResponse = await api.get<Service>(getServiceById(serviceId));
+            useServiceListStore.getState().setSelectedService(serviceResponse.data);
+            await useServiceListStore.getState().changeServiceStateToDraft(serviceResponse.data);
+            navigate(ROUTES.replaceWithId(ROUTES.EDITSERVICE_ROUTE, serviceId));
+          } else {
+            await useServiceListStore.getState().changeServiceStateToDraft();
+          }
+        }}
+      />
+      {loading ? (
+        <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100%" }}>
+          <Mosaic
+            color="#005aa3"
+            size="medium"
+            text={`${t("global.loading")}...`}
+            textColor="black"
+            style={{ textAlign: "end" }}
+          />
         </div>
-      </ReactFlowProvider>
+      ) : (
+        <>
+          <Collapsible
+            title={t("serviceFlow.serviceInfo")}
+            defaultOpen={!id}
+            contentStyle={{ padding: "0" }}
+            onStateChange={(open) => setIsInfoOpen(open)}
+          >
+            <Card isBodyDivided={true} borderless={true} isBackground={true}>
+              <Track style={{ alignItems: "center", gap: 8, width: "100%" }}>
+                <div>
+                  <FormInput
+                    ref={titleRef}
+                    name={""}
+                    placeholder={t("newService.title").toString()}
+                    value={name}
+                    onChange={(e) => {
+                      const value = e.target.value.trimStart().replaceAll(/_+/g, "_");
+                      const hasSpecialCharacters = /[^\p{L}\p{N}_ ]/u;
+                      if (!hasSpecialCharacters.test(value) && !value.startsWith(" ")) {
+                        useServiceStore.getState().changeServiceName(value);
+                      }
+                    }}
+                    style={{
+                      minWidth: "250px",
+                      width: "20vw",
+                      backgroundColor: "transparent",
+                      border: "none",
+                      fontSize: "1.5em",
+                    }}
+                  />
+                </div>
+                {getEditingButton(() => {
+                  titleRef?.current?.focus();
+                })}
+                {!name && <label style={{ color: "#d73e3e" }}>{t("newService.titleRequired")}</label>}
+              </Track>
+              <Track style={{ alignItems: "center", gap: 8, width: "100%" }}>
+                <div>
+                  <FormInput
+                    ref={descriptionRef}
+                    name={""}
+                    placeholder={t("newService.description").toString()}
+                    value={description}
+                    onChange={(e) => useServiceStore.getState().setDescription(e.target.value)}
+                    style={{
+                      minWidth: "250px",
+                      width: "20vw",
+                      backgroundColor: "transparent",
+                      border: "none",
+                      textOverflow: "ellipsis",
+                    }}
+                  />
+                </div>
+                {getEditingButton(() => {
+                  descriptionRef?.current?.focus();
+                })}
+              </Track>
+              <Track style={{ alignItems: "center", gap: 8, width: "100%" }}>
+                <div style={{ flexDirection: "row", display: "flex", alignItems: "center" }}>
+                  <FormInput
+                    name={""}
+                    placeholder={t("newService.chooseMemorySlots").toString()}
+                    value={""}
+                    readOnly={true}
+                    onClick={() => setIsChooseSlotsModalVisible(true)}
+                    style={{
+                      minWidth: slot ? "130px" : "250px",
+                      width: slot ? "17vw" : "20vw",
+                      backgroundColor: "transparent",
+                      border: "none",
+                      textOverflow: "ellipsis",
+                      cursor: "pointer",
+                    }}
+                  />
+                  {slot && (
+                    <button
+                      style={{
+                        border: "1px solid",
+                        padding: "7px",
+                        fontSize: "0.9em",
+                        minWidth: "130px",
+                        maxWidth: "130px",
+                        whiteSpace: "nowrap",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                        display: "inline-block",
+                      }}
+                      onClick={() => {
+                        setIsChooseSlotsModalVisible(true);
+                      }}
+                    >
+                      {slot ?? ""}
+                    </button>
+                  )}
+                </div>
+                {getEditingButton(() => {
+                  setIsChooseSlotsModalVisible(true);
+                })}
+              </Track>
+              <Track style={{ paddingLeft: "26px" }}>
+                <Switch
+                  name="isCommon"
+                  label={t("newService.isCommon")}
+                  onLabel={t("global.yes").toString()}
+                  offLabel={t("global.no").toString()}
+                  value={isCommon}
+                  checked={isCommon}
+                  onCheckedChange={(e) => useServiceStore.getState().setIsCommon(e)}
+                />
+              </Track>
+            </Card>
+          </Collapsible>
+          <FlowElementsPopup />
+          <ReactFlowProvider>
+            <div style={{ width: "100%", height: `${isInfoOpen ? 55 : 84.5}%` }}>
+              <FlowBuilder nodes={nodes} edges={edges} />
+            </div>
+            <Chat />
+          </ReactFlowProvider>
+          {isChooseSlotsModalVisible && <ChooseSlotModel onModalClose={() => setIsChooseSlotsModalVisible(false)} />}
+        </>
+      )}
     </>
   );
 };

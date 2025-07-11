@@ -1,27 +1,27 @@
-import { CSSProperties, FC } from "react";
+import { CSSProperties, FC, DragEvent, ReactNode } from "react";
 import Box from "../Box";
+import { Assign, StepType } from "types";
+import useServiceStore from "store/new-services.store";
+import { ASSIGN_DRAG_TYPE } from "utils/component-util";
 
 type OutputElementBoxProps = {
-  readonly text: string;
-  readonly value?: string | number;
-  readonly color?: "green" | "yellow";
-  readonly draggable?: boolean;
-  readonly useValue?: boolean;
+  readonly children: ReactNode;
+  readonly borderColor?: string;
+  readonly dragData?: Assign;
   readonly onClick?: () => void;
   readonly style?: CSSProperties;
   readonly className?: string;
 };
 
 const OutputElementBox: FC<OutputElementBoxProps> = ({
-  text,
-  color = "green",
-  draggable = true,
-  useValue = false,
-  value = "",
+  borderColor,
+  dragData,
   onClick,
   style,
   className,
+  children,
 }) => {
+  const node = useServiceStore((state) => state.selectedNode);
   const mergedStyle: CSSProperties = {
     borderRadius: 46,
     paddingTop: 1.5,
@@ -30,18 +30,29 @@ const OutputElementBox: FC<OutputElementBoxProps> = ({
     paddingRight: 10,
     fontSize: 14,
     ...style,
+    ...(borderColor && { border: `2px outset ${borderColor}` }),
+  };
+
+  const handleDragStart = (event: DragEvent<HTMLDivElement>) => {
+    if (!dragData) return;
+
+    event.dataTransfer.setData(
+      ASSIGN_DRAG_TYPE,
+      // Need to check for StepType.Assign here since ReactQuill does not support custom onDrop events
+      node?.data.stepType === StepType.Assign ? JSON.stringify(dragData) : dragData.value
+    );
   };
 
   return (
     <Box
       className={className}
       onClick={onClick}
-      color={color}
-      draggable={draggable}
-      onDragStart={(event) => event.dataTransfer.setData("text/plain", useValue ? `${value}` : text)}
+      color="green"
+      draggable={!!dragData}
+      onDragStart={handleDragStart}
       style={mergedStyle}
     >
-      {text}
+      {children}
     </Box>
   );
 };

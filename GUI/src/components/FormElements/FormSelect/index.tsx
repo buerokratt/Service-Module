@@ -1,43 +1,46 @@
-import React, { FC, SelectHTMLAttributes, useId, useState } from 'react';
+import React, { FC, SelectHTMLAttributes, useEffect, useId, useState } from 'react';
 import { useSelect } from 'downshift';
 import clsx from 'clsx';
-import { useTranslation } from 'react-i18next';
 import { MdArrowDropDown } from 'react-icons/md';
 
 import { Icon } from '../../../components';
 import './FormSelect.scss';
+import { t } from 'i18next';
 
 type FormSelectProps = SelectHTMLAttributes<HTMLSelectElement> & {
   label: string;
   name: string;
   hideLabel?: boolean;
-  placeholder?: string,
+  placeholder?: string;
   options: {
     label: string;
     value: string;
   }[];
-  onSelectionChange?: (selection: { label: string, value: string } | null) => void;
-}
-
-const itemToString = (item: ({ label: string, value: string } | null)) => {
-  return item ? item.value : '';
+  onSelectionChange?: (selection: { label: string; value: string } | null) => void;
+  isOpen?: boolean;
+  isMenuAbsolute?: boolean;
+  menuPosition?: "absolute" | "relative";
 };
 
-const FormSelect: FC<FormSelectProps> = (
-  {
-    label,
-    hideLabel,
-    options,
-    disabled,
-    placeholder,
-    defaultValue,
-    onSelectionChange,
-    ...rest
-  },
-) => {
+const itemToString = (item: { label: string; value: string } | null) => {
+  return item ? item.value : "";
+};
+
+const FormSelect: FC<FormSelectProps> = ({
+  label,
+  hideLabel,
+  options,
+  disabled,
+  placeholder,
+  defaultValue,
+  onSelectionChange,
+  isOpen: isMenuOpen = false,
+  isMenuAbsolute = true,
+  menuPosition = 'absolute',
+  ...rest
+}) => {
   const id = useId();
-  const { t } = useTranslation();
-  const defaultSelected = options.find((o) => o.value === defaultValue) || null;
+  const defaultSelected = options.find((o) => o.value === defaultValue) ?? null;
   const [selectedItem, setSelectedItem] = useState<{ label: string, value: string } | null>(defaultSelected);
   const {
     isOpen,
@@ -55,23 +58,28 @@ const FormSelect: FC<FormSelectProps> = (
       setSelectedItem(newSelectedItem ?? null);
       if (onSelectionChange) onSelectionChange(newSelectedItem ?? null);
     },
+    defaultIsOpen: isMenuOpen,
   });
+
+  useEffect(() => {
+    if (defaultValue) {
+      setSelectedItem(options.find((o) => o.value === defaultValue) ?? null);
+    }
+  }, [defaultValue, options]);
 
   const selectClasses = clsx(
     'select',
   );
-
-  const placeholderValue = placeholder || t('global.choose');
 
   return (
     <div className={selectClasses}>
       {label && !hideLabel && <label htmlFor={id} className='select__label' {...getLabelProps()}>{label}</label>}
       <div className='select__wrapper'>
         <div className={`select__trigger ${disabled && 'select__trigger--disabled'}`} {...getToggleButtonProps()} style={{ color: selectedItem?.label ? '#1A1B1F' : '#5D6071' }} {...rest} >
-          {selectedItem?.label ?? placeholderValue}
+          {selectedItem?.label ?? placeholder}
           <Icon label='Dropdown icon' size='medium' icon={<MdArrowDropDown color='#5D6071' />} />
         </div>
-        <ul className='select__menu' {...getMenuProps()}>
+        <ul className={`select__menu select__menu--${menuPosition}`} {...getMenuProps()}>
           {isOpen && (
             options.map((item, index) => (
               <li className={clsx('select__option', { 'select__option--selected': highlightedIndex === index })}
@@ -85,6 +93,5 @@ const FormSelect: FC<FormSelectProps> = (
     </div>
   );
 };
-
 
 export default FormSelect;

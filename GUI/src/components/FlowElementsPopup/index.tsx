@@ -12,7 +12,6 @@ import TextfieldTestContent from "./TextfieldTestContent";
 import DefaultMessageContent from "./DefaultMessageContent";
 import EndConversationContent from "./EndConversationContent";
 import JsonRequestContent from "./JsonRequestContent";
-import axios from "axios";
 import { servicesRequestsExplain } from "../../resources/api-constants";
 import OpenWebPageContent from "./OpenWebPageContent";
 import OpenWebPageTestContent from "./OpenWebPageTestContent";
@@ -23,26 +22,48 @@ import FileSignContent from "./FileSignContent";
 import "./styles.scss";
 import ConditionContent from "./ConditionContent";
 import AssignContent from "./AssignContent";
-import { templateToString } from "utils/string-util";
+import { isTemplate, removeTrailingUnderscores, stringToTemplate, templateToString } from "utils/string-util";
 import { getValueByPath } from "utils/object-util";
 import ApiContent from "./ApiContent";
 import { saveEndpoints } from "services/service-builder";
 import useToastStore from "store/toasts.store";
 import i18next from "i18next";
+import MultiChoiceQuestionContent from "./MultiChoiceQuestionContent";
+import { EDGE_LENGTH, NodeDataProps } from "types/service-flow";
+import { Edge, getConnectedEdges, getIncomers, getOutgoers, Node } from "@xyflow/react";
+import { MultiChoiceQuestionButton } from "types/multi-choice-question";
+import { buildEdge, buildPlaceholder } from "services/flow-builder";
+import useServiceListStore from "store/services.store";
+import api from "../../services/api-dev";
+
 
 const FlowElementsPopup: React.FC = () => {
   const { t } = useTranslation();
   const [selectedTab, setSelectedTab] = useState<string | null>(null);
   const [isJsonRequestVisible, setIsJsonRequestVisible] = useState(false);
+  const [isSaveEnabled, setIsSaveEnabled] = useState(true);
   const [jsonRequestContent, setJsonRequestContent] = useState<any>(null);
   const node = useServiceStore((state) => state.selectedNode);
+  const selectedService = useServiceListStore((state) => state.selectedService);
 
   const isUserDefinedNode = node?.data?.stepType === "user-defined";
 
+  const serviceName = useServiceStore((state) => removeTrailingUnderscores(state.serviceNameDashed()));
   const endpoints = useServiceStore((state) => state.endpoints);
   const rules = useServiceStore((state) => state.rules);
   const assignElements = useServiceStore((state) => state.assignElements);
   const endpointsVariables = useServiceStore((state) => state.endpointsResponseVariables);
+
+  const defaultMultiChoiceQuestionButtons = [
+    {
+      title: "Yes",
+      payload: `#service, /${selectedService?.type ?? 'POST'}/services/active/${serviceName}_mcq_${node?.data.label[node?.data.label.length - 1]}_0`,
+    },
+    {
+      title: "No",
+      payload: `#service, /${selectedService?.type ?? 'POST'}/services/active/${serviceName}_mcq_${node?.data.label[node?.data.label.length - 1]}_1`,
+    },
+  ];
 
   useEffect(() => {
     if (node) node.data.rules = rules;
@@ -63,6 +84,13 @@ const FlowElementsPopup: React.FC = () => {
   const [fileContent, setFileContent] = useState<string | null>(null);
   // StepType.FileSign
   const [signOption, setSignOption] = useState<{ label: string; value: string } | null>(node?.data.signOption ?? null);
+  // StepType.MultiChoiceQuestion
+  const [multiChoiceQuestionQuestion, setMultiChoiceQuestionQuestion] = useState<string>(
+    node?.data.multiChoiceQuestion?.question ?? ""
+  );
+  const [multiChoiceQuestionButtons, setMultiChoiceQuestionButtons] = useState<MultiChoiceQuestionButton[]>(
+    node?.data.multiChoiceQuestion?.buttons ?? defaultMultiChoiceQuestionButtons
+  );
 
   const stepType = node?.data.stepType;
 
@@ -80,6 +108,12 @@ const FlowElementsPopup: React.FC = () => {
     useServiceStore.getState().changeAssignNode(node.data.assignElements);
   }, [stepType === StepType.Assign]);
 
+  useEffect(() => {
+    if (!node) return;
+    setMultiChoiceQuestionQuestion(node?.data?.multiChoiceQuestion?.question ?? "");
+    setMultiChoiceQuestionButtons(node?.data?.multiChoiceQuestion?.buttons ?? defaultMultiChoiceQuestionButtons);
+  }, [stepType === StepType.MultiChoiceQuestion]);
+
   if (!node) return <></>;
 
   const title = node.data.label;
@@ -95,12 +129,15 @@ const FlowElementsPopup: React.FC = () => {
     setFileName(null);
     setFileContent(null);
     setTextfieldMessagePlaceholders({});
+    setMultiChoiceQuestionQuestion("");
+    setMultiChoiceQuestionButtons(defaultMultiChoiceQuestionButtons);
     useServiceStore.getState().resetSelectedNode();
     useServiceStore.getState().resetRules();
+    useServiceStore.getState().resetAssign();
   };
 
   const handleSaveClick = () => {
-    const updatedNode = {
+    const updatedNode: Node<NodeDataProps> = {
       ...node,
       data: {
         ...node.data,
@@ -110,6 +147,10 @@ const FlowElementsPopup: React.FC = () => {
         fileName: fileName ?? node.data?.fileName,
         fileContent: fileContent ?? node.data?.fileContent,
         signOption: signOption ?? node.data?.signOption,
+        multiChoiceQuestion: {
+          question: multiChoiceQuestionQuestion,
+          buttons: multiChoiceQuestionButtons,
+        },
       },
     };
 
@@ -117,10 +158,19 @@ const FlowElementsPopup: React.FC = () => {
       updatedNode.data.rules = rules;
     }
 
+    if (stepType === StepType.MultiChoiceQuestion) {
+      saveMultiChoicePopup(node, updatedNode);
+    }
+
     if (stepType === StepType.Assign) {
       const flatEndpointVariables = endpointsVariables.map((endpoint) => endpoint.chips).flat();
       assignElements.forEach((element) => {
-        // Values are saved as templates for backwards compatibility
+        // Convert simple values such as "some input" to simple string
+        if (!isTemplate(element.value)) {
+          element.value = stringToTemplate('"' + element.value + '"');
+          return;
+        }
+
         const fullPath = templateToString(element.value);
         const endpointVariable = flatEndpointVariables.find((variable) => fullPath.startsWith(String(variable.value)));
 
@@ -158,11 +208,11 @@ const FlowElementsPopup: React.FC = () => {
 
     try {
       const finder = (e: any) => e.name === node.data.label || node.data.label.includes(e.name);
-      const endpoint = endpoints.find(finder)?.definedEndpoints[0];
+      const endpoint = endpoints.find(finder)?.definitions[0];
 
       if (!endpoint) return;
 
-      const response = await axios.post(servicesRequestsExplain(), {
+      const response = await api.post(servicesRequestsExplain(), {
         url: endpoint.url,
         method: endpoint.methodType,
         headers: extractMapValues(endpoint.headers),
@@ -196,7 +246,7 @@ const FlowElementsPopup: React.FC = () => {
 
   const saveApiEndpoints = async () => {
     const endpoints = useServiceStore.getState().endpoints;
-    const name = useServiceStore.getState().name;
+    const name = removeTrailingUnderscores(useServiceStore.getState().serviceNameDashed());
     const id = useServiceStore.getState().serviceId;
 
     await saveEndpoints(
@@ -219,6 +269,88 @@ const FlowElementsPopup: React.FC = () => {
     return true;
   };
 
+  const saveMultiChoicePopup = (originalNode: Node<NodeDataProps>, updatedNode: Node<NodeDataProps>) => {
+    const instance = useServiceStore.getState().reactFlowInstance;
+    if (!instance) return;
+
+    const currentButtons = originalNode.data.multiChoiceQuestion?.buttons ?? defaultMultiChoiceQuestionButtons;
+    const newButtons = updatedNode.data.multiChoiceQuestion?.buttons ?? [];
+    const newButtonTitles = newButtons.map((btn) => btn.title);
+
+    const edges = instance.getEdges();
+    const nodes = instance.getNodes();
+
+    const connectedEdges = getConnectedEdges([originalNode], edges);
+
+    const renamedButtons = new Map<string, string>();
+    currentButtons.forEach((oldBtn, index) => {
+      if (index < newButtons.length && oldBtn.title !== newButtons[index].title) {
+        renamedButtons.set(oldBtn.title, newButtons[index].title);
+      }
+    });
+
+    const updatedEdges = edges.map((edge) => {
+      if (!edge.label || !connectedEdges.some((ce) => ce.id === edge.id)) return edge;
+
+      const newLabel = renamedButtons.get(edge.label as string);
+      if (newLabel) {
+        return { ...edge, label: newLabel };
+      }
+      return edge;
+    });
+
+    const edgesToRemove = connectedEdges.filter((edge) => {
+      if (!edge.label) return false;
+      const currentLabel = renamedButtons.get(edge.label as string) ?? edge.label;
+      return !newButtonTitles.includes(currentLabel as string);
+    });
+
+    const existingEdgeLabels = updatedEdges
+      .filter((edge) => connectedEdges.some((ce) => ce.id === edge.id))
+      .map((edge) => edge.label)
+      .filter(Boolean);
+
+    const buttonsNeedingEdges = newButtons.filter((btn) => !existingEdgeLabels.includes(btn.title));
+
+    const filteredEdges = updatedEdges.filter((e) => !edgesToRemove.some((edgeToRemove) => edgeToRemove.id === e.id));
+
+    const newEdges = buttonsNeedingEdges.map((button) => {
+      const newEdge: Edge = {
+        id: `${originalNode.id}->${crypto.randomUUID()}`,
+        source: originalNode.id,
+        target: crypto.randomUUID(),
+        type: "step",
+        animated: true,
+        deletable: false,
+        label: button.title,
+      };
+      return newEdge;
+    });
+
+    const newGhostNodes = newEdges.map((edge) => ({
+      id: edge.target,
+      type: "ghost",
+      position: { x: originalNode.position.x, y: originalNode.position.y },
+      data: { type: "ghost" },
+      className: "ghost",
+      selectable: false,
+      draggable: false,
+    }));
+
+    let finalNodes = [...nodes.filter((n) => n.id !== updatedNode.id), updatedNode, ...newGhostNodes];
+    let finalEdges = [...filteredEdges, ...newEdges];
+
+    finalNodes = finalNodes.filter(
+      (node) =>
+        node.type !== "ghost" ||
+        getIncomers(node, finalNodes, finalEdges).length > 0 ||
+        getOutgoers(node, finalNodes, finalEdges).length > 0
+    );
+
+    instance.setNodes(finalNodes);
+    instance.setEdges(finalEdges);
+  };
+
   return (
     <Popup
       style={{ maxWidth: 700 }}
@@ -231,11 +363,16 @@ const FlowElementsPopup: React.FC = () => {
           </Button>
           <Track gap={16}>
             {!isReadonly && (
-              <Button appearance="secondary" onClick={onClose}>
+              <Button
+                appearance="secondary"
+                onClick={onClose}
+              >
                 {t("global.cancel")}
               </Button>
             )}
-            <Button onClick={handleSaveClick}>{t(isReadonly ? "global.close" : "global.save")}</Button>
+            <Button disabled={!isSaveEnabled} onClick={handleSaveClick}>
+              {t(isReadonly ? "global.close" : "global.save")}
+            </Button>
           </Track>
         </Track>
       }
@@ -308,6 +445,15 @@ const FlowElementsPopup: React.FC = () => {
                 endpoint={endpoints.find((e) => e.name === node.data.label || node.data.label.includes(e.name))}
               />
             )}
+            {stepType === StepType.MultiChoiceQuestion && (
+              <MultiChoiceQuestionContent
+                question={multiChoiceQuestionQuestion}
+                buttons={multiChoiceQuestionButtons}
+                setQuestion={setMultiChoiceQuestionQuestion}
+                setButtons={setMultiChoiceQuestionButtons}
+                setIsSaveEnabled={setIsSaveEnabled}
+              />
+            )}
             <JsonRequestContent isVisible={isJsonRequestVisible} jsonContent={jsonRequestContent} />
           </Tabs.Content>
           {!isReadonly && (
@@ -315,7 +461,7 @@ const FlowElementsPopup: React.FC = () => {
               {stepType === StepType.Textfield && (
                 <TextfieldTestContent
                   placeholders={textfieldMessagePlaceholders}
-                  message={textfieldMessage || node.data.message}
+                  message={textfieldMessage ?? node.data.message}
                 />
               )}
               {stepType === StepType.OpenWebpage && (

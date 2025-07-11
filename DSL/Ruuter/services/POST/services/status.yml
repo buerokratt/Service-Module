@@ -17,8 +17,11 @@ declaration:
       - field: type
         type: string
         description: "Body field 'type'"
+    headers:
+      - field: cookie
+        type: string
+        description: "Cookie field"      
 
-# TODO: Change Service Status on bot so it can be activated or diactivated
 extract_request_data:
   assign:
     id: ${incoming.body.id}
@@ -50,6 +53,8 @@ assign_old_status_and_path:
 
 check_status:
   switch:
+    - condition: ${new_state === "draft"}
+      next: set_status
     - condition: ${status_res.response.body[0].currentState === new_state}
       next: return_same_state_update
   next: set_status
@@ -120,6 +125,18 @@ activate_service:
       file_path: "[#RUUTER_SERVICES_PATH]/${ruuter_type}/[#RUUTER_SERVICES_DIR_PATH]/${old_file_status_path}/${name + old_file_end}"
       new_path: "[#RUUTER_SERVICES_PATH]/${ruuter_type}/[#RUUTER_SERVICES_DIR_PATH]/active/${name}.yml"
   result: activate_service_result
+  next: activate_all_mcq_services
+ 
+activate_all_mcq_services:
+  call: http.post
+  args:
+    url: "[#SERVICE_DMAPPER]/file-manager/move-all-that-starts-with"
+    body:
+      file_path: "[#RUUTER_SERVICES_PATH]/${ruuter_type}/[#RUUTER_SERVICES_DIR_PATH]/${old_file_status_path}"
+      new_path: "[#RUUTER_SERVICES_PATH]/${ruuter_type}/[#RUUTER_SERVICES_DIR_PATH]/active"
+      keyword: "${name}_"
+      format: "yml"
+  result: active_move_results
   next: return_ok
 
 deactivate_service:
@@ -130,6 +147,18 @@ deactivate_service:
       file_path: "[#RUUTER_SERVICES_PATH]/${ruuter_type}/[#RUUTER_SERVICES_DIR_PATH]/${old_file_status_path}/${name + old_file_end}"
       new_path: "[#RUUTER_SERVICES_PATH]/${ruuter_type}/[#RUUTER_SERVICES_DIR_PATH]/inactive/${name}.tmp"
   result: deactivate_service_result
+  next: dactivate_all_mcq_services
+
+dactivate_all_mcq_services:
+  call: http.post
+  args:
+    url: "[#SERVICE_DMAPPER]/file-manager/move-all-that-starts-with"
+    body:
+      file_path: "[#RUUTER_SERVICES_PATH]/${ruuter_type}/[#RUUTER_SERVICES_DIR_PATH]/${old_file_status_path}"
+      new_path: "[#RUUTER_SERVICES_PATH]/${ruuter_type}/[#RUUTER_SERVICES_DIR_PATH]/inactive"
+      keyword: "${name}_"
+      format: "tmp"
+  result: inactive_move_results
   next: return_ok
 
 draft_service:
@@ -140,6 +169,18 @@ draft_service:
       file_path: "[#RUUTER_SERVICES_PATH]/${ruuter_type}/[#RUUTER_SERVICES_DIR_PATH]/${old_file_status_path}/${name + old_file_end}"
       new_path: "[#RUUTER_SERVICES_PATH]/${ruuter_type}/[#RUUTER_SERVICES_DIR_PATH]/draft/${name}.tmp"
   result: draft_service_result
+  next: draft_all_mcq_services
+
+draft_all_mcq_services:
+  call: http.post
+  args:
+    url: "[#SERVICE_DMAPPER]/file-manager/move-all-that-starts-with"
+    body:
+      file_path: "[#RUUTER_SERVICES_PATH]/${ruuter_type}/[#RUUTER_SERVICES_DIR_PATH]/${old_file_status_path}"
+      new_path: "[#RUUTER_SERVICES_PATH]/${ruuter_type}/[#RUUTER_SERVICES_DIR_PATH]/draft"
+      keyword: "${name}_"
+      format: "tmp"
+  result: inactive_move_results
   next: check_for_intent_connection
 
 check_for_intent_connection:
@@ -161,11 +202,14 @@ unlink_service_from_intent_in_rasa_domain:
   call: http.post
   args:
     url: "[#SERVICE_RUUTER]/services/domain-intent-service-link"
+    headers:
+      cookie: ${incoming.headers.cookie}
     body:
       serviceName: ${connection_res.response.body[0].serviceName}
       intent: ${connection_res.response.body[0].intent}
       serviceMethod: ${ruuter_type}
       type: "Remove"
+      serviceSlot: ""
   result: link_res
   error: return_intent_does_not_exist
   next: delete_intent_connection
@@ -199,7 +243,7 @@ return_incorrect_request:
   next: end
 
 return_same_state_update:
-  status: 400
+  status: 200
   return: "Service is already in this state"
   next: end
 

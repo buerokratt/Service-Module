@@ -44,20 +44,26 @@
     "paginationNavigation": "Navigeeri",
     "choose": "Vali..",
     "continue": "Jätka",
+    "confirm": "Kinnita",
     "view": "Vaata",
     "save": "Salvesta",
     "testService": "Testi teenust",
     "cancel": "Tühista",
     "close": "Sulge",
-    "common": "Üldteenus",
     "errorMessage": "Teenusele puudub ligipääs. Proovi hiljem uuesti.",
-    "none": "Puudub"
+    "none": "Puudub",
+    "statusClarification": "Staatuse täpsustus",
+    "loading": "Laadimine",
+    "skip": "Jäta vahele",
+    "delete": "Kustuta",
+    "keepIt": "Jäta alles"
   },
   "menu": {
     "overview": "Ülevaade",
     "flowbuilder": "Flow Builder",
     "services": "Teenused",
     "newService": "Uus teenus",
+    "backToServiceListing": "Tagasi teenuste lehele",
     "close": "Sulge menüü",
     "intents": "Teemad",
     "auto-services": "Ühendustaotlused",
@@ -115,7 +121,8 @@
       "newValidationMessage": "Uus teade kinnitamiseks",
       "useAutocorrect": "Teksti autokorrektor",
       "required": "Nõutud",
-      "invalidemail": "Kehtetu e-posti aadress"
+      "invalidemail": "Kehtetu e-posti aadress",
+      "statusCommentUpdated": "Staatuse täpsustus uuendatud"
     }
   },
   "overview": {
@@ -158,8 +165,8 @@
       }
     },
     "popup": {
-      "delete": "Kas olete kindel, et soovite teenuse kustutada?",
-      "setActive": "Kas olete kindel, et tahate teenuse aktiveerida?",
+      "delete": "Kas olete kindel, et soovite selle teenuse kustutada? Seda toimingut ei saa tagasi võtta.",
+      "setActive": "Kas oled kindel, et soovid teenuse aktiveerida?",
       "setReady": "Kas olete kindel, et soovite selle teenuse olekuks märkida Valmis?",
       "setDraft": "Kas olete kindel, et soovite selle teenuse olekuks märkida Mustand?",
       "setInactive": "Kas oled kindel, et tahate teenuse deaktiveerida?",
@@ -177,9 +184,12 @@
       "connectionPending": "Teenuse teemaga ühendamise taotlus on ootel. Kas soovite selle tühistada?",
       "cancelRequest": "Tühista taotlus",
       "noIntentsAvailable": "Ühenduse loomiseks ei ole ühtegi teemat saadaval",
+      "noSlotsAvailable": "Ühtegi pesa pole saadaval",
       "connectionQuestion": "Kas olete kindel, et soovite teenuse selle teemaga ühendada?",
       "activate": "Aktiveerige",
-      "deactivate": "Deaktiveerige"
+      "deactivate": "Deaktiveerige",
+      "createNewIntent": "Loo uus teema",
+      "deleteNodeConnections": "Kas soovid kustutada kõik loogikateed, mis on seotud selle plokiga, või jätta need alles?"
     }
   },
   "connectionRequests": {
@@ -209,6 +219,7 @@
       "insert": "Sisesta API otspunkt..",
       "live": "Toodangukeskkonna otspunkt",
       "name": "Otspunkti nimetus",
+      "publicEndpoint": "Avalik otspunkt",
       "params": "Parameetrid",
       "required": "Muutuja on kohustuslik",
       "single": "Otspunkt",
@@ -222,9 +233,12 @@
     "trainingModuleSetup": "Avaleht",
     "serviceSetup": "Teenuse seadistamine",
     "serviceFlowCreation": "Teenusvoo loomine",
+    "connectToIntent": "Ühenda teemaga",
     "name": "Nimetus",
+    "title": "Pealkiri",
     "description": "Kirjeldus",
     "uses": "Teenus kasutab",
+    "defaultServiceName": "nimetu_teenus",
     "toast": {
       "serviceMissingFields": "Nõutav on teenuse nimi ja kirjeldus",
       "missingFields": "Puuduvad väljad",
@@ -236,15 +250,18 @@
       "saveConfigFailed": "Seadete salvestamine ebaõnnestus",
       "testResultSuccess": "Testi tulemus - edu",
       "testResultError": "Testi tulemus - viga"
-    }
+    },
+    "titleRequired": "Pealkiri on kohustuslik",
+    "chooseMemorySlots": "Vali mälukohad"
   },
   "serviceFlow": {
     "element": {
       "taraAuthentication": "TARA autentimine",
       "textfield": "Sõnum kliendile",
       "clientInput": "Kliendi sisend",
-      "assign": "Suunamine",
+      "assign": "Määra",
       "condition": "Tingimus",
+      "multiChoiceQuestion": "Mitmevalikuline küsimus",
       "openNewWebpage": "Uue veebilehe avamine",
       "fileGeneration": "Faili genereerimine",
       "fileSigning": "Faili allkirjastamine",
@@ -279,6 +296,7 @@
       "fileSignYesNo": "Kas soovid faili allkirjastada? Jah/Ei",
       "serviceEnded": "Teenus on lõpetatud",
       "rule": "Reegel",
+      "all": "Kõik",
       "and": "JA",
       "or": "VÕI",
       "not": "MITTE",
@@ -287,17 +305,84 @@
       "addGroup": "+ Grupp",
       "remove": "Eemalda",
       "signType": "Märgi tüüp",
-      "round": "Ümarda"
+      "round": "Ümarda",
+      "dragElementHere": "Lohista element siia",
+      "assignToSelfNotAllowed": "Määramine iseendale ei ole lubatud",
+      "assignAsValue": "Määra teine element väärtuseks",
+      "removeValueAssignment": "Eemalda element, mis on määratud väärtuseks",
+      "assignManualEdit": "Muutke muutuja määramist käsitsi"
     },
     "previousVariables": {
-      "assignElements": "Määra elemendid"
+      "assignElements": "Määra elemendid",
+      "noName": "<Nimeta>",
+      "dates": {
+        "title": "Kuupäevad",
+        "currentDate": "Praegune kuupäev",
+        "currentTime": "Praegune aeg",
+        "currentDateAndTime": "Praegune kuupäev ja kellaaeg",
+        "yesterday": "Eile",
+        "tomorrow": "Homme",
+        "customDateTime": "Kohandatud kuupäev ja kellaaeg",
+        "yearMonthDayFormat": "Aasta Kuu Päeva formaat",
+        "dayMonthYearFormat": "Päev Kuu Aasta formaat",
+        "customFormat": "Kohandatud vorming"
+      },
+      "helpers": {
+        "title": "Tööriistad",
+        "map": "Muuda elemente",
+        "filter": "Filtreeri",
+        "find": "Leia",
+        "length": "Loenda",
+        "sort": "Sorteeri",
+        "join": "Ühenda tekst",
+        "split": "Jaga tekst",
+        "slice": "Lõika loend",
+        "reduce": "Kombineeri üksused",
+        "mapAndJoin": "Muuda ja ühenda üksusi",
+        "tooltip": {
+          "map": "Rakenda reegel iga loendi elemendi kohta\n\nNäide: {{example}}\nSisend: {{input}}\nVäljund: {{output}}",
+          "filter": "Säilita ainult need elemendid, mis vastavad tingimusele\n\nNäide: {{example}}\nSisend: {{input}}\nVäljund: {{output}}",
+          "find": "Leia esimene element, mis vastab tingimusele\n\nNäide: {{example}}\nSisend: {{input}}\nVäljund: {{output}}",
+          "length": "Loenda, mitu elementi on loendis või sõnes\n\nNäide: {{example}}\nSisend: {{input}}\nVäljund: {{output}}",
+          "sort": "Sorteeri elemendid loendis\n\nNäide: {{example}}\nSisend: {{input}}\nVäljund: {{output}}",
+          "join": "Ühenda loendi elemendid üheks tekstiks\n\nNäide: {{example}}\nSisend: {{input}}\nVäljund: {{output}}",
+          "split": "Jaga tekst loendiks eraldaja alusel\n\nNäide: {{example}}\nSisend: {{input}}\nVäljund: {{output}}",
+          "slice": "Võta osa loendist\n\nNäide: {{example}}\nSisend: {{input}}\nVäljund: {{output}}",
+          "reduce": "Ühendage kõik üksused reegli abil üheks tulemuseks\n\nLoendis olevad summad:\nNäide: {{example}}\nSisend: {{input}}\nVäljund: {{output}}\n\nLoendi tasandamine:\nNäide: {{example2}}\nSisend: {{input2}}\nVäljund: {{output2}}\n\nSirvige loendit:\nNäide: {{example3}}\n\nSisend: {{input3}}\n\nVäljund: {{output3}}",
+          "mapAndJoin": "Muutke iga üksust ja ühendage seejärel tekstiks\n\nNäide: {{example}}\n\nSisend: {{input}}\n\nVäljund: {{output}}"
+        }
+      }
     },
     "flow": "Teenusvoog",
     "placeholderNode": "Lohista järgmine samm voogu",
     "placeholderNodeSuccess": "Lohistage edusamm voogu",
     "placeholderNodeFailure": "Lohistage tõrkeetapp voogu",
+    "elements": "Elemendid",
     "allElements": "Üldelemendid",
-    "setupElements": "API elemendid",
+    "serviceInfo": "Teenuse teave",
+    "apiElements": {
+      "title": "API elemendid",
+      "delete": "Kustuta",
+      "deletionImpossible": "Kustutamine ei ole võimalik",
+      "deletionImpossibleMessage": "Kustutamine ei ole võimalik. API element on kasutusel järgmistes teenustes. Kustutage API element nendes teenustes enne teenuste kustutamist.",
+      "deleteConfirmation": "Kustutamine",
+      "deleteConfirmationMessage": "Kas olete kindel, et soovite kustutada API elementi?",
+      "deleteSuccess": "API element kustutatud",
+      "deleteError": "API elementi kustutamine ebaõnnestus"
+    },
+    "multiChoiceQuestion": {
+      "title": "Mitmevalikuline küsimus",
+      "questionPlaceholder": "Sisesta küsimus",
+      "questionError": "Küsimus on kohustuslik",
+      "addButton": "Lisa nupp +",
+      "maxButtonsStart": "Maksimaalselt ",
+      "maxButtonsEnd": " nuppu lubatud.",
+      "minButtons": "Vähemalt 2 nuppu on vajalik.",
+      "ellipsis": "...",
+      "edit": "Muuda",
+      "delete": "Kustuta",
+      "userChoices": "Lõppkasutaja valikud:"
+    },
     "tabs": {
       "setup": "Seadistamine",
       "test": "Testimine"

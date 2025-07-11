@@ -6,13 +6,17 @@ import useServiceStore from "store/services.store";
 import { Button, DataTable, Dialog, FormInput, Icon, Modal, Track } from "components";
 import { Intent } from "types/Intent";
 import i18n from "i18n";
+import { Link } from "react-router-dom";
 
 type ConnectServiceToIntentModelProps = {
   onModalClose: () => void;
   onConnect: (intent: Intent) => void;
+  canCancel?: boolean;
+  canSkip?: boolean;
+  onSkip?: () => void;
 };
 
-const ConnectServiceToIntentModel: FC<ConnectServiceToIntentModelProps> = ({ onModalClose, onConnect }) => {
+const ConnectServiceToIntentModel: FC<ConnectServiceToIntentModelProps> = ({ onModalClose, onConnect, canCancel = true, canSkip = false, onSkip }) => {
   const { t } = useTranslation();
   const [filter, setFilter] = useState("");
   const [pagination, setPagination] = useState<PaginationState>({
@@ -24,20 +28,22 @@ const ConnectServiceToIntentModel: FC<ConnectServiceToIntentModelProps> = ({ onM
   const [selectedIntent, setSelectedIntent] = useState<Intent>();
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
 
-  const loadAvailableIntents = (pagination: PaginationState, sorting: SortingState) => {
+  const loadAvailableIntents = (pagination: PaginationState, sorting: SortingState, search: string) => {
     useServiceStore
       .getState()
       .loadAvailableIntentsList(
         (requests: Intent[]) => setIntents(requests),
-        t("overview.toast.failed.availableIntents"),
+        t("overview.service.toast.failed.availableIntents"),
         pagination,
-        sorting
+        sorting,
+        search
       );
   };
 
   useEffect(() => {
-    loadAvailableIntents(pagination, sorting);
-  }, []);
+    const intialPagination = { pageIndex: 0, pageSize: 10 };
+    loadAvailableIntents(filter ? intialPagination : pagination, sorting, filter);
+  }, [filter]);
 
   const intentColumns = useMemo(
     () =>
@@ -60,7 +66,7 @@ const ConnectServiceToIntentModel: FC<ConnectServiceToIntentModelProps> = ({ onM
         }}
       >
         <FormInput
-          label={t("overview.popup.searchIntents")}
+          label={t("overview.popup.searchIntents").toString()}
           name="search"
           placeholder={t("overview.popup.searchIntents") + "..."}
           hideLabel
@@ -81,24 +87,42 @@ const ConnectServiceToIntentModel: FC<ConnectServiceToIntentModelProps> = ({ onM
         <DataTable
           data={intents}
           columns={intentColumns}
-          globalFilter={filter}
-          setGlobalFilter={setFilter}
           sortable
           sorting={sorting}
           pagination={pagination}
           setPagination={(state: PaginationState) => {
             if (state.pageIndex === pagination.pageIndex && state.pageSize === pagination.pageSize) return;
             setPagination(state);
-            loadAvailableIntents(state, sorting);
+            loadAvailableIntents(state, sorting, filter);
           }}
           setSorting={(state: SortingState) => {
             setSorting(state);
-            loadAvailableIntents(pagination, state);
+            loadAvailableIntents(pagination, state, filter);
           }}
           isClientSide={false}
           pagesCount={intents[intents.length - 1]?.totalPages ?? 1}
         />
       )}
+      <Track
+        justify="between"
+        style={{
+          margin: "10px -16px 0 -16px",
+          padding: "16px 25px 0 25px",
+          borderTop: "1px solid #D2D3D8",
+        }}
+      >
+        <Link style={{ color: "#005aa3" }} to={import.meta.env.REACT_APP_INTENT_CREATION_PATH}>
+          {`+ ${t("overview.popup.createNewIntent")}`}
+        </Link>
+        <Track gap={15}>
+          {canCancel && (
+            <Button appearance="error" onClick={onModalClose}>
+              {t("global.cancel")}
+            </Button>
+          )}
+          {canSkip && <Button onClick={onSkip}>{t("global.skip")}</Button>}
+        </Track>
+      </Track>
       {showConfirmationModal && (
         <Modal title={t("overview.popup.connectionQuestion")} onClose={() => setShowConfirmationModal(false)}>
           <Track justify="end" gap={16}>
@@ -124,7 +148,7 @@ const getColumns = (onClick: (intent: Intent) => void) => {
 
   return [
     columnHelper.accessor("intent", {
-      header: i18n.t("overview.popup.intent") || "",
+      header: i18n.t("overview.popup.intent") ?? "",
     }),
     columnHelper.display({
       id: "connect",

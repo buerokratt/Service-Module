@@ -27,11 +27,17 @@ declaration:
         type: string
         description: "Body field 'serviceId'"
       - field: structure
-        type: json
+        type: object
         description: "Body field 'structure'"
       - field: type
         type: string
         description: "Body field 'type'"
+      - field: updateServiceDb
+        type: boolean
+        description: "Body field 'updateServiceDb'"
+      - field: state
+        type: string
+        description: "Body field 'state'"  
 
 check_for_required_parameters:
   switch:
@@ -49,7 +55,14 @@ extract_request_data:
     serviceId: ${incoming.body.serviceId}
     isCommon: ${incoming.body.isCommon}
     structure: ${incoming.body.structure}
-  next: service_add
+    state: ${incoming.body.state}
+  next: check_if_update_service_db
+
+check_if_update_service_db:
+  switch:
+    - condition: ${incoming.body.updateServiceDb === true}
+      next: service_add
+  next: delete_all_mcq_files
 
 service_add:
   call: http.post
@@ -62,8 +75,19 @@ service_add:
       ruuter_type: ${type}
       service_id: ${serviceId}
       is_common: ${isCommon}
+      state: ${state}
       structure: ${structure}
   result: createdService
+  next: convert_json_content_to_yml
+
+delete_all_mcq_files:
+  call: http.post
+  args:
+    url: "[#SERVICE_DMAPPER]/file-manager/delete-all-that-starts-with"
+    body:
+      path: "[#RUUTER_SERVICES_PATH]/${type}/services/draft"
+      keyword: "${name}_"
+  result: deleteRes 
 
 convert_json_content_to_yml:
   call: http.post

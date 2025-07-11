@@ -50,9 +50,14 @@
     color: get-color(black);
     font-size: $veera-font-size-100;
     line-height: $veera-line-height-500;
-    min-width: 400px;
-    max-width: 354px;
+    max-width: 350px;
     width: 100%;
+
+    &.selected {
+      &.step {
+        border: 1px solid get-color(sapphire-blue-2);
+      }
+    }
 
     &-default {
       width: 320px;
@@ -72,28 +77,31 @@
     &.start,
     &.end {
       display: flex;
-      align-items: center;
+      padding: 0.05rem;
       justify-content: center;
-      width: 64px;
-      height: 64px;
-      border-radius: 50%;
-      font-size: 20px;
       color: get-color(white);
-      border: 0;
-      min-width: revert;
     }
 
     &.placeholder {
       background-color: get-color(extra-light);
       border: dashed 1px get-color(black-coral-10);
+      min-width: 140px;
+      max-width: 354px;
+      padding-left: 0;
+      padding-right: 0;
+      padding-top: 0;
+      padding-bottom: 0;
+      width: 140px;
+      height: 35px;
+      cursor: pointer;
 
       p {
         color: get-color(black-coral-6);
       }
-    }
 
-    &.start {
-      background-color: get-color(sea-green-10);
+      &:hover {
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      }
     }
 
     &.end {
@@ -122,14 +130,29 @@
 
   &__edge-path {
     stroke: get-color(black-coral-10);
-    stroke-width: 2px;
+    stroke-width: 1.5px;
   }
+}
 
-  &__arrowhead {
-    polyline {
-      stroke: get-color(black-coral-10);
-      fill: get-color(black-coral-10);
-      stroke-linejoin: bevel;
-    }
-  }
+.edge-button {
+  pointer-events: all;
+  cursor: pointer;
+  position: absolute;
+  background: white;
+  color: #777;
+  border-radius: 4px;
+  min-width: 80px;
+  min-height: 25px;
+  max-width: 200px;
+  max-height: 25px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-align: center;
+  border: #777 0.5px solid;
+  padding: 0.2rem 0.5rem;
+}
+
+.edge-button:hover {
+  box-shadow: 1px 2px 4px rgba(0, 0, 0, 0.1);
 }

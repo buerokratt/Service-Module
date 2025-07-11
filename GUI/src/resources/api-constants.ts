@@ -22,6 +22,10 @@ export const testService = (state: ServiceState, serviceName: string): string =>
   `${baseUrl}/services/${state.toLowerCase()}/${serviceName}`;
 export const editService = (id: string): string => `${baseUrl}/services/edit?id=${id}`;
 export const getServicesList = (): string => `${baseUrl}/services`;
+export const getServicesByEndpointId = (endpointId: string, excludedServiceId?: string): string =>
+  `${baseUrl}/services-by-endpoint-id?endpointId=${endpointId}${
+    excludedServiceId ? `&excludedServiceId=${excludedServiceId}` : ""
+  }`;
 export const getCommonServicesList = (): string => `${baseUrl}/common-services`;
 export const getConnectionRequests = (): string => `${baseUrl}/services/connection-requests`;
 export const getAvailableIntents = (): string => `${baseUrl}/services/available-intents`;
@@ -30,5 +34,8 @@ export const getFaultyServices = (page: number, pageSize: number, sort: string, 
   `${baseUrl}/services/services-detailed/nok?page=${page}&page_size=${pageSize}&sort=${sort}&order=${order}`;
 export const trainingModuleTraining = (): string => `${trainingModuleBaseUrl}/treening/treeni-uus-mudel`;
 export const getServiceById = (id: string): string => `${baseUrl}/service-by-id?id=${id}`;
-export const updateServiceEndpoints = (id: string): string => `${baseUrl}/services/update-service-endpoints?id=${id}`;
+export const createEndpoint = (): string => `${baseUrl}/services/create-endpoint`;
+export const updateEndpoint = (id: string): string => `${baseUrl}/services/update-endpoint?id=${id}`;
+export const deleteEndpoint = (): string => `${baseUrl}/services/delete-endpoint`;
 export const getSlots = (): string => `${baseUrl}/slots`;
+export const userStepPreferences = (): string => `${baseUrl}/steps/preferences`;

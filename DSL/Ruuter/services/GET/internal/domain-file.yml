@@ -6,11 +6,18 @@ declaration:
   accepts: json
   returns: json
   namespace: service
+  allowlist:
+    headers:
+      - field: cookie
+        type: string
+        description: "Cookie field"
 
 getFileLocations:
   call: http.get
   args:
     url: "[#SERVICE_RUUTER]/internal/return-file-locations"
+    headers:
+      cookie: ${incoming.headers.cookie}
   result: fileLocations
 
 getDomainFile:

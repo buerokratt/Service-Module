@@ -1,25 +1,23 @@
-import React from 'react';
-import { useTranslation } from 'react-i18next';
-import { Track } from 'components';
-import { ElementGroupBuilderProps } from "./assign-types";
+import React from "react";
+import { useTranslation } from "react-i18next";
+import { Track } from "components";
 import AssignElement from "./assignElement";
-import { useAssignBuilder } from './useAssignBuilder';
-import '../styles.scss';
+import { useAssignBuilder } from "./useAssignBuilder";
+import "../styles.scss";
+import { Assign } from "../../../types/assign";
 
-const AssignBuilder: React.FC<ElementGroupBuilderProps> = ({ assignElements, onRemove, onChange, seedGroup }) => {
+interface AssignBuilderProps {
+  onChange: (group: Assign[]) => void;
+  seedGroup: Assign[];
+}
+
+const AssignBuilder: React.FC<AssignBuilderProps> = ({ onChange, seedGroup }) => {
   const { t } = useTranslation();
-  const {
-    elements,
-    addElement,
-    remove,
-    changeElement,
-  } = useAssignBuilder({
-    assignElements,
-    root: !onRemove,
+  const { elements, addElement, remove, changeElement } = useAssignBuilder({
     onChange,
     seedGroup,
-   });
-  
+  });
+
   return (
     <Track gap={16} direction="vertical" align="stretch" className="assign-action-container">
       <Track justify="end">

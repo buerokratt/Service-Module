@@ -1,7 +1,6 @@
-import axios from "axios";
 import { create } from "zustand";
 import { v4 as uuid } from "uuid";
-import { Edge, EdgeChange, Node, NodeChange, ReactFlowInstance, applyEdgeChanges, applyNodeChanges } from "reactflow";
+import { Edge, EdgeChange, Node, NodeChange, ReactFlowInstance, applyEdgeChanges, applyNodeChanges } from "@xyflow/react";
 import { EndpointData, EndpointEnv, EndpointTab, PreDefinedEndpointEnvVariables } from "types/endpoint";
 import {
   getEndpointValidation,
@@ -9,21 +8,23 @@ import {
   getServiceById,
   getTaraAuthResponseVariables,
   servicesRequestsExplain,
+  userStepPreferences,
 } from "resources/api-constants";
 import { Service, ServiceState, Step, StepType } from "types";
 import { RequestVariablesTabsRawData, RequestVariablesTabsRowsData } from "types/request-variables";
 import useToastStore from "./toasts.store";
-import i18next from "i18next";
-import { ROUTES } from "resources/routes-constants";
-import { NavigateFunction } from "react-router-dom";
-import { editServiceInfo, saveFlowClick } from "services/service-builder";
-import { NodeDataProps, initialEdge, initialNodes } from "types/service-flow";
-import { alignNodesInCaseAnyGotOverlapped, buildPlaceholder, updateFlowInputRules } from "services/flow-builder";
+import i18next, { t } from "i18next";
+import { saveEndpoints, saveFlowClick } from "services/service-builder";
+import { NodeDataProps, initialEdges, initialNodes } from "types/service-flow";
+import { alignNodesInCaseAnyGotOverlapped, updateFlowInputRules } from "services/flow-builder";
 import { GroupOrRule } from "components/FlowElementsPopup/RuleBuilder/types";
 import useTestServiceStore from "./test-services.store";
 import { Chip } from "types/chip";
 import { EndpointResponseVariable } from "types/endpoint/endpoint-response-variables";
-import { Assign } from "components/FlowElementsPopup/AssignBuilder/assign-types";
+import { Assign } from "types/assign";
+import { EndpointType } from "types/endpoint/endpoint-type";
+import api from "../services/api-dev";
+import { format } from "date-fns";
 
 interface ServiceStoreState {
   endpoints: EndpointData[];
@@ -39,6 +40,7 @@ interface ServiceStoreState {
   assignElements: Assign[];
   rules: GroupOrRule[];
   isYesNoQuestion: boolean;
+  stepPreferences: string[];
   endpointsResponseVariables: EndpointResponseVariable[];
   setIsYesNoQuestion: (value: boolean) => void;
   changeAssignNode: (assign: Assign[]) => void;
@@ -61,6 +63,7 @@ interface ServiceStoreState {
   setIsCommonEndpoint: (id: string, isCommon: boolean) => void;
   setDescription: (description: string) => void;
   setSlot: (slot: string) => void;
+  setStepPreferences: (stepPreferences: string[]) => void;
   loadEndpointsResponseVariables: () => void;
   setSecrets: (newSecrets: PreDefinedEndpointEnvVariables) => void;
   addProductionVariables: (variables: string[]) => void;
@@ -69,10 +72,11 @@ interface ServiceStoreState {
   addEndpoint: () => void;
   loadSecretVariables: () => Promise<void>;
   loadTaraVariables: () => Promise<void>;
-  loadService: (id?: string) => Promise<void>;
+  loadService: (id?: string, resetState?: boolean) => Promise<void>;
+  loadStepPreferences: () => Promise<void>;
   getAvailableRequestValues: (endpointId: string) => PreDefinedEndpointEnvVariables;
   onNameChange: (endpointId: string, oldName: string, newName: string) => void;
-  changeServiceEndpointType: (id: string, type: string) => void;
+  changeServiceEndpointType: (id: string, type: EndpointType) => void;
   mapEndpointsToSetps: () => Step[];
   selectedTab: EndpointEnv;
   setSelectedTab: (tab: EndpointEnv) => void;
@@ -86,7 +90,8 @@ interface ServiceStoreState {
   resetState: () => void;
   resetAssign: () => void;
   resetRules: () => void;
-  onContinueClick: (navigate: NavigateFunction) => Promise<void>;
+  onServiceSave: (status: 'draft' | 'ready') => Promise<void>;
+  onContinueClick: () => Promise<void>;
   selectedNode: Node<NodeDataProps> | null;
   setSelectedNode: (node: Node<NodeDataProps> | null | undefined) => void;
   resetSelectedNode: () => void;
@@ -114,7 +119,7 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
   slot: "",
   serviceId: uuid(),
   description: "",
-  edges: [initialEdge],
+  edges: initialEdges,
   nodes: initialNodes,
   isNewService: true,
   serviceState: ServiceState.Draft,
@@ -123,9 +128,73 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
   assignElements: [],
   rules: [],
   isYesNoQuestion: false,
+  stepPreferences: [],
   endpointsResponseVariables: [],
   setIsYesNoQuestion: (value: boolean) => set({ isYesNoQuestion: value }),
-  changeAssignNode: (assignElements) => set({ assignElements: assignElements }),
+  changeAssignNode: (assignElements) => {
+    const { nodes } = get();
+    const elementsMap = new Map(
+      nodes
+        .filter((node) => node.data.stepType === StepType.Assign)
+        .flatMap((node) => node.data?.assignElements ?? [])
+        .map((element) => [element.id, element])
+    );
+
+    assignElements.forEach(
+      (updated) => elementsMap.get(updated.id) && Object.assign(elementsMap.get(updated.id), updated)
+    );
+
+    const hasChangedSlot = (slot: any, elementsMap: Map<any, any>): boolean => {
+      const ref = elementsMap.get(slot.id);
+      if (!ref) return false;
+
+      const valueChanged = slot.value !== ref.value;
+      const slotsChanged = JSON.stringify(slot.slots) !== JSON.stringify(ref.slots);
+      const changed = valueChanged || slotsChanged;
+
+      if (changed) {
+        Object.assign(slot, { ...ref, id: slot.id, key: slot.key });
+      }
+
+      if (slot.slots) {
+        checkSlots(slot.slots, elementsMap);
+      }
+
+      return changed;
+    };
+
+    const checkSlots = (slots: any[], elementsMap: Map<any, any>): boolean => {
+      return slots.some((slot) => hasChangedSlot(slot, elementsMap));
+    };
+
+    const processElement = (element: any, elementsMap: Map<any, any>): boolean => {
+      const slotsChanged = element.slots && checkSlots(element.slots, elementsMap);
+
+      if (element.slots?.length) {
+        element.value = element.slots[0].value;
+      }
+
+      return slotsChanged;
+    };
+
+    const hasChangedElements = (node: any, elementsMap: Map<any, any>): boolean => {
+      return node.data.assignElements?.some((element: any) => processElement(element, elementsMap)) ?? false;
+    };
+
+    const getAssignNodes = (nodes: any[]): any[] => {
+      return nodes.filter((node) => node.data.stepType === StepType.Assign);
+    };
+
+    const updateRefs = (): boolean => {
+      const assignNodes = getAssignNodes(nodes);
+      return assignNodes.some((node) => hasChangedElements(node, elementsMap));
+    };
+
+    while (updateRefs()) {
+      /* logic to do while refs are being updated */
+    }
+    set({ assignElements });
+  },
   changeRulesNode: (rules) => set({ rules }),
   disableTestButton: () =>
     set({
@@ -169,8 +238,8 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
       const endpointResponses = await Promise.all(
         get().endpoints.map(async (e) => {
           return Promise.all(
-            e.definedEndpoints.map(async (endpoint) => {
-              const response = await axios.post(servicesRequestsExplain(), {
+            e.definitions.map(async (endpoint) => {
+              const response = await api.post(servicesRequestsExplain(), {
                 url: endpoint.url,
                 method: endpoint.methodType,
                 headers: extractMapValues(endpoint.headers),
@@ -206,29 +275,32 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
       });
 
       set({ endpointsResponseVariables: variables });
-    } catch (e) {}
+    } catch (e) {
+      console.error(e);
+    }
   },
   getFlatVariables: () => {
     return [...get().availableVariables.prod, ...get().availableVariables.test];
   },
-  vaildServiceInfo: () => !!get().name && !!get().description,
-  serviceNameDashed: () => get().name.replace(" ", "-"),
+  vaildServiceInfo: () => !!get().name,
+  serviceNameDashed: () => get().name.replaceAll(" ", "_"),
   deleteEndpoint: (id: string) => {
-    const newEndpoints = get().endpoints.filter((x) => x.id !== id);
+    const newEndpoints = get().endpoints.filter((x) => x.endpointId !== id);
     set({ endpoints: newEndpoints });
   },
   changeServiceName: (name: string) => set({ name }),
   setDescription: (description: string) => set({ description }),
   setSlot: (slot: string) => set({ slot }),
+  setStepPreferences: (stepPreferences: string[]) => set({ stepPreferences }),
   isCommon: false,
   setIsCommon: (isCommon: boolean) => set({ isCommon }),
   isCommonEndpoint: (id: string) => {
-    const endpoint = get().endpoints.find((x) => x.id === id);
+    const endpoint = get().endpoints.find((x) => x.endpointId === id);
     return endpoint?.isCommon ?? false;
   },
   setIsCommonEndpoint: (id: string, isCommon: boolean) => {
     const endpoints = get().endpoints.map((x) => {
-      if (x.id !== id) return x;
+      if (x.endpointId !== id) return x;
       return {
         ...x,
         isCommon,
@@ -255,7 +327,7 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
     });
   },
   addEndpoint: () => {
-    const newEndpoint = { id: uuid(), name: "", definedEndpoints: [] };
+    const newEndpoint = { endpointId: uuid(), name: "", definitions: [], isNew: true };
     set((state) => ({ endpoints: [...state.endpoints, newEndpoint] }));
   },
   resetState: () => {
@@ -271,7 +343,7 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
       reactFlowInstance: null,
       selectedTab: EndpointEnv.Live,
       isNewService: true,
-      edges: [initialEdge],
+      edges: initialEdges,
       nodes: initialNodes,
       isTestButtonEnabled: true,
       assignElements: [],
@@ -286,26 +358,33 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
   },
   resetAssign: () => set({ assignElements: [] }),
   resetRules: () => set({ rules: [], isYesNoQuestion: false }),
-  loadService: async (id) => {
-    get().resetState();
+  loadService: async (id, resetState) => {
+    if (resetState === true) {
+      get().resetState();
+    }
     let nodes = get().nodes;
 
     if (id) {
-      const service = await axios.get<Service[]>(getServiceById(id));
+      const serviceResponse = await api.get<Service>(getServiceById(id));
 
-      const structure = JSON.parse(service.data[0].structure?.value ?? "{}");
-      let endpoints = JSON.parse(service.data[0].endpoints?.value ?? "{}");
+      const structure = JSON.parse(serviceResponse.data.structure?.value ?? "{}");
+      let endpoints = serviceResponse.data.endpoints.map((endpoint) => {
+        return {
+          ...endpoint,
+          definitions: JSON.parse(endpoint.definitions.value),
+        };
+      });
       let edges = structure?.edges;
       nodes = structure?.nodes;
 
-      if (!edges || edges.length === 0) edges = [initialEdge];
+      if (!edges || edges.length === 0) edges = initialEdges;
 
       if (!nodes || nodes.length === 0) nodes = initialNodes;
 
       if (!endpoints || !(endpoints instanceof Array)) endpoints = [];
 
       nodes = nodes.map((node: any) => {
-        if (node.type !== "customNode") return node;
+        if (node.type !== "custom") return node;
         node.data = {
           ...node.data,
           onDelete: get().onDelete,
@@ -318,15 +397,15 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
 
       set({
         serviceId: id,
-        name: service.data[0].name,
-        isCommon: service.data[0].isCommon,
-        description: service.data[0].description,
-        slot: service.data[0].slot,
+        name: serviceResponse.data.name,
+        isCommon: serviceResponse.data.isCommon,
+        description: serviceResponse.data.description,
+        slot: serviceResponse.data.slot,
         edges,
         nodes,
         endpoints,
         isNewService: false,
-        serviceState: service.data[0].state,
+        serviceState: serviceResponse.data.state,
       });
     }
 
@@ -342,8 +421,16 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
 
     get().addProductionVariables(variables);
   },
+  loadStepPreferences: async () => {
+    try {
+      const response = await api.get<{ response: string[] }>(userStepPreferences());
+      set({ stepPreferences: response.data.response });
+    } catch (error) {
+      console.error("Failed to load step preferences:", error);
+    }
+  },
   loadSecretVariables: async () => {
-    const result = await axios.get(getSecretVariables());
+    const result = await api.get(getSecretVariables());
     const data: { prod: string[]; test: string[] } = result.data;
     data.prod = data.prod.map((v) => `{{${v}}}`);
     data.test = data.test.filter((x) => !data.prod.includes(x)).map((v) => `{{${v}}}`);
@@ -358,18 +445,18 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
     get().addTestVariables(data.test);
   },
   loadTaraVariables: async () => {
-    const result = await axios.post(getTaraAuthResponseVariables());
+    const result = await api.post(getTaraAuthResponseVariables());
     const data: { [key: string]: any } = result.data?.response?.body ?? {};
     const taraVariables = Object.keys(data).map((key) => `{{TARA.${key}}}`);
     get().addProductionVariables(taraVariables);
   },
   getAvailableRequestValues: (endpointId: string) => {
     const variables = get()
-      .endpoints.filter((endpoint) => endpoint.id !== endpointId)
+      .endpoints.filter((endpoint) => endpoint.endpointId !== endpointId)
       .map((endpoint) => ({
-        id: endpoint.id,
+        id: endpoint.endpointId,
         name: endpoint.name,
-        response: endpoint.definedEndpoints.find((x) => x.isSelected)?.response ?? [],
+        response: endpoint.definitions.find((x) => x.isSelected)?.response ?? [],
       }))
       .flatMap(({ id, name, response }) => response?.map((x) => `{{${name === "" ? id : name}.${x.name}}}`));
 
@@ -379,8 +466,8 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
     };
   },
   onNameChange: (endpointId: string, oldName: string, newName: string) => {
-    const endpoint = get().endpoints.find((x) => x.id === endpointId);
-    const response = endpoint?.definedEndpoints.find((x) => x.isSelected)?.response ?? [];
+    const endpoint = get().endpoints.find((x) => x.endpointId === endpointId);
+    const response = endpoint?.definitions.find((x) => x.isSelected)?.response ?? [];
     const variables = response.map((x) => `{{${newName ?? x.id}.${x.name}}}`);
 
     const oldFilteredVariables = get().availableVariables.prod.filter(
@@ -388,7 +475,7 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
     );
 
     const newEndpoints = get().endpoints.map((x) => {
-      if (x.id !== endpointId) return x;
+      if (x.endpointId !== endpointId) return x;
       return {
         ...x,
         name: newName,
@@ -403,13 +490,13 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
       },
     }));
   },
-  changeServiceEndpointType: (id: string, type: string) => {
+  changeServiceEndpointType: (id: string, type: EndpointType) => {
     const endpoints = get().endpoints.map((x) => {
-      if (x.id !== id) return x;
+      if (x.endpointId !== id) return x;
       return {
         ...x,
         type,
-        definedEndpoints: [],
+        definitions: [],
       };
     });
 
@@ -418,7 +505,7 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
   mapEndpointsToSetps: (): Step[] => {
     return get()
       .endpoints.map((x) => ({
-        selected: x.definedEndpoints.find((e) => e.isSelected),
+        selected: x.definitions.find((e) => e.isSelected),
         endpoint: x,
       }))
       .filter((x) => !!x.selected)
@@ -444,8 +531,8 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
 
     const endpoints = JSON.parse(JSON.stringify(get().endpoints)) as EndpointData[];
     const defEndpoint = endpoints
-      .find((x) => x.id === parentEndpointId)
-      ?.definedEndpoints.find((x) => x.id === endpointId);
+      .find((x) => x.endpointId === parentEndpointId)
+      ?.definitions.find((x) => x.id === endpointId);
 
     for (const key in data) {
       if (defEndpoint?.[key as EndpointTab]) {
@@ -463,8 +550,8 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
     const live = get().isLive() ? "value" : "testValue";
     const endpoints = JSON.parse(JSON.stringify(get().endpoints)) as EndpointData[];
     const defEndpoint = endpoints
-      .find((x) => x.id === parentEndpointId)
-      ?.definedEndpoints.find((x) => x.id === endpointId);
+      .find((x) => x.endpointId === parentEndpointId)
+      ?.definitions.find((x) => x.id === endpointId);
 
     if (!defEndpoint) return;
 
@@ -499,7 +586,27 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
   },
   reactFlowInstance: null,
   setReactFlowInstance: (reactFlowInstance) => set({ reactFlowInstance }),
-  onContinueClick: async (navigate) => {
+  onServiceSave: async (status: "draft" | "ready" = "ready") => {
+    const endpoints = get().endpoints;
+    const name = get().serviceNameDashed();
+    const id = get().serviceId;
+
+    await saveEndpoints(
+      endpoints,
+      !name ? `${t("newService.defaultServiceName").toString()}_${format(new Date(), "dd_MM_yyyy_HH_mm_ss")}` : name,
+      id,
+      async () => {
+        await saveFlowClick(status);
+      },
+      (e) => {
+        useToastStore.getState().error({
+          title: i18next.t("newService.toast.failed"),
+          message: i18next.t("newService.toast.saveFailed"),
+        });
+      }
+    );
+  },
+  onContinueClick: async () => {
     const vaildServiceInfo = get().vaildServiceInfo();
 
     if (!vaildServiceInfo) {
@@ -510,16 +617,13 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
       return;
     }
 
-    if (get().isNewService) {
-      await saveFlowClick();
-      set({
-        isNewService: false,
-      });
-    } else {
-      await editServiceInfo();
-    }
+    const { isNewService, onServiceSave } = get();
 
-    navigate(ROUTES.replaceWithId(ROUTES.FLOW_ROUTE, get().serviceId));
+    await onServiceSave(ServiceState.Ready);
+
+    if (isNewService) {
+      set({ isNewService: false });
+    }
   },
   selectedNode: null,
   setSelectedNode: (node) => set({ selectedNode: node }),
@@ -527,79 +631,10 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
     const reactFlowInstance = get().reactFlowInstance;
     if (!reactFlowInstance) return;
     const node = reactFlowInstance.getNode(selectedNodeId);
-    get().setSelectedNode(node);
+    get().setSelectedNode(node as Node<NodeDataProps>);
   },
-
   onDelete: (id) => {
-    const reactFlowInstance = get().reactFlowInstance;
-    if (!reactFlowInstance) return;
-
-    const edgeFromDeletedNode = reactFlowInstance
-      .getEdges()
-      .filter((edge) => edge.source === id)
-      .map((x) => x.target);
-
-    const edgeFromNextNode = reactFlowInstance
-      .getEdges()
-      .filter((edge) => edge.source === edgeFromDeletedNode[0])
-      .map((x) => x.target);
-
-    let children: Node<any>[] = [];
-    if (edgeFromNextNode.length > 0) {
-      children = reactFlowInstance.getNodes().filter((node) => edgeFromNextNode.includes(node.id));
-    } else {
-      children = reactFlowInstance.getNodes().filter((node) => edgeFromDeletedNode.includes(node.id));
-    }
-
-    let nodes = get().nodes.filter((x) => x.id !== id);
-
-    if (children.length === 2) {
-      if (children[0].type === "placeholder") {
-        nodes = nodes.filter((x) => x.id !== children[0].id);
-        children.shift();
-      } else if (children[1].type === "placeholder") {
-        nodes = nodes.filter((x) => x.id !== children[1].id);
-        children.pop();
-      } else children = [];
-    }
-
-    let child: Node | undefined;
-
-    if (children.length === 1) child = children[0];
-    if (children.length === 0) {
-      const deletedNodePosition = reactFlowInstance.getNodes().find((node) => node.id === id)?.position;
-      const deletedNodeStepType = reactFlowInstance.getNodes().find((node) => node.id === id)?.data.stepType;
-      if (
-        deletedNodeStepType !== StepType.FinishingStepEnd ||
-        (deletedNodeStepType !== StepType.FinishingStepRedirect && get().nodes.length <= 4)
-      ) {
-        const placeholder = buildPlaceholder({ id, position: deletedNodePosition });
-        nodes.push(placeholder);
-        child = placeholder;
-      }
-    }
-
-    const edges = get()
-      .edges.filter((x) => x.source !== id)
-      .map((x) => (x.target === id && child ? { ...x, target: child.id } : x));
-
-    nodes = nodes.filter((x) => edges.find((y) => y.target === x.id || y.source === x.id));
-
-    if (edgeFromNextNode.length > 0) {
-      nodes = nodes.filter((x) => x.id !== edgeFromDeletedNode[0]);
-      if (edgeFromNextNode.length === 2) {
-        nodes = nodes.filter((x) => x.id !== edgeFromDeletedNode[1]);
-      }
-    }
-
-    if (edgeFromDeletedNode.length > 0 && get().nodes.length > 4) {
-      nodes = nodes.filter((x) => x.id !== edgeFromDeletedNode[0]);
-      if (edgeFromDeletedNode.length === 2) {
-        nodes = nodes.filter((x) => x.id !== edgeFromDeletedNode[1]);
-      }
-    }
-
-    set({ edges, nodes });
+    getReactFlowInstance(get()).deleteElements({ nodes: [get().nodes.find((n) => n.id === id)], edges: [] });
   },
   clickedNode: null,
   setClickedNode: (clickedNode) => set({ clickedNode }),
@@ -629,7 +664,8 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
           prevNode.data.linkText != updatedNode.data.linkText ||
           prevNode.data.fileName != updatedNode.data.fileName ||
           prevNode.data.fileContent != updatedNode.data.fileContent ||
-          prevNode.data.signOption != updatedNode.data.signOption
+          prevNode.data.signOption != updatedNode.data.signOption ||
+          prevNode.data.multiChoiceQuestion != updatedNode.data.multiChoiceQuestion
         ) {
           useServiceStore.getState().disableTestButton();
         }
@@ -643,6 +679,7 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
             fileName: updatedNode.data.fileName,
             fileContent: updatedNode.data.fileContent,
             signOption: updatedNode.data.signOption,
+            multiChoiceQuestion: updatedNode.data.multiChoiceQuestion,
           },
         };
       })
@@ -650,20 +687,21 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
   },
   testUrl: async (endpoint, onError, onSuccess) => {
     try {
-      new URL(endpoint.definedEndpoints[0].url ?? "");
-      if (endpoint.definedEndpoints[0].methodType === "GET") {
-        await axios.post(getEndpointValidation(), {
-          url: endpoint.definedEndpoints[0].url ?? "",
+      new URL(endpoint.definitions[0].url ?? "");
+      if (endpoint.definitions[0].methodType === "GET") {
+        await api.post(getEndpointValidation(), {
+          url: endpoint.definitions[0].url ?? "",
           type: "GET",
         });
       } else {
-        await axios.post(getEndpointValidation(), {
-          url: endpoint.definedEndpoints[0].url ?? "",
+        await api.post(getEndpointValidation(), {
+          url: endpoint.definitions[0].url ?? "",
           type: "POST",
         });
       }
       onSuccess();
     } catch (e) {
+      console.error(e);
       onError();
     }
   },
@@ -680,5 +718,11 @@ function extractMapValues(element: any) {
   }
   return result;
 }
+
+const getReactFlowInstance = (state: any) => {
+  const instance = state.reactFlowInstance;
+  if (!instance) throw new Error("React Flow instance not available");
+  return instance;
+};
 
 export default useServiceStore;

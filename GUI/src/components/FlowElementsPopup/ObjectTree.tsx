@@ -1,10 +1,7 @@
-import OutputElementBox from "components/OutputElementBox";
-import { CSSProperties, FC, useState } from "react";
+import { CSSProperties, FC, useState, useCallback } from "react";
 import { JSONTree, KeyPath } from "react-json-tree";
-import "./styles.scss";
-import { stringToTemplate } from "utils/string-util";
-import { useTranslation } from "react-i18next";
-import {getTypeColor} from "../../utils/object-util";
+import { ObjectTreeLabel } from "./ObjectTreeLabel";
+import { ObjectTreeValue } from "./ObjectTreeValue";
 
 // Some theme colors are inverted with invertTheme below to get the light theme
 const theme = {
@@ -26,92 +23,50 @@ const theme = {
   base0F: "#e87500", // orange-11 (dark orange - deprecated)
 };
 
-const getKeyPathString = (keyPath: KeyPath) => {
-  return keyPath.toReversed().join('"]["');
-};
-
-const round = (n: number) => {
-  return Math.round((n + Number.EPSILON) * 100) / 100;
-};
-
-const escapeKey = (key: string) => {
-  return key.replace(/"/g, '\\"');
-};
-
 type ObjectTreeProps = {
   data: object;
   path: string | number;
   style?: CSSProperties;
 };
 
+const splitPath = (path: string) => {
+  if (path.includes("response.body")) {
+    const [first, ...rest] = path.split("response.body");
+    return [`${first}response.body`, ...rest.join("").split(".").filter(Boolean)];
+  }
+  return path.split(".");
+};
+
 export const ObjectTree: FC<ObjectTreeProps> = ({ path, data, style }) => {
-  const pathArray = String(path).split(".");
+  // Consider using global state if this component gets more complex
+  const pathArray = splitPath(String(path));
   const root = pathArray.pop()!;
-  const { t } = useTranslation();
   const [roundedValues, setRoundedValues] = useState<Map<string, number>>(new Map());
 
-  const buildKeyPathString = (keyPath: KeyPath) => {
-    const key = getKeyPathString(keyPath);
-
-    let base = "";
-    if (pathArray.length > 0) {
-      // Start with the root object name
-      base = pathArray[0];
-
-      // Add remaining path elements with bracket notation
-      for (let i = 1; i < pathArray.length; i++) {
-        base += `["${escapeKey(pathArray[i])}"]`;
-      }
-
-      // Add the final key parts
-      const keyParts = key.split('"]["');
-      for (const part of keyParts) {
-        base += `["${escapeKey(part)}"]`;
-      }
-    } else {
-      // If there's no path array, just use the root and key
-      base = `${root}`;
-
-      // Add the key parts
-      const keyParts = key.split('"]["');
-      for (const part of keyParts) {
-        base += `["${escapeKey(part)}"]`;
-      }
-    }
-
-    return stringToTemplate(roundedValues.has(key) ? "Math.round((" + base + " + Number.EPSILON) * 100) / 100" : base);
-  };
-
-  const parseValue = (raw: any): number | string | any[] | undefined | {}  => {
-    console.log('parsing', raw)
-    if (raw === 'Number') {
-      return 0;
-    }
-    if (raw === 'String') {
-      return "";
-    }
-    if(raw === 'Array') {
-      return [];
-    }
-    if(raw === 'Object') {
-      return {};
-    }
-    return undefined;
-  }
-
-  const toggleRounding = (keyPath: KeyPath, value: number, roundValue = true) => {
-    const key = getKeyPathString(keyPath);
-
-    setRoundedValues((prev) => {
-      const newMap = new Map(prev);
-      if (roundValue) {
-        newMap.set(key, round(value));
-      } else {
-        newMap.delete(key);
-      }
-      return newMap;
-    });
-  };
+  // Memoize the component functions to prevent them from being recreated on each render
+  // https://stackoverflow.com/a/72589674/7405507
+  const labelRenderer = useCallback(
+    (keyPath: KeyPath, nodeType: string) => (
+      <ObjectTreeLabel
+        keyPath={keyPath}
+        nodeType={nodeType}
+        pathArray={[...pathArray, root]}
+        roundedValues={roundedValues}
+      />
+    ),
+    [pathArray, root, roundedValues]
+  );
+  const valueRenderer = useCallback(
+    (rawValue: unknown, _: unknown, ...keyPath: KeyPath) => (
+      <ObjectTreeValue
+        keyPath={keyPath}
+        rawValue={rawValue}
+        roundedValues={roundedValues}
+        setRoundedValues={setRoundedValues}
+      />
+    ),
+    [roundedValues, setRoundedValues]
+  );
 
   return (
     <div style={{ padding: "0px 15px 5px", ...style }}>
@@ -120,38 +75,8 @@ export const ObjectTree: FC<ObjectTreeProps> = ({ path, data, style }) => {
         theme={theme}
         invertTheme={true}
         keyPath={[String(root)]}
-        labelRenderer={(keyPath,raw) => {
-          const key = keyPath[0];
-          const typeColor = getTypeColor(parseValue(raw));
-
-          return (
-              <OutputElementBox
-                  style={{ border: `3px outset ${typeColor.color}` }}
-                  text={`${String(key)}:`}
-                  value={buildKeyPathString(keyPath)}
-                  useValue
-                  draggable={true}
-                  className="object-tree-chip"
-              />
-          );
-        }}
-        valueRenderer={(raw, _, ...keyPath) => {
-          const key = getKeyPathString(keyPath);
-
-          return typeof raw === "number" && !Number.isInteger(raw) ? (
-            <span className="object-tree-checkbox">
-              <input
-                id={key}
-                type="checkbox"
-                onClick={(e) => toggleRounding(keyPath, raw, (e.target as HTMLInputElement).checked)}
-              />
-              <label htmlFor={key}>{t("serviceFlow.popup.round")}</label>
-              <span>{roundedValues.has(key) ? round(raw) : raw}</span>
-            </span>
-          ) : (
-            <span>{String(raw)}</span>
-          );
-        }}
+        labelRenderer={labelRenderer}
+        valueRenderer={valueRenderer}
       />
     </div>
   );
