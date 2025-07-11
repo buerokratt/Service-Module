@@ -22,7 +22,7 @@ import FileSignContent from "./FileSignContent";
 import "./styles.scss";
 import ConditionContent from "./ConditionContent";
 import AssignContent from "./AssignContent";
-import { isTemplate, stringToTemplate, templateToString } from "utils/string-util";
+import { isTemplate, removeTrailingUnderscores, stringToTemplate, templateToString } from "utils/string-util";
 import { getValueByPath } from "utils/object-util";
 import ApiContent from "./ApiContent";
 import { saveEndpoints } from "services/service-builder";
@@ -48,7 +48,7 @@ const FlowElementsPopup: React.FC = () => {
 
   const isUserDefinedNode = node?.data?.stepType === "user-defined";
 
-  const serviceName = useServiceStore((state) => state.serviceNameDashed().replace(/_+$/, ""));
+  const serviceName = useServiceStore((state) => removeTrailingUnderscores(state.serviceNameDashed()));
   const endpoints = useServiceStore((state) => state.endpoints);
   const rules = useServiceStore((state) => state.rules);
   const assignElements = useServiceStore((state) => state.assignElements);
@@ -246,7 +246,7 @@ const FlowElementsPopup: React.FC = () => {
 
   const saveApiEndpoints = async () => {
     const endpoints = useServiceStore.getState().endpoints;
-    const name = useServiceStore.getState().name.replace(/_+$/, "");
+    const name = removeTrailingUnderscores(useServiceStore.getState().serviceNameDashed());
     const id = useServiceStore.getState().serviceId;
 
     await saveEndpoints(

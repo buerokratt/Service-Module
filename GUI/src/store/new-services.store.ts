@@ -586,14 +586,14 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
   },
   reactFlowInstance: null,
   setReactFlowInstance: (reactFlowInstance) => set({ reactFlowInstance }),
-  onServiceSave: async (status: 'draft' | 'ready' = 'ready') => {
+  onServiceSave: async (status: "draft" | "ready" = "ready") => {
     const endpoints = get().endpoints;
     const name = get().serviceNameDashed();
     const id = get().serviceId;
 
     await saveEndpoints(
       endpoints,
-      !name ? `${t("newService.defaultServiceName").toString()}_${format(new Date(), 'dd_MM_yyyy_HH_mm_ss')}` : name,
+      !name ? `${t("newService.defaultServiceName").toString()}_${format(new Date(), "dd_MM_yyyy_HH_mm_ss")}` : name,
       id,
       async () => {
         await saveFlowClick(status);
@@ -619,7 +619,7 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
 
     const { isNewService, onServiceSave } = get();
 
-    await onServiceSave('ready');
+    await onServiceSave(ServiceState.Ready);
 
     if (isNewService) {
       set({ isNewService: false });

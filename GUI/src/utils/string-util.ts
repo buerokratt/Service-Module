@@ -31,3 +31,9 @@ export const getLastDigits = (value: string) => {
   }
   return lastDigits ? parseInt(lastDigits, 10) : 1;
 };
+
+export const removeTrailingUnderscores = (value: string) => {
+  let end = value.length;
+  while (end > 0 && value[end - 1] === "_") end--;
+  return value.slice(0, end);
+};

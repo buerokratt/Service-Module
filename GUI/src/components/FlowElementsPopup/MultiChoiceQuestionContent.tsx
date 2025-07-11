@@ -10,6 +10,7 @@ import FormError from "components/FormElements/FormError";
 import { v4 } from "uuid";
 import useServiceStore from "store/new-services.store";
 import useServiceListStore from "store/services.store";
+import { removeTrailingUnderscores } from "utils/string-util";
 
 const maxButtons = parseInt(process.env.REACT_APP_MULTI_CHOICE_QUESTION_MAX_BUTTONS ?? "4");
 
@@ -32,7 +33,7 @@ const MultiChoiceQuestionContent: FC<MultiChoiceQuestionContentProps> = ({
   const [editIndex, setEditIndex] = useState<number | null>(null);
   const [editValue, setEditValue] = useState<string>("");
   const node = useServiceStore((state) => state.selectedNode);
-  const serviceName = useServiceStore((state) => state.serviceNameDashed().replace(/_+$/, ""));
+  const serviceName = useServiceStore((state) => removeTrailingUnderscores(state.serviceNameDashed()));
   const selectedService = useServiceListStore((state) => state.selectedService);
 
   const handleEdit = (idx: number) => {
