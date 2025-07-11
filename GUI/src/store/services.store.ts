@@ -26,6 +26,7 @@ interface ServiceStoreState {
   deleteService: (id: string) => Promise<void>;
   selectedService: Service | undefined;
   setSelectedService: (service: Service) => void;
+  changeServiceStateToDraft: (service?: Service) => Promise<void>;
   changeServiceState: (
     onEnd: () => void,
     successMessage: string,
@@ -151,6 +152,15 @@ const useServiceListStore = create<ServiceStoreState>((set, get, store) => ({
       selectedService: service,
     });
   },
+  changeServiceStateToDraft: async (service?: Service) => {
+    const selectedService = service ?? get().selectedService;
+    if (!selectedService) return;
+    await api.post(changeServiceStatus(), {
+      id: selectedService.serviceId,
+      state: ServiceState.Draft,
+      type: selectedService.type,
+    });
+  },
   changeServiceState: async (onEnd, successMessage, errorMessage, activate, draft, pagination, sorting) => {
     const selectedService = get().selectedService;
     if (!selectedService) return;
@@ -232,7 +242,7 @@ const useServiceListStore = create<ServiceStoreState>((set, get, store) => ({
         serviceId: selectedService.serviceId,
         serviceName: selectedService.name,
         serviceMethod: selectedService.type,
-        serviceSlot: selectedService.slot,
+        serviceSlot: selectedService.slot ?? '',
         intent: intent,
       });
       useToastStore.getState().success({ title: successMessage });
