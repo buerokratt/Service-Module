@@ -9,6 +9,7 @@ SELECT
   current_state AS state,
   ruuter_type AS type,
   service_id,
+  slot,
   CEIL(COUNT(*) OVER() / :page_size::DECIMAL) AS total_pages
 FROM services
 JOIN MaxServices ON id = maxId

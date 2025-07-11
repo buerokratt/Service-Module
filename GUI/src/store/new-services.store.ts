@@ -24,6 +24,7 @@ import { EndpointResponseVariable } from "types/endpoint/endpoint-response-varia
 import { Assign } from "types/assign";
 import { EndpointType } from "types/endpoint/endpoint-type";
 import api from "../services/api-dev";
+import { format } from "date-fns";
 
 interface ServiceStoreState {
   endpoints: EndpointData[];
@@ -282,7 +283,7 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
     return [...get().availableVariables.prod, ...get().availableVariables.test];
   },
   vaildServiceInfo: () => !!get().name,
-  serviceNameDashed: () => get().name.trim().replace(" ", "_"),
+  serviceNameDashed: () => get().name.replaceAll(" ", "_"),
   deleteEndpoint: (id: string) => {
     const newEndpoints = get().endpoints.filter((x) => x.endpointId !== id);
     set({ endpoints: newEndpoints });
@@ -585,14 +586,14 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
   },
   reactFlowInstance: null,
   setReactFlowInstance: (reactFlowInstance) => set({ reactFlowInstance }),
-  onServiceSave: async (status: 'draft' | 'ready' = 'ready') => {
+  onServiceSave: async (status: "draft" | "ready" = "ready") => {
     const endpoints = get().endpoints;
     const name = get().serviceNameDashed();
     const id = get().serviceId;
 
     await saveEndpoints(
       endpoints,
-      !name ? t("newService.defaultServiceName").toString() : name,
+      !name ? `${t("newService.defaultServiceName").toString()}_${format(new Date(), "dd_MM_yyyy_HH_mm_ss")}` : name,
       id,
       async () => {
         await saveFlowClick(status);
@@ -618,7 +619,7 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
 
     const { isNewService, onServiceSave } = get();
 
-    await onServiceSave('ready');
+    await onServiceSave(ServiceState.Ready);
 
     if (isNewService) {
       set({ isNewService: false });

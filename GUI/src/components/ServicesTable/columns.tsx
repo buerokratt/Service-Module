@@ -103,14 +103,22 @@ export const getColumns = ({
                 boxShadow: "none",
               }}
               appearance="text"
-              onClick={() => (props.row.original.state === ServiceState.Ready ? showIntentConnectionModal() : {})}
+              onClick={() => {
+                useServiceListStore.getState().setSelectedService(props.row.original);
+                if (props.row.original.state === ServiceState.Ready) {
+                  showIntentConnectionModal();
+                }
+              }}
             >
               <label style={{ paddingLeft: "15px", color: "black" }}>{props.cell.getValue()}</label>
             </Button>
           ) : (
             <Button
               appearance="text"
-              onClick={() => showIntentConnectionModal()}
+              onClick={() => {
+                useServiceListStore.getState().setSelectedService(props.row.original);
+                showIntentConnectionModal();
+              }}
               disabled={props.row.original.state === ServiceState.Draft}
             >
               <Icon icon={<MdOutlineArrowForward color="rgba(0, 0, 0, 0.54)" />} />

@@ -9,6 +9,7 @@ import useServiceListStore from "../../store/services.store";
 import { ServiceState } from "types";
 import { deleteService } from "resources/api-constants";
 import api from "../../services/api-dev";
+import { removeTrailingUnderscores } from "utils/string-util";
 
 type NewServiceHeaderProps = {
   activeStep: number;
@@ -17,7 +18,7 @@ type NewServiceHeaderProps = {
 };
 
 const NewServiceHeader: FC<NewServiceHeaderProps> = ({ activeStep, continueOnClick, saveOnClick }) => {
-  const name = useServiceStore((state) => state.serviceNameDashed());
+  const name = removeTrailingUnderscores(useServiceStore((state) => state.serviceNameDashed()));
   const serviceState = useServiceStore((state) => state.serviceState);
   const selectedService = useServiceListStore((state) => state.selectedService);
   const navigate = useNavigate();
@@ -53,7 +54,7 @@ const NewServiceHeader: FC<NewServiceHeaderProps> = ({ activeStep, continueOnCli
             appearance={isSaving ? "loading" : "primary"}
             onClick={async () => {
               setIsSaving(true);
-              await useServiceStore.getState().onServiceSave("draft");
+              await useServiceStore.getState().onServiceSave(ServiceState.Draft);
               setIsSaving(false);
               saveOnClick();
             }}

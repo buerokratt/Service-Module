@@ -10,6 +10,7 @@ import FormError from "components/FormElements/FormError";
 import { v4 } from "uuid";
 import useServiceStore from "store/new-services.store";
 import useServiceListStore from "store/services.store";
+import { removeTrailingUnderscores } from "utils/string-util";
 
 const maxButtons = parseInt(process.env.REACT_APP_MULTI_CHOICE_QUESTION_MAX_BUTTONS ?? "4");
 
@@ -32,7 +33,7 @@ const MultiChoiceQuestionContent: FC<MultiChoiceQuestionContentProps> = ({
   const [editIndex, setEditIndex] = useState<number | null>(null);
   const [editValue, setEditValue] = useState<string>("");
   const node = useServiceStore((state) => state.selectedNode);
-  const serviceName = useServiceStore((state) => state.serviceNameDashed());
+  const serviceName = useServiceStore((state) => removeTrailingUnderscores(state.serviceNameDashed()));
   const selectedService = useServiceListStore((state) => state.selectedService);
 
   const handleEdit = (idx: number) => {
@@ -65,7 +66,7 @@ const MultiChoiceQuestionContent: FC<MultiChoiceQuestionContentProps> = ({
   };
 
   const handleAdd = () => {
-    const newButtons = [...buttons, { title: "", payload: `#service, /${selectedService?.type ?? 'POST'}/services/active/${serviceName}-mcq-${node?.data.label[node?.data.label.length - 1]}-${buttons.length}` }];
+    const newButtons = [...buttons, { title: "", payload: `#service, /${selectedService?.type ?? 'POST'}/services/active/${serviceName}_mcq_${node?.data.label[node?.data.label.length - 1]}_${buttons.length}` }];
     setButtons(newButtons);
     setIsSaveEnabled(newButtons.length > 1);
   };
