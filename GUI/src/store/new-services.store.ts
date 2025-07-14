@@ -328,7 +328,7 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
   },
   addEndpoint: (endpoint?: EndpointData) => {
     if (endpoint) {
-      set((state) => ({ endpoints: [...state.endpoints, newEndpoint] }));
+      set((state) => ({ endpoints: [...state.endpoints, endpoint] }));
       return;
     }
     const newEndpoint = { endpointId: uuid(), name: "", definitions: [], isNew: true };
