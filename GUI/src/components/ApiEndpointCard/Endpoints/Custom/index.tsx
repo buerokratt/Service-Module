@@ -89,7 +89,6 @@ const EndpointCustom: React.FC<EndpointCustomProps> = ({
               name="endpointUrl"
               label=""
               defaultValue={endpoint.definitions[0]?.url ?? ""}
-              value={endpoint.definitions[0]?.url ?? ""}
               onChange={(event) => {
                 const parsedUrl = parseURL(event.target.value);
                 endpoint.definitions[0].url = parsedUrl.url;

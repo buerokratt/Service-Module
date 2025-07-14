@@ -25,9 +25,10 @@ interface RelatedService {
 
 interface ApiEndpointProps {
   step: Step;
+  onClick: (step: Step) => void;
 }
 
-const ApiEndpoint: FC<ApiEndpointProps> = ({ step }) => {
+const ApiEndpoint: FC<ApiEndpointProps> = ({ step, onClick }) => {
   const { t } = useTranslation();
   const { id } = useParams();
 
@@ -46,7 +47,7 @@ const ApiEndpoint: FC<ApiEndpointProps> = ({ step }) => {
       setIsGettingRelatedServices(true);
 
       try {
-        const services = (await api.get<RelatedService[]>(getServicesByEndpointId(endpoint.id, id))).data;
+        const services = (await api.get<RelatedService[]>(getServicesByEndpointId(endpoint.endpointId, id))).data;
         if (services.length > 0) {
           setRelatedServices(services);
         } else {
@@ -114,16 +115,16 @@ const ApiEndpoint: FC<ApiEndpointProps> = ({ step }) => {
       <Box
         className={styles.box}
         key={step.id}
+        style={{ cursor: "pointer" }}
         color={[StepType.FinishingStepEnd, StepType.FinishingStepRedirect].includes(step.type) ? "red" : "blue"}
-        onDragStart={(event) => onDragStart(event, step)}
-        draggable
+        onClick={() => onClick(step)}
+        draggable={false}
       >
         <Track gap={8} style={{ justifyContent: "space-between", overflow: "hidden" }}>
           <div className={styles.labelContainer}>
             {step.type === "user-defined" && <img alt="" src={apiIconTag} />}
             <span className={styles.label}>{step.label}</span>
           </div>
-
           {isGettingRelatedServices ? (
             <div className={clsx("loader", styles.loader)} />
           ) : (

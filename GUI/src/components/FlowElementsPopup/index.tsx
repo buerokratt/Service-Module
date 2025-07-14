@@ -25,14 +25,10 @@ import AssignContent from "./AssignContent";
 import { isTemplate, removeTrailingUnderscores, stringToTemplate, templateToString } from "utils/string-util";
 import { getValueByPath } from "utils/object-util";
 import ApiContent from "./ApiContent";
-import { saveEndpoints } from "services/service-builder";
-import useToastStore from "store/toasts.store";
-import i18next from "i18next";
 import MultiChoiceQuestionContent from "./MultiChoiceQuestionContent";
-import { EDGE_LENGTH, NodeDataProps } from "types/service-flow";
+import { NodeDataProps } from "types/service-flow";
 import { Edge, getConnectedEdges, getIncomers, getOutgoers, Node } from "@xyflow/react";
 import { MultiChoiceQuestionButton } from "types/multi-choice-question";
-import { buildEdge, buildPlaceholder } from "services/flow-builder";
 import useServiceListStore from "store/services.store";
 import api from "../../services/api-dev";
 
@@ -193,7 +189,7 @@ const FlowElementsPopup: React.FC = () => {
     }
 
     if (stepType === StepType.UserDefined) {
-      saveApiEndpoints();
+      saveApiEndpoint();
     }
 
     useServiceStore.getState().handlePopupSave(updatedNode);
@@ -244,29 +240,8 @@ const FlowElementsPopup: React.FC = () => {
     return t("serviceFlow.popup.showJsonRequest");
   };
 
-  const saveApiEndpoints = async () => {
-    const endpoints = useServiceStore.getState().endpoints;
-    const name = removeTrailingUnderscores(useServiceStore.getState().serviceNameDashed());
-    const id = useServiceStore.getState().serviceId;
-
-    await saveEndpoints(
-      endpoints,
-      name,
-      id,
-      () => {
-        useToastStore.getState().success({
-          title: i18next.t("newService.toast.success"),
-          message: i18next.t("newService.toast.savedSuccessfully"),
-        });
-      },
-      (e) => {
-        useToastStore.getState().error({
-          title: i18next.t("newService.toast.failed"),
-          message: i18next.t("newService.toast.saveFailed"),
-        });
-      }
-    );
-    return true;
+  const saveApiEndpoint = async () => {
+    // TODO: Only Save the required endpoint
   };
 
   const saveMultiChoicePopup = (originalNode: Node<NodeDataProps>, updatedNode: Node<NodeDataProps>) => {

@@ -29,8 +29,8 @@ const ApiEndpointCard: FC<EndpointCardProps> = ({ endpoint, isDeletable = true, 
   const [endpointName, setEndpointName] = useState<string>(endpoint.name);
   const [testEnvExists, setTestEnvExists] = useState<boolean>(false);
   const options: { label: string; value: EndpointType; name: string }[] = [
-    { label: "Open API", value: "openApi", name: "da" },
-    { label: "Custom endpoint", value: "custom", name: "da" },
+    { label: "Open API", value: "openApi", name: "" },
+    { label: "Custom endpoint", value: "custom", name: "" },
   ];
   const [option, setOption] = useState<Option | null>(options.find((o) => o.value === endpoint.type) ?? null);
   const [requestTab, setRequestTab] = useState<RequestTab>({ tab: EndpointTab.Params, showRawData: false });
@@ -73,36 +73,40 @@ const ApiEndpointCard: FC<EndpointCardProps> = ({ endpoint, isDeletable = true, 
         return (
           <Tabs.Content className="tab-group__tab-content" value={env} key={env}>
             <Track direction="vertical" align="stretch" gap={16}>
-              <div>
+              <Track isMultiline gap={5}>
                 <label htmlFor="service-type">{t("newService.uses")}</label>
                 <FormSelect
                   name="service-type"
                   label=""
+                  placeholder={t("newService.endpoint.type").toString()}
                   options={options}
                   disabled={selectedTab === EndpointEnv.Test}
                   onSelectionChange={(selection) => {
                     setOption(selection);
+                    endpoint.type = selection?.value as EndpointType;
                     changeServiceEndpointType(endpoint.endpointId, (selection?.value ?? "custom") as EndpointType);
                   }}
                   defaultValue={option?.value}
                 />
-              </div>
+              </Track>
               {option && (
                 <div>
                   <label htmlFor="endpointName">{t("newService.endpoint.name")}</label>
                   <FormInput
                     name="endpointName"
                     label=""
+                    placeholder={t("newService.endpoint.insertName").toString()}
                     value={endpointName}
                     disabled={isNameDisabled || selectedTab === EndpointEnv.Test}
                     onChange={(e) => {
                       onNameChange(endpoint.endpointId, endpointName, e.target.value);
+                      endpoint.name = e.target.value;
                       setEndpointName(e.target.value);
                     }}
                   />
                 </div>
               )}
-              {option?.value === "openAPI" && (
+              {option?.value === "openApi" && (
                 <EndpointOpenAPI
                   endpoint={endpoint}
                   isLive={selectedTab === EndpointEnv.Live}

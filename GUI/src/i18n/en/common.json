@@ -56,7 +56,8 @@
     "loading": "Loading",
     "skip": "Skip",
     "delete": "Delete",
-    "keepIt": "Keep it"
+    "keepIt": "Keep it",
+    "create": "Create"
   },
   "menu": {
     "overview": "Overview",
@@ -227,9 +228,10 @@
       "url": "API endpoint URL",
       "value": "Value",
       "variable": "Variable",
-      "unsupported": "Sorry, we currently only support GET and POST requests."
+      "unsupported": "Sorry, we currently only support GET and POST requests.",
+      "insertName": "Insert endpoint name...",
+      "type": "Endpoint type"
     },
-    "saveDraft": "Save draft",
     "trainingModuleSetup": "Training module setup",
     "serviceSetup": "Service setup",
     "serviceFlowCreation": "Service flow creation",
@@ -239,6 +241,8 @@
     "description": "Description",
     "uses": "Service uses",
     "defaultServiceName": "unnamed_service",
+    "noElementsAvailable": "No elements available",
+    "createNewEndpoint": "Create new endpoint",
     "toast": {
       "serviceMissingFields": "Service name and description are required",
       "missingFields": "Missing Fields",
