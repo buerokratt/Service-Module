@@ -57,7 +57,8 @@
     "skip": "Jäta vahele",
     "delete": "Kustuta",
     "keepIt": "Jäta alles",
-    "create": "Loo"
+    "create": "Loo",
+    "edit": "Muuda"
   },
   "menu": {
     "overview": "Ülevaade",
@@ -243,6 +244,7 @@
     "defaultServiceName": "nimetu_teenus",
     "noElementsAvailable": "Ühtegi elementi pole saadaval",
     "createNewEndpoint": "Loo uus otspunkt",
+    "editEndpoint": "Muuda otspunkti",
     "toast": {
       "serviceMissingFields": "Nõutav on teenuse nimi ja kirjeldus",
       "missingFields": "Puuduvad väljad",
@@ -371,8 +373,12 @@
       "deletionImpossibleMessage": "Kustutamine ei ole võimalik. API element on kasutusel järgmistes teenustes. Kustutage API element nendes teenustes enne teenuste kustutamist.",
       "deleteConfirmation": "Kustutamine",
       "deleteConfirmationMessage": "Kas olete kindel, et soovite kustutada API elementi?",
+      "createSuccess": "API element edukalt loodud",
+      "createError": "API elemendi loomine ebaõnnestus",
       "deleteSuccess": "API element kustutatud",
-      "deleteError": "API elementi kustutamine ebaõnnestus"
+      "deleteError": "API elementi kustutamine ebaõnnestus",
+      "editSuccess": "API element edukalt muudetud",
+      "editError": "API elemendi muutmine ebaõnnestus"
     },
     "multiChoiceQuestion": {
       "title": "Mitmevalikuline küsimus",

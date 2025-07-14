@@ -27,6 +27,7 @@ import api from "services/api";
 import useEdgeAdd from "hooks/flow/useEdgeAdd";
 import { EndpointData } from "types/endpoint";
 import { saveEndpoints } from "services/service-builder";
+import useToastStore from "store/toasts.store";
 
 function CustomEdge({
   id,
@@ -56,6 +57,7 @@ function CustomEdge({
   const steps = useServiceStore((state) => state.mapEndpointsToSteps());
   const contentStyle: CSSProperties = { overflowY: "auto", maxHeight: "245px" };
   const [isAddEndpointModalVisible, setIsAddEndpointModalVisible] = useState(false);
+  const [isCreatingEndpoint, setIsCreatingEndpoint] = useState(false);
   const [endpoint, setEndpoint] = useState<EndpointData>({
     endpointId: uuid(),
     name: "",
@@ -189,18 +191,24 @@ function CustomEdge({
                   {t("overview.cancel")}
                 </Button>
                 <Button
-                  appearance="primary"
+                  appearance={isCreatingEndpoint ? "loading" : "primary"}
                   onClick={() => {
+                    setIsCreatingEndpoint(true);
                     saveEndpoints(
                       [endpoint],
                       () => {
                         useServiceStore.getState().addEndpoint(endpoint);
                         setIsAddEndpointModalVisible(false);
                         setEndpoint({ endpointId: uuid(), name: "", definitions: [], isNew: true });
+                        useToastStore.getState().success({ title: t("serviceFlow.apiElements.createSuccess") });
+                        setIsCreatingEndpoint(false);
                       },
-                      (error) => {}
+                      (error) => {
+                        console.error(`Error creating API endpoint: ${error}`);
+                        useToastStore.getState().error({ title: t("serviceFlow.apiElements.createError") });
+                        setIsCreatingEndpoint(false);
+                      }
                     );
-                    console.log("Endpoint to add:", endpoint);
                   }}
                 >
                   {t("global.create")}

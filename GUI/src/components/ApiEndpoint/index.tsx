@@ -6,17 +6,19 @@ import Popup from "components/Popup";
 import Track from "components/Track";
 import { FC, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { MdDeleteOutline } from "react-icons/md";
+import { MdDeleteOutline, MdOutlineEdit } from "react-icons/md";
 import { Link, useParams } from "react-router-dom";
 import { deleteEndpoint, getServicesByEndpointId } from "resources/api-constants";
 import useServiceStore from "store/new-services.store";
 import useToastStore from "store/toasts.store";
 import { Step, StepType } from "types";
 import { EndpointData } from "types/endpoint";
-import { onDragStart } from "utils/component-util";
 import apiIconTag from "../../assets/images/api-icon-tag.svg";
 import styles from "./ApiEndpoint.module.scss";
 import api from "../../services/api-dev";
+import Modal from "components/Modal";
+import ApiEndpointCard from "components/ApiEndpointCard";
+import { saveEndpoints } from "services/service-builder";
 
 interface RelatedService {
   serviceId: string;
@@ -34,7 +36,10 @@ const ApiEndpoint: FC<ApiEndpointProps> = ({ step, onClick }) => {
 
   const [isGettingRelatedServices, setIsGettingRelatedServices] = useState(false);
   const [relatedServices, setRelatedServices] = useState<RelatedService[]>([]);
-  const [showDeletePopup, setShowDeletePopup] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const nodes = useServiceStore((state) => state.nodes);
 
@@ -51,7 +56,7 @@ const ApiEndpoint: FC<ApiEndpointProps> = ({ step, onClick }) => {
         if (services.length > 0) {
           setRelatedServices(services);
         } else {
-          setShowDeletePopup(true);
+          setShowDeleteModal(true);
         }
       } catch (error) {
         console.error(`Error getting related services: ${error}`);
@@ -60,16 +65,18 @@ const ApiEndpoint: FC<ApiEndpointProps> = ({ step, onClick }) => {
 
       setIsGettingRelatedServices(false);
     } else {
-      setShowDeletePopup(true);
+      console.log("Endpoint is not common, proceeding with deletion.");
+      setShowDeleteModal(true);
     }
   };
 
   const deleteSelectedEndpoint = async (endpoint: EndpointData | undefined) => {
-    if (!endpoint) return;
+    if (!endpoint) {
+      setIsDeleting(false);
+      return;
+    }
 
     try {
-      deleteEndpointFromStore(endpoint.endpointId);
-
       const nodeIdsToDelete = nodes
         .filter((node) => node.type === "custom" && node.data.originalDefinedNodeId === endpoint.endpointId)
         .map((node) => node.id);
@@ -77,26 +84,89 @@ const ApiEndpoint: FC<ApiEndpointProps> = ({ step, onClick }) => {
 
       await api.post(deleteEndpoint(), { id: endpoint.endpointId });
       useToastStore.getState().success({ title: t("serviceFlow.apiElements.deleteSuccess") });
+      deleteEndpointFromStore(endpoint.endpointId);
     } catch (error) {
       console.error(`Error deleting API endpoint: ${error}`);
       useToastStore.getState().error({ title: t("serviceFlow.apiElements.deleteError") });
+    } finally {
+      setIsDeleting(false);
+      setShowDeleteModal(false);
     }
-
-    setShowDeletePopup(false);
   };
 
   return (
     <>
-      {showDeletePopup && (
-        <Popup title={t("serviceFlow.apiElements.deleteConfirmation")} onClose={() => setShowDeletePopup(false)}>
-          <p className={styles.popupText}>{t("serviceFlow.apiElements.deleteConfirmationMessage")}</p>
-          <Button appearance="error" onClick={() => deleteSelectedEndpoint(step.data)}>
-            {t("serviceFlow.apiElements.delete")}
-          </Button>
-          <Button appearance="primary" style={{ marginLeft: 10 }} onClick={() => setShowDeletePopup(false)}>
-            {t("global.cancel")}
-          </Button>
-        </Popup>
+      {showDeleteModal && (
+        <Modal
+          title={t("serviceFlow.apiElements.deleteConfirmationMessage")}
+          onClose={() => {
+            setShowDeleteModal(false);
+          }}
+        >
+          <Track gap={10} align="center" justify="end">
+            <Button
+              appearance={isDeleting ? "loading" : "error"}
+              onClick={() => {
+                setIsDeleting(true);
+                deleteSelectedEndpoint(step.data);
+              }}
+            >
+              {t("serviceFlow.apiElements.delete")}
+            </Button>
+            <Button
+              appearance="primary"
+              style={{ marginLeft: 10 }}
+              onClick={(e) => {
+                setShowDeleteModal(false);
+                e.stopPropagation();
+              }}
+            >
+              {t("global.cancel")}
+            </Button>
+          </Track>
+        </Modal>
+      )}
+
+      {showEditModal && step?.data && (
+        <Modal title={t("newService.editEndpoint")} onClose={() => setShowEditModal(false)}>
+          <Track isMultiline gap={16} direction="vertical" align="stretch">
+            <ApiEndpointCard endpoint={step?.data} isDeletable={false} />
+            <Track justify="end" gap={16}>
+              <Button
+                appearance="secondary"
+                onClick={(e) => {
+                  setShowEditModal(false);
+                  e.stopPropagation();
+                }}
+              >
+                {t("overview.cancel")}
+              </Button>
+              <Button
+                appearance={isEditing ? "loading" : "primary"}
+                onClick={(e) => {
+                  setIsEditing(true);
+                  saveEndpoints(
+                    [step.data!],
+                    () => {
+                      setShowEditModal(false);
+                      e.stopPropagation();
+                      useServiceStore.getState().editEndpoint(step.data);
+                      setIsEditing(false);
+                      useToastStore.getState().success({ title: t("serviceFlow.apiElements.editSuccess") });
+                    },
+                    (error) => {
+                      console.error(`Error Editing API endpoint: ${error}`);
+                      useToastStore.getState().error({ title: t("serviceFlow.apiElements.editError") });
+                      setIsEditing(false);
+                    }
+                  );
+                }}
+              >
+                {t("global.edit")}
+              </Button>
+            </Track>
+          </Track>
+        </Modal>
       )}
 
       {relatedServices.length > 0 && (
@@ -128,10 +198,26 @@ const ApiEndpoint: FC<ApiEndpointProps> = ({ step, onClick }) => {
           {isGettingRelatedServices ? (
             <div className={clsx("loader", styles.loader)} />
           ) : (
-            <Button className={styles.deleteButton} appearance="text" onClick={() => canDeleteEndpoint(step.data)}>
-              <Icon icon={<MdDeleteOutline />} size="medium" />
-              {t("serviceFlow.apiElements.delete")}
-            </Button>
+            <Track gap={12}>
+              <button
+                className={styles.deleteButton}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setShowEditModal(true);
+                }}
+              >
+                <Icon icon={<MdOutlineEdit size={18} />} size="medium" />
+              </button>
+              <button
+                className={styles.deleteButton}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  canDeleteEndpoint(step.data);
+                }}
+              >
+                <Icon icon={<MdDeleteOutline size={18} />} size="medium" />
+              </button>
+            </Track>
           )}
         </Track>
       </Box>

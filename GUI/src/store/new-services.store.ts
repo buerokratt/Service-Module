@@ -69,6 +69,7 @@ interface ServiceStoreState {
   addTestVariables: (variables: string[]) => void;
   changeServiceName: (name: string) => void;
   addEndpoint: (endpoint?: EndpointData) => void;
+  editEndpoint: (endpoint?: EndpointData) => void;
   loadSecretVariables: () => Promise<void>;
   loadTaraVariables: () => Promise<void>;
   loadService: (id?: string, resetState?: boolean) => Promise<void>;
@@ -332,6 +333,14 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
     }
     const newEndpoint = { endpointId: uuid(), name: "", definitions: [], isNew: true };
     set((state) => ({ endpoints: [...state.endpoints, newEndpoint] }));
+  },
+  editEndpoint: (updatedEndpoint?: EndpointData) => {
+    if (!updatedEndpoint) return;
+    set((state) => ({
+      endpoints: state.endpoints.map((endpoint) =>
+        endpoint.endpointId === updatedEndpoint.endpointId ? { ...updatedEndpoint, isNew: false } : endpoint
+      ),
+    }));
   },
   resetState: () => {
     set({
