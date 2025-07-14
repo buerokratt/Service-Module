@@ -14,9 +14,10 @@ type EndpointCardProps = {
   endpoint: EndpointData;
   isDeletable?: boolean;
   isNameDisabled?: boolean;
+  onNameExists?: (exists: boolean) => void;
 };
 
-const ApiEndpointCard: FC<EndpointCardProps> = ({ endpoint, isDeletable = true, isNameDisabled = false }) => {
+const ApiEndpointCard: FC<EndpointCardProps> = ({ endpoint, isDeletable = true, isNameDisabled = false, onNameExists }) => {
   const {
     onNameChange,
     deleteEndpoint,
@@ -34,6 +35,7 @@ const ApiEndpointCard: FC<EndpointCardProps> = ({ endpoint, isDeletable = true, 
   ];
   const [option, setOption] = useState<Option | null>(options.find((o) => o.value === endpoint.type) ?? null);
   const [requestTab, setRequestTab] = useState<RequestTab>({ tab: EndpointTab.Params, showRawData: false });
+  const [nameExists, setNameExists] = useState<boolean>(false);
   const { t } = useTranslation();
 
   const getTabTriggerClasses = (tab: EndpointEnv) => `tab-group__tab-btn ${selectedTab === tab ? "active" : ""}`;
@@ -73,7 +75,7 @@ const ApiEndpointCard: FC<EndpointCardProps> = ({ endpoint, isDeletable = true, 
         return (
           <Tabs.Content className="tab-group__tab-content" value={env} key={env}>
             <Track direction="vertical" align="stretch" gap={16}>
-              <Track isMultiline gap={5}>
+              <Track isMultiline>
                 <label htmlFor="service-type">{t("newService.uses")}</label>
                 <FormSelect
                   name="service-type"
@@ -102,8 +104,13 @@ const ApiEndpointCard: FC<EndpointCardProps> = ({ endpoint, isDeletable = true, 
                       onNameChange(endpoint.endpointId, endpointName, e.target.value);
                       endpoint.name = e.target.value;
                       setEndpointName(e.target.value);
+                      const endpointsNames = useServiceStore.getState().endpoints.map((ep) => ep.name);
+                      const isNameExist = endpointsNames.includes(e.target.value);
+                      setNameExists(isNameExist);
+                      onNameExists?.(isNameExist);
                     }}
                   />
+                  {nameExists && <span style={{ color: "red", fontSize: "13px" }}>Name Already Exists</span>}
                 </div>
               )}
               {option?.value === "openApi" && (

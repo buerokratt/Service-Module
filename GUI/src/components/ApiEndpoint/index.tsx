@@ -40,6 +40,7 @@ const ApiEndpoint: FC<ApiEndpointProps> = ({ step, onClick }) => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [endpointNameExists, setEndpointNameExists] = useState<boolean>(false);
 
   const nodes = useServiceStore((state) => state.nodes);
 
@@ -130,7 +131,7 @@ const ApiEndpoint: FC<ApiEndpointProps> = ({ step, onClick }) => {
       {showEditModal && step?.data && (
         <Modal title={t("newService.editEndpoint")} onClose={() => setShowEditModal(false)}>
           <Track isMultiline gap={16} direction="vertical" align="stretch">
-            <ApiEndpointCard endpoint={step?.data} isDeletable={false} />
+            <ApiEndpointCard endpoint={step?.data} isDeletable={false} onNameExists={setEndpointNameExists} />
             <Track justify="end" gap={16}>
               <Button
                 appearance="secondary"
@@ -143,6 +144,7 @@ const ApiEndpoint: FC<ApiEndpointProps> = ({ step, onClick }) => {
               </Button>
               <Button
                 appearance={isEditing ? "loading" : "primary"}
+                disabled={step.data?.name === "" || endpointNameExists}
                 onClick={(e) => {
                   setIsEditing(true);
                   saveEndpoints(

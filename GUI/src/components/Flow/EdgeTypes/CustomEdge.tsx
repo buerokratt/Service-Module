@@ -58,6 +58,7 @@ function CustomEdge({
   const contentStyle: CSSProperties = { overflowY: "auto", maxHeight: "245px" };
   const [isAddEndpointModalVisible, setIsAddEndpointModalVisible] = useState(false);
   const [isCreatingEndpoint, setIsCreatingEndpoint] = useState(false);
+  const [endpointNameExists, setEndpointNameExists] = useState<boolean>(false);
   const [endpoint, setEndpoint] = useState<EndpointData>({
     endpointId: uuid(),
     name: "",
@@ -185,13 +186,14 @@ function CustomEdge({
         {isAddEndpointModalVisible && (
           <Modal title={t("newService.createNewEndpoint")} onClose={() => setIsAddEndpointModalVisible(false)}>
             <Track isMultiline gap={16} direction="vertical" align="stretch">
-              <ApiEndpointCard endpoint={endpoint} isDeletable={false} />
+              <ApiEndpointCard endpoint={endpoint} isDeletable={false} onNameExists={setEndpointNameExists} />
               <Track justify="end" gap={16}>
                 <Button appearance="secondary" onClick={() => setIsAddEndpointModalVisible(false)}>
                   {t("overview.cancel")}
                 </Button>
                 <Button
                   appearance={isCreatingEndpoint ? "loading" : "primary"}
+                  disabled={endpoint.name === "" || endpointNameExists}
                   onClick={() => {
                     setIsCreatingEndpoint(true);
                     saveEndpoints(
