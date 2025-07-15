@@ -19,6 +19,7 @@ import api from "../../services/api-dev";
 import Modal from "components/Modal";
 import ApiEndpointCard from "components/ApiEndpointCard";
 import { saveEndpoints } from "services/service-builder";
+import { removeTrailingUnderscores } from "utils/string-util";
 
 interface RelatedService {
   serviceId: string;
@@ -41,7 +42,7 @@ const ApiEndpoint: FC<ApiEndpointProps> = ({ step, onClick }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [endpointNameExists, setEndpointNameExists] = useState<boolean>(false);
-
+  const serviceName = useServiceStore((state) => removeTrailingUnderscores(state.serviceNameDashed()));
   const nodes = useServiceStore((state) => state.nodes);
 
   const { deleteEndpoint: deleteEndpointFromStore } = useServiceStore();
@@ -83,7 +84,11 @@ const ApiEndpoint: FC<ApiEndpointProps> = ({ step, onClick }) => {
         .map((node) => node.id);
       nodeIdsToDelete.forEach((nodeId) => useServiceStore.getState().onDelete(nodeId));
 
-      await api.post(deleteEndpoint(), { id: endpoint.endpointId });
+      await api.post(deleteEndpoint(), {
+        id: endpoint.endpointId,
+        service_name: serviceName,
+        endpoint_name: endpoint.name,
+      });
       useToastStore.getState().success({ title: t("serviceFlow.apiElements.deleteSuccess") });
       deleteEndpointFromStore(endpoint.endpointId);
     } catch (error) {
