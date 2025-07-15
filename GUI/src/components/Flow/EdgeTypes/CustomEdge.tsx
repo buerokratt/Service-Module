@@ -4,7 +4,7 @@ import { ApiEndpointCard, Button, Collapsible, Dropdown, Modal, StepElement, Tra
 import useServiceStore from "store/new-services.store";
 import ApiEndpoint from "components/ApiEndpoint";
 import { useTranslation } from "react-i18next";
-import { Step, stepsLabels, StepType } from "types";
+import { Service, Step, stepsLabels, StepType } from "types";
 import { v4 as uuid } from "uuid";
 import {
   arrayMove,
@@ -28,6 +28,7 @@ import useEdgeAdd from "hooks/flow/useEdgeAdd";
 import { EndpointData } from "types/endpoint";
 import { saveEndpoints } from "services/service-builder";
 import useToastStore from "store/toasts.store";
+import { useParams } from "react-router-dom";
 
 function CustomEdge({
   id,
@@ -65,6 +66,7 @@ function CustomEdge({
     definitions: [],
     isNew: true,
   });
+  const { id: idParam } = useParams();
 
   const stepPreferences = useServiceStore((state) => state.stepPreferences);
 
@@ -135,8 +137,15 @@ function CustomEdge({
               defaultOpen={true}
               title={t("serviceFlow.apiElements.title")}
               contentStyle={contentStyle}
-              onAddClick={() => {
-                setIsAddEndpointModalVisible(true);
+              onAddClick={async () => {
+                if (!idParam) {
+                  useToastStore.getState().error({
+                    title: t("newService.toast.servieNotFound"),
+                    message: t("newService.toast.serviceNotFoundEndpointsMessage"),
+                  });
+                } else {
+                  setIsAddEndpointModalVisible(true);
+                }
               }}
             >
               {steps.length > 0 && (

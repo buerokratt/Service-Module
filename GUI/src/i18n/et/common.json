@@ -255,7 +255,9 @@
       "saveInfoFailed": "Teabe salvestamine ebaõnnestus",
       "saveConfigFailed": "Seadete salvestamine ebaõnnestus",
       "testResultSuccess": "Testi tulemus - edu",
-      "testResultError": "Testi tulemus - viga"
+      "testResultError": "Testi tulemus - viga",
+      "servieNotFound": "Teenust ei leitud",
+      "serviceNotFoundEndpointsMessage": "Salvesta teenus kõigepealt, et saaksid lisada otspunkte"
     },
     "titleRequired": "Pealkiri on kohustuslik",
     "chooseMemorySlots": "Vali mälukohad"

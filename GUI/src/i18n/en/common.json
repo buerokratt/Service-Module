@@ -255,7 +255,9 @@
       "saveInfoFailed": "Failed to save info",
       "saveConfigFailed": "Failed to save config",
       "testResultSuccess": "Test result- success",
-      "testResultError": "Test result - error"
+      "testResultError": "Test result - error",
+      "servieNotFound": "Service not found",
+      "serviceNotFoundEndpointsMessage": "Please save the service first to be able to add endpoints"
     },
     "titleRequired": "Title is mandatory",
     "chooseMemorySlots": "Choose memory slots"
