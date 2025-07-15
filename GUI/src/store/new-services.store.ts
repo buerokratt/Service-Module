@@ -235,44 +235,42 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
   availableVariables: { prod: [], test: [] },
   loadEndpointsResponseVariables: async () => {
     try {
-      const endpointResponses = await Promise.all(
-        get().endpoints.map(async (e) => {
-          return Promise.all(
-            e.definitions.map(async (endpoint) => {
-              const response = await api.post(servicesRequestsExplain(), {
-                url: endpoint.url,
-                method: endpoint.methodType,
-                headers: extractMapValues(endpoint.headers),
-                body: extractMapValues(endpoint.body),
-                params: extractMapValues(endpoint.params),
-              });
-              return response.data;
-            })
-          );
-        })
+
+      const requests = get().endpoints.flatMap((e) =>
+        e.definitions.map((endpoint) => ({
+          url: endpoint.url,
+          method: endpoint.methodType,
+          headers: extractMapValues(endpoint.headers),
+          body: extractMapValues(endpoint.body),
+          params: extractMapValues(endpoint.params),
+        }))
       );
+
+      const response = await api.post(servicesRequestsExplain(), {
+        requests: requests,
+      });
 
       const variables: EndpointResponseVariable[] = [];
 
-      endpointResponses.forEach((response, i) => {
+      response.data.response.forEach((res: any, i: number) => {
         const endpoint = get().endpoints[i];
         const chips: Chip[] = [];
 
-        response.forEach((response) => {
-          for (const [key, value] of Object.entries(response)) {
-            chips.push({
-              name: key,
-              value: `${endpoint.name.replace(" ", "_")}_res.response.body.${key}`,
-              data: value,
-            });
-          }
-        });
+        for (const [key, value] of Object.entries(res)) {
+          chips.push({
+            name: key,
+            value: `${endpoint.name.replace(" ", "_")}_res.response.body.${key}`,
+            data: value,
+          });
+        }
 
-        variables.push({
+        const variable: EndpointResponseVariable = {
           name: endpoint.name,
           chips: chips,
-        });
-      });
+        };
+
+        variables.push(variable);
+      })
 
       set({ endpointsResponseVariables: variables });
     } catch (e) {
