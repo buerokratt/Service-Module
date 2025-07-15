@@ -188,10 +188,6 @@ const FlowElementsPopup: React.FC = () => {
       updatedNode.data.assignElements = assignElements;
     }
 
-    if (stepType === StepType.UserDefined) {
-      saveApiEndpoint();
-    }
-
     useServiceStore.getState().handlePopupSave(updatedNode);
     onClose();
   };
@@ -238,10 +234,6 @@ const FlowElementsPopup: React.FC = () => {
     if (!isUserDefinedNode || selectedTab === t("serviceFlow.tabs.test")) return "";
     if (isJsonRequestVisible) return t("serviceFlow.popup.hideJsonRequest");
     return t("serviceFlow.popup.showJsonRequest");
-  };
-
-  const saveApiEndpoint = async () => {
-    // TODO: Only Save the required endpoint
   };
 
   const saveMultiChoicePopup = (originalNode: Node<NodeDataProps>, updatedNode: Node<NodeDataProps>) => {
