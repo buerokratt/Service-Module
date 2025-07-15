@@ -15,13 +15,13 @@ const Modal: FC<PropsWithChildren<ModalProps>> = ({ title, footer, onClose, chil
     <RadixDialog.Root defaultOpen={true} onOpenChange={onClose}>
       <RadixDialog.Portal>
         <RadixDialog.Overlay className="modal__overlay" />
-        <RadixDialog.Content className="modal">
+        <RadixDialog.Content onClick={(e) => e.stopPropagation()} className="modal">
           {title && (
-            <div className="modal__header" onClick={(e) => e.stopPropagation()}>
+            <div className="modal__header">
               <RadixDialog.Title className="h3 modal__title">{title}</RadixDialog.Title>
             </div>
           )}
-          <div className="modal__body" onClick={(e) => e.stopPropagation()}>
+          <div className="modal__body">
             {children}
           </div>
           {footer && (

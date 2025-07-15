@@ -4,7 +4,7 @@ import { ApiEndpointCard, Button, Collapsible, Dropdown, Modal, StepElement, Tra
 import useServiceStore from "store/new-services.store";
 import ApiEndpoint from "components/ApiEndpoint";
 import { useTranslation } from "react-i18next";
-import { Service, Step, stepsLabels, StepType } from "types";
+import { Step, stepsLabels, StepType } from "types";
 import { v4 as uuid } from "uuid";
 import {
   arrayMove,

@@ -178,6 +178,7 @@ function parseURL(url: string) {
       params,
     };
   } catch (e) {
+    console.error("Invalid URL format:", e);
     return {
       url,
       params: {},
