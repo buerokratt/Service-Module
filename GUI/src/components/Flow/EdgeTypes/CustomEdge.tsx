@@ -204,6 +204,7 @@ function CustomEdge({
                         setEndpoint({ endpointId: uuid(), name: "", definitions: [], isNew: true });
                         useToastStore.getState().success({ title: t("serviceFlow.apiElements.createSuccess") });
                         setIsCreatingEndpoint(false);
+                        useServiceStore.getState().loadEndpointsResponseVariables();
                       },
                       (error) => {
                         console.error(`Error creating API endpoint: ${error}`);
