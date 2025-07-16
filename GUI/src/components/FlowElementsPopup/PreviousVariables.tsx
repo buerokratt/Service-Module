@@ -14,6 +14,7 @@ import { v4 } from "uuid";
 import { getHelperTooltips } from "utils/constants";
 import { datesVariables, helperVariables } from "resources/variables-constants";
 import { Node, Edge } from "@xyflow/react";
+import { NodeDataProps } from "types/service-flow";
 
 type PreviousVariablesProps = {
   readonly nodeId: string;
@@ -60,12 +61,12 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
 
     // Get Endpoints variables
     const endpointNodes = previousNodes.filter((node) => node.data.stepType === StepType.UserDefined);
-    const names = endpointNodes.map((node) => node.data.label);
+    const names = endpointNodes.map((node) => node.data.label?.toString().split(" ")[0]);
     endpointsVariables = endpointsVariables.filter((endpoint) => names.includes(endpoint.name));
     setEndpoints(endpointsVariables);
 
     // Get Assign variables
-    const assignNodes = previousNodes.filter((node) => node.data.stepType === StepType.Assign);
+    const assignNodes: Node<NodeDataProps>[] = previousNodes.filter((node) => node.data.stepType === StepType.Assign) as Node<NodeDataProps>[] ?? [];
     const assignElements = assignNodes.map((node) => node.data.assignElements).flat();
     const inputElement: Assign = {
       id: INPUT_ELEMENT_KEY,
@@ -169,7 +170,7 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
               };
 
               return isObject(chip.data) ? (
-                <Tooltip content={`${chip.data} : ${typeColor.type}`} key={dragData.id}>
+                <Tooltip content={`${JSON.stringify(chip.data)} : ${typeColor.type}`} key={dragData.id}>
                   <OutputElementBox
                     dragData={dragData}
                     style={{ cursor: "pointer" }}
@@ -230,7 +231,7 @@ const VariableSection = ({
       </label>
       <Track direction="horizontal" gap={4} justify="start" isMultiline style={{ maxHeight: "30vh", overflow: "auto" }}>
         {variables.map((variable: any) => {
-          const typeColor = getTypeColor(variable.value);
+          const typeColor = getTypeColor(variable?.value);
 
           return isObject(variable.data) && variable.id !== INPUT_ELEMENT_KEY ? (
             <Tooltip

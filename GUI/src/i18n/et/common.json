@@ -56,7 +56,9 @@
     "loading": "Laadimine",
     "skip": "Jäta vahele",
     "delete": "Kustuta",
-    "keepIt": "Jäta alles"
+    "keepIt": "Jäta alles",
+    "create": "Loo",
+    "edit": "Muuda"
   },
   "menu": {
     "overview": "Ülevaade",
@@ -227,9 +229,11 @@
       "url": "API otspunkti URL",
       "value": "Väärtus",
       "variable": "Muutuja",
-      "unsupported": "Vabandust, praegu toetame ainult GET ja POST päringud"
+      "unsupported": "Vabandust, praegu toetame ainult GET ja POST päringud",
+      "insertName": "Sisesta otspunkti nimetus...",
+      "type": "Otspunkti tüüp",
+      "nameAlreadyExists": "API pealkiri peab olema unikaalne"
     },
-    "saveDraft": "Salvesta mustandina",
     "trainingModuleSetup": "Avaleht",
     "serviceSetup": "Teenuse seadistamine",
     "serviceFlowCreation": "Teenusvoo loomine",
@@ -239,6 +243,9 @@
     "description": "Kirjeldus",
     "uses": "Teenus kasutab",
     "defaultServiceName": "nimetu_teenus",
+    "noElementsAvailable": "Ühtegi elementi pole saadaval",
+    "createNewEndpoint": "Loo uus otspunkt",
+    "editEndpoint": "Muuda otspunkti",
     "toast": {
       "serviceMissingFields": "Nõutav on teenuse nimi ja kirjeldus",
       "missingFields": "Puuduvad väljad",
@@ -249,7 +256,9 @@
       "saveInfoFailed": "Teabe salvestamine ebaõnnestus",
       "saveConfigFailed": "Seadete salvestamine ebaõnnestus",
       "testResultSuccess": "Testi tulemus - edu",
-      "testResultError": "Testi tulemus - viga"
+      "testResultError": "Testi tulemus - viga",
+      "servieNotFound": "Teenust ei leitud",
+      "serviceNotFoundEndpointsMessage": "Salvesta teenus kõigepealt, et saaksid lisada otspunkte"
     },
     "titleRequired": "Pealkiri on kohustuslik",
     "chooseMemorySlots": "Vali mälukohad"
@@ -367,8 +376,12 @@
       "deletionImpossibleMessage": "Kustutamine ei ole võimalik. API element on kasutusel järgmistes teenustes. Kustutage API element nendes teenustes enne teenuste kustutamist.",
       "deleteConfirmation": "Kustutamine",
       "deleteConfirmationMessage": "Kas olete kindel, et soovite kustutada API elementi?",
+      "createSuccess": "API element edukalt loodud",
+      "createError": "API elemendi loomine ebaõnnestus",
       "deleteSuccess": "API element kustutatud",
-      "deleteError": "API elementi kustutamine ebaõnnestus"
+      "deleteError": "API elementi kustutamine ebaõnnestus",
+      "editSuccess": "API element edukalt muudetud",
+      "editError": "API elemendi muutmine ebaõnnestus"
     },
     "multiChoiceQuestion": {
       "title": "Mitmevalikuline küsimus",

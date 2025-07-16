@@ -13,8 +13,8 @@ import {
 import { Service, ServiceState, Step, StepType } from "types";
 import { RequestVariablesTabsRawData, RequestVariablesTabsRowsData } from "types/request-variables";
 import useToastStore from "./toasts.store";
-import i18next, { t } from "i18next";
-import { saveEndpoints, saveFlowClick } from "services/service-builder";
+import i18next from "i18next";
+import { saveFlowClick } from "services/service-builder";
 import { NodeDataProps, initialEdges, initialNodes } from "types/service-flow";
 import { alignNodesInCaseAnyGotOverlapped, updateFlowInputRules } from "services/flow-builder";
 import { GroupOrRule } from "components/FlowElementsPopup/RuleBuilder/types";
@@ -24,7 +24,6 @@ import { EndpointResponseVariable } from "types/endpoint/endpoint-response-varia
 import { Assign } from "types/assign";
 import { EndpointType } from "types/endpoint/endpoint-type";
 import api from "../services/api-dev";
-import { format } from "date-fns";
 
 interface ServiceStoreState {
   endpoints: EndpointData[];
@@ -69,7 +68,8 @@ interface ServiceStoreState {
   addProductionVariables: (variables: string[]) => void;
   addTestVariables: (variables: string[]) => void;
   changeServiceName: (name: string) => void;
-  addEndpoint: () => void;
+  addEndpoint: (endpoint?: EndpointData) => void;
+  editEndpoint: (endpoint?: EndpointData) => void;
   loadSecretVariables: () => Promise<void>;
   loadTaraVariables: () => Promise<void>;
   loadService: (id?: string, resetState?: boolean) => Promise<void>;
@@ -77,7 +77,7 @@ interface ServiceStoreState {
   getAvailableRequestValues: (endpointId: string) => PreDefinedEndpointEnvVariables;
   onNameChange: (endpointId: string, oldName: string, newName: string) => void;
   changeServiceEndpointType: (id: string, type: EndpointType) => void;
-  mapEndpointsToSetps: () => Step[];
+  mapEndpointsToSteps: () => Step[];
   selectedTab: EndpointEnv;
   setSelectedTab: (tab: EndpointEnv) => void;
   isLive: () => boolean;
@@ -235,44 +235,42 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
   availableVariables: { prod: [], test: [] },
   loadEndpointsResponseVariables: async () => {
     try {
-      const endpointResponses = await Promise.all(
-        get().endpoints.map(async (e) => {
-          return Promise.all(
-            e.definitions.map(async (endpoint) => {
-              const response = await api.post(servicesRequestsExplain(), {
-                url: endpoint.url,
-                method: endpoint.methodType,
-                headers: extractMapValues(endpoint.headers),
-                body: extractMapValues(endpoint.body),
-                params: extractMapValues(endpoint.params),
-              });
-              return response.data;
-            })
-          );
-        })
+
+      const requests = get().endpoints.flatMap((e) =>
+        e.definitions.map((endpoint) => ({
+          url: endpoint.url,
+          method: endpoint.methodType,
+          headers: extractMapValues(endpoint.headers),
+          body: extractMapValues(endpoint.body),
+          params: extractMapValues(endpoint.params),
+        }))
       );
+
+      const response = await api.post(servicesRequestsExplain(), {
+        requests: requests,
+      });
 
       const variables: EndpointResponseVariable[] = [];
 
-      endpointResponses.forEach((response, i) => {
+      response.data.response.forEach((res: any, i: number) => {
         const endpoint = get().endpoints[i];
         const chips: Chip[] = [];
 
-        response.forEach((response) => {
-          for (const [key, value] of Object.entries(response)) {
-            chips.push({
-              name: key,
-              value: `${endpoint.name.replace(" ", "_")}_res.response.body.${key}`,
-              data: value,
-            });
-          }
-        });
+        for (const [key, value] of Object.entries(res)) {
+          chips.push({
+            name: key,
+            value: `${endpoint.name.replace(" ", "_")}_res.response.body.${key}`,
+            data: value,
+          });
+        }
 
-        variables.push({
+        const variable: EndpointResponseVariable = {
           name: endpoint.name,
           chips: chips,
-        });
-      });
+        };
+
+        variables.push(variable);
+      })
 
       set({ endpointsResponseVariables: variables });
     } catch (e) {
@@ -326,9 +324,21 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
       },
     });
   },
-  addEndpoint: () => {
+  addEndpoint: (endpoint?: EndpointData) => {
+    if (endpoint) {
+      set((state) => ({ endpoints: [...state.endpoints, endpoint] }));
+      return;
+    }
     const newEndpoint = { endpointId: uuid(), name: "", definitions: [], isNew: true };
     set((state) => ({ endpoints: [...state.endpoints, newEndpoint] }));
+  },
+  editEndpoint: (updatedEndpoint?: EndpointData) => {
+    if (!updatedEndpoint) return;
+    set((state) => ({
+      endpoints: state.endpoints.map((endpoint) =>
+        endpoint.endpointId === updatedEndpoint.endpointId ? { ...updatedEndpoint, isNew: false } : endpoint
+      ),
+    }));
   },
   resetState: () => {
     set({
@@ -502,7 +512,7 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
 
     set({ endpoints });
   },
-  mapEndpointsToSetps: (): Step[] => {
+  mapEndpointsToSteps: (): Step[] => {
     return get()
       .endpoints.map((x) => ({
         selected: x.definitions.find((e) => e.isSelected),
@@ -587,24 +597,7 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
   reactFlowInstance: null,
   setReactFlowInstance: (reactFlowInstance) => set({ reactFlowInstance }),
   onServiceSave: async (status: "draft" | "ready" = "ready") => {
-    const endpoints = get().endpoints;
-    const name = get().serviceNameDashed();
-    const id = get().serviceId;
-
-    await saveEndpoints(
-      endpoints,
-      !name ? `${t("newService.defaultServiceName").toString()}_${format(new Date(), "dd_MM_yyyy_HH_mm_ss")}` : name,
-      id,
-      async () => {
-        await saveFlowClick(status);
-      },
-      (e) => {
-        useToastStore.getState().error({
-          title: i18next.t("newService.toast.failed"),
-          message: i18next.t("newService.toast.saveFailed"),
-        });
-      }
-    );
+    await saveFlowClick(status);
   },
   onContinueClick: async () => {
     const vaildServiceInfo = get().vaildServiceInfo();

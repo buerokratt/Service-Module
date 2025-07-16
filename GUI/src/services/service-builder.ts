@@ -297,19 +297,19 @@ const assignEndpointVariables = (
 
 export async function saveEndpoints(
   endpoints: EndpointData[],
-  name: string,
-  serviceId: string,
   onSuccess?: () => void,
   onError?: (e: any) => void
 ) {
   const tasks: Promise<any>[] = [];
   const nodes = useServiceStore.getState().nodes;
+  const serviceId = useServiceStore.getState().serviceId;
+  const serviceName = removeTrailingUnderscores(useServiceStore.getState().serviceNameDashed());
 
   for (const endpoint of endpoints) {
     const selectedEndpointType = endpoint.definitions.find((e) => e.isSelected);
     if (!selectedEndpointType) continue;
 
-    const endpointName = `${name.replaceAll(" ", "_")}-${getEndpointName(endpoint)}`;
+    const endpointName = `${serviceName.replaceAll(" ", "_")}-${getEndpointName(endpoint)}`;
     endpoint.fileName = endpointName;
     for (const env of [EndpointEnv.Live, EndpointEnv.Test]) {
       await saveEndpointInfo(selectedEndpointType, env, endpointName, endpoint);
@@ -583,9 +583,6 @@ export const saveFlow = async ({
         );
       }
     }
-
-    const endpoints = steps.filter((x) => !!x.data).map((x) => x.data!);
-    await saveEndpoints(endpoints, name, serviceId);
   } catch (e: any) {
     onError(e);
     useToastStore.getState().error({
@@ -1109,38 +1106,13 @@ const getEndpointName = (endpoint: EndpointData) => {
   return `${(endpoint.name.trim().length ?? 0) > 0 ? endpoint?.name.replaceAll(" ", "_") : endpoint?.endpointId}`;
 };
 
-export const saveDraft = async () => {
-  const endpoints = useServiceStore.getState().endpoints;
-  const name = removeTrailingUnderscores(useServiceStore.getState().serviceNameDashed());
-  const id = useServiceStore.getState().serviceId;
-
-  await saveEndpoints(
-    endpoints,
-    name,
-    id,
-    () => {
-      useToastStore.getState().success({
-        title: i18next.t("newService.toast.success"),
-        message: i18next.t("newService.toast.savedSuccessfully"),
-      });
-    },
-    (e) => {
-      useToastStore.getState().error({
-        title: i18next.t("newService.toast.failed"),
-        message: i18next.t("newService.toast.saveFailed"),
-      });
-    }
-  );
-  return true;
-};
-
 export const saveFlowClick = async (status: 'draft' | 'ready' = 'ready') => {
   const name = removeTrailingUnderscores(useServiceStore.getState().serviceNameDashed());
   const serviceId = useServiceStore.getState().serviceId;
   const description = useServiceStore.getState().description;
   const slot = useServiceStore.getState().slot;
   const isCommon = useServiceStore.getState().isCommon;
-  const steps = useServiceStore.getState().mapEndpointsToSetps();
+  const steps = useServiceStore.getState().mapEndpointsToSteps();
   const isNewService = useServiceStore.getState().isNewService;
   const edges = useServiceStore.getState().edges;
   const nodes = useServiceStore.getState().nodes;
@@ -1175,9 +1147,7 @@ export const saveFlowClick = async (status: 'draft' | 'ready' = 'ready') => {
 export const editServiceInfo = async () => {
   const name = removeTrailingUnderscores(useServiceStore.getState().serviceNameDashed());
   const description = useServiceStore.getState().description;
-  const endpoints = useServiceStore.getState().endpoints;
   const serviceId = useServiceStore.getState().serviceId;
-  const endPointsName = removeTrailingUnderscores(useServiceStore.getState().serviceNameDashed());
   const slot = useServiceStore.getState().slot;
 
   const tasks: Promise<any>[] = [];
@@ -1192,8 +1162,6 @@ export const editServiceInfo = async () => {
       state: 'ready',
     })
   );
-
-  await saveEndpoints(endpoints, endPointsName, serviceId);
 
   await Promise.all(tasks)
     .then(() =>

@@ -28,15 +28,8 @@
 
   .deleteButton {
     align-items: center;
-    color: get-color(sapphire-blue-10);
+    color: get-color(black-coral-9);
     display: flex;
-    opacity: 0;
     transition: opacity 0.1s ease-in-out;
-  }
-
-  &:hover {
-    .deleteButton {
-      opacity: 1;
-    }
   }
 }

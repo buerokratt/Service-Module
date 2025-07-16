@@ -89,7 +89,6 @@ const EndpointCustom: React.FC<EndpointCustomProps> = ({
               name="endpointUrl"
               label=""
               defaultValue={endpoint.definitions[0]?.url ?? ""}
-              value={endpoint.definitions[0]?.url ?? ""}
               onChange={(event) => {
                 const parsedUrl = parseURL(event.target.value);
                 endpoint.definitions[0].url = parsedUrl.url;
@@ -179,6 +178,7 @@ function parseURL(url: string) {
       params,
     };
   } catch (e) {
+    console.error("Invalid URL format:", e);
     return {
       url,
       params: {},
