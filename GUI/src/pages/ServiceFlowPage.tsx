@@ -14,6 +14,7 @@ import {
   FlowElementsPopup,
   FormInput,
   Icon,
+  Modal,
   NewServiceHeader,
   Switch,
   Track,
@@ -27,8 +28,16 @@ import { Service } from "types";
 import { getServiceById } from "resources/api-constants";
 import useServiceListStore from "store/services.store";
 import api from "services/api";
+import withUnsavedChanges, { WithUnsavedChangesProps } from "hoc/withUnsavedChanges";
 
-const ServiceFlowPage: FC = () => {
+const ServiceFlowPage: FC<WithUnsavedChangesProps> = ({
+  hasUnsavedChanges,
+  setHasUnsavedChanges,
+  showConfirmation,
+  proceedNavigation,
+  cancelNavigation,
+  handleProgrammaticNavigation,
+}) => {
   const { t } = useTranslation();
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -80,6 +89,14 @@ const ServiceFlowPage: FC = () => {
     <>
       <NewServiceHeader
         activeStep={1}
+        backOnClick={() => {
+          if (hasUnsavedChanges) {
+            handleProgrammaticNavigation(ROUTES.OVERVIEW_ROUTE);
+          } else {
+            useServiceStore.getState().resetState();
+            navigate(ROUTES.OVERVIEW_ROUTE, { replace: true });
+          }
+        }}
         continueOnClick={() => {
           useServiceStore
             .getState()
@@ -131,6 +148,7 @@ const ServiceFlowPage: FC = () => {
                     placeholder={t("newService.title").toString()}
                     value={name}
                     onChange={(e) => {
+                      setHasUnsavedChanges(true);
                       const value = e.target.value.trimStart().replaceAll(/_+/g, "_");
                       const hasSpecialCharacters = /[^\p{L}\p{N}_ ]/u;
                       if (!hasSpecialCharacters.test(value) && !value.startsWith(" ")) {
@@ -158,7 +176,10 @@ const ServiceFlowPage: FC = () => {
                     name={""}
                     placeholder={t("newService.description").toString()}
                     value={description}
-                    onChange={(e) => useServiceStore.getState().setDescription(e.target.value)}
+                    onChange={(e) => {
+                      setHasUnsavedChanges(true);
+                      useServiceStore.getState().setDescription(e.target.value);
+                    }}
                     style={{
                       minWidth: "250px",
                       width: "20vw",
@@ -222,7 +243,10 @@ const ServiceFlowPage: FC = () => {
                   offLabel={t("global.no").toString()}
                   value={isCommon}
                   checked={isCommon}
-                  onCheckedChange={(e) => useServiceStore.getState().setIsCommon(e)}
+                  onCheckedChange={(e) => {
+                    setHasUnsavedChanges(true);
+                    useServiceStore.getState().setIsCommon(e);
+                  }}
                 />
               </Track>
             </Card>
@@ -234,11 +258,46 @@ const ServiceFlowPage: FC = () => {
             </div>
             <Chat />
           </ReactFlowProvider>
-          {isChooseSlotsModalVisible && <ChooseSlotModel onModalClose={() => setIsChooseSlotsModalVisible(false)} />}
+          {isChooseSlotsModalVisible && (
+            <ChooseSlotModel
+              onModalClose={(selection) => {
+                if (selection) {
+                  setHasUnsavedChanges(true);
+                }
+                setIsChooseSlotsModalVisible(false);
+              }}
+            />
+          )}
+          {showConfirmation && (
+            <Modal title={t("newService.popup.unsavedChanges")} onClose={() => {}}>
+              <Track gap={10} align="center" justify="end">
+                <Button
+                  appearance="error"
+                  onClick={() => {
+                    cancelNavigation();
+                  }}
+                >
+                  {t("global.cancel")}
+                </Button>
+                <Button
+                  appearance="primary"
+                  style={{ marginLeft: 10 }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    proceedNavigation();
+                    useServiceStore.getState().resetState();
+                    setHasUnsavedChanges(false);
+                  }}
+                >
+                  {t("global.continue")}
+                </Button>
+              </Track>
+            </Modal>
+          )}
         </>
       )}
     </>
   );
 };
 
-export default withAuthorization(ServiceFlowPage, [ROLES.ROLE_ADMINISTRATOR, ROLES.ROLE_SERVICE_MANAGER]);
+export default withUnsavedChanges(withAuthorization(ServiceFlowPage, [ROLES.ROLE_ADMINISTRATOR, ROLES.ROLE_SERVICE_MANAGER]));

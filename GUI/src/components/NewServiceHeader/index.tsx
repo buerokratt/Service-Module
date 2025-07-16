@@ -13,11 +13,12 @@ import { removeTrailingUnderscores } from "utils/string-util";
 
 type NewServiceHeaderProps = {
   activeStep: number;
+  backOnClick: () => void;
   continueOnClick: () => void;
   saveOnClick: () => void;
 };
 
-const NewServiceHeader: FC<NewServiceHeaderProps> = ({ activeStep, continueOnClick, saveOnClick }) => {
+const NewServiceHeader: FC<NewServiceHeaderProps> = ({ activeStep, backOnClick, continueOnClick, saveOnClick }) => {
   const name = removeTrailingUnderscores(useServiceStore((state) => state.serviceNameDashed()));
   const serviceState = useServiceStore((state) => state.serviceState);
   const selectedService = useServiceListStore((state) => state.selectedService);
@@ -30,20 +31,15 @@ const NewServiceHeader: FC<NewServiceHeaderProps> = ({ activeStep, continueOnCli
     <>
       <header className="header" style={{ paddingLeft: 24 }}>
         <Track justify="between" gap={16}>
-          <Button
-            appearance="text"
-            style={{ textDecoration: "none", boxShadow: "none" }}
-            onClick={() => {
-              navigate(ROUTES.OVERVIEW_ROUTE, { replace: true });
-              useServiceStore.getState().resetState();
-            }}
-          >
+          <Button appearance="text" style={{ textDecoration: "none", boxShadow: "none" }} onClick={backOnClick}>
             <h1 style={{ whiteSpace: "nowrap", color: "black" }}>{`< ${t("menu.backToServiceListing")}`}</h1>
           </Button>
           <HeaderStepCounter activeStep={activeStep} />
           <Button
             appearance={isDeleting ? "loading" : "error"}
-            disabled={selectedService ? serviceState !== ServiceState.Draft && serviceState !== ServiceState.Ready : true}
+            disabled={
+              selectedService ? serviceState !== ServiceState.Draft && serviceState !== ServiceState.Ready : true
+            }
             onClick={() => {
               setIsDeleteServiceModalVisible(true);
             }}

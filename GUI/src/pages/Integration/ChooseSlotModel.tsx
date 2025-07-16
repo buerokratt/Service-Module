@@ -7,7 +7,7 @@ import { getSlots } from "resources/api-constants";
 import api from "services/api";
 
 type ChooseSlotModelProps = {
-  onModalClose: () => void;
+  onModalClose: (selection?: string) => void;
 };
 
 const ChooseSlotModel: FC<ChooseSlotModelProps> = ({ onModalClose }) => {
@@ -50,7 +50,7 @@ const ChooseSlotModel: FC<ChooseSlotModelProps> = ({ onModalClose }) => {
             )}
             onSelectionChange={(selection) => {
               useServiceStore.getState().setSlot(selection?.value ?? "");
-              onModalClose();
+              onModalClose(selection?.value);
             }}
             defaultValue={slot}
           />
