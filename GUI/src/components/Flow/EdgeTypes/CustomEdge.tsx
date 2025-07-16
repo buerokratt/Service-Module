@@ -152,15 +152,14 @@ function CustomEdge({
               {steps.length > 0 && (
                 <Track direction="vertical" align="stretch" gap={4}>
                   {steps.map((step) => (
-                    <button key={step.id} onClick={() => setDropdownOpen(false)}>
-                      <ApiEndpoint
-                        step={step}
-                        onClick={(step) => {
-                          onEdgeAdd(step);
-                          setDropdownOpen(false);
-                        }}
-                      />
-                    </button>
+                    <ApiEndpoint
+                      key={step.id}
+                      step={step}
+                      onClick={(step) => {
+                        onEdgeAdd(step);
+                        setDropdownOpen(false);
+                      }}
+                    />
                   ))}
                 </Track>
               )}

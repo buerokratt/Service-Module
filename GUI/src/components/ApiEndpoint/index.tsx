@@ -68,7 +68,6 @@ const ApiEndpoint: FC<ApiEndpointProps> = ({ step, onClick }) => {
 
       setIsGettingRelatedServices(false);
     } else {
-      console.log("Endpoint is not common, proceeding with deletion.");
       setShowDeleteModal(true);
     }
   };
