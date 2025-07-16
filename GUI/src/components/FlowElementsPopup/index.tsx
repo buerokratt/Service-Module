@@ -205,13 +205,17 @@ const FlowElementsPopup: React.FC = () => {
       if (!endpoint) return;
 
       const response = await api.post(servicesRequestsExplain(), {
-        url: endpoint.url,
-        method: endpoint.methodType,
-        headers: extractMapValues(endpoint.headers),
-        body: extractMapValues(endpoint.body),
-        params: extractMapValues(endpoint.params),
+        requests: [
+          {
+            url: endpoint.url,
+            method: endpoint.methodType,
+            headers: extractMapValues(endpoint.headers),
+            body: extractMapValues(endpoint.body),
+            params: extractMapValues(endpoint.params),
+          },
+        ],
       });
-      setJsonRequestContent(response.data);
+      setJsonRequestContent(response.data.response);
       setIsJsonRequestVisible(true);
     } catch (error) {
       console.error("Error: ", error);
