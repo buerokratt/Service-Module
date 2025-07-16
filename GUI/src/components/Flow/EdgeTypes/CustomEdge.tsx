@@ -67,6 +67,7 @@ function CustomEdge({
     isNew: true,
   });
   const { id: idParam } = useParams();
+  const [endpointName, setEndpointName] = useState<string>(endpoint.name ?? "");
 
   const stepPreferences = useServiceStore((state) => state.stepPreferences);
 
@@ -195,14 +196,19 @@ function CustomEdge({
         {isAddEndpointModalVisible && (
           <Modal title={t("newService.createNewEndpoint")} onClose={() => setIsAddEndpointModalVisible(false)}>
             <Track isMultiline gap={16} direction="vertical" align="stretch">
-              <ApiEndpointCard endpoint={endpoint} isDeletable={false} onNameExists={setEndpointNameExists} />
+              <ApiEndpointCard
+                endpoint={endpoint}
+                isDeletable={false}
+                onNameExists={setEndpointNameExists}
+                onNameChange={setEndpointName}
+              />
               <Track justify="end" gap={16}>
                 <Button appearance="secondary" onClick={() => setIsAddEndpointModalVisible(false)}>
                   {t("overview.cancel")}
                 </Button>
                 <Button
                   appearance={isCreatingEndpoint ? "loading" : "primary"}
-                  disabled={endpoint.name === "" || endpointNameExists}
+                  disabled={endpointName === "" || endpointNameExists}
                   onClick={() => {
                     setIsCreatingEndpoint(true);
                     saveEndpoints(

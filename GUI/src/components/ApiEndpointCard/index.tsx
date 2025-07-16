@@ -14,12 +14,12 @@ type EndpointCardProps = {
   endpoint: EndpointData;
   isDeletable?: boolean;
   isNameDisabled?: boolean;
+  onNameChange?: (name: string) => void;
   onNameExists?: (exists: boolean) => void;
 };
 
-const ApiEndpointCard: FC<EndpointCardProps> = ({ endpoint, isDeletable = true, isNameDisabled = false, onNameExists }) => {
+const ApiEndpointCard: FC<EndpointCardProps> = ({ endpoint, isDeletable = true, isNameDisabled = false, onNameExists, onNameChange }) => {
   const {
-    onNameChange,
     deleteEndpoint,
     changeServiceEndpointType,
     getAvailableRequestValues,
@@ -101,16 +101,15 @@ const ApiEndpointCard: FC<EndpointCardProps> = ({ endpoint, isDeletable = true, 
                     value={endpointName}
                     disabled={isNameDisabled || selectedTab === EndpointEnv.Test}
                     onChange={(e) => {
-                      onNameChange(endpoint.endpointId, endpointName, e.target.value);
-                      endpoint.name = e.target.value;
                       setEndpointName(e.target.value);
-                      const endpointsNames = useServiceStore.getState().endpoints.map((ep) => ep.name);
+                      const endpointsNames = useServiceStore.getState().endpoints.map((ep) => ep.name).filter((name) => name !== endpoint.name);
                       const isNameExist = endpointsNames.includes(e.target.value);
                       setNameExists(isNameExist);
                       onNameExists?.(isNameExist);
+                      onNameChange?.(e.target.value);
                     }}
                   />
-                  {nameExists && <span style={{ color: "red", fontSize: "13px" }}>Name Already Exists</span>}
+                  {nameExists && <span style={{ color: "red", fontSize: "13px" }}>{t("newService.endpoint.nameAlreadyExists")}</span>}
                 </div>
               )}
               {option?.value === "openApi" && (

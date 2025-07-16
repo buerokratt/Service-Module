@@ -44,6 +44,7 @@ const ApiEndpoint: FC<ApiEndpointProps> = ({ step, onClick }) => {
   const [endpointNameExists, setEndpointNameExists] = useState<boolean>(false);
   const serviceName = useServiceStore((state) => removeTrailingUnderscores(state.serviceNameDashed()));
   const nodes = useServiceStore((state) => state.nodes);
+  const [endpointName, setEndpointName] = useState<string>(step.data?.name ?? "");
 
   const { deleteEndpoint: deleteEndpointFromStore } = useServiceStore();
 
@@ -137,7 +138,12 @@ const ApiEndpoint: FC<ApiEndpointProps> = ({ step, onClick }) => {
       {showEditModal && step?.data && (
         <Modal title={t("newService.editEndpoint")} onClose={() => setShowEditModal(false)}>
           <Track isMultiline gap={16} direction="vertical" align="stretch">
-            <ApiEndpointCard endpoint={step?.data} isDeletable={false} onNameExists={setEndpointNameExists} />
+            <ApiEndpointCard
+              endpoint={step?.data}
+              isDeletable={false}
+              onNameExists={setEndpointNameExists}
+              onNameChange={setEndpointName}
+            />
             <Track justify="end" gap={16}>
               <Button
                 appearance="secondary"
@@ -150,15 +156,17 @@ const ApiEndpoint: FC<ApiEndpointProps> = ({ step, onClick }) => {
               </Button>
               <Button
                 appearance={isEditing ? "loading" : "primary"}
-                disabled={step.data?.name === "" || endpointNameExists}
+                disabled={endpointName === "" || endpointNameExists}
                 onClick={(e) => {
                   setIsEditing(true);
                   saveEndpoints(
                     [step.data!],
                     () => {
+                      const stepData = step.data!;
+                      stepData.name = endpointName;
                       setShowEditModal(false);
                       e.stopPropagation();
-                      useServiceStore.getState().editEndpoint(step.data);
+                      useServiceStore.getState().editEndpoint(stepData);
                       setIsEditing(false);
                       useToastStore.getState().success({ title: t("serviceFlow.apiElements.editSuccess") });
                       useServiceStore.getState().loadEndpointsResponseVariables();

@@ -231,7 +231,8 @@
       "variable": "Variable",
       "unsupported": "Sorry, we currently only support GET and POST requests.",
       "insertName": "Insert endpoint name...",
-      "type": "Endpoint type"
+      "type": "Endpoint type",
+      "nameAlreadyExists": "Name Already Exists"
     },
     "trainingModuleSetup": "Training module setup",
     "serviceSetup": "Service setup",

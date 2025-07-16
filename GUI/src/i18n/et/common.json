@@ -231,7 +231,8 @@
       "variable": "Muutuja",
       "unsupported": "Vabandust, praegu toetame ainult GET ja POST päringud",
       "insertName": "Sisesta otspunkti nimetus...",
-      "type": "Otspunkti tüüp"
+      "type": "Otspunkti tüüp",
+      "nameAlreadyExists": "Nimetus juba eksisteerib"
     },
     "trainingModuleSetup": "Avaleht",
     "serviceSetup": "Teenuse seadistamine",
