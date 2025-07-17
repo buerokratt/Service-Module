@@ -295,11 +295,7 @@ const assignEndpointVariables = (
   return result;
 };
 
-export async function saveEndpoints(
-  endpoints: EndpointData[],
-  onSuccess?: () => void,
-  onError?: (e: any) => void
-) {
+export async function saveEndpoints(endpoints: EndpointData[], onSuccess?: () => void, onError?: (e: any) => void) {
   const tasks: Promise<any>[] = [];
   const nodes = useServiceStore.getState().nodes;
   const serviceId = useServiceStore.getState().serviceId;
@@ -546,12 +542,22 @@ export const saveFlow = async ({
     ) as Node<NodeDataProps>[];
 
     if (mcqNodes.length > 0) {
-      const nodesUpToFirstMcq = nodes.slice(0, nodes.findIndex((node) => node.data?.stepType === StepType.MultiChoiceQuestion) + 1);
+      const nodesUpToFirstMcq = nodes.slice(
+        0,
+        nodes.findIndex((node) => node.data?.stepType === StepType.MultiChoiceQuestion) + 1
+      );
       yamlContent = getYamlContent(nodesUpToFirstMcq, edges, steps, name, description);
     }
 
-    await saveService(yamlContent, {name, serviceId, description, slot, isCommon, nodes, edges, isNewService} as SaveFlowConfig, true, status, onSuccess, onError);
-    
+    await saveService(
+      yamlContent,
+      { name, serviceId, description, slot, isCommon, nodes, edges, isNewService } as SaveFlowConfig,
+      true,
+      status,
+      onSuccess,
+      onError
+    );
+
     for (const mcqNode of mcqNodes) {
       const mcqEdges = edges.filter((edge) => edge.source === mcqNode.id);
 
@@ -577,7 +583,7 @@ export const saveFlow = async ({
 
         await saveService(
           getYamlContent(branchNodes, branchEdges, steps, serviceName, description),
-          { name: serviceName, serviceId, description, slot, isCommon, nodes, edges, isNewService } as SaveFlowConfig,
+          { name, serviceId, description, slot, isCommon, nodes, edges, isNewService } as SaveFlowConfig,
           false,
           status
         );
@@ -596,7 +602,7 @@ async function saveService(
   content: any,
   config: SaveFlowConfig,
   updateServiceDb: boolean,
-  status: "draft" | "ready" = 'ready',
+  status: "draft" | "ready" = "ready",
   onSuccess?: (e: any) => void,
   onError?: (e: any) => void
 ) {
@@ -869,10 +875,10 @@ function handleConditionStep(
     switch: [
       {
         condition: `\${${buildConditionString(parentNode.data.rules)}}`,
-        next: toSnakeCase(firstChild?.data?.label ?? "") ?? '',
+        next: toSnakeCase(firstChild?.data?.label ?? "") ?? "",
       },
     ],
-    next: toSnakeCase(secondChild?.data?.label ?? "") ?? '',
+    next: toSnakeCase(secondChild?.data?.label ?? "") ?? "",
   });
 }
 
@@ -1106,7 +1112,7 @@ const getEndpointName = (endpoint: EndpointData) => {
   return `${(endpoint.name.trim().length ?? 0) > 0 ? endpoint?.name.replaceAll(" ", "_") : endpoint?.endpointId}`;
 };
 
-export const saveFlowClick = async (status: 'draft' | 'ready' = 'ready') => {
+export const saveFlowClick = async (status: "draft" | "ready" = "ready") => {
   const name = removeTrailingUnderscores(useServiceStore.getState().serviceNameDashed());
   const serviceId = useServiceStore.getState().serviceId;
   const description = useServiceStore.getState().description;
@@ -1119,7 +1125,9 @@ export const saveFlowClick = async (status: 'draft' | 'ready' = 'ready') => {
 
   await saveFlow({
     steps,
-    name: !name ? `${t("newService.defaultServiceName").toString()}_${format(new Date(), 'dd_MM_yyyy_HH_mm_ss')}` : name,
+    name: !name
+      ? `${t("newService.defaultServiceName").toString()}_${format(new Date(), "dd_MM_yyyy_HH_mm_ss")}`
+      : name,
     edges,
     nodes,
     onSuccess: () => {
@@ -1159,7 +1167,7 @@ export const editServiceInfo = async () => {
       slot,
       type: "POST",
       updateServiceDb: true,
-      state: 'ready',
+      state: "ready",
     })
   );
 
