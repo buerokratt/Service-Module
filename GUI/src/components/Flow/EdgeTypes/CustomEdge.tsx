@@ -209,11 +209,13 @@ function CustomEdge({
                   appearance={isCreatingEndpoint ? "loading" : "primary"}
                   disabled={endpointName === "" || endpointNameExists}
                   onClick={() => {
+                    const passedEndpoint = endpoint;
+                    passedEndpoint.name = endpointName;
                     setIsCreatingEndpoint(true);
                     saveEndpoints(
-                      [endpoint],
+                      [passedEndpoint],
                       () => {
-                        useServiceStore.getState().addEndpoint(endpoint);
+                        useServiceStore.getState().addEndpoint(passedEndpoint);
                         setIsAddEndpointModalVisible(false);
                         setEndpoint({ endpointId: uuid(), name: "", definitions: [], isNew: true });
                         useToastStore.getState().success({ title: t("serviceFlow.apiElements.createSuccess") });

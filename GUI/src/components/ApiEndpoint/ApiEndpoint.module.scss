@@ -15,9 +15,14 @@
   .labelContainer {
     display: flex;
     align-items: center;
+    width: 100%;
+    min-width: 0;
 
     .label {
       padding-left: 8px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      min-width: 0;
     }
   }
 

@@ -157,12 +157,12 @@ const ApiEndpoint: FC<ApiEndpointProps> = ({ step, onClick }) => {
                 appearance={isEditing ? "loading" : "primary"}
                 disabled={endpointName === "" || endpointNameExists}
                 onClick={(e) => {
+                  const stepData = step.data!;
+                  stepData.name = endpointName;
                   setIsEditing(true);
                   saveEndpoints(
-                    [step.data!],
+                    [stepData],
                     () => {
-                      const stepData = step.data!;
-                      stepData.name = endpointName;
                       setShowEditModal(false);
                       e.stopPropagation();
                       useServiceStore.getState().editEndpoint(stepData);
