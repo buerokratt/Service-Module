@@ -1,5 +1,5 @@
 WITH latest_services AS (
-  SELECT DISTINCT ON (service_id) id, name, description, current_state, ruuter_type, is_common, service_id, slot
+  SELECT DISTINCT ON (service_id) id, name, description, current_state, ruuter_type, is_common, service_id
   FROM services
   WHERE NOT deleted AND is_common
   ORDER BY service_id, id DESC
