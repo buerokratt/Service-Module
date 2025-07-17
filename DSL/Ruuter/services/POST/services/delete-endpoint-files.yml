@@ -11,10 +11,14 @@ declaration:
       - field: name
         type: string
         description: "Body field 'name'"
+      - field: endpoint_name
+        type: string
+        description: "Body field 'endpoint_name'"  
 
 extract_request_data:
   assign:
     name: ${incoming.body.name}
+    endpoint_name: ${incoming.body.endpoint_name ?? ''}
 
 delete_get_endpoints:
   call: http.post
@@ -22,7 +26,7 @@ delete_get_endpoints:
     url: "[#SERVICE_DMAPPER]/file-manager/delete-all-that-starts-with"
     body:
       path: "[#RUUTER_SERVICES_GET_PATH]/endpoints"
-      keyword: "${name}-"
+      keyword: "${name}-${endpoint_name}"
   result: results
 
 delete_get_endpoints_configs:
@@ -31,7 +35,7 @@ delete_get_endpoints_configs:
     url: "[#SERVICE_DMAPPER]/file-manager/delete-all-that-starts-with"
     body:
       path: "[#RUUTER_SERVICES_GET_PATH]/endpoints/configs"
-      keyword: "${name}-"
+      keyword: "${name}-${endpoint_name}"
   result: results
 
 delete_get_endpoints_info:
@@ -40,7 +44,7 @@ delete_get_endpoints_info:
     url: "[#SERVICE_DMAPPER]/file-manager/delete-all-that-starts-with"
     body:
       path: "[#RUUTER_SERVICES_GET_PATH]/endpoints/info"
-      keyword: "${name}-"
+      keyword: "${name}-${endpoint_name}"
   result: results
 
 delete_post_endpoints:
@@ -49,7 +53,7 @@ delete_post_endpoints:
     url: "[#SERVICE_DMAPPER]/file-manager/delete-all-that-starts-with"
     body:
       path: "[#RUUTER_SERVICES_POST_PATH]/endpoints"
-      keyword: "${name}-"
+      keyword: "${name}-${endpoint_name}"
   result: results
 
 delete_post_endpoints_configs:
@@ -58,7 +62,7 @@ delete_post_endpoints_configs:
     url: "[#SERVICE_DMAPPER]/file-manager/delete-all-that-starts-with"
     body:
       path: "[#RUUTER_SERVICES_POST_PATH]/endpoints/configs"
-      keyword: "${name}-"
+      keyword: "${name}-${endpoint_name}"
   result: results
 
 delete_post_endpoints_info:
@@ -67,7 +71,7 @@ delete_post_endpoints_info:
     url: "[#SERVICE_DMAPPER]/file-manager/delete-all-that-starts-with"
     body:
       path: "[#RUUTER_SERVICES_POST_PATH]/endpoints/info"
-      keyword: "${name}-"
+      keyword: "${name}-${endpoint_name}"
   result: results
 
 delete_get_common_endpoints:
@@ -76,7 +80,7 @@ delete_get_common_endpoints:
     url: "[#SERVICE_DMAPPER]/file-manager/delete-all-that-starts-with"
     body:
       path: "[#RUUTER_SERVICES_GET_PATH]/endpoints/common"
-      keyword: "${name}-"
+      keyword: "${name}-${endpoint_name}"
   result: results
 
 delete_get_common_endpoints_configs:
@@ -85,7 +89,7 @@ delete_get_common_endpoints_configs:
     url: "[#SERVICE_DMAPPER]/file-manager/delete-all-that-starts-with"
     body:
       path: "[#RUUTER_SERVICES_GET_PATH]/endpoints/configs/common"
-      keyword: "${name}-"
+      keyword: "${name}-${endpoint_name}"
   result: results
 
 delete_get_common_endpoints_info:
@@ -94,7 +98,7 @@ delete_get_common_endpoints_info:
     url: "[#SERVICE_DMAPPER]/file-manager/delete-all-that-starts-with"
     body:
       path: "[#RUUTER_SERVICES_GET_PATH]/endpoints/info/common"
-      keyword: "${name}-"
+      keyword: "${name}-${endpoint_name}"
   result: results
 
 delete_post_common_endpoints:
@@ -103,7 +107,7 @@ delete_post_common_endpoints:
     url: "[#SERVICE_DMAPPER]/file-manager/delete-all-that-starts-with"
     body:
       path: "[#RUUTER_SERVICES_POST_PATH]/endpoints/common"
-      keyword: "${name}-"
+      keyword: "${name}-${endpoint_name}"
   result: results
 
 delete_post_common_endpoints_configs:
@@ -112,7 +116,7 @@ delete_post_common_endpoints_configs:
     url: "[#SERVICE_DMAPPER]/file-manager/delete-all-that-starts-with"
     body:
       path: "[#RUUTER_SERVICES_POST_PATH]/endpoints/configs/common"
-      keyword: "${name}-"
+      keyword: "${name}-${endpoint_name}"
   result: results
 
 delete_post_common_endpoints_info:
@@ -121,7 +125,7 @@ delete_post_common_endpoints_info:
     url: "[#SERVICE_DMAPPER]/file-manager/delete-all-that-starts-with"
     body:
       path: "[#RUUTER_SERVICES_POST_PATH]/endpoints/info/common"
-      keyword: "${name}-"
+      keyword: "${name}-${endpoint_name}"
   result: results
 
 return_result:

@@ -56,7 +56,9 @@
     "loading": "Loading",
     "skip": "Skip",
     "delete": "Delete",
-    "keepIt": "Keep it"
+    "keepIt": "Keep it",
+    "create": "Create",
+    "edit": "Edit"
   },
   "menu": {
     "overview": "Overview",
@@ -227,9 +229,11 @@
       "url": "API endpoint URL",
       "value": "Value",
       "variable": "Variable",
-      "unsupported": "Sorry, we currently only support GET and POST requests."
+      "unsupported": "Sorry, we currently only support GET and POST requests.",
+      "insertName": "Insert endpoint name...",
+      "type": "Endpoint type",
+      "nameAlreadyExists": "API title must be unique"
     },
-    "saveDraft": "Save draft",
     "trainingModuleSetup": "Training module setup",
     "serviceSetup": "Service setup",
     "serviceFlowCreation": "Service flow creation",
@@ -239,6 +243,9 @@
     "description": "Description",
     "uses": "Service uses",
     "defaultServiceName": "unnamed_service",
+    "noElementsAvailable": "No elements available",
+    "createNewEndpoint": "Create new endpoint",
+    "editEndpoint": "Edit endpoint",
     "toast": {
       "serviceMissingFields": "Service name and description are required",
       "missingFields": "Missing Fields",
@@ -249,7 +256,9 @@
       "saveInfoFailed": "Failed to save info",
       "saveConfigFailed": "Failed to save config",
       "testResultSuccess": "Test result- success",
-      "testResultError": "Test result - error"
+      "testResultError": "Test result - error",
+      "servieNotFound": "Service not found",
+      "serviceNotFoundEndpointsMessage": "Please save the service first to be able to add endpoints"
     },
     "titleRequired": "Title is mandatory",
     "chooseMemorySlots": "Choose memory slots"
@@ -367,8 +376,12 @@
       "deletionImpossibleMessage": "Deletion is impossible. This API element is used in the following services. Please remove the API element from these services first.",
       "deleteConfirmation": "Delete",
       "deleteConfirmationMessage": "Are you sure you want to delete this API element?",
+      "createSuccess": "API element created successfully",
+      "createError": "Failed to create API element",
       "deleteSuccess": "API element deleted successfully",
-      "deleteError": "Failed to delete API element"
+      "deleteError": "Failed to delete API element",
+      "editSuccess": "API element edited successfully",
+      "editError": "Failed to edit API element"
     },
     "multiChoiceQuestion": {
       "questionPlaceholder": "Enter a question",

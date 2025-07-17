@@ -12,8 +12,8 @@ type ApiContentProps = {
 const ApiContent: FC<ApiContentProps> = ({ nodeId, endpoint }) => {
   return (
     <Track direction="vertical" align="stretch">
+      {endpoint && <ApiEndpointCard endpoint={endpoint} isDeletable={false} isNameDisabled={true} />}
       <PreviousVariables nodeId={nodeId} />
-      {endpoint && <ApiEndpointCard endpoint={endpoint} isDeletable={false} isNameDisabled={true}/>}
     </Track>
   );
 };
