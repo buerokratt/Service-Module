@@ -68,6 +68,7 @@ function CustomEdge({
   });
   const { id: idParam } = useParams();
   const [endpointName, setEndpointName] = useState<string>(endpoint.name ?? "");
+  const { setHasUnsavedChanges } = useServiceStore();
 
   const stepPreferences = useServiceStore((state) => state.stepPreferences);
 
@@ -158,6 +159,7 @@ function CustomEdge({
                       onClick={(step) => {
                         onEdgeAdd(step);
                         setDropdownOpen(false);
+                        setHasUnsavedChanges(true);
                       }}
                     />
                   ))}
@@ -182,6 +184,7 @@ function CustomEdge({
                           onClick={(step) => {
                             onEdgeAdd(step);
                             setDropdownOpen(false);
+                            setHasUnsavedChanges(true);
                           }}
                         />
                       ))}

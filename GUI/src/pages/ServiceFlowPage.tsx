@@ -14,7 +14,6 @@ import {
   FlowElementsPopup,
   FormInput,
   Icon,
-  Modal,
   NewServiceHeader,
   Switch,
   Track,
@@ -28,16 +27,8 @@ import { Service } from "types";
 import { getServiceById } from "resources/api-constants";
 import useServiceListStore from "store/services.store";
 import api from "services/api";
-import withUnsavedChanges, { WithUnsavedChangesProps } from "hoc/withUnsavedChanges";
 
-const ServiceFlowPage: FC<WithUnsavedChangesProps> = ({
-  hasUnsavedChanges,
-  setHasUnsavedChanges,
-  showConfirmation,
-  proceedNavigation,
-  cancelNavigation,
-  handleProgrammaticNavigation,
-}) => {
+const ServiceFlowPage: FC = () => {
   const { t } = useTranslation();
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -48,6 +39,8 @@ const ServiceFlowPage: FC<WithUnsavedChangesProps> = ({
   const [isChooseSlotsModalVisible, setIsChooseSlotsModalVisible] = useState(false);
   const isCommon = useServiceStore((state) => state.isCommon);
   const [isInfoOpen, setIsInfoOpen] = useState(false);
+
+  const { hasUnsavedChanges, setHasUnsavedChanges, handleProgrammaticNavigation } = useServiceStore();
 
   const { id } = useParams();
 
@@ -110,6 +103,7 @@ const ServiceFlowPage: FC<WithUnsavedChangesProps> = ({
             });
         }}
         saveOnClick={async () => {
+          setHasUnsavedChanges(false);
           if (!id) {
             const serviceId = useServiceStore.getState().serviceId;
             const serviceResponse = await api.get<Service>(getServiceById(serviceId));
@@ -268,36 +262,10 @@ const ServiceFlowPage: FC<WithUnsavedChangesProps> = ({
               }}
             />
           )}
-          {showConfirmation && (
-            <Modal title={t("newService.popup.unsavedChanges")} onClose={() => {}}>
-              <Track gap={10} align="center" justify="end">
-                <Button
-                  appearance="error"
-                  onClick={() => {
-                    cancelNavigation();
-                  }}
-                >
-                  {t("global.cancel")}
-                </Button>
-                <Button
-                  appearance="primary"
-                  style={{ marginLeft: 10 }}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    proceedNavigation();
-                    useServiceStore.getState().resetState();
-                    setHasUnsavedChanges(false);
-                  }}
-                >
-                  {t("global.continue")}
-                </Button>
-              </Track>
-            </Modal>
-          )}
         </>
       )}
     </>
   );
 };
 
-export default withUnsavedChanges(withAuthorization(ServiceFlowPage, [ROLES.ROLE_ADMINISTRATOR, ROLES.ROLE_SERVICE_MANAGER]));
+export default withAuthorization(ServiceFlowPage, [ROLES.ROLE_ADMINISTRATOR, ROLES.ROLE_SERVICE_MANAGER]);

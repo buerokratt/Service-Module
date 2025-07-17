@@ -90,7 +90,7 @@ interface ServiceStoreState {
   resetState: () => void;
   resetAssign: () => void;
   resetRules: () => void;
-  onServiceSave: (status: 'draft' | 'ready') => Promise<void>;
+  onServiceSave: (status: "draft" | "ready") => Promise<void>;
   onContinueClick: () => Promise<void>;
   selectedNode: Node<NodeDataProps> | null;
   setSelectedNode: (node: Node<NodeDataProps> | null | undefined) => void;
@@ -111,6 +111,13 @@ interface ServiceStoreState {
   setEndpoints: (callback: (prev: EndpointData[]) => EndpointData[]) => void;
   reactFlowInstance: ReactFlowInstance | null;
   setReactFlowInstance: (reactFlowInstance: ReactFlowInstance | null) => void;
+  hasUnsavedChanges: boolean;
+  nextLocation: string | null;
+  setHasUnsavedChanges: (value: boolean) => void;
+  proceedNavigation: () => string | null;
+  cancelNavigation: () => void;
+  handleNavigationAttempt: (to: string) => boolean;
+  handleProgrammaticNavigation: (to: string) => boolean;
 }
 
 const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
@@ -235,7 +242,6 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
   availableVariables: { prod: [], test: [] },
   loadEndpointsResponseVariables: async () => {
     try {
-
       const requests = get().endpoints.flatMap((e) =>
         e.definitions.map((endpoint) => ({
           url: endpoint.url,
@@ -270,7 +276,7 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
         };
 
         variables.push(variable);
-      })
+      });
 
       set({ endpointsResponseVariables: variables });
     } catch (e) {
@@ -697,6 +703,32 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
       console.error(e);
       onError();
     }
+  },
+  hasUnsavedChanges: false,
+  nextLocation: null,
+  setHasUnsavedChanges: (value) => set({ hasUnsavedChanges: value }),
+  handleNavigationAttempt: (to) => {
+    if (get().hasUnsavedChanges) {
+      set({ nextLocation: to });
+      return false;
+    }
+    return true;
+  },
+  handleProgrammaticNavigation: (to) => {
+    if (get().hasUnsavedChanges) {
+      set({ nextLocation: to });
+      return false;
+    }
+    return true;
+  },
+  proceedNavigation: () => {
+    set({ hasUnsavedChanges: false });
+    const nextLocation = get().nextLocation;
+    set({ nextLocation: null });
+    return nextLocation;
+  },
+  cancelNavigation: () => {
+    set({ nextLocation: null });
   },
 }));
 

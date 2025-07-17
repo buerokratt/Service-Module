@@ -5,6 +5,8 @@ import RootComponent from "./RootComponent";
 import useStore from "./store/store";
 import { useQuery } from "@tanstack/react-query";
 import { UserInfo } from "./types/userInfo";
+import { UnsavedChangesHandler } from "handlers/unsavedChangesHandler";
+import UnsavedChangesDialog from "handlers/unsavedChangesDialog";
 
 const App: React.FC = () => {
   useQuery<{
@@ -29,6 +31,8 @@ const App: React.FC = () => {
   return (
     <BrowserRouter basename={import.meta.env.BASE_URL}>
       <ToastProvider>
+        <UnsavedChangesHandler />
+        <UnsavedChangesDialog />
         <RootComponent />
       </ToastProvider>
     </BrowserRouter>
