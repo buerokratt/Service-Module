@@ -22,6 +22,7 @@ const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
   const { t } = useTranslation();
   const { onNodesDelete, isDeleteConnectionsModalVisible, setIsDeleteConnectionsModalVisible, onDeleteConfirmed, onKeepItConfirmed, hasConnectedNodes, setDeletedNodes } =
     useOnNodesDelete();
+    const { setHasUnsavedChanges } = useServiceStore();
 
   const onConnect = useCallback(({ source, target }: any) => {
     const nodes = getNodes();
@@ -38,6 +39,7 @@ const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
         type: "step",
       },
     ]);
+    setHasUnsavedChanges(true);
   }, []);
 
   const isValidConnection = useCallback((connection: any) => {
@@ -81,8 +83,14 @@ const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
         onInit={setReactFlowInstance}
         nodesDraggable={false}
         onConnect={onConnect}
+        onEdgesDelete={() => {
+          setHasUnsavedChanges(true);
+        }}
         onBeforeDelete={onBeforeDelete}
-        onNodesDelete={onNodesDelete}
+        onNodesDelete={(nodes) => {
+          onNodesDelete(nodes);
+          setHasUnsavedChanges(true);
+        }}
         fitView
         fitViewOptions={{ padding: 5 }}
         isValidConnection={isValidConnection}
