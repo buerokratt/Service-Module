@@ -65,7 +65,6 @@ function useLayout() {
   const edgeCount = useStore(edgeCountSelector);
   const { getNodes, getNode, setNodes, setEdges, getEdges, fitView } = useReactFlow();
 
-  // Extract the layout logic into a separate function
   const runLayout = useCallback(() => {
     const nodes = getNodes();
     const edges = getEdges();
