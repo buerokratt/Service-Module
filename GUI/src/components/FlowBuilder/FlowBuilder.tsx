@@ -17,17 +17,34 @@ type FlowBuilderProps = {
 
 const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
   useLayout();
-  const { getNodes, setEdges } = useReactFlow();
+  const { getNodes, getEdges, setNodes, setEdges } = useReactFlow();
   const setReactFlowInstance = useServiceStore((state) => state.setReactFlowInstance);
   const { t } = useTranslation();
-  const { onNodesDelete, isDeleteConnectionsModalVisible, setIsDeleteConnectionsModalVisible, onDeleteConfirmed, onKeepItConfirmed, hasConnectedNodes, setDeletedNodes } =
+  const { onNodesDelete, onEdgesDelete, isDeleteConnectionsModalVisible, setIsDeleteConnectionsModalVisible, onDeleteConfirmed, onKeepItConfirmed, hasConnectedNodes, setDeletedNodes } =
     useOnNodesDelete();
+    const { setHasUnsavedChanges } = useServiceStore();
 
   const onConnect = useCallback(({ source, target }: any) => {
     const nodes = getNodes();
+    const edges = getEdges();
     const [from, to] = [source, target].sort(
       (a, b) => nodes.findIndex((n) => n.id === a) - nodes.findIndex((n) => n.id === b)
     );
+
+    const parentOutgoingEdges = edges.filter((edge) => edge.source === from);
+
+    const ghostEdges = parentOutgoingEdges.filter((edge) => {
+      const targetNode = nodes.find((n) => n.id === edge.target);
+      return targetNode?.type === "ghost";
+    });
+
+    if (ghostEdges.length > 0) {
+      const ghostNodeIds = ghostEdges.map((edge) => edge.target);
+      const updatedEdges = edges.filter((edge) => !ghostEdges.includes(edge));
+      const updatedNodes = nodes.filter((node) => !ghostNodeIds.includes(node.id));
+      setNodes(updatedNodes);
+      setEdges(updatedEdges);
+    }
 
     setEdges((eds) => [
       ...eds,
@@ -38,6 +55,7 @@ const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
         type: "step",
       },
     ]);
+    setHasUnsavedChanges(true);
   }, []);
 
   const isValidConnection = useCallback((connection: any) => {
@@ -81,8 +99,15 @@ const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
         onInit={setReactFlowInstance}
         nodesDraggable={false}
         onConnect={onConnect}
+        onEdgesDelete={(edges) => {
+          onEdgesDelete(edges);
+          setHasUnsavedChanges(true);
+        }}
         onBeforeDelete={onBeforeDelete}
-        onNodesDelete={onNodesDelete}
+        onNodesDelete={(nodes) => {
+          onNodesDelete(nodes);
+          setHasUnsavedChanges(true);
+        }}
         fitView
         fitViewOptions={{ padding: 5 }}
         isValidConnection={isValidConnection}

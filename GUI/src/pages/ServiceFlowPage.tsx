@@ -40,6 +40,8 @@ const ServiceFlowPage: FC = () => {
   const isCommon = useServiceStore((state) => state.isCommon);
   const [isInfoOpen, setIsInfoOpen] = useState(false);
 
+  const { hasUnsavedChanges, setHasUnsavedChanges, handleProgrammaticNavigation } = useServiceStore();
+
   const { id } = useParams();
 
   useEffect(() => {
@@ -80,6 +82,14 @@ const ServiceFlowPage: FC = () => {
     <>
       <NewServiceHeader
         activeStep={1}
+        backOnClick={() => {
+          if (hasUnsavedChanges) {
+            handleProgrammaticNavigation(ROUTES.OVERVIEW_ROUTE);
+          } else {
+            useServiceStore.getState().resetState();
+            navigate(ROUTES.OVERVIEW_ROUTE, { replace: true });
+          }
+        }}
         continueOnClick={() => {
           useServiceStore
             .getState()
@@ -93,6 +103,7 @@ const ServiceFlowPage: FC = () => {
             });
         }}
         saveOnClick={async () => {
+          setHasUnsavedChanges(false);
           if (!id) {
             const serviceId = useServiceStore.getState().serviceId;
             const serviceResponse = await api.get<Service>(getServiceById(serviceId));
@@ -131,6 +142,7 @@ const ServiceFlowPage: FC = () => {
                     placeholder={t("newService.title").toString()}
                     value={name}
                     onChange={(e) => {
+                      setHasUnsavedChanges(true);
                       const value = e.target.value.trimStart().replaceAll(/_+/g, "_");
                       const hasSpecialCharacters = /[^\p{L}\p{N}_ ]/u;
                       if (!hasSpecialCharacters.test(value) && !value.startsWith(" ")) {
@@ -158,7 +170,10 @@ const ServiceFlowPage: FC = () => {
                     name={""}
                     placeholder={t("newService.description").toString()}
                     value={description}
-                    onChange={(e) => useServiceStore.getState().setDescription(e.target.value)}
+                    onChange={(e) => {
+                      setHasUnsavedChanges(true);
+                      useServiceStore.getState().setDescription(e.target.value);
+                    }}
                     style={{
                       minWidth: "250px",
                       width: "20vw",
@@ -222,7 +237,10 @@ const ServiceFlowPage: FC = () => {
                   offLabel={t("global.no").toString()}
                   value={isCommon}
                   checked={isCommon}
-                  onCheckedChange={(e) => useServiceStore.getState().setIsCommon(e)}
+                  onCheckedChange={(e) => {
+                    setHasUnsavedChanges(true);
+                    useServiceStore.getState().setIsCommon(e);
+                  }}
                 />
               </Track>
             </Card>
@@ -234,7 +252,16 @@ const ServiceFlowPage: FC = () => {
             </div>
             <Chat />
           </ReactFlowProvider>
-          {isChooseSlotsModalVisible && <ChooseSlotModel onModalClose={() => setIsChooseSlotsModalVisible(false)} />}
+          {isChooseSlotsModalVisible && (
+            <ChooseSlotModel
+              onModalClose={(selection) => {
+                if (selection) {
+                  setHasUnsavedChanges(true);
+                }
+                setIsChooseSlotsModalVisible(false);
+              }}
+            />
+          )}
         </>
       )}
     </>

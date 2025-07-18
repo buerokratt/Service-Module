@@ -260,6 +260,9 @@
       "servieNotFound": "Teenust ei leitud",
       "serviceNotFoundEndpointsMessage": "Salvesta teenus kõigepealt, et saaksid lisada otspunkte"
     },
+    "popup": {
+      "unsavedChanges": "Sul on salvestamata muudatusi. Kas soovid kindlasti lahkuda? Salvestamata muudatused lähevad kaotsi."
+    },
     "titleRequired": "Pealkiri on kohustuslik",
     "chooseMemorySlots": "Vali mälukohad"
   },

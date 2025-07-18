@@ -260,6 +260,9 @@
       "servieNotFound": "Service not found",
       "serviceNotFoundEndpointsMessage": "Please save the service first to be able to add endpoints"
     },
+    "popup": {
+      "unsavedChanges": "You have unsaved changes. Are you sure you want to leave? Unsaved changes will be lost."
+    },
     "titleRequired": "Title is mandatory",
     "chooseMemorySlots": "Choose memory slots"
   },
