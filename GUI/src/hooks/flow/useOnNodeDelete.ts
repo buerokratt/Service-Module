@@ -82,7 +82,7 @@ const processDeletedNodes = (
   }
 
   export const useOnNodesDelete = () => {
-    const { getNodes, getEdges, setEdges, setNodes } = useReactFlow();
+    const { getNodes, getEdges, setEdges, setNodes, getNode } = useReactFlow();
 
     const [isDeleteConnectionsModalVisible, setIsDeleteConnectionsModalVisible] = useState(false);
     const [nodeToDelete, setNodeToDelete] = useState<Node | null>(null);
@@ -143,7 +143,39 @@ const processDeletedNodes = (
             console.error(error);
           }
 
-          setEdges(deleted.reduce((acc: Edge[], node: Node) => processDeletedNodes(acc, [node], nodes, setNodes), edges));
+          setEdges(
+            deleted.reduce((acc: Edge[], node: Node) => processDeletedNodes(acc, [node], nodes, setNodes), edges)
+          );
+        },
+        [getNodes, getEdges, setEdges, setNodes, hasConnectedNodes]
+      ),
+      onEdgesDelete: useCallback(
+        (deleted: Edge[]) => {
+          const parentNode = getNode(deleted[0].source);
+            if (parentNode) {
+            const ghostNode: Node = {
+              id: crypto.randomUUID(),
+              type: "ghost",
+              position: { x: parentNode.position.x + 50, y: parentNode.position.y + 50 },
+              data: { type: "ghost" },
+              className: "ghost",
+              selectable: false,
+              draggable: false,
+            };
+
+            const ghostEdge: Edge = {
+              id: `${parentNode.id}->${ghostNode.id}`,
+              source: parentNode.id,
+              target: ghostNode.id,
+              type: "step",
+              animated: true,
+              deletable: false,
+              label: "+",
+            };
+
+            setNodes((nds) => [...nds, ghostNode]);
+            setEdges((eds) => [...eds, ghostEdge]);
+            }
         },
         [getNodes, getEdges, setEdges, setNodes, hasConnectedNodes]
       ),

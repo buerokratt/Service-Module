@@ -20,7 +20,7 @@ const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
   const { getNodes, setEdges } = useReactFlow();
   const setReactFlowInstance = useServiceStore((state) => state.setReactFlowInstance);
   const { t } = useTranslation();
-  const { onNodesDelete, isDeleteConnectionsModalVisible, setIsDeleteConnectionsModalVisible, onDeleteConfirmed, onKeepItConfirmed, hasConnectedNodes, setDeletedNodes } =
+  const { onNodesDelete, onEdgesDelete, isDeleteConnectionsModalVisible, setIsDeleteConnectionsModalVisible, onDeleteConfirmed, onKeepItConfirmed, hasConnectedNodes, setDeletedNodes } =
     useOnNodesDelete();
     const { setHasUnsavedChanges } = useServiceStore();
 
@@ -83,7 +83,8 @@ const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
         onInit={setReactFlowInstance}
         nodesDraggable={false}
         onConnect={onConnect}
-        onEdgesDelete={() => {
+        onEdgesDelete={(edges) => {
+          onEdgesDelete(edges);
           setHasUnsavedChanges(true);
         }}
         onBeforeDelete={onBeforeDelete}
