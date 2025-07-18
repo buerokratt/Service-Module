@@ -32,7 +32,6 @@ import { MultiChoiceQuestionButton } from "types/multi-choice-question";
 import useServiceListStore from "store/services.store";
 import api from "../../services/api-dev";
 
-
 const FlowElementsPopup: React.FC = () => {
   const { t } = useTranslation();
   const [selectedTab, setSelectedTab] = useState<string | null>(null);
@@ -53,11 +52,15 @@ const FlowElementsPopup: React.FC = () => {
   const defaultMultiChoiceQuestionButtons = [
     {
       title: "Yes",
-      payload: `#service, /${selectedService?.type ?? 'POST'}/services/active/${serviceName}_mcq_${node?.data.label[node?.data.label.length - 1]}_0`,
+      payload: `#service, /${selectedService?.type ?? "POST"}/services/active/${serviceName}_mcq_${
+        node?.data.label[node?.data.label.length - 1]
+      }_0`,
     },
     {
       title: "No",
-      payload: `#service, /${selectedService?.type ?? 'POST'}/services/active/${serviceName}_mcq_${node?.data.label[node?.data.label.length - 1]}_1`,
+      payload: `#service, /${selectedService?.type ?? "POST"}/services/active/${serviceName}_mcq_${
+        node?.data.label[node?.data.label.length - 1]
+      }_1`,
     },
   ];
 
@@ -271,7 +274,7 @@ const FlowElementsPopup: React.FC = () => {
     });
 
     const edgesToRemove = connectedEdges.filter((edge) => {
-      if (!edge.label) return false;
+      if (!edge.label || edge.source !== originalNode.id) return false;
       const currentLabel = renamedButtons.get(edge.label as string) ?? edge.label;
       return !newButtonTitles.includes(currentLabel as string);
     });
@@ -334,10 +337,7 @@ const FlowElementsPopup: React.FC = () => {
           </Button>
           <Track gap={16}>
             {!isReadonly && (
-              <Button
-                appearance="secondary"
-                onClick={onClose}
-              >
+              <Button appearance="secondary" onClick={onClose}>
                 {t("global.cancel")}
               </Button>
             )}
