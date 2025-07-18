@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { useReactFlow, useStore, Node, Edge, ReactFlowState } from "@xyflow/react";
 import { stratify, tree } from "d3-hierarchy";
 import { timer } from "d3-timer";
@@ -56,15 +56,16 @@ function layoutNodes(nodes: Node[], edges: Edge[]): Node[] {
 }
 
 const nodeCountSelector = (state: ReactFlowState) => state.nodeLookup.size;
+const edgeCountSelector = (state: ReactFlowState) => state.edgeLookup.size;
 
 function useLayout() {
   const initial = useRef(true);
 
   const nodeCount = useStore(nodeCountSelector);
-
+  const edgeCount = useStore(edgeCountSelector);
   const { getNodes, getNode, setNodes, setEdges, getEdges, fitView } = useReactFlow();
 
-  useEffect(() => {
+  const runLayout = useCallback(() => {
     const nodes = getNodes();
     const edges = getEdges();
 
@@ -118,7 +119,13 @@ function useLayout() {
     return () => {
       t.stop();
     };
-  }, [nodeCount, getEdges, getNodes, getNode, setNodes, fitView, setEdges]);
+  }, [getEdges, getNodes, getNode, setNodes, fitView, setEdges ]);
+
+  useEffect(() => {
+    runLayout();
+  }, [nodeCount, edgeCount, runLayout]);
+  
+  return { runLayout };
 }
 
 export default useLayout;
