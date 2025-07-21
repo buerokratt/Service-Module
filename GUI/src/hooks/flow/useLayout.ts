@@ -16,6 +16,7 @@ function layoutNodes(nodes: Node[], edges: Edge[]): Node[] {
 
   const nodesCopy = [...nodes];
   const edgesCopy = [...edges];
+  const previousPositions = new Map(nodes.map((n) => [n.id, n.position]));
 
   const rootNodes = nodesCopy.filter((node) => !edgesCopy.some((edge) => edge.target === node.id));
 
@@ -42,6 +43,14 @@ function layoutNodes(nodes: Node[], edges: Edge[]): Node[] {
     const hierarchy = stratify<Node>()
       .id((d) => d.id)
       .parentId((d: Node) => edgesCopy.find((e: Edge) => e.target === d.id)?.source)(nodesCopy);
+
+      hierarchy.sort((a, b) => {
+        if (typeof a.id !== "string" || typeof b.id !== "string") return 0;
+        const aPos = previousPositions.get(a.id);
+        const bPos = previousPositions.get(b.id);
+        if (!aPos || !bPos) return 0;
+        return aPos.x - bPos.x || aPos.y - bPos.y;
+      });
 
     const root = layout(hierarchy);
 
