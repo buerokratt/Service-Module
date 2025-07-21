@@ -103,11 +103,28 @@ const processDeletedNodes = (
 
       const nodes = getNodes();
       const edges = getEdges();
-      const connectedNodes = getDirectlyConnectedNodes(nodeToDelete.id, nodes, edges, false);
-      const nodesToDelete = [nodeToDelete, ...connectedNodes];
+
+      const getAllDescendants = (nodeId: string, edges: Edge[], visited = new Set<string>()): string[] => {
+        if (visited.has(nodeId)) return [];
+        visited.add(nodeId);
+
+        const descendants: string[] = [];
+        edges.forEach((edge) => {
+          if (edge.source === nodeId) {
+            descendants.push(edge.target);
+            descendants.push(...getAllDescendants(edge.target, edges, visited));
+          }
+        });
+
+        return descendants;
+      };
+
+      const descendantIds = getAllDescendants(nodeToDelete.id, edges);
+      const uniqueDescendantIds = Array.from(new Set(descendantIds));
+      const descendantNodes = nodes.filter((node) => uniqueDescendantIds.includes(node.id));
+      const nodesToDelete = [nodeToDelete, ...descendantNodes];
 
       setEdges(processDeletedNodes(getEdges(), nodesToDelete, getNodes(), setNodes));
-
       setIsDeleteConnectionsModalVisible(false);
       setNodeToDelete(null);
     }, [nodeToDelete, getNodes, getEdges, setEdges, setNodes]);
