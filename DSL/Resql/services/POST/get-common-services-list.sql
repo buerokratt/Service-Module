@@ -1,8 +1,7 @@
-WITH latest_services AS (
-  SELECT DISTINCT ON (service_id) id, name, description, current_state, ruuter_type, is_common, service_id, slot
+WITH MaxServices AS (
+  SELECT MAX(id) AS maxId
   FROM services
-  WHERE NOT deleted AND is_common
-  ORDER BY service_id, id DESC
+  GROUP BY service_id
 )
 SELECT
   name,
@@ -13,7 +12,9 @@ SELECT
   service_id,
   slot,
   CEIL(COUNT(*) OVER() / :page_size::DECIMAL) AS total_pages
-FROM latest_services
+FROM services
+JOIN MaxServices ON id = maxId
+WHERE NOT deleted AND is_common
 ORDER BY
   CASE WHEN :sorting = 'id asc' THEN id END ASC,
   CASE WHEN :sorting = 'name asc' THEN name END ASC,
