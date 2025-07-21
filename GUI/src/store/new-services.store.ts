@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { v4 as uuid } from "uuid";
-import { Edge, EdgeChange, Node, NodeChange, ReactFlowInstance, applyEdgeChanges, applyNodeChanges } from "@xyflow/react";
+import { Edge, EdgeChange, Node, NodeChange, ReactFlowInstance, applyEdgeChanges, applyNodeChanges, getIncomers, getOutgoers } from "@xyflow/react";
 import { EndpointData, EndpointEnv, EndpointTab, PreDefinedEndpointEnvVariables } from "types/endpoint";
 import {
   getEndpointValidation,
@@ -101,6 +101,7 @@ interface ServiceStoreState {
   setClickedNode: (clickedNode: any) => void;
   onNodesChange: (changes: NodeChange[]) => void;
   onEdgesChange: (changes: EdgeChange[]) => void;
+  onNodeAdded: (node: Node) => void;
   isTestButtonEnabled: boolean;
   disableTestButton: () => void;
   enableTestButton: () => void;
@@ -637,16 +638,43 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
   },
   clickedNode: null,
   setClickedNode: (clickedNode) => set({ clickedNode }),
-
   onNodesChange: (changes: NodeChange[]) => {
     get().setNodes((prevNode) => {
       const changedNodes = applyNodeChanges(changes, prevNode);
       const newNodes = alignNodesInCaseAnyGotOverlapped(changes, changedNodes, get().edges);
+      changes.forEach((change) => {
+        if (change.type === "add") {
+          get().onNodeAdded(change.item);
+        }
+      });
       return newNodes;
     });
   },
   onEdgesChange: (changes: EdgeChange[]) => {
     get().setEdges((eds) => applyEdgeChanges(changes, eds));
+  },
+
+  onNodeAdded: (node: Node) => {
+    const cleanupGhostNodes = () => {
+      const instance = get().reactFlowInstance;
+      if (!instance) return;
+
+      const nodes = instance.getNodes() ?? [];
+      const edges = instance.getEdges() ?? [];
+
+      nodes
+        .filter((n) => n.type === "ghost")
+        .forEach((ghostNode) => {
+          const incomers = getIncomers(ghostNode, nodes, edges);
+          const outgoers = getOutgoers(ghostNode, nodes, edges);
+
+          if (incomers.length === 0 && outgoers.length === 0) {
+            instance.deleteElements({ nodes: [ghostNode] });
+          }
+        });
+    };
+
+    requestAnimationFrame(cleanupGhostNodes);
   },
   resetSelectedNode: () => set({ selectedNode: null }),
   handlePopupSave: (updatedNode) => {
