@@ -4,6 +4,7 @@ export type MultiChoiceQuestion = {
 };
 
 export type MultiChoiceQuestionButton = {
+  id: string;
   title: string;
   payload: string;
 };

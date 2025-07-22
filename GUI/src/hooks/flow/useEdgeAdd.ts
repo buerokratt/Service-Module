@@ -68,8 +68,8 @@ function useEdgeAdd(id: string) {
         id: crypto.randomUUID(),
         type: "ghost",
         position: {
-          x: targetNode.position.x + 150 * (i + 2),
-          y: targetNode.position.y + (i % 2 === 0 ? 0 : 100),
+          x: targetNode.position.x,
+          y: targetNode.position.y,
         },
         data: { type: "ghost" },
         className: "ghost",
