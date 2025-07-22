@@ -636,11 +636,13 @@ async function saveService(
 function getYamlContent(nodes: Node[], edges: Edge[], steps: Step[], name: string, description: string): any {
   const allRelations: any[] = [];
 
-  edges.forEach((edge) => {
-    const node = nodes.find((node) => node.id === edge.source);
-    const followingNode = nodes.find((node) => node.id === edge.target);
-    if (!node) return;
-    let error;
+  nodes.forEach((node) => {
+    const outgoingEdges = edges.filter((edge) => edge.source === node.id);
+
+    outgoingEdges.forEach((edge) => {
+      const followingNode = nodes.find((n) => n.id === edge.target);
+      let error;
+
     switch (node.data.stepType) {
       case StepType.Textfield:
         if (node.data.message === undefined) {
@@ -672,6 +674,7 @@ function getYamlContent(nodes: Node[], edges: Edge[], steps: Step[], name: strin
     }
 
     allRelations.push(`${edge.source},${edge.target}`);
+   });
   });
   // find finishing nodes
   edges.forEach((edge) => {
