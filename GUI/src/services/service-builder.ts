@@ -998,7 +998,6 @@ const getSwitchCase = (conditions: any[]) => {
 
 const getTemplate = (steps: Step[], node: Node, stepName: string, nextStep?: string) => {
   const data = getTemplateDataFromNode(node);
-  console.log(nextStep);
   if (node.data.stepType === StepType.UserDefined) {
     return {
       ...getDefinedEndpointStep(steps, node),
