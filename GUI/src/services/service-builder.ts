@@ -999,6 +999,11 @@ const getSwitchCase = (conditions: any[]) => {
 const getTemplate = (steps: Step[], node: Node, stepName: string, nextStep?: string) => {
   const data = getTemplateDataFromNode(node);
   if (node.data.stepType === StepType.UserDefined) {
+    console.log(node);
+    console.log({
+      ...getDefinedEndpointStep(steps, node),
+      next: nextStep ?? "format_messages",
+    });
     return {
       ...getDefinedEndpointStep(steps, node),
       next: nextStep ?? "format_messages",
@@ -1075,7 +1080,7 @@ const getTemplateDataFromNode = (node: Node): { templateName: string; body?: any
 
 const getDefinedEndpointStep = (steps: Step[], node: Node) => {
   const name = removeTrailingUnderscores(useServiceStore.getState().serviceNameDashed());
-  const endpoint = steps.find((e) => e.label === node.data.label)?.data;
+  const endpoint = steps.find((e) => e.label === node.data.label?.toString().split(" ")[0])?.data;
   const selectedEndpoint = endpoint?.definitions.find((e) => e.isSelected);
   if (!selectedEndpoint || !endpoint) {
     return {
