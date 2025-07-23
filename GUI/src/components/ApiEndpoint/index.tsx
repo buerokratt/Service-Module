@@ -2,7 +2,6 @@ import clsx from "clsx";
 import Box from "components/Box";
 import Button from "components/Button";
 import Icon from "components/Icon";
-import Popup from "components/Popup";
 import Track from "components/Track";
 import { FC, useState } from "react";
 import { useTranslation } from "react-i18next";
