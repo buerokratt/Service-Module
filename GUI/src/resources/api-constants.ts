@@ -39,3 +39,4 @@ export const updateEndpoint = (id: string): string => `${baseUrl}/services/updat
 export const deleteEndpoint = (): string => `${baseUrl}/services/delete-endpoint`;
 export const getSlots = (): string => `${baseUrl}/slots`;
 export const userStepPreferences = (): string => `${baseUrl}/steps/preferences`;
+export const getCommonEndpoints = (): string => `${baseUrl}/endpoints/common`;

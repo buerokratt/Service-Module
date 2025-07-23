@@ -752,7 +752,7 @@ function getYamlContent(nodes: Node[], edges: Edge[], steps: Step[], name: strin
         return handleMultiChoiceQuestion(finishedFlow, parentStepName, parentNode, childNode, childNodeId);
       }
 
-      const nextStep = childNode ? `${childNode.data.stepType}-${childNodeId}` : undefined;
+      const nextStep = childNode ? toSnakeCase(childNode.data.label ?? "format_messages") : "format_messages";
       const template = getTemplate(steps, parentNode, parentStepName, nextStep);
 
       finishedFlow.set(parentStepName, template);
@@ -1075,7 +1075,7 @@ const getTemplateDataFromNode = (node: Node): { templateName: string; body?: any
 
 const getDefinedEndpointStep = (steps: Step[], node: Node) => {
   const name = removeTrailingUnderscores(useServiceStore.getState().serviceNameDashed());
-  const endpoint = steps.find((e) => e.label === node.data.label)?.data;
+  const endpoint = steps.find((e) => e.label === node.data.label?.toString().split(" ")[0])?.data;
   const selectedEndpoint = endpoint?.definitions.find((e) => e.isSelected);
   if (!selectedEndpoint || !endpoint) {
     return {
