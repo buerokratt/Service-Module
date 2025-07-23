@@ -752,7 +752,7 @@ function getYamlContent(nodes: Node[], edges: Edge[], steps: Step[], name: strin
         return handleMultiChoiceQuestion(finishedFlow, parentStepName, parentNode, childNode, childNodeId);
       }
 
-      const nextStep = childNode ? `${childNode.data.stepType}-${childNodeId}` : undefined;
+      const nextStep = childNode ? toSnakeCase(childNode.data.label ?? "format_messages") : "format_messages";
       const template = getTemplate(steps, parentNode, parentStepName, nextStep);
 
       finishedFlow.set(parentStepName, template);
@@ -998,6 +998,7 @@ const getSwitchCase = (conditions: any[]) => {
 
 const getTemplate = (steps: Step[], node: Node, stepName: string, nextStep?: string) => {
   const data = getTemplateDataFromNode(node);
+  console.log(nextStep);
   if (node.data.stepType === StepType.UserDefined) {
     return {
       ...getDefinedEndpointStep(steps, node),
