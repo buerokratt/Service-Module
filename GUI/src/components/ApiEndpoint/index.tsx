@@ -186,16 +186,16 @@ const ApiEndpoint: FC<ApiEndpointProps> = ({ step, onClick }) => {
       )}
 
       {relatedServices.length > 0 && (
-        <Popup title={t("serviceFlow.apiElements.deletionImpossible")} onClose={() => setRelatedServices([])}>
+        <Modal title={t("serviceFlow.apiElements.deletionImpossible")} onClose={() => setRelatedServices([])}>
           <p>{t("serviceFlow.apiElements.deletionImpossibleMessage")}</p>
           <ol className={styles.popupList}>
             {relatedServices.map((service) => (
               <li key={service.serviceId}>
-                <Link to={`/flow/${service.serviceId}`}>{service.name}</Link>
+                <Link to={`/edit/${service.serviceId}`}>{service.name}</Link>
               </li>
             ))}
           </ol>
-        </Popup>
+        </Modal>
       )}
 
       <Box
