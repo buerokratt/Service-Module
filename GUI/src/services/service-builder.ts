@@ -636,11 +636,13 @@ async function saveService(
 function getYamlContent(nodes: Node[], edges: Edge[], steps: Step[], name: string, description: string): any {
   const allRelations: any[] = [];
 
-  edges.forEach((edge) => {
-    const node = nodes.find((node) => node.id === edge.source);
-    const followingNode = nodes.find((node) => node.id === edge.target);
-    if (!node) return;
-    let error;
+  nodes.forEach((node) => {
+    const outgoingEdges = edges.filter((edge) => edge.source === node.id);
+
+    outgoingEdges.forEach((edge) => {
+      const followingNode = nodes.find((n) => n.id === edge.target);
+      let error;
+
     switch (node.data.stepType) {
       case StepType.Textfield:
         if (node.data.message === undefined) {
@@ -672,6 +674,7 @@ function getYamlContent(nodes: Node[], edges: Edge[], steps: Step[], name: strin
     }
 
     allRelations.push(`${edge.source},${edge.target}`);
+   });
   });
   // find finishing nodes
   edges.forEach((edge) => {
@@ -705,12 +708,14 @@ function getYamlContent(nodes: Node[], edges: Edge[], steps: Step[], name: strin
     next: "get_secrets",
   });
 
+  const firstNode = nodes.find((node) => node.type === "custom");
   finishedFlow.set("get_secrets", {
     call: "http.get",
     args: {
       url: `${import.meta.env.REACT_APP_API_URL}/secrets-with-priority`,
     },
     result: "secrets",
+    next: firstNode ? toSnakeCase(firstNode.data.label?.toString() ?? "format_messages") : "format_messages",
   });
   try {
     allRelations.forEach((r) => {
@@ -759,7 +764,7 @@ function getYamlContent(nodes: Node[], edges: Edge[], steps: Step[], name: strin
     });
   }
 
-  finishedFlow.set("formatMessages", {
+  finishedFlow.set("format_messages", {
     call: "http.post",
     args: {
       url: "[#SERVICE_DMAPPER_HBS]/bot_responses_to_messages",
@@ -845,7 +850,7 @@ function handleTextField(
         )}`,
       },
     },
-    next: childNode ? toSnakeCase(childNode.data.label ?? "") : "formatMessages",
+    next: childNode ? toSnakeCase(childNode.data.label ?? "format_messages") : "format_messages",
   });
 }
 
@@ -904,7 +909,7 @@ function handleAssignStep(
       acc[e.key] = e.value;
       return acc;
     }, {}),
-    next: childNode ? toSnakeCase(childNode.data.label ?? "") : "formatMessages",
+    next: childNode ? toSnakeCase(childNode.data.label ?? "format_messages") : "format_messages",
   });
 }
 
@@ -922,7 +927,7 @@ function handleMultiChoiceQuestion(
         result: parentNode?.data?.multiChoiceQuestion?.question ?? "",
       },
     },
-    next: childNode ? toSnakeCase(childNode.data.label ?? "") : "formatMessages",
+    next: childNode ? toSnakeCase(childNode.data.label ?? "format_messages") : "format_messages",
   });
 }
 
@@ -996,7 +1001,7 @@ const getTemplate = (steps: Step[], node: Node, stepName: string, nextStep?: str
   if (node.data.stepType === StepType.UserDefined) {
     return {
       ...getDefinedEndpointStep(steps, node),
-      next: nextStep ?? "formatMessages",
+      next: nextStep ?? "format_messages",
     };
   }
 
@@ -1005,7 +1010,7 @@ const getTemplate = (steps: Step[], node: Node, stepName: string, nextStep?: str
     requestType: "templates",
     body: data?.body,
     result: data?.resultName ?? `${stepName}_result`,
-    next: nextStep ?? "formatMessages",
+    next: nextStep ?? "format_messages",
   };
 };
 

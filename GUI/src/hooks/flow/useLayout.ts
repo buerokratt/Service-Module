@@ -18,12 +18,17 @@ function layoutNodes(nodes: Node[], edges: Edge[]): Node[] {
   const edgesCopy = [...edges];
   const previousPositions = new Map(nodes.map((n) => [n.id, n.position]));
 
-  const rootNodes = nodesCopy.filter((node) => !edgesCopy.some((edge) => edge.target === node.id));
+  const multiParentNodes = nodesCopy.filter((node) => edgesCopy.filter((edge) => edge.target === node.id).length > 1);
+  const nodesToExclude = new Set(multiParentNodes.map((n) => n.id));
+  const filteredNodes = nodesCopy.filter((n) => !nodesToExclude.has(n.id));
+  const filteredEdges = edgesCopy.filter((e) => !nodesToExclude.has(e.target));
+
+  const rootNodes = filteredNodes.filter((node) => !filteredEdges.some((edge) => edge.target === node.id));
 
   if (rootNodes.length > 1) {
     const virtualRootId = "virtual-root";
 
-    nodesCopy.push({
+    filteredNodes.push({
       id: virtualRootId,
       type: "virtual",
       data: {},
@@ -31,7 +36,7 @@ function layoutNodes(nodes: Node[], edges: Edge[]): Node[] {
     });
 
     rootNodes.forEach((root) => {
-      edgesCopy.push({
+      filteredEdges.push({
         id: `virtual-edge-${root.id}`,
         source: virtualRootId,
         target: root.id,
@@ -42,22 +47,45 @@ function layoutNodes(nodes: Node[], edges: Edge[]): Node[] {
   try {
     const hierarchy = stratify<Node>()
       .id((d) => d.id)
-      .parentId((d: Node) => edgesCopy.find((e: Edge) => e.target === d.id)?.source)(nodesCopy);
+      .parentId((d: Node) => filteredEdges.find((e: Edge) => e.target === d.id)?.source)(filteredNodes);
 
-      hierarchy.sort((a, b) => {
-        if (typeof a.id !== "string" || typeof b.id !== "string") return 0;
-        const aPos = previousPositions.get(a.id);
-        const bPos = previousPositions.get(b.id);
-        if (!aPos || !bPos) return 0;
-        return aPos.x - bPos.x || aPos.y - bPos.y;
-      });
+    hierarchy.sort((a, b) => {
+      if (typeof a.id !== "string" || typeof b.id !== "string") return 0;
+      const aPos = previousPositions.get(a.id);
+      const bPos = previousPositions.get(b.id);
+      if (!aPos || !bPos) return 0;
+      return aPos.x - bPos.x || aPos.y - bPos.y;
+    });
 
     const root = layout(hierarchy);
 
-    return root
+    let resultNodes = root
       .descendants()
       .map((d) => ({ ...d.data, position: { x: d.x, y: d.y } }))
       .filter((node) => node.id !== "virtual-root");
+
+    for (const node of multiParentNodes) {
+      const parentEdges = edgesCopy.filter((e) => e.target === node.id);
+      const parentNodes = resultNodes.filter((n) => parentEdges.some((e) => e.source === n.id));
+
+      if (parentNodes.length > 0) {
+        const avgX = parentNodes.reduce((sum, parent) => sum + parent.position.x, 0) / parentNodes.length;
+        const maxParentY = Math.max(...parentNodes.map((p) => p.position.y));
+        const newY = maxParentY + 180;
+
+        resultNodes.push({
+          ...node,
+          position: {
+            x: avgX,
+            y: newY,
+          },
+        });
+      } else {
+        resultNodes.push(node);
+      }
+    }
+
+    return resultNodes;
   } catch (error) {
     console.error("Error in hierarchy layout:", error);
     return nodes;
@@ -128,12 +156,12 @@ function useLayout() {
     return () => {
       t.stop();
     };
-  }, [getEdges, getNodes, getNode, setNodes, fitView, setEdges ]);
+  }, [getEdges, getNodes, getNode, setNodes, fitView, setEdges]);
 
   useEffect(() => {
     runLayout();
   }, [nodeCount, edgeCount, runLayout]);
-  
+
   return { runLayout };
 }
 
