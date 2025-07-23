@@ -1,8 +1,9 @@
 import { create } from "zustand";
 import { v4 as uuid } from "uuid";
-import { Edge, EdgeChange, Node, NodeChange, ReactFlowInstance, applyEdgeChanges, applyNodeChanges } from "@xyflow/react";
+import { Edge, EdgeChange, Node, NodeChange, ReactFlowInstance, applyEdgeChanges, applyNodeChanges, getIncomers, getOutgoers } from "@xyflow/react";
 import { EndpointData, EndpointEnv, EndpointTab, PreDefinedEndpointEnvVariables } from "types/endpoint";
 import {
+  getCommonEndpoints,
   getEndpointValidation,
   getSecretVariables,
   getServiceById,
@@ -10,7 +11,7 @@ import {
   servicesRequestsExplain,
   userStepPreferences,
 } from "resources/api-constants";
-import { Service, ServiceState, Step, StepType } from "types";
+import { EndpointDefinitionJson, Service, ServiceState, Step, StepType } from "types";
 import { RequestVariablesTabsRawData, RequestVariablesTabsRowsData } from "types/request-variables";
 import useToastStore from "./toasts.store";
 import i18next from "i18next";
@@ -24,6 +25,7 @@ import { EndpointResponseVariable } from "types/endpoint/endpoint-response-varia
 import { Assign } from "types/assign";
 import { EndpointType } from "types/endpoint/endpoint-type";
 import api from "../services/api-dev";
+import { AxiosResponse } from "axios";
 
 interface ServiceStoreState {
   endpoints: EndpointData[];
@@ -72,7 +74,8 @@ interface ServiceStoreState {
   editEndpoint: (endpoint?: EndpointData) => void;
   loadSecretVariables: () => Promise<void>;
   loadTaraVariables: () => Promise<void>;
-  loadService: (id?: string, resetState?: boolean) => Promise<void>;
+  loadService: (id?: string, resetState?: boolean) => Promise<AxiosResponse<Service, any> | undefined>;
+  loadCommonEndpoints: () => Promise<void>;
   loadStepPreferences: () => Promise<void>;
   getAvailableRequestValues: (endpointId: string) => PreDefinedEndpointEnvVariables;
   onNameChange: (endpointId: string, oldName: string, newName: string) => void;
@@ -101,6 +104,7 @@ interface ServiceStoreState {
   setClickedNode: (clickedNode: any) => void;
   onNodesChange: (changes: NodeChange[]) => void;
   onEdgesChange: (changes: EdgeChange[]) => void;
+  onNodeAdded: (node: Node) => void;
   isTestButtonEnabled: boolean;
   disableTestButton: () => void;
   enableTestButton: () => void;
@@ -379,9 +383,10 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
       get().resetState();
     }
     let nodes = get().nodes;
+    let serviceResponse: AxiosResponse<Service, any> | undefined;
 
     if (id) {
-      const serviceResponse = await api.get<Service>(getServiceById(id));
+      serviceResponse = await api.get<Service>(getServiceById(id));
 
       const structure = JSON.parse(serviceResponse.data.structure?.value ?? "{}");
       let endpoints = serviceResponse.data.endpoints.map((endpoint) => {
@@ -436,6 +441,25 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
       .map((node) => `{{client_input_${node.data.clientInputId}}}`);
 
     get().addProductionVariables(variables);
+    return serviceResponse;
+  },
+  loadCommonEndpoints: async () => {
+    const response = await api.get(getCommonEndpoints());
+    const endpointsResponse: Array<
+      Pick<EndpointData, "endpointId" | "name" | "type" | "fileName" | "isCommon"> & {
+        definitions: EndpointDefinitionJson;
+      }
+    > = response.data.response;
+    let endpoints = endpointsResponse.map((endpoint) => {
+      return {
+        ...endpoint,
+        definitions: JSON.parse(endpoint.definitions.value),
+      };
+    });
+
+    set({
+      endpoints,
+    });
   },
   loadStepPreferences: async () => {
     try {
@@ -637,16 +661,43 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
   },
   clickedNode: null,
   setClickedNode: (clickedNode) => set({ clickedNode }),
-
   onNodesChange: (changes: NodeChange[]) => {
     get().setNodes((prevNode) => {
       const changedNodes = applyNodeChanges(changes, prevNode);
       const newNodes = alignNodesInCaseAnyGotOverlapped(changes, changedNodes, get().edges);
+      changes.forEach((change) => {
+        if (change.type === "add") {
+          get().onNodeAdded(change.item);
+        }
+      });
       return newNodes;
     });
   },
   onEdgesChange: (changes: EdgeChange[]) => {
     get().setEdges((eds) => applyEdgeChanges(changes, eds));
+  },
+
+  onNodeAdded: (node: Node) => {
+    const cleanupGhostNodes = () => {
+      const instance = get().reactFlowInstance;
+      if (!instance) return;
+
+      const nodes = instance.getNodes() ?? [];
+      const edges = instance.getEdges() ?? [];
+
+      nodes
+        .filter((n) => n.type === "ghost")
+        .forEach((ghostNode) => {
+          const incomers = getIncomers(ghostNode, nodes, edges);
+          const outgoers = getOutgoers(ghostNode, nodes, edges);
+
+          if (incomers.length === 0 && outgoers.length === 0) {
+            instance.deleteElements({ nodes: [ghostNode] });
+          }
+        });
+    };
+
+    requestAnimationFrame(cleanupGhostNodes);
   },
   resetSelectedNode: () => set({ selectedNode: null }),
   handlePopupSave: (updatedNode) => {

@@ -51,12 +51,14 @@ const FlowElementsPopup: React.FC = () => {
 
   const defaultMultiChoiceQuestionButtons = [
     {
+      id: "1",
       title: "Yes",
       payload: `#service, /${selectedService?.type ?? "POST"}/services/active/${serviceName}_mcq_${
         node?.data.label[node?.data.label.length - 1]
       }_0`,
     },
     {
+      id: "2",
       title: "No",
       payload: `#service, /${selectedService?.type ?? "POST"}/services/active/${serviceName}_mcq_${
         node?.data.label[node?.data.label.length - 1]
@@ -249,81 +251,97 @@ const FlowElementsPopup: React.FC = () => {
 
     const currentButtons = originalNode.data.multiChoiceQuestion?.buttons ?? defaultMultiChoiceQuestionButtons;
     const newButtons = updatedNode.data.multiChoiceQuestion?.buttons ?? [];
-    const newButtonTitles = newButtons.map((btn) => btn.title);
 
     const edges = instance.getEdges();
     const nodes = instance.getNodes();
 
     const connectedEdges = getConnectedEdges([originalNode], edges);
 
-    const renamedButtons = new Map<string, string>();
-    currentButtons.forEach((oldBtn, index) => {
-      if (index < newButtons.length && oldBtn.title !== newButtons[index].title) {
-        renamedButtons.set(oldBtn.title, newButtons[index].title);
-      }
+    const currentButtonMap = new Map(currentButtons.map(btn => [btn.id, btn]));
+    const newButtonMap = new Map(newButtons.map(btn => [btn.id, btn]));
+
+    const addedButtons = newButtons.filter(btn => !currentButtonMap.has(btn.id));
+    const removedButtons = currentButtons.filter(btn => !newButtonMap.has(btn.id));
+    const renamedButtons = currentButtons
+        .filter(btn => newButtonMap.has(btn.id))
+        .filter(btn => newButtonMap.get(btn.id)!.title !== btn.title)
+        .map(btn => ({
+            oldTitle: btn.title,
+            newTitle: newButtonMap.get(btn.id)!.title,
+            id: btn.id
+        }));
+
+    const updatedEdges = edges.map(edge => {
+        if (!edge.label || !connectedEdges.some(ce => ce.id === edge.id)) return edge;
+        const rename = renamedButtons.find(r => r.oldTitle === edge.label);
+        if (rename) {
+            return { ...edge, label: rename.newTitle };
+        }
+        return edge;
     });
 
-    const updatedEdges = edges.map((edge) => {
-      if (!edge.label || !connectedEdges.some((ce) => ce.id === edge.id)) return edge;
-
-      const newLabel = renamedButtons.get(edge.label as string);
-      if (newLabel) {
-        return { ...edge, label: newLabel };
-      }
-      return edge;
+    const edgesToRemove = connectedEdges.filter(edge => {
+        if (!edge.label || edge.source !== originalNode.id) return false;
+        return removedButtons.some(btn => btn.title === edge.label);
     });
 
-    const edgesToRemove = connectedEdges.filter((edge) => {
-      if (!edge.label || edge.source !== originalNode.id) return false;
-      const currentLabel = renamedButtons.get(edge.label as string) ?? edge.label;
-      return !newButtonTitles.includes(currentLabel as string);
+    const filteredEdges = updatedEdges.filter(e => 
+        !edgesToRemove.some(edgeToRemove => edgeToRemove.id === e.id)
+    );
+
+    const existingButtonTitles = new Set(
+        filteredEdges
+            .filter(edge => edge.source === originalNode.id)
+            .map(edge => edge.label)
+            .filter(Boolean)
+    );
+
+    const buttonsNeedingEdges = addedButtons.filter(btn => 
+        !existingButtonTitles.has(btn.title)
+    );
+
+    const newEdges = buttonsNeedingEdges.map(button => {
+        const newEdge: Edge = {
+            id: `${originalNode.id}->${button.id}`,
+            source: originalNode.id,
+            target: `ghost-${button.id}`,
+            type: "step",
+            animated: true,
+            deletable: false,
+            label: button.title,
+        };
+        return newEdge;
     });
 
-    const existingEdgeLabels = updatedEdges
-      .filter((edge) => connectedEdges.some((ce) => ce.id === edge.id))
-      .map((edge) => edge.label)
-      .filter(Boolean);
-
-    const buttonsNeedingEdges = newButtons.filter((btn) => !existingEdgeLabels.includes(btn.title));
-
-    const filteredEdges = updatedEdges.filter((e) => !edgesToRemove.some((edgeToRemove) => edgeToRemove.id === e.id));
-
-    const newEdges = buttonsNeedingEdges.map((button) => {
-      const newEdge: Edge = {
-        id: `${originalNode.id}->${crypto.randomUUID()}`,
-        source: originalNode.id,
-        target: crypto.randomUUID(),
-        type: "step",
-        animated: true,
-        deletable: false,
-        label: button.title,
-      };
-      return newEdge;
-    });
-
-    const newGhostNodes = newEdges.map((edge) => ({
-      id: edge.target,
-      type: "ghost",
-      position: { x: originalNode.position.x, y: originalNode.position.y },
-      data: { type: "ghost" },
-      className: "ghost",
-      selectable: false,
-      draggable: false,
+    const newGhostNodes = newEdges.map(edge => ({
+        id: edge.target,
+        type: "ghost",
+        position: { 
+            x: originalNode.position.x + 200,
+            y: originalNode.position.y 
+        },
+        data: { type: "ghost" },
+        className: "ghost",
+        selectable: false,
+        draggable: false,
     }));
 
-    let finalNodes = [...nodes.filter((n) => n.id !== updatedNode.id), updatedNode, ...newGhostNodes];
+    let finalNodes = [
+        ...nodes.filter(n => n.id !== updatedNode.id), 
+        updatedNode, 
+        ...newGhostNodes
+    ];
     let finalEdges = [...filteredEdges, ...newEdges];
 
     finalNodes = finalNodes.filter(
-      (node) =>
-        node.type !== "ghost" ||
+        node => node.type !== "ghost" ||
         getIncomers(node, finalNodes, finalEdges).length > 0 ||
         getOutgoers(node, finalNodes, finalEdges).length > 0
     );
 
     instance.setNodes(finalNodes);
     instance.setEdges(finalEdges);
-  };
+};
 
   return (
     <Popup

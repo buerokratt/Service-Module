@@ -2,7 +2,6 @@ import clsx from "clsx";
 import Box from "components/Box";
 import Button from "components/Button";
 import Icon from "components/Icon";
-import Popup from "components/Popup";
 import Track from "components/Track";
 import { FC, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -186,16 +185,16 @@ const ApiEndpoint: FC<ApiEndpointProps> = ({ step, onClick }) => {
       )}
 
       {relatedServices.length > 0 && (
-        <Popup title={t("serviceFlow.apiElements.deletionImpossible")} onClose={() => setRelatedServices([])}>
+        <Modal title={t("serviceFlow.apiElements.deletionImpossible")} onClose={() => setRelatedServices([])}>
           <p>{t("serviceFlow.apiElements.deletionImpossibleMessage")}</p>
           <ol className={styles.popupList}>
             {relatedServices.map((service) => (
               <li key={service.serviceId}>
-                <Link to={`/flow/${service.serviceId}`}>{service.name}</Link>
+                <Link to={`/edit/${service.serviceId}`}>{service.name}</Link>
               </li>
             ))}
           </ol>
-        </Popup>
+        </Modal>
       )}
 
       <Box

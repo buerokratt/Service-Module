@@ -16,9 +16,9 @@ const maxButtons = parseInt(process.env.REACT_APP_MULTI_CHOICE_QUESTION_MAX_BUTT
 
 export interface MultiChoiceQuestionContentProps {
   question: string;
-  buttons: { title: string; payload: string }[];
+  buttons: { id: string, title: string; payload: string }[];
   setQuestion: (q: string) => void;
-  setButtons: (b: { title: string; payload: string }[]) => void;
+  setButtons: (b: { id: string, title: string; payload: string }[]) => void;
   setIsSaveEnabled: (b: boolean) => void;
 }
 
@@ -66,7 +66,16 @@ const MultiChoiceQuestionContent: FC<MultiChoiceQuestionContentProps> = ({
   };
 
   const handleAdd = () => {
-    const newButtons = [...buttons, { title: "", payload: `#service, /${selectedService?.type ?? 'POST'}/services/active/${serviceName}_mcq_${node?.data.label[node?.data.label.length - 1]}_${buttons.length}` }];
+    const newButtons = [
+      ...buttons,
+      {
+        id: crypto.randomUUID(),
+        title: "",
+        payload: `#service, /${selectedService?.type ?? "POST"}/services/active/${serviceName}_mcq_${
+          node?.data.label[node?.data.label.length - 1]
+        }_${buttons.length}`,
+      },
+    ];
     setButtons(newButtons);
     setIsSaveEnabled(newButtons.length > 1);
   };

@@ -23,10 +23,7 @@ import "./ServiceFlowPage.scss";
 import { Mosaic } from "react-loading-indicators";
 import { MdOutlineEdit } from "react-icons/md";
 import ChooseSlotModel from "./Integration/ChooseSlotModel";
-import { Service } from "types";
-import { getServiceById } from "resources/api-constants";
 import useServiceListStore from "store/services.store";
-import api from "services/api";
 
 const ServiceFlowPage: FC = () => {
   const { t } = useTranslation();
@@ -47,6 +44,7 @@ const ServiceFlowPage: FC = () => {
   useEffect(() => {
     if (!id) {
       useServiceStore.getState().loadStepPreferences();
+      useServiceStore.getState().loadCommonEndpoints();
       return;
     }
     setLoading(true);
@@ -106,10 +104,12 @@ const ServiceFlowPage: FC = () => {
           setHasUnsavedChanges(false);
           if (!id) {
             const serviceId = useServiceStore.getState().serviceId;
-            const serviceResponse = await api.get<Service>(getServiceById(serviceId));
-            useServiceListStore.getState().setSelectedService(serviceResponse.data);
-            await useServiceListStore.getState().changeServiceStateToDraft(serviceResponse.data);
-            navigate(ROUTES.replaceWithId(ROUTES.EDITSERVICE_ROUTE, serviceId));
+            const serviceResponse = await useServiceStore.getState().loadService(serviceId);
+            if (serviceResponse) {
+              useServiceListStore.getState().setSelectedService(serviceResponse?.data);
+              await useServiceListStore.getState().changeServiceStateToDraft(serviceResponse?.data);
+              navigate(ROUTES.replaceWithId(ROUTES.EDITSERVICE_ROUTE, serviceId));
+            } 
           } else {
             await useServiceListStore.getState().changeServiceStateToDraft();
           }

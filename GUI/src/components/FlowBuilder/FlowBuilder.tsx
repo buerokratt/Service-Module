@@ -27,11 +27,8 @@ const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
   const onConnect = useCallback(({ source, target }: any) => {
     const nodes = getNodes();
     const edges = getEdges();
-    const [from, to] = [source, target].sort(
-      (a, b) => nodes.findIndex((n) => n.id === a) - nodes.findIndex((n) => n.id === b)
-    );
 
-    const parentOutgoingEdges = edges.filter((edge) => edge.source === from);
+    const parentOutgoingEdges = edges.filter((edge) => edge.source === source);
 
     const ghostEdges = parentOutgoingEdges.filter((edge) => {
       const targetNode = nodes.find((n) => n.id === edge.target);
@@ -49,9 +46,9 @@ const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
     setEdges((eds) => [
       ...eds,
       {
-        id: `${from}->${to}`,
-        source: from,
-        target: to,
+        id: `${source}->${target}`,
+        source: source,
+        target: target,
         type: "step",
       },
     ]);
