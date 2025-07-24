@@ -68,6 +68,7 @@ function CustomEdge({
   });
   const { id: idParam } = useParams();
   const [endpointName, setEndpointName] = useState<string>(endpoint.name ?? "");
+  const [isCommonEndpoint, setIsCommonEndpoint] = useState<boolean>(endpoint.isCommon ?? false);
   const { setHasUnsavedChanges } = useServiceStore();
 
   const stepPreferences = useServiceStore((state) => state.stepPreferences);
@@ -203,6 +204,7 @@ function CustomEdge({
                 isDeletable={false}
                 onNameExists={setEndpointNameExists}
                 onNameChange={setEndpointName}
+                onCommonChange={setIsCommonEndpoint}
               />
               <Track justify="end" gap={16}>
                 <Button appearance="secondary" onClick={() => setIsAddEndpointModalVisible(false)}>
@@ -214,6 +216,7 @@ function CustomEdge({
                   onClick={() => {
                     const passedEndpoint = endpoint;
                     passedEndpoint.name = endpointName;
+                    passedEndpoint.isCommon = isCommonEndpoint;
                     setIsCreatingEndpoint(true);
                     saveEndpoints(
                       [passedEndpoint],
