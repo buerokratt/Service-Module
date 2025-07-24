@@ -19,6 +19,7 @@ import api from "../services/api-dev";
 import { NodeDataProps } from "types/service-flow";
 import { getLastDigits, removeTrailingUnderscores, toSnakeCase } from "utils/string-util";
 import { format } from "date-fns";
+import { AxiosError } from "axios";
 
 // refactor this file later
 
@@ -1142,10 +1143,10 @@ export const saveFlowClick = async (status: "draft" | "ready" = "ready") => {
       });
       useServiceStore.getState().enableTestButton();
     },
-    onError: (e) => {
+    onError: (e: AxiosError) => {
       useToastStore.getState().error({
         title: i18next.t("newService.toast.failed"),
-        message: e?.message,
+        message: e.response?.status === 409 ? t("newService.toast.serviceNameAlreadyExists") : e?.message,
       });
     },
     description,

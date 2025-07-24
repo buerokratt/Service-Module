@@ -52,8 +52,37 @@ extract_request_data:
 check_for_update_service_db:
   switch:
     - condition: ${incoming.body.updateServiceDb === true}
-      next: delete_all_mcq_files
+      next: get_service
   next: check_for_content
+
+get_service:
+  call: http.post
+  args:
+    url: "[#SERVICE_RESQL]/services/get_services_by_ids"
+    body:
+      serviceIds: "${id}"
+  result: get_service_result
+
+check_if_name_is_the_same:
+  switch:
+    - condition: ${get_service_result.response.body[0].name === name}
+      next: delete_all_mcq_files
+  next: check_if_name_exists
+
+check_if_name_exists:
+  call: http.post
+  args:
+    url: "[#SERVICE_RESQL]/services/check_name_exist"
+    body:
+      name: ${name}
+  result: name_exists_res
+  next: check_name_exists_result
+
+check_name_exists_result:
+  switch:
+    - condition: ${name_exists_res.response.body[0].nameExists}
+      next: return_name_already_exists
+  next: delete_all_mcq_files   
 
 delete_all_mcq_files:
   call: http.post
@@ -200,4 +229,9 @@ return_bad_request:
 return_incorrect_request:
   status: 400
   return: "Required parameter(s) missing"
+  next: end
+
+return_name_already_exists:
+  status: 409
+  return: "Service name already exists"
   next: end
