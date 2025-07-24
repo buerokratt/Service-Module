@@ -1,4 +1,3 @@
-import clsx from "clsx";
 import Box from "components/Box";
 import Button from "components/Button";
 import Icon from "components/Icon";
@@ -6,8 +5,8 @@ import Track from "components/Track";
 import { FC, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { MdDeleteOutline, MdOutlineEdit } from "react-icons/md";
-import { Link, useParams } from "react-router-dom";
-import { deleteEndpoint, getServicesByEndpointId } from "resources/api-constants";
+import { Link } from "react-router-dom";
+import { deleteEndpoint } from "resources/api-constants";
 import useServiceStore from "store/new-services.store";
 import useToastStore from "store/toasts.store";
 import { Step, StepType } from "types";
@@ -32,9 +31,7 @@ interface ApiEndpointProps {
 
 const ApiEndpoint: FC<ApiEndpointProps> = ({ step, onClick }) => {
   const { t } = useTranslation();
-  const { id } = useParams();
 
-  const [isGettingRelatedServices, setIsGettingRelatedServices] = useState(false);
   const [relatedServices, setRelatedServices] = useState<RelatedService[]>([]);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -47,30 +44,6 @@ const ApiEndpoint: FC<ApiEndpointProps> = ({ step, onClick }) => {
   const [isCommonEndpoint, setIsCommonEndpoint] = useState<boolean>(step.data?.isCommon ?? false);
 
   const { deleteEndpoint: deleteEndpointFromStore } = useServiceStore();
-
-  const canDeleteEndpoint = async (endpoint: EndpointData | undefined) => {
-    if (!endpoint) return;
-
-    if (endpoint.isCommon) {
-      setIsGettingRelatedServices(true);
-
-      try {
-        const services = (await api.get<RelatedService[]>(getServicesByEndpointId(endpoint.endpointId, id))).data;
-        if (services.length > 0) {
-          setRelatedServices(services);
-        } else {
-          setShowDeleteModal(true);
-        }
-      } catch (error) {
-        console.error(`Error getting related services: ${error}`);
-        useToastStore.getState().error({ title: t("serviceFlow.apiElements.deleteError") });
-      }
-
-      setIsGettingRelatedServices(false);
-    } else {
-      setShowDeleteModal(true);
-    }
-  };
 
   const deleteSelectedEndpoint = async (endpoint: EndpointData | undefined) => {
     if (!endpoint) {
@@ -213,30 +186,26 @@ const ApiEndpoint: FC<ApiEndpointProps> = ({ step, onClick }) => {
             {step.type === "user-defined" && <img alt="" src={apiIconTag} />}
             <span className={styles.label}>{step.label}</span>
           </div>
-          {isGettingRelatedServices ? (
-            <div className={clsx("loader", styles.loader)} />
-          ) : (
-            <Track gap={12}>
-              <button
-                className={styles.deleteButton}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setShowEditModal(true);
-                }}
-              >
-                <Icon icon={<MdOutlineEdit size={18} />} size="medium" />
-              </button>
-              <button
-                className={styles.deleteButton}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  canDeleteEndpoint(step.data);
-                }}
-              >
-                <Icon icon={<MdDeleteOutline size={18} />} size="medium" />
-              </button>
-            </Track>
-          )}
+          <Track gap={12}>
+            <button
+              className={styles.deleteButton}
+              onClick={(e) => {
+                e.stopPropagation();
+                setShowEditModal(true);
+              }}
+            >
+              <Icon icon={<MdOutlineEdit size={18} />} size="medium" />
+            </button>
+            <button
+              className={styles.deleteButton}
+              onClick={(e) => {
+                e.stopPropagation();
+                setShowDeleteModal(true);
+              }}
+            >
+              <Icon icon={<MdDeleteOutline size={18} />} size="medium" />
+            </button>
+          </Track>
         </Track>
       </Box>
     </>

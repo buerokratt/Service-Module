@@ -54,7 +54,7 @@ check_status:
     - condition: ${status_res.response.body[0].currentState === 'active'}
       next: return_cannot_delete_active_service
     - condition: ${status_res.response.body[0].currentState === 'ready'}
-      next: assign_draft_path  
+      next: assign_draft_path
   next: assign_old_path
 
 assign_old_path:
@@ -64,7 +64,7 @@ assign_old_path:
 
 assign_draft_path:
   assign:
-    old_file_status_path: 'draft'
+    old_file_status_path: "draft"
   next: delete_service
 
 delete_service:
@@ -113,15 +113,6 @@ delete_endpoints_by_service_id:
     body:
       serviceId: ${id}
   result: delete_endpoint_results
-  next: remove_service_from_common_endpoints
-
-remove_service_from_common_endpoints:
-  call: http.post
-  args:
-    url: "[#SERVICE_RESQL]/endpoints/remove_service_from_common_endpoints"
-    body:
-      serviceId: ${id}
-  result: remove_service_from_common_endpoints_results
   next: delete_endpoint_files
 
 delete_endpoint_files:
