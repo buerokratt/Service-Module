@@ -258,7 +258,8 @@
       "testResultSuccess": "Testi tulemus - edu",
       "testResultError": "Testi tulemus - viga",
       "servieNotFound": "Teenust ei leitud",
-      "serviceNotFoundEndpointsMessage": "Salvesta teenus kõigepealt, et saaksid lisada otspunkte"
+      "serviceNotFoundEndpointsMessage": "Salvesta teenus kõigepealt, et saaksid lisada otspunkte",
+      "serviceNameAlreadyExists": "Teenuse nimi on juba olemas"
     },
     "popup": {
       "unsavedChanges": "Sul on salvestamata muudatusi. Kas soovid kindlasti lahkuda? Salvestamata muudatused lähevad kaotsi."

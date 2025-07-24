@@ -258,7 +258,8 @@
       "testResultSuccess": "Test result- success",
       "testResultError": "Test result - error",
       "servieNotFound": "Service not found",
-      "serviceNotFoundEndpointsMessage": "Please save the service first to be able to add endpoints"
+      "serviceNotFoundEndpointsMessage": "Please save the service first to be able to add endpoints",
+      "serviceNameAlreadyExists": "Service name already exists"
     },
     "popup": {
       "unsavedChanges": "You have unsaved changes. Are you sure you want to leave? Unsaved changes will be lost."
