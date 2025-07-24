@@ -45,7 +45,7 @@ services:
       - database
     environment:
       - sqlms.datasources.[0].name=byk
-      # - sqlms.datasources.[0].jdbcUrl=jdbc:postgresql://database:5432/services_db // For Local Use
+      # - sqlms.datasources.[0].jdbcUrl=jdbc:postgresql://database:5432/services_db # For Local Use
       - sqlms.datasources.[0].jdbcUrl=jdbc:postgresql://171.22.247.13:5435/services_db
       - sqlms.datasources.[0].username=byk
       - sqlms.datasources.[0].password=01234
@@ -66,7 +66,7 @@ services:
     environment:
       - server.port=8088
       - sqlms.datasources.[0].name=byk
-      # - sqlms.datasources.[0].jdbcUrl=jdbc:postgresql://database:5432/users_db // For Local Use
+      # - sqlms.datasources.[0].jdbcUrl=jdbc:postgresql://database:5432/users_db # For Local Use
       - sqlms.datasources.[0].jdbcUrl=jdbc:postgresql://171.22.247.13:5433/byk
       - sqlms.datasources.[0].username=byk
       - sqlms.datasources.[0].password=2nH09n6Gly
@@ -86,7 +86,7 @@ services:
     environment:
       - server.port=8089
       - sqlms.datasources.[0].name=byk
-      # - sqlms.datasources.[0].jdbcUrl=jdbc:postgresql://database:5432/training_db // For Local Use
+      # - sqlms.datasources.[0].jdbcUrl=jdbc:postgresql://database:5432/training_db # For Local Use
       - sqlms.datasources.[0].jdbcUrl=jdbc:postgresql://171.22.247.13:5434/train_db
       - sqlms.datasources.[0].username=byk
       - sqlms.datasources.[0].password=01234

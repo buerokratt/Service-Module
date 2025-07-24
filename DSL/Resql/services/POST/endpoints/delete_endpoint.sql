@@ -1,6 +1,6 @@
 INSERT INTO endpoints (
     endpoint_id,
-    service_ids,
+    service_id,
     name,
     type,
     file_name,
@@ -12,7 +12,7 @@ INSERT INTO endpoints (
 )
 SELECT
     endpoint_id,
-    service_ids,
+    service_id,
     name,
     type,
     file_name,
