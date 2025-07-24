@@ -44,6 +44,7 @@ const ApiEndpoint: FC<ApiEndpointProps> = ({ step, onClick }) => {
   const serviceName = useServiceStore((state) => removeTrailingUnderscores(state.serviceNameDashed()));
   const nodes = useServiceStore((state) => state.nodes);
   const [endpointName, setEndpointName] = useState<string>(step.data?.name ?? "");
+  const [isCommonEndpoint, setIsCommonEndpoint] = useState<boolean>(step.data?.isCommon ?? false);
 
   const { deleteEndpoint: deleteEndpointFromStore } = useServiceStore();
 
@@ -141,6 +142,7 @@ const ApiEndpoint: FC<ApiEndpointProps> = ({ step, onClick }) => {
               isDeletable={false}
               onNameExists={setEndpointNameExists}
               onNameChange={setEndpointName}
+              onCommonChange={setIsCommonEndpoint}
             />
             <Track justify="end" gap={16}>
               <Button
@@ -158,6 +160,7 @@ const ApiEndpoint: FC<ApiEndpointProps> = ({ step, onClick }) => {
                 onClick={(e) => {
                   const stepData = step.data!;
                   stepData.name = endpointName;
+                  stepData.isCommon = isCommonEndpoint;
                   setIsEditing(true);
                   saveEndpoints(
                     [stepData],
