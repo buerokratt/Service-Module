@@ -1,34 +1,6 @@
-WITH latest_common_endpoints AS (
-    SELECT DISTINCT ON (endpoint_id) *
-    FROM endpoints
-    WHERE
-        service_ids @> ARRAY[:serviceId::uuid]
-        AND is_common = TRUE
-        AND deleted = FALSE
-    ORDER BY endpoint_id, id DESC
-)
-INSERT INTO endpoints (
-    endpoint_id,
-    service_ids,
-    name,
-    type,
-    file_name,
-    is_common,
-    definitions,
-    deleted,
-    created_at,
-    updated_at
-)
-SELECT
-    endpoint_id,
-    array_remove(service_ids, :serviceId::uuid) AS service_ids,
-    name,
-    type,
-    file_name,
-    is_common,
-    definitions,
-    deleted,
-    created_at,
-    updated_at
-FROM latest_common_endpoints
-WHERE array_length(service_ids, 1) > 1; 
+-- This operation is no longer needed since we now have single service_id instead of array
+-- When removing a service from a common endpoint, we would need to create a new endpoint
+-- with a different service_id, but this logic needs to be rethought based on business requirements
+-- For now, this query will not perform any operation
+SELECT NULL; 
+-- todo igor check this

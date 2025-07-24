@@ -2,14 +2,14 @@ WITH latest_endpoints AS (
     SELECT DISTINCT ON (endpoint_id) *
     FROM endpoints
     WHERE
-        service_ids @> ARRAY[:serviceId::uuid]
+        service_id = :serviceId::uuid
         AND is_common = FALSE
         AND deleted = FALSE
     ORDER BY endpoint_id, id DESC
 )
 INSERT INTO endpoints (
     endpoint_id,
-    service_ids,
+    service_id,
     name,
     type,
     file_name,
@@ -21,7 +21,7 @@ INSERT INTO endpoints (
 )
 SELECT
     endpoint_id,
-    service_ids,
+    service_id,
     name,
     type,
     file_name,
