@@ -7,9 +7,6 @@ DROP INDEX IF EXISTS idx_endpoints_service_ids;
 -- Add new column service_id as UUID
 ALTER TABLE endpoints ADD COLUMN service_id UUID;
 
--- Update the new column with the first service_id from the array (assuming we want to keep the first one)
-UPDATE endpoints SET service_id = service_ids[1] WHERE array_length(service_ids, 1) > 0;
-
 -- Drop the old service_ids column
 ALTER TABLE endpoints DROP COLUMN service_ids;
 
