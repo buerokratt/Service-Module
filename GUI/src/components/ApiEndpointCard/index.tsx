@@ -16,18 +16,21 @@ type EndpointCardProps = {
   isNameDisabled?: boolean;
   onNameChange?: (name: string) => void;
   onNameExists?: (exists: boolean) => void;
+  onCommonChange?: (isCommon: boolean) => void;
 };
 
-const ApiEndpointCard: FC<EndpointCardProps> = ({ endpoint, isDeletable = true, isNameDisabled = false, onNameExists, onNameChange }) => {
-  const {
-    deleteEndpoint,
-    changeServiceEndpointType,
-    getAvailableRequestValues,
-    setIsCommonEndpoint,
-    isCommonEndpoint,
-  } = useServiceStore();
+const ApiEndpointCard: FC<EndpointCardProps> = ({
+  endpoint,
+  isDeletable = true,
+  isNameDisabled = false,
+  onNameExists,
+  onNameChange,
+  onCommonChange,
+}) => {
+  const { deleteEndpoint, changeServiceEndpointType, getAvailableRequestValues } = useServiceStore();
   const [selectedTab, setSelectedTab] = useState<EndpointEnv>(EndpointEnv.Live);
   const [endpointName, setEndpointName] = useState<string>(endpoint.name);
+  const [isCommonEndpoint, setIsCommonEndpoint] = useState<boolean>(endpoint.isCommon ?? false);
   const [testEnvExists, setTestEnvExists] = useState<boolean>(false);
   const options: { label: string; value: EndpointType; name: string }[] = [
     { label: "Open API", value: "openApi", name: "" },
@@ -102,14 +105,19 @@ const ApiEndpointCard: FC<EndpointCardProps> = ({ endpoint, isDeletable = true, 
                     disabled={isNameDisabled || selectedTab === EndpointEnv.Test}
                     onChange={(e) => {
                       setEndpointName(e.target.value);
-                      const endpointsNames = useServiceStore.getState().endpoints.map((ep) => ep.name).filter((name) => name !== endpoint.name);
+                      const endpointsNames = useServiceStore
+                        .getState()
+                        .endpoints.map((ep) => ep.name)
+                        .filter((name) => name !== endpoint.name);
                       const isNameExist = endpointsNames.includes(e.target.value);
                       setNameExists(isNameExist);
                       onNameExists?.(isNameExist);
                       onNameChange?.(e.target.value);
                     }}
                   />
-                  {nameExists && <span style={{ color: "red", fontSize: "13px" }}>{t("newService.endpoint.nameAlreadyExists")}</span>}
+                  {nameExists && (
+                    <span style={{ color: "red", fontSize: "13px" }}>{t("newService.endpoint.nameAlreadyExists")}</span>
+                  )}
                 </div>
               )}
               {option?.value === "openApi" && (
@@ -138,9 +146,12 @@ const ApiEndpointCard: FC<EndpointCardProps> = ({ endpoint, isDeletable = true, 
                     label=""
                     onLabel={t("global.yes").toString()}
                     offLabel={t("global.no").toString()}
-                    value={isCommonEndpoint(endpoint.endpointId)}
-                    checked={isCommonEndpoint(endpoint.endpointId)}
-                    onCheckedChange={(value) => setIsCommonEndpoint(endpoint.endpointId, value)}
+                    value={isCommonEndpoint}
+                    checked={isCommonEndpoint}
+                    onCheckedChange={(value) => {
+                      setIsCommonEndpoint(value);
+                      onCommonChange?.(value);
+                    }}
                   />
                 </Track>
               )}

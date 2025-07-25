@@ -1,7 +1,7 @@
 WITH LatestEndpoints AS (
   SELECT DISTINCT ON (e.endpoint_id) e.*
   FROM endpoints AS e
-  WHERE (e.service_ids @> ARRAY[:id]::uuid[] OR e.is_common = true)
+  WHERE (e.service_id = :id::uuid OR e.is_common = true)
   ORDER BY e.endpoint_id, e.id DESC
 )
 SELECT

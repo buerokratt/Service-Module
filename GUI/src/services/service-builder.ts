@@ -19,6 +19,7 @@ import api from "../services/api-dev";
 import { NodeDataProps } from "types/service-flow";
 import { getLastDigits, removeTrailingUnderscores, toSnakeCase } from "utils/string-util";
 import { format } from "date-fns";
+import { AxiosError } from "axios";
 
 // refactor this file later
 
@@ -297,7 +298,6 @@ const assignEndpointVariables = (
 
 export async function saveEndpoints(endpoints: EndpointData[], onSuccess?: () => void, onError?: (e: any) => void) {
   const tasks: Promise<any>[] = [];
-  const nodes = useServiceStore.getState().nodes;
   const serviceId = useServiceStore.getState().serviceId;
   const serviceName = removeTrailingUnderscores(useServiceStore.getState().serviceNameDashed());
 
@@ -313,15 +313,7 @@ export async function saveEndpoints(endpoints: EndpointData[], onSuccess?: () =>
     const steps = buildSteps(endpointName, endpoint, selectedEndpointType);
     const result = Object.fromEntries(steps.entries());
 
-    if (
-      // Always save a single serviceId for common endpoints
-      !endpoint.isCommon ||
-      // For non-common endpoints, only save service IDs if endpoint is added to the flow
-      // This way we can track which common endpoints are unused and can be safely deleted
-      nodes.some((node) => node.type === "custom" && node.data.originalDefinedNodeId === endpoint.endpointId)
-    ) {
-      endpoint.serviceId = serviceId;
-    }
+    endpoint.serviceId = serviceId;
     endpoint.isCommon = endpoint.isCommon ?? false;
     const isCommonPath = endpoint.isCommon ? "common/" : "";
 
@@ -643,38 +635,38 @@ function getYamlContent(nodes: Node[], edges: Edge[], steps: Step[], name: strin
       const followingNode = nodes.find((n) => n.id === edge.target);
       let error;
 
-    switch (node.data.stepType) {
-      case StepType.Textfield:
-        if (node.data.message === undefined) {
-          error = i18next.t("toast.missing-textfield-message");
-        }
-        break;
-      case StepType.OpenWebpage:
-        if (node.data.link === undefined || node.data.linkText === undefined) {
-          error = i18next.t("toast.missing-website");
-        }
-        break;
-      case StepType.FileGenerate:
-        if (node.data.fileName === undefined || node.data.fileContent === undefined) {
-          error = i18next.t("toast.missing-file-generation");
-        }
-        break;
-      case StepType.Input:
-      case StepType.Condition:
-      case StepType.MultiChoiceQuestion:
-        if (followingNode?.type === "placeholder" && !allRelations.includes(node.id)) {
-          allRelations.push(node.id);
-          return;
-        }
-        break;
-    }
+      switch (node.data.stepType) {
+        case StepType.Textfield:
+          if (node.data.message === undefined) {
+            error = i18next.t("toast.missing-textfield-message");
+          }
+          break;
+        case StepType.OpenWebpage:
+          if (node.data.link === undefined || node.data.linkText === undefined) {
+            error = i18next.t("toast.missing-website");
+          }
+          break;
+        case StepType.FileGenerate:
+          if (node.data.fileName === undefined || node.data.fileContent === undefined) {
+            error = i18next.t("toast.missing-file-generation");
+          }
+          break;
+        case StepType.Input:
+        case StepType.Condition:
+        case StepType.MultiChoiceQuestion:
+          if (followingNode?.type === "placeholder" && !allRelations.includes(node.id)) {
+            allRelations.push(node.id);
+            return;
+          }
+          break;
+      }
 
-    if (error) {
-      throw new Error(error);
-    }
+      if (error) {
+        throw new Error(error);
+      }
 
-    allRelations.push(`${edge.source},${edge.target}`);
-   });
+      allRelations.push(`${edge.source},${edge.target}`);
+    });
   });
   // find finishing nodes
   edges.forEach((edge) => {
@@ -1142,10 +1134,10 @@ export const saveFlowClick = async (status: "draft" | "ready" = "ready") => {
       });
       useServiceStore.getState().enableTestButton();
     },
-    onError: (e) => {
+    onError: (e: AxiosError) => {
       useToastStore.getState().error({
         title: i18next.t("newService.toast.failed"),
-        message: e?.message,
+        message: e.response?.status === 409 ? t("newService.toast.serviceNameAlreadyExists") : e?.message,
       });
     },
     description,
