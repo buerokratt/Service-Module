@@ -1006,36 +1006,6 @@ const getNestedPreDefinedEndpointVariables = (variable: EndpointVariableData, re
   }
 };
 
-const getPreDefinedEndpointVariables = (data?: { variables: EndpointVariableData[]; rawData: RawData }): string[] => {
-  if (!data) return [];
-  const result: string[] = [];
-  data.variables.forEach((v) => {
-    if (!v.value) getNestedPreDefinedEndpointVariables(v, result);
-
-    if (v.value?.startsWith("{{")) result.push(getMapEntry(v.value));
-    if (v.testValue?.startsWith("{{")) result.push(getMapEntry(v.testValue));
-  });
-  try {
-    getNestedPreDefinedRawVariables(JSON.parse(data.rawData?.value ?? "{}"), result);
-    getNestedPreDefinedRawVariables(JSON.parse(data.rawData?.testValue ?? "{}"), result);
-  } catch (e) {
-    console.error(e);
-  }
-
-  return result;
-};
-
-const getSwitchCase = (conditions: any[]) => {
-  return {
-    switch: conditions.map((c) => {
-      return {
-        condition: c.case,
-        next: c.nextStep,
-      };
-    }),
-  };
-};
-
 const getTemplate = (steps: Step[], node: Node, stepName: string, nextStep?: string) => {
   const data = getTemplateDataFromNode(node);
 
@@ -1105,46 +1075,6 @@ const getTemplateDataFromNode = (node: Node): { templateName: string; body?: any
       },
     };
   }
-};
-
-const getDefinedEndpointStep = (steps: Step[], node: Node) => {
-  const name = removeTrailingUnderscores(useServiceStore.getState().serviceNameDashed());
-  const endpoint = steps.find((e) => e.label === node.data.label?.toString().split(" ")[0])?.data;
-  const selectedEndpoint = endpoint?.definitions.find((e) => e.isSelected);
-  if (!selectedEndpoint || !endpoint) {
-    return {
-      return: "",
-    };
-  }
-
-  const isCommonPath = endpoint.isCommon ? "common/" : "";
-  // For backwards compatibility, in case fileName was not defined
-  const defaultFileName = `${name}-${getEndpointName(endpoint)}`;
-  const fileName = endpoint.fileName ?? defaultFileName;
-  const paramss = rawDataIfVariablesMissing(
-    selectedEndpoint,
-    "params",
-    EndpointEnv.Live,
-    assignEndpointVariables(EndpointEnv.Live, "params", selectedEndpoint.params)
-  );
-  const filteredParams = Object.fromEntries(
-    Object.entries(paramss).filter(([_, value]) => String(value).startsWith("${"))
-  );
-  filteredParams["type"] = "prod";
-
-  return {
-    call: `${selectedEndpoint.methodType.toLowerCase() === "get" ? "http.get" : "http.post"}`,
-    args: {
-      url: `${import.meta.env.REACT_APP_API_URL}/services/endpoints/${isCommonPath}${fileName}?type=prod`,
-      body: {
-        headers: `\${new Map([${getPreDefinedEndpointVariables(selectedEndpoint.headers)}])}`,
-        body: `\${new Map([${getPreDefinedEndpointVariables(selectedEndpoint.body)}])}`,
-        params: `\${new Map([${getPreDefinedEndpointVariables(selectedEndpoint.params)}])}`,
-      },
-      query: filteredParams,
-    },
-    result: `${endpoint.name.replaceAll(" ", "_")}_res`,
-  };
 };
 
 const getEndpointName = (endpoint: EndpointData) => {
