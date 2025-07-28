@@ -52,7 +52,6 @@ const ServiceFlowPage: FC = () => {
       .getState()
       .loadService(id)
       .then(() => {
-        useServiceStore.getState().loadEndpointsResponseVariables();
         useServiceStore
           .getState()
           .loadStepPreferences()

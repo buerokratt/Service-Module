@@ -158,7 +158,9 @@ function CustomEdge({
                       key={step.id}
                       step={step}
                       onClick={(step) => {
-                        onEdgeAdd(step);
+                        onEdgeAdd(step).then(() => {
+                          useServiceStore.getState().loadEndpointsResponseVariables();
+                        });
                         setDropdownOpen(false);
                         setHasUnsavedChanges(true);
                       }}
@@ -226,7 +228,6 @@ function CustomEdge({
                         setEndpoint({ endpointId: uuid(), name: "", definitions: [], isNew: true });
                         useToastStore.getState().success({ title: t("serviceFlow.apiElements.createSuccess") });
                         setIsCreatingEndpoint(false);
-                        useServiceStore.getState().loadEndpointsResponseVariables();
                       },
                       (error) => {
                         console.error(`Error creating API endpoint: ${error}`);

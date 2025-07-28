@@ -64,7 +64,6 @@ const ApiEndpoint: FC<ApiEndpointProps> = ({ step, onClick }) => {
       });
       useToastStore.getState().success({ title: t("serviceFlow.apiElements.deleteSuccess") });
       deleteEndpointFromStore(endpoint.endpointId);
-      useServiceStore.getState().loadEndpointsResponseVariables();
     } catch (error) {
       console.error(`Error deleting API endpoint: ${error}`);
       useToastStore.getState().error({ title: t("serviceFlow.apiElements.deleteError") });
@@ -143,7 +142,6 @@ const ApiEndpoint: FC<ApiEndpointProps> = ({ step, onClick }) => {
                       useServiceStore.getState().editEndpoint(stepData);
                       setIsEditing(false);
                       useToastStore.getState().success({ title: t("serviceFlow.apiElements.editSuccess") });
-                      useServiceStore.getState().loadEndpointsResponseVariables();
                     },
                     (error) => {
                       console.error(`Error Editing API endpoint: ${error}`);

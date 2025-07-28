@@ -246,8 +246,17 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
   availableVariables: { prod: [], test: [] },
   loadEndpointsResponseVariables: async () => {
     try {
-      const requests = get().endpoints.flatMap((e) =>
-        e.definitions.map((endpoint) => ({
+      const instance = get().reactFlowInstance;
+      if (!instance) return;
+      const endpointNodes = instance.getNodes().filter((node) => node.data.stepType === StepType.UserDefined) as Node<NodeDataProps>[];
+      if (endpointNodes.length === 0) {
+        set({ endpointsResponseVariables: [] });
+        return;
+      };
+      
+      const endpointsFromNodes = endpointNodes.map((node) => node.data.endpoint);
+      const requests = endpointsFromNodes.flatMap((e) =>
+        e?.definitions.map((endpoint) => ({
           url: endpoint.url,
           method: endpoint.methodType,
           headers: extractMapValues(endpoint.headers),

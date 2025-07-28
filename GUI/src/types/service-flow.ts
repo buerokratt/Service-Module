@@ -1,3 +1,4 @@
+import { EndpointData } from "./endpoint";
 import { MultiChoiceQuestion } from "./multi-choice-question";
 import { StepType } from "./step-type.enum";
 import { Edge, Node } from "@xyflow/react";
@@ -24,6 +25,7 @@ export type NodeDataProps = {
   assignElements?: any;
   multiChoiceQuestion?: MultiChoiceQuestion;
   childrenCount?: number;
+  endpoint?: EndpointData
 };
 
 export const initialNodes: Node[] = [

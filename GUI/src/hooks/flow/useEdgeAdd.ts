@@ -30,6 +30,7 @@ function useEdgeAdd(id: string) {
           : "step",
         stepType: stepType,
         readonly: [StepType.Auth, StepType.FinishingStepEnd, StepType.FinishingStepRedirect].includes(stepType),
+        endpoint: step.data,
         setClickedNode: useServiceStore.getState().setClickedNode,
       },
       className: [StepType.FinishingStepEnd, StepType.FinishingStepRedirect].includes(stepType)

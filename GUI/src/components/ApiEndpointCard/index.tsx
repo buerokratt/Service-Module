@@ -14,6 +14,7 @@ type EndpointCardProps = {
   endpoint: EndpointData;
   isDeletable?: boolean;
   isNameDisabled?: boolean;
+  showCommonSwitch?: boolean;
   onNameChange?: (name: string) => void;
   onNameExists?: (exists: boolean) => void;
   onCommonChange?: (isCommon: boolean) => void;
@@ -23,6 +24,7 @@ const ApiEndpointCard: FC<EndpointCardProps> = ({
   endpoint,
   isDeletable = true,
   isNameDisabled = false,
+  showCommonSwitch = true,
   onNameExists,
   onNameChange,
   onCommonChange,
@@ -138,7 +140,7 @@ const ApiEndpointCard: FC<EndpointCardProps> = ({
                   requestValues={requestValues}
                 />
               )}
-              {option?.value && (
+              {showCommonSwitch && option?.value && (
                 <Track gap={16}>
                   <label htmlFor="isCommon">{t("newService.endpoint.publicEndpoint")}</label>
                   <Switch
