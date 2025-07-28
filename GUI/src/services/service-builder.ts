@@ -744,6 +744,10 @@ function getYamlContent(nodes: Node[], edges: Edge[], steps: Step[], name: strin
         return handleMultiChoiceQuestion(finishedFlow, parentStepName, parentNode, childNode, childNodeId);
       }
 
+      if (parentNode.data.stepType === StepType.UserDefined) {
+        return handleEndpointStep(parentNode, finishedFlow, parentStepName, childNode);
+      }
+
       const nextStep = childNode ? toSnakeCase(childNode.data.label ?? "format_messages") : "format_messages";
       const template = getTemplate(steps, parentNode, parentStepName, nextStep);
 
@@ -905,6 +909,50 @@ function handleAssignStep(
   });
 }
 
+function handleEndpointStep(
+  parentNode: Node<NodeDataProps>,
+  finishedFlow: Map<any, any>,
+  parentStepName: string,
+  childNode: Node<NodeDataProps> | undefined,
+) {
+  const endpointDefinition = parentNode.data.endpoint?.definitions[0];
+  const paramsVariables = endpointDefinition?.params?.variables;
+  const bodyVariables = endpointDefinition?.body?.variables;
+  const headersVariables = endpointDefinition?.headers?.variables;
+  const methodType = endpointDefinition?.methodType?.toLowerCase();
+
+  const stepConfig: any = {
+    call: `http.${methodType}`,
+    args: {
+      url: endpointDefinition?.url?.split("?")[0] ?? "",
+    },
+    next: childNode ? toSnakeCase(childNode.data.label ?? "format_messages") : "format_messages",
+  };
+
+  if (Array.isArray(paramsVariables) && paramsVariables.length > 0) {
+    stepConfig.args.query = paramsVariables.reduce((acc: any, e: any) => {
+      acc[e.name] = e.value;
+      return acc;
+    }, {});
+  }
+
+  if (Array.isArray(bodyVariables) && bodyVariables.length > 0) {
+    stepConfig.args.body = bodyVariables.reduce((acc: any, e: any) => {
+      acc[e.name] = e.value;
+      return acc;
+    }, {});
+  }
+
+  if (Array.isArray(headersVariables) && headersVariables.length > 0) {
+    stepConfig.args.headers = headersVariables.reduce((acc: any, e: any) => {
+      acc[e.name] = e.value;
+      return acc;
+    }, {});
+  }
+
+  finishedFlow.set(parentStepName, stepConfig);
+}
+
 function handleMultiChoiceQuestion(
   finishedFlow: Map<any, any>,
   parentStepName: string,
@@ -990,12 +1038,6 @@ const getSwitchCase = (conditions: any[]) => {
 
 const getTemplate = (steps: Step[], node: Node, stepName: string, nextStep?: string) => {
   const data = getTemplateDataFromNode(node);
-  if (node.data.stepType === StepType.UserDefined) {
-    return {
-      ...getDefinedEndpointStep(steps, node),
-      next: nextStep ?? "format_messages",
-    };
-  }
 
   return {
     template: `${data?.templateName}`,
