@@ -272,19 +272,20 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
       const variables: EndpointResponseVariable[] = [];
 
       response.data.response.forEach((res: any, i: number) => {
-        const endpoint = get().endpoints[i];
+        const endpoint = endpointsFromNodes[i];
         const chips: Chip[] = [];
 
+        console.log("endpoint = ", endpoint);
         for (const [key, value] of Object.entries(res)) {
           chips.push({
             name: key,
-            value: `${endpoint.name.replace(" ", "_")}_res.response.body.${key}`,
+            value: `${endpoint?.name.replace(" ", "_")}_res.response.body.${key}`,
             data: value,
           });
         }
 
         const variable: EndpointResponseVariable = {
-          name: endpoint.name,
+          name: endpoint?.name ?? '',
           chips: chips,
         };
 
