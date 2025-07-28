@@ -113,18 +113,6 @@ delete_endpoints_by_service_id:
     body:
       serviceId: ${id}
   result: delete_endpoint_results
-  next: delete_endpoint_files
-
-delete_endpoint_files:
-  call: http.post
-  args:
-    url: "[#SERVICE_RUUTER]/services/delete-endpoint-files"
-    headers:
-      cookie: ${incoming.headers.cookie}
-    body:
-      name: ${name_res.response.body[0].name}
-      endpoint_name: ""
-  result: delete_endpoint_files_results
   next: delete_mcq_files
 
 delete_mcq_files:
