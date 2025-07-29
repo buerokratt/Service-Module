@@ -249,7 +249,6 @@ const ServiceFlowPage: FC = () => {
             <div style={{ width: "100%", height: `${isInfoOpen ? 55 : 84.5}%` }}>
               <FlowBuilder nodes={nodes} edges={edges} />
             </div>
-            <Chat />
           </ReactFlowProvider>
           {isChooseSlotsModalVisible && (
             <ChooseSlotModel

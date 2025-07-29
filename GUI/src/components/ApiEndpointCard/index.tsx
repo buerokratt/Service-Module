@@ -63,10 +63,7 @@ const ApiEndpointCard: FC<EndpointCardProps> = ({
       <Track justify="between">
         <Tabs.List className="tab-group__list" aria-label="environment">
           <Tabs.Trigger className={getTabTriggerClasses(EndpointEnv.Live)} value={EndpointEnv.Live}>
-            {t("newService.endpoint.live")}
-          </Tabs.Trigger>
-          <Tabs.Trigger className={getTabTriggerClasses(EndpointEnv.Test)} value={EndpointEnv.Test}>
-            {t(testEnvExists ? "newService.endpoint.testEnv" : "newService.endpoint.addTestEnv")}
+            {t("newService.endpoint.single")}
           </Tabs.Trigger>
         </Tabs.List>
         {isDeletable && (
