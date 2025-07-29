@@ -2,7 +2,7 @@ import Box from "components/Box";
 import Button from "components/Button";
 import Icon from "components/Icon";
 import Track from "components/Track";
-import { FC, useState } from "react";
+import { FC, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { MdDeleteOutline, MdOutlineEdit } from "react-icons/md";
 import { Link } from "react-router-dom";
@@ -42,6 +42,9 @@ const ApiEndpoint: FC<ApiEndpointProps> = ({ step, onClick }) => {
   const nodes = useServiceStore((state) => state.nodes);
   const [endpointName, setEndpointName] = useState<string>(step.data?.name ?? "");
   const [isCommonEndpoint, setIsCommonEndpoint] = useState<boolean>(step.data?.isCommon ?? false);
+  const originalEndpoint = useMemo(() => {
+    return step.data ? JSON.parse(JSON.stringify(step.data)) : undefined;
+  }, [step.data]);
 
   const { deleteEndpoint: deleteEndpointFromStore } = useServiceStore();
 
@@ -107,7 +110,13 @@ const ApiEndpoint: FC<ApiEndpointProps> = ({ step, onClick }) => {
       )}
 
       {showEditModal && step?.data && (
-        <Modal title={t("newService.editEndpoint")} onClose={() => setShowEditModal(false)}>
+        <Modal
+          title={t("newService.editEndpoint")}
+          onClose={() => {
+            useServiceStore.getState().editEndpoint(originalEndpoint);
+            setShowEditModal(false);
+          }}
+        >
           <Track isMultiline gap={16} direction="vertical" align="stretch">
             <ApiEndpointCard
               endpoint={step?.data}
@@ -120,6 +129,7 @@ const ApiEndpoint: FC<ApiEndpointProps> = ({ step, onClick }) => {
               <Button
                 appearance="secondary"
                 onClick={(e) => {
+                  useServiceStore.getState().editEndpoint(originalEndpoint);
                   setShowEditModal(false);
                   e.stopPropagation();
                 }}
