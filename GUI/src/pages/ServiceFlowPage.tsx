@@ -1,4 +1,3 @@
-import Chat from "components/chat/chat";
 import withAuthorization, { ROLES } from "hoc/with-authorization";
 import { FC, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
