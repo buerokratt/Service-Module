@@ -31,6 +31,7 @@ import { Edge, getConnectedEdges, getIncomers, getOutgoers, Node } from "@xyflow
 import { MultiChoiceQuestionButton } from "types/multi-choice-question";
 import useServiceListStore from "store/services.store";
 import api from "../../services/api-dev";
+import { EndpointData } from "types/endpoint";
 
 const FlowElementsPopup: React.FC = () => {
   const { t } = useTranslation();
@@ -92,6 +93,8 @@ const FlowElementsPopup: React.FC = () => {
     node?.data.multiChoiceQuestion?.buttons ?? defaultMultiChoiceQuestionButtons
   );
 
+  const [nodeEndpoint, setNodeEndpoint] = useState<EndpointData | undefined>(node?.data.endpoint);
+
   const stepType = node?.data.stepType;
 
   useEffect(() => {
@@ -151,6 +154,7 @@ const FlowElementsPopup: React.FC = () => {
           question: multiChoiceQuestionQuestion,
           buttons: multiChoiceQuestionButtons,
         },
+        endpoint: nodeEndpoint ?? node.data?.endpoint,
       },
     };
 
@@ -163,10 +167,10 @@ const FlowElementsPopup: React.FC = () => {
     }
 
     if (stepType === StepType.UserDefined) {
-      const newLabel = node.data.label?.toString().split(" ");
-      if (node.data.endpoint?.name) {
-        newLabel[0] = node.data.endpoint?.name ?? node.data.label?.toString().split(" ")[0];
-        node.data.label = newLabel.join(" ");
+      const newLabel = updatedNode.data.label?.toString().split(" ");
+      if (updatedNode.data.endpoint?.name) {
+        newLabel[0] = updatedNode.data.endpoint?.name ?? node.data.label?.toString().split(" ")[0];
+        updatedNode.data.label = newLabel.join(" ");
       }
       useServiceStore.getState().loadEndpointsResponseVariables();
     }
@@ -439,6 +443,10 @@ const FlowElementsPopup: React.FC = () => {
               <ApiContent
                 nodeId={node.id}
                 endpoint={node.data.endpoint}
+                onEndpointChange={(endpoint) => {
+                  if (!endpoint) return;
+                  setNodeEndpoint(endpoint);
+                }}
               />
             )}
             {stepType === StepType.MultiChoiceQuestion && (
