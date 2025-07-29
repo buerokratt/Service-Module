@@ -32,6 +32,7 @@ import { MultiChoiceQuestionButton } from "types/multi-choice-question";
 import useServiceListStore from "store/services.store";
 import api from "../../services/api-dev";
 import { EndpointData } from "types/endpoint";
+import useToastStore from "store/toasts.store";
 
 const FlowElementsPopup: React.FC = () => {
   const { t } = useTranslation();
@@ -41,6 +42,7 @@ const FlowElementsPopup: React.FC = () => {
   const [jsonRequestContent, setJsonRequestContent] = useState<any>(null);
   const node = useServiceStore((state) => state.selectedNode);
   const selectedService = useServiceListStore((state) => state.selectedService);
+  const instance = useServiceStore.getState().reactFlowInstance;
 
   const isUserDefinedNode = node?.data?.stepType === "user-defined";
 
@@ -170,6 +172,16 @@ const FlowElementsPopup: React.FC = () => {
       const newLabel = updatedNode.data.label?.toString().split(" ");
       if (updatedNode.data.endpoint?.name) {
         newLabel[0] = updatedNode.data.endpoint?.name ?? node.data.label?.toString().split(" ")[0];
+        const nodeWithSameLabel = instance
+          ?.getNodes()
+          .find((n) => n.data.label === newLabel.join(" ") && n.id !== updatedNode.id);
+        if (nodeWithSameLabel) {
+          useToastStore.getState().error({
+            title: t("newService.toast.elementNameAlreadyExists"),
+            message: t("newService.toast.elementNameAlreadyExistsMessage"),
+          });
+          return;
+        }
         updatedNode.data.label = newLabel.join(" ");
       }
       useServiceStore.getState().loadEndpointsResponseVariables();
@@ -257,7 +269,6 @@ const FlowElementsPopup: React.FC = () => {
   };
 
   const saveMultiChoicePopup = (originalNode: Node<NodeDataProps>, updatedNode: Node<NodeDataProps>) => {
-    const instance = useServiceStore.getState().reactFlowInstance;
     if (!instance) return;
 
     const currentButtons = originalNode.data.multiChoiceQuestion?.buttons ?? defaultMultiChoiceQuestionButtons;
