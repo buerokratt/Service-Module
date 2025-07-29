@@ -79,8 +79,8 @@ const useServiceListStore = create<ServiceStoreState>((set, get, store) => ({
   commonServices: [],
   notCommonServices: [],
   loadServicesList: async (pagination, sorting) => {
-    const order = sorting[0].desc ? "desc" : "asc";
-    const sort = sorting.length === 0 ? "name asc" : sorting[0].id + " " + order;
+    const order = sorting[0]?.desc ? "desc" : "asc";
+    const sort = sorting.length === 0 ? "name asc" : sorting[0]?.id + " " + order;
     const result = await api.post(getServicesList(), {
       page: pagination.pageIndex + 1,
       page_size: pagination.pageSize,
