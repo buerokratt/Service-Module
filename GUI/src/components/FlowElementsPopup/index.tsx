@@ -44,7 +44,6 @@ const FlowElementsPopup: React.FC = () => {
   const isUserDefinedNode = node?.data?.stepType === "user-defined";
 
   const serviceName = useServiceStore((state) => removeTrailingUnderscores(state.serviceNameDashed()));
-  const endpoints = useServiceStore((state) => state.endpoints);
   const rules = useServiceStore((state) => state.rules);
   const assignElements = useServiceStore((state) => state.assignElements);
   const endpointsVariables = useServiceStore((state) => state.endpointsResponseVariables);
@@ -163,6 +162,15 @@ const FlowElementsPopup: React.FC = () => {
       saveMultiChoicePopup(node, updatedNode);
     }
 
+    if (stepType === StepType.UserDefined) {
+      const newLabel = node.data.label?.toString().split(" ");
+      if (node.data.endpoint?.name) {
+        newLabel[0] = node.data.endpoint?.name ?? node.data.label?.toString().split(" ")[0];
+        node.data.label = newLabel.join(" ");
+      }
+      useServiceStore.getState().loadEndpointsResponseVariables();
+    }
+
     if (stepType === StepType.Assign) {
       const flatEndpointVariables = endpointsVariables.map((endpoint) => endpoint.chips).flat();
       assignElements.forEach((element) => {
@@ -204,8 +212,7 @@ const FlowElementsPopup: React.FC = () => {
     }
 
     try {
-      const finder = (e: any) => e.name === node.data.label || node.data.label.includes(e.name);
-      const endpoint = endpoints.find(finder)?.definitions[0];
+      const endpoint = node.data.endpoint?.definitions[0];
 
       if (!endpoint) return;
 
@@ -431,7 +438,7 @@ const FlowElementsPopup: React.FC = () => {
             {stepType === StepType.UserDefined && (
               <ApiContent
                 nodeId={node.id}
-                endpoint={endpoints.find((e) => e.name === node.data.label || node.data.label.includes(e.name))}
+                endpoint={node.data.endpoint}
               />
             )}
             {stepType === StepType.MultiChoiceQuestion && (

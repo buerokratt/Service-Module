@@ -11,9 +11,6 @@ declaration:
       - field: name
         type: string
         description: "Endpoint name"
-      - field: fileName
-        type: string
-        description: "Endpoint file name"
       - field: type
         type: string
         description: "Endpoint type"
@@ -47,7 +44,6 @@ update_endpoint:
     body:
       endpointId: ${id}
       name: ${incoming.body.name}
-      fileName: ${incoming.body.fileName}
       type: ${incoming.body.type}
       isCommon: ${incoming.body.isCommon}
       serviceId: ${incoming.body.serviceId ?? ''}

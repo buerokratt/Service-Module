@@ -3,7 +3,6 @@ INSERT INTO endpoints (
     service_id,
     name,
     type,
-    file_name,
     is_common,
     definitions
 )
@@ -12,7 +11,6 @@ VALUES (
     :serviceId::uuid,
     :name,
     :type::endpoint_type,
-    :fileName,
     :isCommon,
     :definitions::jsonb
 ); 

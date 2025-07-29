@@ -246,8 +246,17 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
   availableVariables: { prod: [], test: [] },
   loadEndpointsResponseVariables: async () => {
     try {
-      const requests = get().endpoints.flatMap((e) =>
-        e.definitions.map((endpoint) => ({
+      const instance = get().reactFlowInstance;
+      if (!instance) return;
+      const endpointNodes = instance.getNodes().filter((node) => node.data.stepType === StepType.UserDefined) as Node<NodeDataProps>[];
+      if (endpointNodes.length === 0) {
+        set({ endpointsResponseVariables: [] });
+        return;
+      };
+      
+      const endpointsFromNodes = endpointNodes.map((node) => node.data.endpoint);
+      const requests = endpointsFromNodes.flatMap((e) =>
+        e?.definitions.map((endpoint) => ({
           url: endpoint.url,
           method: endpoint.methodType,
           headers: extractMapValues(endpoint.headers),
@@ -263,19 +272,19 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
       const variables: EndpointResponseVariable[] = [];
 
       response.data.response.forEach((res: any, i: number) => {
-        const endpoint = get().endpoints[i];
+        const endpoint = endpointsFromNodes[i];
         const chips: Chip[] = [];
 
         for (const [key, value] of Object.entries(res)) {
           chips.push({
             name: key,
-            value: `${endpoint.name.replace(" ", "_")}_res.response.body.${key}`,
+            value: `${endpoint?.name.replace(" ", "_")}_res.response.body.${key}`,
             data: value,
           });
         }
 
         const variable: EndpointResponseVariable = {
-          name: endpoint.name,
+          name: endpoint?.name ?? '',
           chips: chips,
         };
 

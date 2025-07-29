@@ -93,7 +93,10 @@ const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
         panOnScroll
         nodeTypes={nodeTypes}
         edgeTypes={edgeTypes}
-        onInit={setReactFlowInstance}
+        onInit={(instance) => {
+          setReactFlowInstance(instance);
+          useServiceStore.getState().loadEndpointsResponseVariables();
+        }}
         nodesDraggable={false}
         onConnect={onConnect}
         onEdgesDelete={(edges) => {
