@@ -33,7 +33,7 @@ const ServicesTable: FC<ServicesTableProps> = ({ isCommon = false }) => {
     pageIndex: 0,
     pageSize: 10,
   });
-  const [sorting, setSorting] = useState<SortingState>([]);
+  const [sorting, setSorting] = useState<SortingState>([{ id: "name", desc: false }]);
 
   useEffect(() => {
     if (!isCommon) {
@@ -201,9 +201,10 @@ const ServicesTable: FC<ServicesTableProps> = ({ isCommon = false }) => {
               <Button appearance="secondary" onClick={() => setIsReadyPopupVisible(false)}>
                 {t("overview.cancel")}
               </Button>
-              {readyPopupText != t("overview.popup.connectionPending").toString() && readyPopupText != t("overview.popup.setActive").toString() && (
-                <Button onClick={() => changeServiceState()}>{t("overview.popup.setToDraft")}</Button>
-              )}
+              {readyPopupText != t("overview.popup.connectionPending").toString() &&
+                readyPopupText != t("overview.popup.setActive").toString() && (
+                  <Button onClick={() => changeServiceState()}>{t("overview.popup.setToDraft")}</Button>
+                )}
               {getActiveAndConnectionButton()}
             </Track>
           )}
@@ -231,6 +232,7 @@ const ServicesTable: FC<ServicesTableProps> = ({ isCommon = false }) => {
           }
         }}
         setSorting={(state: SortingState) => {
+          console.log("igor state", state);
           setSorting(state);
           if (!isCommon) {
             useServiceListStore.getState().loadServicesList(pagination, state);
