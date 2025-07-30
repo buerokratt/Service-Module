@@ -35,19 +35,11 @@ const ServicesTable: FC<ServicesTableProps> = ({ isCommon = false }) => {
   });
   const [sorting, setSorting] = useState<SortingState>([{ id: "name", desc: false }]);
 
-  const loadServices = (paginationState: PaginationState, sortingState: SortingState) => {
-    useServiceListStore.getState().loadServicesList(paginationState, sortingState);
-  };
-
-  const loadCommonServices = (paginationState: PaginationState, sortingState: SortingState) => {
-    useServiceListStore.getState().loadCommonServicesList(paginationState, sortingState);
-  };
-
   useEffect(() => {
-    if (isCommon) {
-      loadCommonServices(pagination, sorting);
+    if (!isCommon) {
+      useServiceListStore.getState().loadServicesList(pagination, sorting);
     } else {
-      loadServices(pagination, sorting);
+      useServiceListStore.getState().loadCommonServicesList(pagination, sorting);
     }
   }, []);
 
@@ -233,18 +225,18 @@ const ServicesTable: FC<ServicesTableProps> = ({ isCommon = false }) => {
         setPagination={(state: PaginationState) => {
           if (state.pageIndex === pagination.pageIndex && state.pageSize === pagination.pageSize) return;
           setPagination(state);
-          if (isCommon) {
-            loadCommonServices(state, sorting);
+          if (!isCommon) {
+            useServiceListStore.getState().loadServicesList(state, sorting);
           } else {
-            loadServices(state, sorting);
+            useServiceListStore.getState().loadCommonServicesList(state, sorting);
           }
         }}
         setSorting={(state: SortingState) => {
           setSorting(state);
-          if (isCommon) {
-            loadCommonServices(pagination, state);
+          if (!isCommon) {
+            useServiceListStore.getState().loadServicesList(pagination, state);
           } else {
-            loadServices(pagination, state);
+            useServiceListStore.getState().loadCommonServicesList(pagination, state);
           }
         }}
         isClientSide={false}
