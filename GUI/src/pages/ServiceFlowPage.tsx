@@ -1,4 +1,3 @@
-import Chat from "components/chat/chat";
 import withAuthorization, { ROLES } from "hoc/with-authorization";
 import { FC, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -249,7 +248,6 @@ const ServiceFlowPage: FC = () => {
             <div style={{ width: "100%", height: `${isInfoOpen ? 55 : 84.5}%` }}>
               <FlowBuilder nodes={nodes} edges={edges} />
             </div>
-            <Chat />
           </ReactFlowProvider>
           {isChooseSlotsModalVisible && (
             <ChooseSlotModel

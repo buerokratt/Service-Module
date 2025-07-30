@@ -1,4 +1,4 @@
-import { FC, useEffect, useMemo, useState } from "react";
+import { FC, useMemo, useState } from "react";
 import * as Tabs from "@radix-ui/react-tabs";
 import { Button, EndpointCustom, EndpointOpenAPI, FormInput, FormSelect, Icon, Switch, Track } from "..";
 import { Option } from "../../types/option";
@@ -33,7 +33,6 @@ const ApiEndpointCard: FC<EndpointCardProps> = ({
   const [selectedTab, setSelectedTab] = useState<EndpointEnv>(EndpointEnv.Live);
   const [endpointName, setEndpointName] = useState<string>(endpoint.name);
   const [isCommonEndpoint, setIsCommonEndpoint] = useState<boolean>(endpoint.isCommon ?? false);
-  const [testEnvExists, setTestEnvExists] = useState<boolean>(false);
   const options: { label: string; value: EndpointType; name: string }[] = [
     { label: "Open API", value: "openApi", name: "" },
     { label: "Custom endpoint", value: "custom", name: "" },
@@ -44,10 +43,6 @@ const ApiEndpointCard: FC<EndpointCardProps> = ({
   const { t } = useTranslation();
 
   const getTabTriggerClasses = (tab: EndpointEnv) => `tab-group__tab-btn ${selectedTab === tab ? "active" : ""}`;
-
-  useEffect(() => {
-    if (endpoint.hasTestEnv) setTestEnvExists(true);
-  }, [endpoint.hasTestEnv]);
 
   const requestValues = useMemo(() => getAvailableRequestValues(endpoint.endpointId), []);
 
@@ -63,10 +58,7 @@ const ApiEndpointCard: FC<EndpointCardProps> = ({
       <Track justify="between">
         <Tabs.List className="tab-group__list" aria-label="environment">
           <Tabs.Trigger className={getTabTriggerClasses(EndpointEnv.Live)} value={EndpointEnv.Live}>
-            {t("newService.endpoint.live")}
-          </Tabs.Trigger>
-          <Tabs.Trigger className={getTabTriggerClasses(EndpointEnv.Test)} value={EndpointEnv.Test}>
-            {t(testEnvExists ? "newService.endpoint.testEnv" : "newService.endpoint.addTestEnv")}
+            {t("newService.endpoint.single")}
           </Tabs.Trigger>
         </Tabs.List>
         {isDeletable && (

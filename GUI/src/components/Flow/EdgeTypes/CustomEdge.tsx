@@ -199,7 +199,13 @@ function CustomEdge({
           </Track>
         </Dropdown>
         {isAddEndpointModalVisible && (
-          <Modal title={t("newService.createNewEndpoint")} onClose={() => setIsAddEndpointModalVisible(false)}>
+          <Modal
+            title={t("newService.createNewEndpoint")}
+            onClose={() => {
+              setEndpoint({ endpointId: uuid(), name: "", definitions: [], isNew: true });
+              setIsAddEndpointModalVisible(false);
+            }}
+          >
             <Track isMultiline gap={16} direction="vertical" align="stretch">
               <ApiEndpointCard
                 endpoint={endpoint}
@@ -209,7 +215,13 @@ function CustomEdge({
                 onCommonChange={setIsCommonEndpoint}
               />
               <Track justify="end" gap={16}>
-                <Button appearance="secondary" onClick={() => setIsAddEndpointModalVisible(false)}>
+                <Button
+                  appearance="secondary"
+                  onClick={() => {
+                    setEndpoint({ endpointId: uuid(), name: "", definitions: [], isNew: true });
+                    setIsAddEndpointModalVisible(false);
+                  }}
+                >
                   {t("overview.cancel")}
                 </Button>
                 <Button

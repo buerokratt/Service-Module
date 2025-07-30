@@ -196,12 +196,6 @@ rename_dsl:
       new_path: "[#RUUTER_SERVICES_PATH]/${type}/[#RUUTER_SERVICES_DIR_PATH]/${old_state}/${name}.tmp"
   result: results
 
-check_result:
-  switch:
-    - condition: ${200 <= results.response.statusCodeValue && results.response.statusCodeValue < 300}
-      next: service_edit
-  next: return_bad_request
-
 service_edit:
   call: http.post
   args:
@@ -219,11 +213,6 @@ return_ok:
   reloadDsl: true
   status: 200
   return: "Edited Successfully"
-  next: end
-
-return_bad_request:
-  status: 200
-  return: "Error while editing service"
   next: end
 
 return_incorrect_request:
