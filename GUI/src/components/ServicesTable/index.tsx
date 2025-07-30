@@ -232,7 +232,6 @@ const ServicesTable: FC<ServicesTableProps> = ({ isCommon = false }) => {
           }
         }}
         setSorting={(state: SortingState) => {
-          console.log("igor state", state);
           setSorting(state);
           if (!isCommon) {
             useServiceListStore.getState().loadServicesList(pagination, state);
