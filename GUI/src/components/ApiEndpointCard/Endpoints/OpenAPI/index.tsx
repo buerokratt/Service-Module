@@ -340,11 +340,11 @@ const EndpointOpenAPI: React.FC<EndpointOpenAPIProps> = ({
               key={key}
               disableRawData
               isLive={isLive}
-              endpointData={selectedEndpoint}
-              updateEndpointData={updateEndpointData}
+              endpoint={endpoint}
               requestValues={requestValues}
               requestTab={requestTab}
               setRequestTab={setRequestTab}
+              onParametersChange={() => {}}
             />
           </>
         ) : (

@@ -22,7 +22,7 @@ import { PaginationState, SortingState } from "@tanstack/react-table";
 
 type RequestVariablesProps = {
   disableRawData?: boolean;
-  endpointData: EndpointDefinition;
+  endpoint: EndpointData;
   parentEndpointId?: string;
   isLive: boolean;
   requestValues: PreDefinedEndpointEnvVariables;
@@ -33,7 +33,7 @@ type RequestVariablesProps = {
 
 const RequestVariables: React.FC<RequestVariablesProps> = ({
   disableRawData,
-  endpointData,
+  endpoint,
   isLive,
   requestValues,
   requestTab,
@@ -50,6 +50,8 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
     pageIndex: 0,
     pageSize: 10,
   });
+
+  console.log("endpoint", endpoint);
 
   const [sorting, setSorting] = useState<SortingState>([]);
 
@@ -72,10 +74,11 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
   const getTabsRowsData = (): RequestVariablesTabsRowsData => {
     return tabs.reduce((tabsRowsData, tab) => {
       const rows: RequestVariablesRowData[] = [];
+      const endpointData = endpoint.definitions[0];
       if (endpointData) {
         if (!endpointData[tab]) return tabsRowsData;
         let rowIdx = 0;
-        endpointData[tab]!.variables.forEach((variable) => {
+        endpointData[tab].variables.forEach((variable) => {
           rows.push(constructRow(rowIdx, variable, 0));
           if (["schema", "array"].includes(variable.type)) {
             rowIdx = getRowsFromNestedSchema(variable, rowIdx, rows, 1);
@@ -126,6 +129,7 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
 
   const getInitialTabsRawData = (): RequestVariablesTabsRawData => {
     return tabs.reduce((tabsRawData, tab) => {
+      const endpointData = endpoint.definitions[0];
       return { ...tabsRawData, [tab]: endpointData[tab]?.rawData[isLive ? "value" : "testValue"] ?? "" };
     }, {});
   };
@@ -137,10 +141,9 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
 
   const updateRowVariable = (id: string, variable: string) => {
     setRowsData((prevRowsData) => {
-      prevRowsData[requestTab.tab]!.map((row) => {
-        if (row.id !== id) return row;
+      prevRowsData[requestTab.tab]!.forEach((row) => {
+        if (row.id !== id) return;
         row.variable = variable;
-        return row;
       });
       // if last row name is edited, add a new row
       if (!rowsData[requestTab.tab] || id !== `${rowsData[requestTab.tab]!.length - 1}`) return prevRowsData;
@@ -152,17 +155,16 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
       });
       return prevRowsData;
     });
-    updateEndpointData(rowsData, endpointData?.id);
+    updateEndpointData(rowsData, endpoint);
   };
 
   const updateRowValue = (id: string, value: string) => {
     if (!rowsData[requestTab.tab]) return;
-    rowsData[requestTab.tab]!.map((row) => {
-      if (row.id !== id) return row;
+    rowsData[requestTab.tab]!.forEach((row) => {
+      if (row.id !== id) return;
       row.value = value;
-      return row;
     });
-    updateEndpointData(rowsData, endpointData?.id);
+    updateEndpointData(rowsData, endpoint);
     setKey(key + 1);
   };
 
@@ -184,26 +186,19 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
   };
 
   const deleteVariable = (rowData: RequestVariablesRowData) => {
-    setEndpoints((prevEndpoints: EndpointData[]) => {
-      const newEndpoints: EndpointData[] = [];
-      for (const prevEndpoint of prevEndpoints) {
-        const defEndpoint = prevEndpoint.definitions.find((x) => x.id === endpointData.id);
-        const endpoint = defEndpoint?.[requestTab.tab];
+    const endpointData = endpoint.definitions[0];
+    const defEndpoint = endpoint.definitions.find((x) => x.id === endpointData.id);
+    const endpointTab = defEndpoint?.[requestTab.tab];
 
-        if (defEndpoint && endpoint) {
-          if (rowData.endpointVariableId && endpoint.variables.map((v) => v.id).includes(rowData.endpointVariableId)) {
-            endpoint.variables = endpoint.variables.filter((v) => v.id !== rowData.endpointVariableId);
-          } else {
-            endpoint.variables
-              .filter((variable) => ["schema", "array"].includes(variable.type))
-              .forEach((variable) => checkNestedVariables(rowData.endpointVariableId!, variable));
-          }
-        }
-
-        newEndpoints.push(prevEndpoint);
+    if (defEndpoint && endpointTab) {
+      if (rowData.endpointVariableId && endpointTab.variables.map((v) => v.id).includes(rowData.endpointVariableId)) {
+        endpointTab.variables = endpointTab.variables.filter((v) => v.id !== rowData.endpointVariableId);
+      } else {
+        endpointTab.variables
+          .filter((variable) => ["schema", "array"].includes(variable.type))
+          .forEach((variable) => checkNestedVariables(rowData.endpointVariableId!, variable));
       }
-      return newEndpoints;
-    });
+    }
   };
 
   const updateParams = (isValue: boolean, rowId: string, value: string) => {
@@ -224,7 +219,7 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
         if (!row.value || !row.variable) return;
 
         parameters.push({
-          id: row.endpointVariableId !== undefined ? row.endpointVariableId : row.id,
+          id: row.endpointVariableId ?? row.id,
           name: row.variable,
           type: row.type ?? "custom",
           required: row.required ?? false,
@@ -281,7 +276,7 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
           name={`${requestTab.tab}-raw-data`}
           label={""}
           defaultValue={tabRawData[requestTab.tab]}
-          onBlur={() => updateEndpointRawData(tabRawData, endpointData.id, parentEndpointId)}
+          onBlur={() => updateEndpointRawData(tabRawData, endpoint)}
           onChange={(event) => {
             setJsonError(undefined);
             tabRawData[requestTab.tab] = event.target.value;

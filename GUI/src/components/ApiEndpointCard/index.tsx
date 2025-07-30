@@ -1,9 +1,8 @@
 import { FC, useMemo, useState } from "react";
 import * as Tabs from "@radix-ui/react-tabs";
-import { Button, EndpointCustom, EndpointOpenAPI, FormInput, FormSelect, Icon, Switch, Track } from "..";
+import { EndpointCustom, EndpointOpenAPI, FormInput, FormSelect, Switch, Track } from "..";
 import { Option } from "../../types/option";
 import { useTranslation } from "react-i18next";
-import { MdDeleteOutline } from "react-icons/md";
 import "./ApiEndpointCard.scss";
 import { RequestTab } from "../../types";
 import { EndpointData, EndpointEnv, EndpointTab } from "../../types/endpoint";
@@ -29,7 +28,7 @@ const ApiEndpointCard: FC<EndpointCardProps> = ({
   onNameChange,
   onCommonChange,
 }) => {
-  const { deleteEndpoint, changeServiceEndpointType, getAvailableRequestValues } = useServiceStore();
+  const { changeServiceEndpointType, getAvailableRequestValues } = useServiceStore();
   const [selectedTab, setSelectedTab] = useState<EndpointEnv>(EndpointEnv.Live);
   const [endpointName, setEndpointName] = useState<string>(endpoint.name);
   const [isCommonEndpoint, setIsCommonEndpoint] = useState<boolean>(endpoint.isCommon ?? false);
@@ -44,7 +43,7 @@ const ApiEndpointCard: FC<EndpointCardProps> = ({
 
   const getTabTriggerClasses = (tab: EndpointEnv) => `tab-group__tab-btn ${selectedTab === tab ? "active" : ""}`;
 
-  const requestValues = useMemo(() => getAvailableRequestValues(endpoint.endpointId), []);
+  const requestValues = useMemo(() => getAvailableRequestValues(endpoint), []);
 
   return (
     <Tabs.Root
@@ -61,12 +60,6 @@ const ApiEndpointCard: FC<EndpointCardProps> = ({
             {t("newService.endpoint.single")}
           </Tabs.Trigger>
         </Tabs.List>
-        {isDeletable && (
-          <Button appearance="text" onClick={() => deleteEndpoint(endpoint.endpointId)} style={{ color: "#9799A4" }}>
-            <Icon icon={<MdDeleteOutline />} size="medium" />
-            {t("overview.delete")}
-          </Button>
-        )}
       </Track>
       {[EndpointEnv.Live, EndpointEnv.Test].map((env) => {
         return (
@@ -83,7 +76,7 @@ const ApiEndpointCard: FC<EndpointCardProps> = ({
                   onSelectionChange={(selection) => {
                     setOption(selection);
                     endpoint.type = selection?.value as EndpointType;
-                    changeServiceEndpointType(endpoint.endpointId, (selection?.value ?? "custom") as EndpointType);
+                    changeServiceEndpointType(endpoint, (selection?.value ?? "custom") as EndpointType);
                   }}
                   defaultValue={option?.value}
                 />
