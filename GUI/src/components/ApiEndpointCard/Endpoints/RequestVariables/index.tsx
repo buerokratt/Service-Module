@@ -174,6 +174,15 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
         return row;
       });
 
+      if (!rowsData[requestTab.tab] || id !== `${rowsData[requestTab.tab]!.length - 1}`) return newRowsData;
+
+      newRowsData[requestTab.tab]!.push({
+        id: `${rowsData[requestTab.tab]!.length}`,
+        required: false,
+        isNameEditable: true,
+        nestedLevel: 0,
+      });
+
       updateEndpointData(newRowsData, endpoint);
 
       return newRowsData;

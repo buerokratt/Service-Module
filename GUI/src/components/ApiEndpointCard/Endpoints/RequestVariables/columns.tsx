@@ -29,8 +29,6 @@ export const getColumns = ({
   deleteVariable,
   setRowsData,
   updateRowVariable,
-  requestValues,
-  isLive,
   updateRowValue,
   getTabsRowsData,
 }: GetColumnsConfig) => {

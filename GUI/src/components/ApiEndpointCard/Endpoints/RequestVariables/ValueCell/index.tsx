@@ -27,6 +27,7 @@ const ValueCell: React.FC<ValueCellProps> = ({ row, updateRowValue, rowData, val
         onChange={(v: string) => {
           onValueChange(row.id, v);
           setInputValue(v);
+          updateRowValue(row.id, v);
         }}
         onSelected={(v) => {
           setInputValue(v);
