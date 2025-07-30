@@ -47,7 +47,7 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
   const { updateEndpointRawData, updateEndpointData } = useServiceStore();
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
-    pageSize: 10,
+    pageSize: 5,
   });
 
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -136,6 +136,26 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
   const getTabTriggerClasses = (tab: EndpointTab) =>
     `endpoint-tab-group__tab-btn ${requestTab.tab === tab ? "active" : ""}`;
 
+  const maintainSingleEmptyRow = (rows: RequestVariablesRowData[]) => {
+    console.log("Maintaining single empty row for:", rows);
+    const emptyRow = rows.find(row => row.value === undefined && row.variable === undefined);
+    const nonEmptyRows = rows.filter(row => row.value !== undefined || row.variable !== undefined);
+
+    const baseEmptyRow: RequestVariablesRowData = {
+      id: nonEmptyRows.length.toString(),
+      required: false,
+      isNameEditable: true,
+      nestedLevel: 0,
+    };
+
+    return [
+      ...nonEmptyRows,
+      emptyRow
+        ? { ...baseEmptyRow, ...emptyRow }
+        : baseEmptyRow,
+    ];
+  };
+
   const updateRowVariable = (id: string, variable: string) => {
     setRowsData((prevRowsData) => {
       const newRowsData = { ...prevRowsData };
@@ -146,18 +166,10 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
         row.variable = variable;
       });
 
-      if (!rowsData[requestTab.tab] || id !== `${rowsData[requestTab.tab]!.length - 1}`) return newRowsData;
-
-      newRowsData[requestTab.tab]!.push({
-        id: `${rowsData[requestTab.tab]!.length}`,
-        required: false,
-        isNameEditable: true,
-        nestedLevel: 0,
-      });
-
+      newRowsData[requestTab.tab] = maintainSingleEmptyRow(newRowsData[requestTab.tab] || []);
+      updateEndpointData(newRowsData, endpoint);
       return newRowsData;
     });
-    updateEndpointData(rowsData, endpoint);
   };
 
   const updateRowValue = (id: string, value: string) => {
@@ -174,17 +186,8 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
         return row;
       });
 
-      if (!rowsData[requestTab.tab] || id !== `${rowsData[requestTab.tab]!.length - 1}`) return newRowsData;
-
-      newRowsData[requestTab.tab]!.push({
-        id: `${rowsData[requestTab.tab]!.length}`,
-        required: false,
-        isNameEditable: true,
-        nestedLevel: 0,
-      });
-
+      newRowsData[requestTab.tab] = maintainSingleEmptyRow(newRowsData[requestTab.tab] || []);
       updateEndpointData(newRowsData, endpoint);
-
       return newRowsData;
     });
   };
@@ -276,7 +279,7 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
         updateRowValue,
         getTabsRowsData,
       }),
-    [rowsData]
+    []
   );
 
   const buildRawDataView = (): JSX.Element => {

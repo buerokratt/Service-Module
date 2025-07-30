@@ -85,6 +85,7 @@ export const getColumns = ({
           updateRowValue={updateRowValue}
           onValueChange={(rowId, value) => {
             updateParams(true, rowId, value);
+            updateRowValue(rowId, value);
           }}
         />
       ),

@@ -16,8 +16,10 @@ const ValueCell: React.FC<ValueCellProps> = ({ row, updateRowValue, rowData, val
   const { t } = useTranslation();
   const [inputValue, setInputValue] = useState(value);
 
-  if (!rowData) return <></>;
-  if (rowData.type === "schema" || (rowData.type === "array" && rowData.arrayType === "schema")) return <></>;
+  if (!row.original) return <></>;
+  if (row.original.type === "schema" || (row.original.type === "array" && row.original.arrayType === "schema"))
+    return <></>;
+  
   return (
     <div>
       <FormAutocomplete

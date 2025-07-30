@@ -16,8 +16,8 @@ const VariableCell: React.FC<VariableCellProps> = ({ row, updateRowVariable, row
   const { t } = useTranslation();
   const [inputValue, setInputValue] = useState(variable);
 
-  if (!rowData) return <></>;
-  return rowData.isNameEditable ? (
+  if (!row.original) return <></>;
+  return row.original.isNameEditable ? (
     <FormInput
       style={{ borderRadius: "0 4px 4px 0" }}
       name={`endpoint-variable-${row.id}`}
@@ -31,10 +31,10 @@ const VariableCell: React.FC<VariableCellProps> = ({ row, updateRowVariable, row
       placeholder={t("newService.endpoint.variable") + ".."}
     />
   ) : (
-    <p style={{ paddingLeft: 40 * rowData.nestedLevel }}>
-      {rowData.variable}
-      {rowData.type && `, (${rowData.type})`}
-      {rowData.description && `, (${rowData.description})`}
+    <p style={{ paddingLeft: 40 * row.original.nestedLevel }}>
+      {row.original.variable}
+      {row.original.type && `, (${row.original.type})`}
+      {row.original.description && `, (${row.original.description})`}
     </p>
   );
 };
