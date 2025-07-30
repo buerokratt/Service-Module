@@ -137,7 +137,6 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
     `endpoint-tab-group__tab-btn ${requestTab.tab === tab ? "active" : ""}`;
 
   const maintainSingleEmptyRow = (rows: RequestVariablesRowData[]) => {
-    console.log("Maintaining single empty row for:", rows);
     const emptyRow = rows.find(row => row.value === undefined && row.variable === undefined);
     const nonEmptyRows = rows.filter(row => row.value !== undefined || row.variable !== undefined);
 
