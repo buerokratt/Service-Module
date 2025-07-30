@@ -110,7 +110,6 @@ const ServicesTable: FC<ServicesTableProps> = ({ isCommon = false }) => {
   };
 
   const deleteSelectedService = () => {
-    // todo delete here
     useServiceListStore
       .getState()
       .deleteSelectedService(
