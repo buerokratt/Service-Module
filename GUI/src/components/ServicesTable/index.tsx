@@ -110,12 +110,15 @@ const ServicesTable: FC<ServicesTableProps> = ({ isCommon = false }) => {
   };
 
   const deleteSelectedService = () => {
+    // todo delete here
     useServiceListStore
       .getState()
       .deleteSelectedService(
         () => setIsDeletePopupVisible(false),
         t("overview.service.toast.deleted"),
-        t("overview.service.toast.failed.delete")
+        t("overview.service.toast.failed.delete"),
+        pagination,
+        sorting
       );
   };
 

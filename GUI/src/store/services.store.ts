@@ -37,7 +37,13 @@ interface ServiceStoreState {
     sorting: SortingState
   ) => Promise<void>;
   checkServiceIntentConnection: (onConnected: (response: Trigger) => void, onNotConnected: () => void) => Promise<void>;
-  deleteSelectedService: (onEnd: () => void, successMessage: string, errorMessage: string) => Promise<void>;
+  deleteSelectedService: (
+    onEnd: () => void,
+    successMessage: string,
+    errorMessage: string,
+    pagination: PaginationState,
+    sorting: SortingState
+  ) => Promise<void>;
   requestServiceIntentConnection: (
     onEnd: () => void,
     successMessage: string,
@@ -212,7 +218,7 @@ const useServiceListStore = create<ServiceStoreState>((set, get, store) => ({
       onNotConnected();
     }
   },
-  deleteSelectedService: async (onEnd, successMessage, errorMessage) => {
+  deleteSelectedService: async (onEnd, successMessage, errorMessage, pagination, sorting) => {
     const selectedService = get().selectedService;
     if (!selectedService) return;
 
@@ -222,8 +228,8 @@ const useServiceListStore = create<ServiceStoreState>((set, get, store) => ({
         type: selectedService?.type,
       });
       useToastStore.getState().success({ title: successMessage });
-      await useServiceListStore.getState().loadServicesList({ pageIndex: 0, pageSize: 10 }, []);
-      await useServiceListStore.getState().loadCommonServicesList({ pageIndex: 0, pageSize: 10 }, []);
+      await useServiceListStore.getState().loadServicesList(pagination, sorting);
+      await useServiceListStore.getState().loadCommonServicesList(pagination, sorting);
     } catch (error) {
       console.error(error);
       useToastStore.getState().error({ title: errorMessage });
