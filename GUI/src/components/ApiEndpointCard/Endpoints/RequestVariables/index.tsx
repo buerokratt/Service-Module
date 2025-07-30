@@ -5,7 +5,6 @@ import * as Tabs from "@radix-ui/react-tabs";
 import DataTable from "../../../DataTable";
 import { RequestTab } from "../../../../types";
 import {
-  EndpointDefinition,
   EndpointData,
   EndpointTab,
   EndpointVariableData,
@@ -45,13 +44,11 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
   const tabs: EndpointTab[] = [EndpointTab.Params, EndpointTab.Headers, EndpointTab.Body];
   const [jsonError, setJsonError] = useState<string>();
   const [key, setKey] = useState<number>(0);
-  const { setEndpoints, updateEndpointRawData, updateEndpointData } = useServiceStore();
+  const { updateEndpointRawData, updateEndpointData } = useServiceStore();
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
     pageSize: 10,
   });
-
-  console.log("endpoint", endpoint);
 
   const [sorting, setSorting] = useState<SortingState>([]);
 
@@ -141,31 +138,46 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
 
   const updateRowVariable = (id: string, variable: string) => {
     setRowsData((prevRowsData) => {
-      prevRowsData[requestTab.tab]!.forEach((row) => {
+      const newRowsData = { ...prevRowsData };
+      newRowsData[requestTab.tab] = [...(newRowsData[requestTab.tab] || [])];
+
+      newRowsData[requestTab.tab]!.forEach((row) => {
         if (row.id !== id) return;
         row.variable = variable;
       });
-      // if last row name is edited, add a new row
-      if (!rowsData[requestTab.tab] || id !== `${rowsData[requestTab.tab]!.length - 1}`) return prevRowsData;
-      prevRowsData[requestTab.tab]!.push({
+
+      if (!rowsData[requestTab.tab] || id !== `${rowsData[requestTab.tab]!.length - 1}`) return newRowsData;
+
+      newRowsData[requestTab.tab]!.push({
         id: `${rowsData[requestTab.tab]!.length}`,
         required: false,
         isNameEditable: true,
         nestedLevel: 0,
       });
-      return prevRowsData;
+
+      return newRowsData;
     });
     updateEndpointData(rowsData, endpoint);
   };
 
   const updateRowValue = (id: string, value: string) => {
-    if (!rowsData[requestTab.tab]) return;
-    rowsData[requestTab.tab]!.forEach((row) => {
-      if (row.id !== id) return;
-      row.value = value;
+    setRowsData((prevRowsData) => {
+      const newRowsData = { ...prevRowsData };
+      const currentTab = newRowsData[requestTab.tab];
+
+      if (!currentTab) return prevRowsData;
+
+      newRowsData[requestTab.tab] = currentTab.map((row) => {
+        if (row.id === id) {
+          return { ...row, value };
+        }
+        return row;
+      });
+
+      updateEndpointData(newRowsData, endpoint);
+
+      return newRowsData;
     });
-    updateEndpointData(rowsData, endpoint);
-    setKey(key + 1);
   };
 
   const checkNestedVariables = (rowVariableId: string, variable: EndpointVariableData) => {
@@ -202,32 +214,42 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
   };
 
   const updateParams = (isValue: boolean, rowId: string, value: string) => {
+    if (!rowsData[requestTab.tab]) return;
+    const newData = rowsData[requestTab.tab]!.map((row) => {
+      if (row.id !== rowId) return row;
+      if (isValue) {
+        row.value = value;
+      } else {
+        row.variable = value;
+      }
+      return row;
+    });
+
+    const variables: EndpointVariableData[] = [];
+    newData.forEach((row) => {
+      if (!row.value || !row.variable) return;
+
+      variables.push({
+        id: row.endpointVariableId ?? row.id,
+        name: row.variable,
+        type: row.type ?? "custom",
+        required: row.required ?? false,
+        value: row.value,
+      });
+    });
+
     if (requestTab.tab === "params") {
-      if (!rowsData[requestTab.tab]) return;
-      const newData = rowsData[requestTab.tab]!.map((row) => {
-        if (row.id !== rowId) return row;
-        if (isValue) {
-          row.value = value;
-        } else {
-          row.variable = value;
-        }
-        return row;
-      });
-
-      const parameters: EndpointVariableData[] = [];
-      newData.forEach((row) => {
-        if (!row.value || !row.variable) return;
-
-        parameters.push({
-          id: row.endpointVariableId ?? row.id,
-          name: row.variable,
-          type: row.type ?? "custom",
-          required: row.required ?? false,
-          value: row.value,
-        });
-      });
-
-      onParametersChange(parameters);
+      onParametersChange(variables);
+    } else if (requestTab.tab === "body") {
+      endpoint.definitions[0].body = {
+        variables: variables,
+        rawData: {},
+      };
+    } else if (requestTab.tab === "headers") {
+      endpoint.definitions[0].headers = {
+        variables: variables,
+        rawData: {},
+      };
     }
   };
 
@@ -245,7 +267,7 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
         updateRowValue,
         getTabsRowsData,
       }),
-    []
+    [rowsData]
   );
 
   const buildRawDataView = (): JSX.Element => {
@@ -268,7 +290,7 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
               setKey(key + 1);
             }}
           >
-            Format JSON
+            {t("newService.endpoint.formatJson")}
           </Button>
         </Track>
         <FormTextarea
@@ -336,7 +358,7 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
             <>
               <DataTable
                 sortable
-                data={rowsData[tab as EndpointTab]}
+                data={rowsData[tab as EndpointTab] ?? []}
                 columns={columns}
                 setPagination={setPagination}
                 setSorting={setSorting}

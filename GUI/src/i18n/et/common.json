@@ -232,7 +232,8 @@
       "unsupported": "Vabandust, praegu toetame ainult GET ja POST päringud",
       "insertName": "Sisesta otspunkti nimetus...",
       "type": "Otspunkti tüüp",
-      "nameAlreadyExists": "API pealkiri peab olema unikaalne"
+      "nameAlreadyExists": "API pealkiri peab olema unikaalne",
+      "formatJson": "Formateeri JSON"
     },
     "trainingModuleSetup": "Avaleht",
     "serviceSetup": "Teenuse seadistamine",

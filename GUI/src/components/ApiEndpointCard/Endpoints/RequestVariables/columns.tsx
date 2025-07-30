@@ -82,8 +82,6 @@ export const getColumns = ({
       cell: (props) => (
         <ValueCell
           row={props.row}
-          requestValues={requestValues}
-          isLive={isLive}
           rowData={rowsData[requestTab.tab]![+props.row.id]}
           value={rowsData[requestTab.tab]!.find((r) => r.id === props.row.id)?.value ?? ""}
           updateRowValue={updateRowValue}
