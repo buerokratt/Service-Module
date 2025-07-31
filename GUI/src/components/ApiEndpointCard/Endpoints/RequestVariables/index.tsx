@@ -155,34 +155,14 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
     ];
   };
 
-  const updateRowVariable = (id: string, variable: string) => {
+  const updateRowField = (id: string, field: "variable" | "value", newValue: string) => {
     setRowsData((prevRowsData) => {
       const newRowsData = { ...prevRowsData };
       newRowsData[requestTab.tab] = [...(newRowsData[requestTab.tab] || [])];
 
       newRowsData[requestTab.tab]!.forEach((row) => {
         if (row.id !== id) return;
-        row.variable = variable;
-      });
-
-      newRowsData[requestTab.tab] = maintainSingleEmptyRow(newRowsData[requestTab.tab] || []);
-      updateEndpointData(newRowsData, endpoint);
-      return newRowsData;
-    });
-  };
-
-  const updateRowValue = (id: string, value: string) => {
-    setRowsData((prevRowsData) => {
-      const newRowsData = { ...prevRowsData };
-      const currentTab = newRowsData[requestTab.tab];
-
-      if (!currentTab) return prevRowsData;
-
-      newRowsData[requestTab.tab] = currentTab.map((row) => {
-        if (row.id === id) {
-          return { ...row, value };
-        }
-        return row;
+        row[field] = newValue;
       });
 
       newRowsData[requestTab.tab] = maintainSingleEmptyRow(newRowsData[requestTab.tab] || []);
@@ -273,10 +253,9 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
         requestTab,
         deleteVariable,
         setRowsData,
-        updateRowVariable,
+        updateRowField,
         requestValues,
         isLive,
-        updateRowValue,
         getTabsRowsData,
       }),
     []

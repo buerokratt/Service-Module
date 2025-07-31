@@ -575,7 +575,6 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
   updateEndpointData: (data: RequestVariablesTabsRowsData, endpoint?: EndpointData) => {
     if (!endpoint) return;
 
-    const live = "value";
     const defEndpoint = endpoint.definitions[0];  
 
     if (!defEndpoint) return;
@@ -593,14 +592,13 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
             name: row.variable,
             type: "custom",
             required: false,
-            [live]: row.value,
+            value: row.value,
           });
         }
       }
 
       for (const variable of keyedDefEndpoint?.variables ?? []) {
         const updatedVariable = data[key as EndpointTab]!.find((updated) => updated.endpointVariableId === variable.id);
-        variable[live] = updatedVariable?.value;
         variable.name = updatedVariable?.variable ?? variable.name;
         variable.value = updatedVariable?.value ?? variable.value;
       }
