@@ -9,10 +9,9 @@ import {
   EndpointData,
   EndpointDefinition,
   EndpointVariableData,
-  EndpointTab,
   PreDefinedEndpointEnvVariables,
 } from "../../../../types/endpoint";
-import { RequestVariablesRowData, RequestVariablesTabsRowsData } from "../../../../types/request-variables";
+import { RequestVariablesRowData } from "../../../../types/request-variables";
 import useServiceStore from "store/new-services.store";
 import api from "../../../../services/api-dev";
 
@@ -118,10 +117,9 @@ const EndpointOpenAPI: React.FC<EndpointOpenAPIProps> = ({
     });
     if (!schema.required) return result;
     Object.values(schema?.required).forEach((name) => {
-      result.map((variable) => {
-        if (variable.name !== name) return variable;
+      result.forEach((variable) => {
+        if (variable.name !== name) return;
         variable.required = true;
-        return variable;
       });
     });
     return result;
@@ -215,11 +213,10 @@ const EndpointOpenAPI: React.FC<EndpointOpenAPIProps> = ({
     });
     setOpenApiEndpoints(paths);
     setEndpoints((prevEndpoints) => {
-      prevEndpoints.map((prevEndpoint) => {
-        if (prevEndpoint.endpointId !== endpoint.endpointId) return prevEndpoint;
+      prevEndpoints.forEach((prevEndpoint) => {
+        if (prevEndpoint.endpointId !== endpoint.endpointId) return;
         prevEndpoint.definitions = paths;
         prevEndpoint.openApiUrl = openApiUrl;
-        return prevEndpoint;
       });
       return prevEndpoints;
     });
@@ -235,42 +232,6 @@ const EndpointOpenAPI: React.FC<EndpointOpenAPIProps> = ({
         if (["schema", "array"].includes(variableData.type)) {
           checkNestedVariables(variableData, data);
         }
-      });
-    }
-  };
-
-  const updateEndpointData = (data: RequestVariablesTabsRowsData, openApiEndpointId?: string) => {
-    if (!openApiEndpointId) return;
-    setEndpoints((prevEndpoints) => {
-      return prevEndpoints.map((prevEndpoint) => {
-        if (prevEndpoint.endpointId !== endpoint.endpointId) return prevEndpoint;
-        updateEndpoint(prevEndpoint, data, openApiEndpointId);
-        return prevEndpoint;
-      });
-    });
-    setKey(key + 1);
-  };
-
-  const updateEndpoint = (
-    prevEndpoint: EndpointData,
-    data: RequestVariablesTabsRowsData,
-    openApiEndpointId?: string
-  ) => {
-    prevEndpoint.definitions.forEach((openApiEndpoint) => {
-      if (openApiEndpoint.id === openApiEndpointId) {
-        updateOpenApiEndpoint(data, openApiEndpoint);
-      }
-    });
-  };
-
-  const updateOpenApiEndpoint = (data: RequestVariablesTabsRowsData, openApiEndpoint: EndpointDefinition) => {
-    for (const key in data) {
-      openApiEndpoint[key as EndpointTab]?.variables.forEach((variable) => {
-        if (["schema", "array"].includes(variable.type)) {
-          checkNestedVariables(variable, data[key as EndpointTab]!);
-        }
-        const updatedVariable = data[key as EndpointTab]!.find((updated) => updated.endpointVariableId === variable.id);
-        variable[isLive ? "value" : "testValue"] = updatedVariable?.value;
       });
     }
   };

@@ -553,11 +553,7 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
         data: endpoint,
       }));
   },
-  setEndpoints: (callback) => {
-    // set((state) => ({
-    //   endpoints: callback(state.endpoints),
-    // }));
-  },
+  setEndpoints: () => {},
   selectedTab: EndpointEnv.Live,
   setSelectedTab: (tab: EndpointEnv) => set({ selectedTab: tab }),
   isLive: () => get().selectedTab === EndpointEnv.Live,
