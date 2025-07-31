@@ -10,16 +10,15 @@ import { PreDefinedEndpointEnvVariables } from "types/endpoint";
 import { RequestTab } from "types";
 
 interface GetColumnsConfig {
-  rowsData: RequestVariablesTabsRowsData,
-  updateParams: (isValue: boolean, rowId: string, value: string) => void,
-  requestTab: RequestTab,
-  deleteVariable: (rowData: RequestVariablesRowData) => void,
-  setRowsData: React.Dispatch<React.SetStateAction<RequestVariablesTabsRowsData>>,
-  updateRowVariable: (id: string, variable: string) => void,
-  requestValues: PreDefinedEndpointEnvVariables,
-  isLive: boolean,
-  updateRowValue: (id: string, value: string) => void,
-  getTabsRowsData: () => RequestVariablesTabsRowsData,
+  rowsData: RequestVariablesTabsRowsData;
+  updateParams: (isValue: boolean, rowId: string, value: string) => void;
+  requestTab: RequestTab;
+  deleteVariable: (rowData: RequestVariablesRowData) => void;
+  setRowsData: React.Dispatch<React.SetStateAction<RequestVariablesTabsRowsData>>;
+  requestValues: PreDefinedEndpointEnvVariables;
+  isLive: boolean;
+  updateRowField: (id: string, field: "variable" | "value", value: string) => void;
+  getTabsRowsData: () => RequestVariablesTabsRowsData;
 }
 
 export const getColumns = ({
@@ -28,10 +27,7 @@ export const getColumns = ({
   requestTab,
   deleteVariable,
   setRowsData,
-  updateRowVariable,
-  requestValues,
-  isLive,
-  updateRowValue,
+  updateRowField,
   getTabsRowsData,
 }: GetColumnsConfig) => {
   const columnHelper = createColumnHelper<RequestVariablesTableColumns>();
@@ -63,8 +59,9 @@ export const getColumns = ({
         <VariableCell
           row={props.row}
           variable={rowsData[requestTab.tab]!.find((r) => r.id === props.row.id)?.variable ?? ""}
-          updateRowVariable={updateRowVariable}
-          rowData={rowsData[requestTab.tab]![+props.row.id]}
+          updateRowVariable={(id, variable) => {
+            updateRowField(id, "variable", variable);
+          }}
           onValueChange={(rowId, value) => {
             updateParams(false, rowId, value);
           }}
@@ -82,11 +79,10 @@ export const getColumns = ({
       cell: (props) => (
         <ValueCell
           row={props.row}
-          requestValues={requestValues}
-          isLive={isLive}
-          rowData={rowsData[requestTab.tab]![+props.row.id]}
           value={rowsData[requestTab.tab]!.find((r) => r.id === props.row.id)?.value ?? ""}
-          updateRowValue={updateRowValue}
+          updateRowValue={(id, value) => {
+            updateRowField(id, "value", value);
+          }}
           onValueChange={(rowId, value) => {
             updateParams(true, rowId, value);
           }}
@@ -118,5 +114,5 @@ export const getColumns = ({
         );
       },
     }),
-  ]
+  ];
 }

@@ -232,7 +232,8 @@
       "unsupported": "Sorry, we currently only support GET and POST requests.",
       "insertName": "Insert endpoint name...",
       "type": "Endpoint type",
-      "nameAlreadyExists": "API title must be unique"
+      "nameAlreadyExists": "API title must be unique",
+      "formatJson": "Format JSON"
     },
     "trainingModuleSetup": "Training module setup",
     "serviceSetup": "Service setup",
