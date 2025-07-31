@@ -42,7 +42,6 @@ function CustomEdge({
   style,
   markerEnd,
 }: EdgeProps) {
-
   const [edgePath, edgeCenterX, edgeCenterY] = getBezierPath({
     sourceX,
     sourceY,
@@ -136,6 +135,33 @@ function CustomEdge({
           }
         >
           <Track direction="vertical" align="stretch" gap={15}>
+            <DndContext
+              modifiers={[restrictToParentElement]}
+              sensors={sensors}
+              collisionDetection={closestCorners}
+              onDragEnd={handleDragEnd}
+            >
+              <Collapsible title={t("serviceFlow.allElements")} contentStyle={contentStyle} defaultOpen>
+                {allElements.length > 0 && (
+                  <Track direction="vertical" align="stretch" gap={4}>
+                    <SortableContext items={allElements} strategy={verticalListSortingStrategy}>
+                      {allElements.map((element) => (
+                        <StepElement
+                          key={element.id}
+                          step={element}
+                          onClick={(step) => {
+                            onEdgeAdd(step);
+                            setDropdownOpen(false);
+                            setHasUnsavedChanges(true);
+                          }}
+                        />
+                      ))}
+                    </SortableContext>
+                  </Track>
+                )}
+              </Collapsible>
+            </DndContext>
+
             <Collapsible
               defaultOpen={true}
               title={t("serviceFlow.apiElements.title")}
@@ -169,33 +195,6 @@ function CustomEdge({
                 </Track>
               )}
             </Collapsible>
-
-            <DndContext
-              modifiers={[restrictToParentElement]}
-              sensors={sensors}
-              collisionDetection={closestCorners}
-              onDragEnd={handleDragEnd}
-            >
-              <Collapsible title={t("serviceFlow.allElements")} contentStyle={contentStyle} defaultOpen>
-                {allElements.length > 0 && (
-                  <Track direction="vertical" align="stretch" gap={4}>
-                    <SortableContext items={allElements} strategy={verticalListSortingStrategy}>
-                      {allElements.map((element) => (
-                        <StepElement
-                          key={element.id}
-                          step={element}
-                          onClick={(step) => {
-                            onEdgeAdd(step);
-                            setDropdownOpen(false);
-                            setHasUnsavedChanges(true);
-                          }}
-                        />
-                      ))}
-                    </SortableContext>
-                  </Track>
-                )}
-              </Collapsible>
-            </DndContext>
           </Track>
         </Dropdown>
         {isAddEndpointModalVisible && (
