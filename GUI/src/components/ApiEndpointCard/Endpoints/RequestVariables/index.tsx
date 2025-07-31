@@ -189,6 +189,7 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
   };
 
   const deleteVariable = (rowData: RequestVariablesRowData) => {
+    if (rowData.variable === undefined || rowData.value === undefined) return;
     const endpointData = endpoint.definitions[0];
     const defEndpoint = endpoint.definitions.find((x) => x.id === endpointData.id);
     const endpointTab = defEndpoint?.[requestTab.tab];
@@ -201,6 +202,10 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
           .filter((variable) => ["schema", "array"].includes(variable.type))
           .forEach((variable) => checkNestedVariables(rowData.endpointVariableId!, variable));
       }
+    }
+    
+    if (requestTab.tab === "params") {
+      onParametersChange(endpointTab?.variables ?? []);
     }
   };
 
@@ -258,7 +263,7 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
         isLive,
         getTabsRowsData,
       }),
-    []
+    [deleteVariable]
   );
 
   const buildRawDataView = (): JSX.Element => {
