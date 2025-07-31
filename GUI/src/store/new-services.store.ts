@@ -739,6 +739,8 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
             fileContent: updatedNode.data.fileContent,
             signOption: updatedNode.data.signOption,
             multiChoiceQuestion: updatedNode.data.multiChoiceQuestion,
+            endpoint: updatedNode.data.endpoint,
+            label: updatedNode.data.label,
           },
         };
       })

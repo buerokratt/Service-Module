@@ -167,18 +167,10 @@ export const saveFlow = async ({
       const mcqEdges = edges.filter((edge) => edge.source === mcqNode.id);
 
       for (const edge of mcqEdges) {
-        const placeholderNode = nodes.find((n) => n.id === edge.target);
-        if (!placeholderNode) continue;
-
-        const nextEdge = edges.find((e) => e.source === placeholderNode.id);
-        if (!nextEdge) continue;
-
-        const nextNode = nodes.find((n) => n.id === nextEdge.target);
+        const nextNode = nodes.find((n) => n.id === edge.target);
         if (!nextNode) continue;
 
-        const branchLabel = edges.find((e) => e.source === mcqNode.id)?.label ?? "branch";
-        const buttonIndex = mcqNode?.data?.multiChoiceQuestion?.buttons.findIndex((e: any) => e.title === branchLabel);
-
+        const buttonIndex = mcqNode?.data?.multiChoiceQuestion?.buttons.findIndex((e: any) => e.title === edge.label);
         const mcqNodeId = getLastDigits(toSnakeCase(mcqNode.data.label ?? ""));
         const serviceName = `${name}_mcq_${mcqNodeId}_${buttonIndex}`;
         const branchNodes = getBranchNodes(nodes, edges, nextNode);
@@ -188,7 +180,7 @@ export const saveFlow = async ({
 
         await saveService(
           getYamlContent(branchNodes, branchEdges, steps, serviceName, description),
-          { name, serviceId, description, slot, isCommon, nodes, edges, isNewService } as SaveFlowConfig,
+          { name: serviceName, serviceId, description, slot, isCommon, nodes, edges, isNewService } as SaveFlowConfig,
           false,
           status
         );
@@ -212,7 +204,9 @@ async function saveService(
   onError?: (e: any) => void
 ) {
   const { isNewService, serviceId, name, description, slot, isCommon, edges, nodes } = config;
-  useServiceStore.getState().changeServiceName(removeTrailingUnderscores(name));
+  if (updateServiceDb) {
+    useServiceStore.getState().changeServiceName(removeTrailingUnderscores(name));
+  }
   await api
     .post(
       isNewService ? createNewService() : editService(serviceId),

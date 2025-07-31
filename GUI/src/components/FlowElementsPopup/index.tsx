@@ -31,6 +31,8 @@ import { Edge, getConnectedEdges, getIncomers, getOutgoers, Node } from "@xyflow
 import { MultiChoiceQuestionButton } from "types/multi-choice-question";
 import useServiceListStore from "store/services.store";
 import api from "../../services/api-dev";
+import { EndpointData } from "types/endpoint";
+import useToastStore from "store/toasts.store";
 
 const FlowElementsPopup: React.FC = () => {
   const { t } = useTranslation();
@@ -40,6 +42,7 @@ const FlowElementsPopup: React.FC = () => {
   const [jsonRequestContent, setJsonRequestContent] = useState<any>(null);
   const node = useServiceStore((state) => state.selectedNode);
   const selectedService = useServiceListStore((state) => state.selectedService);
+  const instance = useServiceStore.getState().reactFlowInstance;
 
   const isUserDefinedNode = node?.data?.stepType === "user-defined";
 
@@ -91,6 +94,8 @@ const FlowElementsPopup: React.FC = () => {
   const [multiChoiceQuestionButtons, setMultiChoiceQuestionButtons] = useState<MultiChoiceQuestionButton[]>(
     node?.data.multiChoiceQuestion?.buttons ?? defaultMultiChoiceQuestionButtons
   );
+
+  const [nodeEndpoint, setNodeEndpoint] = useState<EndpointData | undefined>(node?.data.endpoint);
 
   const stepType = node?.data.stepType;
 
@@ -151,6 +156,7 @@ const FlowElementsPopup: React.FC = () => {
           question: multiChoiceQuestionQuestion,
           buttons: multiChoiceQuestionButtons,
         },
+        endpoint: nodeEndpoint ?? node.data?.endpoint,
       },
     };
 
@@ -163,10 +169,20 @@ const FlowElementsPopup: React.FC = () => {
     }
 
     if (stepType === StepType.UserDefined) {
-      const newLabel = node.data.label?.toString().split(" ");
-      if (node.data.endpoint?.name) {
-        newLabel[0] = node.data.endpoint?.name ?? node.data.label?.toString().split(" ")[0];
-        node.data.label = newLabel.join(" ");
+      const newLabel = updatedNode.data.label?.toString().split(" ");
+      if (updatedNode.data.endpoint?.name) {
+        newLabel[0] = updatedNode.data.endpoint?.name ?? node.data.label?.toString().split(" ")[0];
+        const nodeWithSameLabel = instance
+          ?.getNodes()
+          .find((n) => n.data.label === newLabel.join(" ") && n.id !== updatedNode.id);
+        if (nodeWithSameLabel) {
+          useToastStore.getState().error({
+            title: t("newService.toast.elementNameAlreadyExists"),
+            message: t("newService.toast.elementNameAlreadyExistsMessage"),
+          });
+          return;
+        }
+        updatedNode.data.label = newLabel.join(" ");
       }
       useServiceStore.getState().loadEndpointsResponseVariables();
     }
@@ -253,7 +269,6 @@ const FlowElementsPopup: React.FC = () => {
   };
 
   const saveMultiChoicePopup = (originalNode: Node<NodeDataProps>, updatedNode: Node<NodeDataProps>) => {
-    const instance = useServiceStore.getState().reactFlowInstance;
     if (!instance) return;
 
     const currentButtons = originalNode.data.multiChoiceQuestion?.buttons ?? defaultMultiChoiceQuestionButtons;
@@ -439,6 +454,10 @@ const FlowElementsPopup: React.FC = () => {
               <ApiContent
                 nodeId={node.id}
                 endpoint={node.data.endpoint}
+                onEndpointChange={(endpoint) => {
+                  if (!endpoint) return;
+                  setNodeEndpoint(endpoint);
+                }}
               />
             )}
             {stepType === StepType.MultiChoiceQuestion && (

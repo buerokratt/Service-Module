@@ -39,7 +39,7 @@ const ValueCell: React.FC<ValueCellProps> = ({ row, requestValues, updateRowValu
     <div ref={ref}>
       <FormAutocomplete
         placeholder={t("global.choose")}
-        data={isLive ? requestValues.prod : [...requestValues.prod, ...requestValues.test]}
+        data={[]}
         value={inputValue}
         onChange={(v: string) => {
           onValueChange(row.id, v);
