@@ -606,6 +606,7 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
         const updatedVariable = data[key as EndpointTab]!.find((updated) => updated.endpointVariableId === variable.id);
         variable[live] = updatedVariable?.value;
         variable.name = updatedVariable?.variable ?? variable.name;
+        variable.value = updatedVariable?.value ?? variable.value;
       }
     }
 

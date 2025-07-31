@@ -62,7 +62,6 @@ export const getColumns = ({
           row={props.row}
           variable={rowsData[requestTab.tab]!.find((r) => r.id === props.row.id)?.variable ?? ""}
           updateRowVariable={updateRowVariable}
-          rowData={rowsData[requestTab.tab]![+props.row.id]}
           onValueChange={(rowId, value) => {
             updateParams(false, rowId, value);
           }}
@@ -80,12 +79,10 @@ export const getColumns = ({
       cell: (props) => (
         <ValueCell
           row={props.row}
-          rowData={rowsData[requestTab.tab]![+props.row.id]}
           value={rowsData[requestTab.tab]!.find((r) => r.id === props.row.id)?.value ?? ""}
           updateRowValue={updateRowValue}
           onValueChange={(rowId, value) => {
             updateParams(true, rowId, value);
-            updateRowValue(rowId, value);
           }}
         />
       ),

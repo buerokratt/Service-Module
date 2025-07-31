@@ -240,13 +240,14 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
     newData.forEach((row) => {
       if (!row.value || !row.variable) return;
 
-      variables.push({
+      const newVariable: EndpointVariableData = {
         id: row.endpointVariableId ?? row.id,
         name: row.variable,
         type: row.type ?? "custom",
         required: row.required ?? false,
         value: row.value,
-      });
+      };
+      variables.push(newVariable);
     });
 
     if (requestTab.tab === "params") {

@@ -1,18 +1,17 @@
 import { Row } from "@tanstack/react-table";
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { FormAutocomplete } from "../../../..";
-import { RequestVariablesRowData, RequestVariablesTableColumns } from "../../../../../types/request-variables";
+import { FormInput } from "../../../..";
+import { RequestVariablesTableColumns } from "../../../../../types/request-variables";
 
 type ValueCellProps = {
   row: Row<RequestVariablesTableColumns>;
   value: string;
-  rowData?: RequestVariablesRowData;
   updateRowValue: (id: string, value: string) => void;
   onValueChange: (rowId: string, value: string) => void;
 };
 
-const ValueCell: React.FC<ValueCellProps> = ({ row, updateRowValue, rowData, value, onValueChange }) => {
+const ValueCell: React.FC<ValueCellProps> = ({ row, updateRowValue, value, onValueChange }) => {
   const { t } = useTranslation();
   const [inputValue, setInputValue] = useState(value);
 
@@ -22,20 +21,17 @@ const ValueCell: React.FC<ValueCellProps> = ({ row, updateRowValue, rowData, val
   
   return (
     <div>
-      <FormAutocomplete
-        placeholder={t("global.choose")}
-        data={[]}
+      <FormInput
+        style={{ borderRadius: "4px" }}
+        name={`endpoint-value-${row.id}`}
+        label=""
+        onChange={(e) => {
+          onValueChange(row.id, e.target.value);
+          setInputValue(e.target.value);
+          updateRowValue(row.id, e.target.value);
+        }}
         value={inputValue}
-        onChange={(v: string) => {
-          onValueChange(row.id, v);
-          setInputValue(v);
-          updateRowValue(row.id, v);
-        }}
-        onSelected={(v) => {
-          setInputValue(v);
-          updateRowValue(row.id, v);
-        }}
-        excludeCharacters={new RegExp(/[{}]/)}
+        placeholder={t("newService.endpoint.value") + ".."}
       />
     </div>
   );
