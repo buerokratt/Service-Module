@@ -257,7 +257,7 @@
       "saveConfigFailed": "Seadete salvestamine ebaõnnestus",
       "testResultSuccess": "Testi tulemus - edu",
       "testResultError": "Testi tulemus - viga",
-      "servieNotFound": "Teenust ei leitud",
+      "serviceNotFound": "Teenust ei leitud",
       "serviceNotFoundEndpointsMessage": "Salvesta teenus kõigepealt, et saaksid lisada otspunkte",
       "serviceNameAlreadyExists": "Teenuse nimi on juba olemas",
       "elementNameAlreadyExists": "Elementi nimi on juba olemas",

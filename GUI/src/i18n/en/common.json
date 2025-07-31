@@ -257,7 +257,7 @@
       "saveConfigFailed": "Failed to save config",
       "testResultSuccess": "Test result- success",
       "testResultError": "Test result - error",
-      "servieNotFound": "Service not found",
+      "serviceNotFound": "Service not found",
       "serviceNotFoundEndpointsMessage": "Please save the service first to be able to add endpoints",
       "serviceNameAlreadyExists": "Service name already exists",
       "elementNameAlreadyExists": "Element name already exists",

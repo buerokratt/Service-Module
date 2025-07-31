@@ -169,7 +169,7 @@ function CustomEdge({
               onAddClick={async () => {
                 if (!idParam) {
                   useToastStore.getState().error({
-                    title: t("newService.toast.servieNotFound"),
+                    title: t("newService.toast.serviceNotFound"),
                     message: t("newService.toast.serviceNotFoundEndpointsMessage"),
                   });
                 } else {
