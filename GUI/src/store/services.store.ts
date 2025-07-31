@@ -80,7 +80,7 @@ const useServiceListStore = create<ServiceStoreState>((set, get, store) => ({
   notCommonServices: [],
   loadServicesList: async (pagination, sorting) => {
     const order = sorting[0]?.desc ? "desc" : "asc";
-    const sort = sorting.length === 0 ? "id asc" : sorting[0]?.id + " " + order;
+    const sort = sorting.length === 0 ? "name asc" : sorting[0]?.id + " " + order;
     const result = await api.post(getServicesList(), {
       page: pagination.pageIndex + 1,
       page_size: pagination.pageSize,
@@ -242,7 +242,7 @@ const useServiceListStore = create<ServiceStoreState>((set, get, store) => ({
         serviceId: selectedService.serviceId,
         serviceName: selectedService.name,
         serviceMethod: selectedService.type,
-        serviceSlot: selectedService.slot ?? '',
+        serviceSlot: selectedService.slot ?? "",
         intent: intent,
       });
       useToastStore.getState().success({ title: successMessage });

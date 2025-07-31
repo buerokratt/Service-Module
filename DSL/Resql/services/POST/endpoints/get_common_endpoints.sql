@@ -8,7 +8,6 @@ SELECT
   endpoint_id,
   name,
   type,
-  file_name,
   is_common,
   definitions
 FROM LatestEndpoints

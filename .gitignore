@@ -4,12 +4,10 @@
 /DSL/Ruuter/services/POST/services/active
 /DSL/Ruuter/services/POST/services/draft
 /DSL/Ruuter/services/POST/services/inactive
-/DSL/Ruuter/services/POST/services/endpoints
 /DSL/Ruuter/services/POST/services/inactive
 /DSL/Ruuter/services/GET/services/active
 /DSL/Ruuter/services/GET/services/draft
 /DSL/Ruuter/services/GET/services/inactive
-/DSL/Ruuter/services/GET/services/endpoints
 /DSL/Ruuter/services/GET/services/inactive
 .DS_Store
 .vscode

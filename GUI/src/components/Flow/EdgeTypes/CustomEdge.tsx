@@ -158,7 +158,9 @@ function CustomEdge({
                       key={step.id}
                       step={step}
                       onClick={(step) => {
-                        onEdgeAdd(step);
+                        onEdgeAdd(step).then(() => {
+                          useServiceStore.getState().loadEndpointsResponseVariables();
+                        });
                         setDropdownOpen(false);
                         setHasUnsavedChanges(true);
                       }}
@@ -197,7 +199,13 @@ function CustomEdge({
           </Track>
         </Dropdown>
         {isAddEndpointModalVisible && (
-          <Modal title={t("newService.createNewEndpoint")} onClose={() => setIsAddEndpointModalVisible(false)}>
+          <Modal
+            title={t("newService.createNewEndpoint")}
+            onClose={() => {
+              setEndpoint({ endpointId: uuid(), name: "", definitions: [], isNew: true });
+              setIsAddEndpointModalVisible(false);
+            }}
+          >
             <Track isMultiline gap={16} direction="vertical" align="stretch">
               <ApiEndpointCard
                 endpoint={endpoint}
@@ -207,7 +215,13 @@ function CustomEdge({
                 onCommonChange={setIsCommonEndpoint}
               />
               <Track justify="end" gap={16}>
-                <Button appearance="secondary" onClick={() => setIsAddEndpointModalVisible(false)}>
+                <Button
+                  appearance="secondary"
+                  onClick={() => {
+                    setEndpoint({ endpointId: uuid(), name: "", definitions: [], isNew: true });
+                    setIsAddEndpointModalVisible(false);
+                  }}
+                >
                   {t("overview.cancel")}
                 </Button>
                 <Button
@@ -226,7 +240,6 @@ function CustomEdge({
                         setEndpoint({ endpointId: uuid(), name: "", definitions: [], isNew: true });
                         useToastStore.getState().success({ title: t("serviceFlow.apiElements.createSuccess") });
                         setIsCreatingEndpoint(false);
-                        useServiceStore.getState().loadEndpointsResponseVariables();
                       },
                       (error) => {
                         console.error(`Error creating API endpoint: ${error}`);

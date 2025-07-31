@@ -33,13 +33,21 @@ const ServicesTable: FC<ServicesTableProps> = ({ isCommon = false }) => {
     pageIndex: 0,
     pageSize: 10,
   });
-  const [sorting, setSorting] = useState<SortingState>([]);
+  const [sorting, setSorting] = useState<SortingState>([{ id: "name", desc: false }]);
+
+  const loadServices = (paginationState: PaginationState, sortingState: SortingState) => {
+    useServiceListStore.getState().loadServicesList(paginationState, sortingState);
+  };
+
+  const loadCommonServices = (paginationState: PaginationState, sortingState: SortingState) => {
+    useServiceListStore.getState().loadCommonServicesList(paginationState, sortingState);
+  };
 
   useEffect(() => {
-    if (!isCommon) {
-      useServiceListStore.getState().loadServicesList(pagination, sorting);
+    if (isCommon) {
+      loadCommonServices(pagination, sorting);
     } else {
-      useServiceListStore.getState().loadCommonServicesList(pagination, sorting);
+      loadServices(pagination, sorting);
     }
   }, []);
 
@@ -201,9 +209,10 @@ const ServicesTable: FC<ServicesTableProps> = ({ isCommon = false }) => {
               <Button appearance="secondary" onClick={() => setIsReadyPopupVisible(false)}>
                 {t("overview.cancel")}
               </Button>
-              {readyPopupText != t("overview.popup.connectionPending").toString() && readyPopupText != t("overview.popup.setActive").toString() && (
-                <Button onClick={() => changeServiceState()}>{t("overview.popup.setToDraft")}</Button>
-              )}
+              {readyPopupText != t("overview.popup.connectionPending").toString() &&
+                readyPopupText != t("overview.popup.setActive").toString() && (
+                  <Button onClick={() => changeServiceState()}>{t("overview.popup.setToDraft")}</Button>
+                )}
               {getActiveAndConnectionButton()}
             </Track>
           )}
@@ -224,18 +233,18 @@ const ServicesTable: FC<ServicesTableProps> = ({ isCommon = false }) => {
         setPagination={(state: PaginationState) => {
           if (state.pageIndex === pagination.pageIndex && state.pageSize === pagination.pageSize) return;
           setPagination(state);
-          if (!isCommon) {
-            useServiceListStore.getState().loadServicesList(state, sorting);
+          if (isCommon) {
+            loadCommonServices(state, sorting);
           } else {
-            useServiceListStore.getState().loadCommonServicesList(state, sorting);
+            loadServices(state, sorting);
           }
         }}
         setSorting={(state: SortingState) => {
           setSorting(state);
-          if (!isCommon) {
-            useServiceListStore.getState().loadServicesList(pagination, state);
+          if (isCommon) {
+            loadCommonServices(pagination, state);
           } else {
-            useServiceListStore.getState().loadCommonServicesList(pagination, state);
+            loadServices(pagination, state);
           }
         }}
         isClientSide={false}
