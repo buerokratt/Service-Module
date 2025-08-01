@@ -37,7 +37,6 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
   requestValues,
   requestTab,
   setRequestTab,
-  parentEndpointId,
   onParametersChange,
 }) => {
   const { t } = useTranslation();
@@ -51,6 +50,7 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
   });
 
   const [sorting, setSorting] = useState<SortingState>([]);
+  const [deletedVariable, setDeletedVariable] = useState<RequestVariablesRowData | undefined>(undefined);
 
   const constructRow = (id: number, data: EndpointVariableData, nestedLevel: number): RequestVariablesRowData => {
     const value = isLive ? data.value : data.testValue;
@@ -167,6 +167,18 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
 
       newRowsData[requestTab.tab] = maintainSingleEmptyRow(newRowsData[requestTab.tab] || []);
       updateEndpointData(newRowsData, endpoint);
+      if (requestTab.tab === "params")
+        onParametersChange(
+          newRowsData[requestTab.tab]
+            ?.filter((row) => row.value && row.variable)
+            .map((row) => ({
+              id: row.endpointVariableId ?? row.id,
+              name: row.variable!,
+              type: row.type ?? "custom",
+              required: row.required ?? false,
+              value: row.value!,
+            })) ?? []
+        );
       return newRowsData;
     });
   };
@@ -207,6 +219,7 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
     if (requestTab.tab === "params") {
       onParametersChange(endpointTab?.variables ?? []);
     }
+    setDeletedVariable(rowData);
   };
 
   const updateParams = (isValue: boolean, rowId: string, value: string) => {
@@ -263,7 +276,7 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
         isLive,
         getTabsRowsData,
       }),
-    [deleteVariable]
+    [deletedVariable]
   );
 
   const buildRawDataView = (): JSX.Element => {
