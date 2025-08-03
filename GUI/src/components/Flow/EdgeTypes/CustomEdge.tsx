@@ -59,6 +59,7 @@ function CustomEdge({
 
   const { t } = useTranslation();
   const [allElements, setAllElements] = useState<Step[]>([]);
+  const [apiElements, setApiElements] = useState<Step[]>([]);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const contentStyle: CSSProperties = {
     overflowY: "auto",
@@ -80,8 +81,8 @@ function CustomEdge({
   const { setHasUnsavedChanges } = useServiceStore();
 
   const stepPreferences = useServiceStore((state) => state.stepPreferences);
-  const apiElements = useServiceStore((state) => state.apiElements);
-  const setApiElements = useServiceStore((state) => state.setApiElements);
+  const endpoints = useServiceStore((state) => state.endpoints);
+  const mapEndpointsToSteps = useServiceStore((state) => state.mapEndpointsToSteps);
 
   const onEdgeAdd = useEdgeAdd(id);
 
@@ -96,6 +97,11 @@ function CustomEdge({
     });
     setAllElements(elements);
   }, [stepPreferences]);
+
+  useEffect(() => {
+    const steps = mapEndpointsToSteps();
+    setApiElements(steps);
+  }, [mapEndpointsToSteps]);
 
   function handleDragEnd(event: DragEndEvent) {
     const { active, over } = event;
@@ -137,7 +143,7 @@ function CustomEdge({
     const endpointIds = endpoints.map((e) => e.data?.endpointId).filter(Boolean);
 
     api.post(userStepPreferences(), {
-      steps: stepPreferences || [],
+      steps: stepPreferences,
       endpoints: endpointIds,
     });
   }

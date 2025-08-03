@@ -52,7 +52,6 @@ interface ServiceStoreState {
   rules: GroupOrRule[];
   isYesNoQuestion: boolean;
   stepPreferences: string[];
-  apiElements: Step[];
   endpointsResponseVariables: EndpointResponseVariable[];
   setIsYesNoQuestion: (value: boolean) => void;
   changeAssignNode: (assign: Assign[]) => void;
@@ -76,7 +75,6 @@ interface ServiceStoreState {
   setDescription: (description: string) => void;
   setSlot: (slot: string) => void;
   setStepPreferences: (stepPreferences: string[]) => void;
-  setApiElements: (apiElements: Step[]) => void;
   loadEndpointsResponseVariables: () => void;
   setSecrets: (newSecrets: PreDefinedEndpointEnvVariables) => void;
   addProductionVariables: (variables: string[]) => void;
@@ -152,7 +150,6 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
   rules: [],
   isYesNoQuestion: false,
   stepPreferences: [],
-  apiElements: [],
   endpointsResponseVariables: [],
   setIsYesNoQuestion: (value: boolean) => set({ isYesNoQuestion: value }),
   changeAssignNode: (assignElements) => {
@@ -324,7 +321,6 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
   setDescription: (description: string) => set({ description }),
   setSlot: (slot: string) => set({ slot }),
   setStepPreferences: (stepPreferences: string[]) => set({ stepPreferences }),
-  setApiElements: (apiElements) => set({ apiElements }),
   isCommon: false,
   setIsCommon: (isCommon: boolean) => set({ isCommon }),
   isCommonEndpoint: (id: string) => {
@@ -492,9 +488,6 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
       set({
         stepPreferences: response.data.response.steps ?? [],
       });
-      // Update apiElements after setting preferences
-      const apiElements = get().mapEndpointsToSteps();
-      set({ apiElements });
     } catch (error) {
       console.error("Failed to load step preferences:", error);
     }
