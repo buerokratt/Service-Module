@@ -53,6 +53,7 @@ interface ServiceStoreState {
   isYesNoQuestion: boolean;
   stepPreferences: string[];
   endpointPreferences: string[];
+  apiElements: Step[];
   endpointsResponseVariables: EndpointResponseVariable[];
   setIsYesNoQuestion: (value: boolean) => void;
   changeAssignNode: (assign: Assign[]) => void;
@@ -77,6 +78,7 @@ interface ServiceStoreState {
   setSlot: (slot: string) => void;
   setStepPreferences: (stepPreferences: string[]) => void;
   setEndpointPreferences: (endpointPreferences: string[]) => void;
+  setApiElements: (apiElements: Step[]) => void;
   loadEndpointsResponseVariables: () => void;
   setSecrets: (newSecrets: PreDefinedEndpointEnvVariables) => void;
   addProductionVariables: (variables: string[]) => void;
@@ -153,6 +155,7 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
   isYesNoQuestion: false,
   stepPreferences: [],
   endpointPreferences: [],
+  apiElements: [],
   endpointsResponseVariables: [],
   setIsYesNoQuestion: (value: boolean) => set({ isYesNoQuestion: value }),
   changeAssignNode: (assignElements) => {
@@ -325,6 +328,7 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
   setSlot: (slot: string) => set({ slot }),
   setStepPreferences: (stepPreferences: string[]) => set({ stepPreferences }),
   setEndpointPreferences: (endpointPreferences: string[]) => set({ endpointPreferences }),
+  setApiElements: (apiElements) => set({ apiElements }),
   isCommon: false,
   setIsCommon: (isCommon: boolean) => set({ isCommon }),
   isCommonEndpoint: (id: string) => {
@@ -493,6 +497,9 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
         stepPreferences: response.data.response.steps ?? [],
         endpointPreferences: response.data.response.endpoints ?? [],
       });
+      // Update apiElements after setting preferences
+      const apiElements = get().mapEndpointsToSteps();
+      set({ apiElements });
     } catch (error) {
       console.error("Failed to load step preferences:", error);
     }

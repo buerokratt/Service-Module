@@ -53,7 +53,6 @@ function CustomEdge({
 
   const { t } = useTranslation();
   const [allElements, setAllElements] = useState<Step[]>([]);
-  const [apiElements, setApiElements] = useState<Step[]>(useServiceStore.getState().mapEndpointsToSteps());
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const contentStyle: CSSProperties = {
     overflowY: "auto",
@@ -75,8 +74,8 @@ function CustomEdge({
   const { setHasUnsavedChanges } = useServiceStore();
 
   const stepPreferences = useServiceStore((state) => state.stepPreferences);
-  // todo why?
-  const endpointPreferences = useServiceStore((state) => state.endpointPreferences);
+  const apiElements = useServiceStore((state) => state.apiElements);
+  const setApiElements = useServiceStore((state) => state.setApiElements);
 
   const onEdgeAdd = useEdgeAdd(id);
 
@@ -111,13 +110,12 @@ function CustomEdge({
     const { active, over } = event;
 
     if (over && active.id !== over.id) {
-      setApiElements((elements) => {
-        const oldIndex = elements.findIndex((item) => item.id === active.id);
-        const newIndex = elements.findIndex((item) => item.id === over.id);
-        const newElements = arrayMove(elements, oldIndex, newIndex);
-        updateEndpointPreference(newElements);
-        return newElements;
-      });
+      const currentElements = apiElements;
+      const oldIndex = currentElements.findIndex((item: Step) => item.id === active.id);
+      const newIndex = currentElements.findIndex((item: Step) => item.id === over.id);
+      const newElements = arrayMove(currentElements, oldIndex, newIndex);
+      setApiElements(newElements);
+      updateEndpointPreference(newElements);
     }
   }
 
