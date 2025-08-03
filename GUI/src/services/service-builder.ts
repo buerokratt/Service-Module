@@ -3,13 +3,7 @@ import { Group, Rule } from "components/FlowElementsPopup/RuleBuilder/types";
 import i18next, { t } from "i18next";
 import { NodeHtmlMarkdown } from "node-html-markdown";
 import { Edge, Node } from "@xyflow/react";
-import {
-  createEndpoint,
-  createNewService,
-  editService,
-  testService,
-  updateEndpoint,
-} from "resources/api-constants";
+import { createEndpoint, createNewService, editService, testService, updateEndpoint } from "resources/api-constants";
 import useServiceStore from "store/new-services.store";
 import useToastStore from "store/toasts.store";
 import { Step, StepType } from "types";
@@ -23,7 +17,6 @@ import { AxiosError } from "axios";
 export async function saveEndpoints(endpoints: EndpointData[], onSuccess?: () => void, onError?: (e: any) => void) {
   const tasks: Promise<any>[] = [];
   const serviceId = useServiceStore.getState().serviceId;
-
 
   for (const endpoint of endpoints) {
     const selectedEndpointType = endpoint.definitions.find((e) => e.isSelected);
@@ -432,7 +425,7 @@ function handleTextField(
   finishedFlow: Map<any, any>,
   parentStepName: string,
   parentNode: Node,
-  childNode: Node<NodeDataProps> | undefined,
+  childNode: Node<NodeDataProps> | undefined
 ) {
   const htmlToMarkdown = new NodeHtmlMarkdown({
     textReplace: [
@@ -493,7 +486,7 @@ function handleAssignStep(
   parentNode: Node<NodeDataProps>,
   finishedFlow: Map<any, any>,
   parentStepName: string,
-  childNode: Node<NodeDataProps> | undefined,
+  childNode: Node<NodeDataProps> | undefined
 ) {
   const invalidElementsExist = hasInvalidElements(parentNode.data.assignElements ?? []);
   const isInvalid =
@@ -518,7 +511,7 @@ function handleEndpointStep(
   parentNode: Node<NodeDataProps>,
   finishedFlow: Map<any, any>,
   parentStepName: string,
-  childNode: Node<NodeDataProps> | undefined,
+  childNode: Node<NodeDataProps> | undefined
 ) {
   const endpointDefinition = parentNode.data.endpoint?.definitions[0];
   const paramsVariables = endpointDefinition?.params?.variables;
@@ -562,7 +555,7 @@ function handleMultiChoiceQuestion(
   finishedFlow: Map<any, any>,
   parentStepName: string,
   parentNode: Node<NodeDataProps>,
-  childNode: Node<NodeDataProps> | undefined,
+  childNode: Node<NodeDataProps> | undefined
 ) {
   return finishedFlow.set(parentStepName, {
     assign: {
@@ -687,7 +680,7 @@ export const saveFlowClick = async (status: "draft" | "ready" = "ready") => {
   const description = useServiceStore.getState().description;
   const slot = useServiceStore.getState().slot;
   const isCommon = useServiceStore.getState().isCommon;
-  const steps = useServiceStore.getState().mapEndpointsToSteps();
+  const steps = useServiceStore.getState().apiElements;
   const isNewService = useServiceStore.getState().isNewService;
   const edges = useServiceStore.getState().edges;
   const nodes = useServiceStore.getState().nodes;
