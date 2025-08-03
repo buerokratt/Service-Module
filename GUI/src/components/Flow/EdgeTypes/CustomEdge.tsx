@@ -133,15 +133,7 @@ function CustomEdge({
   }
 
   function updateEndpointPreference(endpoints: Step[]) {
-    // todo why?
-    const endpointIds = endpoints.map((e) => {
-      // Try to get endpointId from data first, then fall back to id
-      if (e.data && typeof e.data === "object" && "endpointId" in e.data) {
-        return e.data.endpointId;
-      }
-      // If no data or no endpointId, use the id as string
-      return e.id.toString();
-    });
+    const endpointIds = endpoints.map((e) => e.data?.endpointId).filter(Boolean);
 
     api.post(userStepPreferences(), {
       steps: stepPreferences || [],
