@@ -121,6 +121,7 @@ function CustomEdge({
     <>
       <BaseEdge id={id} style={style} path={edgePath} markerEnd={markerEnd} />
       <EdgeLabelRenderer>
+        {/* All elements */}
         <Dropdown
           open={dropdownOpen}
           onOpenChange={setDropdownOpen}
@@ -166,6 +167,7 @@ function CustomEdge({
               </Collapsible>
             </DndContext>
 
+            {/* API elements */}
             <Collapsible
               defaultOpen={true}
               title={t("serviceFlow.apiElements.title")}
@@ -201,6 +203,8 @@ function CustomEdge({
             </Collapsible>
           </Track>
         </Dropdown>
+
+        {/* Add endpoint modal */}
         {isAddEndpointModalVisible && (
           <Modal
             title={t("newService.createNewEndpoint")}
