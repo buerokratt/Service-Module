@@ -81,7 +81,6 @@ function CustomEdge({
   const { setHasUnsavedChanges } = useServiceStore();
 
   const stepPreferences = useServiceStore((state) => state.stepPreferences);
-  const endpoints = useServiceStore((state) => state.endpoints);
   const mapEndpointsToSteps = useServiceStore((state) => state.mapEndpointsToSteps);
 
   const onEdgeAdd = useEdgeAdd(id);
