@@ -11,9 +11,8 @@
   resize: both;
   overflow: auto;
   width: 400px;
-  // min-width: 400px;
-  // max-width: 600px;
-  // todo igor needs fine tuning with large monitor
+  min-width: 400px;
+  max-width: 600px;
   min-height: 235px !important;
   max-height: 80vh !important;
   height: auto !important;
