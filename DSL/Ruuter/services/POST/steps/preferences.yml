@@ -59,9 +59,7 @@ get_user_step_preferences:
   result: preferences
 
 return_preferences:
-  return:
-    steps: ${preferences.response.body[0].steps}
-    endpoints: ${preferences.response.body[0].endpoints}
+  return: ${preferences.response.body[0]}
   next: end
 
 return_unauthorized:
