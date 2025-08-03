@@ -55,7 +55,7 @@ function CustomEdge({
   const [allElements, setAllElements] = useState<Step[]>([]);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const steps = useServiceStore((state) => state.mapEndpointsToSteps());
-  const contentStyle: CSSProperties = { overflowY: "auto", maxHeight: "245px" };
+  const contentStyle: CSSProperties = { overflowY: "auto" };
   const [isAddEndpointModalVisible, setIsAddEndpointModalVisible] = useState(false);
   const [isCreatingEndpoint, setIsCreatingEndpoint] = useState(false);
   const [endpointNameExists, setEndpointNameExists] = useState<boolean>(false);
@@ -134,14 +134,18 @@ function CustomEdge({
             </button>
           }
         >
-          <Track direction="vertical" align="stretch" gap={15}>
+          <Track direction="vertical" align="stretch" gap={15} style={{ height: "100%", minHeight: 0 }}>
             <DndContext
               modifiers={[restrictToParentElement]}
               sensors={sensors}
               collisionDetection={closestCorners}
               onDragEnd={handleDragEnd}
             >
-              <Collapsible title={t("serviceFlow.allElements")} contentStyle={contentStyle} defaultOpen>
+              <Collapsible
+                title={t("serviceFlow.allElements")}
+                contentStyle={{ ...contentStyle, flex: 1, minHeight: 0, overflow: "auto" }}
+                defaultOpen
+              >
                 {allElements.length > 0 && (
                   <Track direction="vertical" align="stretch" gap={4}>
                     <SortableContext items={allElements} strategy={verticalListSortingStrategy}>
@@ -165,7 +169,7 @@ function CustomEdge({
             <Collapsible
               defaultOpen={true}
               title={t("serviceFlow.apiElements.title")}
-              contentStyle={contentStyle}
+              contentStyle={{ ...contentStyle, flex: 1, minHeight: 0, overflow: "auto" }}
               onAddClick={async () => {
                 if (!idParam) {
                   useToastStore.getState().error({
