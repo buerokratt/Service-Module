@@ -1,6 +1,16 @@
 import { create } from "zustand";
 import { v4 as uuid } from "uuid";
-import { Edge, EdgeChange, Node, NodeChange, ReactFlowInstance, applyEdgeChanges, applyNodeChanges, getIncomers, getOutgoers } from "@xyflow/react";
+import {
+  Edge,
+  EdgeChange,
+  Node,
+  NodeChange,
+  ReactFlowInstance,
+  applyEdgeChanges,
+  applyNodeChanges,
+  getIncomers,
+  getOutgoers,
+} from "@xyflow/react";
 import { EndpointData, EndpointEnv, EndpointTab, PreDefinedEndpointEnvVariables } from "types/endpoint";
 import {
   getCommonEndpoints,
@@ -248,12 +258,14 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
     try {
       const instance = get().reactFlowInstance;
       if (!instance) return;
-      const endpointNodes = instance.getNodes().filter((node) => node.data.stepType === StepType.UserDefined) as Node<NodeDataProps>[];
+      const endpointNodes = instance
+        .getNodes()
+        .filter((node) => node.data.stepType === StepType.UserDefined) as Node<NodeDataProps>[];
       if (endpointNodes.length === 0) {
         set({ endpointsResponseVariables: [] });
         return;
-      };
-      
+      }
+
       const endpointsFromNodes = endpointNodes.map((node) => node.data.endpoint);
       const requests = endpointsFromNodes.flatMap((e) =>
         e?.definitions.map((endpoint) => ({
@@ -284,7 +296,7 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
         }
 
         const variable: EndpointResponseVariable = {
-          name: endpoint?.name ?? '',
+          name: endpoint?.name ?? "",
           chips: chips,
         };
 
@@ -472,8 +484,8 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
   },
   loadStepPreferences: async () => {
     try {
-      const response = await api.get<{ response: string[] }>(userStepPreferences());
-      set({ stepPreferences: response.data.response });
+      const response = await api.get<{ response: { steps: string[]; endpoints: string[] } }>(userStepPreferences());
+      set({ stepPreferences: response.data.response.steps || [] });
     } catch (error) {
       console.error("Failed to load step preferences:", error);
     }
