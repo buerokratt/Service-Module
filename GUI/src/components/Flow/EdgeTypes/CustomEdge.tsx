@@ -55,7 +55,7 @@ function CustomEdge({
   const [allElements, setAllElements] = useState<Step[]>([]);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const steps = useServiceStore((state) => state.mapEndpointsToSteps());
-  const contentStyle: CSSProperties = { overflowY: "auto" };
+  const contentStyle: CSSProperties = { overflowY: "auto", maxHeight: "335px" };
   const [isAddEndpointModalVisible, setIsAddEndpointModalVisible] = useState(false);
   const [isCreatingEndpoint, setIsCreatingEndpoint] = useState(false);
   const [endpointNameExists, setEndpointNameExists] = useState<boolean>(false);
@@ -143,7 +143,7 @@ function CustomEdge({
             >
               <Collapsible
                 title={t("serviceFlow.allElements")}
-                contentStyle={{ ...contentStyle, flex: 1, minHeight: 0, overflow: "auto" }}
+                contentStyle={{ ...contentStyle, flex: 1, minHeight: 0 }}
                 defaultOpen
               >
                 {allElements.length > 0 && (
@@ -169,7 +169,7 @@ function CustomEdge({
             <Collapsible
               defaultOpen={true}
               title={t("serviceFlow.apiElements.title")}
-              contentStyle={{ ...contentStyle, flex: 1, minHeight: 0, overflow: "auto" }}
+              contentStyle={{ ...contentStyle, flex: 1, minHeight: 0 }}
               onAddClick={async () => {
                 if (!idParam) {
                   useToastStore.getState().error({
