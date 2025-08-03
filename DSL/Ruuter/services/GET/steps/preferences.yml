@@ -39,7 +39,7 @@ check_preferences_response:
   switch:
     - condition: ${preferences.response.body.length > 0}
       next: return_preferences
-  next: seed_default_user_preferences    
+  next: seed_default_user_preferences
 
 seed_default_user_preferences:
   call: http.post
@@ -58,11 +58,15 @@ refetch_user_step_preferences:
   result: refetched_preferences
 
 return_refetched_preferences:
-  return: ${refetched_preferences.response.body[0].steps}
+  return:
+    steps: ${refetched_preferences.response.body[0].steps}
+    endpoints: ${refetched_preferences.response.body[0].endpoints}
   next: end
 
 return_preferences:
-  return: ${preferences.response.body[0].steps}
+  return:
+    steps: ${preferences.response.body[0].steps}
+    endpoints: ${preferences.response.body[0].endpoints}
   next: end
 
 return_unauthorized:
