@@ -13,11 +13,9 @@
   width: 400px;
   min-width: 400px;
   max-width: 600px;
-  min-height: 235px !important;
-  max-height: 80vh !important;
-  height: auto !important;
-  display: flex !important;
-  flex-direction: column !important;
+  min-height: 235px;
+  max-height: 80vh;
+  height: auto;
 
   &__header {
     padding: get-spacing(haapsalu);
