@@ -53,7 +53,6 @@ async function createEndpointAndUpdateState(endpoint: EndpointData): Promise<any
 }
 
 interface SaveFlowConfig {
-  steps: Step[];
   name: string;
   edges: Edge[];
   nodes: Node[];
@@ -119,7 +118,6 @@ const buildConditionString = (group: any): string => {
 };
 
 export const saveFlow = async ({
-  steps,
   name,
   edges,
   nodes,
@@ -133,7 +131,7 @@ export const saveFlow = async ({
   status = "ready",
 }: SaveFlowConfig) => {
   try {
-    let yamlContent = getYamlContent(nodes, edges, steps, name, description);
+    let yamlContent = getYamlContent(nodes, edges, name, description);
 
     const mcqNodes = nodes.filter(
       (node) => node.data?.stepType === StepType.MultiChoiceQuestion
@@ -144,7 +142,7 @@ export const saveFlow = async ({
         0,
         nodes.findIndex((node) => node.data?.stepType === StepType.MultiChoiceQuestion) + 1
       );
-      yamlContent = getYamlContent(nodesUpToFirstMcq, edges, steps, name, description);
+      yamlContent = getYamlContent(nodesUpToFirstMcq, edges, name, description);
     }
 
     await saveService(
@@ -172,7 +170,7 @@ export const saveFlow = async ({
         );
 
         await saveService(
-          getYamlContent(branchNodes, branchEdges, steps, serviceName, description),
+          getYamlContent(branchNodes, branchEdges, serviceName, description),
           { name: serviceName, serviceId, description, slot, isCommon, nodes, edges, isNewService } as SaveFlowConfig,
           false,
           status
@@ -225,7 +223,7 @@ async function saveService(
     .catch(onError);
 }
 
-function getYamlContent(nodes: Node[], edges: Edge[], steps: Step[], name: string, description: string): any {
+function getYamlContent(nodes: Node[], edges: Edge[], name: string, description: string): any {
   const allRelations: any[] = [];
 
   nodes.forEach((node) => {
@@ -349,7 +347,7 @@ function getYamlContent(nodes: Node[], edges: Edge[], steps: Step[], name: strin
       }
 
       const nextStep = childNode ? toSnakeCase(childNode.data.label ?? "format_messages") : "format_messages";
-      const template = getTemplate(steps, parentNode, parentStepName, nextStep);
+      const template = getTemplate(parentNode, parentStepName, nextStep);
 
       finishedFlow.set(parentStepName, template);
     });
@@ -603,7 +601,7 @@ const getNestedPreDefinedEndpointVariables = (variable: EndpointVariableData, re
   }
 };
 
-const getTemplate = (steps: Step[], node: Node, stepName: string, nextStep?: string) => {
+const getTemplate = (node: Node, stepName: string, nextStep?: string) => {
   const data = getTemplateDataFromNode(node);
 
   return {
@@ -680,13 +678,11 @@ export const saveFlowClick = async (status: "draft" | "ready" = "ready") => {
   const description = useServiceStore.getState().description;
   const slot = useServiceStore.getState().slot;
   const isCommon = useServiceStore.getState().isCommon;
-  const steps = useServiceStore.getState().apiElements;
   const isNewService = useServiceStore.getState().isNewService;
   const edges = useServiceStore.getState().edges;
   const nodes = useServiceStore.getState().nodes;
 
   await saveFlow({
-    steps,
     name: !name
       ? `${t("newService.defaultServiceName").toString()}_${format(new Date(), "dd_MM_yyyy_HH_mm_ss")}`
       : name,
