@@ -57,8 +57,8 @@ function CustomEdge({
   const steps = useServiceStore((state) => state.mapEndpointsToSteps());
   const contentStyle: CSSProperties = {
     overflowY: "auto",
-    maxHeight: "calc(37.5vh - 50px)",
-    minHeight: "100px",
+    maxHeight: "calc(30vh - 42px)",
+    minHeight: "80px",
   };
   const [isAddEndpointModalVisible, setIsAddEndpointModalVisible] = useState(false);
   const [isCreatingEndpoint, setIsCreatingEndpoint] = useState(false);
