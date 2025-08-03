@@ -1,36 +1,44 @@
-@import 'src/styles/tools/spacing';
-@import 'src/styles/tools/color';
-@import 'src/styles/settings/variables/other';
-@import 'src/styles/settings/variables/typography';
+@import "src/styles/tools/spacing";
+@import "src/styles/tools/color";
+@import "src/styles/settings/variables/other";
+@import "src/styles/settings/variables/typography";
 
 .dropdown {
-    background-color: white;
-    border-radius: 6px;
-    box-shadow: 0px 10px 38px -10px rgba(22, 23, 24, 0.35);
-    z-index: 1000;
-    resize: both;
-    overflow: auto;
-    width: 400px;
-    min-width: 400px;
-    max-width: 600px;
-    min-height: 500px;
-    max-height: 550px;
+  background-color: white;
+  border-radius: 6px;
+  box-shadow: 0px 10px 38px -10px rgba(22, 23, 24, 0.35);
+  z-index: 1000;
+  resize: both;
+  overflow: auto;
+  width: 400px;
+  // min-width: 400px;
+  // max-width: 600px;
+  // todo igor needs fine tuning with large monitor
+  min-height: 1000px !important;
+  max-height: 1500px !important;
+  height: auto !important;
+  display: flex !important;
+  flex-direction: column !important;
 
-    &__header {
-      padding: get-spacing(haapsalu);
-      margin-bottom: 12px;
-      display: flex;
-      align-items: center;
-      border-radius: $veera-radius-m $veera-radius-m 0 0;
-      background-color: get-color(black-coral-0);
-      border-bottom: 1px solid get-color(black-coral-2);
-    }
-  
-    &__title {
-      font-size: large;
-    }
-  
-    &__content {
-      padding: 10px;
-    }
+  &__header {
+    padding: get-spacing(haapsalu);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    border-radius: $veera-radius-m $veera-radius-m 0 0;
+    background-color: get-color(black-coral-0);
+    border-bottom: 1px solid get-color(black-coral-2);
+    flex-shrink: 0;
   }
+
+  &__title {
+    font-size: large;
+  }
+
+  &__content {
+    padding: 10px;
+    flex: 1;
+    overflow-y: auto;
+    min-height: 0;
+  }
+}
