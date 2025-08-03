@@ -16,6 +16,8 @@
   min-height: 235px;
   max-height: 75vh;
   height: auto;
+  display: flex;
+  flex-direction: column;
 
   &__header {
     padding: get-spacing(haapsalu);
@@ -37,5 +39,7 @@
     flex: 1;
     overflow-y: auto;
     min-height: 0;
+    display: flex;
+    flex-direction: column;
   }
 }
