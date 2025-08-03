@@ -55,7 +55,7 @@ function CustomEdge({
   const [allElements, setAllElements] = useState<Step[]>([]);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const steps = useServiceStore((state) => state.mapEndpointsToSteps());
-  const contentStyle: CSSProperties = { overflowY: "auto", maxHeight: "245px" };
+  const contentStyle: CSSProperties = { overflowY: "auto", maxHeight: "335px" };
   const [isAddEndpointModalVisible, setIsAddEndpointModalVisible] = useState(false);
   const [isCreatingEndpoint, setIsCreatingEndpoint] = useState(false);
   const [endpointNameExists, setEndpointNameExists] = useState<boolean>(false);
