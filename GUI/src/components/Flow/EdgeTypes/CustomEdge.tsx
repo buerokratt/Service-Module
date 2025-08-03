@@ -200,39 +200,48 @@ function CustomEdge({
             </DndContext>
 
             {/* API elements */}
-            <Collapsible
-              defaultOpen={true}
-              title={t("serviceFlow.apiElements.title")}
-              contentStyle={contentStyle}
-              onAddClick={async () => {
-                if (!idParam) {
-                  useToastStore.getState().error({
-                    title: t("newService.toast.serviceNotFound"),
-                    message: t("newService.toast.serviceNotFoundEndpointsMessage"),
-                  });
-                } else {
-                  setIsAddEndpointModalVisible(true);
-                }
-              }}
+            <DndContext
+              modifiers={[restrictToParentElement]}
+              sensors={sensors}
+              collisionDetection={closestCorners}
+              onDragEnd={handleApiDragEnd}
             >
-              {apiElements.length > 0 && (
-                <Track direction="vertical" align="stretch" gap={4}>
-                  {apiElements.map((step) => (
-                    <ApiEndpoint
-                      key={step.id}
-                      step={step}
-                      onClick={(step) => {
-                        onEdgeAdd(step).then(() => {
-                          useServiceStore.getState().loadEndpointsResponseVariables();
-                        });
-                        setDropdownOpen(false);
-                        setHasUnsavedChanges(true);
-                      }}
-                    />
-                  ))}
-                </Track>
-              )}
-            </Collapsible>
+              <Collapsible
+                defaultOpen={true}
+                title={t("serviceFlow.apiElements.title")}
+                contentStyle={contentStyle}
+                onAddClick={async () => {
+                  if (!idParam) {
+                    useToastStore.getState().error({
+                      title: t("newService.toast.serviceNotFound"),
+                      message: t("newService.toast.serviceNotFoundEndpointsMessage"),
+                    });
+                  } else {
+                    setIsAddEndpointModalVisible(true);
+                  }
+                }}
+              >
+                {apiElements.length > 0 && (
+                  <Track direction="vertical" align="stretch" gap={4}>
+                    <SortableContext items={apiElements} strategy={verticalListSortingStrategy}>
+                      {apiElements.map((step) => (
+                        <ApiEndpoint
+                          key={step.id}
+                          step={step}
+                          onClick={(step) => {
+                            onEdgeAdd(step).then(() => {
+                              useServiceStore.getState().loadEndpointsResponseVariables();
+                            });
+                            setDropdownOpen(false);
+                            setHasUnsavedChanges(true);
+                          }}
+                        />
+                      ))}
+                    </SortableContext>
+                  </Track>
+                )}
+              </Collapsible>
+            </DndContext>
           </Track>
         </Dropdown>
 
