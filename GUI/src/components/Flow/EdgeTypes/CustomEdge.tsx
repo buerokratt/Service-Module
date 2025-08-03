@@ -30,6 +30,12 @@ import { saveEndpoints } from "services/service-builder";
 import useToastStore from "store/toasts.store";
 import { useParams } from "react-router-dom";
 
+function reorderElements<T>(elements: T[], activeId: string | number, overId: string | number): T[] {
+  const oldIndex = elements.findIndex((item: any) => item.id === activeId);
+  const newIndex = elements.findIndex((item: any) => item.id === overId);
+  return arrayMove(elements, oldIndex, newIndex);
+}
+
 function CustomEdge({
   id,
   label,
@@ -96,24 +102,19 @@ function CustomEdge({
 
     if (over && active.id !== over.id) {
       setAllElements((elements) => {
-        const oldIndex = elements.findIndex((item) => item.id === active.id);
-        const newIndex = elements.findIndex((item) => item.id === over.id);
-        const newElements = arrayMove(elements, oldIndex, newIndex);
+        const newElements = reorderElements(elements, active.id, over.id);
         updateStepPreference(newElements);
         return newElements;
       });
     }
   }
 
-  // todo common method?
   function handleApiDragEnd(event: DragEndEvent) {
     const { active, over } = event;
 
     if (over && active.id !== over.id) {
       const currentElements = apiElements;
-      const oldIndex = currentElements.findIndex((item: Step) => item.id === active.id);
-      const newIndex = currentElements.findIndex((item: Step) => item.id === over.id);
-      const newElements = arrayMove(currentElements, oldIndex, newIndex);
+      const newElements = reorderElements(currentElements, active.id, over.id);
       setApiElements(newElements);
       updateEndpointPreference(newElements);
     }
