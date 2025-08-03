@@ -121,7 +121,6 @@ function CustomEdge({
     <>
       <BaseEdge id={id} style={style} path={edgePath} markerEnd={markerEnd} />
       <EdgeLabelRenderer>
-        {/* All elements */}
         <Dropdown
           open={dropdownOpen}
           onOpenChange={setDropdownOpen}
@@ -139,6 +138,7 @@ function CustomEdge({
             </button>
           }
         >
+          {/* All elements */}
           <Track direction="vertical" align="stretch" gap={15}>
             <DndContext
               modifiers={[restrictToParentElement]}
