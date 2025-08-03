@@ -20,9 +20,9 @@ type PreviousVariablesProps = {
   readonly nodeId: string;
 };
 
-// Unique key for input element, used below to identify it
+// Unique key for predefined elements, used below to identify it
 // All other assign element keys are UUIDs
-const INPUT_ELEMENT_KEY = "-1";
+const predefinedInputKeys = ['-1', '-2'];
 
 const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
   const { t } = useTranslation();
@@ -68,16 +68,26 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
     // Get Assign variables
     const assignNodes: Node<NodeDataProps>[] = previousNodes.filter((node) => node.data.stepType === StepType.Assign) as Node<NodeDataProps>[] ?? [];
     const assignElements = assignNodes.map((node) => node.data.assignElements).flat();
-    const inputElement: Assign = {
-      id: INPUT_ELEMENT_KEY,
-      key: "input",
-      value: stringToTemplate("incoming.body.input"),
-      // Can only be a string array, see trigger-service.yaml in Buerokratt-Chatbot
-      // Value is not known at this point, so passing a dummy to correctly infer type
-      data: [],
-    };
+    const predefinedInputElements: Assign[] = [
+      {
+        id: predefinedInputKeys[0],
+        key: "input",
+        value: stringToTemplate("incoming.body.input"),
+        // Can only be a string array, see trigger-service.yaml in Buerokratt-Chatbot
+        // Value is not known at this point, so passing a dummy to correctly infer type
+        data: [],
+      },
+      {
+        id: predefinedInputKeys[1],
+        key: "Empty Content Type",
+        value: stringToTemplate(""),
+        // Can only be a string array, see trigger-service.yaml in Buerokratt-Chatbot
+        // Value is not known at this point, so passing a dummy to correctly infer type
+        data: [],
+      },
+    ];
 
-    setAssignedVariables([...assignElements, inputElement, ...newAssignElements]);
+    setAssignedVariables([...assignElements, ...predefinedInputElements, ...newAssignElements]);
   }, [endpointsVariables, newAssignElements]);
 
   function getCurrentBranchNodesUp(nodes: Node[], edges: Edge[], currentNode: Node) {
@@ -233,9 +243,11 @@ const VariableSection = ({
         {variables.map((variable: any) => {
           const typeColor = getTypeColor(variable?.value);
 
-          return isObject(variable.data) && variable.id !== INPUT_ELEMENT_KEY ? (
+          return isObject(variable.data) && !predefinedInputKeys.includes(variable.id) ? (
             <Tooltip
-              content={variable.tooltip ? `${variable.value}\n\n${variable.tooltip}` : `${variable.value} : ${typeColor.type}`}
+              content={
+                variable.tooltip ? `${variable.value}\n\n${variable.tooltip}` : `${variable.value} : ${typeColor.type}`
+              }
               key={variable.id}
             >
               <OutputElementBox
@@ -258,7 +270,12 @@ const VariableSection = ({
               </OutputElementBox>
             </Tooltip>
           ) : (
-            <Tooltip content={variable.tooltip? `${variable.value}\n\n${variable.tooltip}` : `${variable.value} : ${typeColor.type}`} key={variable.id}>
+            <Tooltip
+              content={
+                variable.tooltip ? `${variable.value}\n\n${variable.tooltip}` : `${variable.value} : ${typeColor.type}`
+              }
+              key={variable.id}
+            >
               <OutputElementBox
                 dragData={variable.key ? variable : undefined}
                 style={{ cursor: variable.key ? "grab" : "default" }}
