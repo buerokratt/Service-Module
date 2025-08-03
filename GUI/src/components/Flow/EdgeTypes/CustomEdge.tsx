@@ -53,8 +53,8 @@ function CustomEdge({
 
   const { t } = useTranslation();
   const [allElements, setAllElements] = useState<Step[]>([]);
+  const [apiElements, setApiElements] = useState<Step[]>(useServiceStore.getState().mapEndpointsToSteps());
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const steps = useServiceStore((state) => state.mapEndpointsToSteps());
   const contentStyle: CSSProperties = {
     overflowY: "auto",
     maxHeight: "calc(30vh - 42px)",
@@ -75,6 +75,8 @@ function CustomEdge({
   const { setHasUnsavedChanges } = useServiceStore();
 
   const stepPreferences = useServiceStore((state) => state.stepPreferences);
+  // todo why?
+  const endpointPreferences = useServiceStore((state) => state.endpointPreferences);
 
   const onEdgeAdd = useEdgeAdd(id);
 
@@ -104,6 +106,21 @@ function CustomEdge({
     }
   }
 
+  // todo common method?
+  function handleApiDragEnd(event: DragEndEvent) {
+    const { active, over } = event;
+
+    if (over && active.id !== over.id) {
+      setApiElements((elements) => {
+        const oldIndex = elements.findIndex((item) => item.id === active.id);
+        const newIndex = elements.findIndex((item) => item.id === over.id);
+        const newElements = arrayMove(elements, oldIndex, newIndex);
+        updateEndpointPreference(newElements);
+        return newElements;
+      });
+    }
+  }
+
   const sensors = useSensors(
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, {
@@ -114,6 +131,23 @@ function CustomEdge({
   function updateStepPreference(steps: Step[]) {
     api.post(userStepPreferences(), {
       steps: steps.map((e) => e.type),
+    });
+  }
+
+  function updateEndpointPreference(endpoints: Step[]) {
+    // todo why?
+    const endpointIds = endpoints.map((e) => {
+      // Try to get endpointId from data first, then fall back to id
+      if (e.data && typeof e.data === "object" && "endpointId" in e.data) {
+        return e.data.endpointId;
+      }
+      // If no data or no endpointId, use the id as string
+      return e.id.toString();
+    });
+
+    api.post(userStepPreferences(), {
+      steps: stepPreferences || [],
+      endpoints: endpointIds,
     });
   }
 
@@ -183,9 +217,9 @@ function CustomEdge({
                 }
               }}
             >
-              {steps.length > 0 && (
+              {apiElements.length > 0 && (
                 <Track direction="vertical" align="stretch" gap={4}>
-                  {steps.map((step) => (
+                  {apiElements.map((step) => (
                     <ApiEndpoint
                       key={step.id}
                       step={step}
