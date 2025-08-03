@@ -52,6 +52,7 @@ interface ServiceStoreState {
   rules: GroupOrRule[];
   isYesNoQuestion: boolean;
   stepPreferences: string[];
+  endpointPreferences: string[];
   endpointsResponseVariables: EndpointResponseVariable[];
   setIsYesNoQuestion: (value: boolean) => void;
   changeAssignNode: (assign: Assign[]) => void;
@@ -75,6 +76,7 @@ interface ServiceStoreState {
   setDescription: (description: string) => void;
   setSlot: (slot: string) => void;
   setStepPreferences: (stepPreferences: string[]) => void;
+  setEndpointPreferences: (endpointPreferences: string[]) => void;
   loadEndpointsResponseVariables: () => void;
   setSecrets: (newSecrets: PreDefinedEndpointEnvVariables) => void;
   addProductionVariables: (variables: string[]) => void;
@@ -150,6 +152,7 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
   rules: [],
   isYesNoQuestion: false,
   stepPreferences: [],
+  endpointPreferences: [],
   endpointsResponseVariables: [],
   setIsYesNoQuestion: (value: boolean) => set({ isYesNoQuestion: value }),
   changeAssignNode: (assignElements) => {
@@ -321,6 +324,7 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
   setDescription: (description: string) => set({ description }),
   setSlot: (slot: string) => set({ slot }),
   setStepPreferences: (stepPreferences: string[]) => set({ stepPreferences }),
+  setEndpointPreferences: (endpointPreferences: string[]) => set({ endpointPreferences }),
   isCommon: false,
   setIsCommon: (isCommon: boolean) => set({ isCommon }),
   isCommonEndpoint: (id: string) => {
@@ -485,7 +489,10 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
   loadStepPreferences: async () => {
     try {
       const response = await api.get<{ response: { steps: string[]; endpoints: string[] } }>(userStepPreferences());
-      set({ stepPreferences: response.data.response.steps || [] });
+      set({
+        stepPreferences: response.data.response.steps ?? [],
+        endpointPreferences: response.data.response.endpoints ?? [],
+      });
     } catch (error) {
       console.error("Failed to load step preferences:", error);
     }
