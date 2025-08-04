@@ -77,7 +77,7 @@ function CustomEdge({
   useEffect(() => {
     const elements: Step[] = [];
     stepPreferences.forEach((preference, index) => {
-      // TODO: Add more steps when they are ready
+      // Add more steps when they are ready
       const allowedSteps = [
         StepType.Condition,
         StepType.Assign,
@@ -122,7 +122,7 @@ function CustomEdge({
       const currentElements = apiElements;
       const newElements = reorderElements(currentElements, active.id, over.id);
       setApiElements(newElements);
-      const endpointIds = newElements.map((e) => e.data?.endpointId).filter((id): id is string => Boolean(id));
+      const endpointIds = newElements.map((e) => e.data!.endpointId);
       updateEndpointPreference(endpointIds);
     }
   }
@@ -137,7 +137,7 @@ function CustomEdge({
   function updateStepPreference(steps: Step[]) {
     api.post(userStepPreferences(), {
       steps: steps.map((e) => e.type),
-      endpoints: [],
+      endpoints: apiElements.map((e) => e.data!.endpointId),
     });
   }
 
