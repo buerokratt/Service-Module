@@ -134,7 +134,8 @@ function CustomEdge({
       const currentElements = apiElements;
       const newElements = reorderElements(currentElements, active.id, over.id);
       setApiElements(newElements);
-      updateEndpointPreference(newElements);
+      const endpointIds = newElements.map((e) => e.data?.endpointId).filter((id): id is string => Boolean(id));
+      updateEndpointPreference(endpointIds);
     }
   }
 
@@ -152,9 +153,7 @@ function CustomEdge({
     });
   }
 
-  function updateEndpointPreference(endpoints: Step[]) {
-    const endpointIds = endpoints.map((e) => e.data?.endpointId).filter(Boolean);
-
+  function updateEndpointPreference(endpointIds: string[]) {
     api.post(userStepPreferences(), {
       steps: stepPreferences,
       endpoints: endpointIds,
@@ -296,6 +295,12 @@ function CustomEdge({
                       [passedEndpoint],
                       () => {
                         useServiceStore.getState().addEndpoint(passedEndpoint);
+                        // Add the new endpoint to user preferences
+                        const currentEndpointIds = apiElements
+                          .map((e) => e.data?.endpointId)
+                          .filter((id): id is string => Boolean(id));
+                        const newEndpointIds = [...currentEndpointIds, passedEndpoint.endpointId];
+                        updateEndpointPreference(newEndpointIds);
                         setIsAddEndpointModalVisible(false);
                         setEndpoint({ endpointId: uuid(), name: "", definitions: [], isNew: true });
                         useToastStore.getState().success({ title: t("serviceFlow.apiElements.createSuccess") });
