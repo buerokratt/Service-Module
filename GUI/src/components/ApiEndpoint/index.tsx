@@ -12,6 +12,7 @@ import useToastStore from "store/toasts.store";
 import { Step, StepType } from "types";
 import { EndpointData } from "types/endpoint";
 import apiIconTag from "../../assets/images/api-icon-tag.svg";
+import publicIconTag from "../../assets/images/public-icon-tag.svg";
 import styles from "./ApiEndpoint.module.scss";
 import api from "../../services/api-dev";
 import Modal from "components/Modal";
@@ -206,9 +207,7 @@ const ApiEndpoint: FC<ApiEndpointProps> = ({ step, onClick }) => {
             </div>
             <div className={styles.labelContainer}>
               {step.type === "user-defined" && <img alt="" src={apiIconTag} />}
-              {step.data?.isCommon && (
-                <span className={styles.commonLabel}>{t("newService.endpoint.publicEndpoint")}</span>
-              )}
+              {step.data?.isCommon && <img alt="" src={publicIconTag} />}
               <span className={styles.label}>{step.label}</span>
             </div>
           </Track>
