@@ -206,6 +206,9 @@ const ApiEndpoint: FC<ApiEndpointProps> = ({ step, onClick }) => {
             </div>
             <div className={styles.labelContainer}>
               {step.type === "user-defined" && <img alt="" src={apiIconTag} />}
+              {step.data?.isCommon && (
+                <span className={styles.commonLabel}>{t("newService.endpoint.publicEndpoint")}</span>
+              )}
               <span className={styles.label}>{step.label}</span>
             </div>
           </Track>
