@@ -3,7 +3,7 @@ export const isTemplate = (value: string | number) => {
 };
 
 export const stringToTemplate = (value: string | number) => {
-  return "${" + value + "}";
+  return value ? "${" + value + "}" : '${""}';
 };
 
 export const templateToString = (value: string | number) => {

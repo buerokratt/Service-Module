@@ -281,6 +281,12 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
           });
         }
 
+        chips.push({
+          name: "Status Code",
+          value: `${endpoint?.name.replaceAll(" ", "_")}_res.response.statusCodeValue`,
+          data: `${endpoint?.name.replaceAll(" ", "_")}_res.response.statusCodeValue`,
+        });
+
         const variable: EndpointResponseVariable = {
           name: endpoint?.name ?? "",
           chips: chips,

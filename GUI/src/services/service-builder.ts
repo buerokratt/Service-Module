@@ -292,8 +292,28 @@ function getYamlContent(nodes: Node[], edges: Edge[], steps: Step[], name: strin
     accepts: "json",
     returns: "json",
     namespace: "service",
+    allowList: {
+      body: [
+        {
+          field: "chatId",
+          type: "string",
+          description: "The chat ID for the message",
+        },
+        {
+          field: "authorId",
+          type: "string",
+          description: "The author ID for the message",
+        },
+        {
+          field: "input",
+          type: "object",
+          description: "The Input from the user",
+        },
+      ],
+    },
   });
 
+  const firstNode = nodes.find((node) => node.type === "custom");
   finishedFlow.set("prepare", {
     assign: {
       chatId: "${incoming.body.chatId}",
@@ -304,18 +324,9 @@ function getYamlContent(nodes: Node[], edges: Edge[], steps: Step[], name: strin
         result: "",
       },
     },
-    next: "get_secrets",
-  });
-
-  const firstNode = nodes.find((node) => node.type === "custom");
-  finishedFlow.set("get_secrets", {
-    call: "http.get",
-    args: {
-      url: `${import.meta.env.REACT_APP_API_URL}/secrets-with-priority`,
-    },
-    result: "secrets",
     next: firstNode ? toSnakeCase(firstNode.data.label?.toString() ?? "format_messages") : "format_messages",
   });
+
   try {
     allRelations.forEach((r) => {
       const [parentNodeId, childNodeId] = r.split(",");
@@ -531,6 +542,7 @@ function handleEndpointStep(
     args: {
       url: endpointDefinition?.url?.split("?")[0] ?? "",
     },
+    result: `${parentNode.data.endpoint?.name.replaceAll(" ", "_")}_res`,
     next: childNode ? toSnakeCase(childNode.data.label ?? "format_messages") : "format_messages",
   };
 
