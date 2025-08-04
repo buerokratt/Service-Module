@@ -245,12 +245,13 @@ function CustomEdge({
         </Dropdown>
 
         {/* Add endpoint modal */}
-        <AddEndpointModal
-          isVisible={isAddEndpointModalVisible}
-          onClose={() => setIsAddEndpointModalVisible(false)}
-          onUpdatePreferences={updateEndpointPreference}
-          currentEndpointIds={apiElements.map((e) => e.data?.endpointId).filter((id): id is string => Boolean(id))}
-        />
+        {isAddEndpointModalVisible && (
+          <AddEndpointModal
+            onClose={() => setIsAddEndpointModalVisible(false)}
+            onUpdatePreferences={updateEndpointPreference}
+            currentEndpointIds={apiElements.map((e) => e.data!.endpointId)}
+          />
+        )}
       </EdgeLabelRenderer>
     </>
   );

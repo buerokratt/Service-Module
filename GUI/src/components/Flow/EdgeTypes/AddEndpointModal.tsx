@@ -8,18 +8,12 @@ import useServiceStore from "store/new-services.store";
 import { saveEndpoints } from "../../../services/service-builder";
 
 interface AddEndpointModalProps {
-  isVisible: boolean;
   onClose: () => void;
   onUpdatePreferences: (endpointIds: string[]) => void;
   currentEndpointIds: string[];
 }
 
-const AddEndpointModal: React.FC<AddEndpointModalProps> = ({
-  isVisible,
-  onClose,
-  onUpdatePreferences,
-  currentEndpointIds,
-}) => {
+const AddEndpointModal: React.FC<AddEndpointModalProps> = ({ onClose, onUpdatePreferences, currentEndpointIds }) => {
   const { t } = useTranslation();
   const [endpoint, setEndpoint] = useState<EndpointData>({
     endpointId: uuid(),
@@ -65,8 +59,6 @@ const AddEndpointModal: React.FC<AddEndpointModalProps> = ({
       }
     );
   };
-
-  if (!isVisible) return null;
 
   return (
     <Modal title={t("newService.createNewEndpoint")} onClose={handleClose}>
