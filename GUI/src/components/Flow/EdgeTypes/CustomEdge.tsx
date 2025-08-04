@@ -1,11 +1,11 @@
 import { BaseEdge, EdgeLabelRenderer, EdgeProps, getBezierPath } from "@xyflow/react";
 import { CSSProperties, memo, useEffect, useState } from "react";
-import { ApiEndpointCard, Button, Collapsible, Dropdown, Modal, StepElement, Track } from "components";
+import { Collapsible, Dropdown, StepElement, Track } from "components";
 import useServiceStore from "store/new-services.store";
 import ApiEndpoint from "components/ApiEndpoint";
+import AddEndpointModal from "./AddEndpointModal";
 import { useTranslation } from "react-i18next";
 import { Step, stepsLabels, StepType } from "types";
-import { v4 as uuid } from "uuid";
 import {
   arrayMove,
   SortableContext,
@@ -25,8 +25,6 @@ import {
 import { userStepPreferences } from "resources/api-constants";
 import api from "services/api";
 import useEdgeAdd from "hooks/flow/useEdgeAdd";
-import { EndpointData } from "types/endpoint";
-import { saveEndpoints } from "services/service-builder";
 import useToastStore from "store/toasts.store";
 import { useParams } from "react-router-dom";
 
@@ -67,17 +65,7 @@ function CustomEdge({
     minHeight: "80px",
   };
   const [isAddEndpointModalVisible, setIsAddEndpointModalVisible] = useState(false);
-  const [isCreatingEndpoint, setIsCreatingEndpoint] = useState(false);
-  const [endpointNameExists, setEndpointNameExists] = useState<boolean>(false);
-  const [endpoint, setEndpoint] = useState<EndpointData>({
-    endpointId: uuid(),
-    name: "",
-    definitions: [],
-    isNew: true,
-  });
   const { id: idParam } = useParams();
-  const [endpointName, setEndpointName] = useState<string>(endpoint.name ?? "");
-  const [isCommonEndpoint, setIsCommonEndpoint] = useState<boolean>(endpoint.isCommon ?? false);
   const { setHasUnsavedChanges } = useServiceStore();
 
   const stepPreferences = useServiceStore((state) => state.stepPreferences);
@@ -257,69 +245,12 @@ function CustomEdge({
         </Dropdown>
 
         {/* Add endpoint modal */}
-        {isAddEndpointModalVisible && (
-          <Modal
-            title={t("newService.createNewEndpoint")}
-            onClose={() => {
-              setEndpoint({ endpointId: uuid(), name: "", definitions: [], isNew: true });
-              setIsAddEndpointModalVisible(false);
-            }}
-          >
-            <Track isMultiline gap={16} direction="vertical" align="stretch">
-              <ApiEndpointCard
-                endpoint={endpoint}
-                isDeletable={false}
-                onNameExists={setEndpointNameExists}
-                onNameChange={setEndpointName}
-                onCommonChange={setIsCommonEndpoint}
-              />
-              <Track justify="end" gap={16}>
-                <Button
-                  appearance="secondary"
-                  onClick={() => {
-                    setEndpoint({ endpointId: uuid(), name: "", definitions: [], isNew: true });
-                    setIsAddEndpointModalVisible(false);
-                  }}
-                >
-                  {t("overview.cancel")}
-                </Button>
-                <Button
-                  appearance={isCreatingEndpoint ? "loading" : "primary"}
-                  disabled={endpointName === "" || endpointNameExists}
-                  onClick={() => {
-                    const passedEndpoint = endpoint;
-                    passedEndpoint.name = endpointName;
-                    passedEndpoint.isCommon = isCommonEndpoint;
-                    setIsCreatingEndpoint(true);
-                    saveEndpoints(
-                      [passedEndpoint],
-                      () => {
-                        useServiceStore.getState().addEndpoint(passedEndpoint);
-                        // Add the new endpoint to user preferences
-                        const currentEndpointIds = apiElements
-                          .map((e) => e.data?.endpointId)
-                          .filter((id): id is string => Boolean(id));
-                        const newEndpointIds = [...currentEndpointIds, passedEndpoint.endpointId];
-                        updateEndpointPreference(newEndpointIds);
-                        setIsAddEndpointModalVisible(false);
-                        setEndpoint({ endpointId: uuid(), name: "", definitions: [], isNew: true });
-                        useToastStore.getState().success({ title: t("serviceFlow.apiElements.createSuccess") });
-                        setIsCreatingEndpoint(false);
-                      },
-                      (error) => {
-                        console.error(`Error creating API endpoint: ${error}`);
-                        useToastStore.getState().error({ title: t("serviceFlow.apiElements.createError") });
-                        setIsCreatingEndpoint(false);
-                      }
-                    );
-                  }}
-                >
-                  {t("global.create")}
-                </Button>
-              </Track>
-            </Track>
-          </Modal>
-        )}
+        <AddEndpointModal
+          isVisible={isAddEndpointModalVisible}
+          onClose={() => setIsAddEndpointModalVisible(false)}
+          onUpdatePreferences={updateEndpointPreference}
+          currentEndpointIds={apiElements.map((e) => e.data?.endpointId).filter((id): id is string => Boolean(id))}
+        />
       </EdgeLabelRenderer>
     </>
   );
