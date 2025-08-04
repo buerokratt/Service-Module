@@ -82,6 +82,7 @@ function CustomEdge({
 
   const stepPreferences = useServiceStore((state) => state.stepPreferences);
   const mapEndpointsToSteps = useServiceStore((state) => state.mapEndpointsToSteps);
+  const endpoints = useServiceStore((state) => state.endpoints);
 
   const onEdgeAdd = useEdgeAdd(id);
 
@@ -100,7 +101,8 @@ function CustomEdge({
   useEffect(() => {
     const steps = mapEndpointsToSteps();
     setApiElements(steps);
-  }, [mapEndpointsToSteps]);
+    // endpoints in the dependency array below needed to re-run when new endpoints are added
+  }, [mapEndpointsToSteps, endpoints]);
 
   function handleDragEnd(event: DragEndEvent) {
     const { active, over } = event;
