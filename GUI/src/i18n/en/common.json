@@ -280,7 +280,7 @@
       "openNewWebpage": "Open new webpage",
       "fileGeneration": "File generation",
       "fileSigning": "File signing",
-      "conversationEnd": "End conversation",
+      "serviceEnd": "End service",
       "redirectConversationToSupport": "Direct to Customer Support",
       "rules": "Rules",
       "rasaRules": "Rasa Rules",

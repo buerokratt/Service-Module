@@ -22,10 +22,9 @@ export const stepsLabels: Record<StepType, string> = {
   [StepType.FileSign]: "serviceFlow.element.fileSigning",
   [StepType.Step]: "serviceFlow.element.step",
   [StepType.Rule]: "serviceFlow.element.rule",
-  [StepType.FinishingStepEnd]: "serviceFlow.element.conversationEnd",
+  [StepType.FinishingStepEnd]: "serviceFlow.element.serviceEnd",
   [StepType.FinishingStepRedirect]: "serviceFlow.element.redirectConversationToSupport",
   [StepType.UserDefined]: "serviceFlow.element.userDefined",
   [StepType.RasaRules]: "serviceFlow.element.rasaRules",
   [StepType.SiGa]: "serviceFlow.element.siga",
 };
- 

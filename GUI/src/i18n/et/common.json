@@ -280,7 +280,7 @@
       "openNewWebpage": "Uue veebilehe avamine",
       "fileGeneration": "Faili genereerimine",
       "fileSigning": "Faili allkirjastamine",
-      "conversationEnd": "Vestluse lõpetamine",
+      "serviceEnd": "Teenuse lõpetamine",
       "redirectConversationToSupport": "Klienditeenindusse suunamine",
       "rules": "Reeglid",
       "rasaRules": "Rasa reeglid",
