@@ -34,6 +34,10 @@ function reorderElements<T>(elements: T[], activeId: string | number, overId: st
   return arrayMove(elements, oldIndex, newIndex);
 }
 
+function getEndpointIds(elements: Step[]): string[] {
+  return elements.map((e) => e.data!.endpointId);
+}
+
 function CustomEdge({
   id,
   label,
@@ -122,7 +126,7 @@ function CustomEdge({
       const currentElements = apiElements;
       const newElements = reorderElements(currentElements, active.id, over.id);
       setApiElements(newElements);
-      const endpointIds = newElements.map((e) => e.data!.endpointId);
+      const endpointIds = getEndpointIds(newElements);
       updateEndpointPreference(endpointIds);
     }
   }
@@ -137,7 +141,7 @@ function CustomEdge({
   function updateStepPreference(steps: Step[]) {
     api.post(userStepPreferences(), {
       steps: steps.map((e) => e.type),
-      endpoints: apiElements.map((e) => e.data!.endpointId),
+      endpoints: getEndpointIds(apiElements),
     });
   }
 
@@ -249,7 +253,7 @@ function CustomEdge({
           <AddEndpointModal
             onClose={() => setIsAddEndpointModalVisible(false)}
             onUpdatePreferences={updateEndpointPreference}
-            currentEndpointIds={apiElements.map((e) => e.data!.endpointId)}
+            currentEndpointIds={getEndpointIds(apiElements)}
           />
         )}
       </EdgeLabelRenderer>
