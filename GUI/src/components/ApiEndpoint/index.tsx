@@ -11,8 +11,7 @@ import useServiceStore from "store/new-services.store";
 import useToastStore from "store/toasts.store";
 import { Step, StepType } from "types";
 import { EndpointData } from "types/endpoint";
-import apiIconTag from "../../assets/images/api-icon-tag.svg";
-import publicIconTag from "../../assets/images/public-icon-tag.svg";
+
 import styles from "./ApiEndpoint.module.scss";
 import api from "../../services/api-dev";
 import Modal from "components/Modal";
@@ -206,8 +205,8 @@ const ApiEndpoint: FC<ApiEndpointProps> = ({ step, onClick }) => {
               <Icon icon={<MdDragIndicator size={16} />} size="small" />
             </div>
             <div className={styles.labelContainer}>
-              {step.type === "user-defined" && <img alt="" src={apiIconTag} />}
-              {step.data?.isCommon && <img alt="" src={publicIconTag} />}
+              {step.type === "user-defined" && <span className={styles.apiBadge}>API</span>}
+              {step.data?.isCommon && <span className={styles.publicBadge}>{t("serviceFlow.apiElements.public")}</span>}
               <span className={styles.label}>{step.label}</span>
             </div>
           </Track>

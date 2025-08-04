@@ -387,7 +387,8 @@
       "deleteSuccess": "API element kustutatud",
       "deleteError": "API elementi kustutamine ebaõnnestus",
       "editSuccess": "API element edukalt muudetud",
-      "editError": "API elemendi muutmine ebaõnnestus"
+      "editError": "API elemendi muutmine ebaõnnestus",
+      "public": "Avalik"
     },
     "multiChoiceQuestion": {
       "title": "Mitmevalikuline küsimus",
