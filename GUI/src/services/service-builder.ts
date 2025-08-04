@@ -6,7 +6,7 @@ import { Edge, Node } from "@xyflow/react";
 import { createEndpoint, createNewService, editService, testService, updateEndpoint } from "resources/api-constants";
 import useServiceStore from "store/new-services.store";
 import useToastStore from "store/toasts.store";
-import { Step, StepType } from "types";
+import { StepType } from "types";
 import { EndpointData, EndpointVariableData } from "types/endpoint";
 import api from "../services/api-dev";
 import { NodeDataProps } from "types/service-flow";
