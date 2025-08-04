@@ -135,6 +135,7 @@ function CustomEdge({
   function updateStepPreference(steps: Step[]) {
     api.post(userStepPreferences(), {
       steps: steps.map((e) => e.type),
+      endpoints: [],
     });
   }
 
