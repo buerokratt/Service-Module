@@ -20,6 +20,14 @@ delete_endpoint:
       id: ${incoming.body.id}
   result: res
 
+remove_from_preferences:
+  call: http.post
+  args:
+    url: "[#SERVICE_RESQL]/endpoints/remove_endpoint_from_preferences"
+    body:
+      endpoint_id: ${incoming.body.id}
+  result: preferences_res
+
 return_ok:
   status: 200
   return: "Endpoint deleted"
