@@ -89,11 +89,22 @@ function CustomEdge({
   useEffect(() => {
     const elements: Step[] = [];
     stepPreferences.forEach((preference, index) => {
-      elements.push({
-        id: index,
-        label: t(`${stepsLabels[preference as StepType]}`),
-        type: preference as StepType,
-      });
+      // TODO: Add more steps when they are ready
+      const allowedSteps = [
+        StepType.Condition,
+        StepType.Assign,
+        StepType.MultiChoiceQuestion,
+        StepType.FinishingStepRedirect,
+        StepType.FinishingStepEnd,
+      ];
+
+      if (allowedSteps.includes(preference as StepType)) {
+        elements.push({
+          id: index,
+          label: t(`${stepsLabels[preference as StepType]}`),
+          type: preference as StepType,
+        });
+      }
     });
     setAllElements(elements);
   }, [stepPreferences]);
