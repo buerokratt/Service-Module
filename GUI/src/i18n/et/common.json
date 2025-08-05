@@ -258,7 +258,7 @@
       "saveConfigFailed": "Seadete salvestamine ebaõnnestus",
       "testResultSuccess": "Testi tulemus - edu",
       "testResultError": "Testi tulemus - viga",
-      "servieNotFound": "Teenust ei leitud",
+      "serviceNotFound": "Teenust ei leitud",
       "serviceNotFoundEndpointsMessage": "Salvesta teenus kõigepealt, et saaksid lisada otspunkte",
       "serviceNameAlreadyExists": "Teenuse nimi on juba olemas",
       "elementNameAlreadyExists": "Elementi nimi on juba olemas",
@@ -281,7 +281,7 @@
       "openNewWebpage": "Uue veebilehe avamine",
       "fileGeneration": "Faili genereerimine",
       "fileSigning": "Faili allkirjastamine",
-      "conversationEnd": "Vestluse lõpetamine",
+      "serviceEnd": "Teenuse lõpetamine",
       "redirectConversationToSupport": "Klienditeenindusse suunamine",
       "rules": "Reeglid",
       "rasaRules": "Rasa reeglid",
@@ -391,7 +391,8 @@
       "deleteSuccess": "API element kustutatud",
       "deleteError": "API elementi kustutamine ebaõnnestus",
       "editSuccess": "API element edukalt muudetud",
-      "editError": "API elemendi muutmine ebaõnnestus"
+      "editError": "API elemendi muutmine ebaõnnestus",
+      "public": "Avalik"
     },
     "multiChoiceQuestion": {
       "title": "Mitmevalikuline küsimus",

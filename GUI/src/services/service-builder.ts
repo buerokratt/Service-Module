@@ -3,16 +3,10 @@ import { Group, Rule } from "components/FlowElementsPopup/RuleBuilder/types";
 import i18next, { t } from "i18next";
 import { NodeHtmlMarkdown } from "node-html-markdown";
 import { Edge, Node } from "@xyflow/react";
-import {
-  createEndpoint,
-  createNewService,
-  editService,
-  testService,
-  updateEndpoint,
-} from "resources/api-constants";
+import { createEndpoint, createNewService, editService, testService, updateEndpoint } from "resources/api-constants";
 import useServiceStore from "store/new-services.store";
 import useToastStore from "store/toasts.store";
-import { Step, StepType } from "types";
+import { StepType } from "types";
 import { EndpointData, EndpointVariableData } from "types/endpoint";
 import api from "../services/api-dev";
 import { NodeDataProps } from "types/service-flow";
@@ -23,7 +17,6 @@ import { AxiosError } from "axios";
 export async function saveEndpoints(endpoints: EndpointData[], onSuccess?: () => void, onError?: (e: any) => void) {
   const tasks: Promise<any>[] = [];
   const serviceId = useServiceStore.getState().serviceId;
-
 
   for (const endpoint of endpoints) {
     const selectedEndpointType = endpoint.definitions.find((e) => e.isSelected);
@@ -60,7 +53,6 @@ async function createEndpointAndUpdateState(endpoint: EndpointData): Promise<any
 }
 
 interface SaveFlowConfig {
-  steps: Step[];
   name: string;
   edges: Edge[];
   nodes: Node[];
@@ -126,7 +118,6 @@ const buildConditionString = (group: any): string => {
 };
 
 export const saveFlow = async ({
-  steps,
   name,
   edges,
   nodes,
@@ -140,7 +131,7 @@ export const saveFlow = async ({
   status = "ready",
 }: SaveFlowConfig) => {
   try {
-    let yamlContent = getYamlContent(nodes, edges, steps, name, description);
+    let yamlContent = getYamlContent(nodes, edges, name, description);
 
     const mcqNodes = nodes.filter(
       (node) => node.data?.stepType === StepType.MultiChoiceQuestion
@@ -151,7 +142,7 @@ export const saveFlow = async ({
         0,
         nodes.findIndex((node) => node.data?.stepType === StepType.MultiChoiceQuestion) + 1
       );
-      yamlContent = getYamlContent(nodesUpToFirstMcq, edges, steps, name, description);
+      yamlContent = getYamlContent(nodesUpToFirstMcq, edges, name, description);
     }
 
     await saveService(
@@ -179,7 +170,7 @@ export const saveFlow = async ({
         );
 
         await saveService(
-          getYamlContent(branchNodes, branchEdges, steps, serviceName, description),
+          getYamlContent(branchNodes, branchEdges, serviceName, description),
           { name: serviceName, serviceId, description, slot, isCommon, nodes, edges, isNewService } as SaveFlowConfig,
           false,
           status
@@ -232,7 +223,7 @@ async function saveService(
     .catch(onError);
 }
 
-function getYamlContent(nodes: Node[], edges: Edge[], steps: Step[], name: string, description: string): any {
+function getYamlContent(nodes: Node[], edges: Edge[], name: string, description: string): any {
   const allRelations: any[] = [];
 
   nodes.forEach((node) => {
@@ -367,7 +358,7 @@ function getYamlContent(nodes: Node[], edges: Edge[], steps: Step[], name: strin
       }
 
       const nextStep = childNode ? toSnakeCase(childNode.data.label ?? "format_messages") : "format_messages";
-      const template = getTemplate(steps, parentNode, parentStepName, nextStep);
+      const template = getTemplate(parentNode, parentStepName, nextStep);
 
       finishedFlow.set(parentStepName, template);
     });
@@ -443,7 +434,7 @@ function handleTextField(
   finishedFlow: Map<any, any>,
   parentStepName: string,
   parentNode: Node,
-  childNode: Node<NodeDataProps> | undefined,
+  childNode: Node<NodeDataProps> | undefined
 ) {
   const htmlToMarkdown = new NodeHtmlMarkdown({
     textReplace: [
@@ -504,7 +495,7 @@ function handleAssignStep(
   parentNode: Node<NodeDataProps>,
   finishedFlow: Map<any, any>,
   parentStepName: string,
-  childNode: Node<NodeDataProps> | undefined,
+  childNode: Node<NodeDataProps> | undefined
 ) {
   const invalidElementsExist = hasInvalidElements(parentNode.data.assignElements ?? []);
   const isInvalid =
@@ -529,7 +520,7 @@ function handleEndpointStep(
   parentNode: Node<NodeDataProps>,
   finishedFlow: Map<any, any>,
   parentStepName: string,
-  childNode: Node<NodeDataProps> | undefined,
+  childNode: Node<NodeDataProps> | undefined
 ) {
   const endpointDefinition = parentNode.data.endpoint?.definitions[0];
   const paramsVariables = endpointDefinition?.params?.variables;
@@ -574,7 +565,7 @@ function handleMultiChoiceQuestion(
   finishedFlow: Map<any, any>,
   parentStepName: string,
   parentNode: Node<NodeDataProps>,
-  childNode: Node<NodeDataProps> | undefined,
+  childNode: Node<NodeDataProps> | undefined
 ) {
   return finishedFlow.set(parentStepName, {
     assign: {
@@ -622,7 +613,7 @@ const getNestedPreDefinedEndpointVariables = (variable: EndpointVariableData, re
   }
 };
 
-const getTemplate = (steps: Step[], node: Node, stepName: string, nextStep?: string) => {
+const getTemplate = (node: Node, stepName: string, nextStep?: string) => {
   const data = getTemplateDataFromNode(node);
 
   return {
@@ -699,13 +690,11 @@ export const saveFlowClick = async (status: "draft" | "ready" = "ready") => {
   const description = useServiceStore.getState().description;
   const slot = useServiceStore.getState().slot;
   const isCommon = useServiceStore.getState().isCommon;
-  const steps = useServiceStore.getState().mapEndpointsToSteps();
   const isNewService = useServiceStore.getState().isNewService;
   const edges = useServiceStore.getState().edges;
   const nodes = useServiceStore.getState().nodes;
 
   await saveFlow({
-    steps,
     name: !name
       ? `${t("newService.defaultServiceName").toString()}_${format(new Date(), "dd_MM_yyyy_HH_mm_ss")}`
       : name,

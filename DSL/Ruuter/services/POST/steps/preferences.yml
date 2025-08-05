@@ -11,10 +11,14 @@ declaration:
       - field: steps
         type: string
         description: "Body field 'steps'"
+      - field: endpoints
+        type: string
+        description: "Body field 'endpoints'"
 
 extractRequestData:
   assign:
-    steps: ${incoming.body.steps.join(",")} 
+    steps: ${incoming.body.steps.join(",")}
+    endpoints: ${incoming.body.endpoints.join(",")}
 
 get_user_info:
   call: http.post
@@ -42,6 +46,7 @@ update_user_step_preferences:
     url: "[#SERVICE_RESQL]/update-user-step-preferences"
     body:
       steps: "{${steps}}"
+      endpoints: "{${endpoints}}"
       user_id_code: ${idCode}
   result: update_preferences_res
 
@@ -54,7 +59,7 @@ get_user_step_preferences:
   result: preferences
 
 return_preferences:
-  return: ${preferences.response.body[0].steps}
+  return: ${preferences.response.body[0]}
   next: end
 
 return_unauthorized:

@@ -4,20 +4,22 @@ import Icon from "components/Icon";
 import Track from "components/Track";
 import { FC, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { MdDeleteOutline, MdOutlineEdit } from "react-icons/md";
+import { MdDeleteOutline, MdOutlineEdit, MdDragIndicator } from "react-icons/md";
 import { Link } from "react-router-dom";
 import { deleteEndpoint } from "resources/api-constants";
 import useServiceStore from "store/new-services.store";
 import useToastStore from "store/toasts.store";
 import { Step, StepType } from "types";
 import { EndpointData } from "types/endpoint";
-import apiIconTag from "../../assets/images/api-icon-tag.svg";
+
 import styles from "./ApiEndpoint.module.scss";
 import api from "../../services/api-dev";
 import Modal from "components/Modal";
 import ApiEndpointCard from "components/ApiEndpointCard";
 import { saveEndpoints } from "services/service-builder";
 import { removeTrailingUnderscores } from "utils/string-util";
+import { useSortable } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 
 interface RelatedService {
   serviceId: string;
@@ -31,6 +33,14 @@ interface ApiEndpointProps {
 
 const ApiEndpoint: FC<ApiEndpointProps> = ({ step, onClick }) => {
   const { t } = useTranslation();
+
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: step.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
 
   const [relatedServices, setRelatedServices] = useState<RelatedService[]>([]);
   const [showEditModal, setShowEditModal] = useState(false);
@@ -182,18 +192,24 @@ const ApiEndpoint: FC<ApiEndpointProps> = ({ step, onClick }) => {
       )}
 
       <Box
+        ref={setNodeRef}
+        style={style}
         className={styles.box}
         key={step.id}
-        style={{ cursor: "pointer" }}
         color={[StepType.FinishingStepEnd, StepType.FinishingStepRedirect].includes(step.type) ? "red" : "blue"}
         onClick={() => onClick(step)}
-        draggable={false}
       >
         <Track gap={8} style={{ justifyContent: "space-between", overflow: "hidden" }}>
-          <div className={styles.labelContainer}>
-            {step.type === "user-defined" && <img alt="" src={apiIconTag} />}
-            <span className={styles.label}>{step.label}</span>
-          </div>
+          <Track gap={8} style={{ alignItems: "center" }}>
+            <div {...attributes} {...listeners} style={{ cursor: "grab", display: "flex", alignItems: "center" }}>
+              <Icon icon={<MdDragIndicator size={16} />} size="small" />
+            </div>
+            <div className={styles.labelContainer}>
+              {step.type === "user-defined" && <span className={styles.apiBadge}>API</span>}
+              {step.data?.isCommon && <span className={styles.publicBadge}>{t("serviceFlow.apiElements.public")}</span>}
+              <span className={styles.label}>{step.label}</span>
+            </div>
+          </Track>
           <Track gap={12}>
             <button
               className={styles.deleteButton}

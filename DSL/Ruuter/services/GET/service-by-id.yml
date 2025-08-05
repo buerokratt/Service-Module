@@ -17,6 +17,26 @@ check_for_parameters:
     - condition: ${incoming.params == null || incoming.params.id == null}
       next: return_incorrect_request
 
+get_user_info:
+  call: http.post
+  args:
+    url: "[#SERVICE_TIM]/jwt/custom-jwt-userinfo"
+    contentType: plaintext
+    headers:
+      cookie: ${incoming.headers.cookie}
+    plaintext: "customJwtCookie"
+  result: res
+
+check_user_info_response:
+  switch:
+    - condition: ${200 <= res.response.statusCodeValue && res.response.statusCodeValue < 300}
+      next: assignIdCode
+  next: return_unauthorized
+
+assignIdCode:
+  assign:
+    idCode: ${res.response.body.idCode}
+
 get_service_by_id:
   call: http.post
   args:
@@ -31,6 +51,7 @@ get_endpoints_by_service_id:
     url: "[#SERVICE_RESQL]/endpoints/get_endpoints_by_service_id"
     body:
       id: ${incoming.params.id}
+      user_id_code: ${idCode}
   result: endpoints_results
 
 prepare_results:
@@ -56,4 +77,9 @@ return_ok:
 return_incorrect_request:
   status: 400
   return: "Required parameter(s) missing"
+  next: end
+
+return_unauthorized:
+  status: 401
+  return: "unauthorized"
   next: end

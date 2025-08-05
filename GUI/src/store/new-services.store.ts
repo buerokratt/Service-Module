@@ -1,6 +1,16 @@
 import { create } from "zustand";
 import { v4 as uuid } from "uuid";
-import { Edge, EdgeChange, Node, NodeChange, ReactFlowInstance, applyEdgeChanges, applyNodeChanges, getIncomers, getOutgoers } from "@xyflow/react";
+import {
+  Edge,
+  EdgeChange,
+  Node,
+  NodeChange,
+  ReactFlowInstance,
+  applyEdgeChanges,
+  applyNodeChanges,
+  getIncomers,
+  getOutgoers,
+} from "@xyflow/react";
 import { EndpointData, EndpointEnv, EndpointTab, PreDefinedEndpointEnvVariables } from "types/endpoint";
 import {
   getCommonEndpoints,
@@ -476,8 +486,10 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
   },
   loadStepPreferences: async () => {
     try {
-      const response = await api.get<{ response: string[] }>(userStepPreferences());
-      set({ stepPreferences: response.data.response });
+      const response = await api.get<{ response: { steps: string[]; endpoints: string[] } }>(userStepPreferences());
+      set({
+        stepPreferences: response.data.response.steps ?? [],
+      });
     } catch (error) {
       console.error("Failed to load step preferences:", error);
     }

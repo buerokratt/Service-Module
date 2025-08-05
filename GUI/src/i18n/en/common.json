@@ -258,7 +258,7 @@
       "saveConfigFailed": "Failed to save config",
       "testResultSuccess": "Test result- success",
       "testResultError": "Test result - error",
-      "servieNotFound": "Service not found",
+      "serviceNotFound": "Service not found",
       "serviceNotFoundEndpointsMessage": "Please save the service first to be able to add endpoints",
       "serviceNameAlreadyExists": "Service name already exists",
       "elementNameAlreadyExists": "Element name already exists",
@@ -281,7 +281,7 @@
       "openNewWebpage": "Open new webpage",
       "fileGeneration": "File generation",
       "fileSigning": "File signing",
-      "conversationEnd": "End conversation",
+      "serviceEnd": "End service",
       "redirectConversationToSupport": "Direct to Customer Support",
       "rules": "Rules",
       "rasaRules": "Rasa Rules",
@@ -391,7 +391,8 @@
       "deleteSuccess": "API element deleted successfully",
       "deleteError": "Failed to delete API element",
       "editSuccess": "API element edited successfully",
-      "editError": "Failed to edit API element"
+      "editError": "Failed to edit API element",
+      "public": "Public"
     },
     "multiChoiceQuestion": {
       "questionPlaceholder": "Enter a question",
