@@ -232,7 +232,8 @@
       "unsupported": "Vabandust, praegu toetame ainult GET ja POST päringud",
       "insertName": "Sisesta otspunkti nimetus...",
       "type": "Otspunkti tüüp",
-      "nameAlreadyExists": "API pealkiri peab olema unikaalne"
+      "nameAlreadyExists": "API pealkiri peab olema unikaalne",
+      "formatJson": "Formateeri JSON"
     },
     "trainingModuleSetup": "Avaleht",
     "serviceSetup": "Teenuse seadistamine",
@@ -257,7 +258,7 @@
       "saveConfigFailed": "Seadete salvestamine ebaõnnestus",
       "testResultSuccess": "Testi tulemus - edu",
       "testResultError": "Testi tulemus - viga",
-      "servieNotFound": "Teenust ei leitud",
+      "serviceNotFound": "Teenust ei leitud",
       "serviceNotFoundEndpointsMessage": "Salvesta teenus kõigepealt, et saaksid lisada otspunkte",
       "serviceNameAlreadyExists": "Teenuse nimi on juba olemas",
       "elementNameAlreadyExists": "Elementi nimi on juba olemas",
@@ -280,7 +281,7 @@
       "openNewWebpage": "Uue veebilehe avamine",
       "fileGeneration": "Faili genereerimine",
       "fileSigning": "Faili allkirjastamine",
-      "conversationEnd": "Vestluse lõpetamine",
+      "serviceEnd": "Teenuse lõpetamine",
       "redirectConversationToSupport": "Klienditeenindusse suunamine",
       "rules": "Reeglid",
       "rasaRules": "Rasa reeglid",
@@ -330,6 +331,9 @@
     "previousVariables": {
       "assignElements": "Määra elemendid",
       "noName": "<Nimeta>",
+      "environmentVariables": {
+        "title": "Keskkonnamuutujad"
+      },
       "dates": {
         "title": "Kuupäevad",
         "currentDate": "Praegune kuupäev",
@@ -387,7 +391,8 @@
       "deleteSuccess": "API element kustutatud",
       "deleteError": "API elementi kustutamine ebaõnnestus",
       "editSuccess": "API element edukalt muudetud",
-      "editError": "API elemendi muutmine ebaõnnestus"
+      "editError": "API elemendi muutmine ebaõnnestus",
+      "public": "Avalik"
     },
     "multiChoiceQuestion": {
       "title": "Mitmevalikuline küsimus",

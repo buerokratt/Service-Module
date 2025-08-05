@@ -113,6 +113,15 @@ delete_endpoints_by_service_id:
     body:
       serviceId: ${id}
   result: delete_endpoint_results
+  next: remove_service_endpoints_from_preferences
+
+remove_service_endpoints_from_preferences:
+  call: http.post
+  args:
+    url: "[#SERVICE_RESQL]/endpoints/remove_service_endpoints_from_preferences"
+    body:
+      serviceId: ${id}
+  result: remove_preferences_results
   next: delete_mcq_files
 
 delete_mcq_files:

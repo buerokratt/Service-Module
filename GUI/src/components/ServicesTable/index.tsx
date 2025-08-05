@@ -115,7 +115,9 @@ const ServicesTable: FC<ServicesTableProps> = ({ isCommon = false }) => {
       .deleteSelectedService(
         () => setIsDeletePopupVisible(false),
         t("overview.service.toast.deleted"),
-        t("overview.service.toast.failed.delete")
+        t("overview.service.toast.failed.delete"),
+        pagination,
+        sorting
       );
   };
 

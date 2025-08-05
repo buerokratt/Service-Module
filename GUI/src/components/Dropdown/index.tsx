@@ -18,14 +18,14 @@ const Dropdown: FC<DropdownProps> = ({ open, onOpenChange, trigger, title, child
     <DropdownMenu.Root open={open} onOpenChange={onOpenChange}>
       <DropdownMenu.Trigger asChild>{trigger}</DropdownMenu.Trigger>
       <DropdownMenu.Portal>
-        <DropdownMenu.Content className="dropdown" sideOffset={5}>
-            <Track className="dropdown__header" gap={8} justify="between" align="center">
-              <DropdownMenu.Label className="dropdown__title">{title}</DropdownMenu.Label>
-              <button onClick={onClose}>
-                <Icon icon={<MdOutlineClose size={20}/>} size="medium" />
-              </button>
-            </Track>
-            <div className="dropdown__content">{children}</div>
+        <DropdownMenu.Content className="dropdown" sideOffset={5} side="bottom" align="start" avoidCollisions={false}>
+          <Track className="dropdown__header" gap={8} justify="between" align="center">
+            <DropdownMenu.Label className="dropdown__title">{title}</DropdownMenu.Label>
+            <button onClick={onClose}>
+              <Icon icon={<MdOutlineClose size={20} />} size="medium" />
+            </button>
+          </Track>
+          <div className="dropdown__content">{children}</div>
         </DropdownMenu.Content>
       </DropdownMenu.Portal>
     </DropdownMenu.Root>
