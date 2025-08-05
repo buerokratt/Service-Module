@@ -343,6 +343,9 @@
         "customFormat": "Custom format"
       },
       "noName": "<No name>",
+      "environmentVariables": {
+        "title": "Environment Variables"
+      },
       "helpers": {
         "title": "Tools",
         "map": "Change items",

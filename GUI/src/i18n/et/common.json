@@ -331,6 +331,9 @@
     "previousVariables": {
       "assignElements": "Määra elemendid",
       "noName": "<Nimeta>",
+      "environmentVariables": {
+        "title": "Keskkonnamuutujad"
+      },
       "dates": {
         "title": "Kuupäevad",
         "currentDate": "Praegune kuupäev",

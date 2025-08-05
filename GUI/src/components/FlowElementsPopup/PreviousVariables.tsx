@@ -12,7 +12,7 @@ import { getTypeColor, isObject } from "utils/object-util";
 import Tooltip from "../Tooltip";
 import { v4 } from "uuid";
 import { getHelperTooltips } from "utils/constants";
-import { datesVariables, helperVariables } from "resources/variables-constants";
+import { datesVariables, environmentVariables, helperVariables } from "resources/variables-constants";
 import { Node, Edge } from "@xyflow/react";
 import { NodeDataProps } from "types/service-flow";
 
@@ -130,6 +130,15 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
           border={border}
         />
       )}
+
+      <VariableSection
+        title={t("serviceFlow.previousVariables.environmentVariables.title")}
+        variables={[...environmentVariables]}
+        assignedObjectTree={assignedObjectTree}
+        setAssignedObjectTree={setAssignedObjectTree}
+        popupBodyCss={popupBodyCss}
+        border={border}
+      />
 
       <VariableSection
         title={t("serviceFlow.previousVariables.dates.title")}
