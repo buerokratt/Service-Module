@@ -18,7 +18,7 @@ const Dropdown: FC<DropdownProps> = ({ open, onOpenChange, trigger, title, child
     <DropdownMenu.Root open={open} onOpenChange={onOpenChange}>
       <DropdownMenu.Trigger asChild>{trigger}</DropdownMenu.Trigger>
       <DropdownMenu.Portal>
-        <DropdownMenu.Content className="dropdown" sideOffset={5} side="bottom" align="start" avoidCollisions={false}>
+        <DropdownMenu.Content className="dropdown" sideOffset={5}>
           <Track className="dropdown__header" gap={8} justify="between" align="center">
             <DropdownMenu.Label className="dropdown__title">{title}</DropdownMenu.Label>
             <button onClick={onClose}>
