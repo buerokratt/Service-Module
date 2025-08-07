@@ -12,6 +12,7 @@ export type EndpointDefinition = {
   supported: boolean;
   isSelected: boolean;
   url?: string;
+  openApiUrl?: string;
   description?: string;
   params?: {
     variables: EndpointVariableData[];
