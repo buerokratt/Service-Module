@@ -12,7 +12,6 @@ import {
   PreDefinedEndpointEnvVariables,
 } from "../../../../types/endpoint";
 import { RequestVariablesRowData } from "../../../../types/request-variables";
-import useServiceStore from "store/new-services.store";
 import api from "../../../../services/api-dev";
 
 type EndpointOpenAPIProps = {
@@ -30,14 +29,13 @@ const EndpointOpenAPI: React.FC<EndpointOpenAPIProps> = ({
   requestTab,
   setRequestTab,
 }) => {
-  const [openApiUrl, setOpenApiUrl] = useState<string>(endpoint.openApiUrl ?? "");
+  const [openApiUrl, setOpenApiUrl] = useState<string>(endpoint?.definitions[0]?.openApiUrl ?? "");
   const [selectedEndpoint, setSelectedEndpoint] = useState<EndpointDefinition | undefined>(
     endpoint.definitions.find((e) => e.isSelected)
   );
   const [openApiEndpoints, setOpenApiEndpoints] = useState<EndpointDefinition[]>(endpoint.definitions ?? []);
   const [key, setKey] = useState<number>(0);
   const { t } = useTranslation();
-  const { setEndpoints } = useServiceStore();
 
   useEffect(() => setKey(key + 1), [isLive]);
 
@@ -165,10 +163,11 @@ const EndpointOpenAPI: React.FC<EndpointOpenAPIProps> = ({
             label,
             path,
             url: endpointUrl,
+            openApiUrl,
             type: "openApi",
             methodType: method,
-            supported: false,
-            isSelected: false,
+            supported: true,
+            isSelected: true,
             dataType: "custom",
           });
           return;
@@ -185,9 +184,10 @@ const EndpointOpenAPI: React.FC<EndpointOpenAPIProps> = ({
           type: "openApi",
           methodType: method,
           supported: true,
-          isSelected: false,
+          isSelected: true,
           description: data.summary ?? data.description,
           url: endpointUrl,
+          openApiUrl,
           dataType: "custom",
           body: body
             ? {
@@ -212,14 +212,8 @@ const EndpointOpenAPI: React.FC<EndpointOpenAPIProps> = ({
       });
     });
     setOpenApiEndpoints(paths);
-    setEndpoints((prevEndpoints) => {
-      prevEndpoints.forEach((prevEndpoint) => {
-        if (prevEndpoint.endpointId !== endpoint.endpointId) return;
-        prevEndpoint.definitions = paths;
-        prevEndpoint.openApiUrl = openApiUrl;
-      });
-      return prevEndpoints;
-    });
+    endpoint.definitions = paths;
+    endpoint.definitions[0].openApiUrl = openApiUrl;
     setKey(key + 1);
   };
 
@@ -239,23 +233,10 @@ const EndpointOpenAPI: React.FC<EndpointOpenAPIProps> = ({
   const onSelectEndpoint = (selection: Option | null) => {
     const newSelectedEndpoint = openApiEndpoints.find((openApiEndpoint) => openApiEndpoint.label === selection?.label);
     setSelectedEndpoint(newSelectedEndpoint);
-    setEndpoints((prevEndpoints) => {
-      return updateSelectedEndpoint(prevEndpoints, newSelectedEndpoint);
-    });
+    if (!newSelectedEndpoint) return;
+    endpoint.definitions = [];
+    endpoint.definitions.push(newSelectedEndpoint);
     setKey(key + 1);
-  };
-
-  const updateSelectedEndpoint = (
-    prevEndpoints: EndpointData[],
-    newSelectedEndpoint: EndpointDefinition | undefined
-  ) => {
-    return prevEndpoints.map((prevEndpoint) => {
-      if (prevEndpoint.endpointId !== endpoint.endpointId) return prevEndpoint;
-      prevEndpoint.definitions.forEach((definedEndpoint) => {
-        definedEndpoint.isSelected = definedEndpoint === newSelectedEndpoint;
-      });
-      return prevEndpoint;
-    });
   };
 
   return (

@@ -787,6 +787,8 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
 }));
 
 function extractMapValues(element: any) {
+  if (!element) return {};
+  
   if (element.rawData && element.rawData.length > 0) {
     return element.rawData.value;
   }
