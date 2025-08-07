@@ -85,6 +85,7 @@ function CustomEdge({
       const allowedSteps = [
         StepType.Condition,
         StepType.Assign,
+        StepType.Textfield,
         StepType.MultiChoiceQuestion,
         StepType.FinishingStepRedirect,
         StepType.FinishingStepEnd,
