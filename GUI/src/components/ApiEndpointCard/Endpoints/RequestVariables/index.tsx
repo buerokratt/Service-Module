@@ -127,6 +127,7 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
   const getInitialTabsRawData = (): RequestVariablesTabsRawData => {
     return tabs.reduce((tabsRawData, tab) => {
       const endpointData = endpoint.definitions[0];
+      if (!endpointData || !endpointData[tab]) return tabsRawData;
       return { ...tabsRawData, [tab]: endpointData[tab]?.rawData[isLive ? "value" : "testValue"] ?? "" };
     }, {});
   };
@@ -165,7 +166,9 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
         row[field] = newValue;
       });
 
-      newRowsData[requestTab.tab] = maintainSingleEmptyRow(newRowsData[requestTab.tab] || []);
+      if (endpoint.type === "custom") {
+        newRowsData[requestTab.tab] = maintainSingleEmptyRow(newRowsData[requestTab.tab] || []);
+      }
       updateEndpointData(newRowsData, endpoint);
       if (requestTab.tab === "params")
         onParametersChange(
