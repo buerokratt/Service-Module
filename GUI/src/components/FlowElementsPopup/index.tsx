@@ -464,7 +464,13 @@ const FlowElementsPopup: React.FC = () => {
             {stepType === StepType.RasaRules && <RasaRulesContent />}
             {stepType === StepType.Assign && <AssignContent nodeId={node.id} />}
             {stepType === StepType.Condition && <ConditionContent nodeId={node.id} />}
-            {stepType === StepType.DynamicChoices && <DynamicChoicesContent nodeId={node.id} />}
+            {stepType === StepType.DynamicChoices && (
+              <DynamicChoicesContent
+                nodeId={node.id}
+                dynamicChoices={dynamicChoices}
+                onDynamicChoicesChange={setDynamicChoices}
+              />
+            )}
             {stepType === StepType.UserDefined && (
               <ApiContent
                 nodeId={node.id}
