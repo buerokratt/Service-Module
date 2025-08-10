@@ -27,4 +27,5 @@ export const stepsLabels: Record<StepType, string> = {
   [StepType.UserDefined]: "serviceFlow.element.userDefined",
   [StepType.RasaRules]: "serviceFlow.element.rasaRules",
   [StepType.SiGa]: "serviceFlow.element.siga",
+  [StepType.DynamicChoices]: "serviceFlow.element.dynamicChoices",
 };

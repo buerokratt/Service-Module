@@ -285,7 +285,8 @@
       "redirectConversationToSupport": "Klienditeenindusse suunamine",
       "rules": "Reeglid",
       "rasaRules": "Rasa reeglid",
-      "siga": "Allkirjastamine"
+      "siga": "Allkirjastamine",
+      "dynamicChoices": "Dünaamilised valikud"
     },
     "popup": {
       "messageLabel": "Sõnum",

@@ -25,7 +25,7 @@ function useEdgeAdd(id: string) {
         label: nodeLabel,
         onDelete: useServiceStore.getState().onDelete,
         onEdit: useServiceStore.getState().handleNodeEdit,
-        type: [StepType.FinishingStepEnd, StepType.FinishingStepRedirect].includes(stepType)
+        type: [StepType.DynamicChoices, StepType.FinishingStepEnd, StepType.FinishingStepRedirect].includes(stepType)
           ? "finishing-step"
           : "step",
         stepType: stepType,
@@ -35,6 +35,8 @@ function useEdgeAdd(id: string) {
       },
       className: [StepType.FinishingStepEnd, StepType.FinishingStepRedirect].includes(stepType)
         ? "finishing-step"
+        : [StepType.DynamicChoices].includes(stepType)
+        ? "dynamic-choices"
         : "step",
       type: "custom",
     };
@@ -49,7 +51,11 @@ function useEdgeAdd(id: string) {
 
     let targetEdge: Edge | null = null;
 
-    if (stepType != StepType.FinishingStepEnd && stepType != StepType.FinishingStepRedirect) {
+    if (
+      stepType != StepType.DynamicChoices &&
+      stepType != StepType.FinishingStepEnd &&
+      stepType != StepType.FinishingStepRedirect
+    ) {
       targetEdge = {
         id: `${newNodeId}->${edge.target}`,
         source: newNodeId,

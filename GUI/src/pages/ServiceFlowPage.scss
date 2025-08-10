@@ -123,6 +123,11 @@
       border: 1px solid get-color(jasper-3);
     }
 
+    &.dynamic-choices {
+      background-color: get-color(purple-1);
+      border: 1px solid get-color(purple-3);
+    }
+
     &.selected {
       border: dashed 1px get-color(black-coral-1);
     }
