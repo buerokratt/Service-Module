@@ -33,6 +33,8 @@ import useServiceListStore from "store/services.store";
 import api from "../../services/api-dev";
 import { EndpointData } from "types/endpoint";
 import useToastStore from "store/toasts.store";
+import { DynamicChoices } from "types/dynamic-choices";
+import DynamicChoicesContent from "./DynamicChoicesContent";
 
 const FlowElementsPopup: React.FC = () => {
   const { t } = useTranslation();
@@ -54,19 +56,26 @@ const FlowElementsPopup: React.FC = () => {
   const defaultMultiChoiceQuestionButtons = [
     {
       id: "1",
-      title: "Yes",
+      title: "Jah",
       payload: `#service, /${selectedService?.type ?? "POST"}/services/active/${serviceName}_mcq_${
         node?.data.label[node?.data.label.length - 1]
       }_0`,
     },
     {
       id: "2",
-      title: "No",
+      title: "Ei",
       payload: `#service, /${selectedService?.type ?? "POST"}/services/active/${serviceName}_mcq_${
         node?.data.label[node?.data.label.length - 1]
       }_1`,
     },
   ];
+
+  const defaultDynamicChoices: DynamicChoices = {
+    list: "",
+    serviceName: "",
+    key: "",
+    payloadKeys: "",
+  };
 
   useEffect(() => {
     if (node) node.data.rules = rules;
@@ -93,6 +102,9 @@ const FlowElementsPopup: React.FC = () => {
   );
   const [multiChoiceQuestionButtons, setMultiChoiceQuestionButtons] = useState<MultiChoiceQuestionButton[]>(
     node?.data.multiChoiceQuestion?.buttons ?? defaultMultiChoiceQuestionButtons
+  );
+  const [dynamicChoices, setDynamicChoices] = useState<DynamicChoices>(
+    node?.data.dynamicChoices ?? defaultDynamicChoices
   );
 
   const [nodeEndpoint, setNodeEndpoint] = useState<EndpointData | undefined>(node?.data.endpoint);
@@ -136,6 +148,7 @@ const FlowElementsPopup: React.FC = () => {
     setTextfieldMessagePlaceholders({});
     setMultiChoiceQuestionQuestion("");
     setMultiChoiceQuestionButtons(defaultMultiChoiceQuestionButtons);
+    setDynamicChoices(defaultDynamicChoices);
     useServiceStore.getState().resetSelectedNode();
     useServiceStore.getState().resetRules();
     useServiceStore.getState().resetAssign();
@@ -156,6 +169,7 @@ const FlowElementsPopup: React.FC = () => {
           question: multiChoiceQuestionQuestion,
           buttons: multiChoiceQuestionButtons,
         },
+        dynamicChoices: dynamicChoices,
         endpoint: nodeEndpoint ?? node.data?.endpoint,
       },
     };
@@ -450,6 +464,7 @@ const FlowElementsPopup: React.FC = () => {
             {stepType === StepType.RasaRules && <RasaRulesContent />}
             {stepType === StepType.Assign && <AssignContent nodeId={node.id} />}
             {stepType === StepType.Condition && <ConditionContent nodeId={node.id} />}
+            {stepType === StepType.DynamicChoices && <DynamicChoicesContent nodeId={node.id} />}
             {stepType === StepType.UserDefined && (
               <ApiContent
                 nodeId={node.id}

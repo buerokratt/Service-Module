@@ -202,5 +202,6 @@ const processDeletedNodes = (
       onKeepItConfirmed,
       hasConnectedNodes,
       setDeletedNodes,
+      setNodeToDelete,
     };
   };

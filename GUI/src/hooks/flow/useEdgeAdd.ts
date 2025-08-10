@@ -70,7 +70,7 @@ function useEdgeAdd(id: string) {
     let ghostEdges: Edge[] = []; 
 
     if (stepType === StepType.MultiChoiceQuestion || stepType === StepType.Condition || stepType === StepType.Input) {
-      const labels = stepType === StepType.MultiChoiceQuestion ? ["Yes", "No"] : ["Success", "Failure"];
+      const labels = stepType === StepType.MultiChoiceQuestion ? ["Jah", "Ei"] : ["Success", "Failure"];
       ghostNodes = labels.slice(1).map((_, i) => ({
         id: crypto.randomUUID(),
         type: "ghost",
