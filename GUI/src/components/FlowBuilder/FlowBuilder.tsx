@@ -63,7 +63,7 @@ const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
     async ({ nodes: nodesToDelete, edges: edgesToDelete }: { nodes: Node[]; edges: Edge[] }) => {
       setDeletedNodes(null);
       try {
-        if (edgesToDelete.length > 0) {
+        if (edgesToDelete.length > 0 && nodesToDelete.length === 0) {
           const shouldPreventDelete = getNode(edgesToDelete[0].source)?.data.stepType === StepType.MultiChoiceQuestion;
           if (shouldPreventDelete) {
             return false;
@@ -79,7 +79,6 @@ const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
           setDeletedNodes(nodesToDelete);
           setIsDeleteConnectionsModalVisible(true);
         }
-        return false;
         return !shouldPreventDelete;
       } catch (error) {
         console.error("Error in onBeforeDelete:", error);
