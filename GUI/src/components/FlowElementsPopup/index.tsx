@@ -112,24 +112,35 @@ const FlowElementsPopup: React.FC = () => {
   const stepType = node?.data.stepType;
 
   useEffect(() => {
-    if (stepType !== StepType.Input && stepType !== StepType.Condition) return;
-    if (!node?.data?.rules) return;
-
-    useServiceStore.getState().changeRulesNode(node.data.rules);
-  }, [stepType === StepType.Input, stepType === StepType.Condition]);
-
-  useEffect(() => {
-    if (stepType !== StepType.Assign) return;
-    if (!node?.data?.assignElements) return;
-
-    useServiceStore.getState().changeAssignNode(node.data.assignElements);
-  }, [stepType === StepType.Assign]);
-
-  useEffect(() => {
     if (!node) return;
-    setMultiChoiceQuestionQuestion(node?.data?.multiChoiceQuestion?.question ?? "");
-    setMultiChoiceQuestionButtons(node?.data?.multiChoiceQuestion?.buttons ?? defaultMultiChoiceQuestionButtons);
-  }, [stepType === StepType.MultiChoiceQuestion]);
+
+    switch (stepType) {
+      case StepType.Input:
+      case StepType.Condition:
+        if (node.data?.rules) {
+          useServiceStore.getState().changeRulesNode(node.data.rules);
+        }
+        break;
+
+      case StepType.Assign:
+        if (node.data?.assignElements) {
+          useServiceStore.getState().changeAssignNode(node.data.assignElements);
+        }
+        break;
+
+      case StepType.MultiChoiceQuestion:
+        setMultiChoiceQuestionQuestion(node.data?.multiChoiceQuestion?.question ?? "");
+        setMultiChoiceQuestionButtons(node.data?.multiChoiceQuestion?.buttons ?? defaultMultiChoiceQuestionButtons);
+        break;
+
+      case StepType.DynamicChoices:
+        setDynamicChoices(node.data?.dynamicChoices ?? defaultDynamicChoices);
+        break;
+
+      default:
+        break;
+    }
+  }, [stepType]);
 
   if (!node) return <></>;
 
