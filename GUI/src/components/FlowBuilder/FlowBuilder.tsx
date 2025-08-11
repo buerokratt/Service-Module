@@ -17,7 +17,7 @@ type FlowBuilderProps = {
 
 const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
   useLayout();
-  const { getNodes, getEdges, setNodes, setEdges } = useReactFlow();
+  const { getNodes, getEdges, setNodes, setEdges, getNode } = useReactFlow();
   const setReactFlowInstance = useServiceStore((state) => state.setReactFlowInstance);
   const { t } = useTranslation();
   const { onNodesDelete, onEdgesDelete, isDeleteConnectionsModalVisible, setIsDeleteConnectionsModalVisible, onDeleteConfirmed, onKeepItConfirmed, hasConnectedNodes, setDeletedNodes } =
@@ -60,9 +60,16 @@ const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
   }, []);
 
   const onBeforeDelete = useCallback(
-    async ({ nodes: nodesToDelete }: { nodes: Node[]; edges: Edge[] }) => {
+    async ({ nodes: nodesToDelete, edges: edgesToDelete }: { nodes: Node[]; edges: Edge[] }) => {
       setDeletedNodes(null);
       try {
+        if (edgesToDelete.length > 0) {
+          const shouldPreventDelete = getNode(edgesToDelete[0].source)?.data.stepType === StepType.MultiChoiceQuestion;
+          if (shouldPreventDelete) {
+            return false;
+          }
+        }
+
         if (nodesToDelete.length === 0 || 
           ![StepType.MultiChoiceQuestion, StepType.Condition, StepType.Input]
             .includes(nodesToDelete[0]?.data.stepType as StepType)) return true;
@@ -72,6 +79,7 @@ const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
           setDeletedNodes(nodesToDelete);
           setIsDeleteConnectionsModalVisible(true);
         }
+        return false;
         return !shouldPreventDelete;
       } catch (error) {
         console.error("Error in onBeforeDelete:", error);
