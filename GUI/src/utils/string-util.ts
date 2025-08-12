@@ -37,3 +37,15 @@ export const removeTrailingUnderscores = (value: string) => {
   while (end > 0 && value[end - 1] === "_") end--;
   return value.slice(0, end);
 };
+
+export function stringToArray(str: string, fallback: any = []) {
+  try {
+    if (!str || typeof str !== "string" || str.trim() === "") {
+      return fallback;
+    }
+    const parsed = JSON.parse(str);
+    return Array.isArray(parsed) ? parsed : fallback;
+  } catch (e) {
+    return fallback;
+  }
+}

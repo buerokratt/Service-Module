@@ -10,14 +10,18 @@ import { getDragData } from "utils/component-util";
 
 interface AssignElementProps {
   element: Assign;
-  onRemove: (id: string) => void;
+  onRemove?: (id: string) => void;
   onChange: (element: Assign) => void;
+  manualEdit?: boolean;
+  isKeyEditable?: boolean;
+  keyStyle?: React.CSSProperties;
+  valueStyle?: React.CSSProperties;
 }
 
-const AssignElement: React.FC<AssignElementProps> = ({ element, onRemove, onChange }) => {
+const AssignElement: React.FC<AssignElementProps> = ({ element, onRemove, onChange, manualEdit = false, isKeyEditable, keyStyle, valueStyle }) => {
   const slots = element.slots ?? [];
   const [isSecondSlotOpen, setIsSecondSlotOpen] = useState(!!slots[1]);
-  const [isEditingManually, setIsEditingManually] = useState(element.value && !slots.length);
+  const [isEditingManually, setIsEditingManually] = useState(manualEdit || element.value && !slots.length);
 
   const changeKey = (e: React.ChangeEvent<HTMLInputElement>) => {
     onChange({ ...element, key: e.target.value });
@@ -62,19 +66,22 @@ const AssignElement: React.FC<AssignElementProps> = ({ element, onRemove, onChan
       <FormInput
         value={element.key}
         name="key"
+        disabled={isKeyEditable === false}
         onChange={changeKey}
         onDrop={(e) => e.preventDefault()}
+        style={keyStyle}
         label=""
         hideLabel
       />
       :
-      <Track style={{ flex: "1 0 75%", justifyContent: "flex-end" }}>
+      <Track style={{ flex: "1 0 75%", justifyContent: "flex-end" }} gap={5}>
         {isEditingManually ? (
           <FormInput
             value={element.value}
             name="value"
             onChange={changeValue}
             label=""
+            style={valueStyle}
             hideLabel
             onDrop={changeManualInputValue}
           />
@@ -109,10 +116,11 @@ const AssignElement: React.FC<AssignElementProps> = ({ element, onRemove, onChan
             </div>
           </Tooltip>
         ) : null}
-
-        <button onClick={() => onRemove(element.id)} className="small-assign-button assign-red">
-          <Icon icon={<MdDeleteOutline />} />
-        </button>
+        {onRemove && (
+          <button onClick={() => onRemove(element.id)} className="small-assign-button assign-red">
+            <Icon icon={<MdDeleteOutline />} />
+          </button>
+        )}
       </Track>
     </Track>
   );

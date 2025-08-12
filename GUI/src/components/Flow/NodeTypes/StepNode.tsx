@@ -9,14 +9,12 @@ import CheckBadge from "components/CheckBadge";
 import ExclamationBadge from "components/ExclamationBadge";
 import Track from "components/Track";
 import { StepType } from "types";
+import { DynamicChoices } from "types/dynamic-choices";
 
 type NodeDataProps = {
   data: {
     childrenCount: number;
     clientInputId: number;
-    conditionId: number;
-    multiChoiceQuestionId: number;
-    assignId: number;
     label: string;
     onDelete: (id: string) => void;
     onEdit: (id: string) => void;
@@ -36,6 +34,7 @@ type NodeDataProps = {
     rules?: Group;
     assignElements?: Assign[];
     multiChoiceQuestion?: MultiChoiceQuestion;
+    dynamicChoices?: DynamicChoices;
   };
 };
 
@@ -74,6 +73,11 @@ const StepNode: FC<NodeDataProps> = ({ data }) => {
     if (data.stepType === StepType.MultiChoiceQuestion) {
       return !data?.multiChoiceQuestion?.question || data.multiChoiceQuestion?.buttons?.find((e) => e.title === "") != undefined;
     }
+
+    if (data.stepType === StepType.DynamicChoices) {
+      return !data?.dynamicChoices?.list || !data?.dynamicChoices?.serviceName || !data?.dynamicChoices?.key;
+    }
+    
     if (data.stepType === StepType.UserDefined) return;
     if (data.stepType === StepType.OpenWebpage) return !data.link || !data.linkText;
     if (data.stepType === StepType.FileGenerate) return !data.fileName || !data.fileContent;

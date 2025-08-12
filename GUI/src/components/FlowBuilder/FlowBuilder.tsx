@@ -20,8 +20,17 @@ const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
   const { getNodes, getEdges, setNodes, setEdges } = useReactFlow();
   const setReactFlowInstance = useServiceStore((state) => state.setReactFlowInstance);
   const { t } = useTranslation();
-  const { onNodesDelete, onEdgesDelete, isDeleteConnectionsModalVisible, setIsDeleteConnectionsModalVisible, onDeleteConfirmed, onKeepItConfirmed, hasConnectedNodes, setDeletedNodes } =
-    useOnNodesDelete();
+  const {
+    onNodesDelete,
+    onEdgesDelete,
+    isDeleteConnectionsModalVisible,
+    setIsDeleteConnectionsModalVisible,
+    onDeleteConfirmed,
+    onKeepItConfirmed,
+    hasConnectedNodes,
+    setDeletedNodes,
+    setNodeToDelete,
+  } = useOnNodesDelete();
     const { setHasUnsavedChanges } = useServiceStore();
 
   const onConnect = useCallback(({ source, target }: any) => {
@@ -118,7 +127,10 @@ const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
         <Controls orientation="horizontal" showInteractive={false} />
       </ReactFlow>
       {isDeleteConnectionsModalVisible && (
-        <Modal title={t("overview.popup.deleteNodeConnections")} onClose={onKeepItConfirmed}>
+        <Modal title={t("overview.popup.deleteNodeConnections")} onClose={() => {
+          setNodeToDelete(null);
+          setIsDeleteConnectionsModalVisible(false);
+        }}>
           <Track justify="end" gap={16}>
             <Button appearance="primary" onClick={onDeleteConfirmed}>
               {t("global.delete")}
