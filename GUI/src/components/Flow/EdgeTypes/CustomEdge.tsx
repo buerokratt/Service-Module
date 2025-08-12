@@ -87,7 +87,7 @@ function CustomEdge({
         StepType.Assign,
         StepType.Textfield,
         StepType.MultiChoiceQuestion,
-        StepType.FinishingStepRedirect,
+        StepType.DynamicChoices,
         StepType.FinishingStepEnd,
       ];
 

@@ -21,12 +21,6 @@ type NodeDataProps = {
   };
 };
 
-const boxTypeColors: { [key: string]: any } = {
-  step: "blue",
-  "finishing-step": "red",
-  rule: "gray",
-};
-
 const CustomNode: FC<NodeProps & NodeDataProps> = (props) => {
   const { data, isConnectable, id } = props;
   const shouldOffsetHandles = data.childrenCount > 1;

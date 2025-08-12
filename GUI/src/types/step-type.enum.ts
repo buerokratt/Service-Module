@@ -16,4 +16,5 @@ export enum StepType {
   UserDefined = "user-defined",
   RasaRules = "rasa-rules",
   SiGa = "siga",
+  DynamicChoices = "dynamic-choices",
 }
