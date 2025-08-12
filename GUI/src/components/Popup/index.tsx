@@ -47,16 +47,17 @@ const Popup: FC<PropsWithChildren<DialogProps>> = ({
   };
 
   const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setTempTitle(e.target.value);
-    onTitleChange?.(e.target.value);
+    const sanitizedValue = e.target.value.replace(/[^a-zA-Z0-9-\s]/g, "");
+    setTempTitle(sanitizedValue);
+    onTitleChange?.(sanitizedValue);
   };
 
   const handleTitleSave = () => {
-    if (!titleError) {
+    if (!titleError && tempTitle.trim() !== "") {
       setIsEditingTitle(false);
-      setTitle(tempTitle);
+      setTitle(tempTitle.trim());
       if (onTitleSave && tempTitle !== title) {
-        onTitleSave?.(tempTitle);
+        onTitleSave?.(tempTitle.trim());
       }
     }
   };
@@ -98,6 +99,7 @@ const Popup: FC<PropsWithChildren<DialogProps>> = ({
                         value={tempTitle}
                         onKeyDown={handleTitleKeyDown}
                         onChange={handleTitleChange}
+                        maxLength={30}
                         style={{
                           minWidth: "200px",
                           maxWidth: "200px",
