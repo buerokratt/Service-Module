@@ -108,11 +108,15 @@ const FlowElementsPopup: React.FC = () => {
   );
 
   const [nodeEndpoint, setNodeEndpoint] = useState<EndpointData | undefined>(node?.data.endpoint);
+  const [title, setTitle] = useState(node?.data.label ?? "");
+  const [titleError, setTitleError] = useState<string | undefined>(undefined);
 
   const stepType = node?.data.stepType;
 
   useEffect(() => {
     if (!node) return;
+
+    setTitle(node.data.label ?? "");
 
     switch (stepType) {
       case StepType.Input:
@@ -144,7 +148,6 @@ const FlowElementsPopup: React.FC = () => {
 
   if (!node) return <></>;
 
-  const title = node.data.label;
   const isReadonly = node.data.readonly;
 
   const onClose = () => {
@@ -171,6 +174,7 @@ const FlowElementsPopup: React.FC = () => {
       ...node,
       data: {
         ...node.data,
+        label: title,
         message: textfieldMessage ?? node.data?.message,
         link: webpageUrl ?? node.data?.link,
         linkText: webpageName ?? node.data?.linkText,
@@ -413,6 +417,17 @@ const FlowElementsPopup: React.FC = () => {
           </Track>
         </Track>
       }
+      titleEditable
+      onTitleChange={(newTitle) => {
+        const nodeWithSameLabel = instance?.getNodes().find((n) => n.data.label === newTitle && n.id !== node.id);
+        setTitleError(nodeWithSameLabel ? t("newService.toast.elementNameAlreadyExists").toString() : undefined);
+      }}
+      onTitleSave={setTitle}
+      onTitleEditCancel={() => {
+        setTitleError(undefined);
+        setTitle(node.data.label ?? "");
+      }}
+      titleError={titleError}
     >
       <Track direction="vertical" align="stretch" gap={16} className="flow-body-reverse-margin">
         <Tabs.Root
