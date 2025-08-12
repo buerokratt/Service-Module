@@ -159,6 +159,7 @@ const FlowElementsPopup: React.FC = () => {
     setTextfieldMessagePlaceholders({});
     setMultiChoiceQuestionQuestion("");
     setMultiChoiceQuestionButtons(defaultMultiChoiceQuestionButtons);
+    setIsSaveEnabled(true);
     setDynamicChoices(defaultDynamicChoices);
     useServiceStore.getState().resetSelectedNode();
     useServiceStore.getState().resetRules();

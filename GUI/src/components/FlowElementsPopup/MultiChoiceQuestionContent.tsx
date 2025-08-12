@@ -53,6 +53,7 @@ const MultiChoiceQuestionContent: FC<MultiChoiceQuestionContentProps> = ({
     setButtons(newButtons);
     setEditIndex(null);
     setEditValue("");
+    setIsSaveEnabled(newButtons.length > 1 && newButtons.every((btn) => btn.title.length > 0));
   };
 
   const handleDelete = (idx: number) => {
@@ -62,7 +63,7 @@ const MultiChoiceQuestionContent: FC<MultiChoiceQuestionContentProps> = ({
       setEditIndex(null);
       setEditValue("");
     }
-    setIsSaveEnabled(newButtons.length > 1);
+    setIsSaveEnabled(newButtons.length > 1 && newButtons.every((btn) => btn.title.length > 0));
   };
 
   const handleAdd = () => {
@@ -77,7 +78,7 @@ const MultiChoiceQuestionContent: FC<MultiChoiceQuestionContentProps> = ({
       },
     ];
     setButtons(newButtons);
-    setIsSaveEnabled(newButtons.length > 1);
+    setIsSaveEnabled(false);
   };
 
   return (
