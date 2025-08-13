@@ -533,7 +533,7 @@ function handleEndpointStep(
   const methodType = endpointDefinition?.methodType?.toLowerCase();
 
   const stepConfig: any = {
-    call: `http.${methodType}`,
+    call: `http.${methodType ?? 'post'}`,
     args: {
       url: endpointDefinition?.url?.split("?")[0] ?? "",
     },
