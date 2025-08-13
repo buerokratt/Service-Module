@@ -46,7 +46,109 @@ const JsonEditorPoC: React.FC = () => {
         sortObjectKeys: false,
         colorPicker: true,
         timestampTag: true,
-        language: "en",
+        language: "et",
+        languages: {
+          et: {
+            array: "Massiiv",
+            auto: "Automaatne",
+            appendText: "Lisa lõppu",
+            appendTitle: "Lisa uus väli tüübiga 'auto' selle välja järele (Ctrl+Shift+Ins)",
+            appendSubmenuTitle: "Vali lisatava välja tüüp",
+            appendTitleAuto: "Lisa uus väli tüübiga 'auto' (Ctrl+Shift+Ins)",
+            ascending: "Kasvav",
+            ascendingTitle: "Sorteeri selle ${type} alamvälju kasvavas järjekorras",
+            actionsMenu: "Klõpsa tegevuste menüü avamiseks (Ctrl+M)",
+            cannotParseFieldError: "Ei saa välja JSON-iks teisendada",
+            cannotParseValueError: "Ei saa väärtust JSON-iks teisendada",
+            collapseAll: "Ahenda kõik väljad",
+            compactTitle: "Tihenda JSON andmed, eemalda kõik tühikud (Ctrl+Shift+I)",
+            descending: "Kahanev",
+            descendingTitle: "Sorteeri selle ${type} alamvälju kahanevas järjekorras",
+            drag: "Lohista välja liigutamiseks (Alt+Shift+Nooled)",
+            duplicateKey: "dubleeritud võti",
+            duplicateText: "Dubleeri",
+            duplicateTitle: "Dubleeri valitud väljad (Ctrl+D)",
+            duplicateField: "Dubleeri see väli (Ctrl+D)",
+            duplicateFieldError: "Dubleeritud välja nimi",
+            empty: "tühi",
+            expandAll: "Laienda kõik väljad",
+            expandTitle:
+              "Klõpsa välja laiendamiseks/ahendamiseks (Ctrl+E). \n" +
+              "Ctrl+Klõps laiendab/ahendab koos kõigi alamväljadega.",
+            formatTitle: "Vorminda JSON andmed, korraliku taanduse ja reavahetustega (Ctrl+I)",
+            insert: "Lisa",
+            insertTitle: "Lisa uus väli tüübiga 'auto' enne seda välja (Ctrl+Ins)",
+            insertSub: "Vali lisatava välja tüüp",
+            object: "Objekt",
+            ok: "Ok",
+            redo: "Tee uuesti (Ctrl+Shift+Z)",
+            removeText: "Eemalda",
+            removeTitle: "Eemalda valitud väljad (Ctrl+Del)",
+            removeField: "Eemalda see väli (Ctrl+Del)",
+            repairTitle:
+              "Paranda JSON: paranda jutumärgid ja paomärgid, eemalda kommentaarid ja JSONP märgendid, teisenda JavaScript objektid JSON-iks.",
+            searchTitle: "Otsi välju ja väärtusi",
+            searchNextResultTitle: "Järgmine tulemus (Enter)",
+            searchPreviousResultTitle: "Eelmine tulemus (Shift + Enter)",
+            selectNode: "Vali sõlm...",
+            showAll: "näita kõik",
+            showMore: "näita rohkem",
+            showMoreStatus: "kuvatakse ${visibleChilds} ${totalChilds}-st elemendist.",
+            sort: "Sorteeri",
+            sortTitle: "Sorteeri selle ${type} alamvälju",
+            sortTitleShort: "Sorteeri sisu",
+            sortFieldLabel: "Väli:",
+            sortDirectionLabel: "Suund:",
+            sortFieldTitle: "Vali pesastatud väli, mille järgi massiivi või objekti sorteerida",
+            sortAscending: "Kasvav",
+            sortAscendingTitle: "Sorteeri valitud väli kasvavas järjekorras",
+            sortDescending: "Kahanev",
+            sortDescendingTitle: "Sorteeri valitud väli kahanevas järjekorras",
+            string: "Sõne",
+            transform: "Teisenda",
+            transformTitle: "Filtreeri, sorteeri või teisenda selle ${type} alamvälju",
+            transformTitleShort: "Filtreeri, sorteeri või teisenda sisu",
+            extract: "Eralda",
+            extractTitle: "Eralda see ${type}",
+            transformQueryTitle: "Sisesta JMESPath päring",
+            transformWizardLabel: "Nõustaja",
+            transformWizardFilter: "Filter",
+            transformWizardSortBy: "Sorteeri",
+            transformWizardSelectFields: "Vali väljad",
+            transformQueryLabel: "Päring",
+            transformPreviewLabel: "Eelvaade",
+            type: "Tüüp",
+            typeTitle: "Muuda selle välja tüüpi",
+            openUrl: "Ctrl+Klõps või Ctrl+Enter URL-i uues aknas avamiseks",
+            undo: "Võta viimane tegevus tagasi (Ctrl+Z)",
+            validationCannotMove: "Välja ei saa liigutada iseenda alamväljaks",
+            autoType:
+              'Välja tüüp "auto". ' +
+              "Välja tüüp määratakse automaatselt väärtuse põhjal " +
+              "ja võib olla sõne, number, tõeväärtus või null.",
+            objectType: 'Välja tüüp "objekt". ' + "Objekt sisaldab järjestamata võti/väärtus paaride kogumit.",
+            arrayType: 'Välja tüüp "massiiv". ' + "Massiiv sisaldab järjestatud väärtuste kogumit.",
+            stringType:
+              'Välja tüüp "sõne". ' + "Välja tüüpi ei määrata väärtuse põhjal, " + "vaid tagastatakse alati sõnena.",
+            modeEditorTitle: "Vaheta redaktori režiimi",
+            modeCodeText: "Kood",
+            modeCodeTitle: "Lülitu koodi esiletõstule",
+            modeFormText: "Vorm",
+            modeFormTitle: "Lülitu vormi redaktorile",
+            modeTextText: "Tekst",
+            modeTextTitle: "Lülitu lihtteksti redaktorile",
+            modeTreeText: "Puu",
+            modeTreeTitle: "Lülitu puu redaktorile",
+            modeViewText: "Vaade",
+            modeViewTitle: "Lülitu puu vaatele",
+            modePreviewText: "Eelvaade",
+            modePreviewTitle: "Lülitu eelvaate režiimile",
+            examples: "Näited",
+            default: "Vaikimisi",
+            containsInvalidProperties: "Sisaldab vigaseid omadusi",
+            containsInvalidItems: "Sisaldab vigaseid elemente",
+          },
+        },
       });
 
       editor.set(data);
@@ -73,26 +175,28 @@ const JsonEditorPoC: React.FC = () => {
 
   const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
-    
+
     try {
       const dragData = getDragData(e);
       if (dragData && jsonEditorRef.current) {
         // Extract just the value from the drag data
         const valueToReplace = dragData.value || dragData.data || dragData;
-        
+
         // Get the element under the cursor
         const element = document.elementFromPoint(e.clientX, e.clientY);
         if (element) {
           // Find the closest JSON editor node
-          const jsonNode = element.closest('.jsoneditor-value, .jsoneditor-field, .jsoneditor-string, .jsoneditor-number, .jsoneditor-boolean');
-          
+          const jsonNode = element.closest(
+            ".jsoneditor-value, .jsoneditor-field, .jsoneditor-string, .jsoneditor-number, .jsoneditor-boolean"
+          );
+
           if (jsonNode) {
             // Get the current JSON data
             const currentData = jsonEditorRef.current.get();
-            
+
             // Try to find the path to the dropped node
             const path = findNodePath(jsonNode, currentData);
-            
+
             if (path) {
               // Update the value at the specific path
               const newData = updateValueAtPath(currentData, path, valueToReplace);
@@ -111,32 +215,32 @@ const JsonEditorPoC: React.FC = () => {
   const findNodePath = (node: Element, data: any): string | null => {
     // This is a simplified approach - you might need to enhance this
     // based on the actual DOM structure of jsoneditor
-    
+
     // Look for data attributes or other identifiers
-    const fieldElement = node.closest('[data-path]');
+    const fieldElement = node.closest("[data-path]");
     if (fieldElement) {
-      return fieldElement.getAttribute('data-path');
+      return fieldElement.getAttribute("data-path");
     }
-    
+
     // Fallback: try to find by text content
     const textContent = node.textContent?.trim();
     if (textContent) {
       return findPathByValue(data, textContent);
     }
-    
+
     return null;
   };
 
   // Helper function to find path by value
-  const findPathByValue = (obj: any, value: string, currentPath = ''): string | null => {
+  const findPathByValue = (obj: any, value: string, currentPath = ""): string | null => {
     for (const key in obj) {
       const newPath = currentPath ? `${currentPath}.${key}` : key;
-      
+
       if (obj[key] === value) {
         return newPath;
       }
-      
-      if (typeof obj[key] === 'object' && obj[key] !== null) {
+
+      if (typeof obj[key] === "object" && obj[key] !== null) {
         const result = findPathByValue(obj[key], value, newPath);
         if (result) return result;
       }
@@ -146,10 +250,10 @@ const JsonEditorPoC: React.FC = () => {
 
   // Helper function to update value at a specific path
   const updateValueAtPath = (obj: any, path: string, newValue: any): any => {
-    const pathParts = path.split('.');
+    const pathParts = path.split(".");
     const newObj = { ...obj };
     let current = newObj;
-    
+
     // Navigate to the parent of the target
     for (let i = 0; i < pathParts.length - 1; i++) {
       if (current[pathParts[i]] === undefined) {
@@ -157,15 +261,15 @@ const JsonEditorPoC: React.FC = () => {
       }
       current = current[pathParts[i]];
     }
-    
+
     // Update the value at the target path
     const lastPart = pathParts[pathParts.length - 1];
     current[lastPart] = newValue;
-    
+
     return newObj;
   };
 
-    return (
+  return (
     <div
       ref={editorRef}
       onDragOver={handleDragOver}
