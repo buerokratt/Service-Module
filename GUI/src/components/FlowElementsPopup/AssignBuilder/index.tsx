@@ -32,7 +32,19 @@ const AssignBuilder: React.FC<AssignBuilderProps> = ({ onChange, seedGroup }) =>
         <AssignElement key={element.id} element={element} onRemove={remove} onChange={changeElement} />
       ))}
 
-      <JsonEditorPoC />
+      {/* JSON Editor PoC */}
+      <JsonEditorPoC
+        initialValue={{
+          example: "value",
+          nested: {
+            key: "value",
+            array: [1, 2, 3],
+          },
+        }}
+        onChange={(value: any) => {
+          console.log("JSON Editor changed:", value);
+        }}
+      />
     </Track>
   );
 };
