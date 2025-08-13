@@ -33,6 +33,7 @@
     "howler": "^2.2.4",
     "i18next": "^22.4.9",
     "i18next-browser-languagedetector": "^7.0.1",
+    "json-edit-react": "^1.28.2",
     "moment": "^2.29.4",
     "msw": "^0.49.2",
     "node-html-markdown": "^1.3.0",
