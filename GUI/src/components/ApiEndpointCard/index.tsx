@@ -8,6 +8,7 @@ import { RequestTab } from "../../types";
 import { EndpointData, EndpointEnv, EndpointTab } from "../../types/endpoint";
 import useServiceStore from "store/new-services.store";
 import { EndpointType } from "types/endpoint/endpoint-type";
+import { removeTrailingUnderscores } from "utils/string-util";
 
 type EndpointCardProps = {
   endpoint: EndpointData;
@@ -105,7 +106,7 @@ const ApiEndpointCard: FC<EndpointCardProps> = ({
                       const isNameExist = endpointsNames.includes(e.target.value);
                       setNameExists(isNameExist);
                       onNameExists?.(isNameExist);
-                      onNameChange?.(sanitizedValue.replace(/_+$/, ""));
+                      onNameChange?.(removeTrailingUnderscores(sanitizedValue));
                     }}
                   />
                   {nameExists && (
