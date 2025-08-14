@@ -3,10 +3,12 @@ import React, { useEffect, useRef, useState } from "react";
 import JSONEditor from "jsoneditor";
 import "jsoneditor/dist/jsoneditor.css";
 import { getDragData } from "utils/component-util";
+import styles from "./JsonEditorPoC.module.scss";
 
 const JsonEditorPoC: React.FC = () => {
   const editorRef = useRef<HTMLDivElement>(null);
   const jsonEditorRef = useRef<JSONEditor | null>(null);
+  const [hoveredElement, setHoveredElement] = useState<Element | null>(null);
   const [data, setData] = useState({
     name: "John Doe",
     age: 30,
@@ -27,25 +29,6 @@ const JsonEditorPoC: React.FC = () => {
       const editor = new JSONEditor(editorRef.current, {
         mode: "tree",
         modes: ["tree", "view", "form", "text", "code"],
-        onChangeJSON: (json: any) => {
-          console.log("JSON changed:", json);
-          setData(json);
-        },
-        onError: (error: any) => {
-          console.error("JSON Editor error:", error);
-        },
-        enableSort: true,
-        enableTransform: true,
-        search: true,
-        enableClipboard: true,
-        enableHistory: false,
-        enableNavigationBar: false,
-        enableStatusBar: false,
-        indentation: 2,
-        escapeUnicode: false,
-        sortObjectKeys: false,
-        colorPicker: true,
-        timestampTag: true,
         language: "et",
         languages: {
           et: {
@@ -169,12 +152,55 @@ const JsonEditorPoC: React.FC = () => {
     }
   }, [data]);
 
+  // Cleanup effect to remove highlight when component unmounts
+  useEffect(() => {
+    return () => {
+      if (hoveredElement) {
+        hoveredElement.classList.remove(styles.dragHoverHighlight);
+      }
+    };
+  }, [hoveredElement]);
+
   const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
+
+    // Get the element under the cursor
+    const element = document.elementFromPoint(e.clientX, e.clientY);
+    if (element) {
+      // Find the closest JSON editor node
+      const jsonNode = element.closest(
+        ".jsoneditor-value, .jsoneditor-field, .jsoneditor-string, .jsoneditor-number, .jsoneditor-boolean"
+      );
+
+      // Remove highlight from previously hovered element
+      if (hoveredElement && hoveredElement !== jsonNode) {
+        hoveredElement.classList.remove(styles.dragHoverHighlight);
+      }
+
+      // Add highlight to currently hovered element
+      if (jsonNode && jsonNode !== hoveredElement) {
+        jsonNode.classList.add(styles.dragHoverHighlight);
+        setHoveredElement(jsonNode);
+      }
+    }
+  };
+
+  const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
+    // Remove highlight when leaving the drop zone
+    if (hoveredElement) {
+      hoveredElement.classList.remove(styles.dragHoverHighlight);
+      setHoveredElement(null);
+    }
   };
 
   const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
+
+    // Clean up highlight
+    if (hoveredElement) {
+      hoveredElement.classList.remove(styles.dragHoverHighlight);
+      setHoveredElement(null);
+    }
 
     try {
       const dragData = getDragData(e);
@@ -212,10 +238,7 @@ const JsonEditorPoC: React.FC = () => {
   };
 
   // Helper function to find the path to a node in the JSON structure
-  const findNodePath = (node: Element, data: any): string | null => {
-    // This is a simplified approach - you might need to enhance this
-    // based on the actual DOM structure of jsoneditor
-
+  const findNodePath = (node: Element, data: unknown): string | null => {
     // Look for data attributes or other identifiers
     const fieldElement = node.closest("[data-path]");
     if (fieldElement) {
@@ -252,7 +275,7 @@ const JsonEditorPoC: React.FC = () => {
   const updateValueAtPath = (obj: any, path: string, newValue: any): any => {
     const pathParts = path.split(".");
     const newObj = { ...obj };
-    let current = newObj;
+    let current: any = newObj;
 
     // Navigate to the parent of the target
     for (let i = 0; i < pathParts.length - 1; i++) {
@@ -273,6 +296,7 @@ const JsonEditorPoC: React.FC = () => {
     <div
       ref={editorRef}
       onDragOver={handleDragOver}
+      onDragLeave={handleDragLeave}
       onDrop={handleDrop}
       style={{
         height: "400px",
