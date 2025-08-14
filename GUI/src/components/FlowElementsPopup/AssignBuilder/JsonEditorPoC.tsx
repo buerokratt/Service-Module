@@ -226,9 +226,9 @@ const JsonEditorPoC: React.FC = () => {
 
             if (path) {
               // Update the value at the specific path
-              const newData = updateValueAtPath(currentData, path, valueToReplace);
+              const newData = updateValueAtPath(currentData as Record<string, unknown>, path, valueToReplace);
               jsonEditorRef.current.set(newData);
-              setData(newData);
+              setData(newData as typeof data);
             }
           }
         }
@@ -239,7 +239,7 @@ const JsonEditorPoC: React.FC = () => {
   };
 
   // Helper function to find the path to a node in the JSON structure
-  const findNodePath = (node: Element, data: unknown): string | null => {
+  const findNodePath = (node: Element, data: Record<string, unknown>): string | null => {
     // Look for data attributes or other identifiers
     const fieldElement = node.closest("[data-path]");
     if (fieldElement) {
@@ -256,7 +256,7 @@ const JsonEditorPoC: React.FC = () => {
   };
 
   // Helper function to find path by value
-  const findPathByValue = (obj: any, value: string, currentPath = ""): string | null => {
+  const findPathByValue = (obj: Record<string, unknown>, value: string, currentPath = ""): string | null => {
     for (const key in obj) {
       const newPath = currentPath ? `${currentPath}.${key}` : key;
 
@@ -265,7 +265,7 @@ const JsonEditorPoC: React.FC = () => {
       }
 
       if (typeof obj[key] === "object" && obj[key] !== null) {
-        const result = findPathByValue(obj[key], value, newPath);
+        const result = findPathByValue(obj[key] as Record<string, unknown>, value, newPath);
         if (result) return result;
       }
     }
@@ -273,17 +273,21 @@ const JsonEditorPoC: React.FC = () => {
   };
 
   // Helper function to update value at a specific path
-  const updateValueAtPath = (obj: any, path: string, newValue: any): any => {
+  const updateValueAtPath = (
+    obj: Record<string, unknown>,
+    path: string,
+    newValue: unknown
+  ): Record<string, unknown> => {
     const pathParts = path.split(".");
     const newObj = { ...obj };
-    let current: any = newObj;
+    let current: Record<string, unknown> = newObj;
 
     // Navigate to the parent of the target
     for (let i = 0; i < pathParts.length - 1; i++) {
       if (current[pathParts[i]] === undefined) {
         current[pathParts[i]] = {};
       }
-      current = current[pathParts[i]];
+      current = current[pathParts[i]] as Record<string, unknown>;
     }
 
     // Update the value at the target path
