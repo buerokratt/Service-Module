@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
+// todo why?
 // @ts-ignore
 import JSONEditor from "jsoneditor";
 import "jsoneditor/dist/jsoneditor.css";
@@ -11,7 +12,7 @@ const JsonEditorPoC: React.FC = () => {
   const [hoveredElement, setHoveredElement] = useState<Element | null>(null);
   const [data, setData] = useState({
     name: "John Doe",
-    age: 30,
+    age: "30",
     email: "john@example.com",
     address: {
       street: "123 Main St",
