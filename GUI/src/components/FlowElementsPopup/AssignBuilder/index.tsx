@@ -5,7 +5,7 @@ import AssignElement from "./assignElement";
 import { useAssignBuilder } from "./useAssignBuilder";
 import "../styles.scss";
 import { Assign } from "../../../types/assign";
-import JsonEditorPoC from "./JsonEditorPoC";
+import ObjectTree from "./ObjectTree";
 
 interface AssignBuilderProps {
   onChange: (group: Assign[]) => void;
@@ -32,7 +32,7 @@ const AssignBuilder: React.FC<AssignBuilderProps> = ({ onChange, seedGroup }) =>
         <AssignElement key={element.id} element={element} onRemove={remove} onChange={changeElement} />
       ))}
 
-      <JsonEditorPoC />
+      <ObjectTree />
     </Track>
   );
 };

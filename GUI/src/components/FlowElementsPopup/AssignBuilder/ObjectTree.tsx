@@ -4,9 +4,9 @@ import React, { useEffect, useRef, useState } from "react";
 import JSONEditor from "jsoneditor";
 import "jsoneditor/dist/jsoneditor.css";
 import { getDragData } from "utils/component-util";
-import styles from "./JsonEditorPoC.module.scss";
+import styles from "./ObjectTree.module.scss";
 
-const JsonEditorPoC: React.FC = () => {
+const ObjectTree: React.FC = () => {
   const editorRef = useRef<HTMLDivElement>(null);
   const jsonEditorRef = useRef<JSONEditor | null>(null);
   const [hoveredElement, setHoveredElement] = useState<Element | null>(null);
@@ -312,4 +312,4 @@ const JsonEditorPoC: React.FC = () => {
   );
 };
 
-export default JsonEditorPoC;
+export default ObjectTree;
