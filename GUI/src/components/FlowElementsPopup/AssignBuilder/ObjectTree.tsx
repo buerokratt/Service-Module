@@ -11,7 +11,7 @@ const findNodePath = (node: Element, data: Record<string, unknown>): string | nu
   // Try to find by text content (for values)
   const textContent = node.textContent?.trim();
   if (textContent) {
-    const path = searchInCollection(data, textContent, "", Array.isArray(data));
+    const path = searchInCollection(data, textContent);
     return path;
   }
 
@@ -30,15 +30,12 @@ const isValueMatch = (objValue: unknown, value: string): boolean => {
 };
 
 // Helper function to search for value in a collection
-const searchInCollection = (
-  collection: Record<string, unknown> | unknown[],
-  value: string,
-  currentPath: string,
-  isArray: boolean,
-): string | null => {
+const searchInCollection = (collection: object, value: string, currentPath = ""): string | null => {
+  const isArray = Array.isArray(collection);
+
   const entries = isArray
-    ? (collection as unknown[]).map((value, index) => ({ key: index, value }))
-    : Object.entries(collection as Record<string, unknown>).map(([key, value]) => ({ key, value }));
+    ? collection.map((value, index) => ({ key: index, value }))
+    : Object.entries(collection).map(([key, value]) => ({ key, value }));
 
   for (const { key, value: objValue } of entries) {
     const newPath = currentPath
@@ -52,12 +49,7 @@ const searchInCollection = (
     if (isValueMatch(objValue, value)) return newPath;
 
     if (isObject(objValue)) {
-      const result = searchInCollection(
-        objValue as Record<string, unknown> | unknown[],
-        value,
-        newPath,
-        Array.isArray(objValue),
-      );
+      const result = searchInCollection(objValue, value, newPath);
       if (result) return result;
     }
   }
