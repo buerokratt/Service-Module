@@ -8,6 +8,7 @@ import { RequestTab } from "../../types";
 import { EndpointData, EndpointEnv, EndpointTab } from "../../types/endpoint";
 import useServiceStore from "store/new-services.store";
 import { EndpointType } from "types/endpoint/endpoint-type";
+import { removeTrailingUnderscores } from "utils/string-util";
 
 type EndpointCardProps = {
   endpoint: EndpointData;
@@ -88,10 +89,16 @@ const ApiEndpointCard: FC<EndpointCardProps> = ({
                     name="endpointName"
                     label=""
                     placeholder={t("newService.endpoint.insertName").toString()}
+                    maxLength={30}
                     value={endpointName}
                     disabled={isNameDisabled || selectedTab === EndpointEnv.Test}
                     onChange={(e) => {
-                      setEndpointName(e.target.value);
+                      const sanitizedValue = e.target.value
+                        .replace(/[^a-zA-Z0-9_\s]/g, "")
+                        .replace(/\s+/g, "_")
+                        .replace(/_+/g, "_");  
+
+                      setEndpointName(sanitizedValue);
                       const endpointsNames = useServiceStore
                         .getState()
                         .endpoints.map((ep) => ep.name)
@@ -99,7 +106,7 @@ const ApiEndpointCard: FC<EndpointCardProps> = ({
                       const isNameExist = endpointsNames.includes(e.target.value);
                       setNameExists(isNameExist);
                       onNameExists?.(isNameExist);
-                      onNameChange?.(e.target.value);
+                      onNameChange?.(removeTrailingUnderscores(sanitizedValue));
                     }}
                   />
                   {nameExists && (
