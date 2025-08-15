@@ -8,13 +8,42 @@ import styles from "./ObjectTree.module.scss";
 
 // Helper function to find the path to a node in the JSON structure
 const findNodePath = (node: Element, data: Record<string, unknown>): string | null => {
+  console.log("findNodePath called with node:", node.outerHTML);
+
   // Try to find by text content (for values)
   const textContent = node.textContent?.trim();
   if (textContent) {
+    console.log("Searching for text content:", textContent);
     const path = searchInCollection(data, textContent);
+    console.log("Found path for text content:", path);
     return path;
   }
 
+  // Try to find by field name if it's a field node
+  const fieldNameElement = node.querySelector(".jsoneditor-field-name");
+  if (fieldNameElement) {
+    const fieldName = fieldNameElement.textContent?.trim();
+    console.log("Found field name:", fieldName);
+    if (fieldName) {
+      // For field names, we need to find the parent object and then the field
+      const parentNode = node.closest(".jsoneditor-field");
+      if (parentNode) {
+        const parentText = parentNode.textContent?.trim();
+        console.log("Parent text:", parentText);
+        if (parentText) {
+          const parentPath = searchInCollection(data, parentText);
+          console.log("Parent path:", parentPath);
+          if (parentPath) {
+            const fullPath = `${parentPath}.${fieldName}`;
+            console.log("Full path:", fullPath);
+            return fullPath;
+          }
+        }
+      }
+    }
+  }
+
+  console.log("No path found");
   return null;
 };
 
@@ -32,6 +61,7 @@ const isValueMatch = (objValue: unknown, value: string): boolean => {
 // Helper function to search for value in a collection
 const searchInCollection = (collection: object, value: string, currentPath = ""): string | null => {
   const isArray = Array.isArray(collection);
+  console.log("searchInCollection:", { collection, value, currentPath, isArray });
 
   const entries = isArray
     ? collection.map((value, index) => ({ key: index, value }))
@@ -45,6 +75,8 @@ const searchInCollection = (collection: object, value: string, currentPath = "")
       : isArray
         ? `[${key}]`
         : String(key);
+
+    console.log("Checking path:", newPath, "value:", objValue, "matches:", isValueMatch(objValue, value));
 
     if (isValueMatch(objValue, value)) return newPath;
 
@@ -64,28 +96,28 @@ const ObjectTree: React.FC = () => {
   const [hoveredElement, setHoveredElement] = useState<Element | null>(null);
 
   const jsonEditor = t("jsonEditor", { returnObjects: true });
-  const [data, setData] = useState<Record<string, unknown> | unknown[]>([
-    {
-      name: "John Doe",
-      age: 30,
-      email: "john@example.com",
-      address: {
-        street: "123 Main St",
-        city: "Anytown",
-        zip: "12345",
-      },
-      preferences: {
-        theme: "dark",
-        notifications: true,
-      },
-      hobbies: ["reading", "gaming", "coding"],
-      scores: [85, 92, 78],
+  const [data, setData] = useState<Record<string, unknown> | unknown[]>({
+    name: "John Doe",
+    age: 30,
+    email: "john@example.com",
+    address: {
+      street: "123 Main St",
+      city: "Anytown",
+      zip: "12345",
     },
-  ]);
+    preferences: {
+      theme: "dark",
+      notifications: true,
+    },
+    hobbies: ["reading", "gaming", "coding"],
+    scores: [85, 92, { test: "test value" }, 78],
+  });
 
   useEffect(() => {
     if (editorRef.current && !jsonEditorRef.current) {
       const editor = new JSONEditor(editorRef.current, {
+        // todo remove?
+        modes: ["tree", "code"],
         language: i18n.language,
         languages: {
           [i18n.language]: jsonEditor,
@@ -125,8 +157,10 @@ const ObjectTree: React.FC = () => {
     // Get the element under the cursor
     const element = document.elementFromPoint(e.clientX, e.clientY);
     if (element) {
-      // Find the closest JSON editor node
-      const jsonNode = element.closest(".jsoneditor-value");
+      // Find the closest JSON editor node - improved selectors for all data types
+      const jsonNode = element.closest(
+        ".jsoneditor-value, .jsoneditor-field, .jsoneditor-string, .jsoneditor-number, .jsoneditor-boolean, .jsoneditor-null, .jsoneditor-object, .jsoneditor-array",
+      );
 
       // Remove highlight from previously hovered element
       if (hoveredElement && hoveredElement !== jsonNode) {
@@ -167,8 +201,10 @@ const ObjectTree: React.FC = () => {
         // Get the element under the cursor
         const element = document.elementFromPoint(e.clientX, e.clientY);
         if (element) {
-          // Find the closest JSON editor node
-          const jsonNode = element.closest(".jsoneditor-value");
+          // Find the closest JSON editor node - improved selectors for all data types
+          const jsonNode = element.closest(
+            ".jsoneditor-value, .jsoneditor-field, .jsoneditor-string, .jsoneditor-number, .jsoneditor-boolean, .jsoneditor-null, .jsoneditor-object, .jsoneditor-array",
+          );
 
           if (jsonNode) {
             // Get the current JSON data
@@ -178,10 +214,14 @@ const ObjectTree: React.FC = () => {
             const path = findNodePath(jsonNode, currentData);
 
             if (path) {
+              console.log("Found path:", path, "for value:", valueToReplace);
               // Update the value at the specific path
               const newData = updateValueAtPath(currentData, path, valueToReplace);
               jsonEditorRef.current.set(newData);
               setData(newData);
+            } else {
+              console.log("Could not find path for node:", jsonNode.textContent);
+              console.log("Node structure:", jsonNode.outerHTML);
             }
           }
         }

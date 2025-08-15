@@ -69,7 +69,7 @@ export const isArray = (x: unknown) => {
 };
 
 export const getTypeColor = (
-  value: unknown
+  value: unknown,
 ): { type: "null/undefined" | "string" | "number" | "date" | "array" | "object" | "unknown"; color: string } => {
   switch (true) {
     case value === null || value === undefined:
@@ -134,7 +134,7 @@ const parsePath = (path: string): (string | number)[] => {
 export const updateValueAtPath = (
   obj: Record<string, unknown> | unknown[],
   path: string,
-  newValue: unknown
+  newValue: unknown,
 ): Record<string, unknown> | unknown[] => {
   const pathParts = parsePath(path);
   const newObj = Array.isArray(obj) ? [...obj] : { ...obj };
@@ -143,8 +143,15 @@ export const updateValueAtPath = (
   // Navigate to the parent of the target
   for (let i = 0; i < pathParts.length - 1; i++) {
     const part = pathParts[i];
+    const nextPart = pathParts[i + 1];
+
     if (current[part] === undefined) {
-      current[part] = {};
+      // Check if the next part is a number (array index) or string (object key)
+      if (typeof nextPart === "number") {
+        current[part] = [];
+      } else {
+        current[part] = {};
+      }
     }
     current = current[part];
   }
