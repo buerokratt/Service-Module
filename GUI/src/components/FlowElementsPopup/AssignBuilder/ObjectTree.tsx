@@ -6,6 +6,7 @@ import "jsoneditor/dist/jsoneditor.css";
 import { getDragData } from "utils/component-util";
 import styles from "./ObjectTree.module.scss";
 
+// todo remove logs
 // Helper function to find the path to a node in the JSON structure
 const findNodePath = (node: Element, data: Record<string, unknown>): string | null => {
   console.log("Finding path for node:", node.className, node.textContent);
