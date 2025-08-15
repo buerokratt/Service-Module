@@ -4,6 +4,7 @@ import React, { useEffect, useRef, useState } from "react";
 import JSONEditor from "jsoneditor";
 import "jsoneditor/dist/jsoneditor.css";
 import { getDragData } from "utils/component-util";
+import { updateValueAtPath } from "utils/object-util";
 import styles from "./ObjectTree.module.scss";
 
 // todo bug: open tree closes on drop
@@ -78,69 +79,6 @@ const searchInCollection = (
 // Helper function to find path by value
 const findPathByValue = (obj: Record<string, unknown> | unknown[], value: string, currentPath = ""): string | null => {
   return searchInCollection(obj, value, currentPath, Array.isArray(obj));
-};
-
-// Helper function to parse path into parts
-const parsePath = (path: string): (string | number)[] => {
-  const pathParts: (string | number)[] = [];
-  let currentPath = path;
-
-  while (currentPath.length > 0) {
-    // First, check for array index at the beginning
-    const arrayMatch = currentPath.match(/^\[(\d+)\]/);
-    if (arrayMatch) {
-      pathParts.push(parseInt(arrayMatch[1]));
-      currentPath = currentPath.substring(arrayMatch[0].length);
-      continue;
-    }
-
-    // Then check for property name followed by array index
-    const propertyArrayMatch = currentPath.match(/^([^.\[\]]+)\[(\d+)\]/);
-    if (propertyArrayMatch) {
-      pathParts.push(propertyArrayMatch[1]); // property name
-      pathParts.push(parseInt(propertyArrayMatch[2])); // array index
-      currentPath = currentPath.substring(propertyArrayMatch[0].length);
-      continue;
-    }
-
-    // Check for dot notation
-    const dotIndex = currentPath.indexOf(".");
-    if (dotIndex === -1) {
-      pathParts.push(currentPath);
-      break;
-    } else {
-      pathParts.push(currentPath.substring(0, dotIndex));
-      currentPath = currentPath.substring(dotIndex + 1);
-    }
-  }
-
-  return pathParts;
-};
-
-// Helper function to update value at a specific path
-const updateValueAtPath = (
-  obj: Record<string, unknown> | unknown[],
-  path: string,
-  newValue: unknown
-): Record<string, unknown> | unknown[] => {
-  const pathParts = parsePath(path);
-  const newObj = Array.isArray(obj) ? [...obj] : { ...obj };
-  let current: any = newObj;
-
-  // Navigate to the parent of the target
-  for (let i = 0; i < pathParts.length - 1; i++) {
-    const part = pathParts[i];
-    if (current[part] === undefined) {
-      current[part] = {};
-    }
-    current = current[part];
-  }
-
-  // Update the value at the target path
-  const lastPart = pathParts[pathParts.length - 1];
-  current[lastPart] = newValue;
-
-  return newObj;
 };
 
 const ObjectTree: React.FC = () => {
