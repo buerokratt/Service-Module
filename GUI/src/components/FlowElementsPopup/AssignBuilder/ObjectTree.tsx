@@ -30,26 +30,15 @@ const findPathByValue = (obj: Record<string, unknown>, value: string, currentPat
     const newPath = currentPath ? `${currentPath}.${key}` : key;
     const objValue = obj[key];
 
-    // Handle different value types
-    if (objValue === value) {
-      return newPath;
-    }
+    // Check if values match (handling different types)
+    const isMatch =
+      objValue === value ||
+      (typeof objValue === "number" && !isNaN(Number(value)) && objValue === Number(value)) ||
+      (typeof objValue === "boolean" &&
+        objValue === (value.toLowerCase() === "true" ? true : value.toLowerCase() === "false" ? false : null)) ||
+      (objValue === null && value.toLowerCase() === "null");
 
-    // Handle number comparison
-    if (typeof objValue === "number" && !isNaN(Number(value)) && objValue === Number(value)) {
-      return newPath;
-    }
-
-    // Handle boolean comparison
-    if (typeof objValue === "boolean") {
-      const boolValue = value.toLowerCase() === "true" ? true : value.toLowerCase() === "false" ? false : null;
-      if (objValue === boolValue) {
-        return newPath;
-      }
-    }
-
-    // Handle null comparison
-    if (objValue === null && value.toLowerCase() === "null") {
+    if (isMatch) {
       return newPath;
     }
 
