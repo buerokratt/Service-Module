@@ -15,7 +15,6 @@ import { getHelperTooltips } from "utils/constants";
 import { datesVariables, environmentVariables, helperVariables } from "resources/variables-constants";
 import { Node, Edge } from "@xyflow/react";
 import { NodeDataProps } from "types/service-flow";
-import { name } from "react-quill";
 
 type PreviousVariablesProps = {
   readonly nodeId: string;

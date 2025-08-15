@@ -215,8 +215,10 @@ const ObjectTree: React.FC = () => {
 
             if (path) {
               console.log("Found path:", path, "for value:", valueToReplace);
+              console.log("About to call updateValueAtPath with currentData:", currentData);
               // Update the value at the specific path
               const newData = updateValueAtPath(currentData, path, valueToReplace);
+              console.log("updateValueAtPath returned:", newData);
               jsonEditorRef.current.set(newData);
               setData(newData);
             } else {
