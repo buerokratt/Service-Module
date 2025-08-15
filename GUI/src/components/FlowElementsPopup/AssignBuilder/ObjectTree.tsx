@@ -85,8 +85,6 @@ const searchInCollection = (
   return null;
 };
 
-// todo inline?
-
 const ObjectTree: React.FC = () => {
   const editorRef = useRef<HTMLDivElement>(null);
   const jsonEditorRef = useRef<JSONEditor | null>(null);
