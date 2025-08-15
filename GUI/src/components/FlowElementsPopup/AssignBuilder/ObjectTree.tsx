@@ -71,24 +71,25 @@ const ObjectTree: React.FC = () => {
   const jsonEditorRef = useRef<JSONEditor | null>(null);
   const [hoveredElement, setHoveredElement] = useState<Element | null>(null);
 
-  // Get all JSONEditor translations as an object
   const jsonEditor = t("jsonEditor", { returnObjects: true });
-  const [data, setData] = useState({
-    name: "John Doe",
-    age: 30,
-    email: "john@example.com",
-    address: {
-      street: "123 Main St",
-      city: "Anytown",
-      zip: "12345",
+  const [data, setData] = useState<Record<string, unknown> | unknown[]>([
+    {
+      name: "John Doe",
+      age: 30,
+      email: "john@example.com",
+      address: {
+        street: "123 Main St",
+        city: "Anytown",
+        zip: "12345",
+      },
+      preferences: {
+        theme: "dark",
+        notifications: true,
+      },
+      hobbies: ["reading", "gaming", "coding"],
+      scores: [85, 92, 78],
     },
-    preferences: {
-      theme: "dark",
-      notifications: true,
-    },
-    hobbies: ["reading", "gaming", "coding"],
-    scores: [85, 92, 78],
-  });
+  ]);
 
   useEffect(() => {
     if (editorRef.current && !jsonEditorRef.current) {
@@ -132,10 +133,8 @@ const ObjectTree: React.FC = () => {
     // Get the element under the cursor
     const element = document.elementFromPoint(e.clientX, e.clientY);
     if (element) {
-      // Find the closest JSON editor node - improved selectors for all data types
-      const jsonNode = element.closest(
-        ".jsoneditor-value, .jsoneditor-field, .jsoneditor-string, .jsoneditor-number, .jsoneditor-boolean, .jsoneditor-null, .jsoneditor-object, .jsoneditor-array",
-      );
+      // Find the closest JSON editor node
+      const jsonNode = element.closest(".jsoneditor-value");
 
       // Remove highlight from previously hovered element
       if (hoveredElement && hoveredElement !== jsonNode) {
@@ -171,15 +170,13 @@ const ObjectTree: React.FC = () => {
       const dragData = getDragData(e);
       if (dragData && jsonEditorRef.current) {
         // Extract just the value from the drag data
-        const valueToReplace = dragData.value || dragData.data || dragData;
+        const valueToReplace = dragData.value;
 
         // Get the element under the cursor
         const element = document.elementFromPoint(e.clientX, e.clientY);
         if (element) {
           // Find the closest JSON editor node
-          const jsonNode = element.closest(
-            ".jsoneditor-value, .jsoneditor-field, .jsoneditor-string, .jsoneditor-number, .jsoneditor-boolean, .jsoneditor-null, .jsoneditor-object, .jsoneditor-array",
-          );
+          const jsonNode = element.closest(".jsoneditor-value");
 
           if (jsonNode) {
             // Get the current JSON data
@@ -190,9 +187,9 @@ const ObjectTree: React.FC = () => {
 
             if (path) {
               // Update the value at the specific path
-              const newData = updateValueAtPath(currentData as Record<string, unknown>, path, valueToReplace);
+              const newData = updateValueAtPath(currentData, path, valueToReplace);
               jsonEditorRef.current.set(newData);
-              setData(newData as typeof data);
+              setData(newData);
             }
           }
         }
