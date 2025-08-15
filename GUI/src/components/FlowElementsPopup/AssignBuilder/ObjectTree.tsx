@@ -125,10 +125,7 @@ const ObjectTree: React.FC = () => {
     // Get the element under the cursor
     const element = document.elementFromPoint(e.clientX, e.clientY);
     if (element) {
-      // Find the closest JSON editor node - improved selectors for all data types
-      const jsonNode = element.closest(
-        ".jsoneditor-value, .jsoneditor-field, .jsoneditor-string, .jsoneditor-number, .jsoneditor-boolean, .jsoneditor-null, .jsoneditor-object, .jsoneditor-array",
-      );
+      const jsonNode = element.closest(".jsoneditor-value");
 
       // Remove highlight from previously hovered element
       if (hoveredElement && hoveredElement !== jsonNode) {
@@ -169,10 +166,7 @@ const ObjectTree: React.FC = () => {
         // Get the element under the cursor
         const element = document.elementFromPoint(e.clientX, e.clientY);
         if (element) {
-          // Find the closest JSON editor node - improved selectors for all data types
-          const jsonNode = element.closest(
-            ".jsoneditor-value, .jsoneditor-field, .jsoneditor-string, .jsoneditor-number, .jsoneditor-boolean, .jsoneditor-null, .jsoneditor-object, .jsoneditor-array",
-          );
+          const jsonNode = element.closest(".jsoneditor-value");
 
           if (jsonNode) {
             // Get the current JSON data
