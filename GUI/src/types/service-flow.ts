@@ -1,3 +1,4 @@
+import { DynamicChoices } from "./dynamic-choices";
 import { EndpointData } from "./endpoint";
 import { MultiChoiceQuestion } from "./multi-choice-question";
 import { StepType } from "./step-type.enum";
@@ -24,6 +25,7 @@ export type NodeDataProps = {
   rules?: any;
   assignElements?: any;
   multiChoiceQuestion?: MultiChoiceQuestion;
+  dynamicChoices?: DynamicChoices;
   childrenCount?: number;
   endpoint?: EndpointData
 };

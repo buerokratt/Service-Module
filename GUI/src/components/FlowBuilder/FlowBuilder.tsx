@@ -17,11 +17,20 @@ type FlowBuilderProps = {
 
 const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
   useLayout();
-  const { getNodes, getEdges, setNodes, setEdges } = useReactFlow();
+  const { getNodes, getEdges, setNodes, setEdges, getNode } = useReactFlow();
   const setReactFlowInstance = useServiceStore((state) => state.setReactFlowInstance);
   const { t } = useTranslation();
-  const { onNodesDelete, onEdgesDelete, isDeleteConnectionsModalVisible, setIsDeleteConnectionsModalVisible, onDeleteConfirmed, onKeepItConfirmed, hasConnectedNodes, setDeletedNodes } =
-    useOnNodesDelete();
+  const {
+    onNodesDelete,
+    onEdgesDelete,
+    isDeleteConnectionsModalVisible,
+    setIsDeleteConnectionsModalVisible,
+    onDeleteConfirmed,
+    onKeepItConfirmed,
+    hasConnectedNodes,
+    setDeletedNodes,
+    setNodeToDelete,
+  } = useOnNodesDelete();
     const { setHasUnsavedChanges } = useServiceStore();
 
   const onConnect = useCallback(({ source, target }: any) => {
@@ -60,9 +69,16 @@ const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
   }, []);
 
   const onBeforeDelete = useCallback(
-    async ({ nodes: nodesToDelete }: { nodes: Node[]; edges: Edge[] }) => {
+    async ({ nodes: nodesToDelete, edges: edgesToDelete }: { nodes: Node[]; edges: Edge[] }) => {
       setDeletedNodes(null);
       try {
+        if (edgesToDelete.length > 0 && nodesToDelete.length === 0) {
+          const shouldPreventDelete = getNode(edgesToDelete[0].source)?.data.stepType === StepType.MultiChoiceQuestion;
+          if (shouldPreventDelete) {
+            return false;
+          }
+        }
+
         if (nodesToDelete.length === 0 || 
           ![StepType.MultiChoiceQuestion, StepType.Condition, StepType.Input]
             .includes(nodesToDelete[0]?.data.stepType as StepType)) return true;
@@ -118,7 +134,10 @@ const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
         <Controls orientation="horizontal" showInteractive={false} />
       </ReactFlow>
       {isDeleteConnectionsModalVisible && (
-        <Modal title={t("overview.popup.deleteNodeConnections")} onClose={onKeepItConfirmed}>
+        <Modal title={t("overview.popup.deleteNodeConnections")} onClose={() => {
+          setNodeToDelete(null);
+          setIsDeleteConnectionsModalVisible(false);
+        }}>
           <Track justify="end" gap={16}>
             <Button appearance="primary" onClick={onDeleteConfirmed}>
               {t("global.delete")}

@@ -10,7 +10,7 @@ import { StepType } from "types";
 import { EndpointData, EndpointVariableData } from "types/endpoint";
 import api from "../services/api-dev";
 import { NodeDataProps } from "types/service-flow";
-import { getLastDigits, removeTrailingUnderscores, toSnakeCase } from "utils/string-util";
+import { getLastDigits, removeTrailingUnderscores, stringToArray, toSnakeCase } from "utils/string-util";
 import { format } from "date-fns";
 import { AxiosError } from "axios";
 
@@ -353,6 +353,10 @@ function getYamlContent(nodes: Node[], edges: Edge[], name: string, description:
         return handleMultiChoiceQuestion(finishedFlow, parentStepName, parentNode, childNode);
       }
 
+      if (parentNode.data.stepType === StepType.DynamicChoices) {
+        return handleDynamicChoices(finishedFlow, parentStepName, parentNode, childNode);
+      }
+
       if (parentNode.data.stepType === StepType.UserDefined) {
         return handleEndpointStep(parentNode, finishedFlow, parentStepName, childNode);
       }
@@ -529,7 +533,7 @@ function handleEndpointStep(
   const methodType = endpointDefinition?.methodType?.toLowerCase();
 
   const stepConfig: any = {
-    call: `http.${methodType}`,
+    call: `http.${methodType ?? 'post'}`,
     args: {
       url: endpointDefinition?.url?.split("?")[0] ?? "",
     },
@@ -573,6 +577,37 @@ function handleMultiChoiceQuestion(
       res: {
         result: parentNode?.data?.multiChoiceQuestion?.question ?? "",
       },
+    },
+    next: childNode ? toSnakeCase(childNode.data.label ?? "format_messages") : "format_messages",
+  });
+}
+
+function handleDynamicChoices(
+  finishedFlow: Map<any, any>,
+  parentStepName: string,
+  parentNode: Node<NodeDataProps>,
+  childNode: Node<NodeDataProps> | undefined
+) {
+  const list = parentNode.data.dynamicChoices?.list ?? "";
+  finishedFlow.set(parentStepName, {
+    call: "http.post",
+    args: {
+      url: "[#SERVICE_DMAPPER]/generate/buttons-list",
+      body: {
+        list: stringToArray(list, list),
+        service_name: parentNode.data.dynamicChoices?.serviceName ?? "",
+        key: parentNode.data.dynamicChoices?.key ?? "",
+        payload_prefix: "#service, /POST/",
+        payload_keys: parentNode.data.dynamicChoices?.payloadKeys.split(",") ?? [],
+      },
+    },
+    result: "dynamic_choices_res",
+    next: "assign_dynamic_choices_buttons",
+  });
+
+  return finishedFlow.set("assign_dynamic_choices_buttons", {
+    assign: {
+      buttons: "${dynamic_choices_res.response.body.response ?? []}",
     },
     next: childNode ? toSnakeCase(childNode.data.label ?? "format_messages") : "format_messages",
   });

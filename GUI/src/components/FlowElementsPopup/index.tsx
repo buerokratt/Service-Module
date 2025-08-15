@@ -33,6 +33,8 @@ import useServiceListStore from "store/services.store";
 import api from "../../services/api-dev";
 import { EndpointData } from "types/endpoint";
 import useToastStore from "store/toasts.store";
+import { DynamicChoices } from "types/dynamic-choices";
+import DynamicChoicesContent from "./DynamicChoicesContent";
 
 const FlowElementsPopup: React.FC = () => {
   const { t } = useTranslation();
@@ -54,19 +56,26 @@ const FlowElementsPopup: React.FC = () => {
   const defaultMultiChoiceQuestionButtons = [
     {
       id: "1",
-      title: "Yes",
+      title: "Jah",
       payload: `#service, /${selectedService?.type ?? "POST"}/services/active/${serviceName}_mcq_${
         node?.data.label[node?.data.label.length - 1]
       }_0`,
     },
     {
       id: "2",
-      title: "No",
+      title: "Ei",
       payload: `#service, /${selectedService?.type ?? "POST"}/services/active/${serviceName}_mcq_${
         node?.data.label[node?.data.label.length - 1]
       }_1`,
     },
   ];
+
+  const defaultDynamicChoices: DynamicChoices = {
+    list: "",
+    serviceName: "",
+    key: "",
+    payloadKeys: "",
+  };
 
   useEffect(() => {
     if (node) node.data.rules = rules;
@@ -94,34 +103,51 @@ const FlowElementsPopup: React.FC = () => {
   const [multiChoiceQuestionButtons, setMultiChoiceQuestionButtons] = useState<MultiChoiceQuestionButton[]>(
     node?.data.multiChoiceQuestion?.buttons ?? defaultMultiChoiceQuestionButtons
   );
+  const [dynamicChoices, setDynamicChoices] = useState<DynamicChoices>(
+    node?.data.dynamicChoices ?? defaultDynamicChoices
+  );
 
   const [nodeEndpoint, setNodeEndpoint] = useState<EndpointData | undefined>(node?.data.endpoint);
+  const [title, setTitle] = useState(node?.data.label ?? "");
+  const [titleError, setTitleError] = useState<string | undefined>(undefined);
 
   const stepType = node?.data.stepType;
 
   useEffect(() => {
-    if (stepType !== StepType.Input && stepType !== StepType.Condition) return;
-    if (!node?.data?.rules) return;
-
-    useServiceStore.getState().changeRulesNode(node.data.rules);
-  }, [stepType === StepType.Input, stepType === StepType.Condition]);
-
-  useEffect(() => {
-    if (stepType !== StepType.Assign) return;
-    if (!node?.data?.assignElements) return;
-
-    useServiceStore.getState().changeAssignNode(node.data.assignElements);
-  }, [stepType === StepType.Assign]);
-
-  useEffect(() => {
     if (!node) return;
-    setMultiChoiceQuestionQuestion(node?.data?.multiChoiceQuestion?.question ?? "");
-    setMultiChoiceQuestionButtons(node?.data?.multiChoiceQuestion?.buttons ?? defaultMultiChoiceQuestionButtons);
-  }, [stepType === StepType.MultiChoiceQuestion]);
+
+    setTitle(node.data.label ?? "");
+
+    switch (stepType) {
+      case StepType.Input:
+      case StepType.Condition:
+        if (node.data?.rules) {
+          useServiceStore.getState().changeRulesNode(node.data.rules);
+        }
+        break;
+
+      case StepType.Assign:
+        if (node.data?.assignElements) {
+          useServiceStore.getState().changeAssignNode(node.data.assignElements);
+        }
+        break;
+
+      case StepType.MultiChoiceQuestion:
+        setMultiChoiceQuestionQuestion(node.data?.multiChoiceQuestion?.question ?? "");
+        setMultiChoiceQuestionButtons(node.data?.multiChoiceQuestion?.buttons ?? defaultMultiChoiceQuestionButtons);
+        break;
+
+      case StepType.DynamicChoices:
+        setDynamicChoices(node.data?.dynamicChoices ?? defaultDynamicChoices);
+        break;
+
+      default:
+        break;
+    }
+  }, [stepType]);
 
   if (!node) return <></>;
 
-  const title = node.data.label;
   const isReadonly = node.data.readonly;
 
   const onClose = () => {
@@ -136,6 +162,8 @@ const FlowElementsPopup: React.FC = () => {
     setTextfieldMessagePlaceholders({});
     setMultiChoiceQuestionQuestion("");
     setMultiChoiceQuestionButtons(defaultMultiChoiceQuestionButtons);
+    setIsSaveEnabled(true);
+    setDynamicChoices(defaultDynamicChoices);
     useServiceStore.getState().resetSelectedNode();
     useServiceStore.getState().resetRules();
     useServiceStore.getState().resetAssign();
@@ -146,6 +174,7 @@ const FlowElementsPopup: React.FC = () => {
       ...node,
       data: {
         ...node.data,
+        label: title,
         message: textfieldMessage ?? node.data?.message,
         link: webpageUrl ?? node.data?.link,
         linkText: webpageName ?? node.data?.linkText,
@@ -156,6 +185,7 @@ const FlowElementsPopup: React.FC = () => {
           question: multiChoiceQuestionQuestion,
           buttons: multiChoiceQuestionButtons,
         },
+        dynamicChoices: dynamicChoices,
         endpoint: nodeEndpoint ?? node.data?.endpoint,
       },
     };
@@ -387,6 +417,17 @@ const FlowElementsPopup: React.FC = () => {
           </Track>
         </Track>
       }
+      titleEditable
+      onTitleChange={(newTitle) => {
+        const nodeWithSameLabel = instance?.getNodes().find((n) => n.data.label === newTitle && n.id !== node.id);
+        setTitleError(nodeWithSameLabel ? t("newService.toast.elementNameAlreadyExists").toString() : undefined);
+      }}
+      onTitleSave={setTitle}
+      onTitleEditCancel={() => {
+        setTitleError(undefined);
+        setTitle(node.data.label ?? "");
+      }}
+      titleError={titleError}
     >
       <Track direction="vertical" align="stretch" gap={16} className="flow-body-reverse-margin">
         <Tabs.Root
@@ -450,6 +491,13 @@ const FlowElementsPopup: React.FC = () => {
             {stepType === StepType.RasaRules && <RasaRulesContent />}
             {stepType === StepType.Assign && <AssignContent nodeId={node.id} />}
             {stepType === StepType.Condition && <ConditionContent nodeId={node.id} />}
+            {stepType === StepType.DynamicChoices && (
+              <DynamicChoicesContent
+                nodeId={node.id}
+                dynamicChoices={dynamicChoices}
+                onDynamicChoicesChange={setDynamicChoices}
+              />
+            )}
             {stepType === StepType.UserDefined && (
               <ApiContent
                 nodeId={node.id}
