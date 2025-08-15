@@ -6,6 +6,61 @@ import "jsoneditor/dist/jsoneditor.css";
 import { getDragData } from "utils/component-util";
 import styles from "./ObjectTree.module.scss";
 
+// Helper function to find the path to a node in the JSON structure
+const findNodePath = (node: Element, data: Record<string, unknown>): string | null => {
+  // Look for data attributes or other identifiers
+  const fieldElement = node.closest("[data-path]");
+  if (fieldElement) {
+    return fieldElement.getAttribute("data-path");
+  }
+
+  // Fallback: try to find by text content
+  const textContent = node.textContent?.trim();
+  if (textContent) {
+    return findPathByValue(data, textContent);
+  }
+
+  return null;
+};
+
+// Helper function to find path by value
+const findPathByValue = (obj: Record<string, unknown>, value: string, currentPath = ""): string | null => {
+  for (const key in obj) {
+    const newPath = currentPath ? `${currentPath}.${key}` : key;
+
+    if (obj[key] === value) {
+      return newPath;
+    }
+
+    if (typeof obj[key] === "object" && obj[key] !== null) {
+      const result = findPathByValue(obj[key] as Record<string, unknown>, value, newPath);
+      if (result) return result;
+    }
+  }
+  return null;
+};
+
+// Helper function to update value at a specific path
+const updateValueAtPath = (obj: Record<string, unknown>, path: string, newValue: unknown): Record<string, unknown> => {
+  const pathParts = path.split(".");
+  const newObj = { ...obj };
+  let current: Record<string, unknown> = newObj;
+
+  // Navigate to the parent of the target
+  for (let i = 0; i < pathParts.length - 1; i++) {
+    if (current[pathParts[i]] === undefined) {
+      current[pathParts[i]] = {};
+    }
+    current = current[pathParts[i]] as Record<string, unknown>;
+  }
+
+  // Update the value at the target path
+  const lastPart = pathParts[pathParts.length - 1];
+  current[lastPart] = newValue;
+
+  return newObj;
+};
+
 const ObjectTree: React.FC = () => {
   const editorRef = useRef<HTMLDivElement>(null);
   const jsonEditorRef = useRef<JSONEditor | null>(null);
@@ -234,65 +289,6 @@ const ObjectTree: React.FC = () => {
     } catch (error) {
       console.error("Error processing drop:", error);
     }
-  };
-
-  // Helper function to find the path to a node in the JSON structure
-  const findNodePath = (node: Element, data: Record<string, unknown>): string | null => {
-    // Look for data attributes or other identifiers
-    const fieldElement = node.closest("[data-path]");
-    if (fieldElement) {
-      return fieldElement.getAttribute("data-path");
-    }
-
-    // Fallback: try to find by text content
-    const textContent = node.textContent?.trim();
-    if (textContent) {
-      return findPathByValue(data, textContent);
-    }
-
-    return null;
-  };
-
-  // Helper function to find path by value
-  const findPathByValue = (obj: Record<string, unknown>, value: string, currentPath = ""): string | null => {
-    for (const key in obj) {
-      const newPath = currentPath ? `${currentPath}.${key}` : key;
-
-      if (obj[key] === value) {
-        return newPath;
-      }
-
-      if (typeof obj[key] === "object" && obj[key] !== null) {
-        const result = findPathByValue(obj[key] as Record<string, unknown>, value, newPath);
-        if (result) return result;
-      }
-    }
-    return null;
-  };
-
-  // Helper function to update value at a specific path
-  const updateValueAtPath = (
-    obj: Record<string, unknown>,
-    path: string,
-    newValue: unknown
-  ): Record<string, unknown> => {
-    const pathParts = path.split(".");
-    const newObj = { ...obj };
-    let current: Record<string, unknown> = newObj;
-
-    // Navigate to the parent of the target
-    for (let i = 0; i < pathParts.length - 1; i++) {
-      if (current[pathParts[i]] === undefined) {
-        current[pathParts[i]] = {};
-      }
-      current = current[pathParts[i]] as Record<string, unknown>;
-    }
-
-    // Update the value at the target path
-    const lastPart = pathParts[pathParts.length - 1];
-    current[lastPart] = newValue;
-
-    return newObj;
   };
 
   return (
