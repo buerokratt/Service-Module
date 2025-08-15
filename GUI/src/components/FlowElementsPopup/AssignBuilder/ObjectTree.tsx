@@ -67,7 +67,7 @@ const ObjectTree: React.FC = () => {
   const [hoveredElement, setHoveredElement] = useState<Element | null>(null);
   const [data, setData] = useState({
     name: "John Doe",
-    age: "30",
+    age: 30,
     email: "john@example.com",
     address: {
       street: "123 Main St",
