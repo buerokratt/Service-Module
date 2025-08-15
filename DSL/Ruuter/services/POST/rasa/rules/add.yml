@@ -8,12 +8,9 @@ declaration:
   namespace: service
   allowlist:
     body:
-      - field: rule
+      - field: data
         type: object
-        description: "Body field 'rule'"
-      - field: story
-        type: object
-        description: "Body field 'story'"
+        description: "Body field 'data'"
     headers:
       - field: cookie
         type: string
@@ -42,6 +39,8 @@ getRuleNames:
   call: http.get
   args:
     url: "[#SERVICE_RUUTER]/rasa/rule-names"
+    headers:
+      cookie: ${incoming.headers.cookie}
   result: ruleResult
 
 validateRuleName:
@@ -56,6 +55,8 @@ getFileLocations:
   call: http.get
   args:
     url: "[#SERVICE_RUUTER]/internal/return-file-locations"
+    headers:
+      cookie: ${incoming.headers.cookie}
   result: fileLocations
 
 getRulesFile:
