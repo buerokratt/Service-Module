@@ -74,7 +74,7 @@ const searchInCollection = (
   return null;
 };
 
-// todo inline
+// todo inline?
 // Helper function to find path by value
 const findPathByValue = (obj: Record<string, unknown> | unknown[], value: string, currentPath = ""): string | null => {
   return searchInCollection(obj, value, currentPath, Array.isArray(obj));
@@ -125,42 +125,20 @@ const updateValueAtPath = (
 ): Record<string, unknown> | unknown[] => {
   const pathParts = parsePath(path);
   const newObj = Array.isArray(obj) ? [...obj] : { ...obj };
-  let current: Record<string, unknown> | unknown[] = newObj;
+  let current: any = newObj;
 
   // Navigate to the parent of the target
   for (let i = 0; i < pathParts.length - 1; i++) {
     const part = pathParts[i];
-
-    // Navigate to the next part of the path
-    if (typeof part === "number") {
-      // Array index
-      if (Array.isArray(current)) {
-        if (current[part] === undefined) {
-          current[part] = {};
-        }
-        current = current[part] as Record<string, unknown> | unknown[];
-      } else {
-        // Convert object to array if needed
-        (current as Record<string, unknown>)[part.toString()] = {};
-        current = (current as Record<string, unknown>)[part.toString()] as Record<string, unknown> | unknown[];
-      }
-    } else {
-      // Object key
-      if (!Array.isArray(current)) {
-        if (current[part] === undefined) {
-          current[part] = {};
-        }
-        current = current[part] as Record<string, unknown> | unknown[];
-      } else {
-        // This shouldn't happen with proper path parsing, but handle it gracefully
-        break;
-      }
+    if (current[part] === undefined) {
+      current[part] = {};
     }
+    current = current[part];
   }
 
   // Update the value at the target path
   const lastPart = pathParts[pathParts.length - 1];
-  (current as any)[lastPart] = newValue;
+  current[lastPart] = newValue;
 
   return newObj;
 };
