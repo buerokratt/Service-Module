@@ -173,11 +173,10 @@ const updateValueAtPath = (
       : undefined;
 
   if (originalValue !== undefined) {
-    const convertedValue = newValue;
     if (Array.isArray(current) && typeof lastPart === "number") {
-      current[lastPart] = convertedValue;
+      current[lastPart] = newValue;
     } else if (!Array.isArray(current) && typeof lastPart === "string") {
-      current[lastPart] = convertedValue;
+      current[lastPart] = newValue;
     }
   }
 
