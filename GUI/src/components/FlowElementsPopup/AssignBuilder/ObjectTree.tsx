@@ -20,7 +20,35 @@ const findNodePath = (node: Element, data: Record<string, unknown>): string | nu
 };
 
 // Helper function to find path by value
-const findPathByValue = (obj: Record<string, unknown>, value: string, currentPath = ""): string | null => {
+const findPathByValue = (obj: Record<string, unknown> | unknown[], value: string, currentPath = ""): string | null => {
+  // Handle arrays
+  if (Array.isArray(obj)) {
+    for (let i = 0; i < obj.length; i++) {
+      const newPath = currentPath ? `${currentPath}[${i}]` : `[${i}]`;
+      const objValue = obj[i];
+
+      // Check if values match (handling different types)
+      const isMatch =
+        objValue === value ||
+        (typeof objValue === "number" && !isNaN(Number(value)) && objValue === Number(value)) ||
+        (typeof objValue === "boolean" &&
+          objValue === (value.toLowerCase() === "true" ? true : value.toLowerCase() === "false" ? false : null)) ||
+        (objValue === null && value.toLowerCase() === "null");
+
+      if (isMatch) {
+        return newPath;
+      }
+
+      // Recursively search in nested objects/arrays
+      if (typeof objValue === "object" && objValue !== null) {
+        const result = findPathByValue(objValue as Record<string, unknown> | unknown[], value, newPath);
+        if (result) return result;
+      }
+    }
+    return null;
+  }
+
+  // Handle objects
   for (const key in obj) {
     const newPath = currentPath ? `${currentPath}.${key}` : key;
     const objValue = obj[key];
@@ -37,9 +65,9 @@ const findPathByValue = (obj: Record<string, unknown>, value: string, currentPat
       return newPath;
     }
 
-    // Recursively search in objects
-    if (typeof objValue === "object" && objValue !== null && !Array.isArray(objValue)) {
-      const result = findPathByValue(objValue as Record<string, unknown>, value, newPath);
+    // Recursively search in nested objects/arrays
+    if (typeof objValue === "object" && objValue !== null) {
+      const result = findPathByValue(objValue as Record<string, unknown> | unknown[], value, newPath);
       if (result) return result;
     }
   }
@@ -47,49 +75,122 @@ const findPathByValue = (obj: Record<string, unknown>, value: string, currentPat
 };
 
 // Helper function to update value at a specific path
-const updateValueAtPath = (obj: Record<string, unknown>, path: string, newValue: unknown): Record<string, unknown> => {
-  const pathParts = path.split(".");
-  const newObj = { ...obj };
-  let current: Record<string, unknown> = newObj;
+const updateValueAtPath = (
+  obj: Record<string, unknown> | unknown[],
+  path: string,
+  newValue: unknown
+): Record<string, unknown> | unknown[] => {
+  // Parse path to handle both dot notation and array indices
+  const pathParts: (string | number)[] = [];
+  let currentPath = path;
+
+  // Extract array indices and object keys
+  while (currentPath.length > 0) {
+    // First, check for array index at the beginning
+    const arrayMatch = currentPath.match(/^\[(\d+)\]/);
+    if (arrayMatch) {
+      pathParts.push(parseInt(arrayMatch[1]));
+      currentPath = currentPath.substring(arrayMatch[0].length);
+      continue;
+    }
+
+    // Then check for property name followed by array index
+    const propertyArrayMatch = currentPath.match(/^([^.\[\]]+)\[(\d+)\]/);
+    if (propertyArrayMatch) {
+      pathParts.push(propertyArrayMatch[1]); // property name
+      pathParts.push(parseInt(propertyArrayMatch[2])); // array index
+      currentPath = currentPath.substring(propertyArrayMatch[0].length);
+      continue;
+    }
+
+    // Check for dot notation
+    const dotIndex = currentPath.indexOf(".");
+    if (dotIndex === -1) {
+      pathParts.push(currentPath);
+      break;
+    } else {
+      pathParts.push(currentPath.substring(0, dotIndex));
+      currentPath = currentPath.substring(dotIndex + 1);
+    }
+  }
+
+  const newObj = Array.isArray(obj) ? [...obj] : { ...obj };
+  let current: Record<string, unknown> | unknown[] = newObj;
 
   // Navigate to the parent of the target
   for (let i = 0; i < pathParts.length - 1; i++) {
-    if (current[pathParts[i]] === undefined) {
-      current[pathParts[i]] = {};
+    const part = pathParts[i];
+    if (typeof part === "number") {
+      // Array index
+      if (Array.isArray(current)) {
+        if (current[part] === undefined) {
+          current[part] = {};
+        }
+        current = current[part] as Record<string, unknown> | unknown[];
+      } else {
+        // Convert object to array if needed
+        (current as Record<string, unknown>)[part.toString()] = {};
+        current = (current as Record<string, unknown>)[part.toString()] as Record<string, unknown> | unknown[];
+      }
+    } else {
+      // Object key
+      if (!Array.isArray(current)) {
+        if (current[part] === undefined) {
+          current[part] = {};
+        }
+        current = current[part] as Record<string, unknown> | unknown[];
+      } else {
+        // This shouldn't happen with proper path parsing, but handle it gracefully
+        break;
+      }
     }
-    current = current[pathParts[i]] as Record<string, unknown>;
   }
 
   // Update the value at the target path
   const lastPart = pathParts[pathParts.length - 1];
 
-  // Try to preserve the original type if possible
-  const originalValue = current[lastPart];
-  if (originalValue !== undefined) {
-    // Convert newValue to match the original type
-    if (typeof originalValue === "number" && typeof newValue === "string") {
-      const numValue = Number(newValue);
-      if (!isNaN(numValue)) {
-        current[lastPart] = numValue;
-      } else {
-        current[lastPart] = newValue; // Keep as string if conversion fails
-      }
-    } else if (typeof originalValue === "boolean" && typeof newValue === "string") {
-      if (newValue.toLowerCase() === "true") {
-        current[lastPart] = true;
-      } else if (newValue.toLowerCase() === "false") {
-        current[lastPart] = false;
-      } else {
-        current[lastPart] = newValue; // Keep as string if conversion fails
-      }
-    } else {
-      current[lastPart] = newValue;
+  if (typeof lastPart === "number") {
+    // Array index
+    if (Array.isArray(current)) {
+      const originalValue = current[lastPart];
+      current[lastPart] = convertValueToMatchType(originalValue, newValue);
     }
   } else {
-    current[lastPart] = newValue;
+    // Object key
+    if (!Array.isArray(current)) {
+      const originalValue = current[lastPart];
+      current[lastPart] = convertValueToMatchType(originalValue, newValue);
+    }
   }
 
   return newObj;
+};
+
+// Helper function to convert value to match the original type
+const convertValueToMatchType = (originalValue: unknown, newValue: unknown): unknown => {
+  if (originalValue === undefined) {
+    return newValue;
+  }
+
+  // Convert newValue to match the original type
+  if (typeof originalValue === "number" && typeof newValue === "string") {
+    const numValue = Number(newValue);
+    if (!isNaN(numValue)) {
+      return numValue;
+    } else {
+      return newValue; // Keep as string if conversion fails
+    }
+  } else if (typeof originalValue === "boolean" && typeof newValue === "string") {
+    if (newValue.toLowerCase() === "true") {
+      return true;
+    } else if (newValue.toLowerCase() === "false") {
+      return false;
+    } else {
+      return newValue; // Keep as string if conversion fails
+    }
+  } else {
+    return newValue;
+  }
 };
 
 const ObjectTree: React.FC = () => {
@@ -109,11 +210,14 @@ const ObjectTree: React.FC = () => {
       theme: "dark",
       notifications: true,
     },
+    hobbies: ["reading", "gaming", "coding"],
+    scores: [85, 92, 78],
   });
 
   useEffect(() => {
     if (editorRef.current && !jsonEditorRef.current) {
       const editor = new JSONEditor(editorRef.current, {
+        modes: ["tree", "code"],
         language: "et",
         languages: {
           et: {
