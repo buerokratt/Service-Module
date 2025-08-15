@@ -28,8 +28,6 @@ const ObjectTree: React.FC = () => {
   useEffect(() => {
     if (editorRef.current && !jsonEditorRef.current) {
       const editor = new JSONEditor(editorRef.current, {
-        mode: "tree",
-        modes: ["tree", "view", "form", "text", "code"],
         language: "et",
         languages: {
           et: {
