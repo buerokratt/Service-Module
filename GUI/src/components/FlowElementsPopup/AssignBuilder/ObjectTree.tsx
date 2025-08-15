@@ -5,8 +5,6 @@ import { getDragData } from "utils/component-util";
 import { isObject, updateValueAtPath } from "utils/object-util";
 import styles from "./ObjectTree.module.scss";
 
-// todo bug: open tree closes on drop
-
 // Helper function to find the path to a node in the JSON structure
 const findNodePath = (node: Element, data: Record<string, unknown>): string | null => {
   // Try to find by text content (for values)
