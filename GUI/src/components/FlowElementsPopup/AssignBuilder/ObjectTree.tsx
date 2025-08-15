@@ -8,18 +8,35 @@ import styles from "./ObjectTree.module.scss";
 
 // Helper function to find the path to a node in the JSON structure
 const findNodePath = (node: Element, data: Record<string, unknown>): string | null => {
-  // Look for data attributes or other identifiers
-  const fieldElement = node.closest("[data-path]");
-  if (fieldElement) {
-    return fieldElement.getAttribute("data-path");
-  }
+  console.log("Finding path for node:", node.className, node.textContent);
 
-  // Fallback: try to find by text content
+  // Try to find by text content (for values)
   const textContent = node.textContent?.trim();
   if (textContent) {
-    return findPathByValue(data, textContent);
+    console.log("Trying to find path by text content:", textContent);
+    const path = findPathByValue(data, textContent);
+    console.log("Found path by text content:", path);
+    return path;
   }
 
+  console.log("No path found for node");
+  return null;
+};
+
+// Helper function to find path by field name
+const findPathByFieldName = (obj: Record<string, unknown>, fieldName: string, currentPath = ""): string | null => {
+  for (const key in obj) {
+    const newPath = currentPath ? `${currentPath}.${key}` : key;
+
+    if (key === fieldName) {
+      return newPath;
+    }
+
+    if (typeof obj[key] === "object" && obj[key] !== null && !Array.isArray(obj[key])) {
+      const result = findPathByFieldName(obj[key] as Record<string, unknown>, fieldName, newPath);
+      if (result) return result;
+    }
+  }
   return null;
 };
 
@@ -27,13 +44,34 @@ const findNodePath = (node: Element, data: Record<string, unknown>): string | nu
 const findPathByValue = (obj: Record<string, unknown>, value: string, currentPath = ""): string | null => {
   for (const key in obj) {
     const newPath = currentPath ? `${currentPath}.${key}` : key;
+    const objValue = obj[key];
 
-    if (obj[key] === value) {
+    // Handle different value types
+    if (objValue === value) {
       return newPath;
     }
 
-    if (typeof obj[key] === "object" && obj[key] !== null) {
-      const result = findPathByValue(obj[key] as Record<string, unknown>, value, newPath);
+    // Handle number comparison
+    if (typeof objValue === "number" && !isNaN(Number(value)) && objValue === Number(value)) {
+      return newPath;
+    }
+
+    // Handle boolean comparison
+    if (typeof objValue === "boolean") {
+      const boolValue = value.toLowerCase() === "true" ? true : value.toLowerCase() === "false" ? false : null;
+      if (objValue === boolValue) {
+        return newPath;
+      }
+    }
+
+    // Handle null comparison
+    if (objValue === null && value.toLowerCase() === "null") {
+      return newPath;
+    }
+
+    // Recursively search in objects
+    if (typeof objValue === "object" && objValue !== null && !Array.isArray(objValue)) {
+      const result = findPathByValue(objValue as Record<string, unknown>, value, newPath);
       if (result) return result;
     }
   }
@@ -56,7 +94,32 @@ const updateValueAtPath = (obj: Record<string, unknown>, path: string, newValue:
 
   // Update the value at the target path
   const lastPart = pathParts[pathParts.length - 1];
-  current[lastPart] = newValue;
+
+  // Try to preserve the original type if possible
+  const originalValue = current[lastPart];
+  if (originalValue !== undefined) {
+    // Convert newValue to match the original type
+    if (typeof originalValue === "number" && typeof newValue === "string") {
+      const numValue = Number(newValue);
+      if (!isNaN(numValue)) {
+        current[lastPart] = numValue;
+      } else {
+        current[lastPart] = newValue; // Keep as string if conversion fails
+      }
+    } else if (typeof originalValue === "boolean" && typeof newValue === "string") {
+      if (newValue.toLowerCase() === "true") {
+        current[lastPart] = true;
+      } else if (newValue.toLowerCase() === "false") {
+        current[lastPart] = false;
+      } else {
+        current[lastPart] = newValue; // Keep as string if conversion fails
+      }
+    } else {
+      current[lastPart] = newValue;
+    }
+  } else {
+    current[lastPart] = newValue;
+  }
 
   return newObj;
 };
@@ -221,9 +284,9 @@ const ObjectTree: React.FC = () => {
     // Get the element under the cursor
     const element = document.elementFromPoint(e.clientX, e.clientY);
     if (element) {
-      // Find the closest JSON editor node
+      // Find the closest JSON editor node - improved selectors for all data types
       const jsonNode = element.closest(
-        ".jsoneditor-value, .jsoneditor-field, .jsoneditor-string, .jsoneditor-number, .jsoneditor-boolean"
+        ".jsoneditor-value, .jsoneditor-field, .jsoneditor-string, .jsoneditor-number, .jsoneditor-boolean, .jsoneditor-null, .jsoneditor-object, .jsoneditor-array"
       );
 
       // Remove highlight from previously hovered element
@@ -267,22 +330,30 @@ const ObjectTree: React.FC = () => {
         if (element) {
           // Find the closest JSON editor node
           const jsonNode = element.closest(
-            ".jsoneditor-value, .jsoneditor-field, .jsoneditor-string, .jsoneditor-number, .jsoneditor-boolean"
+            ".jsoneditor-value, .jsoneditor-field, .jsoneditor-string, .jsoneditor-number, .jsoneditor-boolean, .jsoneditor-null, .jsoneditor-object, .jsoneditor-array"
           );
 
           if (jsonNode) {
+            console.log("Found JSON node:", jsonNode.className, jsonNode.textContent);
+
             // Get the current JSON data
             const currentData = jsonEditorRef.current.get();
 
             // Try to find the path to the dropped node
             const path = findNodePath(jsonNode, currentData);
+            console.log("Found path:", path, "Value to replace:", valueToReplace);
 
             if (path) {
               // Update the value at the specific path
               const newData = updateValueAtPath(currentData as Record<string, unknown>, path, valueToReplace);
               jsonEditorRef.current.set(newData);
               setData(newData as typeof data);
+              console.log("Successfully updated data at path:", path);
+            } else {
+              console.log("Could not find path for node:", jsonNode);
             }
+          } else {
+            console.log("No JSON node found at drop position");
           }
         }
       }
