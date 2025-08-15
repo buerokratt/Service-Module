@@ -239,7 +239,7 @@ const ObjectTree: React.FC = () => {
     }
   };
 
-  const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
+  const handleDragLeave = () => {
     // Remove highlight when leaving the drop zone
     if (hoveredElement) {
       hoveredElement.classList.remove(styles.dragHoverHighlight);
