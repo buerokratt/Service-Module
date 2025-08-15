@@ -117,37 +117,6 @@ const parsePath = (path: string): (string | number)[] => {
   return pathParts;
 };
 
-// Helper function to navigate to a specific path part
-const navigateToPathPart = (
-  current: Record<string, unknown> | unknown[],
-  part: string | number
-): Record<string, unknown> | unknown[] => {
-  if (typeof part === "number") {
-    // Array index
-    if (Array.isArray(current)) {
-      if (current[part] === undefined) {
-        current[part] = {};
-      }
-      return current[part] as Record<string, unknown> | unknown[];
-    } else {
-      // Convert object to array if needed
-      (current as Record<string, unknown>)[part.toString()] = {};
-      return (current as Record<string, unknown>)[part.toString()] as Record<string, unknown> | unknown[];
-    }
-  } else {
-    // Object key
-    if (!Array.isArray(current)) {
-      if (current[part] === undefined) {
-        current[part] = {};
-      }
-      return current[part] as Record<string, unknown> | unknown[];
-    } else {
-      // This shouldn't happen with proper path parsing, but handle it gracefully
-      return current;
-    }
-  }
-};
-
 // Helper function to update value at a specific path
 const updateValueAtPath = (
   obj: Record<string, unknown> | unknown[],
@@ -160,25 +129,38 @@ const updateValueAtPath = (
 
   // Navigate to the parent of the target
   for (let i = 0; i < pathParts.length - 1; i++) {
-    current = navigateToPathPart(current, pathParts[i]);
+    const part = pathParts[i];
+
+    // Navigate to the next part of the path
+    if (typeof part === "number") {
+      // Array index
+      if (Array.isArray(current)) {
+        if (current[part] === undefined) {
+          current[part] = {};
+        }
+        current = current[part] as Record<string, unknown> | unknown[];
+      } else {
+        // Convert object to array if needed
+        (current as Record<string, unknown>)[part.toString()] = {};
+        current = (current as Record<string, unknown>)[part.toString()] as Record<string, unknown> | unknown[];
+      }
+    } else {
+      // Object key
+      if (!Array.isArray(current)) {
+        if (current[part] === undefined) {
+          current[part] = {};
+        }
+        current = current[part] as Record<string, unknown> | unknown[];
+      } else {
+        // This shouldn't happen with proper path parsing, but handle it gracefully
+        break;
+      }
+    }
   }
 
   // Update the value at the target path
   const lastPart = pathParts[pathParts.length - 1];
-  const originalValue =
-    Array.isArray(current) && typeof lastPart === "number"
-      ? current[lastPart]
-      : !Array.isArray(current) && typeof lastPart === "string"
-      ? current[lastPart]
-      : undefined;
-
-  if (originalValue !== undefined) {
-    if (Array.isArray(current) && typeof lastPart === "number") {
-      current[lastPart] = newValue;
-    } else if (!Array.isArray(current) && typeof lastPart === "string") {
-      current[lastPart] = newValue;
-    }
-  }
+  (current as any)[lastPart] = newValue;
 
   return newObj;
 };
