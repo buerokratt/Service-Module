@@ -8,14 +8,10 @@ import styles from "./ObjectTree.module.scss";
 
 // Helper function to find the path to a node in the JSON structure
 const findNodePath = (node: Element, data: Record<string, unknown>): string | null => {
-  console.log("findNodePath called with node:", node.outerHTML);
-
   // Try to find by text content (for values)
   const textContent = node.textContent?.trim();
   if (textContent) {
-    console.log("Searching for text content:", textContent);
     const path = searchInCollection(data, textContent);
-    console.log("Found path for text content:", path);
     return path;
   }
 
@@ -23,27 +19,21 @@ const findNodePath = (node: Element, data: Record<string, unknown>): string | nu
   const fieldNameElement = node.querySelector(".jsoneditor-field-name");
   if (fieldNameElement) {
     const fieldName = fieldNameElement.textContent?.trim();
-    console.log("Found field name:", fieldName);
     if (fieldName) {
       // For field names, we need to find the parent object and then the field
       const parentNode = node.closest(".jsoneditor-field");
       if (parentNode) {
         const parentText = parentNode.textContent?.trim();
-        console.log("Parent text:", parentText);
         if (parentText) {
           const parentPath = searchInCollection(data, parentText);
-          console.log("Parent path:", parentPath);
           if (parentPath) {
-            const fullPath = `${parentPath}.${fieldName}`;
-            console.log("Full path:", fullPath);
-            return fullPath;
+            return `${parentPath}.${fieldName}`;
           }
         }
       }
     }
   }
 
-  console.log("No path found");
   return null;
 };
 
@@ -61,7 +51,6 @@ const isValueMatch = (objValue: unknown, value: string): boolean => {
 // Helper function to search for value in a collection
 const searchInCollection = (collection: object, value: string, currentPath = ""): string | null => {
   const isArray = Array.isArray(collection);
-  console.log("searchInCollection:", { collection, value, currentPath, isArray });
 
   const entries = isArray
     ? collection.map((value, index) => ({ key: index, value }))
@@ -75,8 +64,6 @@ const searchInCollection = (collection: object, value: string, currentPath = "")
       : isArray
         ? `[${key}]`
         : String(key);
-
-    console.log("Checking path:", newPath, "value:", objValue, "matches:", isValueMatch(objValue, value));
 
     if (isValueMatch(objValue, value)) return newPath;
 
@@ -214,16 +201,10 @@ const ObjectTree: React.FC = () => {
             const path = findNodePath(jsonNode, currentData);
 
             if (path) {
-              console.log("Found path:", path, "for value:", valueToReplace);
-              console.log("About to call updateValueAtPath with currentData:", currentData);
               // Update the value at the specific path
               const newData = updateValueAtPath(currentData, path, valueToReplace);
-              console.log("updateValueAtPath returned:", newData);
               jsonEditorRef.current.set(newData);
               setData(newData);
-            } else {
-              console.log("Could not find path for node:", jsonNode.textContent);
-              console.log("Node structure:", jsonNode.outerHTML);
             }
           }
         }

@@ -95,7 +95,6 @@ export const getKeyPathString = (keyPath: KeyPath) => {
 
 // Helper function to parse object path into parts
 const parsePath = (path: string): (string | number)[] => {
-  console.log("parsePath called with:", path);
   const pathParts: (string | number)[] = [];
   let currentPath = path;
 
@@ -134,7 +133,6 @@ const parsePath = (path: string): (string | number)[] => {
     }
   }
 
-  console.log("parsePath result:", pathParts);
   return pathParts;
 };
 
@@ -144,9 +142,7 @@ export const updateValueAtPath = (
   path: string,
   newValue: unknown,
 ): Record<string, unknown> | unknown[] => {
-  console.log("updateValueAtPath called with:", { obj, path, newValue });
   const pathParts = parsePath(path);
-  console.log("Path parts:", pathParts);
   const newObj = Array.isArray(obj) ? [...obj] : { ...obj };
   let current: any = newObj;
 
@@ -154,16 +150,13 @@ export const updateValueAtPath = (
   for (let i = 0; i < pathParts.length - 1; i++) {
     const part = pathParts[i];
     const nextPart = pathParts[i + 1];
-    console.log(`Navigating to part ${i}:`, part, "next part:", nextPart, "current:", current[part]);
 
     if (current[part] === undefined) {
       // Check if the next part is a number (array index) or string (object key)
       if (typeof nextPart === "number") {
         current[part] = [];
-        console.log("Created array at", part);
       } else {
         current[part] = {};
-        console.log("Created object at", part);
       }
     }
     current = current[part];
@@ -171,9 +164,7 @@ export const updateValueAtPath = (
 
   // Update the value at the target path
   const lastPart = pathParts[pathParts.length - 1];
-  console.log("Setting value at", lastPart, "to", newValue);
   current[lastPart] = newValue;
 
-  console.log("Final result:", newObj);
   return newObj;
 };
