@@ -9,18 +9,13 @@ import styles from "./ObjectTree.module.scss";
 // todo remove logs
 // Helper function to find the path to a node in the JSON structure
 const findNodePath = (node: Element, data: Record<string, unknown>): string | null => {
-  console.log("Finding path for node:", node.className, node.textContent);
-
   // Try to find by text content (for values)
   const textContent = node.textContent?.trim();
   if (textContent) {
-    console.log("Trying to find path by text content:", textContent);
     const path = findPathByValue(data, textContent);
-    console.log("Found path by text content:", path);
     return path;
   }
 
-  console.log("No path found for node");
   return null;
 };
 
