@@ -1,6 +1,4 @@
 import React, { useEffect, useRef, useState } from "react";
-// todo why?
-// @ts-ignore
 import JSONEditor from "jsoneditor";
 import "jsoneditor/dist/jsoneditor.css";
 import { getDragData } from "utils/component-util";
@@ -37,7 +35,7 @@ const searchInCollection = (
   collection: Record<string, unknown> | unknown[],
   value: string,
   currentPath: string,
-  isArray: boolean
+  isArray: boolean,
 ): string | null => {
   const entries = isArray
     ? (collection as unknown[]).map((value, index) => ({ key: index, value }))
@@ -49,8 +47,8 @@ const searchInCollection = (
         ? `${currentPath}[${key}]`
         : `${currentPath}.${key}`
       : isArray
-      ? `[${key}]`
-      : String(key);
+        ? `[${key}]`
+        : String(key);
 
     if (isValueMatch(objValue, value)) return newPath;
 
@@ -59,7 +57,7 @@ const searchInCollection = (
         objValue as Record<string, unknown> | unknown[],
         value,
         newPath,
-        Array.isArray(objValue)
+        Array.isArray(objValue),
       );
       if (result) return result;
     }
@@ -234,7 +232,7 @@ const ObjectTree: React.FC = () => {
     if (element) {
       // Find the closest JSON editor node - improved selectors for all data types
       const jsonNode = element.closest(
-        ".jsoneditor-value, .jsoneditor-field, .jsoneditor-string, .jsoneditor-number, .jsoneditor-boolean, .jsoneditor-null, .jsoneditor-object, .jsoneditor-array"
+        ".jsoneditor-value, .jsoneditor-field, .jsoneditor-string, .jsoneditor-number, .jsoneditor-boolean, .jsoneditor-null, .jsoneditor-object, .jsoneditor-array",
       );
 
       // Remove highlight from previously hovered element
@@ -278,7 +276,7 @@ const ObjectTree: React.FC = () => {
         if (element) {
           // Find the closest JSON editor node
           const jsonNode = element.closest(
-            ".jsoneditor-value, .jsoneditor-field, .jsoneditor-string, .jsoneditor-number, .jsoneditor-boolean, .jsoneditor-null, .jsoneditor-object, .jsoneditor-array"
+            ".jsoneditor-value, .jsoneditor-field, .jsoneditor-string, .jsoneditor-number, .jsoneditor-boolean, .jsoneditor-null, .jsoneditor-object, .jsoneditor-array",
           );
 
           if (jsonNode) {
