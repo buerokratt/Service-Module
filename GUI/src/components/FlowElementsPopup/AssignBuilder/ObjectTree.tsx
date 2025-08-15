@@ -15,25 +15,6 @@ const findNodePath = (node: Element, data: Record<string, unknown>): string | nu
     return path;
   }
 
-  // Try to find by field name if it's a field node
-  const fieldNameElement = node.querySelector(".jsoneditor-field-name");
-  if (fieldNameElement) {
-    const fieldName = fieldNameElement.textContent?.trim();
-    if (fieldName) {
-      // For field names, we need to find the parent object and then the field
-      const parentNode = node.closest(".jsoneditor-field");
-      if (parentNode) {
-        const parentText = parentNode.textContent?.trim();
-        if (parentText) {
-          const parentPath = searchInCollection(data, parentText);
-          if (parentPath) {
-            return `${parentPath}.${fieldName}`;
-          }
-        }
-      }
-    }
-  }
-
   return null;
 };
 
