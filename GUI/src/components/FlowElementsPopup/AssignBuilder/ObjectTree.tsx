@@ -4,7 +4,7 @@ import React, { useEffect, useRef, useState } from "react";
 import JSONEditor from "jsoneditor";
 import "jsoneditor/dist/jsoneditor.css";
 import { getDragData } from "utils/component-util";
-import { updateValueAtPath } from "utils/object-util";
+import { isObject, updateValueAtPath } from "utils/object-util";
 import styles from "./ObjectTree.module.scss";
 
 // todo bug: open tree closes on drop
@@ -14,7 +14,7 @@ const findNodePath = (node: Element, data: Record<string, unknown>): string | nu
   // Try to find by text content (for values)
   const textContent = node.textContent?.trim();
   if (textContent) {
-    const path = findPathByValue(data, textContent);
+    const path = searchInCollection(data, textContent, "", Array.isArray(data));
     return path;
   }
 
@@ -50,8 +50,13 @@ const searchInCollection = (
       }
 
       // Recursively search in nested arrays
-      if (typeof objValue === "object" && objValue !== null) {
-        const result = findPathByValue(objValue as Record<string, unknown> | unknown[], value, newPath);
+      if (isObject(objValue)) {
+        const result = searchInCollection(
+          objValue as Record<string, unknown> | unknown[],
+          value,
+          newPath,
+          Array.isArray(objValue)
+        );
         if (result) return result;
       }
     }
@@ -66,8 +71,13 @@ const searchInCollection = (
       }
 
       // Recursively search in nested objects
-      if (typeof objValue === "object" && objValue !== null) {
-        const result = findPathByValue(objValue as Record<string, unknown> | unknown[], value, newPath);
+      if (isObject(objValue)) {
+        const result = searchInCollection(
+          objValue as Record<string, unknown> | unknown[],
+          value,
+          newPath,
+          Array.isArray(objValue)
+        );
         if (result) return result;
       }
     }
@@ -76,10 +86,6 @@ const searchInCollection = (
 };
 
 // todo inline?
-// Helper function to find path by value
-const findPathByValue = (obj: Record<string, unknown> | unknown[], value: string, currentPath = ""): string | null => {
-  return searchInCollection(obj, value, currentPath, Array.isArray(obj));
-};
 
 const ObjectTree: React.FC = () => {
   const editorRef = useRef<HTMLDivElement>(null);
