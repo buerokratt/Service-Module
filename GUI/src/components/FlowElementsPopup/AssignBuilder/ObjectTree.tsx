@@ -39,49 +39,32 @@ const searchInCollection = (
   currentPath: string,
   isArray: boolean
 ): string | null => {
-  if (isArray) {
-    // Handle arrays
-    for (let i = 0; i < (collection as unknown[]).length; i++) {
-      const newPath = currentPath ? `${currentPath}[${i}]` : `[${i}]`;
-      const objValue = (collection as unknown[])[i];
+  const entries = isArray
+    ? (collection as unknown[]).map((value, index) => ({ key: index, value }))
+    : Object.entries(collection as Record<string, unknown>).map(([key, value]) => ({ key, value }));
 
-      if (isValueMatch(objValue, value)) {
-        return newPath;
-      }
+  for (const { key, value: objValue } of entries) {
+    const newPath = currentPath
+      ? isArray
+        ? `${currentPath}[${key}]`
+        : `${currentPath}.${key}`
+      : isArray
+      ? `[${key}]`
+      : String(key);
 
-      // Recursively search in nested arrays
-      if (isObject(objValue)) {
-        const result = searchInCollection(
-          objValue as Record<string, unknown> | unknown[],
-          value,
-          newPath,
-          Array.isArray(objValue)
-        );
-        if (result) return result;
-      }
-    }
-  } else {
-    // Handle objects
-    for (const key in collection as Record<string, unknown>) {
-      const newPath = currentPath ? `${currentPath}.${key}` : key;
-      const objValue = (collection as Record<string, unknown>)[key];
+    if (isValueMatch(objValue, value)) return newPath;
 
-      if (isValueMatch(objValue, value)) {
-        return newPath;
-      }
-
-      // Recursively search in nested objects
-      if (isObject(objValue)) {
-        const result = searchInCollection(
-          objValue as Record<string, unknown> | unknown[],
-          value,
-          newPath,
-          Array.isArray(objValue)
-        );
-        if (result) return result;
-      }
+    if (isObject(objValue)) {
+      const result = searchInCollection(
+        objValue as Record<string, unknown> | unknown[],
+        value,
+        newPath,
+        Array.isArray(objValue)
+      );
+      if (result) return result;
     }
   }
+
   return null;
 };
 
