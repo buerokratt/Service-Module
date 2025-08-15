@@ -6,6 +6,8 @@ import "jsoneditor/dist/jsoneditor.css";
 import { getDragData } from "utils/component-util";
 import styles from "./ObjectTree.module.scss";
 
+// todo bug: open tree closes on drop
+
 // Helper function to find the path to a node in the JSON structure
 const findNodePath = (node: Element, data: Record<string, unknown>): string | null => {
   // Try to find by text content (for values)
@@ -72,6 +74,7 @@ const searchInCollection = (
   return null;
 };
 
+// todo inline
 // Helper function to find path by value
 const findPathByValue = (obj: Record<string, unknown> | unknown[], value: string, currentPath = ""): string | null => {
   return searchInCollection(obj, value, currentPath, Array.isArray(obj));
@@ -170,7 +173,7 @@ const updateValueAtPath = (
       : undefined;
 
   if (originalValue !== undefined) {
-    const convertedValue = convertValueToMatchType(originalValue, newValue);
+    const convertedValue = newValue;
     if (Array.isArray(current) && typeof lastPart === "number") {
       current[lastPart] = convertedValue;
     } else if (!Array.isArray(current) && typeof lastPart === "string") {
@@ -179,33 +182,6 @@ const updateValueAtPath = (
   }
 
   return newObj;
-};
-
-// Helper function to convert value to match the original type
-const convertValueToMatchType = (originalValue: unknown, newValue: unknown): unknown => {
-  if (originalValue === undefined) {
-    return newValue;
-  }
-
-  // Convert newValue to match the original type
-  if (typeof originalValue === "number" && typeof newValue === "string") {
-    const numValue = Number(newValue);
-    if (!isNaN(numValue)) {
-      return numValue;
-    } else {
-      return newValue; // Keep as string if conversion fails
-    }
-  } else if (typeof originalValue === "boolean" && typeof newValue === "string") {
-    if (newValue.toLowerCase() === "true") {
-      return true;
-    } else if (newValue.toLowerCase() === "false") {
-      return false;
-    } else {
-      return newValue; // Keep as string if conversion fails
-    }
-  } else {
-    return newValue;
-  }
 };
 
 const ObjectTree: React.FC = () => {
