@@ -294,26 +294,18 @@ const ObjectTree: React.FC = () => {
           );
 
           if (jsonNode) {
-            console.log("Found JSON node:", jsonNode.className, jsonNode.textContent);
-
             // Get the current JSON data
             const currentData = jsonEditorRef.current.get();
 
             // Try to find the path to the dropped node
             const path = findNodePath(jsonNode, currentData);
-            console.log("Found path:", path, "Value to replace:", valueToReplace);
 
             if (path) {
               // Update the value at the specific path
               const newData = updateValueAtPath(currentData as Record<string, unknown>, path, valueToReplace);
               jsonEditorRef.current.set(newData);
               setData(newData as typeof data);
-              console.log("Successfully updated data at path:", path);
-            } else {
-              console.log("Could not find path for node:", jsonNode);
             }
-          } else {
-            console.log("No JSON node found at drop position");
           }
         }
       }
