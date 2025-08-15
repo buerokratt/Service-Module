@@ -24,23 +24,6 @@ const findNodePath = (node: Element, data: Record<string, unknown>): string | nu
   return null;
 };
 
-// Helper function to find path by field name
-const findPathByFieldName = (obj: Record<string, unknown>, fieldName: string, currentPath = ""): string | null => {
-  for (const key in obj) {
-    const newPath = currentPath ? `${currentPath}.${key}` : key;
-
-    if (key === fieldName) {
-      return newPath;
-    }
-
-    if (typeof obj[key] === "object" && obj[key] !== null && !Array.isArray(obj[key])) {
-      const result = findPathByFieldName(obj[key] as Record<string, unknown>, fieldName, newPath);
-      if (result) return result;
-    }
-  }
-  return null;
-};
-
 // Helper function to find path by value
 const findPathByValue = (obj: Record<string, unknown>, value: string, currentPath = ""): string | null => {
   for (const key in obj) {
