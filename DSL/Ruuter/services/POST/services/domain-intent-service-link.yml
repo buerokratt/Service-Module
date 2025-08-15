@@ -104,6 +104,8 @@ add_rule:
   call: http.post
   args:
     url: "[#SERVICE_RUUTER]/rasa/rules/add"
+    headers:
+      cookie: ${incoming.headers.cookie}
     body:
       data: ${data}
   result: add_rule_res
