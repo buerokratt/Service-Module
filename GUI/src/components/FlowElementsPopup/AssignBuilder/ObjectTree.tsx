@@ -6,7 +6,6 @@ import "jsoneditor/dist/jsoneditor.css";
 import { getDragData } from "utils/component-util";
 import styles from "./ObjectTree.module.scss";
 
-// todo remove logs
 // Helper function to find the path to a node in the JSON structure
 const findNodePath = (node: Element, data: Record<string, unknown>): string | null => {
   // Try to find by text content (for values)
@@ -19,72 +18,70 @@ const findNodePath = (node: Element, data: Record<string, unknown>): string | nu
   return null;
 };
 
-// Helper function to find path by value
-const findPathByValue = (obj: Record<string, unknown> | unknown[], value: string, currentPath = ""): string | null => {
-  // Handle arrays
-  if (Array.isArray(obj)) {
-    for (let i = 0; i < obj.length; i++) {
+// Helper function to check if values match (handling different types)
+const isValueMatch = (objValue: unknown, value: string): boolean => {
+  return (
+    objValue === value ||
+    (typeof objValue === "number" && !isNaN(Number(value)) && objValue === Number(value)) ||
+    (typeof objValue === "boolean" &&
+      objValue === (value.toLowerCase() === "true" ? true : value.toLowerCase() === "false" ? false : null)) ||
+    (objValue === null && value.toLowerCase() === "null")
+  );
+};
+
+// Helper function to search for value in a collection
+const searchInCollection = (
+  collection: Record<string, unknown> | unknown[],
+  value: string,
+  currentPath: string,
+  isArray: boolean
+): string | null => {
+  if (isArray) {
+    // Handle arrays
+    for (let i = 0; i < (collection as unknown[]).length; i++) {
       const newPath = currentPath ? `${currentPath}[${i}]` : `[${i}]`;
-      const objValue = obj[i];
+      const objValue = (collection as unknown[])[i];
 
-      // Check if values match (handling different types)
-      const isMatch =
-        objValue === value ||
-        (typeof objValue === "number" && !isNaN(Number(value)) && objValue === Number(value)) ||
-        (typeof objValue === "boolean" &&
-          objValue === (value.toLowerCase() === "true" ? true : value.toLowerCase() === "false" ? false : null)) ||
-        (objValue === null && value.toLowerCase() === "null");
-
-      if (isMatch) {
+      if (isValueMatch(objValue, value)) {
         return newPath;
       }
 
-      // Recursively search in nested objects/arrays
+      // Recursively search in nested arrays
       if (typeof objValue === "object" && objValue !== null) {
         const result = findPathByValue(objValue as Record<string, unknown> | unknown[], value, newPath);
         if (result) return result;
       }
     }
-    return null;
-  }
+  } else {
+    // Handle objects
+    for (const key in collection as Record<string, unknown>) {
+      const newPath = currentPath ? `${currentPath}.${key}` : key;
+      const objValue = (collection as Record<string, unknown>)[key];
 
-  // Handle objects
-  for (const key in obj) {
-    const newPath = currentPath ? `${currentPath}.${key}` : key;
-    const objValue = obj[key];
+      if (isValueMatch(objValue, value)) {
+        return newPath;
+      }
 
-    // Check if values match (handling different types)
-    const isMatch =
-      objValue === value ||
-      (typeof objValue === "number" && !isNaN(Number(value)) && objValue === Number(value)) ||
-      (typeof objValue === "boolean" &&
-        objValue === (value.toLowerCase() === "true" ? true : value.toLowerCase() === "false" ? false : null)) ||
-      (objValue === null && value.toLowerCase() === "null");
-
-    if (isMatch) {
-      return newPath;
-    }
-
-    // Recursively search in nested objects/arrays
-    if (typeof objValue === "object" && objValue !== null) {
-      const result = findPathByValue(objValue as Record<string, unknown> | unknown[], value, newPath);
-      if (result) return result;
+      // Recursively search in nested objects
+      if (typeof objValue === "object" && objValue !== null) {
+        const result = findPathByValue(objValue as Record<string, unknown> | unknown[], value, newPath);
+        if (result) return result;
+      }
     }
   }
   return null;
 };
 
-// Helper function to update value at a specific path
-const updateValueAtPath = (
-  obj: Record<string, unknown> | unknown[],
-  path: string,
-  newValue: unknown
-): Record<string, unknown> | unknown[] => {
-  // Parse path to handle both dot notation and array indices
+// Helper function to find path by value
+const findPathByValue = (obj: Record<string, unknown> | unknown[], value: string, currentPath = ""): string | null => {
+  return searchInCollection(obj, value, currentPath, Array.isArray(obj));
+};
+
+// Helper function to parse path into parts
+const parsePath = (path: string): (string | number)[] => {
   const pathParts: (string | number)[] = [];
   let currentPath = path;
 
-  // Extract array indices and object keys
   while (currentPath.length > 0) {
     // First, check for array index at the beginning
     const arrayMatch = currentPath.match(/^\[(\d+)\]/);
@@ -114,52 +111,70 @@ const updateValueAtPath = (
     }
   }
 
+  return pathParts;
+};
+
+// Helper function to navigate to a specific path part
+const navigateToPathPart = (
+  current: Record<string, unknown> | unknown[],
+  part: string | number
+): Record<string, unknown> | unknown[] => {
+  if (typeof part === "number") {
+    // Array index
+    if (Array.isArray(current)) {
+      if (current[part] === undefined) {
+        current[part] = {};
+      }
+      return current[part] as Record<string, unknown> | unknown[];
+    } else {
+      // Convert object to array if needed
+      (current as Record<string, unknown>)[part.toString()] = {};
+      return (current as Record<string, unknown>)[part.toString()] as Record<string, unknown> | unknown[];
+    }
+  } else {
+    // Object key
+    if (!Array.isArray(current)) {
+      if (current[part] === undefined) {
+        current[part] = {};
+      }
+      return current[part] as Record<string, unknown> | unknown[];
+    } else {
+      // This shouldn't happen with proper path parsing, but handle it gracefully
+      return current;
+    }
+  }
+};
+
+// Helper function to update value at a specific path
+const updateValueAtPath = (
+  obj: Record<string, unknown> | unknown[],
+  path: string,
+  newValue: unknown
+): Record<string, unknown> | unknown[] => {
+  const pathParts = parsePath(path);
   const newObj = Array.isArray(obj) ? [...obj] : { ...obj };
   let current: Record<string, unknown> | unknown[] = newObj;
 
   // Navigate to the parent of the target
   for (let i = 0; i < pathParts.length - 1; i++) {
-    const part = pathParts[i];
-    if (typeof part === "number") {
-      // Array index
-      if (Array.isArray(current)) {
-        if (current[part] === undefined) {
-          current[part] = {};
-        }
-        current = current[part] as Record<string, unknown> | unknown[];
-      } else {
-        // Convert object to array if needed
-        (current as Record<string, unknown>)[part.toString()] = {};
-        current = (current as Record<string, unknown>)[part.toString()] as Record<string, unknown> | unknown[];
-      }
-    } else {
-      // Object key
-      if (!Array.isArray(current)) {
-        if (current[part] === undefined) {
-          current[part] = {};
-        }
-        current = current[part] as Record<string, unknown> | unknown[];
-      } else {
-        // This shouldn't happen with proper path parsing, but handle it gracefully
-        break;
-      }
-    }
+    current = navigateToPathPart(current, pathParts[i]);
   }
 
   // Update the value at the target path
   const lastPart = pathParts[pathParts.length - 1];
+  const originalValue =
+    Array.isArray(current) && typeof lastPart === "number"
+      ? current[lastPart]
+      : !Array.isArray(current) && typeof lastPart === "string"
+      ? current[lastPart]
+      : undefined;
 
-  if (typeof lastPart === "number") {
-    // Array index
-    if (Array.isArray(current)) {
-      const originalValue = current[lastPart];
-      current[lastPart] = convertValueToMatchType(originalValue, newValue);
-    }
-  } else {
-    // Object key
-    if (!Array.isArray(current)) {
-      const originalValue = current[lastPart];
-      current[lastPart] = convertValueToMatchType(originalValue, newValue);
+  if (originalValue !== undefined) {
+    const convertedValue = convertValueToMatchType(originalValue, newValue);
+    if (Array.isArray(current) && typeof lastPart === "number") {
+      current[lastPart] = convertedValue;
+    } else if (!Array.isArray(current) && typeof lastPart === "string") {
+      current[lastPart] = convertedValue;
     }
   }
 
