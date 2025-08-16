@@ -99,7 +99,7 @@ interface ServiceStoreState {
   resetState: () => void;
   resetAssign: () => void;
   resetRules: () => void;
-  onServiceSave: (status: "draft" | "ready") => Promise<void>;
+  onServiceSave: (status: "draft" | "ready", showError?: boolean) => Promise<void>;
   onContinueClick: () => Promise<void>;
   selectedNode: Node<NodeDataProps> | null;
   setSelectedNode: (node: Node<NodeDataProps> | null | undefined) => void;
@@ -627,8 +627,8 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
   },
   reactFlowInstance: null,
   setReactFlowInstance: (reactFlowInstance) => set({ reactFlowInstance }),
-  onServiceSave: async (status: "draft" | "ready" = "ready") => {
-    await saveFlowClick(status);
+  onServiceSave: async (status: "draft" | "ready" = "ready", showError = true) => {
+    await saveFlowClick(status, showError);
   },
   onContinueClick: async () => {
     const vaildServiceInfo = get().vaildServiceInfo();
