@@ -10,7 +10,7 @@ import { Link } from "react-router-dom";
 
 type ConnectServiceToIntentModelProps = {
   onModalClose: () => void;
-  onConnect: (intent: Intent) => void;
+  onConnect: () => void;
   canCancel?: boolean;
   canSkip?: boolean;
   onSkip?: () => void;
@@ -27,6 +27,7 @@ const ConnectServiceToIntentModel: FC<ConnectServiceToIntentModelProps> = ({ onM
   const [intents, setIntents] = useState<Intent[] | undefined>(undefined);
   const [selectedIntent, setSelectedIntent] = useState<Intent>();
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
+  const [isConnecting, setIsConnecting] = useState(false);
 
   const loadAvailableIntents = (pagination: PaginationState, sorting: SortingState, search: string) => {
     useServiceStore
@@ -130,8 +131,29 @@ const ConnectServiceToIntentModel: FC<ConnectServiceToIntentModelProps> = ({ onM
               {t("global.no")}
             </Button>
             <Button
+              appearance={!isConnecting ? "primary" : "loading"}
               onClick={() => {
-                if (selectedIntent) onConnect(selectedIntent);
+                if (selectedIntent) {
+                  setIsConnecting(true);
+                  useServiceStore
+                    .getState()
+                    .requestServiceIntentConnection(
+                      () => setShowConfirmationModal(false),
+                      t("overview.service.toast.connectedToIntentSuccessfully"),
+                      t("overview.service.toast.failed.failedToConnectToIntent"),
+                      selectedIntent.intent,
+                      pagination,
+                      sorting
+                    )
+                    .then(() => {
+                      setIsConnecting(false);
+                      onConnect();
+                    })
+                    .catch((e) => {
+                      console.error("Error connecting to intent:", e);
+                      setIsConnecting(false);
+                    });
+                }
               }}
             >
               {t("global.yes")}
