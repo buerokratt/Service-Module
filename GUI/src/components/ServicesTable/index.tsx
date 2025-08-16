@@ -43,6 +43,8 @@ const ServicesTable: FC<ServicesTableProps> = ({ isCommon = false }) => {
     useServiceListStore.getState().loadCommonServicesList(paginationState, sortingState);
   };
 
+  const [isDeletingService, setIsDeletingService] = useState(false);
+
   useEffect(() => {
     if (isCommon) {
       loadCommonServices(pagination, sorting);
@@ -110,15 +112,26 @@ const ServicesTable: FC<ServicesTableProps> = ({ isCommon = false }) => {
   };
 
   const deleteSelectedService = () => {
+    setIsDeletingService(true);
     useServiceListStore
       .getState()
       .deleteSelectedService(
-        () => setIsDeletePopupVisible(false),
+        async () => {
+          setIsDeletePopupVisible(false);
+          await useServiceListStore.getState().loadServicesList(pagination, sorting);
+          await useServiceListStore.getState().loadCommonServicesList(pagination, sorting);
+        },
         t("overview.service.toast.deleted"),
         t("overview.service.toast.failed.delete"),
         pagination,
         sorting
-      );
+      )
+      .then(() => {
+        setIsDeletingService(false);
+      })
+      .catch(() => {
+        setIsDeletingService(false);
+      });
   };
 
   const requestServiceIntentConnection = (intent: string) => {
@@ -180,7 +193,7 @@ const ServicesTable: FC<ServicesTableProps> = ({ isCommon = false }) => {
             <Button appearance="secondary" onClick={() => setIsDeletePopupVisible(false)}>
               {t("overview.cancel")}
             </Button>
-            <Button appearance="error" onClick={deleteSelectedService}>
+            <Button appearance={!isDeletingService ? "error" : 'loading'} onClick={deleteSelectedService}>
               {t("overview.delete")}
             </Button>
           </Track>

@@ -218,11 +218,9 @@ const useServiceListStore = create<ServiceStoreState>((set, get, store) => ({
         type: selectedService?.type,
       });
       useToastStore.getState().success({ title: successMessage });
-      await useServiceListStore.getState().loadServicesList(pagination, sorting);
-      await useServiceListStore.getState().loadCommonServicesList(pagination, sorting);
     } catch (error) {
-      console.error(error);
       useToastStore.getState().error({ title: errorMessage });
+      throw error;
     }
     set({
       selectedService: undefined,
