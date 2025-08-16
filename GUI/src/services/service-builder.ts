@@ -744,6 +744,7 @@ export const saveFlowClick = async (status: "draft" | "ready" = "ready", showErr
         title: i18next.t("newService.toast.failed"),
         message: e.response?.status === 409 ? t("newService.toast.serviceNameAlreadyExists") : e?.message,
       });
+      throw new Error(e.response?.status === 409 ? t("newService.toast.serviceNameAlreadyExists").toString() : e?.message);
     },
     description,
     slot,

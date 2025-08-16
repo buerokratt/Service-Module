@@ -593,7 +593,7 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
   updateEndpointData: (data: RequestVariablesTabsRowsData, endpoint?: EndpointData) => {
     if (!endpoint) return;
 
-    const defEndpoint = endpoint.definitions[0];  
+    const defEndpoint = endpoint.definitions[0];
 
     if (!defEndpoint) return;
 
@@ -638,12 +638,16 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
         title: i18next.t("newService.toast.missingFields"),
         message: i18next.t("newService.toast.serviceMissingFields"),
       });
-      return;
+      return Promise.reject(new Error(i18next.t("newService.toast.missingFields") ?? "Error"));
     }
 
     const { isNewService, onServiceSave } = get();
 
-    await onServiceSave(ServiceState.Ready);
+    try {
+      await onServiceSave(ServiceState.Ready);
+    } catch (e: any) {
+      return Promise.reject(new Error(i18next.t("toast.cannot-save-flow") ?? e?.message ?? "Error"));
+    }
 
     if (isNewService) {
       set({ isNewService: false });
