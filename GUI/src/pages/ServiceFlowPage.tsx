@@ -87,16 +87,8 @@ const ServiceFlowPage: FC = () => {
           }
         }}
         continueOnClick={() => {
-          useServiceStore
-            .getState()
-            .onContinueClick()
-            .then(() => {
-              navigate(ROUTES.OVERVIEW_ROUTE, { replace: true });
-              useServiceStore.getState().resetState();
-            })
-            .catch((error) => {
-              console.error(error);
-            });
+          navigate(ROUTES.OVERVIEW_ROUTE, { replace: true });
+          useServiceStore.getState().resetState();
         }}
         saveOnClick={async () => {
           setHasUnsavedChanges(false);

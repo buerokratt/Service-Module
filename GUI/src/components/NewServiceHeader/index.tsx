@@ -26,6 +26,7 @@ const NewServiceHeader: FC<NewServiceHeaderProps> = ({ activeStep, backOnClick, 
   const navigate = useNavigate();
   const [isSaving, setIsSaving] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isContinuing, setIsContinuing] = useState(false);
   const [isDeleteServiceModalVisible, setIsDeleteServiceModalVisible] = useState(false);
 
   return (
@@ -59,12 +60,24 @@ const NewServiceHeader: FC<NewServiceHeaderProps> = ({ activeStep, backOnClick, 
             {t("global.save")}
           </Button>
           <Button
+            appearance={isContinuing ? "loading" : "primary"}
             onClick={() => {
               if (isSaving) {
                 useToastStore.getState().info({ title: t("overview.service.toast.cannotContinueUntilServiceIsSaved") });
                 return;
-              };
-              continueOnClick();
+              }
+              setIsContinuing(true);
+              useServiceStore
+                .getState()
+                .onContinueClick()
+                .then(() => {
+                  setIsContinuing(false);
+                  continueOnClick();
+                })
+                .catch((error) => {
+                  setIsContinuing(false);
+                  console.error(error);
+                });
             }}
             disabled={!name}
           >
