@@ -10,6 +10,7 @@ import { ServiceState } from "types";
 import { deleteService } from "resources/api-constants";
 import api from "../../services/api-dev";
 import { removeTrailingUnderscores } from "utils/string-util";
+import useToastStore from "store/toasts.store";
 
 type NewServiceHeaderProps = {
   activeStep: number;
@@ -57,7 +58,16 @@ const NewServiceHeader: FC<NewServiceHeaderProps> = ({ activeStep, backOnClick, 
           >
             {t("global.save")}
           </Button>
-          <Button onClick={continueOnClick} disabled={!name}>
+          <Button
+            onClick={() => {
+              if (isSaving) {
+                useToastStore.getState().info({ title: t("overview.service.toast.cannotContinueUntilServiceIsSaved") });
+                return;
+              };
+              continueOnClick();
+            }}
+            disabled={!name}
+          >
             {t("global.confirm")}
           </Button>
         </Track>

@@ -105,11 +105,8 @@ const ServiceFlowPage: FC = () => {
             const serviceResponse = await useServiceStore.getState().loadService(serviceId);
             if (serviceResponse) {
               useServiceListStore.getState().setSelectedService(serviceResponse?.data);
-              await useServiceListStore.getState().changeServiceStateToDraft(serviceResponse?.data);
               navigate(ROUTES.replaceWithId(ROUTES.EDITSERVICE_ROUTE, serviceId));
             } 
-          } else {
-            await useServiceListStore.getState().changeServiceStateToDraft();
           }
         }}
       />

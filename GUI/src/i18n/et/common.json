@@ -163,7 +163,8 @@
         },
         "requestedConnection": "Ühendamist taotletakse",
         "cancelledConnection": "Ühendamistaotlus tühistati",
-        "connectedToIntentSuccessfully": "Kavatsusega ühendamine õnnestus"
+        "connectedToIntentSuccessfully": "Kavatsusega ühendamine õnnestus",
+        "cannotContinueUntilServiceIsSaved": "Ei saa jätkata enne, kui teenus on salvestatud"
       }
     },
     "popup": {

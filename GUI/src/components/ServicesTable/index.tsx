@@ -212,7 +212,8 @@ const ServicesTable: FC<ServicesTableProps> = ({ isCommon = false }) => {
                 {t("overview.cancel")}
               </Button>
               {readyPopupText != t("overview.popup.connectionPending").toString() &&
-                readyPopupText != t("overview.popup.setActive").toString() && (
+                readyPopupText != t("overview.popup.setActive").toString() &&
+                readyPopupText != t("overview.popup.intentNotConnected").toString() && (
                   <Button onClick={() => changeServiceState()}>{t("overview.popup.setToDraft")}</Button>
                 )}
               {getActiveAndConnectionButton()}
