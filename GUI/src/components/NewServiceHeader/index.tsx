@@ -4,7 +4,7 @@ import { Button, HeaderStepCounter, Modal, Track } from "..";
 import useServiceStore from "store/new-services.store";
 import "@buerokratt-ria/header/src/Header.scss";
 import { ROUTES } from "resources/routes-constants";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import useServiceListStore from "../../store/services.store";
 import { ServiceState } from "types";
 import { deleteService } from "resources/api-constants";
@@ -28,6 +28,7 @@ const NewServiceHeader: FC<NewServiceHeaderProps> = ({ activeStep, backOnClick, 
   const [isDeleting, setIsDeleting] = useState(false);
   const [isContinuing, setIsContinuing] = useState(false);
   const [isDeleteServiceModalVisible, setIsDeleteServiceModalVisible] = useState(false);
+  const { id } = useParams();
 
   return (
     <>
@@ -40,7 +41,7 @@ const NewServiceHeader: FC<NewServiceHeaderProps> = ({ activeStep, backOnClick, 
           <Button
             appearance={isDeleting ? "loading" : "error"}
             disabled={
-              selectedService ? serviceState !== ServiceState.Draft && serviceState !== ServiceState.Ready : true
+              serviceState && id ? serviceState !== ServiceState.Draft && serviceState !== ServiceState.Ready : true
             }
             onClick={() => {
               setIsDeleteServiceModalVisible(true);

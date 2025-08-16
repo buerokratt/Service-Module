@@ -99,6 +99,8 @@ const ServiceFlowPage: FC = () => {
               useServiceListStore.getState().setSelectedService(serviceResponse?.data);
               navigate(ROUTES.replaceWithId(ROUTES.EDITSERVICE_ROUTE, serviceId));
             } 
+          } else {
+            useServiceStore.getState().loadService(id);
           }
         }}
       />
