@@ -11,6 +11,13 @@ import ObjectEditor from "./ObjectEditor";
 import styles from "./AssignElement.module.scss";
 import useToastStore from "store/toasts.store";
 
+const showInvalidObjectError = () => {
+  useToastStore.getState().error({
+    title: t("serviceFlow.apiElements.cannotOpenEditor"),
+    message: t("serviceFlow.apiElements.invalidObjectError"),
+  });
+};
+
 interface AssignElementProps {
   element: Assign;
   onRemove?: (id: string) => void;
@@ -85,10 +92,7 @@ const AssignElement: React.FC<AssignElementProps> = ({
       }
 
       if (!isTemplate(element.value)) {
-        useToastStore.getState().error({
-          title: t("serviceFlow.apiElements.cannotOpenEditor"),
-          message: t("serviceFlow.apiElements.invalidObjectError"),
-        });
+        showInvalidObjectError();
         return;
       }
 
@@ -96,11 +100,7 @@ const AssignElement: React.FC<AssignElementProps> = ({
         JSON.parse(templateToString(element.value));
         setIsObjectEditorOpen(!isObjectEditorOpen);
       } catch (error) {
-        // Handle JSON parsing errors gracefully
-        useToastStore.getState().error({
-          title: t("serviceFlow.apiElements.cannotOpenEditor"),
-          message: t("serviceFlow.apiElements.invalidObjectError"),
-        });
+        showInvalidObjectError();
       }
     }
   };
