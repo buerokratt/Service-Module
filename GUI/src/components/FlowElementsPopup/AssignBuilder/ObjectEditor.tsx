@@ -162,7 +162,8 @@ const ObjectEditor: React.FC<ObjectEditorProps> = ({ onChange, data }) => {
             if (path) {
               // Update the value at the specific path
               const newData = updateValueAtPath(currentData, path, valueToReplace);
-              jsonEditorRef.current.set(newData);
+
+              jsonEditorRef.current.update(newData);
 
               onChange(stringToTemplate(JSON.stringify(newData)));
             }
