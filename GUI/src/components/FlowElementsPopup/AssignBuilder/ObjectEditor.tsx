@@ -66,12 +66,10 @@ interface ObjectEditorProps {
 
 const ObjectEditor: React.FC<ObjectEditorProps> = ({ onChange, data: inputData }) => {
   const { t, i18n } = useTranslation();
+  const jsonEditor = t("jsonEditor", { returnObjects: true });
   const editorRef = useRef<HTMLDivElement>(null);
   const jsonEditorRef = useRef<JSONEditor | null>(null);
   const [hoveredElement, setHoveredElement] = useState<Element | null>(null);
-
-  const jsonEditor = t("jsonEditor", { returnObjects: true });
-  const [data, setData] = useState<Record<string, unknown> | unknown[]>(inputData);
 
   useEffect(() => {
     if (editorRef.current && !jsonEditorRef.current) {
@@ -85,7 +83,7 @@ const ObjectEditor: React.FC<ObjectEditorProps> = ({ onChange, data: inputData }
         },
       });
 
-      editor.set(data);
+      editor.set(inputData);
       jsonEditorRef.current = editor;
     }
 
@@ -97,11 +95,12 @@ const ObjectEditor: React.FC<ObjectEditorProps> = ({ onChange, data: inputData }
     };
   }, []);
 
+  // todo check if necessary
   useEffect(() => {
     if (jsonEditorRef.current) {
-      jsonEditorRef.current.set(data);
+      jsonEditorRef.current.set(inputData);
     }
-  }, [data]);
+  }, [inputData]);
 
   // Cleanup effect to remove highlight when component unmounts
   useEffect(() => {
@@ -172,7 +171,6 @@ const ObjectEditor: React.FC<ObjectEditorProps> = ({ onChange, data: inputData }
               // Update the value at the specific path
               const newData = updateValueAtPath(currentData, path, valueToReplace);
               jsonEditorRef.current.set(newData);
-              setData(newData);
 
               onChange(stringToTemplate(JSON.stringify(newData)));
             }
