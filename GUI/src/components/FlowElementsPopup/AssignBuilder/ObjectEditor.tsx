@@ -94,13 +94,6 @@ const ObjectEditor: React.FC<ObjectEditorProps> = ({ onChange, data }) => {
     };
   }, []);
 
-  // todo check if necessary
-  useEffect(() => {
-    if (jsonEditorRef.current) {
-      jsonEditorRef.current.set(data);
-    }
-  }, [data]);
-
   // Cleanup effect to remove highlight when component unmounts
   useEffect(() => {
     return () => {
