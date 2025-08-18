@@ -5,7 +5,7 @@ import AssignElement from "./assignElement";
 import { useAssignBuilder } from "./useAssignBuilder";
 import "../styles.scss";
 import { Assign } from "../../../types/assign";
-import ObjectTree from "./ObjectTree";
+import ObjectEditor from "./ObjectEditor";
 
 interface AssignBuilderProps {
   onChange: (group: Assign[]) => void;
@@ -31,8 +31,6 @@ const AssignBuilder: React.FC<AssignBuilderProps> = ({ onChange, seedGroup }) =>
       {elements?.map((element) => (
         <AssignElement key={element.id} element={element} onRemove={remove} onChange={changeElement} />
       ))}
-
-      <ObjectTree />
     </Track>
   );
 };

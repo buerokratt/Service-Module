@@ -4,7 +4,7 @@ import JSONEditor from "jsoneditor";
 import "jsoneditor/dist/jsoneditor.css";
 import { getDragData } from "utils/component-util";
 import { isObject, updateValueAtPath } from "utils/object-util";
-import styles from "./ObjectTree.module.scss";
+import styles from "./ObjectEditor.module.scss";
 
 // Helper function to find the path to a node in the JSON structure
 const findNodePath = (node: Element, data: Record<string, unknown>): string | null => {
@@ -57,7 +57,7 @@ const searchInCollection = (collection: object, value: string, currentPath = "")
   return null;
 };
 
-const ObjectTree: React.FC = () => {
+const ObjectEditor: React.FC = () => {
   const { t, i18n } = useTranslation();
   const editorRef = useRef<HTMLDivElement>(null);
   const jsonEditorRef = useRef<JSONEditor | null>(null);
@@ -195,6 +195,7 @@ const ObjectTree: React.FC = () => {
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
+      // todo styles
       style={{
         height: "400px",
         border: "1px solid #ddd",
@@ -204,4 +205,4 @@ const ObjectTree: React.FC = () => {
   );
 };
 
-export default ObjectTree;
+export default ObjectEditor;
