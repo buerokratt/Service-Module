@@ -21,11 +21,18 @@ const findNodePath = (node: Element, data: Record<string, unknown>): string | nu
 
 // Helper function to check if values match (handling different types)
 const isValueMatch = (objValue: unknown, value: string): boolean => {
+  // Handle boolean conversion
+  let booleanValue: boolean | null = null;
+  if (value.toLowerCase() === "true") {
+    booleanValue = true;
+  } else if (value.toLowerCase() === "false") {
+    booleanValue = false;
+  }
+
   return (
     objValue === value ||
     (typeof objValue === "number" && !isNaN(Number(value)) && objValue === Number(value)) ||
-    (typeof objValue === "boolean" &&
-      objValue === (value.toLowerCase() === "true" ? true : value.toLowerCase() === "false" ? false : null)) ||
+    (typeof objValue === "boolean" && objValue === booleanValue) ||
     (objValue === null && value.toLowerCase() === "null")
   );
 };
@@ -39,13 +46,21 @@ const searchInCollection = (collection: object, value: string, currentPath = "")
     : Object.entries(collection).map(([key, value]) => ({ key, value }));
 
   for (const { key, value: objValue } of entries) {
-    const newPath = currentPath
-      ? isArray
-        ? `${currentPath}[${key}]`
-        : `${currentPath}.${key}`
-      : isArray
-        ? `[${key}]`
-        : String(key);
+    let newPath: string;
+
+    if (currentPath) {
+      if (isArray) {
+        newPath = `${currentPath}[${key}]`;
+      } else {
+        newPath = `${currentPath}.${key}`;
+      }
+    } else {
+      if (isArray) {
+        newPath = `[${key}]`;
+      } else {
+        newPath = String(key);
+      }
+    }
 
     if (isValueMatch(objValue, value)) return newPath;
 
@@ -182,6 +197,16 @@ const ObjectEditor: React.FC<ObjectEditorProps> = ({ onChange, data }) => {
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
       className={styles.editor}
+      role="application"
+      tabIndex={0}
+      onKeyDown={(e) => {
+        // Handle keyboard interactions for accessibility
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          // Focus the editor for keyboard navigation
+          editorRef.current?.focus();
+        }
+      }}
     />
   );
 };
