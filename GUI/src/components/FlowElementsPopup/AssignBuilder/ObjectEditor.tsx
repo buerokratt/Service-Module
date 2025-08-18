@@ -167,6 +167,7 @@ const ObjectEditor: React.FC<ObjectEditorProps> = ({ onChange, data }) => {
             const path = findNodePath(jsonNode, currentData);
 
             if (path) {
+              // todo i think this broke after removing component state
               // Update the value at the specific path
               const newData = updateValueAtPath(currentData, path, valueToReplace);
               jsonEditorRef.current.set(newData);
