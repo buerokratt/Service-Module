@@ -61,38 +61,21 @@ const searchInCollection = (collection: object, value: string, currentPath = "")
 
 interface ObjectEditorProps {
   onChange: (value: string) => void;
+  data: Record<string, unknown> | unknown[];
 }
 
-const ObjectEditor: React.FC<ObjectEditorProps> = ({ onChange }) => {
+const ObjectEditor: React.FC<ObjectEditorProps> = ({ onChange, data: inputData }) => {
   const { t, i18n } = useTranslation();
   const editorRef = useRef<HTMLDivElement>(null);
   const jsonEditorRef = useRef<JSONEditor | null>(null);
   const [hoveredElement, setHoveredElement] = useState<Element | null>(null);
 
   const jsonEditor = t("jsonEditor", { returnObjects: true });
-  const [data, setData] = useState<Record<string, unknown> | unknown[]>({
-    // todo remove
-    // name: "John Doe",
-    // age: 30,
-    // email: "john@example.com",
-    // address: {
-    //   street: "123 Main St",
-    //   city: "Anytown",
-    //   zip: "12345",
-    // },
-    // preferences: {
-    //   theme: "dark",
-    //   notifications: true,
-    // },
-    // hobbies: ["reading", "gaming", "coding"],
-    // scores: [85, 92, { test: "test value" }, 78],
-  });
+  const [data, setData] = useState<Record<string, unknown> | unknown[]>(inputData);
 
   useEffect(() => {
     if (editorRef.current && !jsonEditorRef.current) {
       const editor = new JSONEditor(editorRef.current, {
-        // todo remove?
-        modes: ["tree", "code"],
         language: i18n.language,
         languages: {
           [i18n.language]: jsonEditor,

@@ -143,7 +143,12 @@ const AssignElement: React.FC<AssignElementProps> = ({
         </Track>
       </Track>
 
-      {isObjectEditorOpen && <ObjectEditor onChange={(value) => onChange({ ...element, value })} />}
+      {isObjectEditorOpen && (
+        <ObjectEditor
+          onChange={(value) => onChange({ ...element, value })}
+          data={JSON.parse(templateToString(element.value))}
+        />
+      )}
     </>
   );
 };
