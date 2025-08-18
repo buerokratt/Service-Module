@@ -3,7 +3,7 @@ import { DragInput, FormInput, Icon, Tooltip, Track } from "components";
 import { MdDataObject, MdDeleteOutline, MdEdit, MdMoveDown } from "react-icons/md";
 import { Assign } from "../../../types/assign";
 import "../styles.scss";
-import { stringToTemplate, templateToString } from "utils/string-util";
+import { isTemplate, stringToTemplate, templateToString } from "utils/string-util";
 import { isArray, isObject } from "utils/object-util";
 import { t } from "i18next";
 import { getDragData } from "utils/component-util";
@@ -137,33 +137,41 @@ const AssignElement: React.FC<AssignElementProps> = ({
             </>
           )}
 
-          <button
-            className="small-assign-button assign-blue"
-            onClick={() => {
-              if (isObjectEditorOpen) {
-                setIsObjectEditorOpen(!isObjectEditorOpen);
-                setIsEditingManually(true);
-              } else {
-                try {
-                  // todo proper message in UI
-                  const parsedValue = JSON.parse(templateToString(element.value));
-                  if (parsedValue) {
-                    setIsObjectEditorOpen(!isObjectEditorOpen);
-                  } else {
-                    // Handle empty/null/undefined parsed value
-                    console.log("Parsed JSON value is falsy");
+          <Tooltip content={t("serviceFlow.popup.openObjectEditor")}>
+            <button
+              className="small-assign-button assign-blue"
+              onClick={() => {
+                if (isObjectEditorOpen) {
+                  setIsObjectEditorOpen(!isObjectEditorOpen);
+                  setIsEditingManually(true);
+                } else {
+                  console.log("IGOR element.value", element.value);
+                  // Skip JSON parsing if the value is a template string
+                  if (!isTemplate(element.value)) {
+                    console.log("Cannot parse template string as JSON");
+                    return;
                   }
-                } catch (error) {
-                  // Handle JSON parsing errors gracefully
-                  console.log("Failed to parse JSON:", error);
-                  // Optionally show user-friendly error message or fallback behavior
+
+                  try {
+                    // todo proper message in UI
+                    const parsedValue = JSON.parse(templateToString(element.value));
+                    if (parsedValue) {
+                      setIsObjectEditorOpen(!isObjectEditorOpen);
+                    } else {
+                      // Handle empty/null/undefined parsed value
+                      console.log("Parsed JSON value is falsy");
+                    }
+                  } catch (error) {
+                    // Handle JSON parsing errors gracefully
+                    console.log("Failed to parse JSON:", error);
+                    // Optionally show user-friendly error message or fallback behavior
+                  }
                 }
-              }
-            }}
-          >
-            {/* todo add tooltip */}
-            <Icon icon={<MdDataObject />} />
-          </button>
+              }}
+            >
+              <Icon icon={<MdDataObject />} />
+            </button>
+          </Tooltip>
 
           {onRemove && (
             <button onClick={() => onRemove(element.id)} className="small-assign-button assign-red">

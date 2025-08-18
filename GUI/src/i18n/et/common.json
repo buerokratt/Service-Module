@@ -337,7 +337,8 @@
       "assignToSelfNotAllowed": "Määramine iseendale ei ole lubatud",
       "assignAsValue": "Määra teine element väärtuseks",
       "removeValueAssignment": "Eemalda element, mis on määratud väärtuseks",
-      "assignManualEdit": "Muutke muutuja määramist käsitsi"
+      "assignManualEdit": "Muutke muutuja määramist käsitsi",
+      "openObjectEditor": "Ava objekti redaktor"
     },
     "previousVariables": {
       "assignElements": "Määra elemendid",

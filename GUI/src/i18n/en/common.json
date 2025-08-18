@@ -337,7 +337,8 @@
       "assignToSelfNotAllowed": "Assign to self not allowed",
       "assignAsValue": "Assign another element to use as value",
       "removeValueAssignment": "Remove element assigned as value",
-      "assignManualEdit": "Manually edit variable assignment"
+      "assignManualEdit": "Manually edit variable assignment",
+      "openObjectEditor": "Open object editor"
     },
     "previousVariables": {
       "assignElements": "Assign Elements",
