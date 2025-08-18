@@ -73,6 +73,38 @@ const AssignElement: React.FC<AssignElementProps> = ({
     onChange({ ...element, slots: undefined });
   };
 
+  const toggleObjectEditor = () => {
+    if (isObjectEditorOpen) {
+      setIsObjectEditorOpen(!isObjectEditorOpen);
+      setIsEditingManually(true);
+    } else {
+      // New empty element
+      if (element.value === "") {
+        setIsObjectEditorOpen(!isObjectEditorOpen);
+        return;
+      }
+
+      if (!isTemplate(element.value)) {
+        useToastStore.getState().error({
+          title: t("serviceFlow.apiElements.cannotOpenEditor"),
+          message: t("serviceFlow.apiElements.invalidObjectError"),
+        });
+        return;
+      }
+
+      try {
+        JSON.parse(templateToString(element.value));
+        setIsObjectEditorOpen(!isObjectEditorOpen);
+      } catch (error) {
+        // Handle JSON parsing errors gracefully
+        useToastStore.getState().error({
+          title: t("serviceFlow.apiElements.cannotOpenEditor"),
+          message: t("serviceFlow.apiElements.invalidObjectError"),
+        });
+      }
+    }
+  };
+
   return (
     <div className={styles.assignElement}>
       <Track gap={16} isFlex>
@@ -139,44 +171,9 @@ const AssignElement: React.FC<AssignElementProps> = ({
           )}
 
           <Tooltip content={t("serviceFlow.popup.openObjectEditor")}>
-            <button
-              className="small-assign-button assign-blue"
-              onClick={() => {
-                if (isObjectEditorOpen) {
-                  setIsObjectEditorOpen(!isObjectEditorOpen);
-                  setIsEditingManually(true);
-                } else {
-                  if (!isTemplate(element.value)) {
-                    useToastStore.getState().error({
-                      title: t("serviceFlow.apiElements.cannotOpenEditor"),
-                      message: t("serviceFlow.apiElements.invalidObjectError"),
-                    });
-                    return;
-                  }
-
-                  try {
-                    const parsedValue = JSON.parse(templateToString(element.value));
-                    if (parsedValue) {
-                      setIsObjectEditorOpen(!isObjectEditorOpen);
-                    } else {
-                      // Handle empty/null/undefined parsed value
-                      useToastStore.getState().error({
-                        title: t("serviceFlow.apiElements.cannotOpenEditor"),
-                        message: t("serviceFlow.apiElements.invalidObjectError"),
-                      });
-                    }
-                  } catch (error) {
-                    // Handle JSON parsing errors gracefully
-                    useToastStore.getState().error({
-                      title: t("serviceFlow.apiElements.cannotOpenEditor"),
-                      message: t("serviceFlow.apiElements.invalidObjectError"),
-                    });
-                  }
-                }
-              }}
-            >
+            <div className="small-assign-button assign-blue" onClick={toggleObjectEditor}>
               <Icon icon={<MdDataObject />} />
-            </button>
+            </div>
           </Tooltip>
 
           {onRemove && (
