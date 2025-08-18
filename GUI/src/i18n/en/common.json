@@ -404,6 +404,7 @@
       "deleteError": "Failed to delete API element",
       "editSuccess": "API element edited successfully",
       "editError": "Failed to edit API element",
+      "parseError": "Failed to parse JSON value",
       "public": "Public"
     },
     "multiChoiceQuestion": {

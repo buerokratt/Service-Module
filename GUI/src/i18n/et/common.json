@@ -404,6 +404,7 @@
       "deleteError": "API elementi kustutamine ebaõnnestus",
       "editSuccess": "API element edukalt muudetud",
       "editError": "API elemendi muutmine ebaõnnestus",
+      "parseError": "JSON väärtuse parsimine ebaõnnestus",
       "public": "Avalik"
     },
     "multiChoiceQuestion": {

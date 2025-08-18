@@ -9,6 +9,7 @@ import { t } from "i18next";
 import { getDragData } from "utils/component-util";
 import ObjectEditor from "./ObjectEditor";
 import styles from "./AssignElement.module.scss";
+import useToastStore from "store/toasts.store";
 
 interface AssignElementProps {
   element: Assign;
@@ -149,6 +150,7 @@ const AssignElement: React.FC<AssignElementProps> = ({
                   // Skip JSON parsing if the value is a template string
                   if (!isTemplate(element.value)) {
                     console.log("Cannot parse template string as JSON");
+                    useToastStore.getState().error({ title: t("serviceFlow.apiElements.parseError") });
                     return;
                   }
 
@@ -160,11 +162,12 @@ const AssignElement: React.FC<AssignElementProps> = ({
                     } else {
                       // Handle empty/null/undefined parsed value
                       console.log("Parsed JSON value is falsy");
+                      useToastStore.getState().error({ title: t("serviceFlow.apiElements.parseError") });
                     }
                   } catch (error) {
                     // Handle JSON parsing errors gracefully
                     console.log("Failed to parse JSON:", error);
-                    // Optionally show user-friendly error message or fallback behavior
+                    useToastStore.getState().error({ title: t("serviceFlow.apiElements.parseError") });
                   }
                 }
               }}
