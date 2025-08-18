@@ -60,11 +60,10 @@ const searchInCollection = (collection: object, value: string, currentPath = "")
 };
 
 interface ObjectEditorProps {
-  assignElement: Assign;
-  onChange: (element: Assign) => void;
+  onChange: (value: string) => void;
 }
 
-const ObjectEditor: React.FC<ObjectEditorProps> = ({ assignElement, onChange }) => {
+const ObjectEditor: React.FC<ObjectEditorProps> = ({ onChange }) => {
   const { t, i18n } = useTranslation();
   const editorRef = useRef<HTMLDivElement>(null);
   const jsonEditorRef = useRef<JSONEditor | null>(null);
@@ -99,7 +98,7 @@ const ObjectEditor: React.FC<ObjectEditorProps> = ({ assignElement, onChange }) 
           [i18n.language]: jsonEditor,
         },
         onChange: () => {
-          onChange({ ...assignElement, value: stringToTemplate(JSON.stringify(jsonEditorRef.current?.get())) });
+          onChange(stringToTemplate(JSON.stringify(jsonEditorRef.current?.get())));
         },
       });
 
@@ -196,7 +195,7 @@ const ObjectEditor: React.FC<ObjectEditorProps> = ({ assignElement, onChange }) 
 
               console.log("IGOR newData", newData);
 
-              onChange({ ...assignElement, value: stringToTemplate(JSON.stringify(newData)) });
+              onChange(stringToTemplate(JSON.stringify(newData)));
             }
           }
         }
