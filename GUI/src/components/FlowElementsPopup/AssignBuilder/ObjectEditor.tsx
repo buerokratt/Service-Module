@@ -37,31 +37,11 @@ const isValueMatch = (objValue: unknown, value: string): boolean => {
   );
 };
 
-// Helper function to build path for array elements
-const buildArrayPath = (currentPath: string, key: number): string => {
-  return currentPath ? `${currentPath}[${key}]` : `[${key}]`;
-};
-
-// Helper function to build path for object elements
-const buildObjectPath = (currentPath: string, key: string): string => {
-  return currentPath ? `${currentPath}.${key}` : String(key);
-};
-
-// Helper function to build the new path based on collection type
-const buildNewPath = (isArray: boolean, currentPath: string, key: string | number): string => {
-  return isArray ? buildArrayPath(currentPath, key as number) : buildObjectPath(currentPath, key as string);
-};
-
-// Helper function to search for value in a collection
-const searchInCollection = (collection: object, value: string, currentPath = ""): string | null => {
-  const isArray = Array.isArray(collection);
-
-  const entries = isArray
-    ? collection.map((value, index) => ({ key: index, value }))
-    : Object.entries(collection).map(([key, value]) => ({ key, value }));
-
-  for (const { key, value: objValue } of entries) {
-    const newPath = buildNewPath(isArray, currentPath, key);
+// Helper function to search for value in an array
+const searchInArray = (array: unknown[], value: string, currentPath = ""): string | null => {
+  for (let index = 0; index < array.length; index++) {
+    const objValue = array[index];
+    const newPath = currentPath ? `${currentPath}[${index}]` : `[${index}]`;
 
     if (isValueMatch(objValue, value)) return newPath;
 
@@ -72,6 +52,31 @@ const searchInCollection = (collection: object, value: string, currentPath = "")
   }
 
   return null;
+};
+
+// Helper function to search for value in an object
+const searchInObject = (obj: Record<string, unknown>, value: string, currentPath = ""): string | null => {
+  for (const [key, objValue] of Object.entries(obj)) {
+    const newPath = currentPath ? `${currentPath}.${key}` : String(key);
+
+    if (isValueMatch(objValue, value)) return newPath;
+
+    if (isObject(objValue)) {
+      const result = searchInCollection(objValue, value, newPath);
+      if (result) return result;
+    }
+  }
+
+  return null;
+};
+
+// Helper function to search for value in a collection
+const searchInCollection = (collection: object, value: string, currentPath = ""): string | null => {
+  if (Array.isArray(collection)) {
+    return searchInArray(collection, value, currentPath);
+  }
+
+  return searchInObject(collection as Record<string, unknown>, value, currentPath);
 };
 
 interface ObjectEditorProps {
