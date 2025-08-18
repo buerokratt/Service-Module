@@ -143,7 +143,7 @@ const AssignElement: React.FC<AssignElementProps> = ({
         </Track>
       </Track>
 
-      {isObjectEditorOpen && <ObjectEditor />}
+      {isObjectEditorOpen && <ObjectEditor assignElement={element} onChange={onChange} />}
     </>
   );
 };

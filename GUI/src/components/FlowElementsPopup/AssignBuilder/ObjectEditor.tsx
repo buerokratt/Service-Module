@@ -5,6 +5,8 @@ import "jsoneditor/dist/jsoneditor.css";
 import { getDragData } from "utils/component-util";
 import { isObject, updateValueAtPath } from "utils/object-util";
 import styles from "./ObjectEditor.module.scss";
+import { Assign } from "types";
+import { stringToTemplate } from "utils/string-util";
 
 // Helper function to find the path to a node in the JSON structure
 const findNodePath = (node: Element, data: Record<string, unknown>): string | null => {
@@ -57,7 +59,12 @@ const searchInCollection = (collection: object, value: string, currentPath = "")
   return null;
 };
 
-const ObjectEditor: React.FC = () => {
+interface ObjectEditorProps {
+  assignElement: Assign;
+  onChange: (element: Assign) => void;
+}
+
+const ObjectEditor: React.FC<ObjectEditorProps> = ({ assignElement, onChange }) => {
   const { t, i18n } = useTranslation();
   const editorRef = useRef<HTMLDivElement>(null);
   const jsonEditorRef = useRef<JSONEditor | null>(null);
@@ -90,6 +97,9 @@ const ObjectEditor: React.FC = () => {
         language: i18n.language,
         languages: {
           [i18n.language]: jsonEditor,
+        },
+        onChange: () => {
+          onChange({ ...assignElement, value: stringToTemplate(JSON.stringify(jsonEditorRef.current?.get())) });
         },
       });
 
@@ -176,11 +186,17 @@ const ObjectEditor: React.FC = () => {
             // Try to find the path to the dropped node
             const path = findNodePath(jsonNode, currentData);
 
+            console.log("IGOR path", path);
+
             if (path) {
               // Update the value at the specific path
               const newData = updateValueAtPath(currentData, path, valueToReplace);
               jsonEditorRef.current.set(newData);
               setData(newData);
+
+              console.log("IGOR newData", newData);
+
+              onChange({ ...assignElement, value: stringToTemplate(JSON.stringify(newData)) });
             }
           }
         }
