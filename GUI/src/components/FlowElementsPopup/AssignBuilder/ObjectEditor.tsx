@@ -37,6 +37,21 @@ const isValueMatch = (objValue: unknown, value: string): boolean => {
   );
 };
 
+// Helper function to build path for array elements
+const buildArrayPath = (currentPath: string, key: number): string => {
+  return currentPath ? `${currentPath}[${key}]` : `[${key}]`;
+};
+
+// Helper function to build path for object elements
+const buildObjectPath = (currentPath: string, key: string): string => {
+  return currentPath ? `${currentPath}.${key}` : String(key);
+};
+
+// Helper function to build the new path based on collection type
+const buildNewPath = (isArray: boolean, currentPath: string, key: string | number): string => {
+  return isArray ? buildArrayPath(currentPath, key as number) : buildObjectPath(currentPath, key as string);
+};
+
 // Helper function to search for value in a collection
 const searchInCollection = (collection: object, value: string, currentPath = ""): string | null => {
   const isArray = Array.isArray(collection);
@@ -46,19 +61,7 @@ const searchInCollection = (collection: object, value: string, currentPath = "")
     : Object.entries(collection).map(([key, value]) => ({ key, value }));
 
   for (const { key, value: objValue } of entries) {
-    let newPath: string;
-
-    if (currentPath) {
-      if (isArray) {
-        newPath = `${currentPath}[${key}]`;
-      } else {
-        newPath = `${currentPath}.${key}`;
-      }
-    } else if (isArray) {
-      newPath = `[${key}]`;
-    } else {
-      newPath = String(key);
-    }
+    const newPath = buildNewPath(isArray, currentPath, key);
 
     if (isValueMatch(objValue, value)) return newPath;
 
