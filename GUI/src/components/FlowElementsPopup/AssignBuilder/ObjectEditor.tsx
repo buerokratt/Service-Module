@@ -64,7 +64,7 @@ interface ObjectEditorProps {
   data: Record<string, unknown> | unknown[];
 }
 
-const ObjectEditor: React.FC<ObjectEditorProps> = ({ onChange, data: inputData }) => {
+const ObjectEditor: React.FC<ObjectEditorProps> = ({ onChange, data }) => {
   const { t, i18n } = useTranslation();
   const jsonEditor = t("jsonEditor", { returnObjects: true });
   const editorRef = useRef<HTMLDivElement>(null);
@@ -83,7 +83,7 @@ const ObjectEditor: React.FC<ObjectEditorProps> = ({ onChange, data: inputData }
         },
       });
 
-      editor.set(inputData);
+      editor.set(data);
       jsonEditorRef.current = editor;
     }
 
@@ -98,9 +98,9 @@ const ObjectEditor: React.FC<ObjectEditorProps> = ({ onChange, data: inputData }
   // todo check if necessary
   useEffect(() => {
     if (jsonEditorRef.current) {
-      jsonEditorRef.current.set(inputData);
+      jsonEditorRef.current.set(data);
     }
-  }, [inputData]);
+  }, [data]);
 
   // Cleanup effect to remove highlight when component unmounts
   useEffect(() => {
