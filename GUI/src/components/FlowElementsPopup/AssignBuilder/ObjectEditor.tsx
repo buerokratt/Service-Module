@@ -5,7 +5,6 @@ import "jsoneditor/dist/jsoneditor.css";
 import { getDragData } from "utils/component-util";
 import { isObject, updateValueAtPath } from "utils/object-util";
 import styles from "./ObjectEditor.module.scss";
-import { Assign } from "types";
 import { stringToTemplate } from "utils/string-util";
 
 // Helper function to find the path to a node in the JSON structure
