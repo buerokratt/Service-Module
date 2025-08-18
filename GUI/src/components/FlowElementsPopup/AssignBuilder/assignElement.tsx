@@ -146,28 +146,31 @@ const AssignElement: React.FC<AssignElementProps> = ({
                   setIsObjectEditorOpen(!isObjectEditorOpen);
                   setIsEditingManually(true);
                 } else {
-                  console.log("IGOR element.value", element.value);
-                  // Skip JSON parsing if the value is a template string
                   if (!isTemplate(element.value)) {
-                    console.log("Cannot parse template string as JSON");
-                    useToastStore.getState().error({ title: t("serviceFlow.apiElements.parseError") });
+                    useToastStore.getState().error({
+                      title: t("serviceFlow.apiElements.cannotOpenEditor"),
+                      message: t("serviceFlow.apiElements.invalidObjectError"),
+                    });
                     return;
                   }
 
                   try {
-                    // todo proper message in UI
                     const parsedValue = JSON.parse(templateToString(element.value));
                     if (parsedValue) {
                       setIsObjectEditorOpen(!isObjectEditorOpen);
                     } else {
                       // Handle empty/null/undefined parsed value
-                      console.log("Parsed JSON value is falsy");
-                      useToastStore.getState().error({ title: t("serviceFlow.apiElements.parseError") });
+                      useToastStore.getState().error({
+                        title: t("serviceFlow.apiElements.cannotOpenEditor"),
+                        message: t("serviceFlow.apiElements.invalidObjectError"),
+                      });
                     }
                   } catch (error) {
                     // Handle JSON parsing errors gracefully
-                    console.log("Failed to parse JSON:", error);
-                    useToastStore.getState().error({ title: t("serviceFlow.apiElements.parseError") });
+                    useToastStore.getState().error({
+                      title: t("serviceFlow.apiElements.cannotOpenEditor"),
+                      message: t("serviceFlow.apiElements.invalidObjectError"),
+                    });
                   }
                 }
               }}

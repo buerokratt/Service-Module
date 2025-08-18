@@ -405,6 +405,8 @@
       "editSuccess": "API element edukalt muudetud",
       "editError": "API elemendi muutmine ebaõnnestus",
       "parseError": "JSON väärtuse parsimine ebaõnnestus",
+      "cannotOpenEditor": "Objektiredaktorit ei saa avada",
+      "invalidObjectError": "Sisendi parsimine ebaõnnestus, väärtus pole kehtiv objekt",
       "public": "Avalik"
     },
     "multiChoiceQuestion": {
