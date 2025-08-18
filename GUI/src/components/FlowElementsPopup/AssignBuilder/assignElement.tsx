@@ -8,6 +8,7 @@ import { isArray, isObject } from "utils/object-util";
 import { t } from "i18next";
 import { getDragData } from "utils/component-util";
 import ObjectEditor from "./ObjectEditor";
+import styles from "./AssignElement.module.scss";
 
 interface AssignElementProps {
   element: Assign;
@@ -72,7 +73,7 @@ const AssignElement: React.FC<AssignElementProps> = ({
   };
 
   return (
-    <>
+    <div className={styles.assignElement}>
       <Track gap={16} isFlex>
         <FormInput
           value={element.key}
@@ -149,7 +150,7 @@ const AssignElement: React.FC<AssignElementProps> = ({
           onChange={(value) => onChange({ ...element, value })}
         />
       )}
-    </>
+    </div>
   );
 };
 

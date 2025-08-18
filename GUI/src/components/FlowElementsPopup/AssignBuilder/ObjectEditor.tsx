@@ -181,12 +181,7 @@ const ObjectEditor: React.FC<ObjectEditorProps> = ({ onChange, data }) => {
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
-      // todo styles
-      style={{
-        height: "400px",
-        border: "1px solid #ddd",
-        borderRadius: "4px",
-      }}
+      className={styles.editor}
     />
   );
 };
