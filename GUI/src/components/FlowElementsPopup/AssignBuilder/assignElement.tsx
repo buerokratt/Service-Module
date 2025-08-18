@@ -31,7 +31,7 @@ const AssignElement: React.FC<AssignElementProps> = ({
   const slots = element.slots ?? [];
   const [isSecondSlotOpen, setIsSecondSlotOpen] = useState(!!slots[1]);
   const [isEditingManually, setIsEditingManually] = useState(manualEdit || (element.value && !slots.length));
-  const [isObjectTreeOpen, setIsObjectTreeOpen] = useState(false);
+  const [isObjectEditorOpen, setIsObjectEditorOpen] = useState(false);
 
   const changeKey = (e: React.ChangeEvent<HTMLInputElement>) => {
     onChange({ ...element, key: e.target.value });
@@ -120,7 +120,10 @@ const AssignElement: React.FC<AssignElementProps> = ({
             </Track>
           )}
 
-          <button className="small-assign-button assign-blue" onClick={() => setIsObjectTreeOpen(!isObjectTreeOpen)}>
+          <button
+            className="small-assign-button assign-blue"
+            onClick={() => setIsObjectEditorOpen(!isObjectEditorOpen)}
+          >
             <Icon icon={<MdDataObject />} />
           </button>
 
@@ -140,7 +143,7 @@ const AssignElement: React.FC<AssignElementProps> = ({
         </Track>
       </Track>
 
-      {isObjectTreeOpen && <ObjectEditor />}
+      {isObjectEditorOpen && <ObjectEditor />}
     </>
   );
 };
