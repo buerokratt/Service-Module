@@ -475,7 +475,7 @@
     "title": "Chat Integration",
     "input-placeholder": "Enter your message..."
   },
-  "jsonEditor": {
+  "objectEditor": {
     "array": "Array",
     "auto": "Auto",
     "appendText": "Append",
@@ -566,6 +566,7 @@
     "examples": "Examples",
     "default": "Default",
     "containsInvalidProperties": "Contains invalid properties",
-    "containsInvalidItems": "Contains invalid items"
+    "containsInvalidItems": "Contains invalid items",
+    "editor": "Object Editor"
   }
 }

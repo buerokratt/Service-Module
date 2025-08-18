@@ -476,7 +476,7 @@
     "title": "Chat Integration",
     "input-placeholder": "Kirjutage oma sõnum..."
   },
-  "jsonEditor": {
+  "objectEditor": {
     "array": "Massiiv",
     "auto": "Automaatne",
     "appendText": "Lisa lõppu",
@@ -567,6 +567,7 @@
     "examples": "Näited",
     "default": "Vaikimisi",
     "containsInvalidProperties": "Sisaldab vigaseid omadusi",
-    "containsInvalidItems": "Sisaldab vigaseid elemente"
+    "containsInvalidItems": "Sisaldab vigaseid elemente",
+    "editor": "Objektiredaktor"
   }
 }

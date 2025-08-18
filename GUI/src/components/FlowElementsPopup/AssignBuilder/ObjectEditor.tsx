@@ -54,12 +54,10 @@ const searchInCollection = (collection: object, value: string, currentPath = "")
       } else {
         newPath = `${currentPath}.${key}`;
       }
+    } else if (isArray) {
+      newPath = `[${key}]`;
     } else {
-      if (isArray) {
-        newPath = `[${key}]`;
-      } else {
-        newPath = String(key);
-      }
+      newPath = String(key);
     }
 
     if (isValueMatch(objValue, value)) return newPath;
@@ -80,7 +78,7 @@ interface ObjectEditorProps {
 
 const ObjectEditor: React.FC<ObjectEditorProps> = ({ onChange, data }) => {
   const { t, i18n } = useTranslation();
-  const jsonEditor = t("jsonEditor", { returnObjects: true });
+  const jsonEditor = t("objectEditor", { returnObjects: true });
   const editorRef = useRef<HTMLDivElement>(null);
   const jsonEditorRef = useRef<JSONEditor | null>(null);
   const [hoveredElement, setHoveredElement] = useState<Element | null>(null);
@@ -198,6 +196,7 @@ const ObjectEditor: React.FC<ObjectEditorProps> = ({ onChange, data }) => {
       onDrop={handleDrop}
       className={styles.editor}
       role="application"
+      aria-label={t("objectEditor.editor")!}
       tabIndex={0}
       onKeyDown={(e) => {
         // Handle keyboard interactions for accessibility
