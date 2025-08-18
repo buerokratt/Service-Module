@@ -140,8 +140,12 @@ const AssignElement: React.FC<AssignElementProps> = ({
           <button
             className="small-assign-button assign-blue"
             onClick={() => {
-              setIsObjectEditorOpen(!isObjectEditorOpen);
-              if (isObjectEditorOpen) setIsEditingManually(true);
+              if (isObjectEditorOpen) {
+                setIsObjectEditorOpen(!isObjectEditorOpen);
+                setIsEditingManually(true);
+              } else {
+                setIsObjectEditorOpen(!isObjectEditorOpen);
+              }
             }}
           >
             <Icon icon={<MdDataObject />} />
