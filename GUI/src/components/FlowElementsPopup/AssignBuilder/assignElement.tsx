@@ -87,38 +87,54 @@ const AssignElement: React.FC<AssignElementProps> = ({
         />
         :
         <Track style={{ flex: "1 0 75%", justifyContent: "flex-end" }} gap={5}>
-          {isEditingManually ? (
-            <FormInput
-              value={element.value}
-              name="value"
-              onChange={changeValue}
-              label=""
-              style={valueStyle}
-              hideLabel
-              onDrop={changeManualInputValue}
-            />
-          ) : (
-            <Track gap={3} isFlex>
-              <DragInput id={element.id} element={slots[0]} onChange={changeFirstSlot} />
+          {!isObjectEditorOpen && (
+            <>
+              {isEditingManually ? (
+                <FormInput
+                  value={element.value}
+                  name="value"
+                  onChange={changeValue}
+                  label=""
+                  style={valueStyle}
+                  hideLabel
+                  onDrop={changeManualInputValue}
+                />
+              ) : (
+                <Track gap={3} isFlex>
+                  <DragInput id={element.id} element={slots[0]} onChange={changeFirstSlot} />
 
-              {slots.length && isObject(slots[0].data) && !isArray(slots[0].data) ? (
-                <Tooltip
-                  content={t(
-                    isSecondSlotOpen ? "serviceFlow.popup.removeValueAssignment" : "serviceFlow.popup.assignAsValue",
-                  )}
-                  onButtonClick={() => {
-                    setIsSecondSlotOpen(!isSecondSlotOpen);
-                    if (!isSecondSlotOpen) resetSecondSlot();
-                  }}
-                >
-                  <div className={`small-assign-button ${isSecondSlotOpen ? "assign-red" : "assign-blue"}`}>
-                    <Icon icon={<MdMoveDown />} />
+                  {slots.length && isObject(slots[0].data) && !isArray(slots[0].data) ? (
+                    <Tooltip
+                      content={t(
+                        isSecondSlotOpen
+                          ? "serviceFlow.popup.removeValueAssignment"
+                          : "serviceFlow.popup.assignAsValue",
+                      )}
+                      onButtonClick={() => {
+                        setIsSecondSlotOpen(!isSecondSlotOpen);
+                        if (!isSecondSlotOpen) resetSecondSlot();
+                      }}
+                    >
+                      <div className={`small-assign-button ${isSecondSlotOpen ? "assign-red" : "assign-blue"}`}>
+                        <Icon icon={<MdMoveDown />} />
+                      </div>
+                    </Tooltip>
+                  ) : null}
+
+                  {isSecondSlotOpen ? (
+                    <DragInput id={element.id} element={slots[1]} onChange={changeSecondSlot} />
+                  ) : null}
+                </Track>
+              )}
+
+              {!isEditingManually ? (
+                <Tooltip content={t("serviceFlow.popup.assignManualEdit")} onButtonClick={enableManualEdit}>
+                  <div className="small-assign-button assign-blue">
+                    <Icon icon={<MdEdit />} />
                   </div>
                 </Tooltip>
               ) : null}
-
-              {isSecondSlotOpen ? <DragInput id={element.id} element={slots[1]} onChange={changeSecondSlot} /> : null}
-            </Track>
+            </>
           )}
 
           <button
@@ -127,14 +143,6 @@ const AssignElement: React.FC<AssignElementProps> = ({
           >
             <Icon icon={<MdDataObject />} />
           </button>
-
-          {!isEditingManually ? (
-            <Tooltip content={t("serviceFlow.popup.assignManualEdit")} onButtonClick={enableManualEdit}>
-              <div className="small-assign-button assign-blue">
-                <Icon icon={<MdEdit />} />
-              </div>
-            </Tooltip>
-          ) : null}
 
           {onRemove && (
             <button onClick={() => onRemove(element.id)} className="small-assign-button assign-red">
