@@ -184,6 +184,7 @@ const useServiceListStore = create<ServiceStoreState>((set, get, store) => ({
     } catch (error) {
       console.error(error);
       useToastStore.getState().error({ title: errorMessage });
+      throw error;
     }
     set({
       selectedService: undefined,

@@ -33,6 +33,7 @@ const ServicesTable: FC<ServicesTableProps> = ({ isCommon = false }) => {
     pageSize: 10,
   });
   const [sorting, setSorting] = useState<SortingState>([{ id: "name", desc: false }]);
+  const [isActivating, setIsActivating] = useState(false);
 
   const loadServices = (paginationState: PaginationState, sortingState: SortingState) => {
     useServiceListStore.getState().loadServicesList(paginationState, sortingState);
@@ -96,18 +97,26 @@ const ServicesTable: FC<ServicesTableProps> = ({ isCommon = false }) => {
   );
 
   const changeServiceState = (activate: boolean = false, draft: boolean = false) => {
-    useServiceListStore.getState().changeServiceState(
-      () => {
-        setIsReadyPopupVisible(false);
-        setIsStatePopupVisible(false);
-      },
-      t("overview.service.toast.updated"),
-      t("overview.service.toast.failed.state"),
-      activate,
-      draft,
-      pagination,
-      sorting
-    );
+    useServiceListStore
+      .getState()
+      .changeServiceState(
+        () => {
+          setIsReadyPopupVisible(false);
+          setIsStatePopupVisible(false);
+        },
+        t("overview.service.toast.updated"),
+        t("overview.service.toast.failed.state"),
+        activate,
+        draft,
+        pagination,
+        sorting
+      )
+      .then(() => {
+        setIsActivating(false);
+      })
+      .catch(() => {
+        setIsActivating(false);
+      });
   };
 
   const deleteSelectedService = () => {
@@ -154,7 +163,17 @@ const ServicesTable: FC<ServicesTableProps> = ({ isCommon = false }) => {
 
   const getActiveAndConnectionButton = () => {
     if (readyPopupText === t("overview.popup.setActive")) {
-      return <Button onClick={() => changeServiceState(true)}>{t("overview.popup.activateService")}</Button>;
+      return (
+        <Button
+          appearance={!isActivating ? "primary" : "loading"}
+          onClick={() => {
+            setIsActivating(true);
+            changeServiceState(true);
+          }}
+        >
+          {t("overview.popup.activateService")}
+        </Button>
+      );
     }
     if (readyPopupText === t("overview.popup.connectionPending")) {
       return <Button onClick={cancelConnectionRequest}>{t("overview.popup.cancelRequest")}</Button>;
