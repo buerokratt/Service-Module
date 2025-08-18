@@ -170,8 +170,8 @@ const AssignElement: React.FC<AssignElementProps> = ({
             </>
           )}
 
-          <Tooltip content={t("serviceFlow.popup.openObjectEditor")}>
-            <div className="small-assign-button assign-blue" onClick={toggleObjectEditor}>
+          <Tooltip content={t("serviceFlow.popup.openObjectEditor")} onButtonClick={toggleObjectEditor}>
+            <div className="small-assign-button assign-blue">
               <Icon icon={<MdDataObject />} />
             </div>
           </Tooltip>
