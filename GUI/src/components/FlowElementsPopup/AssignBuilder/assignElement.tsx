@@ -120,6 +120,10 @@ const AssignElement: React.FC<AssignElementProps> = ({
             </Track>
           )}
 
+          <button className="small-assign-button assign-blue" onClick={() => setIsObjectTreeOpen(!isObjectTreeOpen)}>
+            <Icon icon={<MdDataObject />} />
+          </button>
+
           {!isEditingManually ? (
             <Tooltip content={t("serviceFlow.popup.assignManualEdit")} onButtonClick={enableManualEdit}>
               <div className="small-assign-button assign-blue">
@@ -127,10 +131,6 @@ const AssignElement: React.FC<AssignElementProps> = ({
               </div>
             </Tooltip>
           ) : null}
-
-          <button className="small-assign-button assign-blue" onClick={() => setIsObjectTreeOpen(!isObjectTreeOpen)}>
-            <Icon icon={<MdDataObject />} />
-          </button>
 
           {onRemove && (
             <button onClick={() => onRemove(element.id)} className="small-assign-button assign-red">

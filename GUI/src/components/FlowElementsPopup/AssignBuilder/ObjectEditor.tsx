@@ -65,20 +65,21 @@ const ObjectEditor: React.FC = () => {
 
   const jsonEditor = t("jsonEditor", { returnObjects: true });
   const [data, setData] = useState<Record<string, unknown> | unknown[]>({
-    name: "John Doe",
-    age: 30,
-    email: "john@example.com",
-    address: {
-      street: "123 Main St",
-      city: "Anytown",
-      zip: "12345",
-    },
-    preferences: {
-      theme: "dark",
-      notifications: true,
-    },
-    hobbies: ["reading", "gaming", "coding"],
-    scores: [85, 92, { test: "test value" }, 78],
+    // todo remove
+    // name: "John Doe",
+    // age: 30,
+    // email: "john@example.com",
+    // address: {
+    //   street: "123 Main St",
+    //   city: "Anytown",
+    //   zip: "12345",
+    // },
+    // preferences: {
+    //   theme: "dark",
+    //   notifications: true,
+    // },
+    // hobbies: ["reading", "gaming", "coding"],
+    // scores: [85, 92, { test: "test value" }, 78],
   });
 
   useEffect(() => {
