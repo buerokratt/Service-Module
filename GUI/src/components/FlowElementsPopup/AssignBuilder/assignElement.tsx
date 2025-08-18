@@ -100,6 +100,7 @@ const AssignElement: React.FC<AssignElementProps> = ({
         JSON.parse(templateToString(element.value));
         setIsObjectEditorOpen(!isObjectEditorOpen);
       } catch (error) {
+        console.log("Error parsing input", error);
         showInvalidObjectError();
       }
     }

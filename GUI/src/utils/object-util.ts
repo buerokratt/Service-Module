@@ -100,7 +100,7 @@ const parsePath = (path: string): (string | number)[] => {
 
   while (currentPath.length > 0) {
     // First, check for array index at the beginning
-    const arrayMatch = currentPath.match(/^\[(\d+)\]/);
+    const arrayMatch = /^\[(\d+)\]/.exec(currentPath);
     if (arrayMatch) {
       pathParts.push(parseInt(arrayMatch[1]));
       currentPath = currentPath.substring(arrayMatch[0].length);
@@ -108,7 +108,7 @@ const parsePath = (path: string): (string | number)[] => {
     }
 
     // Then check for property name followed by array index
-    const propertyArrayMatch = currentPath.match(/^([^.\[\]]+)\[(\d+)\]/);
+    const propertyArrayMatch = /^([^.\[\]]+)\[(\d+)\]/.exec(currentPath);
     if (propertyArrayMatch) {
       pathParts.push(propertyArrayMatch[1]); // property name
       pathParts.push(parseInt(propertyArrayMatch[2])); // array index
