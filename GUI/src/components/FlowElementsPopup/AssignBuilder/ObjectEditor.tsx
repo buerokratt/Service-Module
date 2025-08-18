@@ -185,15 +185,11 @@ const ObjectEditor: React.FC<ObjectEditorProps> = ({ onChange }) => {
             // Try to find the path to the dropped node
             const path = findNodePath(jsonNode, currentData);
 
-            console.log("IGOR path", path);
-
             if (path) {
               // Update the value at the specific path
               const newData = updateValueAtPath(currentData, path, valueToReplace);
               jsonEditorRef.current.set(newData);
               setData(newData);
-
-              console.log("IGOR newData", newData);
 
               onChange(stringToTemplate(JSON.stringify(newData)));
             }
