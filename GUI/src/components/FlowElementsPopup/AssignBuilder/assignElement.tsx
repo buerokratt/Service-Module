@@ -144,10 +144,24 @@ const AssignElement: React.FC<AssignElementProps> = ({
                 setIsObjectEditorOpen(!isObjectEditorOpen);
                 setIsEditingManually(true);
               } else {
-                setIsObjectEditorOpen(!isObjectEditorOpen);
+                try {
+                  // todo proper message in UI
+                  const parsedValue = JSON.parse(templateToString(element.value));
+                  if (parsedValue) {
+                    setIsObjectEditorOpen(!isObjectEditorOpen);
+                  } else {
+                    // Handle empty/null/undefined parsed value
+                    console.log("Parsed JSON value is falsy");
+                  }
+                } catch (error) {
+                  // Handle JSON parsing errors gracefully
+                  console.log("Failed to parse JSON:", error);
+                  // Optionally show user-friendly error message or fallback behavior
+                }
               }
             }}
           >
+            {/* todo add tooltip */}
             <Icon icon={<MdDataObject />} />
           </button>
 
