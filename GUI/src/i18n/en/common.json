@@ -163,7 +163,8 @@
         },
         "requestedConnection": "Connection Requested",
         "cancelledConnection": "Connection Request Cancelled",
-        "connectedToIntentSuccessfully": "Connected to intent successfully"
+        "connectedToIntentSuccessfully": "Connected to intent successfully",
+        "cannotContinueUntilServiceIsSaved": "Cannot proceed until the service is saved"
       }
     },
     "popup": {

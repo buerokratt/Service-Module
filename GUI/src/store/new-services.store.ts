@@ -47,7 +47,7 @@ interface ServiceStoreState {
   edges: Edge[];
   nodes: Node[];
   isNewService: boolean;
-  serviceState: ServiceState;
+  serviceState?: ServiceState;
   assignElements: Assign[];
   rules: GroupOrRule[];
   isYesNoQuestion: boolean;
@@ -139,7 +139,7 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
   edges: initialEdges,
   nodes: initialNodes,
   isNewService: true,
-  serviceState: ServiceState.Draft,
+  serviceState: undefined,
   isTestButtonVisible: false,
   isTestButtonEnabled: true,
   assignElements: [],
@@ -395,7 +395,7 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
       clickedNode: null,
       isTestButtonVisible: false,
       selectedNode: null,
-      serviceState: ServiceState.Draft,
+      serviceState: undefined,
     });
     useTestServiceStore.getState().reset();
   },
