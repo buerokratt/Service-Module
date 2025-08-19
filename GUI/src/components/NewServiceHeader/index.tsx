@@ -53,7 +53,7 @@ const NewServiceHeader: FC<NewServiceHeaderProps> = ({ activeStep, backOnClick, 
             appearance={isSaving ? "loading" : "primary"}
             onClick={async () => {
               setIsSaving(true);
-              await useServiceStore.getState().onServiceSave(ServiceState.Draft);
+              await useServiceStore.getState().onServiceSave(ServiceState.Draft, false);
               setIsSaving(false);
               saveOnClick();
             }}
