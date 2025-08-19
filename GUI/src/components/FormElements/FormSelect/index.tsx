@@ -77,7 +77,7 @@ const FormSelect: FC<FormSelectProps> = ({
       <div className='select__wrapper'>
         <div className={`select__trigger ${disabled && 'select__trigger--disabled'}`} {...getToggleButtonProps()} style={{ color: selectedItem?.label ? '#1A1B1F' : '#5D6071' }} {...rest} >
           {selectedItem?.label ?? placeholder}
-          <Icon label='Dropdown icon' size='medium' icon={<MdArrowDropDown color='#5D6071' />} />
+          <Icon label='Dropdown icon' size='medium' icon={<MdArrowDropDown color='#5D6071' size={16} />} />
         </div>
         <ul className={`select__menu select__menu--${menuPosition}`} {...getMenuProps()}>
           {isOpen && (
