@@ -27,7 +27,7 @@
     "d3-hierarchy": "^3.1.2",
     "d3-timer": "^3.0.1",
     "date-fns": "^2.29.3",
-    "downshift": "^7.2.0",
+    "downshift": "^9.0.6",
     "eslint-plugin-prettier": "^4.2.1",
     "framer-motion": "^11.0.14",
     "howler": "^2.2.4",
