@@ -1,0 +1,14 @@
+@import "src/styles/tools/color";
+
+.dragHoverHighlight {
+  background-color: get-color(sea-green-1) !important;
+  border: 1px solid get-color(sea-green-10) !important;
+  border-radius: 4px !important;
+  box-shadow: 0 0 8px get-color(sea-green-3) !important;
+  transition: all 0.2s ease-in-out !important;
+}
+
+.editor {
+  height: 200px;
+  padding-top: 8px;
+}

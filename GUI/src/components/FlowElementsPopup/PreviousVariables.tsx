@@ -22,7 +22,7 @@ type PreviousVariablesProps = {
 
 // Unique key for predefined elements, used below to identify it
 // All other assign element keys are UUIDs
-const predefinedInputKeys = ['-1', '-2'];
+const predefinedInputKeys = ["-1", "-2"];
 
 const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
   const { t } = useTranslation();
@@ -41,7 +41,7 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
   const helperVariablesWithTooltips = helperVariables.map((variable, index) => {
     return {
       ...variable,
-      tooltip: getHelperTooltips()[index]
+      tooltip: getHelperTooltips()[index],
     };
   });
 
@@ -50,7 +50,7 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
     const currentNode = nodes[currentNodeIndex];
 
     let startIndex = nodes.findLastIndex(
-      (node, i) => i < currentNodeIndex && node.data.stepType === StepType.MultiChoiceQuestion
+      (node, i) => i < currentNodeIndex && node.data.stepType === StepType.MultiChoiceQuestion,
     );
 
     let previousNodes = nodes.slice(startIndex === -1 ? 0 : startIndex, currentNodeIndex);
@@ -66,7 +66,8 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
     setEndpoints(endpointsVariables);
 
     // Get Assign variables
-    const assignNodes: Node<NodeDataProps>[] = previousNodes.filter((node) => node.data.stepType === StepType.Assign) as Node<NodeDataProps>[] ?? [];
+    const assignNodes: Node<NodeDataProps>[] =
+      (previousNodes.filter((node) => node.data.stepType === StepType.Assign) as Node<NodeDataProps>[]) ?? [];
     const assignElements = assignNodes.map((node) => node.data.assignElements).flat();
     const predefinedInputElements: Assign[] = [
       {
@@ -201,7 +202,7 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
                           : {
                               data: chip.data,
                               path: chip.value,
-                            }
+                            },
                       );
                     }}
                   >
@@ -236,6 +237,7 @@ const VariableSection = ({
   border,
 }: any) => {
   const { t } = useTranslation();
+
   return (
     <Track
       direction="vertical"
@@ -251,6 +253,13 @@ const VariableSection = ({
       <Track direction="horizontal" gap={4} justify="start" isMultiline style={{ maxHeight: "30vh", overflow: "auto" }}>
         {variables.map((variable: any) => {
           const typeColor = getTypeColor(variable?.value);
+
+          const rawName =
+            title === t("serviceFlow.previousVariables.environmentVariables.title") ||
+            title === t("serviceFlow.previousVariables.assignElements")
+              ? variable.key
+              : t(variable.key);
+          const name = rawName.length > 0 ? rawName : t("serviceFlow.previousVariables.noName");
 
           return isObject(variable.data) && !predefinedInputKeys.includes(variable.id) ? (
             <Tooltip
@@ -271,7 +280,7 @@ const VariableSection = ({
                       : {
                           data: variable.data,
                           path: variable.value,
-                        }
+                        },
                   );
                 }}
               >
@@ -290,7 +299,7 @@ const VariableSection = ({
                 style={{ cursor: variable.key ? "grab" : "default" }}
                 borderColor={typeColor.color}
               >
-                {variable.key.length > 0 ? t(variable.key) : t("serviceFlow.previousVariables.noName")}
+                {name}
               </OutputElementBox>
             </Tooltip>
           );
