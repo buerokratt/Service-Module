@@ -72,7 +72,7 @@ const EndpointCustom: React.FC<EndpointCustomProps> = ({
               <FormSelect
                 name={"request-type"}
                 label={""}
-                style={{ borderRadius: "4px 0 0 4px", borderRight: 0 }}
+                style={{ borderRadius: "4px 0 0 4px", borderRight: 0, fontSize: "15px" }}
                 options={[
                   { label: "GET", value: "GET" },
                   { label: "POST", value: "POST" },
