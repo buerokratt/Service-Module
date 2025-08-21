@@ -87,16 +87,8 @@ const ServiceFlowPage: FC = () => {
           }
         }}
         continueOnClick={() => {
-          useServiceStore
-            .getState()
-            .onContinueClick()
-            .then(() => {
-              navigate(ROUTES.OVERVIEW_ROUTE, { replace: true });
-              useServiceStore.getState().resetState();
-            })
-            .catch((error) => {
-              console.error(error);
-            });
+          navigate(ROUTES.OVERVIEW_ROUTE, { replace: true });
+          useServiceStore.getState().resetState();
         }}
         saveOnClick={async () => {
           setHasUnsavedChanges(false);
@@ -105,11 +97,10 @@ const ServiceFlowPage: FC = () => {
             const serviceResponse = await useServiceStore.getState().loadService(serviceId);
             if (serviceResponse) {
               useServiceListStore.getState().setSelectedService(serviceResponse?.data);
-              await useServiceListStore.getState().changeServiceStateToDraft(serviceResponse?.data);
               navigate(ROUTES.replaceWithId(ROUTES.EDITSERVICE_ROUTE, serviceId));
             } 
           } else {
-            await useServiceListStore.getState().changeServiceStateToDraft();
+            useServiceStore.getState().loadService(id);
           }
         }}
       />

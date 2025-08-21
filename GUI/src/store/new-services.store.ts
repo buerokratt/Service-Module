@@ -47,7 +47,7 @@ interface ServiceStoreState {
   edges: Edge[];
   nodes: Node[];
   isNewService: boolean;
-  serviceState: ServiceState;
+  serviceState?: ServiceState;
   assignElements: Assign[];
   rules: GroupOrRule[];
   isYesNoQuestion: boolean;
@@ -99,7 +99,7 @@ interface ServiceStoreState {
   resetState: () => void;
   resetAssign: () => void;
   resetRules: () => void;
-  onServiceSave: (status: "draft" | "ready") => Promise<void>;
+  onServiceSave: (status: "draft" | "ready", showError?: boolean) => Promise<void>;
   onContinueClick: () => Promise<void>;
   selectedNode: Node<NodeDataProps> | null;
   setSelectedNode: (node: Node<NodeDataProps> | null | undefined) => void;
@@ -139,7 +139,7 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
   edges: initialEdges,
   nodes: initialNodes,
   isNewService: true,
-  serviceState: ServiceState.Draft,
+  serviceState: undefined,
   isTestButtonVisible: false,
   isTestButtonEnabled: true,
   assignElements: [],
@@ -395,7 +395,7 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
       clickedNode: null,
       isTestButtonVisible: false,
       selectedNode: null,
-      serviceState: ServiceState.Draft,
+      serviceState: undefined,
     });
     useTestServiceStore.getState().reset();
   },
@@ -593,7 +593,7 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
   updateEndpointData: (data: RequestVariablesTabsRowsData, endpoint?: EndpointData) => {
     if (!endpoint) return;
 
-    const defEndpoint = endpoint.definitions[0];  
+    const defEndpoint = endpoint.definitions[0];
 
     if (!defEndpoint) return;
 
@@ -627,8 +627,8 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
   },
   reactFlowInstance: null,
   setReactFlowInstance: (reactFlowInstance) => set({ reactFlowInstance }),
-  onServiceSave: async (status: "draft" | "ready" = "ready") => {
-    await saveFlowClick(status);
+  onServiceSave: async (status: "draft" | "ready" = "ready", showError = true) => {
+    await saveFlowClick(status, showError);
   },
   onContinueClick: async () => {
     const vaildServiceInfo = get().vaildServiceInfo();
@@ -638,12 +638,16 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
         title: i18next.t("newService.toast.missingFields"),
         message: i18next.t("newService.toast.serviceMissingFields"),
       });
-      return;
+      return Promise.reject(new Error(i18next.t("newService.toast.missingFields") ?? "Error"));
     }
 
     const { isNewService, onServiceSave } = get();
 
-    await onServiceSave(ServiceState.Ready);
+    try {
+      await onServiceSave(ServiceState.Ready);
+    } catch (e: any) {
+      return Promise.reject(new Error(i18next.t("toast.cannot-save-flow") ?? e?.message ?? "Error"));
+    }
 
     if (isNewService) {
       set({ isNewService: false });

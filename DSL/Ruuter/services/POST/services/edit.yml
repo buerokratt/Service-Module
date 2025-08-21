@@ -36,6 +36,10 @@ declaration:
       - field: id
         type: string
         description: "Parameter 'id'"
+    headers:
+      - field: cookie
+        type: string
+        description: "Cookie field"    
 
 extract_request_data:
   assign:
@@ -169,6 +173,7 @@ assign_values:
     old_name: ${old_service_result.response.body[0].name}
     old_structure: ${old_service_result.response.body[0].structure}
     old_state: ${old_service_result.response.body[0].state}
+    service_type: ${old_service_result.response.body[0].type}
 
 check_new_structure:
   switch:
@@ -208,6 +213,25 @@ service_edit:
       structure: ${new_structure}
       state: ${state ?? 'draft'}
   result: editedService
+
+check for_state:
+  switch:
+    - condition: ${state === 'draft'}
+      next: change_state_to_draft
+  next: return_ok
+
+change_state_to_draft:
+  call: http.post
+  args:
+    url: "[#SERVICE_RUUTER]/services/status"
+    headers:
+      cookie: ${incoming.headers.cookie}
+    body:
+      id: ${id}
+      state: "draft"
+      type: ${service_type ?? 'POST'}
+  result: changeStateResult
+  next: return_ok
 
 return_ok:
   reloadDsl: true

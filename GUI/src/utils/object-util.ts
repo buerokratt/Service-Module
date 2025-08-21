@@ -69,7 +69,7 @@ export const isArray = (x: unknown) => {
 };
 
 export const getTypeColor = (
-  value: unknown
+  value: unknown,
 ): { type: "null/undefined" | "string" | "number" | "date" | "array" | "object" | "unknown"; color: string } => {
   switch (true) {
     case value === null || value === undefined:
@@ -91,4 +91,80 @@ export const getTypeColor = (
 
 export const getKeyPathString = (keyPath: KeyPath) => {
   return keyPath.toReversed().join('"]["');
+};
+
+// Helper function to parse object path into parts
+const parsePath = (path: string): (string | number)[] => {
+  const pathParts: (string | number)[] = [];
+  let currentPath = path;
+
+  while (currentPath.length > 0) {
+    // First, check for array index at the beginning
+    const arrayMatch = /^\[(\d+)\]/.exec(currentPath);
+    if (arrayMatch) {
+      pathParts.push(parseInt(arrayMatch[1]));
+      currentPath = currentPath.substring(arrayMatch[0].length);
+      continue;
+    }
+
+    // Then check for property name followed by array index
+    const propertyArrayMatch = /^([^.\[\]]+)\[(\d+)\]/.exec(currentPath);
+    if (propertyArrayMatch) {
+      pathParts.push(propertyArrayMatch[1]); // property name
+      pathParts.push(parseInt(propertyArrayMatch[2])); // array index
+      currentPath = currentPath.substring(propertyArrayMatch[0].length);
+      continue;
+    }
+
+    // Check for dot notation
+    const dotIndex = currentPath.indexOf(".");
+    if (dotIndex === -1) {
+      // No more dots, add the remaining part if it's not empty
+      if (currentPath.length > 0) {
+        pathParts.push(currentPath);
+      }
+      break;
+    } else {
+      const part = currentPath.substring(0, dotIndex);
+      if (part.length > 0) {
+        pathParts.push(part);
+      }
+      currentPath = currentPath.substring(dotIndex + 1);
+    }
+  }
+
+  return pathParts;
+};
+
+// Helper function to update value at a specific object path
+export const updateValueAtPath = (
+  obj: Record<string, unknown> | unknown[],
+  path: string,
+  newValue: unknown,
+): Record<string, unknown> | unknown[] => {
+  const pathParts = parsePath(path);
+  const newObj = Array.isArray(obj) ? [...obj] : { ...obj };
+  let current: any = newObj;
+
+  // Navigate to the parent of the target
+  for (let i = 0; i < pathParts.length - 1; i++) {
+    const part = pathParts[i];
+    const nextPart = pathParts[i + 1];
+
+    if (current[part] === undefined) {
+      // Check if the next part is a number (array index) or string (object key)
+      if (typeof nextPart === "number") {
+        current[part] = [];
+      } else {
+        current[part] = {};
+      }
+    }
+    current = current[part];
+  }
+
+  // Update the value at the target path
+  const lastPart = pathParts[pathParts.length - 1];
+  current[lastPart] = newValue;
+
+  return newObj;
 };

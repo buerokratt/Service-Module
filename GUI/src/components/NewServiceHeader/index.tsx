@@ -4,12 +4,13 @@ import { Button, HeaderStepCounter, Modal, Track } from "..";
 import useServiceStore from "store/new-services.store";
 import "@buerokratt-ria/header/src/Header.scss";
 import { ROUTES } from "resources/routes-constants";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import useServiceListStore from "../../store/services.store";
 import { ServiceState } from "types";
 import { deleteService } from "resources/api-constants";
 import api from "../../services/api-dev";
 import { removeTrailingUnderscores } from "utils/string-util";
+import useToastStore from "store/toasts.store";
 
 type NewServiceHeaderProps = {
   activeStep: number;
@@ -25,7 +26,9 @@ const NewServiceHeader: FC<NewServiceHeaderProps> = ({ activeStep, backOnClick, 
   const navigate = useNavigate();
   const [isSaving, setIsSaving] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isContinuing, setIsContinuing] = useState(false);
   const [isDeleteServiceModalVisible, setIsDeleteServiceModalVisible] = useState(false);
+  const { id } = useParams();
 
   return (
     <>
@@ -38,7 +41,7 @@ const NewServiceHeader: FC<NewServiceHeaderProps> = ({ activeStep, backOnClick, 
           <Button
             appearance={isDeleting ? "loading" : "error"}
             disabled={
-              selectedService ? serviceState !== ServiceState.Draft && serviceState !== ServiceState.Ready : true
+              serviceState && id ? serviceState !== ServiceState.Draft && serviceState !== ServiceState.Ready : true
             }
             onClick={() => {
               setIsDeleteServiceModalVisible(true);
@@ -50,14 +53,35 @@ const NewServiceHeader: FC<NewServiceHeaderProps> = ({ activeStep, backOnClick, 
             appearance={isSaving ? "loading" : "primary"}
             onClick={async () => {
               setIsSaving(true);
-              await useServiceStore.getState().onServiceSave(ServiceState.Draft);
+              await useServiceStore.getState().onServiceSave(ServiceState.Draft, false);
               setIsSaving(false);
               saveOnClick();
             }}
           >
             {t("global.save")}
           </Button>
-          <Button onClick={continueOnClick} disabled={!name}>
+          <Button
+            appearance={isContinuing ? "loading" : "primary"}
+            onClick={() => {
+              if (isSaving) {
+                useToastStore.getState().info({ title: t("overview.service.toast.cannotContinueUntilServiceIsSaved") });
+                return;
+              }
+              setIsContinuing(true);
+              useServiceStore
+                .getState()
+                .onContinueClick()
+                .then(() => {
+                  setIsContinuing(false);
+                  continueOnClick();
+                })
+                .catch((error) => {
+                  setIsContinuing(false);
+                  console.error(error);
+                });
+            }}
+            disabled={!name}
+          >
             {t("global.confirm")}
           </Button>
         </Track>

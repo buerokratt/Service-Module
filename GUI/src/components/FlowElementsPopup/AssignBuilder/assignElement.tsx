@@ -1,12 +1,22 @@
 import React, { useState } from "react";
 import { DragInput, FormInput, Icon, Tooltip, Track } from "components";
-import { MdDeleteOutline, MdEdit, MdMoveDown } from "react-icons/md";
+import { MdDataObject, MdDeleteOutline, MdEdit, MdMoveDown } from "react-icons/md";
 import { Assign } from "../../../types/assign";
 import "../styles.scss";
-import { stringToTemplate, templateToString } from "utils/string-util";
+import { isTemplate, stringToTemplate, templateToString } from "utils/string-util";
 import { isArray, isObject } from "utils/object-util";
 import { t } from "i18next";
 import { getDragData } from "utils/component-util";
+import ObjectEditor from "./ObjectEditor";
+import styles from "./AssignElement.module.scss";
+import useToastStore from "store/toasts.store";
+
+const showInvalidObjectError = () => {
+  useToastStore.getState().error({
+    title: t("serviceFlow.apiElements.cannotOpenEditor"),
+    message: t("serviceFlow.apiElements.invalidObjectError"),
+  });
+};
 
 interface AssignElementProps {
   element: Assign;
@@ -18,10 +28,19 @@ interface AssignElementProps {
   valueStyle?: React.CSSProperties;
 }
 
-const AssignElement: React.FC<AssignElementProps> = ({ element, onRemove, onChange, manualEdit = false, isKeyEditable, keyStyle, valueStyle }) => {
+const AssignElement: React.FC<AssignElementProps> = ({
+  element,
+  onRemove,
+  onChange,
+  manualEdit = false,
+  isKeyEditable,
+  keyStyle,
+  valueStyle,
+}) => {
   const slots = element.slots ?? [];
   const [isSecondSlotOpen, setIsSecondSlotOpen] = useState(!!slots[1]);
-  const [isEditingManually, setIsEditingManually] = useState(manualEdit || element.value && !slots.length);
+  const [isEditingManually, setIsEditingManually] = useState(manualEdit || (element.value && !slots.length));
+  const [isObjectEditorOpen, setIsObjectEditorOpen] = useState(false);
 
   const changeKey = (e: React.ChangeEvent<HTMLInputElement>) => {
     onChange({ ...element, key: e.target.value });
@@ -61,68 +80,118 @@ const AssignElement: React.FC<AssignElementProps> = ({ element, onRemove, onChan
     onChange({ ...element, slots: undefined });
   };
 
+  const toggleObjectEditor = () => {
+    if (isObjectEditorOpen) {
+      setIsObjectEditorOpen(!isObjectEditorOpen);
+      setIsEditingManually(true);
+    } else {
+      // New empty element
+      if (element.value === "") {
+        setIsObjectEditorOpen(!isObjectEditorOpen);
+        return;
+      }
+
+      if (!isTemplate(element.value)) {
+        showInvalidObjectError();
+        return;
+      }
+
+      try {
+        JSON.parse(templateToString(element.value));
+        setIsObjectEditorOpen(!isObjectEditorOpen);
+      } catch (error) {
+        console.log("Error parsing input", error);
+        showInvalidObjectError();
+      }
+    }
+  };
+
   return (
-    <Track gap={16} isFlex>
-      <FormInput
-        value={element.key}
-        name="key"
-        disabled={isKeyEditable === false}
-        onChange={changeKey}
-        onDrop={(e) => e.preventDefault()}
-        style={keyStyle}
-        label=""
-        hideLabel
-      />
-      :
-      <Track style={{ flex: "1 0 75%", justifyContent: "flex-end" }} gap={5}>
-        {isEditingManually ? (
-          <FormInput
-            value={element.value}
-            name="value"
-            onChange={changeValue}
-            label=""
-            style={valueStyle}
-            hideLabel
-            onDrop={changeManualInputValue}
-          />
-        ) : (
-          <Track gap={3} isFlex>
-            <DragInput id={element.id} element={slots[0]} onChange={changeFirstSlot} />
+    <>
+      <Track gap={16} isFlex className={styles.assignElement}>
+        <FormInput
+          value={element.key}
+          name="key"
+          disabled={isKeyEditable === false}
+          onChange={changeKey}
+          onDrop={(e) => e.preventDefault()}
+          style={keyStyle}
+          label=""
+          hideLabel
+        />
+        :
+        <Track style={{ flex: "1 0 75%", justifyContent: "flex-end" }} gap={5}>
+          {!isObjectEditorOpen && (
+            <>
+              {isEditingManually ? (
+                <FormInput
+                  value={element.value}
+                  name="value"
+                  onChange={changeValue}
+                  label=""
+                  style={valueStyle}
+                  hideLabel
+                  onDrop={changeManualInputValue}
+                />
+              ) : (
+                <Track gap={3} isFlex>
+                  <DragInput id={element.id} element={slots[0]} onChange={changeFirstSlot} />
 
-            {slots.length && isObject(slots[0].data) && !isArray(slots[0].data) ? (
-              <Tooltip
-                content={t(
-                  isSecondSlotOpen ? "serviceFlow.popup.removeValueAssignment" : "serviceFlow.popup.assignAsValue"
-                )}
-                onButtonClick={() => {
-                  setIsSecondSlotOpen(!isSecondSlotOpen);
-                  if (!isSecondSlotOpen) resetSecondSlot();
-                }}
-              >
-                <div className={`small-assign-button ${isSecondSlotOpen ? "assign-red" : "assign-blue"}`}>
-                  <Icon icon={<MdMoveDown />} />
-                </div>
-              </Tooltip>
-            ) : null}
+                  {slots.length && isObject(slots[0].data) && !isArray(slots[0].data) ? (
+                    <Tooltip
+                      content={t(
+                        isSecondSlotOpen ? "serviceFlow.popup.removeValueAssignment" : "serviceFlow.popup.assignAsValue"
+                      )}
+                      onButtonClick={() => {
+                        setIsSecondSlotOpen(!isSecondSlotOpen);
+                        if (!isSecondSlotOpen) resetSecondSlot();
+                      }}
+                    >
+                      <div className={`small-assign-button ${isSecondSlotOpen ? "assign-red" : "assign-blue"}`}>
+                        <Icon icon={<MdMoveDown />} />
+                      </div>
+                    </Tooltip>
+                  ) : null}
 
-            {isSecondSlotOpen ? <DragInput id={element.id} element={slots[1]} onChange={changeSecondSlot} /> : null}
-          </Track>
-        )}
+                  {isSecondSlotOpen ? (
+                    <DragInput id={element.id} element={slots[1]} onChange={changeSecondSlot} />
+                  ) : null}
+                </Track>
+              )}
 
-        {!isEditingManually ? (
-          <Tooltip content={t("serviceFlow.popup.assignManualEdit")} onButtonClick={enableManualEdit}>
-            <div className="small-assign-button assign-blue">
-              <Icon icon={<MdEdit />} />
-            </div>
-          </Tooltip>
-        ) : null}
-        {onRemove && (
-          <button onClick={() => onRemove(element.id)} className="small-assign-button assign-red">
-            <Icon icon={<MdDeleteOutline />} />
-          </button>
-        )}
+              {!isEditingManually ? (
+                <Tooltip content={t("serviceFlow.popup.assignManualEdit")} onButtonClick={enableManualEdit}>
+                  <div className="small-assign-button assign-blue">
+                    <Icon icon={<MdEdit />} />
+                  </div>
+                </Tooltip>
+              ) : null}
+            </>
+          )}
+
+          {!isEditingManually && (
+            <Tooltip content={t("serviceFlow.popup.openObjectEditor")} onButtonClick={toggleObjectEditor}>
+              <div className="small-assign-button assign-blue">
+                <Icon icon={<MdDataObject />} />
+              </div>
+            </Tooltip>
+          )}
+
+          {onRemove && (
+            <button onClick={() => onRemove(element.id)} className="small-assign-button assign-red">
+              <Icon icon={<MdDeleteOutline />} />
+            </button>
+          )}
+        </Track>
       </Track>
-    </Track>
+
+      {isObjectEditorOpen && (
+        <ObjectEditor
+          data={element.value ? JSON.parse(templateToString(element.value)) : {}}
+          onChange={(value) => onChange({ ...element, value })}
+        />
+      )}
+    </>
   );
 };
 

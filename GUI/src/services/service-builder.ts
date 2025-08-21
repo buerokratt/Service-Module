@@ -64,6 +64,7 @@ interface SaveFlowConfig {
   serviceId: string;
   isNewService: boolean;
   status: "draft" | "ready";
+  showError?: boolean;
 }
 
 const hasInvalidRules = (elements: any[]): boolean => {
@@ -129,9 +130,10 @@ export const saveFlow = async ({
   serviceId,
   isNewService,
   status = "ready",
+  showError = true,
 }: SaveFlowConfig) => {
   try {
-    let yamlContent = getYamlContent(nodes, edges, name, description);
+    let yamlContent = getYamlContent(nodes, edges, name, description, showError);
 
     const mcqNodes = nodes.filter(
       (node) => node.data?.stepType === StepType.MultiChoiceQuestion
@@ -142,7 +144,7 @@ export const saveFlow = async ({
         0,
         nodes.findIndex((node) => node.data?.stepType === StepType.MultiChoiceQuestion) + 1
       );
-      yamlContent = getYamlContent(nodesUpToFirstMcq, edges, name, description);
+      yamlContent = getYamlContent(nodesUpToFirstMcq, edges, name, description, showError);
     }
 
     await saveService(
@@ -170,7 +172,7 @@ export const saveFlow = async ({
         );
 
         await saveService(
-          getYamlContent(branchNodes, branchEdges, serviceName, description),
+          getYamlContent(branchNodes, branchEdges, serviceName, description, showError),
           { name: serviceName, serviceId, description, slot, isCommon, nodes, edges, isNewService } as SaveFlowConfig,
           false,
           status
@@ -179,10 +181,6 @@ export const saveFlow = async ({
     }
   } catch (e: any) {
     onError(e);
-    useToastStore.getState().error({
-      title: i18next.t("toast.cannot-save-flow"),
-      message: e?.message,
-    });
   }
 };
 
@@ -223,7 +221,7 @@ async function saveService(
     .catch(onError);
 }
 
-function getYamlContent(nodes: Node[], edges: Edge[], name: string, description: string): any {
+function getYamlContent(nodes: Node[], edges: Edge[], name: string, description: string, showError = true): any {
   const allRelations: any[] = [];
 
   nodes.forEach((node) => {
@@ -259,7 +257,7 @@ function getYamlContent(nodes: Node[], edges: Edge[], name: string, description:
           break;
       }
 
-      if (error) {
+      if (error && showError) {
         throw new Error(error);
       }
 
@@ -367,10 +365,9 @@ function getYamlContent(nodes: Node[], edges: Edge[], name: string, description:
       finishedFlow.set(parentStepName, template);
     });
   } catch (e: any) {
-    useToastStore.getState().error({
-      title: i18next.t("toast.cannot-save-flow"),
-      message: e?.message,
-    });
+    if (showError) {
+      throw new Error(i18next.t("toast.cannot-save-flow") ?? e?.message ?? "Error");
+    }
   }
 
   finishedFlow.set("format_messages", {
@@ -598,7 +595,7 @@ function handleDynamicChoices(
         service_name: parentNode.data.dynamicChoices?.serviceName ?? "",
         key: parentNode.data.dynamicChoices?.key ?? "",
         payload_prefix: "#service, /POST/",
-        payload_keys: parentNode.data.dynamicChoices?.payloadKeys.split(",") ?? [],
+        payload_keys: parentNode.data.dynamicChoices?.payloadKeys.split(",").filter((item) => item.trim()) ?? [],
       },
     },
     result: "dynamic_choices_res",
@@ -719,7 +716,7 @@ const getTemplateDataFromNode = (node: Node): { templateName: string; body?: any
   }
 };
 
-export const saveFlowClick = async (status: "draft" | "ready" = "ready") => {
+export const saveFlowClick = async (status: "draft" | "ready" = "ready", showError: boolean = true) => {
   const name = removeTrailingUnderscores(useServiceStore.getState().serviceNameDashed());
   const serviceId = useServiceStore.getState().serviceId;
   const description = useServiceStore.getState().description;
@@ -747,6 +744,7 @@ export const saveFlowClick = async (status: "draft" | "ready" = "ready") => {
         title: i18next.t("newService.toast.failed"),
         message: e.response?.status === 409 ? t("newService.toast.serviceNameAlreadyExists") : e?.message,
       });
+      throw new Error(e.response?.status === 409 ? t("newService.toast.serviceNameAlreadyExists").toString() : e?.message);
     },
     description,
     slot,
@@ -754,6 +752,7 @@ export const saveFlowClick = async (status: "draft" | "ready" = "ready") => {
     serviceId,
     isNewService,
     status,
+    showError,
   });
 };
 

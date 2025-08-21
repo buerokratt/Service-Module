@@ -2,7 +2,7 @@ import { FC } from "react";
 import Track from "../Track";
 import PreviousVariables from "./PreviousVariables";
 import { DynamicChoices } from "types/dynamic-choices";
-import AssignElement from "./AssignBuilder/assignElement";
+import AssignElement from "./AssignBuilder/AssignElement";
 import { MdOutlineInfo } from "react-icons/md";
 import Tooltip from "components/Tooltip";
 import { t } from "i18next";
