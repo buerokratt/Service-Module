@@ -17,6 +17,9 @@ declaration:
       - field: sorting
         type: string
         description: "Parameter 'sorting'"
+      - field: order
+        type: string
+        description: "Parameter 'order'"  
 
 getFaults:
   call: http.post
