@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef } from "react";
 import { useReactFlow, useStore, Node, Edge, ReactFlowState } from "@xyflow/react";
 import { stratify, tree } from "d3-hierarchy";
 import { timer } from "d3-timer";
+import { StepType } from "types";
 
 const layout = tree<Node>()
   .nodeSize([400, 180])
@@ -67,17 +68,22 @@ function layoutNodes(nodes: Node[], edges: Edge[]): Node[] {
     for (const node of multiParentNodes) {
       const parentEdges = edgesCopy.filter((e) => e.target === node.id);
       const parentNodes = resultNodes.filter((n) => parentEdges.some((e) => e.source === n.id));
+      const isParentNodesContainMultiPathNode = parentNodes.some(
+        (n) => n.data.stepType === StepType.MultiChoiceQuestion || n.data.stepType === StepType.Condition
+      );
 
       if (parentNodes.length > 0) {
         const avgX = parentNodes.reduce((sum, parent) => sum + parent.position.x, 0) / parentNodes.length;
         const maxParentY = Math.max(...parentNodes.map((p) => p.position.y));
         const newY = maxParentY + 180;
+        const multipathNewY = maxParentY + 300;
 
+        console.log(isParentNodesContainMultiPathNode);
         resultNodes.push({
           ...node,
           position: {
             x: avgX,
-            y: newY,
+            y: isParentNodesContainMultiPathNode ? multipathNewY : newY,
           },
         });
       } else {
