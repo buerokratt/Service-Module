@@ -46,6 +46,29 @@ export function stringToArray(str: string, fallback: any = []) {
     const parsed = JSON.parse(str);
     return Array.isArray(parsed) ? parsed : fallback;
   } catch (e) {
+    console.error(e);
     return fallback;
   }
 }
+
+export function removeNestedTemplates(str: string): string {
+  let changed: boolean;
+  
+  do {
+      changed = false;
+      str = str.replace(/\$\{([^}]*)\$\{([^}]*)\}([^}]*)\}/g, (match: string, p1: string, p2: string, p3: string): string => {
+          changed = true;
+          return `\${${p1}${p2}${p3}}`;
+      });
+  } while (changed);
+  
+  do {
+      changed = false;
+      str = str.replace(/\$\{([^}]*)\{([^}]*)\}([^}]*)\}/g, (match: string, p1: string, p2: string, p3: string): string => {
+          changed = true;
+          return `\${${p1}${p2}${p3}}`;
+      });
+  } while (changed);
+  
+  return str;
+};

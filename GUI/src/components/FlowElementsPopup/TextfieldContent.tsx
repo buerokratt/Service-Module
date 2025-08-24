@@ -2,6 +2,7 @@ import { t } from "i18next";
 import { FormRichText, Track } from "..";
 import { CSSProperties, FC } from "react";
 import PreviousVariables from "./PreviousVariables";
+import { removeNestedTemplates } from "utils/string-util";
 
 type TextfieldContentProps = {
   readonly defaultMessage?: string;
@@ -35,11 +36,12 @@ const TextfieldContent: FC<TextfieldContentProps> = ({ defaultMessage, onChange,
         <FormRichText
           onChange={(value) => {
             if (!onChange) return;
-            const placeholders = findMessagePlaceholders(value);
-            onChange(value, placeholders);
+            const formattedValue = removeNestedTemplates(value ?? "");
+            const placeholders = findMessagePlaceholders(formattedValue);
+            onChange(formattedValue, placeholders);
           }}
           defaultValue={defaultMessage}
-        ></FormRichText>
+        />
       </Track>
       <PreviousVariables nodeId={nodeId} />
     </>
