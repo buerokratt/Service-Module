@@ -37,6 +37,11 @@ export default [
       'react-refresh': reactRefresh,
       sonarjs: sonarjs,
     },
+    settings: {
+      react: {
+        version: '18.2.0',
+      },
+    },
     rules: {
       ...eslint.configs.recommended.rules,
       ...tseslint.configs.recommended.rules,
