@@ -77,7 +77,7 @@ const FormSelect: FC<FormSelectProps> = ({
           {...rest}
         >
           {selectedItem?.label ?? placeholder}
-          <Icon label="Dropdown icon" size="medium" icon={<MdArrowDropDown color="#5D6071" />} />
+          <Icon label="Dropdown icon" size="medium" icon={<MdArrowDropDown color="#5D6071" size={16} />} />
         </div>
         <ul className={`select__menu select__menu--${menuPosition}`} {...getMenuProps()}>
           {isOpen &&

@@ -12,6 +12,7 @@ type OutputElementBoxProps = {
   readonly onClick?: () => void;
   readonly style?: CSSProperties;
   readonly className?: string;
+  readonly isAssignElement?: boolean;
 };
 
 const OutputElementBox: FC<OutputElementBoxProps> = ({
@@ -21,6 +22,7 @@ const OutputElementBox: FC<OutputElementBoxProps> = ({
   style,
   className,
   children,
+  isAssignElement = false,
 }) => {
   const node = useServiceStore((state) => state.selectedNode);
   const mergedStyle: CSSProperties = {
@@ -37,12 +39,14 @@ const OutputElementBox: FC<OutputElementBoxProps> = ({
   const handleDragStart = (event: DragEvent<HTMLDivElement>) => {
     if (!dragData) return;
 
+    const dragValue = isAssignElement ? `\${${dragData.key}}` : dragData.value;
+
     event.dataTransfer.setData(
       ASSIGN_DRAG_TYPE,
       // Need to check for StepType.Assign here since ReactQuill does not support custom onDrop events
       node?.data.stepType === StepType.Assign || node?.data.stepType === StepType.DynamicChoices
         ? JSON.stringify(dragData)
-        : dragData.value,
+        : dragValue,
     );
   };
 

@@ -78,6 +78,7 @@ const ApiEndpointCard: FC<EndpointCardProps> = ({
                   placeholder={t('newService.endpoint.type').toString()}
                   options={options}
                   disabled={selectedTab === EndpointEnv.Test}
+                  style={{ fontSize: "15px" }}
                   onSelectionChange={(selection) => {
                     setOption(selection);
                     endpoint.type = selection?.value as EndpointType;

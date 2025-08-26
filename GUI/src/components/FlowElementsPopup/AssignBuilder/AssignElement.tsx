@@ -109,8 +109,8 @@ const AssignElement: React.FC<AssignElementProps> = ({
   };
 
   return (
-    <div className={styles.assignElement}>
-      <Track gap={16} isFlex>
+    <>
+      <Track gap={16} isFlex className={styles.assignElement}>
         <FormInput
           value={element.key}
           name="key"
@@ -173,11 +173,13 @@ const AssignElement: React.FC<AssignElementProps> = ({
             </>
           )}
 
-          <Tooltip content={t('serviceFlow.popup.openObjectEditor')} onButtonClick={toggleObjectEditor}>
-            <div className="small-assign-button assign-blue">
-              <Icon icon={<MdDataObject />} />
-            </div>
-          </Tooltip>
+          {!isEditingManually && (
+            <Tooltip content={t('serviceFlow.popup.openObjectEditor')} onButtonClick={toggleObjectEditor}>
+              <div className="small-assign-button assign-blue">
+                <Icon icon={<MdDataObject />} />
+              </div>
+            </Tooltip>
+          )}
 
           {onRemove && (
             <button onClick={() => onRemove(element.id)} className="small-assign-button assign-red">
@@ -193,7 +195,7 @@ const AssignElement: React.FC<AssignElementProps> = ({
           onChange={(value) => onChange({ ...element, value })}
         />
       )}
-    </div>
+    </>
   );
 };
 

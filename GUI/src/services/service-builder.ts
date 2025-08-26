@@ -15,7 +15,6 @@ import { getLastDigits, removeTrailingUnderscores, stringToArray, toSnakeCase } 
 
 import api from '../services/api-dev';
 
-
 export async function saveEndpoints(endpoints: EndpointData[], onSuccess?: () => void, onError?: (e: any) => void) {
   const tasks: Promise<any>[] = [];
   const serviceId = useServiceStore.getState().serviceId;
@@ -597,7 +596,7 @@ function handleDynamicChoices(
         service_name: parentNode.data.dynamicChoices?.serviceName ?? '',
         key: parentNode.data.dynamicChoices?.key ?? '',
         payload_prefix: '#service, /POST/',
-        payload_keys: parentNode.data.dynamicChoices?.payloadKeys.split(',') ?? [],
+        payload_keys: parentNode.data.dynamicChoices?.payloadKeys.split(',').filter((item) => item.trim()) ?? [],
       },
     },
     result: 'dynamic_choices_res',
