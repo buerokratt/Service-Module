@@ -1,34 +1,41 @@
-
-# Pipelines 
+# Pipelines
 
 ## Startup
 
-#### Docker 
+#### Docker
+
 ```
 docker-compose up -d
 ```
+
 Default service port is 3010 or the value of environment variable **PORT**.
 
 #### Standalone
+
+<!-- todo temp -->
 
 ```
 npm start
 ```
 
-
 ## API calls
+
 ### 1. Rasa YAML to OpenSearch
-	Pipeline for populating OpenSearch with Rasa YAML files
 
-####	POST /put/<index_name>/<index_type>
-**body:** form with field `input` OR 
-				attached file object on data field `input`
+    Pipeline for populating OpenSearch with Rasa YAML files
 
-		Puts one entity into OpenSearch index `index_name` with ID identifier in object on field `index_type`
-		Example: 
-			POST /put/intents/intent
-			
-***example file***
+#### POST /put/<index_name>/<index_type>
+
+**body:** form with field `input` OR
+attached file object on data field `input`
+
+    	Puts one entity into OpenSearch index `index_name` with ID identifier in object on field `index_type`
+    	Example:
+    		POST /put/intents/intent
+
+
+**_example file_**
+
 ```
 nlu:
 - intent: rahvaarv
@@ -41,22 +48,25 @@ nlu:
     - eesti rahvastik
 ```
 
-####	POST /bulk/<index_name>/<index_type>
-**body**: form with field `input` OR
-			attached file object on data field `input`		
+#### POST /bulk/<index_name>/<index_type>
 
-		Puts a list of entities with ID identifier in field `index_type` into OpenSearch index `index_name`  
-		Example:
-			POST /bulk/stories/story
-			
-***example file***
+**body**: form with field `input` OR
+attached file object on data field `input`
+
+    	Puts a list of entities with ID identifier in field `index_type` into OpenSearch index `index_name`
+    	Example:
+    		POST /bulk/stories/story
+
+
+**_example file_**
+
 ```
 stories:
 - story: andmekaitse_küsimused
   steps:
   - intent: andmekaitse_küsimused
   - action: utter_andmekaitse_küsimused
-  
+
 - story: Deactivate custom fallback form
   steps:
   - action: custom_fallback_form
@@ -65,15 +75,17 @@ stories:
   - action: action_react_to_affirm_deny_in_custom_fallback_form
 ```
 
-####	POST /bulk/<index_name>
+#### POST /bulk/<index_name>
+
 **body**: form with field `input` OR
-			attached file object on data field `input`		
+attached file object on data field `input`
 
-		Puts a list of different entities into OpenSearch index `index_name`
-		Example:
-			POST /bulk/domain
+    	Puts a list of different entities into OpenSearch index `index_name`
+    	Example:
+    		POST /bulk/domain
 
-***example file***
+**_example file_**
+
 ```
 intents:
   - rahvaarv
@@ -93,25 +105,25 @@ forms:
     required_slots:
         - affirm_deny
 ```
-####	POST /delete/<index_name>
 
-		Deletes index `index_name`. 
+#### POST /delete/<index_name>
 
-		Example:
-			POST /delete/intents
+    	Deletes index `index_name`.
 
-####	POST /delete/<index_name>/obj_id
+    	Example:
+    		POST /delete/intents
 
-		Deletes object with id `obj_id` from index `index_name`. 
+#### POST /delete/<index_name>/obj_id
 
-		Example:
-			POST /delete/intents/rahvaarv
+    	Deletes object with id `obj_id` from index `index_name`.
 
-
+    	Example:
+    		POST /delete/intents/rahvaarv
 
 ### Script to populate OpenSearch with mock YAMLs
-***./init_with_mocks.sh***
-expects mock YAMLs to be in a configurable folder (default: .*./DataMapper/locations*)
+
+**_./init_with_mocks.sh_**
+expects mock YAMLs to be in a configurable folder (default: ._./DataMapper/locations_)
 Server has to be running
 
 ## 2. YAML to JSON (and vice versa)
@@ -120,29 +132,25 @@ Usage:
 
 #### POST /yaml
 
-**body:** form with field `input` OR 
-				attached file object on data field `input`
-				
-	Converts input YAMl file to JSON
-
+**body:** form with field `input` OR
+attached file object on data field `input`
+Converts input YAMl file to JSON
 
 #### POST /json
 
-**body:** form with field `input` OR 
-				attached file object on data field `input`
-				
-	Converts input JSON file to YAML
-
+**body:** form with field `input` OR
+attached file object on data field `input`
+Converts input JSON file to YAML
 
 ## 3. Configuration
 
 These values are read from environment and specify the connection to OpenSearch server:
 
-key | default value
----|---
-**OPENSEARCH_PROTOCOL**	| https
-**OPENSEARCH_AUTH** | admin:admin
-**OPENSEARCH_HOST** | localhost
-**OPENSEARCH_PORT** | 9200
+| key                     | default value |
+| ----------------------- | ------------- |
+| **OPENSEARCH_PROTOCOL** | https         |
+| **OPENSEARCH_AUTH**     | admin:admin   |
+| **OPENSEARCH_HOST**     | localhost     |
+| **OPENSEARCH_PORT**     | 9200          |
 
 =======
