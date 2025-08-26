@@ -27,4 +27,4 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
-      - run: docker image build .
+      - run: cd GUI && docker image build .
