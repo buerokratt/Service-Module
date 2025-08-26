@@ -86,7 +86,9 @@ export default [
           ignoreDeclarationSort: true,
         },
       ],
+      // Not needed with new JSX transform (React 17+)
       'react/react-in-jsx-scope': 'off',
+      // TypeScript provides better type checking than PropTypes
       'react/prop-types': 'off',
       ...sonarjs.configs.recommended.rules,
       // SonarCloud does not seem to support Vitest
