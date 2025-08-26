@@ -84,6 +84,8 @@ export default [
       'react/react-in-jsx-scope': 'off',
       'react/prop-types': 'off',
       ...sonarjs.configs.recommended.rules,
+      // SonarCloud does not seem to support Vitest
+      'sonarjs/assertions-in-tests': 'off',
     },
   },
 
