@@ -2,25 +2,35 @@ name: Run checks
 on:
   push:
     branches: [main, dev]
+    paths:
+      - "GUI/**"
   pull_request:
     types: [opened, ready_for_review, reopened, synchronize]
+    paths:
+      - "GUI/**"
 concurrency:
   group: ${{ github.ref }}-checks
   cancel-in-progress: true
 
 jobs:
   frontend-format:
+    if: github.event.pull_request.draft == false
     uses: ./.github/workflows/run-check.yml
     with:
       command: npm run format
+
   frontend-lint:
+    if: github.event.pull_request.draft == false
     uses: ./.github/workflows/run-check.yml
     with:
       command: npm run lint
+
   frontend-test:
+    if: github.event.pull_request.draft == false
     uses: ./.github/workflows/run-check.yml
     with:
       command: npm run test:run
+
   frontend-build:
     if: github.event.pull_request.draft == false
     runs-on: ubuntu-latest
