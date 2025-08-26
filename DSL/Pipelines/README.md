@@ -12,6 +12,8 @@ Default service port is 3010 or the value of environment variable **PORT**.
 
 #### Standalone
 
+<!-- todo temp -->
+
 ```
 npm start
 ```
@@ -27,9 +29,10 @@ npm start
 **body:** form with field `input` OR
 attached file object on data field `input`
 
-     Puts one entity into OpenSearch index `index_name` with ID identifier in object on field `index_type`
-     Example:
-      POST /put/intents/intent
+    	Puts one entity into OpenSearch index `index_name` with ID identifier in object on field `index_type`
+    	Example:
+    		POST /put/intents/intent
+
 
 **_example file_**
 
@@ -50,9 +53,10 @@ nlu:
 **body**: form with field `input` OR
 attached file object on data field `input`
 
-     Puts a list of entities with ID identifier in field `index_type` into OpenSearch index `index_name`
-     Example:
-      POST /bulk/stories/story
+    	Puts a list of entities with ID identifier in field `index_type` into OpenSearch index `index_name`
+    	Example:
+    		POST /bulk/stories/story
+
 
 **_example file_**
 
@@ -76,9 +80,9 @@ stories:
 **body**: form with field `input` OR
 attached file object on data field `input`
 
-     Puts a list of different entities into OpenSearch index `index_name`
-     Example:
-      POST /bulk/domain
+    	Puts a list of different entities into OpenSearch index `index_name`
+    	Example:
+    		POST /bulk/domain
 
 **_example file_**
 
@@ -104,17 +108,17 @@ forms:
 
 #### POST /delete/<index_name>
 
-     Deletes index `index_name`.
+    	Deletes index `index_name`.
 
-     Example:
-      POST /delete/intents
+    	Example:
+    		POST /delete/intents
 
 #### POST /delete/<index_name>/obj_id
 
-     Deletes object with id `obj_id` from index `index_name`.
+    	Deletes object with id `obj_id` from index `index_name`.
 
-     Example:
-      POST /delete/intents/rahvaarv
+    	Example:
+    		POST /delete/intents/rahvaarv
 
 ### Script to populate OpenSearch with mock YAMLs
 
