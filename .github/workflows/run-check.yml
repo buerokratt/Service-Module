@@ -7,7 +7,7 @@ on:
         type: string
 
 jobs:
-  check:
+  run-check:
     if: github.event.pull_request.draft == false
     runs-on: ubuntu-latest
     timeout-minutes: 10
@@ -18,7 +18,5 @@ jobs:
           node-version-file: "GUI/package.json"
           cache: npm
           cache-dependency-path: GUI/package-lock.json
-      #   - name: Install specific npm version
-      #     run: npm install -g npm@11.5.2
       - run: cd GUI && npm ci --legacy-peer-deps
       - run: cd GUI && ${{ inputs.command }}
