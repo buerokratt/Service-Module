@@ -1,9 +1,9 @@
-import { KeyPath } from "react-json-tree";
+import { KeyPath } from 'react-json-tree';
 
 export const getValueByPath = (obj: unknown, path: string): unknown => {
   if (!isObject(obj)) return obj;
 
-  const keys = path.split(".");
+  const keys = path.split('.');
   let result: unknown = obj;
 
   for (let key of keys) {
@@ -33,10 +33,10 @@ const handleArrayNotation = (result: unknown, key: string): unknown => {
 };
 
 const handleMixedNotation = (result: unknown, key: string): unknown => {
-  if (!(key.includes("[") && key.endsWith("]"))) return undefined;
+  if (!(key.includes('[') && key.endsWith(']'))) return undefined;
 
-  const propName = key.substring(0, key.indexOf("["));
-  const indexStr = key.substring(key.indexOf("[") + 1, key.length - 1);
+  const propName = key.substring(0, key.indexOf('['));
+  const indexStr = key.substring(key.indexOf('[') + 1, key.length - 1);
   const index = parseInt(indexStr);
 
   if (!isObject(result) || !(propName in (result as Record<string, unknown>))) {
@@ -61,7 +61,7 @@ const handleSimpleNotation = (result: unknown, key: string): unknown => {
 };
 
 export const isObject = (x: unknown) => {
-  return typeof x === "object" && x !== null;
+  return typeof x === 'object' && x !== null;
 };
 
 export const isArray = (x: unknown) => {
@@ -70,22 +70,22 @@ export const isArray = (x: unknown) => {
 
 export const getTypeColor = (
   value: unknown,
-): { type: "null/undefined" | "string" | "number" | "date" | "array" | "object" | "unknown"; color: string } => {
+): { type: 'null/undefined' | 'string' | 'number' | 'date' | 'array' | 'object' | 'unknown'; color: string } => {
   switch (true) {
     case value === null || value === undefined:
-      return { type: "null/undefined", color: "#A1A1A1" };
-    case typeof value === "string":
-      return { type: "string", color: "#FF6F61" };
-    case typeof value === "number":
-      return { type: "number", color: "#6BDB75" };
+      return { type: 'null/undefined', color: '#A1A1A1' };
+    case typeof value === 'string':
+      return { type: 'string', color: '#FF6F61' };
+    case typeof value === 'number':
+      return { type: 'number', color: '#6BDB75' };
     case value instanceof Date:
-      return { type: "date", color: "#FFC145" };
+      return { type: 'date', color: '#FFC145' };
     case Array.isArray(value):
-      return { type: "array", color: "#64C1FF" };
-    case typeof value === "object":
-      return { type: "object", color: "#8E6CE8" };
+      return { type: 'array', color: '#64C1FF' };
+    case typeof value === 'object':
+      return { type: 'object', color: '#8E6CE8' };
     default:
-      return { type: "unknown", color: "#FFFFFF" };
+      return { type: 'unknown', color: '#FFFFFF' };
   }
 };
 
@@ -117,7 +117,7 @@ const parsePath = (path: string): (string | number)[] => {
     }
 
     // Check for dot notation
-    const dotIndex = currentPath.indexOf(".");
+    const dotIndex = currentPath.indexOf('.');
     if (dotIndex === -1) {
       // No more dots, add the remaining part if it's not empty
       if (currentPath.length > 0) {
@@ -153,7 +153,7 @@ export const updateValueAtPath = (
 
     if (current[part] === undefined) {
       // Check if the next part is a number (array index) or string (object key)
-      if (typeof nextPart === "number") {
+      if (typeof nextPart === 'number') {
         current[part] = [];
       } else {
         current[part] = {};
