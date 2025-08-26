@@ -2,10 +2,8 @@ name: Run checks
 on:
   push:
     branches: [main, dev]
-    paths: ["GUI/**", ".github/**"]
   pull_request:
     types: [opened, ready_for_review, reopened, synchronize]
-    paths: ["GUI/**", ".github/**"]
 concurrency:
   group: ${{ github.ref }}-checks
   cancel-in-progress: true
@@ -24,6 +22,7 @@ jobs:
     with:
       command: npm run test:run
   frontend-build:
+    if: github.event.pull_request.draft == false && (github.event_name == 'push' || contains(github.event.pull_request.files.*.name, 'GUI/'))
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
