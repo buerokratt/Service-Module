@@ -1,7 +1,7 @@
-@import 'src/styles/tools/spacing';
-@import 'src/styles/tools/color';
-@import 'src/styles/settings/variables/other';
-@import 'src/styles/settings/variables/typography';
+@use '../../styles/tools/spacing' as *;
+@use '../../styles/tools/color' as *;
+@use '../../styles/settings/variables/other' as *;
+@use '../../styles/settings/variables/typography' as *;
 
 .btn {
   $self: &;
