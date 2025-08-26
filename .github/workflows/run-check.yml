@@ -18,7 +18,7 @@ jobs:
           node-version-file: "GUI/package.json"
         #   cache: npm
         #   cache-dependency-path: GUI/package-lock.json
-      - name: Install specific npm version
-        run: npm install -g npm@11.5.2
-      - run: cd GUI && npm install
+      #   - name: Install specific npm version
+      #     run: npm install -g npm@11.5.2
+      - run: cd GUI && npm install --legacy-peer-deps
       - run: cd GUI && ${{ inputs.command }}
