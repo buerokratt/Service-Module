@@ -23,6 +23,7 @@
 **/npm-debug.log*
 /.idea/
 
+# todo rem
 # Cursor IDE
 .cursor/
 .cursorrules
