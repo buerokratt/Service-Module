@@ -91,7 +91,7 @@ export default [
 
   // Global ignores
   {
-    ignores: ['eslint.config.mjs', 'dist', 'build', 'node_modules'],
+    ignores: ['eslint.config.mjs', 'dist', 'build', 'node_modules', 'vitest.config.ts'],
   },
 ];
 
