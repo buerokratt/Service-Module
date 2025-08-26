@@ -4,7 +4,7 @@ COPY ./package.json ./package-lock.json ./
 ENV PORT=3006
 
 FROM image AS build
-RUN npm ci --mode=development --ignore-scripts
+RUN npm ci --legacy-peer-deps --mode=development --ignore-scripts
 COPY . .
 RUN ./node_modules/.bin/vite build --mode=development
 VOLUME /app
