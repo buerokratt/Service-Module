@@ -98,7 +98,7 @@ const parsePath = (path: string): (string | number)[] => {
   const pathParts: (string | number)[] = [];
   let currentPath = path;
 
-  // todosds
+  // todosdssdsdsd
   while (currentPath.length > 0) {
     // First, check for array index at the beginning
     const arrayMatch = /^\[(\d+)\]/.exec(currentPath);

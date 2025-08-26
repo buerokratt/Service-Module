@@ -10,38 +10,22 @@ concurrency:
 
 jobs:
   frontend-format:
-    if: >
-      github.event.pull_request.draft == false && 
-      (github.event_name == 'push' || 
-       contains(github.event.pull_request.files.*.name, 'GUI/') || 
-       contains(github.event.pull_request.files.*.name, '.github/'))
+    if: github.event.pull_request.draft == false && (github.event_name == 'push' || contains(github.event.pull_request.files.*.name, 'GUI/') || contains(github.event.pull_request.files.*.name, '.github/'))
     uses: ./.github/workflows/run-check.yml
     with:
       command: npm run format
   frontend-lint:
-    if: >
-      github.event.pull_request.draft == false && 
-      (github.event_name == 'push' || 
-       contains(github.event.pull_request.files.*.name, 'GUI/') || 
-       contains(github.event.pull_request.files.*.name, '.github/'))
+    if: github.event.pull_request.draft == false && (github.event_name == 'push' || contains(github.event.pull_request.files.*.name, 'GUI/') || contains(github.event.pull_request.files.*.name, '.github/'))
     uses: ./.github/workflows/run-check.yml
     with:
       command: npm run lint
   frontend-test:
-    if: >
-      github.event.pull_request.draft == false && 
-      (github.event_name == 'push' || 
-       contains(github.event.pull_request.files.*.name, 'GUI/') || 
-       contains(github.event.pull_request.files.*.name, '.github/'))
+    if: github.event.pull_request.draft == false && (github.event_name == 'push' || contains(github.event.pull_request.files.*.name, 'GUI/') || contains(github.event.pull_request.files.*.name, '.github/'))
     uses: ./.github/workflows/run-check.yml
     with:
       command: npm run test:run
   frontend-build:
-    if: >
-      github.event.pull_request.draft == false && 
-      (github.event_name == 'push' || 
-       contains(github.event.pull_request.files.*.name, 'GUI/') || 
-       contains(github.event.pull_request.files.*.name, '.github/'))
+    if: github.event.pull_request.draft == false && (github.event_name == 'push' || contains(github.event.pull_request.files.*.name, 'GUI/') || contains(github.event.pull_request.files.*.name, '.github/'))
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
