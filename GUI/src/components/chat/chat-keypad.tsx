@@ -1,16 +1,16 @@
-import React, { useState } from "react";
-import { useTranslation } from "react-i18next";
-import Send from "../../static/icons/send.svg";
+import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import Send from '../../static/icons/send.svg';
 import styles from './chat.module.scss';
-import useTestServiceStore from "store/test-services.store";
+import useTestServiceStore from 'store/test-services.store';
 
 const ChatKeyPad = (): JSX.Element => {
-  const [userInput, setUserInput] = useState<string>("");
+  const [userInput, setUserInput] = useState<string>('');
   const { t } = useTranslation();
 
   const addNewMessageToState = (): void => {
     useTestServiceStore.getState().sendUserInput(userInput);
-    setUserInput("");
+    setUserInput('');
   };
 
   return (
@@ -19,25 +19,21 @@ const ChatKeyPad = (): JSX.Element => {
         <input
           className={styles.input}
           value={userInput}
-          placeholder={t("chat.input-placeholder") ?? ''}
+          placeholder={t('chat.input-placeholder') ?? ''}
           onChange={(e) => setUserInput(e.target.value)}
           onKeyDown={(event) => {
-            if (event.key === "Enter") {
-                event.preventDefault();
-                addNewMessageToState();
-              }
+            if (event.key === 'Enter') {
+              event.preventDefault();
+              addNewMessageToState();
             }
-          }
+          }}
         />
-      <button
-        onClick={addNewMessageToState}
-        className={styles.button}
-      >
-        <img src={Send} alt="Send message icon" />
-      </button>
-    </div>
+        <button onClick={addNewMessageToState} className={styles.button}>
+          <img src={Send} alt="Send message icon" />
+        </button>
+      </div>
     </div>
   );
-}
+};
 
 export default ChatKeyPad;

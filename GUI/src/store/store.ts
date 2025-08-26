@@ -32,16 +32,14 @@ const useStore = create<StoreState>((set, get, store) => ({
 
   selectedChat: () => {
     const selectedChatId = get().selectedChatId;
-    return get().activeChats.find(c => c.id === selectedChatId);
+    return get().activeChats.find((c) => c.id === selectedChatId);
   },
   unansweredChats: () => {
-    return get().activeChats.filter(c => c.customerSupportId === '');
+    return get().activeChats.filter((c) => c.customerSupportId === '');
   },
   forwordedChats: () => {
     const userId = get().userId;
-    return get().activeChats.filter(c =>
-        c.status === CHAT_STATUS.REDIRECTED && c.customerSupportId === userId
-    ) || [];
+    return get().activeChats.filter((c) => c.status === CHAT_STATUS.REDIRECTED && c.customerSupportId === userId) || [];
   },
   unansweredChatsLength: () => get().unansweredChats().length,
   forwordedChatsLength: () => get().forwordedChats().length,

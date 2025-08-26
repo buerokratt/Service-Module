@@ -1,7 +1,7 @@
-import { Node, Edge, MarkerType, XYPosition, NodeChange, NodeDimensionChange } from "@xyflow/react";
-import useServiceStore from "store/new-services.store";
-import { ConditionRuleType, StepType } from "types";
-import { GRID_UNIT, EDGE_LENGTH } from "types/service-flow";
+import { Node, Edge, MarkerType, XYPosition, NodeChange, NodeDimensionChange } from '@xyflow/react';
+import useServiceStore from 'store/new-services.store';
+import { ConditionRuleType, StepType } from 'types';
+import { GRID_UNIT, EDGE_LENGTH } from 'types/service-flow';
 
 // refactor this file later
 
@@ -16,23 +16,23 @@ export const buildPlaceholder = ({
   matchingPlaceholder?: Node;
   position?: XYPosition;
 }): Node => {
-  if (!matchingPlaceholder && !position) throw Error("Either matchingPlaceholder or position have to be defined.");
+  if (!matchingPlaceholder && !position) throw Error('Either matchingPlaceholder or position have to be defined.');
 
   const positionX = position ? position.x : matchingPlaceholder!.position.x;
   const positionY = position ? position.y : matchingPlaceholder!.position.y + (matchingPlaceholder!.height ?? 0);
 
   return {
     id,
-    type: "placeholder",
+    type: 'placeholder',
     position: {
       x: positionX,
       y: EDGE_LENGTH + positionY,
     },
     data: {
-      type: "placeholder",
+      type: 'placeholder',
       label,
     },
-    className: "placeholder",
+    className: 'placeholder',
     selectable: false,
     draggable: false,
   };
@@ -54,7 +54,7 @@ export const buildEdge = ({
     sourceHandle,
     source,
     target,
-    type: "smoothstep",
+    type: 'smoothstep',
     markerEnd: {
       type: MarkerType.ArrowClosed,
     },
@@ -64,7 +64,7 @@ export const buildEdge = ({
 export const alignNodesInCaseAnyGotOverlapped = (nodeChanges: NodeChange[], prevNodes: Node[], prevEdges: Edge[]) => {
   // Find node following every updated node to see if it overlaps
   nodeChanges.forEach((nodeChange: NodeChange) => {
-    if (nodeChange.type !== "dimensions") return;
+    if (nodeChange.type !== 'dimensions') return;
     const nodeId = (nodeChange as NodeDimensionChange).id;
     const updatedNode = prevNodes.find((node) => node.id === nodeId);
     if (!updatedNode) return;
@@ -110,19 +110,19 @@ export const buildRuleWithPlaceholder = ({
         x: positionX + offset,
         y: positionY,
       },
-      type: "custom",
+      type: 'custom',
       data: {
         label,
         onDelete: useServiceStore.getState().onDelete,
         onEdit: useServiceStore.getState().handleNodeEdit,
-        type: "rule",
+        type: 'rule',
         stepType: StepType.Rule,
         readonly: true,
         name,
         condition,
         value,
       },
-      className: "rule",
+      className: 'rule',
     },
     buildPlaceholder({
       id: `${id + 1}`,
@@ -138,7 +138,7 @@ export interface UpdateFlowInputRules {
 
 export const updateFlowInputRules = (
   updatedRules: UpdateFlowInputRules,
-  updateNodeInternals?: (nodeId: string) => void
+  updateNodeInternals?: (nodeId: string) => void,
 ) => {
   const clickedNode = useServiceStore.getState().clickedNode;
 
@@ -158,7 +158,7 @@ export const updateFlowInputRules = (
   edges
     .filter((edge) => nodesToRemove.includes(edge.source))
     .forEach((edge) => {
-      const placeholder = nodes.find((node) => node.id === edge.target && node.type === "placeholder");
+      const placeholder = nodes.find((node) => node.id === edge.target && node.type === 'placeholder');
       if (placeholder) nodesToRemove.push(placeholder.id);
     });
   let newRules: string[] = [];
@@ -199,7 +199,7 @@ export const updateFlowInputRules = (
             name: ruleData?.name,
             condition: ruleData?.condition,
             value: ruleData?.value,
-          })
+          }),
         );
         return `${newRuleId}`;
       } else {
@@ -231,7 +231,7 @@ export const updateFlowInputRules = (
         !newRules.includes(edge.target) &&
         !newRules.includes(edge.source) &&
         !nodesToRemove.includes(edge.source) &&
-        !nodesToRemove.includes(edge.target)
+        !nodesToRemove.includes(edge.target),
     );
     // Add new edges to connect new rules and placeholders
     newRules.forEach((rule, i) => {
@@ -244,7 +244,7 @@ export const updateFlowInputRules = (
           targetId: +rule,
           handleId: i,
           placeholderId: nodeAfterNewRule?.id,
-        })
+        }),
       );
     });
     return newEdges;
@@ -284,7 +284,7 @@ export const onFlowNodeDragStop = (
   event: any,
   draggedNode: Node,
   reactFlowWrapper: React.RefObject<HTMLDivElement>,
-  startDragNode: React.MutableRefObject<Node | undefined>
+  startDragNode: React.MutableRefObject<Node | undefined>,
 ) => {
   // Dragging existing node onto placeholder
 
@@ -305,13 +305,13 @@ export const onFlowNodeDragStop = (
           node.position.x = startDragNode.current?.position.x ?? 0;
           node.position.y = startDragNode.current?.position.y ?? 0;
           return node;
-        })
+        }),
       );
     }
   }
 
   const matchingPlaceholder = reactFlowInstance.getNodes().find((node) => {
-    if (node.type !== "placeholder") return false;
+    if (node.type !== 'placeholder') return false;
     return (
       node.position.x <= position.x &&
       position.x <= node.position.x + node.width! &&
@@ -334,7 +334,7 @@ export const onFlowNodeDragStop = (
         node.position.x = matchingPlaceholder.position.x;
         node.position.y = matchingPlaceholder.position.y;
         return node;
-      })
+      }),
   );
   // Remove old edge and create a new one pointing to draggedNode
   useServiceStore.getState().setEdges((prevEdges) => {

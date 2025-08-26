@@ -25,14 +25,14 @@ const Card: FC<PropsWithChildren<CardProps>> = ({
 }) => {
   return (
     <div
-      className={clsx("card", {
-        "card--borderless": borderless,
-        "card--scrollable": isScrollable,
-        "card--transparent": isBackground,
+      className={clsx('card', {
+        'card--borderless': borderless,
+        'card--scrollable': isScrollable,
+        'card--transparent': isBackground,
       })}
     >
-      {header && <div className={`card__header ${isHeaderLight ? "white" : ""}`}>{header}</div>}
-      <div className={`card__body ${isBodyDivided ? "divided" : ""}`}>{children}</div>
+      {header && <div className={`card__header ${isHeaderLight ? 'white' : ''}`}>{header}</div>}
+      <div className={`card__body ${isBodyDivided ? 'divided' : ''}`}>{children}</div>
       {footer && <div className="card__footer">{footer}</div>}
     </div>
   );

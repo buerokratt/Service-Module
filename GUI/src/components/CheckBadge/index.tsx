@@ -1,6 +1,6 @@
-import { FC } from "react";
-import { AiFillCheckCircle } from "react-icons/ai";
-import Icon from "../Icon";
+import { FC } from 'react';
+import { AiFillCheckCircle } from 'react-icons/ai';
+import Icon from '../Icon';
 
 import './CheckBadge.scss';
 

@@ -1,11 +1,11 @@
-import { ReactNode, useEffect, useRef, useState } from "react";
-import { FormInput, OutputElementBox, Tooltip } from "components";
-import styles from "./DragInput.module.scss";
-import { Assign } from "types";
-import { t } from "i18next";
-import { getDragData } from "utils/component-util";
-import { getTypeColor, isArray } from "utils/object-util";
-import { isTemplate, stringToTemplate, templateToString } from "utils/string-util";
+import { ReactNode, useEffect, useRef, useState } from 'react';
+import { FormInput, OutputElementBox, Tooltip } from 'components';
+import styles from './DragInput.module.scss';
+import { Assign } from 'types';
+import { t } from 'i18next';
+import { getDragData } from 'utils/component-util';
+import { getTypeColor, isArray } from 'utils/object-util';
+import { isTemplate, stringToTemplate, templateToString } from 'utils/string-util';
 
 const ARRAY_INDEX_PATTERN = /\[\d+\]$/;
 
@@ -17,7 +17,7 @@ const getArrayIndex = (value: string): number => {
 
 const updateArrayIndex = (value: string, index?: number): string => {
   let base = templateToString(value);
-  base = base.replace(ARRAY_INDEX_PATTERN, "");
+  base = base.replace(ARRAY_INDEX_PATTERN, '');
   return stringToTemplate(index !== undefined ? `${base}[${index}]` : base);
 };
 
@@ -30,13 +30,13 @@ interface DragInputProps {
 const DragInput = ({ onChange, element, id }: DragInputProps): ReactNode => {
   const [all, setAll] = useState(false);
   const [arrayIndex, setArrayIndex] = useState(0);
-  const [text, setText] = useState(element?.key ?? "");
-  const [placeholder, setPlaceholder] = useState(t("serviceFlow.popup.dragElementHere"));
+  const [text, setText] = useState(element?.key ?? '');
+  const [placeholder, setPlaceholder] = useState(t('serviceFlow.popup.dragElementHere'));
   const inputRef = useRef<HTMLInputElement>(null);
 
   const resetPlaceholder = () => {
     inputRef.current?.classList.remove(styles.dragHover, styles.dragHoverDisabled);
-    setPlaceholder(t("serviceFlow.popup.dragElementHere"));
+    setPlaceholder(t('serviceFlow.popup.dragElementHere'));
   };
 
   useEffect(() => {
@@ -84,7 +84,7 @@ const DragInput = ({ onChange, element, id }: DragInputProps): ReactNode => {
                     onChange({ ...element, value: updateArrayIndex(element.value) });
                   }}
                 />
-                <label htmlFor={`${id}-all`}>{t("serviceFlow.popup.all")}</label>
+                <label htmlFor={`${id}-all`}>{t('serviceFlow.popup.all')}</label>
               </div>
             </div>
           ) : (
@@ -99,7 +99,7 @@ const DragInput = ({ onChange, element, id }: DragInputProps): ReactNode => {
     <FormInput
       ref={inputRef}
       name=""
-      placeholder={placeholder ?? ""}
+      placeholder={placeholder ?? ''}
       label=""
       className={styles.dragInput}
       onDrop={(e) => {
@@ -107,7 +107,7 @@ const DragInput = ({ onChange, element, id }: DragInputProps): ReactNode => {
 
         if (id === data.id) {
           inputRef.current?.classList.add(styles.dragHoverDisabled);
-          setPlaceholder(t("serviceFlow.popup.assignToSelfNotAllowed"));
+          setPlaceholder(t('serviceFlow.popup.assignToSelfNotAllowed'));
           setTimeout(() => {
             resetPlaceholder();
           }, 800);

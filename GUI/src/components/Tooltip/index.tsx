@@ -1,7 +1,7 @@
-import { FC, PropsWithChildren, ReactNode, useState } from "react";
-import * as RadixTooltip from "@radix-ui/react-tooltip";
+import { FC, PropsWithChildren, ReactNode, useState } from 'react';
+import * as RadixTooltip from '@radix-ui/react-tooltip';
 
-import "./Tooltip.scss";
+import './Tooltip.scss';
 
 type TooltipProps = {
   content: ReactNode;
@@ -15,7 +15,7 @@ const Tooltip: FC<PropsWithChildren<TooltipProps>> = ({ content, children, onBut
       <RadixTooltip.Root open={open} onOpenChange={setOpen}>
         <RadixTooltip.Trigger asChild>
           <button
-            style={{ display: "inline-flex" }}
+            style={{ display: 'inline-flex' }}
             onClick={() => {
               setOpen(true);
               onButtonClick?.();

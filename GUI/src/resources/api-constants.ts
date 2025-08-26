@@ -1,4 +1,4 @@
-import { ServiceState } from "types";
+import { ServiceState } from 'types';
 
 const baseUrl = import.meta.env.REACT_APP_API_URL;
 const trainingModuleBaseUrl = import.meta.env.REACT_APP_TRAINING_MODULE_GUI_BASE_URL;

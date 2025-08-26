@@ -1,5 +1,5 @@
-import { BaseSyntheticEvent, ChangeEvent, FC, useState } from "react";
-import "./FormAutocomplete.scss";
+import { BaseSyntheticEvent, ChangeEvent, FC, useState } from 'react';
+import './FormAutocomplete.scss';
 
 type FormAutocompleteProps = {
   placeholder: string;
@@ -24,15 +24,15 @@ const FormAutocomplete: FC<FormAutocompleteProps> = ({
 }) => {
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [isHideSuggestions, setIsHideSuggestions] = useState(shouldHideSuggestions);
-  const [selectedVal, setSelectedVal] = useState(value ?? "");
+  const [selectedVal, setSelectedVal] = useState(value ?? '');
 
   const onKeyUpHandler = (e: BaseSyntheticEvent<KeyboardEvent> | null) => {
-    const value: string = e?.target.value ?? "";
+    const value: string = e?.target.value ?? '';
     const newSuggestions = data.filter((item: string) =>
       item
         .toLocaleLowerCase()
-        .replace(excludeCharacters ?? "", "")
-        .includes(value.toLocaleLowerCase().replace(excludeCharacters ?? "", ""))
+        .replace(excludeCharacters ?? '', '')
+        .includes(value.toLocaleLowerCase().replace(excludeCharacters ?? '', '')),
     );
     setSuggestions(newSuggestions);
     setIsHideSuggestions(newSuggestions.length > 0 && newSuggestions[0] === value);
@@ -69,7 +69,7 @@ const FormAutocomplete: FC<FormAutocompleteProps> = ({
       </div>
 
       {suggestions.length > 0 && (
-        <div className="suggestions" style={{ display: isHideSuggestions ? "none" : "block" }}>
+        <div className="suggestions" style={{ display: isHideSuggestions ? 'none' : 'block' }}>
           {suggestions.map((item: string, idx: number) => (
             <button key={`${item}-${idx}`} onClick={() => hideSuggestions(item)}>
               {item}

@@ -4,42 +4,40 @@ import { ControllerRenderProps } from 'react-hook-form';
 
 import './SwitchBox.scss';
 
-type SwitchBoxProps = HTMLAttributes<HTMLDivElement> & Partial<ControllerRenderProps> & {
-  name: string;
-  label: string;
-  checked?: boolean;
-  hideLabel?: boolean;
-  onCheckedChange?: (checked: boolean) => void;
-}
+type SwitchBoxProps = HTMLAttributes<HTMLDivElement> &
+  Partial<ControllerRenderProps> & {
+    name: string;
+    label: string;
+    checked?: boolean;
+    hideLabel?: boolean;
+    onCheckedChange?: (checked: boolean) => void;
+  };
 
-const SwitchBox = forwardRef<HTMLButtonElement, SwitchBoxProps>((
-  {
-    label,
-    checked,
-    hideLabel,
-    onCheckedChange,
-    ...rest
+const SwitchBox = forwardRef<HTMLButtonElement, SwitchBoxProps>(
+  ({ label, checked, hideLabel, onCheckedChange, ...rest }, ref) => {
+    const id = useId();
+
+    return (
+      <div className="switchbox" {...rest}>
+        {label && !hideLabel && (
+          <label htmlFor={id} className="switch__label">
+            {label}
+          </label>
+        )}
+        <RadixSwitch.Root
+          ref={ref}
+          id={id}
+          className="switchbox__button"
+          onCheckedChange={onCheckedChange}
+          defaultChecked={checked}
+        >
+          <RadixSwitch.Thumb className="switchbox__thumb" />
+        </RadixSwitch.Root>
+      </div>
+    );
   },
-  ref,
-) => {
-  const id = useId();
+);
 
-  return (
-    <div className='switchbox' {...rest}>
-      {label && !hideLabel && <label htmlFor={id} className='switch__label'>{label}</label>}
-      <RadixSwitch.Root
-        ref={ref}
-        id={id}
-        className='switchbox__button'
-        onCheckedChange={onCheckedChange}
-        defaultChecked={checked}
-      >
-        <RadixSwitch.Thumb className='switchbox__thumb' />
-      </RadixSwitch.Root>
-    </div>
-  );
-});
-
-SwitchBox.displayName = 'switchBox'
+SwitchBox.displayName = 'switchBox';
 
 export default SwitchBox;

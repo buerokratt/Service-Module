@@ -10,18 +10,18 @@ type FormCheckboxesType = {
     label: string;
     value: string;
   }[];
-}
+};
 
 const FormCheckboxes: FC<FormCheckboxesType> = ({ label, name, hideLabel, items }) => {
   const id = useId();
 
   return (
-    <div className='checkboxes'>
-      {label && !hideLabel && <label className='checkboxes__label'>{label}</label>}
-      <div className='checkboxes__wrapper'>
+    <div className="checkboxes">
+      {label && !hideLabel && <label className="checkboxes__label">{label}</label>}
+      <div className="checkboxes__wrapper">
         {items.map((item, index) => (
-          <div key={`${item.value}-${index}`} className='checkboxes__item'>
-            <input type='checkbox' name={name} id={`${id}-${item.value}`} value={item.value} />
+          <div key={`${item.value}-${index}`} className="checkboxes__item">
+            <input type="checkbox" name={name} id={`${id}-${item.value}`} value={item.value} />
             <label htmlFor={`${id}-${item.value}`}>{item.label}</label>
           </div>
         ))}

@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { v4 as uuid } from "uuid";
+import { v4 as uuid } from 'uuid';
 import { ReactNode } from 'react';
 
 export interface ToastType {
@@ -28,26 +28,26 @@ interface ToastState {
 const useToastStore = create<ToastState>((set, get, store) => ({
   toasts: [],
   open: (toast: ToastType) => {
-    const newToast = {  id: uuid(), ...toast };
-    set(state => ({
+    const newToast = { id: uuid(), ...toast };
+    set((state) => ({
       toasts: [...state.toasts, newToast],
-    }))
-  },
-  close: (id: string) => {
-    set(state => ({
-      toasts: state.toasts.filter(t => t.id !== id),
     }));
   },
-  success: ({title, message}: ToastMessage) => {
+  close: (id: string) => {
+    set((state) => ({
+      toasts: state.toasts.filter((t) => t.id !== id),
+    }));
+  },
+  success: ({ title, message }: ToastMessage) => {
     get().open({ type: 'success', title, message });
   },
-  info: ({title, message}: ToastMessage) => {
+  info: ({ title, message }: ToastMessage) => {
     get().open({ type: 'info', title, message });
   },
-  warning: ({title, message}: ToastMessage) => {
+  warning: ({ title, message }: ToastMessage) => {
     get().open({ type: 'warning', title, message });
   },
-  error: ({title, message}: ToastMessage) => {
+  error: ({ title, message }: ToastMessage) => {
     get().open({ type: 'error', title, message });
   },
 }));

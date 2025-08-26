@@ -1,8 +1,8 @@
-import React from "react";
-import { Icon, Track } from "@buerokratt-ria/header/src/header/components";
-import { ColumnDef, Table, flexRender } from "@tanstack/react-table";
-import { MdExpandLess, MdExpandMore, MdUnfoldMore } from "react-icons/md";
-import Filter from "./Filter";
+import React from 'react';
+import { Icon, Track } from '@buerokratt-ria/header/src/header/components';
+import { ColumnDef, Table, flexRender } from '@tanstack/react-table';
+import { MdExpandLess, MdExpandMore, MdUnfoldMore } from 'react-icons/md';
+import Filter from './Filter';
 
 type ColumnMeta = {
   meta: {

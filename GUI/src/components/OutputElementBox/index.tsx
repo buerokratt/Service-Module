@@ -1,8 +1,8 @@
-import { CSSProperties, FC, DragEvent, ReactNode } from "react";
-import Box from "../Box";
-import { Assign, StepType } from "types";
-import useServiceStore from "store/new-services.store";
-import { ASSIGN_DRAG_TYPE } from "utils/component-util";
+import { CSSProperties, FC, DragEvent, ReactNode } from 'react';
+import Box from '../Box';
+import { Assign, StepType } from 'types';
+import useServiceStore from 'store/new-services.store';
+import { ASSIGN_DRAG_TYPE } from 'utils/component-util';
 
 type OutputElementBoxProps = {
   readonly children: ReactNode;
@@ -41,7 +41,7 @@ const OutputElementBox: FC<OutputElementBoxProps> = ({
       // Need to check for StepType.Assign here since ReactQuill does not support custom onDrop events
       node?.data.stepType === StepType.Assign || node?.data.stepType === StepType.DynamicChoices
         ? JSON.stringify(dragData)
-        : dragData.value
+        : dragData.value,
     );
   };
 

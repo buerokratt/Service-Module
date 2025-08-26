@@ -1,5 +1,5 @@
-import { EndpointDefinition } from "./endpoint-definition";
-import { EndpointType } from "./endpoint-type";
+import { EndpointDefinition } from './endpoint-definition';
+import { EndpointType } from './endpoint-type';
 
 export type EndpointData = {
   endpointId: string;

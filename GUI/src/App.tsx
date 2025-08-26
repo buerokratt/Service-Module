@@ -1,31 +1,31 @@
-import React from "react";
-import { BrowserRouter } from "react-router-dom";
-import { ToastProvider } from "./components/Toast/ToastProvider";
-import RootComponent from "./RootComponent";
-import useStore from "./store/store";
-import { useQuery } from "@tanstack/react-query";
-import { UserInfo } from "./types/userInfo";
-import { UnsavedChangesHandler } from "handlers/unsavedChangesHandler";
-import UnsavedChangesDialog from "handlers/unsavedChangesDialog";
+import React from 'react';
+import { BrowserRouter } from 'react-router-dom';
+import { ToastProvider } from './components/Toast/ToastProvider';
+import RootComponent from './RootComponent';
+import useStore from './store/store';
+import { useQuery } from '@tanstack/react-query';
+import { UserInfo } from './types/userInfo';
+import { UnsavedChangesHandler } from 'handlers/unsavedChangesHandler';
+import UnsavedChangesDialog from 'handlers/unsavedChangesDialog';
 
 const App: React.FC = () => {
   useQuery<{
     data: { custom_jwt_userinfo: UserInfo };
   }>({
-    queryKey: ["userinfo", "prod"],
+    queryKey: ['userinfo', 'prod'],
     onSuccess: (res: any) => {
-      return useStore.getState().setUserInfo(res.data)
+      return useStore.getState().setUserInfo(res.data);
     },
-    enabled: import.meta.env.REACT_APP_LOCAL === "true",
+    enabled: import.meta.env.REACT_APP_LOCAL === 'true',
   });
-  
+
   useQuery({
-    queryKey: [import.meta.env.REACT_APP_AUTH_PATH, "auth"],
+    queryKey: [import.meta.env.REACT_APP_AUTH_PATH, 'auth'],
     onSuccess: (res: { response: UserInfo }) => {
-      localStorage.setItem("exp", res.response.JWTExpirationTimestamp);
+      localStorage.setItem('exp', res.response.JWTExpirationTimestamp);
       return useStore.getState().setUserInfo(res.response);
     },
-    enabled: import.meta.env.REACT_APP_LOCAL !== "true",
+    enabled: import.meta.env.REACT_APP_LOCAL !== 'true',
   });
 
   return (

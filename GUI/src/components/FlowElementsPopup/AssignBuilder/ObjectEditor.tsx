@@ -1,11 +1,11 @@
-import React, { useEffect, useRef, useState } from "react";
-import { useTranslation } from "react-i18next";
-import JSONEditor from "jsoneditor";
-import "jsoneditor/dist/jsoneditor.css";
-import { getDragData } from "utils/component-util";
-import { isObject, updateValueAtPath } from "utils/object-util";
-import styles from "./ObjectEditor.module.scss";
-import { stringToTemplate } from "utils/string-util";
+import React, { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import JSONEditor from 'jsoneditor';
+import 'jsoneditor/dist/jsoneditor.css';
+import { getDragData } from 'utils/component-util';
+import { isObject, updateValueAtPath } from 'utils/object-util';
+import styles from './ObjectEditor.module.scss';
+import { stringToTemplate } from 'utils/string-util';
 
 // Helper function to find the path to a node in the JSON structure
 const findNodePath = (node: Element, data: Record<string, unknown>): string | null => {
@@ -23,22 +23,22 @@ const findNodePath = (node: Element, data: Record<string, unknown>): string | nu
 const isValueMatch = (objValue: unknown, value: string): boolean => {
   // Handle boolean conversion
   let booleanValue: boolean | null = null;
-  if (value.toLowerCase() === "true") {
+  if (value.toLowerCase() === 'true') {
     booleanValue = true;
-  } else if (value.toLowerCase() === "false") {
+  } else if (value.toLowerCase() === 'false') {
     booleanValue = false;
   }
 
   return (
     objValue === value ||
-    (typeof objValue === "number" && !isNaN(Number(value)) && objValue === Number(value)) ||
-    (typeof objValue === "boolean" && objValue === booleanValue) ||
-    (objValue === null && value.toLowerCase() === "null")
+    (typeof objValue === 'number' && !isNaN(Number(value)) && objValue === Number(value)) ||
+    (typeof objValue === 'boolean' && objValue === booleanValue) ||
+    (objValue === null && value.toLowerCase() === 'null')
   );
 };
 
 // Helper function to search for value in an array
-const searchInArray = (array: unknown[], value: string, currentPath = ""): string | null => {
+const searchInArray = (array: unknown[], value: string, currentPath = ''): string | null => {
   for (let index = 0; index < array.length; index++) {
     const objValue = array[index];
     const newPath = currentPath ? `${currentPath}[${index}]` : `[${index}]`;
@@ -55,7 +55,7 @@ const searchInArray = (array: unknown[], value: string, currentPath = ""): strin
 };
 
 // Helper function to search for value in an object
-const searchInObject = (obj: Record<string, unknown>, value: string, currentPath = ""): string | null => {
+const searchInObject = (obj: Record<string, unknown>, value: string, currentPath = ''): string | null => {
   for (const [key, objValue] of Object.entries(obj)) {
     const newPath = currentPath ? `${currentPath}.${key}` : String(key);
 
@@ -71,7 +71,7 @@ const searchInObject = (obj: Record<string, unknown>, value: string, currentPath
 };
 
 // Helper function to search for value in a collection
-const searchInCollection = (collection: object, value: string, currentPath = ""): string | null => {
+const searchInCollection = (collection: object, value: string, currentPath = ''): string | null => {
   if (Array.isArray(collection)) {
     return searchInArray(collection, value, currentPath);
   }
@@ -86,7 +86,7 @@ interface ObjectEditorProps {
 
 const ObjectEditor: React.FC<ObjectEditorProps> = ({ onChange, data }) => {
   const { t, i18n } = useTranslation();
-  const jsonEditor = t("objectEditor", { returnObjects: true });
+  const jsonEditor = t('objectEditor', { returnObjects: true });
   const editorRef = useRef<HTMLDivElement>(null);
   const jsonEditorRef = useRef<JSONEditor | null>(null);
   const [hoveredElement, setHoveredElement] = useState<Element | null>(null);
@@ -130,7 +130,7 @@ const ObjectEditor: React.FC<ObjectEditorProps> = ({ onChange, data }) => {
     // Get the element under the cursor
     const element = document.elementFromPoint(e.clientX, e.clientY);
     if (element) {
-      const jsonNode = element.closest(".jsoneditor-value");
+      const jsonNode = element.closest('.jsoneditor-value');
 
       // Remove highlight from previously hovered element
       if (hoveredElement && hoveredElement !== jsonNode) {
@@ -171,7 +171,7 @@ const ObjectEditor: React.FC<ObjectEditorProps> = ({ onChange, data }) => {
         // Get the element under the cursor
         const element = document.elementFromPoint(e.clientX, e.clientY);
         if (element) {
-          const jsonNode = element.closest(".jsoneditor-value");
+          const jsonNode = element.closest('.jsoneditor-value');
 
           if (jsonNode) {
             // Get the current JSON data
@@ -192,7 +192,7 @@ const ObjectEditor: React.FC<ObjectEditorProps> = ({ onChange, data }) => {
         }
       }
     } catch (error) {
-      console.error("Error processing drop:", error);
+      console.error('Error processing drop:', error);
     }
   };
 
@@ -204,11 +204,11 @@ const ObjectEditor: React.FC<ObjectEditorProps> = ({ onChange, data }) => {
       onDrop={handleDrop}
       className={styles.editor}
       role="application"
-      aria-label={t("objectEditor.editor")!}
+      aria-label={t('objectEditor.editor')!}
       tabIndex={0}
       onKeyDown={(e) => {
         // Handle keyboard interactions for accessibility
-        if (e.key === "Enter" || e.key === " ") {
+        if (e.key === 'Enter' || e.key === ' ') {
           e.preventDefault();
           // Focus the editor for keyboard navigation
           editorRef.current?.focus();

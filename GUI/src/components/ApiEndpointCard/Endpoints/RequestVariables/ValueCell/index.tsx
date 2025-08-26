@@ -1,8 +1,8 @@
-import { Row } from "@tanstack/react-table";
-import React, { useState } from "react";
-import { useTranslation } from "react-i18next";
-import { FormInput } from "../../../..";
-import { RequestVariablesTableColumns } from "../../../../../types/request-variables";
+import { Row } from '@tanstack/react-table';
+import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { FormInput } from '../../../..';
+import { RequestVariablesTableColumns } from '../../../../../types/request-variables';
 
 type ValueCellProps = {
   row: Row<RequestVariablesTableColumns>;
@@ -16,13 +16,13 @@ const ValueCell: React.FC<ValueCellProps> = ({ row, updateRowValue, value, onVal
   const [inputValue, setInputValue] = useState(value);
 
   if (!row.original) return <></>;
-  if (row.original.type === "schema" || (row.original.type === "array" && row.original.arrayType === "schema"))
+  if (row.original.type === 'schema' || (row.original.type === 'array' && row.original.arrayType === 'schema'))
     return <></>;
-  
+
   return (
     <div>
       <FormInput
-        style={{ borderRadius: "4px" }}
+        style={{ borderRadius: '4px' }}
         name={`endpoint-value-${row.id}`}
         label=""
         onChange={(e) => {
@@ -31,7 +31,7 @@ const ValueCell: React.FC<ValueCellProps> = ({ row, updateRowValue, value, onVal
           updateRowValue(row.id, e.target.value);
         }}
         value={inputValue}
-        placeholder={t("newService.endpoint.value") + ".."}
+        placeholder={t('newService.endpoint.value') + '..'}
       />
     </div>
   );

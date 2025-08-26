@@ -8,7 +8,7 @@ import 'overlayscrollbars/css/OverlayScrollbars.css';
 
 const ChatContent = (): JSX.Element => {
   const OSref = useRef<OverlayScrollbarsComponent>(null);
-  const chat = useTestServiceStore(x => x.chat);
+  const chat = useTestServiceStore((x) => x.chat);
 
   useEffect(() => {
     if (OSref.current) {
@@ -16,7 +16,6 @@ const ChatContent = (): JSX.Element => {
       instance?.scroll({ y: '100%' }, 200);
     }
   }, [chat]);
-
 
   return (
     <AnimatePresence initial={false}>
@@ -29,7 +28,9 @@ const ChatContent = (): JSX.Element => {
             scrollbars: { visibility: 'auto', autoHide: 'leave' },
           }}
         >
-          {chat.map((message) => <ChatMessage message={message} key={message.id} />)}
+          {chat.map((message) => (
+            <ChatMessage message={message} key={message.id} />
+          ))}
         </OverlayScrollbarsComponent>
       </div>
     </AnimatePresence>

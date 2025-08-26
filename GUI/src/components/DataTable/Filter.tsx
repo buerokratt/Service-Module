@@ -1,27 +1,27 @@
-import React, { FC, useState, MouseEvent } from 'react'
-import { Column, Table } from '@tanstack/react-table'
-import { useTranslation } from 'react-i18next'
-import { MdOutlineSearch } from 'react-icons/md'
+import React, { FC, useState, MouseEvent } from 'react';
+import { Column, Table } from '@tanstack/react-table';
+import { useTranslation } from 'react-i18next';
+import { MdOutlineSearch } from 'react-icons/md';
 
-import { Icon } from '../../components'
-import DebouncedInput from './DebouncedInput'
+import { Icon } from '../../components';
+import DebouncedInput from './DebouncedInput';
 
 type FilterProps = {
-  column: Column<any, unknown>
-  table: Table<any>
-}
+  column: Column<any, unknown>;
+  table: Table<any>;
+};
 
 const Filter: FC<FilterProps> = ({ column, table }) => {
-  const { t } = useTranslation()
-  const [filterOpen, setFilterOpen] = useState(false)
-  const firstValue = table.getPreFilteredRowModel().flatRows[0]?.getValue(column.id)
+  const { t } = useTranslation();
+  const [filterOpen, setFilterOpen] = useState(false);
+  const firstValue = table.getPreFilteredRowModel().flatRows[0]?.getValue(column.id);
 
-  const columnFilterValue = column.getFilterValue()
+  const columnFilterValue = column.getFilterValue();
 
   const handleFilterToggle = (e: MouseEvent) => {
-    e.stopPropagation()
-    setFilterOpen(!filterOpen)
-  }
+    e.stopPropagation();
+    setFilterOpen(!filterOpen);
+  };
 
   return (
     <>
@@ -49,7 +49,7 @@ const Filter: FC<FilterProps> = ({ column, table }) => {
         </div>
       )}
     </>
-  )
-}
+  );
+};
 
-export default Filter
+export default Filter;

@@ -1,15 +1,15 @@
-import { FC, memo, useEffect, useState } from "react";
-import { useTranslation } from "react-i18next";
+import { FC, memo, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
-import useServiceStore from "store/new-services.store";
-import { Group, Rule } from "components/FlowElementsPopup/RuleBuilder/types";
-import { Assign } from "types/assign";
-import { MultiChoiceQuestion } from "types/multi-choice-question";
-import CheckBadge from "components/CheckBadge";
-import ExclamationBadge from "components/ExclamationBadge";
-import Track from "components/Track";
-import { StepType } from "types";
-import { DynamicChoices } from "types/dynamic-choices";
+import useServiceStore from 'store/new-services.store';
+import { Group, Rule } from 'components/FlowElementsPopup/RuleBuilder/types';
+import { Assign } from 'types/assign';
+import { MultiChoiceQuestion } from 'types/multi-choice-question';
+import CheckBadge from 'components/CheckBadge';
+import ExclamationBadge from 'components/ExclamationBadge';
+import Track from 'components/Track';
+import { StepType } from 'types';
+import { DynamicChoices } from 'types/dynamic-choices';
 
 type NodeDataProps = {
   data: {
@@ -56,13 +56,13 @@ const StepNode: FC<NodeDataProps> = ({ data }) => {
     if (data.stepType === StepType.Input || data.stepType === StepType.Condition) {
       const hasInvalidRules = (elements: any[]): boolean => {
         return elements.some((e) => {
-          if ("children" in e) {
+          if ('children' in e) {
             const group = e as Group;
             if (group.children.length === 0) return true;
             return hasInvalidRules(group.children);
           } else {
             const rule = e as Rule;
-            return rule.value === "" || rule.field === "" || rule.operator === "";
+            return rule.value === '' || rule.field === '' || rule.operator === '';
           }
         });
       };
@@ -71,13 +71,16 @@ const StepNode: FC<NodeDataProps> = ({ data }) => {
       return data.rules?.children === undefined || invalidRulesExist || data.rules?.children.length === 0;
     }
     if (data.stepType === StepType.MultiChoiceQuestion) {
-      return !data?.multiChoiceQuestion?.question || data.multiChoiceQuestion?.buttons?.find((e) => e.title === "") != undefined;
+      return (
+        !data?.multiChoiceQuestion?.question ||
+        data.multiChoiceQuestion?.buttons?.find((e) => e.title === '') != undefined
+      );
     }
 
     if (data.stepType === StepType.DynamicChoices) {
       return !data?.dynamicChoices?.list || !data?.dynamicChoices?.serviceName || !data?.dynamicChoices?.key;
     }
-    
+
     if (data.stepType === StepType.UserDefined) return;
     if (data.stepType === StepType.OpenWebpage) return !data.link || !data.linkText;
     if (data.stepType === StepType.FileGenerate) return !data.fileName || !data.fileContent;
@@ -86,7 +89,7 @@ const StepNode: FC<NodeDataProps> = ({ data }) => {
       const hasInvalidElements = (elements: any[]): boolean => {
         return elements.some((e) => {
           const element = e as Assign;
-          return element.key === "" || element.value === "";
+          return element.key === '' || element.value === '';
         });
       };
 
@@ -118,7 +121,7 @@ const StepNode: FC<NodeDataProps> = ({ data }) => {
     await useServiceStore.getState().testUrl(
       endpoint,
       () => setIsTestedAndPassed(false),
-      () => setIsTestedAndPassed(true)
+      () => setIsTestedAndPassed(true),
     );
   };
 
@@ -128,7 +131,7 @@ const StepNode: FC<NodeDataProps> = ({ data }) => {
 
   return (
     <Track
-      style={{ overflow: "hidden", whiteSpace: "nowrap", textOverflow: "ellipsis" }}
+      style={{ overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}
       direction="vertical"
       align="left"
     >
@@ -137,15 +140,15 @@ const StepNode: FC<NodeDataProps> = ({ data }) => {
         {data.label}
       </p>
       {data.stepType === StepType.Textfield && (
-        <div style={boldText} dangerouslySetInnerHTML={createMarkup(data.message ?? "")}></div>
+        <div style={boldText} dangerouslySetInnerHTML={createMarkup(data.message ?? '')}></div>
       )}
       {data.stepType === StepType.MultiChoiceQuestion && (
-        <div style={boldText} dangerouslySetInnerHTML={createMarkup(data.multiChoiceQuestion?.question ?? "")}></div>
+        <div style={boldText} dangerouslySetInnerHTML={createMarkup(data.multiChoiceQuestion?.question ?? '')}></div>
       )}
-      {data.stepType === StepType.Auth && <p style={boldText}>"{t("serviceFlow.popup.loginWithTARA")}"</p>}
+      {data.stepType === StepType.Auth && <p style={boldText}>"{t('serviceFlow.popup.loginWithTARA')}"</p>}
       {data.stepType === StepType.Input && (
         <p>
-          <span style={boldText}>{t("newService.endpoint.variable")}</span>
+          <span style={boldText}>{t('newService.endpoint.variable')}</span>
           <span style={{ marginLeft: 8 }} className="client-input-variable-tag">
             client_input_{data.clientInputId}
           </span>
@@ -169,10 +172,10 @@ const StepNode: FC<NodeDataProps> = ({ data }) => {
           </span>
         </p>
       )}
-      {data.stepType === StepType.FileSign && <p style={boldText}>“{t("serviceFlow.popup.fileSign")}”</p>}
-      {data.stepType === StepType.FinishingStepEnd && <p style={boldText}>“{t("serviceFlow.popup.serviceEnded")}”</p>}
+      {data.stepType === StepType.FileSign && <p style={boldText}>“{t('serviceFlow.popup.fileSign')}”</p>}
+      {data.stepType === StepType.FinishingStepEnd && <p style={boldText}>“{t('serviceFlow.popup.serviceEnded')}”</p>}
       {data.stepType === StepType.FinishingStepRedirect && (
-        <p style={boldText}>{t("serviceFlow.popup.redirectToCustomerSupport")}</p>
+        <p style={boldText}>{t('serviceFlow.popup.redirectToCustomerSupport')}</p>
       )}
       {data.stepType === StepType.Rule && (
         <p>

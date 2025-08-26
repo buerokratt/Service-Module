@@ -1,8 +1,8 @@
-import { FC } from "react";
-import { KeyPath } from "react-json-tree";
-import OutputElementBox from "components/OutputElementBox";
-import { getKeyPathString, getTypeColor } from "../../utils/object-util";
-import { stringToTemplate } from "utils/string-util";
+import { FC } from 'react';
+import { KeyPath } from 'react-json-tree';
+import OutputElementBox from 'components/OutputElementBox';
+import { getKeyPathString, getTypeColor } from '../../utils/object-util';
+import { stringToTemplate } from 'utils/string-util';
 
 const escapeKey = (key: string) => {
   return key.replace(/"/g, '\\"');
@@ -10,13 +10,13 @@ const escapeKey = (key: string) => {
 
 const parseNodeType = (nodeType: string): number | string | unknown[] | undefined | {} => {
   switch (nodeType) {
-    case "Number":
+    case 'Number':
       return 0;
-    case "String":
-      return "";
-    case "Array":
+    case 'String':
+      return '';
+    case 'Array':
       return [];
-    case "Object":
+    case 'Object':
       return {};
     default:
       return undefined;
@@ -26,7 +26,7 @@ const parseNodeType = (nodeType: string): number | string | unknown[] | undefine
 const buildKeyPathString = (key: string, pathArray: string[]) => {
   const [root, ...remainingPath] = [...pathArray].reverse();
 
-  let path = "";
+  let path = '';
   if (remainingPath.length > 0) {
     // Start with the root object name
     path = remainingPath.toReversed()[0];
@@ -56,7 +56,7 @@ const buildKeyPathString = (key: string, pathArray: string[]) => {
 };
 
 const buildRoundedValueString = (base: string) => {
-  return "Math.round((" + base + " + Number.EPSILON) * 100) / 100";
+  return 'Math.round((' + base + ' + Number.EPSILON) * 100) / 100';
 };
 
 interface ObjectTreeLabelProps {
@@ -77,7 +77,7 @@ export const ObjectTreeLabel: FC<ObjectTreeLabelProps> = ({ keyPath, nodeType, p
 
   return (
     <OutputElementBox
-      dragData={{ key, value: buildValueString(keyPath), data: parseNodeType(nodeType), id: "" }}
+      dragData={{ key, value: buildValueString(keyPath), data: parseNodeType(nodeType), id: '' }}
       className="object-tree-chip"
       borderColor={typeColor.color}
     >

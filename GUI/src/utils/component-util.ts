@@ -1,12 +1,12 @@
-import { Step } from "types";
+import { Step } from 'types';
 
-export const ASSIGN_DRAG_TYPE = "text/plain";
+export const ASSIGN_DRAG_TYPE = 'text/plain';
 
 export const onDragStart = (event: React.DragEvent<HTMLDivElement>, step: Step) => {
-  event.dataTransfer.setData("application/reactflow-label", step.label);
-  event.dataTransfer.setData("application/reactflow-type", step.type);
-  event.dataTransfer.setData("application/reactflow-originalDefinedNodeId", step.data?.endpointId ?? "");
-  event.dataTransfer.effectAllowed = "move";
+  event.dataTransfer.setData('application/reactflow-label', step.label);
+  event.dataTransfer.setData('application/reactflow-type', step.type);
+  event.dataTransfer.setData('application/reactflow-originalDefinedNodeId', step.data?.endpointId ?? '');
+  event.dataTransfer.effectAllowed = 'move';
 };
 
 export const getDragData = (event: React.DragEvent<HTMLDivElement>) => {

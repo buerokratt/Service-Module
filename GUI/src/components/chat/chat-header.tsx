@@ -9,15 +9,13 @@ const ChatHeader = (): JSX.Element => {
 
   return (
     <div className={styles.header}>
-      <div className={styles.title}>
-        {t('chat.title')}
-      </div>
+      <div className={styles.title}>{t('chat.title')}</div>
       <div className={styles.actions}>
         <button onClick={useTestServiceStore.getState().restart}>
-          <img src={Reset} alt='Reset'/>
+          <img src={Reset} alt="Reset" />
         </button>
         <button onClick={useTestServiceStore.getState().closeChat}>
-          <img src={Close} alt='Close'/>
+          <img src={Close} alt="Close" />
         </button>
       </div>
     </div>

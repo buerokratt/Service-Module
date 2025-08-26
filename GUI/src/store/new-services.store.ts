@@ -1,5 +1,5 @@
-import { create } from "zustand";
-import { v4 as uuid } from "uuid";
+import { create } from 'zustand';
+import { v4 as uuid } from 'uuid';
 import {
   Edge,
   EdgeChange,
@@ -10,8 +10,8 @@ import {
   applyNodeChanges,
   getIncomers,
   getOutgoers,
-} from "@xyflow/react";
-import { EndpointData, EndpointEnv, EndpointTab, PreDefinedEndpointEnvVariables } from "types/endpoint";
+} from '@xyflow/react';
+import { EndpointData, EndpointEnv, EndpointTab, PreDefinedEndpointEnvVariables } from 'types/endpoint';
 import {
   getCommonEndpoints,
   getEndpointValidation,
@@ -20,22 +20,22 @@ import {
   getTaraAuthResponseVariables,
   servicesRequestsExplain,
   userStepPreferences,
-} from "resources/api-constants";
-import { EndpointDefinitionJson, Service, ServiceState, Step, StepType } from "types";
-import { RequestVariablesTabsRawData, RequestVariablesTabsRowsData } from "types/request-variables";
-import useToastStore from "./toasts.store";
-import i18next from "i18next";
-import { saveFlowClick } from "services/service-builder";
-import { NodeDataProps, initialEdges, initialNodes } from "types/service-flow";
-import { alignNodesInCaseAnyGotOverlapped, updateFlowInputRules } from "services/flow-builder";
-import { GroupOrRule } from "components/FlowElementsPopup/RuleBuilder/types";
-import useTestServiceStore from "./test-services.store";
-import { Chip } from "types/chip";
-import { EndpointResponseVariable } from "types/endpoint/endpoint-response-variables";
-import { Assign } from "types/assign";
-import { EndpointType } from "types/endpoint/endpoint-type";
-import api from "../services/api-dev";
-import { AxiosResponse } from "axios";
+} from 'resources/api-constants';
+import { EndpointDefinitionJson, Service, ServiceState, Step, StepType } from 'types';
+import { RequestVariablesTabsRawData, RequestVariablesTabsRowsData } from 'types/request-variables';
+import useToastStore from './toasts.store';
+import i18next from 'i18next';
+import { saveFlowClick } from 'services/service-builder';
+import { NodeDataProps, initialEdges, initialNodes } from 'types/service-flow';
+import { alignNodesInCaseAnyGotOverlapped, updateFlowInputRules } from 'services/flow-builder';
+import { GroupOrRule } from 'components/FlowElementsPopup/RuleBuilder/types';
+import useTestServiceStore from './test-services.store';
+import { Chip } from 'types/chip';
+import { EndpointResponseVariable } from 'types/endpoint/endpoint-response-variables';
+import { Assign } from 'types/assign';
+import { EndpointType } from 'types/endpoint/endpoint-type';
+import api from '../services/api-dev';
+import { AxiosResponse } from 'axios';
 
 interface ServiceStoreState {
   endpoints: EndpointData[];
@@ -99,7 +99,7 @@ interface ServiceStoreState {
   resetState: () => void;
   resetAssign: () => void;
   resetRules: () => void;
-  onServiceSave: (status: "draft" | "ready", showError?: boolean) => Promise<void>;
+  onServiceSave: (status: 'draft' | 'ready', showError?: boolean) => Promise<void>;
   onContinueClick: () => Promise<void>;
   selectedNode: Node<NodeDataProps> | null;
   setSelectedNode: (node: Node<NodeDataProps> | null | undefined) => void;
@@ -132,10 +132,10 @@ interface ServiceStoreState {
 
 const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
   endpoints: [],
-  name: "",
-  slot: "",
+  name: '',
+  slot: '',
   serviceId: uuid(),
-  description: "",
+  description: '',
   edges: initialEdges,
   nodes: initialNodes,
   isNewService: true,
@@ -154,11 +154,11 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
       nodes
         .filter((node) => node.data.stepType === StepType.Assign)
         .flatMap((node) => node.data?.assignElements ?? [])
-        .map((element) => [element.id, element])
+        .map((element) => [element.id, element]),
     );
 
     assignElements.forEach(
-      (updated) => elementsMap.get(updated.id) && Object.assign(elementsMap.get(updated.id), updated)
+      (updated) => elementsMap.get(updated.id) && Object.assign(elementsMap.get(updated.id), updated),
     );
 
     const hasChangedSlot = (slot: any, elementsMap: Map<any, any>): boolean => {
@@ -270,7 +270,7 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
           headers: extractMapValues(endpoint.headers),
           body: extractMapValues(endpoint.body),
           params: extractMapValues(endpoint.params),
-        }))
+        })),
       );
 
       const response = await api.post(servicesRequestsExplain(), {
@@ -286,19 +286,19 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
         for (const [key, value] of Object.entries(res)) {
           chips.push({
             name: key,
-            value: `${endpoint?.name.replace(" ", "_")}_res.response.body.${key}`,
+            value: `${endpoint?.name.replace(' ', '_')}_res.response.body.${key}`,
             data: value,
           });
         }
 
         chips.push({
-          name: "Status Code",
-          value: `${endpoint?.name.replaceAll(" ", "_")}_res.response.statusCodeValue`,
-          data: `${endpoint?.name.replaceAll(" ", "_")}_res.response.statusCodeValue`,
+          name: 'Status Code',
+          value: `${endpoint?.name.replaceAll(' ', '_')}_res.response.statusCodeValue`,
+          data: `${endpoint?.name.replaceAll(' ', '_')}_res.response.statusCodeValue`,
         });
 
         const variable: EndpointResponseVariable = {
-          name: endpoint?.name ?? "",
+          name: endpoint?.name ?? '',
           chips: chips,
         };
 
@@ -314,7 +314,7 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
     return [...get().availableVariables.prod, ...get().availableVariables.test];
   },
   vaildServiceInfo: () => !!get().name,
-  serviceNameDashed: () => get().name.replaceAll(" ", "_"),
+  serviceNameDashed: () => get().name.replaceAll(' ', '_'),
   deleteEndpoint: (id: string) => {
     const newEndpoints = get().endpoints.filter((x) => x.endpointId !== id);
     set({ endpoints: newEndpoints });
@@ -362,24 +362,24 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
       set((state) => ({ endpoints: [...state.endpoints, endpoint] }));
       return;
     }
-    const newEndpoint = { endpointId: uuid(), name: "", definitions: [], isNew: true };
+    const newEndpoint = { endpointId: uuid(), name: '', definitions: [], isNew: true };
     set((state) => ({ endpoints: [...state.endpoints, newEndpoint] }));
   },
   editEndpoint: (updatedEndpoint?: EndpointData) => {
     if (!updatedEndpoint) return;
     set((state) => ({
       endpoints: state.endpoints.map((endpoint) =>
-        endpoint.endpointId === updatedEndpoint.endpointId ? { ...updatedEndpoint, isNew: false } : endpoint
+        endpoint.endpointId === updatedEndpoint.endpointId ? { ...updatedEndpoint, isNew: false } : endpoint,
       ),
     }));
   },
   resetState: () => {
     set({
-      name: "",
+      name: '',
       endpoints: [],
       serviceId: uuid(),
-      description: "",
-      slot: "",
+      description: '',
+      slot: '',
       secrets: { prod: [], test: [] },
       availableVariables: { prod: [], test: [] },
       isCommon: false,
@@ -411,7 +411,7 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
     if (id) {
       serviceResponse = await api.get<Service>(getServiceById(id));
 
-      const structure = JSON.parse(serviceResponse.data.structure?.value ?? "{}");
+      const structure = JSON.parse(serviceResponse.data.structure?.value ?? '{}');
       let endpoints = serviceResponse.data.endpoints.map((endpoint) => {
         return {
           ...endpoint,
@@ -428,7 +428,7 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
       if (!endpoints || !(endpoints instanceof Array)) endpoints = [];
 
       nodes = nodes.map((node: any) => {
-        if (node.type !== "custom") return node;
+        if (node.type !== 'custom') return node;
         node.data = {
           ...node.data,
           onDelete: get().onDelete,
@@ -455,7 +455,7 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
 
     await get().loadSecretVariables();
 
-    if (nodes?.find((node) => node.data.stepType === "auth")) {
+    if (nodes?.find((node) => node.data.stepType === 'auth')) {
       await get().loadTaraVariables();
     }
 
@@ -469,7 +469,7 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
   loadCommonEndpoints: async () => {
     const response = await api.get(getCommonEndpoints());
     const endpointsResponse: Array<
-      Pick<EndpointData, "endpointId" | "name" | "type" | "fileName" | "isCommon"> & {
+      Pick<EndpointData, 'endpointId' | 'name' | 'type' | 'fileName' | 'isCommon'> & {
         definitions: EndpointDefinitionJson;
       }
     > = response.data.response;
@@ -491,7 +491,7 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
         stepPreferences: response.data.response.steps ?? [],
       });
     } catch (error) {
-      console.error("Failed to load step preferences:", error);
+      console.error('Failed to load step preferences:', error);
     }
   },
   loadSecretVariables: async () => {
@@ -520,7 +520,7 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
     const responseVariables = selectedDefinition?.response ?? [];
 
     const variables = responseVariables.map(
-      (x) => `{{${endpoint.name === "" ? endpoint.endpointId : endpoint.name}.${x.name}}}`
+      (x) => `{{${endpoint.name === '' ? endpoint.endpointId : endpoint.name}.${x.name}}}`,
     );
 
     return {
@@ -534,7 +534,7 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
     const variables = response.map((x) => `{{${newName ?? x.id}.${x.name}}}`);
 
     const oldFilteredVariables = get().availableVariables.prod.filter(
-      (v) => v.replace("{{", "").split(".")[0] !== oldName
+      (v) => v.replace('{{', '').split('.')[0] !== oldName,
     );
 
     const newEndpoints = get().endpoints.map((x) => {
@@ -577,7 +577,7 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
   isLive: () => get().selectedTab === EndpointEnv.Live,
   updateEndpointRawData: (data: RequestVariablesTabsRawData, endpoint?: EndpointData) => {
     if (!endpoint) return;
-    const live = "value";
+    const live = 'value';
 
     const defEndpoint = endpoint.definitions[0];
 
@@ -608,7 +608,7 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
           keyedDefEndpoint?.variables.push({
             id: uuid(),
             name: row.variable,
-            type: "custom",
+            type: 'custom',
             required: false,
             value: row.value,
           });
@@ -627,7 +627,7 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
   },
   reactFlowInstance: null,
   setReactFlowInstance: (reactFlowInstance) => set({ reactFlowInstance }),
-  onServiceSave: async (status: "draft" | "ready" = "ready", showError = true) => {
+  onServiceSave: async (status: 'draft' | 'ready' = 'ready', showError = true) => {
     await saveFlowClick(status, showError);
   },
   onContinueClick: async () => {
@@ -635,10 +635,10 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
 
     if (!vaildServiceInfo) {
       useToastStore.getState().error({
-        title: i18next.t("newService.toast.missingFields"),
-        message: i18next.t("newService.toast.serviceMissingFields"),
+        title: i18next.t('newService.toast.missingFields'),
+        message: i18next.t('newService.toast.serviceMissingFields'),
       });
-      return Promise.reject(new Error(i18next.t("newService.toast.missingFields") ?? "Error"));
+      return Promise.reject(new Error(i18next.t('newService.toast.missingFields') ?? 'Error'));
     }
 
     const { isNewService, onServiceSave } = get();
@@ -646,7 +646,7 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
     try {
       await onServiceSave(ServiceState.Ready);
     } catch (e: any) {
-      return Promise.reject(new Error(i18next.t("toast.cannot-save-flow") ?? e?.message ?? "Error"));
+      return Promise.reject(new Error(i18next.t('toast.cannot-save-flow') ?? e?.message ?? 'Error'));
     }
 
     if (isNewService) {
@@ -671,7 +671,7 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
       const changedNodes = applyNodeChanges(changes, prevNode);
       const newNodes = alignNodesInCaseAnyGotOverlapped(changes, changedNodes, get().edges);
       changes.forEach((change) => {
-        if (change.type === "add") {
+        if (change.type === 'add') {
           get().onNodeAdded(change.item);
         }
       });
@@ -691,7 +691,7 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
       const edges = instance.getEdges() ?? [];
 
       nodes
-        .filter((n) => n.type === "ghost")
+        .filter((n) => n.type === 'ghost')
         .forEach((ghostNode) => {
           const incomers = getIncomers(ghostNode, nodes, edges);
           const outgoers = getOutgoers(ghostNode, nodes, edges);
@@ -741,21 +741,21 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
             label: updatedNode.data.label,
           },
         };
-      })
+      }),
     );
   },
   testUrl: async (endpoint, onError, onSuccess) => {
     try {
-      new URL(endpoint.definitions[0].url ?? "");
-      if (endpoint.definitions[0].methodType === "GET") {
+      new URL(endpoint.definitions[0].url ?? '');
+      if (endpoint.definitions[0].methodType === 'GET') {
         await api.post(getEndpointValidation(), {
-          url: endpoint.definitions[0].url ?? "",
-          type: "GET",
+          url: endpoint.definitions[0].url ?? '',
+          type: 'GET',
         });
       } else {
         await api.post(getEndpointValidation(), {
-          url: endpoint.definitions[0].url ?? "",
-          type: "POST",
+          url: endpoint.definitions[0].url ?? '',
+          type: 'POST',
         });
       }
       onSuccess();
@@ -794,7 +794,7 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
 
 function extractMapValues(element: any) {
   if (!element) return {};
-  
+
   if (element.rawData && element.rawData.length > 0) {
     return element.rawData.value;
   }
@@ -808,7 +808,7 @@ function extractMapValues(element: any) {
 
 const getReactFlowInstance = (state: any) => {
   const instance = state.reactFlowInstance;
-  if (!instance) throw new Error("React Flow instance not available");
+  if (!instance) throw new Error('React Flow instance not available');
   return instance;
 };
 

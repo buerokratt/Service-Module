@@ -1,20 +1,20 @@
-import React, { CSSProperties, FC, useEffect, useState } from "react";
-import Track from "../Track";
-import useServiceStore from "../../store/new-services.store";
-import { EndpointResponseVariable } from "types/endpoint/endpoint-response-variables";
-import OutputElementBox from "components/OutputElementBox";
-import { StepType } from "types";
-import { Assign } from "../../types/assign";
-import { useTranslation } from "react-i18next";
-import { ObjectTree } from "./ObjectTree";
-import { stringToTemplate, templateToString } from "utils/string-util";
-import { getTypeColor, isObject } from "utils/object-util";
-import Tooltip from "../Tooltip";
-import { v4 } from "uuid";
-import { getHelperTooltips } from "utils/constants";
-import { datesVariables, environmentVariables, helperVariables } from "resources/variables-constants";
-import { Node, Edge } from "@xyflow/react";
-import { NodeDataProps } from "types/service-flow";
+import React, { CSSProperties, FC, useEffect, useState } from 'react';
+import Track from '../Track';
+import useServiceStore from '../../store/new-services.store';
+import { EndpointResponseVariable } from 'types/endpoint/endpoint-response-variables';
+import OutputElementBox from 'components/OutputElementBox';
+import { StepType } from 'types';
+import { Assign } from '../../types/assign';
+import { useTranslation } from 'react-i18next';
+import { ObjectTree } from './ObjectTree';
+import { stringToTemplate, templateToString } from 'utils/string-util';
+import { getTypeColor, isObject } from 'utils/object-util';
+import Tooltip from '../Tooltip';
+import { v4 } from 'uuid';
+import { getHelperTooltips } from 'utils/constants';
+import { datesVariables, environmentVariables, helperVariables } from 'resources/variables-constants';
+import { Node, Edge } from '@xyflow/react';
+import { NodeDataProps } from 'types/service-flow';
 
 type PreviousVariablesProps = {
   readonly nodeId: string;
@@ -22,7 +22,7 @@ type PreviousVariablesProps = {
 
 // Unique key for predefined elements, used below to identify it
 // All other assign element keys are UUIDs
-const predefinedInputKeys = ["-1", "-2"];
+const predefinedInputKeys = ['-1', '-2'];
 
 const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
   const { t } = useTranslation();
@@ -61,7 +61,7 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
 
     // Get Endpoints variables
     const endpointNodes = previousNodes.filter((node) => node.data.stepType === StepType.UserDefined);
-    const names = endpointNodes.map((node) => node.data.label?.toString().split(" ")[0]);
+    const names = endpointNodes.map((node) => node.data.label?.toString().split(' ')[0]);
     endpointsVariables = endpointsVariables.filter((endpoint) => names.includes(endpoint.name));
     setEndpoints(endpointsVariables);
 
@@ -72,16 +72,16 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
     const predefinedInputElements: Assign[] = [
       {
         id: predefinedInputKeys[0],
-        key: "input",
-        value: stringToTemplate("incoming.body.input"),
+        key: 'input',
+        value: stringToTemplate('incoming.body.input'),
         // Can only be a string array, see trigger-service.yaml in Buerokratt-Chatbot
         // Value is not known at this point, so passing a dummy to correctly infer type
         data: [],
       },
       {
         id: predefinedInputKeys[1],
-        key: "Empty Content Type",
-        value: stringToTemplate(""),
+        key: 'Empty Content Type',
+        value: stringToTemplate(''),
         // Can only be a string array, see trigger-service.yaml in Buerokratt-Chatbot
         // Value is not known at this point, so passing a dummy to correctly infer type
         data: [],
@@ -113,17 +113,17 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
 
   const popupBodyCss: CSSProperties = {
     padding: 16,
-    backgroundColor: "#F9F9F9",
-    width: "100%",
+    backgroundColor: '#F9F9F9',
+    width: '100%',
   };
 
-  const border = "1px solid #D2D3D8";
+  const border = '1px solid #D2D3D8';
 
   return (
     <Track direction="vertical" align="stretch">
       {assignedVariables.length > 0 && (
         <VariableSection
-          title={t("serviceFlow.previousVariables.assignElements")}
+          title={t('serviceFlow.previousVariables.assignElements')}
           variables={[...assignedVariables]}
           assignedObjectTree={assignedObjectTree}
           setAssignedObjectTree={setAssignedObjectTree}
@@ -133,7 +133,7 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
       )}
 
       <VariableSection
-        title={t("serviceFlow.previousVariables.environmentVariables.title")}
+        title={t('serviceFlow.previousVariables.environmentVariables.title')}
         variables={[...environmentVariables]}
         assignedObjectTree={assignedObjectTree}
         setAssignedObjectTree={setAssignedObjectTree}
@@ -142,7 +142,7 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
       />
 
       <VariableSection
-        title={t("serviceFlow.previousVariables.dates.title")}
+        title={t('serviceFlow.previousVariables.dates.title')}
         variables={[...datesVariables]}
         assignedObjectTree={assignedObjectTree}
         setAssignedObjectTree={setAssignedObjectTree}
@@ -151,7 +151,7 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
       />
 
       <VariableSection
-        title={t("serviceFlow.previousVariables.helpers.title")}
+        title={t('serviceFlow.previousVariables.helpers.title')}
         variables={[...helperVariablesWithTooltips]}
         assignedObjectTree={assignedObjectTree}
         setAssignedObjectTree={setAssignedObjectTree}
@@ -171,14 +171,14 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
         <Track key={v4()} direction="vertical" align="left" style={{ ...popupBodyCss, borderBottom: border }}>
           <label
             htmlFor="json"
-            style={{ marginBottom: "10px", textTransform: "capitalize", cursor: "auto" }}
+            style={{ marginBottom: '10px', textTransform: 'capitalize', cursor: 'auto' }}
           >{`${endpoint.name}`}</label>
           <Track
             direction="horizontal"
             gap={4}
             justify="start"
             isMultiline
-            style={{ maxHeight: "30vh", overflow: "auto" }}
+            style={{ maxHeight: '30vh', overflow: 'auto' }}
           >
             {endpoint.chips.map((chip) => {
               const typeColor = getTypeColor(chip.data);
@@ -193,7 +193,7 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
                 <Tooltip content={`${JSON.stringify(chip.data)} : ${typeColor.type}`} key={dragData.id}>
                   <OutputElementBox
                     dragData={dragData}
-                    style={{ cursor: "pointer" }}
+                    style={{ cursor: 'pointer' }}
                     borderColor={typeColor.color}
                     onClick={() => {
                       setEndpointsObjectTree(
@@ -206,7 +206,7 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
                       );
                     }}
                   >
-                    {endpointsObjectTree?.path === chip.value ? chip.name + " ▲" : chip.name + " ▼"}
+                    {endpointsObjectTree?.path === chip.value ? chip.name + ' ▲' : chip.name + ' ▼'}
                   </OutputElementBox>
                 </Tooltip>
               ) : (
@@ -247,19 +247,19 @@ const VariableSection = ({
         borderBottom: assignedObjectTree ? undefined : border,
       }}
     >
-      <label htmlFor="json" style={{ marginBottom: "10px", textTransform: "capitalize", cursor: "auto" }}>
+      <label htmlFor="json" style={{ marginBottom: '10px', textTransform: 'capitalize', cursor: 'auto' }}>
         {title}
       </label>
-      <Track direction="horizontal" gap={4} justify="start" isMultiline style={{ maxHeight: "30vh", overflow: "auto" }}>
+      <Track direction="horizontal" gap={4} justify="start" isMultiline style={{ maxHeight: '30vh', overflow: 'auto' }}>
         {variables.map((variable: any) => {
           const typeColor = getTypeColor(variable?.value);
 
           const rawName =
-            title === t("serviceFlow.previousVariables.environmentVariables.title") ||
-            title === t("serviceFlow.previousVariables.assignElements")
+            title === t('serviceFlow.previousVariables.environmentVariables.title') ||
+            title === t('serviceFlow.previousVariables.assignElements')
               ? variable.key
               : t(variable.key);
-          const name = rawName.length > 0 ? rawName : t("serviceFlow.previousVariables.noName");
+          const name = rawName.length > 0 ? rawName : t('serviceFlow.previousVariables.noName');
 
           return isObject(variable.data) && !predefinedInputKeys.includes(variable.id) ? (
             <Tooltip
@@ -271,7 +271,7 @@ const VariableSection = ({
               <OutputElementBox
                 className="tooltip"
                 dragData={variable}
-                style={{ cursor: "pointer" }}
+                style={{ cursor: 'pointer' }}
                 borderColor={typeColor.color}
                 onClick={() => {
                   setAssignedObjectTree(
@@ -284,7 +284,7 @@ const VariableSection = ({
                   );
                 }}
               >
-                {assignedObjectTree?.path === variable.value ? t(variable.key) + " ▲" : t(variable.key) + " ▼"}
+                {assignedObjectTree?.path === variable.value ? t(variable.key) + ' ▲' : t(variable.key) + ' ▼'}
               </OutputElementBox>
             </Tooltip>
           ) : (
@@ -296,7 +296,7 @@ const VariableSection = ({
             >
               <OutputElementBox
                 dragData={variable.key ? variable : undefined}
-                style={{ cursor: variable.key ? "grab" : "default" }}
+                style={{ cursor: variable.key ? 'grab' : 'default' }}
                 borderColor={typeColor.color}
               >
                 {name}

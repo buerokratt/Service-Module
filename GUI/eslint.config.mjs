@@ -101,4 +101,3 @@ export default [
     ignores: ['eslint.config.mjs', 'dist', 'build', 'node_modules', 'vitest.config.ts'],
   },
 ];
-

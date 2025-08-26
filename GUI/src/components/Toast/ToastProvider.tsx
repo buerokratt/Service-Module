@@ -1,15 +1,15 @@
-import React, { FC, PropsWithChildren } from 'react'
-import { useTranslation } from 'react-i18next'
-import * as RadixToast from '@radix-ui/react-toast'
+import React, { FC, PropsWithChildren } from 'react';
+import { useTranslation } from 'react-i18next';
+import * as RadixToast from '@radix-ui/react-toast';
 
-import Toast from './index'
-import useToastStore from 'store/toasts.store'
-import {POPUP_DURATION} from "../../constants/consts";
+import Toast from './index';
+import useToastStore from 'store/toasts.store';
+import { POPUP_DURATION } from '../../constants/consts';
 
 export const ToastProvider: FC<PropsWithChildren> = ({ children }) => {
   const { t } = useTranslation();
-  const toasts = useToastStore(state => state.toasts);
-  
+  const toasts = useToastStore((state) => state.toasts);
+
   return (
     <RadixToast.Provider
       swipeDirection="right"
@@ -17,8 +17,10 @@ export const ToastProvider: FC<PropsWithChildren> = ({ children }) => {
       duration={POPUP_DURATION * 1000}
     >
       {children}
-      {toasts.map((toast) => <Toast key={toast.id} toast={toast} />)}
+      {toasts.map((toast) => (
+        <Toast key={toast.id} toast={toast} />
+      ))}
       <RadixToast.Viewport className="toast__list" />
     </RadixToast.Provider>
-  )
-}
+  );
+};

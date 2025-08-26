@@ -20,16 +20,16 @@ export const useAudio = (audiosrc: string) => {
 
     return () => {
       howl.unload();
-    }
+    };
   }, []);
 
   return [audio] as const;
-}
+};
 
 export const useDing = () => {
   return useAudio(ding);
-}
+};
 
 export const useNewMessageSound = () => {
   return useAudio(newMessageSound);
-}
+};

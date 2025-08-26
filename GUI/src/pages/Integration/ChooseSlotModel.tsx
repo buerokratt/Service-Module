@@ -1,10 +1,10 @@
-import { FC } from "react";
-import { useTranslation } from "react-i18next";
-import useServiceStore from "store/new-services.store";
-import { Dialog, FormSelect, Track } from "components";
-import { useQuery } from "@tanstack/react-query";
-import { getSlots } from "resources/api-constants";
-import api from "services/api";
+import { FC } from 'react';
+import { useTranslation } from 'react-i18next';
+import useServiceStore from 'store/new-services.store';
+import { Dialog, FormSelect, Track } from 'components';
+import { useQuery } from '@tanstack/react-query';
+import { getSlots } from 'resources/api-constants';
+import api from 'services/api';
 
 type ChooseSlotModelProps = {
   onModalClose: (selection?: string) => void;
@@ -13,21 +13,21 @@ type ChooseSlotModelProps = {
 const ChooseSlotModel: FC<ChooseSlotModelProps> = ({ onModalClose }) => {
   const { t } = useTranslation();
   const { data: slots } = useQuery<string[]>({
-    queryKey: ["slots"],
+    queryKey: ['slots'],
     queryFn: async () => {
       try {
         const res = await api.get(getSlots());
         return res.data.response ?? [];
       } catch (error) {
         console.error(error);
-        return []; 
+        return [];
       }
     },
   });
   const slot = useServiceStore((state) => state.slot);
 
   return (
-    <Dialog title={"slots"} onClose={onModalClose} size="large">
+    <Dialog title={'slots'} onClose={onModalClose} size="large">
       {!slots && (
         <Track justify="center" gap={16} direction="vertical">
           <div className="loader" style={{ marginTop: 10 }} />
@@ -35,7 +35,7 @@ const ChooseSlotModel: FC<ChooseSlotModelProps> = ({ onModalClose }) => {
       )}
       {slots && slots.length === 0 && (
         <Track justify="center" gap={16} direction="vertical">
-          <label style={{ margin: 30 }}>{t("overview.popup.noSlotsAvailable")}</label>
+          <label style={{ margin: 30 }}>{t('overview.popup.noSlotsAvailable')}</label>
         </Track>
       )}
       {slots && slots.length > 0 && (
@@ -45,11 +45,11 @@ const ChooseSlotModel: FC<ChooseSlotModelProps> = ({ onModalClose }) => {
             label=""
             isOpen={true}
             menuPosition="relative"
-            options={[{ label: t("global.none"), value: "" }].concat(
-              slots?.map((slot) => ({ label: slot, value: slot })) ?? []
+            options={[{ label: t('global.none'), value: '' }].concat(
+              slots?.map((slot) => ({ label: slot, value: slot })) ?? [],
             )}
             onSelectionChange={(selection) => {
-              useServiceStore.getState().setSlot(selection?.value ?? "");
+              useServiceStore.getState().setSlot(selection?.value ?? '');
               onModalClose(selection?.value);
             }}
             defaultValue={slot}

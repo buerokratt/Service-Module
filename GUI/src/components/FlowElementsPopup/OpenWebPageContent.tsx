@@ -1,14 +1,14 @@
-import { t } from "i18next";
-import { FormInput } from "../FormElements";
-import Track from "../Track";
-import { FC } from "react";
+import { t } from 'i18next';
+import { FormInput } from '../FormElements';
+import Track from '../Track';
+import { FC } from 'react';
 
 type OpenWebPageContentProps = {
   readonly onWebpageNameChange: (name: string) => void;
   readonly onWebpageUrlChange: (name: string) => void;
   readonly defaultWebpageUrl?: string;
   readonly defaultWebpageName?: string;
-}
+};
 
 const OpenWebPageContent: FC<OpenWebPageContentProps> = ({
   onWebpageNameChange,
@@ -21,8 +21,8 @@ const OpenWebPageContent: FC<OpenWebPageContentProps> = ({
       <Track direction="vertical" align="left" style={{ width: '100%' }}>
         <label htmlFor="json">{t('serviceFlow.popup.openWebpageLabel')}</label>
         <FormInput
-          name={"web-page"}
-          label={"web-page"}
+          name={'web-page'}
+          label={'web-page'}
           defaultValue={defaultWebpageName}
           onChange={(event) => onWebpageNameChange(event.target.value)}
           hideLabel
@@ -31,8 +31,8 @@ const OpenWebPageContent: FC<OpenWebPageContentProps> = ({
       <Track direction="vertical" align="left" style={{ width: '100%' }}>
         <label htmlFor="web-page-url">URL</label>
         <FormInput
-          name={"web-page-url"}
-          label={"web-page-url"}
+          name={'web-page-url'}
+          label={'web-page-url'}
           defaultValue={defaultWebpageUrl}
           placeholder="https://"
           onChange={(event) => onWebpageUrlChange(event.target.value)}
@@ -41,6 +41,6 @@ const OpenWebPageContent: FC<OpenWebPageContentProps> = ({
       </Track>
     </Track>
   );
-}
+};
 
 export default OpenWebPageContent;

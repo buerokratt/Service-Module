@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { v4 as uuid } from "uuid";
+import { v4 as uuid } from 'uuid';
 import { testServiceFlow } from 'services/flow-tester';
 
 type TestingMessageAuthor = 'enduser' | 'bot' | 'system';
@@ -41,14 +41,15 @@ const useTestServiceStore = create<TestServiceStoreState>((set, get) => ({
     testServiceFlow();
     set({ isChatOpened: true });
   },
-  closeChat: () => set({ 
-    chat: [],
-    currentNodeId: null,
-    isChatOpened: false,
-  }),
+  closeChat: () =>
+    set({
+      chat: [],
+      currentNodeId: null,
+      isChatOpened: false,
+    }),
   chat: [],
   currentNodeId: null,
-  changeCurrentNodeId: currentNodeId => set({ currentNodeId }),
+  changeCurrentNodeId: (currentNodeId) => set({ currentNodeId }),
   clearCurrentNodeId: () => set({ currentNodeId: null }),
   addUserMessage: (message) => get().pushMessage(message, 'enduser'),
   addBotMessage: (message, payload) => get().pushMessage(message, 'bot', 'normal', payload),
@@ -62,14 +63,14 @@ const useTestServiceStore = create<TestServiceStoreState>((set, get) => ({
     };
 
     set({
-      chat: [ ...get().chat, msg ]
-    })
+      chat: [...get().chat, msg],
+    });
   },
   addError: (error) => get().pushMessage(error, 'system', 'error'),
   addInfo: (info, payload) => get().pushMessage(info, 'system', 'info', payload),
   addSuccess: (succes) => get().pushMessage(succes, 'system', 'success'),
   reset: () => {
-    set({ 
+    set({
       chat: [],
       currentNodeId: null,
       waitingForInput: false,
@@ -82,16 +83,17 @@ const useTestServiceStore = create<TestServiceStoreState>((set, get) => ({
   },
   waitingForInput: false,
   userInput: null,
-  waitForUserInput: () => set({ 
-    waitingForInput: true,
-    userInput: null,
-  }),
+  waitForUserInput: () =>
+    set({
+      waitingForInput: true,
+      userInput: null,
+    }),
   sendUserInput: (userInput) => {
     get().addUserMessage(userInput);
-    set({ 
+    set({
       waitingForInput: false,
       userInput,
-    })
+    });
   },
 }));
 

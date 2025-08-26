@@ -1,11 +1,11 @@
-import React, { useState } from "react";
-import { useTranslation } from "react-i18next";
-import { v4 as uuid } from "uuid";
-import { ApiEndpointCard, Button, Modal, Track } from "components";
-import { EndpointData } from "../../../types/endpoint/endpoint-data";
-import useToastStore from "store/toasts.store";
-import useServiceStore from "store/new-services.store";
-import { saveEndpoints } from "../../../services/service-builder";
+import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { v4 as uuid } from 'uuid';
+import { ApiEndpointCard, Button, Modal, Track } from 'components';
+import { EndpointData } from '../../../types/endpoint/endpoint-data';
+import useToastStore from 'store/toasts.store';
+import useServiceStore from 'store/new-services.store';
+import { saveEndpoints } from '../../../services/service-builder';
 
 interface AddEndpointModalProps {
   onClose: () => void;
@@ -17,18 +17,18 @@ const AddEndpointModal: React.FC<AddEndpointModalProps> = ({ onClose, onUpdatePr
   const { t } = useTranslation();
   const [endpoint, setEndpoint] = useState<EndpointData>({
     endpointId: uuid(),
-    name: "",
+    name: '',
     definitions: [],
     isNew: true,
   });
-  const [endpointName, setEndpointName] = useState("");
+  const [endpointName, setEndpointName] = useState('');
   const [endpointNameExists, setEndpointNameExists] = useState(false);
   const [isCommonEndpoint, setIsCommonEndpoint] = useState(false);
   const [isCreatingEndpoint, setIsCreatingEndpoint] = useState(false);
 
   const handleClose = () => {
-    setEndpoint({ endpointId: uuid(), name: "", definitions: [], isNew: true });
-    setEndpointName("");
+    setEndpoint({ endpointId: uuid(), name: '', definitions: [], isNew: true });
+    setEndpointName('');
     setIsCommonEndpoint(false);
     setIsCreatingEndpoint(false);
     onClose();
@@ -49,19 +49,19 @@ const AddEndpointModal: React.FC<AddEndpointModalProps> = ({ onClose, onUpdatePr
         onUpdatePreferences(newEndpointIds);
 
         handleClose();
-        useToastStore.getState().success({ title: t("serviceFlow.apiElements.createSuccess") });
+        useToastStore.getState().success({ title: t('serviceFlow.apiElements.createSuccess') });
         setIsCreatingEndpoint(false);
       },
       (error) => {
         console.error(`Error creating API endpoint: ${error}`);
-        useToastStore.getState().error({ title: t("serviceFlow.apiElements.createError") });
+        useToastStore.getState().error({ title: t('serviceFlow.apiElements.createError') });
         setIsCreatingEndpoint(false);
-      }
+      },
     );
   };
 
   return (
-    <Modal title={t("newService.createNewEndpoint")} onClose={handleClose}>
+    <Modal title={t('newService.createNewEndpoint')} onClose={handleClose}>
       <Track isMultiline gap={16} direction="vertical" align="stretch">
         <ApiEndpointCard
           endpoint={endpoint}
@@ -72,14 +72,14 @@ const AddEndpointModal: React.FC<AddEndpointModalProps> = ({ onClose, onUpdatePr
         />
         <Track justify="end" gap={16}>
           <Button appearance="secondary" onClick={handleClose}>
-            {t("overview.cancel")}
+            {t('overview.cancel')}
           </Button>
           <Button
-            appearance={isCreatingEndpoint ? "loading" : "primary"}
-            disabled={endpointName === "" || endpointNameExists}
+            appearance={isCreatingEndpoint ? 'loading' : 'primary'}
+            disabled={endpointName === '' || endpointNameExists}
             onClick={handleCreate}
           >
-            {t("global.create")}
+            {t('global.create')}
           </Button>
         </Track>
       </Track>

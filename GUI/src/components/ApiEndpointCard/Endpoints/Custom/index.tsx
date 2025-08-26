@@ -1,12 +1,12 @@
-import React, { useEffect, useRef, useState } from "react";
-import { useTranslation } from "react-i18next";
-import { MdErrorOutline } from "react-icons/md";
-import { v4 as uuid } from "uuid";
-import { Button, FormInput, FormSelect, Icon, RequestVariables, Track } from "../../..";
-import { RequestTab } from "../../../../types";
-import { EndpointData, EndpointVariableData, PreDefinedEndpointEnvVariables } from "../../../../types/endpoint";
-import useServiceStore from "store/new-services.store";
-import useToastStore from "store/toasts.store";
+import React, { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { MdErrorOutline } from 'react-icons/md';
+import { v4 as uuid } from 'uuid';
+import { Button, FormInput, FormSelect, Icon, RequestVariables, Track } from '../../..';
+import { RequestTab } from '../../../../types';
+import { EndpointData, EndpointVariableData, PreDefinedEndpointEnvVariables } from '../../../../types/endpoint';
+import useServiceStore from 'store/new-services.store';
+import useToastStore from 'store/toasts.store';
 
 type EndpointCustomProps = {
   endpoint: EndpointData;
@@ -33,11 +33,11 @@ const EndpointCustom: React.FC<EndpointCustomProps> = ({
   if (endpoint.definitions.length === 0) {
     endpoint.definitions.push({
       id: uuid(),
-      label: "",
-      methodType: "GET",
-      type: "custom",
-      dataType: "custom",
-      path: "",
+      label: '',
+      methodType: 'GET',
+      type: 'custom',
+      dataType: 'custom',
+      path: '',
       supported: true,
       isSelected: true,
       body: {
@@ -65,30 +65,30 @@ const EndpointCustom: React.FC<EndpointCustomProps> = ({
   return (
     <Track direction="vertical" align="stretch" gap={16}>
       <div>
-        <label htmlFor="endpointUrl">{t("newService.endpoint.url")}</label>
+        <label htmlFor="endpointUrl">{t('newService.endpoint.url')}</label>
         <Track gap={8}>
-          <Track style={{ width: "100%" }}>
+          <Track style={{ width: '100%' }}>
             <div style={{ width: 108 }}>
               <FormSelect
-                name={"request-type"}
-                label={""}
-                style={{ borderRadius: "4px 0 0 4px", borderRight: 0 }}
+                name={'request-type'}
+                label={''}
+                style={{ borderRadius: '4px 0 0 4px', borderRight: 0 }}
                 options={[
-                  { label: "GET", value: "GET" },
-                  { label: "POST", value: "POST" },
+                  { label: 'GET', value: 'GET' },
+                  { label: 'POST', value: 'POST' },
                 ]}
                 onSelectionChange={(selection) => {
-                  endpoint.definitions[0].methodType = selection?.value ?? "GET";
+                  endpoint.definitions[0].methodType = selection?.value ?? 'GET';
                 }}
-                defaultValue={endpoint.definitions[0]?.methodType ?? "GET"}
+                defaultValue={endpoint.definitions[0]?.methodType ?? 'GET'}
               />
             </div>
             <FormInput
               ref={ref}
-              style={{ borderRadius: "0 4px 4px 0" }}
+              style={{ borderRadius: '0 4px 4px 0' }}
               name="endpointUrl"
               label=""
-              defaultValue={endpoint.definitions[0]?.url ?? ""}
+              defaultValue={endpoint.definitions[0]?.url ?? ''}
               onChange={(event) => {
                 const parsedUrl = parseURL(event.target.value);
                 endpoint.definitions[0].url = parsedUrl.url;
@@ -97,7 +97,7 @@ const EndpointCustom: React.FC<EndpointCustomProps> = ({
                   parameters.push({
                     id: uuid(),
                     name: key,
-                    type: "custom",
+                    type: 'custom',
                     required: false,
                     value: parsedUrl.params[key],
                   });
@@ -109,29 +109,29 @@ const EndpointCustom: React.FC<EndpointCustomProps> = ({
                 };
                 refereshEndpoint();
               }}
-              placeholder={t("newService.endpoint.insert") ?? ""}
+              placeholder={t('newService.endpoint.insert') ?? ''}
             />
           </Track>
           <Button
             onClick={() =>
               testUrl(
                 endpoint,
-                () => setUrlError(t("newService.endpoint.error") ?? undefined),
+                () => setUrlError(t('newService.endpoint.error') ?? undefined),
                 () => {
                   setUrlError(undefined);
                   useToastStore.getState().success({
-                    title: t("newService.endpoint.success"),
+                    title: t('newService.endpoint.success'),
                   });
-                }
+                },
               )
             }
           >
-            {t("newService.test")}
+            {t('newService.test')}
           </Button>
         </Track>
       </div>
       {urlError && (
-        <div className={"toast toast--error"} style={{ padding: "8px 16px 8px 16px" }}>
+        <div className={'toast toast--error'} style={{ padding: '8px 16px 8px 16px' }}>
           <div className="toast__title">
             <Icon icon={<MdErrorOutline />} />
             {urlError}
@@ -147,20 +147,20 @@ const EndpointCustom: React.FC<EndpointCustomProps> = ({
         setRequestTab={setRequestTab}
         parentEndpointId={endpoint.endpointId}
         onParametersChange={(parameters) => {
-          const url = new URL(endpoint.definitions[0].url ?? "");
+          const url = new URL(endpoint.definitions[0].url ?? '');
           url.searchParams.forEach((_, key) => {
             url.searchParams.delete(key);
           });
           parameters.forEach((param: EndpointVariableData) => {
-            url.searchParams.set(param.name, param.value ?? "");
+            url.searchParams.set(param.name, param.value ?? '');
           });
           endpoint.definitions[0].params = {
             variables: parameters,
             rawData: {},
           };
-          endpoint.definitions[0].url = url.href ?? "";
+          endpoint.definitions[0].url = url.href ?? '';
           if (ref?.current) {
-            ref.current.value = url.href ?? "";
+            ref.current.value = url.href ?? '';
           }
         }}
       />
@@ -178,7 +178,7 @@ function parseURL(url: string) {
       params,
     };
   } catch (e) {
-    console.error("Invalid URL format:", e);
+    console.error('Invalid URL format:', e);
     return {
       url,
       params: {},

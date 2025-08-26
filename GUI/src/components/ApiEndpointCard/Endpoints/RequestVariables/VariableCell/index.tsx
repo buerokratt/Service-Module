@@ -1,8 +1,8 @@
-import { Row } from "@tanstack/react-table";
-import React, { useState } from "react";
-import { useTranslation } from "react-i18next";
-import { FormInput } from "../../../..";
-import { RequestVariablesTableColumns } from "../../../../../types/request-variables";
+import { Row } from '@tanstack/react-table';
+import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { FormInput } from '../../../..';
+import { RequestVariablesTableColumns } from '../../../../../types/request-variables';
 
 type VariableCellProps = {
   row: Row<RequestVariablesTableColumns>;
@@ -18,7 +18,7 @@ const VariableCell: React.FC<VariableCellProps> = ({ row, updateRowVariable, var
   if (!row.original) return <></>;
   return row.original.isNameEditable ? (
     <FormInput
-      style={{ borderRadius: "4px" }}
+      style={{ borderRadius: '4px' }}
       name={`endpoint-variable-${row.id}`}
       label=""
       onChange={(e) => {
@@ -27,7 +27,7 @@ const VariableCell: React.FC<VariableCellProps> = ({ row, updateRowVariable, var
         updateRowVariable(row.id, e.target.value);
       }}
       value={inputValue}
-      placeholder={t("newService.endpoint.variable") + ".."}
+      placeholder={t('newService.endpoint.variable') + '..'}
     />
   ) : (
     <p style={{ paddingLeft: 40 * row.original.nestedLevel }}>

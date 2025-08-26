@@ -1,9 +1,9 @@
-import React, { FC, HTMLAttributes, PropsWithChildren, ReactNode, useEffect, useRef, useState } from "react";
-import * as RadixDialog from "@radix-ui/react-dialog";
-import { MdOutlineClose, MdOutlineEdit, MdCheck, MdClose } from "react-icons/md";
+import React, { FC, HTMLAttributes, PropsWithChildren, ReactNode, useEffect, useRef, useState } from 'react';
+import * as RadixDialog from '@radix-ui/react-dialog';
+import { MdOutlineClose, MdOutlineEdit, MdCheck, MdClose } from 'react-icons/md';
 
-import { Button, FormInput, Icon, Track } from "..";
-import "./Popup.scss";
+import { Button, FormInput, Icon, Track } from '..';
+import './Popup.scss';
 
 type DialogProps = HTMLAttributes<HTMLDivElement> & {
   title: string;
@@ -47,13 +47,13 @@ const Popup: FC<PropsWithChildren<DialogProps>> = ({
   };
 
   const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const sanitizedValue = e.target.value.replace(/[^a-zA-Z0-9-\s]/g, "");
+    const sanitizedValue = e.target.value.replace(/[^a-zA-Z0-9-\s]/g, '');
     setTempTitle(sanitizedValue);
     onTitleChange?.(sanitizedValue);
   };
 
   const handleTitleSave = () => {
-    if (!titleError && tempTitle.trim() !== "") {
+    if (!titleError && tempTitle.trim() !== '') {
       setIsEditingTitle(false);
       setTitle(tempTitle.trim());
       if (onTitleSave && tempTitle !== title) {
@@ -69,7 +69,7 @@ const Popup: FC<PropsWithChildren<DialogProps>> = ({
   };
 
   const handleTitleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter") {
+    if (e.key === 'Enter') {
       handleTitleSave();
     }
   };
@@ -82,37 +82,37 @@ const Popup: FC<PropsWithChildren<DialogProps>> = ({
         <RadixDialog.Overlay className="popup__overlay" />
         <RadixDialog.Content
           className="popup"
-          aria-describedby={description ? "dialog-description" : undefined}
+          aria-describedby={description ? 'dialog-description' : undefined}
           {...rest}
         >
           <div className="popup__header">
-            <Track style={{ width: "100%" }} justify="between" align="center">
-              <Track gap={8} style={{ alignItems: "center" }}>
+            <Track style={{ width: '100%' }} justify="between" align="center">
+              <Track gap={8} style={{ alignItems: 'center' }}>
                 {isEditingTitle ? (
-                  <Track style={{ alignItems: "center", gap: 8, width: "100%" }}>
+                  <Track style={{ alignItems: 'center', gap: 8, width: '100%' }}>
                     <div>
                       <FormInput
                         className="h3 popup__title"
                         ref={titleRef}
-                        name={""}
-                        placeholder={""}
+                        name={''}
+                        placeholder={''}
                         value={tempTitle}
                         onKeyDown={handleTitleKeyDown}
                         onChange={handleTitleChange}
                         maxLength={30}
                         style={{
-                          minWidth: "200px",
-                          maxWidth: "200px",
-                          backgroundColor: "transparent",
-                          border: "none",
-                          textOverflow: "ellipsis",
+                          minWidth: '200px',
+                          maxWidth: '200px',
+                          backgroundColor: 'transparent',
+                          border: 'none',
+                          textOverflow: 'ellipsis',
                         }}
                       />
                     </div>
-                    <Button appearance="text" onClick={handleTitleSave} style={{ boxShadow: "none" }}>
+                    <Button appearance="text" onClick={handleTitleSave} style={{ boxShadow: 'none' }}>
                       <Icon icon={<MdCheck size={20} color="#308653" />} size="medium" />
                     </Button>
-                    <Button appearance="text" onClick={handleTitleCancel} style={{ boxShadow: "none" }}>
+                    <Button appearance="text" onClick={handleTitleCancel} style={{ boxShadow: 'none' }}>
                       <Icon icon={<MdClose size={20} color="#D73E3E" />} size="medium" />
                     </Button>
                     {titleEditable && !isEditingTitle && (
@@ -121,12 +121,12 @@ const Popup: FC<PropsWithChildren<DialogProps>> = ({
                         onClick={() => {
                           titleRef?.current?.focus();
                         }}
-                        style={{ boxShadow: "none" }}
+                        style={{ boxShadow: 'none' }}
                       >
                         <Icon icon={<MdOutlineEdit color="#686868" />} size="medium" />
                       </Button>
                     )}
-                    {titleError && <label style={{ color: "#D73E3E" }}>{titleError}</label>}
+                    {titleError && <label style={{ color: '#D73E3E' }}>{titleError}</label>}
                   </Track>
                 ) : (
                   <RadixDialog.Title className="h3 popup__title">{title}</RadixDialog.Title>
@@ -136,7 +136,7 @@ const Popup: FC<PropsWithChildren<DialogProps>> = ({
                     className="popup__edit-title"
                     appearance="text"
                     onClick={handleTitleEditStart}
-                    style={{ boxShadow: "none" }}
+                    style={{ boxShadow: 'none' }}
                     aria-label="Edit title"
                   >
                     <Icon icon={<MdOutlineEdit color="#686868" />} size="medium" />
@@ -150,7 +150,7 @@ const Popup: FC<PropsWithChildren<DialogProps>> = ({
               </RadixDialog.Close>
             </Track>
           </div>
-          <div className={hasDefaultBody ? "popup__body" : ""}>{children}</div>
+          <div className={hasDefaultBody ? 'popup__body' : ''}>{children}</div>
           {footer && (
             <Track className="popup__footer" gap={16} justify="end">
               {footer}

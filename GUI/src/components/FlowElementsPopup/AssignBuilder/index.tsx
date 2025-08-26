@@ -1,10 +1,10 @@
-import React from "react";
-import { useTranslation } from "react-i18next";
-import { Track } from "components";
-import AssignElement from "./AssignElement";
-import { useAssignBuilder } from "./useAssignBuilder";
-import "../styles.scss";
-import { Assign } from "../../../types/assign";
+import React from 'react';
+import { useTranslation } from 'react-i18next';
+import { Track } from 'components';
+import AssignElement from './AssignElement';
+import { useAssignBuilder } from './useAssignBuilder';
+import '../styles.scss';
+import { Assign } from '../../../types/assign';
 
 interface AssignBuilderProps {
   onChange: (group: Assign[]) => void;
@@ -20,10 +20,10 @@ const AssignBuilder: React.FC<AssignBuilderProps> = ({ onChange, seedGroup }) =>
 
   return (
     <Track direction="vertical" align="stretch" className="assign-action-container">
-      <Track justify="end" style={{ padding: "10px" }}>
+      <Track justify="end" style={{ padding: '10px' }}>
         <Track gap={8}>
           <button className="small-assign-button assign-blue" onClick={addElement}>
-            {t("serviceFlow.popup.addElement")}
+            {t('serviceFlow.popup.addElement')}
           </button>
         </Track>
       </Track>

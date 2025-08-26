@@ -1,13 +1,17 @@
-import { Row, createColumnHelper } from "@tanstack/react-table";
-import { RequestVariablesRowData, RequestVariablesTableColumns, RequestVariablesTabsRowsData } from "types/request-variables";
-import VariableCell from "./VariableCell";
-import Tooltip from "components/Tooltip";
-import { Button ,Icon, Track } from "@buerokratt-ria/header/src/components";
-import { MdDeleteOutline } from "react-icons/md";
-import ValueCell from "./ValueCell";
-import i18n from "i18n";
-import { PreDefinedEndpointEnvVariables } from "types/endpoint";
-import { RequestTab } from "types";
+import { Row, createColumnHelper } from '@tanstack/react-table';
+import {
+  RequestVariablesRowData,
+  RequestVariablesTableColumns,
+  RequestVariablesTabsRowsData,
+} from 'types/request-variables';
+import VariableCell from './VariableCell';
+import Tooltip from 'components/Tooltip';
+import { Button, Icon, Track } from '@buerokratt-ria/header/src/components';
+import { MdDeleteOutline } from 'react-icons/md';
+import ValueCell from './ValueCell';
+import i18n from 'i18n';
+import { PreDefinedEndpointEnvVariables } from 'types/endpoint';
+import { RequestTab } from 'types';
 
 interface GetColumnsConfig {
   rowsData: RequestVariablesTabsRowsData;
@@ -17,7 +21,7 @@ interface GetColumnsConfig {
   setRowsData: React.Dispatch<React.SetStateAction<RequestVariablesTabsRowsData>>;
   requestValues: PreDefinedEndpointEnvVariables;
   isLive: boolean;
-  updateRowField: (id: string, field: "variable" | "value", value: string) => void;
+  updateRowField: (id: string, field: 'variable' | 'value', value: string) => void;
   getTabsRowsData: () => RequestVariablesTabsRowsData;
 }
 
@@ -35,32 +39,32 @@ export const getColumns = ({
   const sortRows = (
     rowA: Row<RequestVariablesTableColumns>,
     rowB: Row<RequestVariablesTableColumns>,
-    type: "variable" | "value"
+    type: 'variable' | 'value',
   ): number => {
     if (!rowsData[requestTab.tab]) return 1;
     const valueA = rowsData[requestTab.tab]!.find((row) => row.id === rowA.id);
     const valueB = rowsData[requestTab.tab]!.find((row) => row.id === rowB.id);
-    if (type === "variable") {
-      return (valueA?.variable ?? "") < (valueB?.variable ?? "") ? 1 : -1;
+    if (type === 'variable') {
+      return (valueA?.variable ?? '') < (valueB?.variable ?? '') ? 1 : -1;
     }
-    return (valueA?.value ?? "") < (valueB?.value ?? "") ? 1 : -1;
+    return (valueA?.value ?? '') < (valueB?.value ?? '') ? 1 : -1;
   };
-  
+
   return [
-    columnHelper.accessor("variable", {
-      header: i18n.t("newService.endpoint.variable") ?? "",
+    columnHelper.accessor('variable', {
+      header: i18n.t('newService.endpoint.variable') ?? '',
       meta: {
-        size: "50%",
+        size: '50%',
       },
       sortingFn: (rowA: Row<RequestVariablesTableColumns>, rowB: Row<RequestVariablesTableColumns>) => {
-        return sortRows(rowA, rowB, "variable");
+        return sortRows(rowA, rowB, 'variable');
       },
       cell: (props) => (
         <VariableCell
           row={props.row}
-          variable={rowsData[requestTab.tab]!.find((r) => r.id === props.row.id)?.variable ?? ""}
+          variable={rowsData[requestTab.tab]!.find((r) => r.id === props.row.id)?.variable ?? ''}
           updateRowVariable={(id, variable) => {
-            updateRowField(id, "variable", variable);
+            updateRowField(id, 'variable', variable);
           }}
           onValueChange={(rowId, value) => {
             updateParams(false, rowId, value);
@@ -68,20 +72,20 @@ export const getColumns = ({
         />
       ),
     }),
-    columnHelper.accessor("value", {
-      header: i18n.t("newService.endpoint.value") ?? "",
+    columnHelper.accessor('value', {
+      header: i18n.t('newService.endpoint.value') ?? '',
       meta: {
-        size: "50%",
+        size: '50%',
       },
       sortingFn: (rowA: Row<RequestVariablesTableColumns>, rowB: Row<RequestVariablesTableColumns>) => {
-        return sortRows(rowA, rowB, "value");
+        return sortRows(rowA, rowB, 'value');
       },
       cell: (props) => (
         <ValueCell
           row={props.row}
-          value={rowsData[requestTab.tab]!.find((r) => r.id === props.row.id)?.value ?? ""}
+          value={rowsData[requestTab.tab]!.find((r) => r.id === props.row.id)?.value ?? ''}
           updateRowValue={(id, value) => {
-            updateRowField(id, "value", value);
+            updateRowField(id, 'value', value);
           }}
           onValueChange={(rowId, value) => {
             updateParams(true, rowId, value);
@@ -90,12 +94,12 @@ export const getColumns = ({
       ),
     }),
     columnHelper.display({
-      id: "delete",
+      id: 'delete',
       cell: (props) => {
         return (
           <Track justify="center" style={{ paddingRight: 8 }}>
             {props.row.original.required ? (
-              <Tooltip content={i18n.t("newService.endpoint.required")}>
+              <Tooltip content={i18n.t('newService.endpoint.required')}>
                 <span className="variable-required">!</span>
               </Tooltip>
             ) : (
@@ -115,4 +119,4 @@ export const getColumns = ({
       },
     }),
   ];
-}
+};

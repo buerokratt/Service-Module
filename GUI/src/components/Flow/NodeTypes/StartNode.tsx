@@ -1,6 +1,6 @@
-import { FC } from "react";
-import { Handle, Position } from "@xyflow/react";
-import { IoChevronDown } from "react-icons/io5";
+import { FC } from 'react';
+import { Handle, Position } from '@xyflow/react';
+import { IoChevronDown } from 'react-icons/io5';
 
 const StartNode: FC = () => {
   return (

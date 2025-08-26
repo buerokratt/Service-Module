@@ -1,12 +1,12 @@
-import { Node, Edge, getIncomers, getOutgoers, getConnectedEdges, useReactFlow } from "@xyflow/react";
-import { useCallback, useState } from "react";
-import { StepType } from "types";
+import { Node, Edge, getIncomers, getOutgoers, getConnectedEdges, useReactFlow } from '@xyflow/react';
+import { useCallback, useState } from 'react';
+import { StepType } from 'types';
 
 const getRemainingEdges = (allEdges: Edge[], edgesToRemove: Edge[]): Edge[] =>
   allEdges.filter((edge) => !edgesToRemove.includes(edge));
 
 const isGhostNode = (nodes: Node[], targetId: string): boolean =>
-  nodes.some((n) => n.id === targetId && n.type === "ghost");
+  nodes.some((n) => n.id === targetId && n.type === 'ghost');
 
 const createNewEdges = (incomers: Node[], outgoers: Node[], nodes: Node[], connectedEdges: Edge[]): Edge[] =>
   incomers.flatMap(({ id: source }) =>
@@ -15,21 +15,20 @@ const createNewEdges = (incomers: Node[], outgoers: Node[], nodes: Node[], conne
         id: `${source}->${target}`,
         source,
         target,
-        type: "step",
+        type: 'step',
         animated: isGhostNode(nodes, target),
         deletable: !isGhostNode(nodes, target),
-        label: connectedEdges.find((edge) => edge.source === source)?.label ?? "+",
+        label: connectedEdges.find((edge) => edge.source === source)?.label ?? '+',
       };
-    })
+    }),
   );
-  
+
 const processDeletedNodes = (
   edges: Edge[],
   deletedNodes: Node[],
   nodes: Node[],
-  setNodes: (nodes: Node[]) => void
+  setNodes: (nodes: Node[]) => void,
 ): Edge[] => {
-
   let updatedNodes = [...nodes];
   let updatedEdges = [...edges];
 
@@ -37,7 +36,7 @@ const processDeletedNodes = (
     const incomers = getIncomers(node, updatedNodes, updatedEdges);
     let outgoers = getOutgoers(node, updatedNodes, updatedEdges);
 
-    const outgoingGhostNodes = outgoers.filter((outgoer) => outgoer.type === "ghost");
+    const outgoingGhostNodes = outgoers.filter((outgoer) => outgoer.type === 'ghost');
     if (outgoingGhostNodes.length > 0) {
       const ghostEdges = getConnectedEdges(outgoingGhostNodes, updatedEdges);
       updatedEdges = getRemainingEdges(updatedEdges, ghostEdges);
@@ -48,10 +47,10 @@ const processDeletedNodes = (
     if (outgoers.length === 0 || outgoers.length > 1) {
       const ghostNode: Node = {
         id: crypto.randomUUID(),
-        type: "ghost",
+        type: 'ghost',
         position: { x: node.position.x, y: node.position.y },
-        data: { type: "ghost" },
-        className: "ghost",
+        data: { type: 'ghost' },
+        className: 'ghost',
         selectable: false,
         draggable: false,
       };
@@ -67,141 +66,138 @@ const processDeletedNodes = (
 
   updatedNodes = updatedNodes.filter(
     (node) =>
-      node.type !== "ghost" ||
+      node.type !== 'ghost' ||
       getIncomers(node, updatedNodes, updatedEdges).length > 0 ||
-      getOutgoers(node, updatedNodes, updatedEdges).length > 0
+      getOutgoers(node, updatedNodes, updatedEdges).length > 0,
   );
 
   setNodes(updatedNodes);
   return updatedEdges;
 };
 
-  function getDirectlyConnectedNodes(nodeId: string, nodes: Node[], edges: Edge[], withGhost: boolean = true): Node[] {
-    const connectedNodeIds = edges.filter((edge) => edge.source === nodeId).map((edge) => edge.target);
-    return nodes.filter((node) => connectedNodeIds.includes(node.id) && (withGhost || node.type !== "ghost"));
-  }
+function getDirectlyConnectedNodes(nodeId: string, nodes: Node[], edges: Edge[], withGhost: boolean = true): Node[] {
+  const connectedNodeIds = edges.filter((edge) => edge.source === nodeId).map((edge) => edge.target);
+  return nodes.filter((node) => connectedNodeIds.includes(node.id) && (withGhost || node.type !== 'ghost'));
+}
 
-  export const useOnNodesDelete = () => {
-    const { getNodes, getEdges, setEdges, setNodes, getNode } = useReactFlow();
+export const useOnNodesDelete = () => {
+  const { getNodes, getEdges, setEdges, setNodes, getNode } = useReactFlow();
 
-    const [isDeleteConnectionsModalVisible, setIsDeleteConnectionsModalVisible] = useState(false);
-    const [nodeToDelete, setNodeToDelete] = useState<Node | null>(null);
+  const [isDeleteConnectionsModalVisible, setIsDeleteConnectionsModalVisible] = useState(false);
+  const [nodeToDelete, setNodeToDelete] = useState<Node | null>(null);
 
-    const hasConnectedNodes = useCallback(
-      (nodeId: string) => {
-        const nodes = getNodes();
-        const edges = getEdges();
-        return getDirectlyConnectedNodes(nodeId, nodes, edges, false).length > 0;
-      },
-      [getNodes, getEdges]
-    );
-
-    const setDeletedNodes = useCallback((nodes: Node[] | null) => setNodeToDelete(nodes?.[0] ?? null), []);
-
-    const onDeleteConfirmed = useCallback(async () => {
-      if (!nodeToDelete) return;
-
+  const hasConnectedNodes = useCallback(
+    (nodeId: string) => {
       const nodes = getNodes();
       const edges = getEdges();
+      return getDirectlyConnectedNodes(nodeId, nodes, edges, false).length > 0;
+    },
+    [getNodes, getEdges],
+  );
 
-      const getAllDescendants = (nodeId: string, edges: Edge[], visited = new Set<string>()): string[] => {
-        if (visited.has(nodeId)) return [];
-        visited.add(nodeId);
+  const setDeletedNodes = useCallback((nodes: Node[] | null) => setNodeToDelete(nodes?.[0] ?? null), []);
 
-        const descendants: string[] = [];
-        edges.forEach((edge) => {
-          if (edge.source === nodeId) {
-            descendants.push(edge.target);
-            descendants.push(...getAllDescendants(edge.target, edges, visited));
-          }
-        });
+  const onDeleteConfirmed = useCallback(async () => {
+    if (!nodeToDelete) return;
 
-        return descendants;
-      };
+    const nodes = getNodes();
+    const edges = getEdges();
 
-      const descendantIds = getAllDescendants(nodeToDelete.id, edges);
-      const uniqueDescendantIds = Array.from(new Set(descendantIds));
-      const descendantNodes = nodes.filter((node) => uniqueDescendantIds.includes(node.id));
-      const nodesToDelete = [nodeToDelete, ...descendantNodes];
+    const getAllDescendants = (nodeId: string, edges: Edge[], visited = new Set<string>()): string[] => {
+      if (visited.has(nodeId)) return [];
+      visited.add(nodeId);
 
-      setEdges(processDeletedNodes(getEdges(), nodesToDelete, getNodes(), setNodes));
-      setIsDeleteConnectionsModalVisible(false);
-      setNodeToDelete(null);
-    }, [nodeToDelete, getNodes, getEdges, setEdges, setNodes]);
-    
+      const descendants: string[] = [];
+      edges.forEach((edge) => {
+        if (edge.source === nodeId) {
+          descendants.push(edge.target);
+          descendants.push(...getAllDescendants(edge.target, edges, visited));
+        }
+      });
 
-    const onKeepItConfirmed = useCallback(() => {
-      if (!nodeToDelete) return;
-      setEdges(processDeletedNodes(getEdges(), [nodeToDelete], getNodes(), setNodes));
-      setIsDeleteConnectionsModalVisible(false);
-      setNodeToDelete(null);
-    }, [nodeToDelete, getNodes, getEdges, setEdges, setNodes]);
-
-    return {
-      onNodesDelete: useCallback(
-        (deleted: Node[]) => {
-          const nodes = getNodes();
-          const edges = getEdges();
-
-          try {
-            const stepType = deleted[0].data.stepType;
-            if (
-              stepType === StepType.MultiChoiceQuestion ||
-              stepType === StepType.Condition ||
-              stepType === StepType.Input
-            ) {
-              if (hasConnectedNodes(deleted[0].id)) {
-                setNodeToDelete(deleted[0]);
-                setIsDeleteConnectionsModalVisible(true);
-                return;
-              }
-            }
-          } catch (error) {
-            console.error(error);
-          }
-
-          setEdges(
-            deleted.reduce((acc: Edge[], node: Node) => processDeletedNodes(acc, [node], nodes, setNodes), edges)
-          );
-        },
-        [getNodes, getEdges, setEdges, setNodes, hasConnectedNodes]
-      ),
-      onEdgesDelete: useCallback(
-        (deleted: Edge[]) => {
-          const parentNode = getNode(deleted[0].source);
-            if (parentNode) {
-            const ghostNode: Node = {
-              id: crypto.randomUUID(),
-              type: "ghost",
-              position: { x: parentNode.position.x + 50, y: parentNode.position.y + 50 },
-              data: { type: "ghost" },
-              className: "ghost",
-              selectable: false,
-              draggable: false,
-            };
-
-            const ghostEdge: Edge = {
-              id: `${parentNode.id}->${ghostNode.id}`,
-              source: parentNode.id,
-              target: ghostNode.id,
-              type: "step",
-              animated: true,
-              deletable: false,
-              label: "+",
-            };
-
-            setNodes((nds) => [...nds, ghostNode]);
-            setEdges((eds) => [...eds, ghostEdge]);
-            }
-        },
-        [getNodes, getEdges, setEdges, setNodes, hasConnectedNodes]
-      ),
-      isDeleteConnectionsModalVisible,
-      setIsDeleteConnectionsModalVisible,
-      onDeleteConfirmed,
-      onKeepItConfirmed,
-      hasConnectedNodes,
-      setDeletedNodes,
-      setNodeToDelete,
+      return descendants;
     };
+
+    const descendantIds = getAllDescendants(nodeToDelete.id, edges);
+    const uniqueDescendantIds = Array.from(new Set(descendantIds));
+    const descendantNodes = nodes.filter((node) => uniqueDescendantIds.includes(node.id));
+    const nodesToDelete = [nodeToDelete, ...descendantNodes];
+
+    setEdges(processDeletedNodes(getEdges(), nodesToDelete, getNodes(), setNodes));
+    setIsDeleteConnectionsModalVisible(false);
+    setNodeToDelete(null);
+  }, [nodeToDelete, getNodes, getEdges, setEdges, setNodes]);
+
+  const onKeepItConfirmed = useCallback(() => {
+    if (!nodeToDelete) return;
+    setEdges(processDeletedNodes(getEdges(), [nodeToDelete], getNodes(), setNodes));
+    setIsDeleteConnectionsModalVisible(false);
+    setNodeToDelete(null);
+  }, [nodeToDelete, getNodes, getEdges, setEdges, setNodes]);
+
+  return {
+    onNodesDelete: useCallback(
+      (deleted: Node[]) => {
+        const nodes = getNodes();
+        const edges = getEdges();
+
+        try {
+          const stepType = deleted[0].data.stepType;
+          if (
+            stepType === StepType.MultiChoiceQuestion ||
+            stepType === StepType.Condition ||
+            stepType === StepType.Input
+          ) {
+            if (hasConnectedNodes(deleted[0].id)) {
+              setNodeToDelete(deleted[0]);
+              setIsDeleteConnectionsModalVisible(true);
+              return;
+            }
+          }
+        } catch (error) {
+          console.error(error);
+        }
+
+        setEdges(deleted.reduce((acc: Edge[], node: Node) => processDeletedNodes(acc, [node], nodes, setNodes), edges));
+      },
+      [getNodes, getEdges, setEdges, setNodes, hasConnectedNodes],
+    ),
+    onEdgesDelete: useCallback(
+      (deleted: Edge[]) => {
+        const parentNode = getNode(deleted[0].source);
+        if (parentNode) {
+          const ghostNode: Node = {
+            id: crypto.randomUUID(),
+            type: 'ghost',
+            position: { x: parentNode.position.x + 50, y: parentNode.position.y + 50 },
+            data: { type: 'ghost' },
+            className: 'ghost',
+            selectable: false,
+            draggable: false,
+          };
+
+          const ghostEdge: Edge = {
+            id: `${parentNode.id}->${ghostNode.id}`,
+            source: parentNode.id,
+            target: ghostNode.id,
+            type: 'step',
+            animated: true,
+            deletable: false,
+            label: '+',
+          };
+
+          setNodes((nds) => [...nds, ghostNode]);
+          setEdges((eds) => [...eds, ghostEdge]);
+        }
+      },
+      [getNodes, getEdges, setEdges, setNodes, hasConnectedNodes],
+    ),
+    isDeleteConnectionsModalVisible,
+    setIsDeleteConnectionsModalVisible,
+    onDeleteConfirmed,
+    onKeepItConfirmed,
+    hasConnectedNodes,
+    setDeletedNodes,
+    setNodeToDelete,
   };
+};

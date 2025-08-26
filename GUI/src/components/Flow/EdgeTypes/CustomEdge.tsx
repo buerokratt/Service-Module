@@ -1,18 +1,18 @@
-import { BaseEdge, EdgeLabelRenderer, EdgeProps, getBezierPath } from "@xyflow/react";
-import { CSSProperties, memo, useEffect, useState } from "react";
-import { Collapsible, Dropdown, StepElement, Track } from "components";
-import useServiceStore from "store/new-services.store";
-import ApiEndpoint from "components/ApiEndpoint";
-import AddEndpointModal from "./AddEndpointModal";
-import { useTranslation } from "react-i18next";
-import { Step, stepsLabels, StepType } from "types";
+import { BaseEdge, EdgeLabelRenderer, EdgeProps, getBezierPath } from '@xyflow/react';
+import { CSSProperties, memo, useEffect, useState } from 'react';
+import { Collapsible, Dropdown, StepElement, Track } from 'components';
+import useServiceStore from 'store/new-services.store';
+import ApiEndpoint from 'components/ApiEndpoint';
+import AddEndpointModal from './AddEndpointModal';
+import { useTranslation } from 'react-i18next';
+import { Step, stepsLabels, StepType } from 'types';
 import {
   arrayMove,
   SortableContext,
   sortableKeyboardCoordinates,
   verticalListSortingStrategy,
-} from "@dnd-kit/sortable";
-import { restrictToParentElement } from "@dnd-kit/modifiers";
+} from '@dnd-kit/sortable';
+import { restrictToParentElement } from '@dnd-kit/modifiers';
 import {
   closestCorners,
   DndContext,
@@ -21,12 +21,12 @@ import {
   PointerSensor,
   useSensor,
   useSensors,
-} from "@dnd-kit/core";
-import { userStepPreferences } from "resources/api-constants";
-import api from "services/api";
-import useEdgeAdd from "hooks/flow/useEdgeAdd";
-import useToastStore from "store/toasts.store";
-import { useParams } from "react-router-dom";
+} from '@dnd-kit/core';
+import { userStepPreferences } from 'resources/api-constants';
+import api from 'services/api';
+import useEdgeAdd from 'hooks/flow/useEdgeAdd';
+import useToastStore from 'store/toasts.store';
+import { useParams } from 'react-router-dom';
 
 function reorderElements<T>(elements: T[], activeId: string | number, overId: string | number): T[] {
   const oldIndex = elements.findIndex((item: any) => item.id === activeId);
@@ -64,9 +64,9 @@ function CustomEdge({
   const [apiElements, setApiElements] = useState<Step[]>([]);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const contentStyle: CSSProperties = {
-    overflowY: "auto",
-    maxHeight: "calc(30vh - 42px)",
-    minHeight: "80px",
+    overflowY: 'auto',
+    maxHeight: 'calc(30vh - 42px)',
+    minHeight: '80px',
   };
   const [isAddEndpointModalVisible, setIsAddEndpointModalVisible] = useState(false);
   const { id: idParam } = useParams();
@@ -136,7 +136,7 @@ function CustomEdge({
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
-    })
+    }),
   );
 
   function updateStepPreference(steps: Step[]) {
@@ -161,7 +161,7 @@ function CustomEdge({
           open={dropdownOpen}
           onOpenChange={setDropdownOpen}
           onClose={() => setDropdownOpen(false)}
-          title={t("serviceFlow.elements").toString()}
+          title={t('serviceFlow.elements').toString()}
           trigger={
             <button
               style={{
@@ -170,7 +170,7 @@ function CustomEdge({
               onClick={() => {}}
               className="edge-button nodrag nopan"
             >
-              {label ?? "+"}
+              {label ?? '+'}
             </button>
           }
         >
@@ -182,7 +182,7 @@ function CustomEdge({
               collisionDetection={closestCorners}
               onDragEnd={handleDragEnd}
             >
-              <Collapsible title={t("serviceFlow.allElements")} contentStyle={contentStyle} defaultOpen>
+              <Collapsible title={t('serviceFlow.allElements')} contentStyle={contentStyle} defaultOpen>
                 {allElements.length > 0 && (
                   <Track direction="vertical" align="stretch" gap={4}>
                     <SortableContext items={allElements} strategy={verticalListSortingStrategy}>
@@ -212,13 +212,13 @@ function CustomEdge({
             >
               <Collapsible
                 defaultOpen={true}
-                title={t("serviceFlow.apiElements.title")}
+                title={t('serviceFlow.apiElements.title')}
                 contentStyle={contentStyle}
                 onAddClick={async () => {
                   if (!idParam) {
                     useToastStore.getState().error({
-                      title: t("newService.toast.serviceNotFound"),
-                      message: t("newService.toast.serviceNotFoundEndpointsMessage"),
+                      title: t('newService.toast.serviceNotFound'),
+                      message: t('newService.toast.serviceNotFoundEndpointsMessage'),
                     });
                   } else {
                     setIsAddEndpointModalVisible(true);

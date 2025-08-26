@@ -1,14 +1,14 @@
-import { Step } from "types";
-import { Node } from "@xyflow/react";
+import { Step } from 'types';
+import { Node } from '@xyflow/react';
 
 export const getNodeLabel = (step: Step, nodes: Node[]) => {
-  const baseLabel = step.label.split(" - ").pop();
+  const baseLabel = step.label.split(' - ').pop();
   const existingNumbers = nodes
     .filter((node: any) => node.data.stepType === step.type)
     .map((node: any) => node.data.label)
     .filter((label) => label.startsWith(baseLabel))
     .map((label) => {
-      const parts = label.split(" - ");
+      const parts = label.split(' - ');
       if (parts.length > 1) {
         const num = parseInt(parts[parts.length - 1]);
         return isNaN(num) ? 0 : num;
@@ -27,4 +27,4 @@ export const getNodeLabel = (step: Step, nodes: Node[]) => {
   }
 
   return `${baseLabel} - ${nextNumber}`;
-}
+};
