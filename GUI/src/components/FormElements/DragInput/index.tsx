@@ -1,11 +1,12 @@
-import { ReactNode, useEffect, useRef, useState } from 'react';
 import { FormInput, OutputElementBox, Tooltip } from 'components';
-import styles from './DragInput.module.scss';
-import { Assign } from 'types';
 import { t } from 'i18next';
+import { ReactNode, useEffect, useRef, useState } from 'react';
+import { Assign } from 'types';
 import { getDragData } from 'utils/component-util';
 import { getTypeColor, isArray } from 'utils/object-util';
 import { isTemplate, stringToTemplate, templateToString } from 'utils/string-util';
+
+import styles from './DragInput.module.scss';
 
 const ARRAY_INDEX_PATTERN = /\[\d+\]$/;
 

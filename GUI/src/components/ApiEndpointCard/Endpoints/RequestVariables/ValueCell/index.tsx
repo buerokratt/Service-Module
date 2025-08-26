@@ -1,6 +1,7 @@
 import { Row } from '@tanstack/react-table';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+
 import { FormInput } from '../../../..';
 import { RequestVariablesTableColumns } from '../../../../../types/request-variables';
 

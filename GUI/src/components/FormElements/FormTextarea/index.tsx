@@ -1,6 +1,6 @@
+import clsx from 'clsx';
 import React, { ChangeEvent, forwardRef, useId, useState } from 'react';
 import TextareaAutosize, { TextareaAutosizeProps } from 'react-textarea-autosize';
-import clsx from 'clsx';
 
 import './FormTextarea.scss';
 

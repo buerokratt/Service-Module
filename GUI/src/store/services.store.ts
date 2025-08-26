@@ -1,4 +1,4 @@
-import { create } from 'zustand';
+import { PaginationState, SortingState } from '@tanstack/react-table';
 import {
   changeIntentConnection,
   changeServiceStatus,
@@ -11,10 +11,11 @@ import {
   respondToConnectionRequest,
 } from 'resources/api-constants';
 import { Service, ServiceState } from 'types';
-import useToastStore from './toasts.store';
-import { Trigger } from 'types/Trigger';
 import { Intent } from 'types/Intent';
-import { PaginationState, SortingState } from '@tanstack/react-table';
+import { Trigger } from 'types/Trigger';
+import { create } from 'zustand';
+
+import useToastStore from './toasts.store';
 import api from '../services/api-dev';
 
 interface ServiceStoreState {

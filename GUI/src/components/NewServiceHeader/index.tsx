@@ -1,16 +1,17 @@
-import React, { FC, useState } from 'react';
 import { t } from 'i18next';
-import { Button, HeaderStepCounter, Modal, Track } from '..';
+import React, { FC, useState } from 'react';
 import useServiceStore from 'store/new-services.store';
 import '@buerokratt-ria/header/src/Header.scss';
-import { ROUTES } from 'resources/routes-constants';
 import { useNavigate, useParams } from 'react-router-dom';
-import useServiceListStore from '../../store/services.store';
-import { ServiceState } from 'types';
 import { deleteService } from 'resources/api-constants';
-import api from '../../services/api-dev';
-import { removeTrailingUnderscores } from 'utils/string-util';
+import { ROUTES } from 'resources/routes-constants';
 import useToastStore from 'store/toasts.store';
+import { ServiceState } from 'types';
+import { removeTrailingUnderscores } from 'utils/string-util';
+
+import { Button, HeaderStepCounter, Modal, Track } from '..';
+import api from '../../services/api-dev';
+import useServiceListStore from '../../store/services.store';
 
 type NewServiceHeaderProps = {
   activeStep: number;

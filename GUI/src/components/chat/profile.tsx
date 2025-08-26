@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
-import styles from './chat.module.scss';
 import useTestServiceStore from 'store/test-services.store';
+
+import styles from './chat.module.scss';
 import Buerokratt from '../../static/icons/buerokratt.svg';
 
 const Profile = () => (

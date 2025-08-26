@@ -1,25 +1,25 @@
+import { useSortable } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+import ApiEndpointCard from 'components/ApiEndpointCard';
 import Box from 'components/Box';
 import Button from 'components/Button';
 import Icon from 'components/Icon';
+import Modal from 'components/Modal';
 import Track from 'components/Track';
 import { FC, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { MdDeleteOutline, MdOutlineEdit, MdDragIndicator } from 'react-icons/md';
+import { MdDeleteOutline, MdDragIndicator, MdOutlineEdit } from 'react-icons/md';
 import { Link } from 'react-router-dom';
 import { deleteEndpoint } from 'resources/api-constants';
+import { saveEndpoints } from 'services/service-builder';
 import useServiceStore from 'store/new-services.store';
 import useToastStore from 'store/toasts.store';
 import { Step, StepType } from 'types';
 import { EndpointData } from 'types/endpoint';
+import { removeTrailingUnderscores } from 'utils/string-util';
 
 import styles from './ApiEndpoint.module.scss';
 import api from '../../services/api-dev';
-import Modal from 'components/Modal';
-import ApiEndpointCard from 'components/ApiEndpointCard';
-import { saveEndpoints } from 'services/service-builder';
-import { removeTrailingUnderscores } from 'utils/string-util';
-import { useSortable } from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
 
 interface RelatedService {
   serviceId: string;

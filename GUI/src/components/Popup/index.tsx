@@ -1,6 +1,6 @@
-import React, { FC, HTMLAttributes, PropsWithChildren, ReactNode, useEffect, useRef, useState } from 'react';
 import * as RadixDialog from '@radix-ui/react-dialog';
-import { MdOutlineClose, MdOutlineEdit, MdCheck, MdClose } from 'react-icons/md';
+import React, { FC, HTMLAttributes, PropsWithChildren, ReactNode, useEffect, useRef, useState } from 'react';
+import { MdCheck, MdClose, MdOutlineClose, MdOutlineEdit } from 'react-icons/md';
 
 import { Button, FormInput, Icon, Track } from '..';
 import './Popup.scss';

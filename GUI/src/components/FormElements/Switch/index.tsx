@@ -1,7 +1,7 @@
-import React, { forwardRef, useId } from 'react';
 import * as RadixSwitch from '@radix-ui/react-switch';
-import { useTranslation } from 'react-i18next';
+import React, { forwardRef, useId } from 'react';
 import { ControllerRenderProps } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 
 import './Switch.scss';
 

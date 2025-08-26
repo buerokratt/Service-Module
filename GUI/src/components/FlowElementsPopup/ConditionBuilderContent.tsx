@@ -1,9 +1,11 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { SwitchBox } from '../FormElements';
-import YesNoPopupContent from './YesNoPopupContent';
-import RuleBuilder from './RuleBuilder';
+
 import { Track } from '..';
+import { SwitchBox } from '../FormElements';
+import RuleBuilder from './RuleBuilder';
+import YesNoPopupContent from './YesNoPopupContent';
+
 import './styles.scss';
 import useServiceStore from 'store/new-services.store';
 

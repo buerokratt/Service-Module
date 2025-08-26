@@ -1,9 +1,9 @@
-import React, { forwardRef, useId } from 'react';
-import ReactDatePicker, { registerLocale } from 'react-datepicker';
 import clsx from 'clsx';
 import { et } from 'date-fns/locale';
+import React, { forwardRef, useId } from 'react';
+import ReactDatePicker, { registerLocale } from 'react-datepicker';
 import { ControllerRenderProps } from 'react-hook-form';
-import { MdChevronRight, MdChevronLeft, MdOutlineToday, MdOutlineSchedule } from 'react-icons/md';
+import { MdChevronLeft, MdChevronRight, MdOutlineSchedule, MdOutlineToday } from 'react-icons/md';
 
 import { Icon } from '../../../components';
 import 'react-datepicker/dist/react-datepicker.css';

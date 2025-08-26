@@ -1,5 +1,5 @@
-import React, { FC, PropsWithChildren, ReactNode } from 'react';
 import * as RadixDialog from '@radix-ui/react-dialog';
+import React, { FC, PropsWithChildren, ReactNode } from 'react';
 
 import { Track } from '..';
 import './Modal.scss';

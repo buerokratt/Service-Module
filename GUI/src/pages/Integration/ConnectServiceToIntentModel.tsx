@@ -1,12 +1,12 @@
-import { FC, useEffect, useMemo, useState } from 'react';
 import { createColumnHelper, PaginationState, SortingState } from '@tanstack/react-table';
+import { Button, DataTable, Dialog, FormInput, Icon, Modal, Track } from 'components';
+import i18n from 'i18n';
+import { FC, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MdOutlineArrowForward } from 'react-icons/md';
-import useServiceStore from 'store/services.store';
-import { Button, DataTable, Dialog, FormInput, Icon, Modal, Track } from 'components';
-import { Intent } from 'types/Intent';
-import i18n from 'i18n';
 import { Link } from 'react-router-dom';
+import useServiceStore from 'store/services.store';
+import { Intent } from 'types/Intent';
 
 type ConnectServiceToIntentModelProps = {
   onModalClose: () => void;

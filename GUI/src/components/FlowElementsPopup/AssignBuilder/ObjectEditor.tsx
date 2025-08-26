@@ -1,11 +1,12 @@
+import JSONEditor from 'jsoneditor';
 import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import JSONEditor from 'jsoneditor';
 import 'jsoneditor/dist/jsoneditor.css';
 import { getDragData } from 'utils/component-util';
 import { isObject, updateValueAtPath } from 'utils/object-util';
-import styles from './ObjectEditor.module.scss';
 import { stringToTemplate } from 'utils/string-util';
+
+import styles from './ObjectEditor.module.scss';
 
 // Helper function to find the path to a node in the JSON structure
 const findNodePath = (node: Element, data: Record<string, unknown>): string | null => {

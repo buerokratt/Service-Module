@@ -1,11 +1,13 @@
-import { FC } from 'react';
-import Track from '../Track';
-import PreviousVariables from './PreviousVariables';
-import { DynamicChoices } from 'types/dynamic-choices';
-import AssignElement from './AssignBuilder/AssignElement';
-import { MdOutlineInfo } from 'react-icons/md';
 import Tooltip from 'components/Tooltip';
 import { t } from 'i18next';
+import { FC } from 'react';
+import { MdOutlineInfo } from 'react-icons/md';
+import { DynamicChoices } from 'types/dynamic-choices';
+
+import Track from '../Track';
+import AssignElement from './AssignBuilder/AssignElement';
+import PreviousVariables from './PreviousVariables';
+
 
 type DynamicChoicesContentProps = {
   readonly nodeId: string;

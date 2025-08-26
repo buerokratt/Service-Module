@@ -1,12 +1,14 @@
 import React from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
+
 import { Layout } from './components';
+import FaultyServicesPage from './pages/FaultyServicesPage';
 import NotFoundPage from './pages/NotFoundPage';
 import OverviewPage from './pages/OverviewPage';
-import FaultyServicesPage from './pages/FaultyServicesPage';
-import { ROUTES } from './resources/routes-constants';
 import ServiceFlowPage from './pages/ServiceFlowPage';
 import ServiceSettingPage from './pages/ServiceSettingPage';
+import { ROUTES } from './resources/routes-constants';
+
 import './styles/main.scss';
 import ConnectionRequestsPage from 'pages/ConnectionRequestsPage';
 

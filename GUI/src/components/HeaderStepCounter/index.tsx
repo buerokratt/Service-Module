@@ -1,9 +1,10 @@
 import React, { FC, useEffect } from 'react';
-import { Track } from '..';
-import Step from './HeaderStep';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import useServiceStore from 'store/new-services.store';
+
+import { Track } from '..';
+import Step from './HeaderStep';
 import './HeaderStepCounter.scss';
 
 type StepCounterProps = {

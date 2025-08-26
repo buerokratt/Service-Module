@@ -1,7 +1,8 @@
 import { t } from 'i18next';
+import { FC } from 'react';
+
 import { FormInput } from '../FormElements';
 import Track from '../Track';
-import { FC } from 'react';
 
 type OpenWebPageContentProps = {
   readonly onWebpageNameChange: (name: string) => void;

@@ -1,8 +1,11 @@
+import * as Tabs from '@radix-ui/react-tabs';
+import { PaginationState, SortingState } from '@tanstack/react-table';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import useServiceStore from 'store/new-services.store';
+
+import { getColumns } from './columns';
 import { Button, FormTextarea, SwitchBox, Track } from '../../..';
-import * as Tabs from '@radix-ui/react-tabs';
-import DataTable from '../../../DataTable';
 import { RequestTab } from '../../../../types';
 import {
   EndpointData,
@@ -11,13 +14,14 @@ import {
   PreDefinedEndpointEnvVariables,
 } from '../../../../types/endpoint';
 import {
-  RequestVariablesTabsRowsData,
-  RequestVariablesTabsRawData,
   RequestVariablesRowData,
+  RequestVariablesTabsRawData,
+  RequestVariablesTabsRowsData,
 } from '../../../../types/request-variables';
-import useServiceStore from 'store/new-services.store';
-import { getColumns } from './columns';
-import { PaginationState, SortingState } from '@tanstack/react-table';
+import DataTable from '../../../DataTable';
+
+
+
 
 type RequestVariablesProps = {
   disableRawData?: boolean;

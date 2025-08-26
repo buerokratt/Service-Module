@@ -1,11 +1,12 @@
 import { FC, useEffect, useState } from 'react';
-import Track from '../Track';
-import { getDomainFile } from '../../resources/api-constants';
-import { FormInput, FormSelect } from '../FormElements';
-import Button from '../Button';
-import { v4 as uuidv4 } from 'uuid';
 import { useTranslation } from 'react-i18next';
+import { v4 as uuidv4 } from 'uuid';
+
+import { getDomainFile } from '../../resources/api-constants';
 import api from '../../services/api-dev';
+import Button from '../Button';
+import { FormInput, FormSelect } from '../FormElements';
+import Track from '../Track';
 
 const RasaRulesContent: FC = () => {
   const [config, setConfig] = useState<any>({});

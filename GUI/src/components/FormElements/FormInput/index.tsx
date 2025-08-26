@@ -1,5 +1,5 @@
-import React, { forwardRef, InputHTMLAttributes, useId } from 'react';
 import clsx from 'clsx';
+import React, { forwardRef, InputHTMLAttributes, useId } from 'react';
 import { MdOutlinePalette } from 'react-icons/md';
 
 import { Icon } from '../../../components';

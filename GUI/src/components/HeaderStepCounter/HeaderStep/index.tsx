@@ -1,4 +1,5 @@
 import React, { BaseSyntheticEvent, FC } from 'react';
+
 import { Track } from '../..';
 import './HeaderStep.scss';
 

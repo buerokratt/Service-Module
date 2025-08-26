@@ -1,6 +1,7 @@
 import { t } from 'i18next';
-import { FormRichText, Track } from '..';
 import { CSSProperties, FC } from 'react';
+
+import { FormRichText, Track } from '..';
 import PreviousVariables from './PreviousVariables';
 
 type TextfieldContentProps = {

@@ -2,13 +2,14 @@ import React from 'react';
 import { createRoot } from 'react-dom/client';
 import './i18n';
 import { QueryClient, QueryClientProvider, QueryFunction } from '@tanstack/react-query';
+
 import App from './App';
+import apiAn from './services/analytics-api';
 import api from './services/api';
 import apiDev from './services/api-dev';
 import apiDevV2 from './services/api-dev-v2';
-import auth from './services/auth';
 import apigeneric from './services/apigeneric';
-import apiAn from './services/analytics-api';
+import auth from './services/auth';
 
 const defaultQueryFn: QueryFunction | undefined = async ({ queryKey }) => {
   if (import.meta.env.REACT_APP_LOCAL === 'true') {

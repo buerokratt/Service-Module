@@ -1,5 +1,5 @@
-import { api } from './mock-apis';
 import * as API_CONF from './api-conf';
+import { api } from './mock-apis';
 
 let stateSwitch = true;
 

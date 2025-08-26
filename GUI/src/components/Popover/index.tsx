@@ -1,5 +1,5 @@
-import React, { FC, PropsWithChildren, ReactNode } from 'react';
 import * as RadixPopover from '@radix-ui/react-popover';
+import React, { FC, PropsWithChildren, ReactNode } from 'react';
 
 import './Popover.scss';
 

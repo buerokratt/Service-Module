@@ -1,5 +1,6 @@
 import { FC } from 'react';
 import { AiOutlineExclamation } from 'react-icons/ai';
+
 import Icon from '../Icon';
 
 import './ExclamationBadge.scss';

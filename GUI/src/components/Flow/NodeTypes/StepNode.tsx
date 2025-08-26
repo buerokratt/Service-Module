@@ -1,15 +1,14 @@
-import { FC, memo, useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-
-import useServiceStore from 'store/new-services.store';
-import { Group, Rule } from 'components/FlowElementsPopup/RuleBuilder/types';
-import { Assign } from 'types/assign';
-import { MultiChoiceQuestion } from 'types/multi-choice-question';
 import CheckBadge from 'components/CheckBadge';
 import ExclamationBadge from 'components/ExclamationBadge';
+import { Group, Rule } from 'components/FlowElementsPopup/RuleBuilder/types';
 import Track from 'components/Track';
+import { FC, memo, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import useServiceStore from 'store/new-services.store';
 import { StepType } from 'types';
+import { Assign } from 'types/assign';
 import { DynamicChoices } from 'types/dynamic-choices';
+import { MultiChoiceQuestion } from 'types/multi-choice-question';
 
 type NodeDataProps = {
   data: {

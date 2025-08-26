@@ -1,5 +1,5 @@
-import { FC, PropsWithChildren, ReactNode, useState } from 'react';
 import * as RadixTooltip from '@radix-ui/react-tooltip';
+import { FC, PropsWithChildren, ReactNode, useState } from 'react';
 
 import './Tooltip.scss';
 

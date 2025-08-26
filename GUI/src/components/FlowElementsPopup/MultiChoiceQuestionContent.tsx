@@ -1,16 +1,18 @@
-import { useState, FC } from 'react';
+import { FC, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { FormTextarea, FormInput } from '../FormElements';
-import Track from '../Track';
-import Button from '../Button';
-import Icon from '../Icon';
-import { MdEdit, MdDeleteOutline, MdCheck } from 'react-icons/md';
-import './styles.scss';
-import FormError from 'components/FormElements/FormError';
-import { v4 } from 'uuid';
+import { MdCheck, MdDeleteOutline, MdEdit } from 'react-icons/md';
 import useServiceStore from 'store/new-services.store';
 import useServiceListStore from 'store/services.store';
 import { removeTrailingUnderscores } from 'utils/string-util';
+import { v4 } from 'uuid';
+
+import Button from '../Button';
+import { FormInput, FormTextarea } from '../FormElements';
+import Icon from '../Icon';
+import Track from '../Track';
+
+import './styles.scss';
+import FormError from 'components/FormElements/FormError';
 
 const maxButtons = parseInt(process.env.REACT_APP_MULTI_CHOICE_QUESTION_MAX_BUTTONS ?? '4');
 

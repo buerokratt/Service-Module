@@ -1,5 +1,6 @@
 import { FC } from 'react';
 import { useTranslation } from 'react-i18next';
+
 import { Track } from '..';
 
 const EndConversationContent: FC = () => {

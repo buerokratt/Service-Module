@@ -1,20 +1,26 @@
-import React, { CSSProperties, FC, useEffect, useState } from 'react';
-import Track from '../Track';
-import useServiceStore from '../../store/new-services.store';
-import { EndpointResponseVariable } from 'types/endpoint/endpoint-response-variables';
+import { Edge, Node } from '@xyflow/react';
 import OutputElementBox from 'components/OutputElementBox';
-import { StepType } from 'types';
-import { Assign } from '../../types/assign';
+import React, { CSSProperties, FC, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ObjectTree } from './ObjectTree';
-import { stringToTemplate, templateToString } from 'utils/string-util';
-import { getTypeColor, isObject } from 'utils/object-util';
-import Tooltip from '../Tooltip';
-import { v4 } from 'uuid';
-import { getHelperTooltips } from 'utils/constants';
 import { datesVariables, environmentVariables, helperVariables } from 'resources/variables-constants';
-import { Node, Edge } from '@xyflow/react';
+import { StepType } from 'types';
+import { EndpointResponseVariable } from 'types/endpoint/endpoint-response-variables';
+import { stringToTemplate, templateToString } from 'utils/string-util';
+
+import { v4 } from 'uuid';
+import { ObjectTree } from './ObjectTree';
+import useServiceStore from '../../store/new-services.store';
+
+import { Assign } from '../../types/assign';
+
+import { getTypeColor, isObject } from 'utils/object-util';
+
+import Tooltip from '../Tooltip';
+
+import { getHelperTooltips } from 'utils/constants';
 import { NodeDataProps } from 'types/service-flow';
+
+import Track from '../Track';
 
 type PreviousVariablesProps = {
   readonly nodeId: string;

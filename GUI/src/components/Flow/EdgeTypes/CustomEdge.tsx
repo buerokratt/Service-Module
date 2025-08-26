@@ -1,18 +1,3 @@
-import { BaseEdge, EdgeLabelRenderer, EdgeProps, getBezierPath } from '@xyflow/react';
-import { CSSProperties, memo, useEffect, useState } from 'react';
-import { Collapsible, Dropdown, StepElement, Track } from 'components';
-import useServiceStore from 'store/new-services.store';
-import ApiEndpoint from 'components/ApiEndpoint';
-import AddEndpointModal from './AddEndpointModal';
-import { useTranslation } from 'react-i18next';
-import { Step, stepsLabels, StepType } from 'types';
-import {
-  arrayMove,
-  SortableContext,
-  sortableKeyboardCoordinates,
-  verticalListSortingStrategy,
-} from '@dnd-kit/sortable';
-import { restrictToParentElement } from '@dnd-kit/modifiers';
 import {
   closestCorners,
   DndContext,
@@ -22,11 +7,27 @@ import {
   useSensor,
   useSensors,
 } from '@dnd-kit/core';
+import { restrictToParentElement } from '@dnd-kit/modifiers';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
+import { BaseEdge, EdgeLabelRenderer, EdgeProps, getBezierPath } from '@xyflow/react';
+import { Collapsible, Dropdown, StepElement, Track } from 'components';
+import ApiEndpoint from 'components/ApiEndpoint';
+import useEdgeAdd from 'hooks/flow/useEdgeAdd';
+import { CSSProperties, memo, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useParams } from 'react-router-dom';
 import { userStepPreferences } from 'resources/api-constants';
 import api from 'services/api';
-import useEdgeAdd from 'hooks/flow/useEdgeAdd';
+import useServiceStore from 'store/new-services.store';
 import useToastStore from 'store/toasts.store';
-import { useParams } from 'react-router-dom';
+import { Step, stepsLabels, StepType } from 'types';
+
+import AddEndpointModal from './AddEndpointModal';
 
 function reorderElements<T>(elements: T[], activeId: string | number, overId: string | number): T[] {
   const oldIndex = elements.findIndex((item: any) => item.id === activeId);

@@ -1,5 +1,5 @@
-import React, { BaseHTMLAttributes, forwardRef, PropsWithChildren } from 'react';
 import clsx from 'clsx';
+import React, { BaseHTMLAttributes, forwardRef, PropsWithChildren } from 'react';
 
 import './Box.scss';
 

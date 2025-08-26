@@ -1,5 +1,5 @@
-import AxiosMockAdapter from 'axios-mock-adapter';
 import axios, { AxiosError } from 'axios';
+import AxiosMockAdapter from 'axios-mock-adapter';
 
 export const mockApi = axios.create({
   baseURL: '/mock',

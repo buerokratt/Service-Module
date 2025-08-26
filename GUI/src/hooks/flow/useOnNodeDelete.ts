@@ -1,4 +1,4 @@
-import { Node, Edge, getIncomers, getOutgoers, getConnectedEdges, useReactFlow } from '@xyflow/react';
+import { Edge, getConnectedEdges, getIncomers, getOutgoers, Node, useReactFlow } from '@xyflow/react';
 import { useCallback, useState } from 'react';
 import { StepType } from 'types';
 

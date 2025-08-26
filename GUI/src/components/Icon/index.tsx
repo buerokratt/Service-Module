@@ -1,6 +1,6 @@
-import React, { CSSProperties, forwardRef, ReactNode, StyleHTMLAttributes } from 'react';
 import * as AccessibleIcon from '@radix-ui/react-accessible-icon';
 import clsx from 'clsx';
+import React, { CSSProperties, forwardRef, ReactNode, StyleHTMLAttributes } from 'react';
 
 import './Icon.scss';
 

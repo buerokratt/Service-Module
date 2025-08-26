@@ -1,6 +1,6 @@
-import { create } from 'zustand';
-import { v4 as uuid } from 'uuid';
 import { testServiceFlow } from 'services/flow-tester';
+import { v4 as uuid } from 'uuid';
+import { create } from 'zustand';
 
 type TestingMessageAuthor = 'enduser' | 'bot' | 'system';
 type TestingMessageType = 'error' | 'normal' | 'info' | 'success';

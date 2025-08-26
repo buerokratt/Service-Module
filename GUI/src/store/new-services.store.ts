@@ -1,17 +1,17 @@
-import { create } from 'zustand';
-import { v4 as uuid } from 'uuid';
 import {
+  applyEdgeChanges,
+  applyNodeChanges,
   Edge,
   EdgeChange,
+  getIncomers,
+  getOutgoers,
   Node,
   NodeChange,
   ReactFlowInstance,
-  applyEdgeChanges,
-  applyNodeChanges,
-  getIncomers,
-  getOutgoers,
 } from '@xyflow/react';
-import { EndpointData, EndpointEnv, EndpointTab, PreDefinedEndpointEnvVariables } from 'types/endpoint';
+import { AxiosResponse } from 'axios';
+import { GroupOrRule } from 'components/FlowElementsPopup/RuleBuilder/types';
+import i18next from 'i18next';
 import {
   getCommonEndpoints,
   getEndpointValidation,
@@ -21,21 +21,25 @@ import {
   servicesRequestsExplain,
   userStepPreferences,
 } from 'resources/api-constants';
-import { EndpointDefinitionJson, Service, ServiceState, Step, StepType } from 'types';
-import { RequestVariablesTabsRawData, RequestVariablesTabsRowsData } from 'types/request-variables';
-import useToastStore from './toasts.store';
-import i18next from 'i18next';
-import { saveFlowClick } from 'services/service-builder';
-import { NodeDataProps, initialEdges, initialNodes } from 'types/service-flow';
 import { alignNodesInCaseAnyGotOverlapped, updateFlowInputRules } from 'services/flow-builder';
-import { GroupOrRule } from 'components/FlowElementsPopup/RuleBuilder/types';
+import { saveFlowClick } from 'services/service-builder';
+import { EndpointDefinitionJson, Service, ServiceState, Step, StepType } from 'types';
+import { EndpointData, EndpointEnv, EndpointTab, PreDefinedEndpointEnvVariables } from 'types/endpoint';
+import { v4 as uuid } from 'uuid';
+import { create } from 'zustand';
+import { RequestVariablesTabsRawData, RequestVariablesTabsRowsData } from 'types/request-variables';
+
 import useTestServiceStore from './test-services.store';
+import useToastStore from './toasts.store';
+
+import { initialEdges, initialNodes, NodeDataProps } from 'types/service-flow';
 import { Chip } from 'types/chip';
 import { EndpointResponseVariable } from 'types/endpoint/endpoint-response-variables';
 import { Assign } from 'types/assign';
 import { EndpointType } from 'types/endpoint/endpoint-type';
+
 import api from '../services/api-dev';
-import { AxiosResponse } from 'axios';
+
 
 interface ServiceStoreState {
   endpoints: EndpointData[];

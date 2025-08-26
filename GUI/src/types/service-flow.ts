@@ -1,8 +1,9 @@
+import { Edge, Node } from '@xyflow/react';
+
 import { DynamicChoices } from './dynamic-choices';
 import { EndpointData } from './endpoint';
 import { MultiChoiceQuestion } from './multi-choice-question';
 import { StepType } from './step-type.enum';
-import { Edge, Node } from '@xyflow/react';
 
 export const GRID_UNIT = 16;
 export const EDGE_LENGTH = 5 * GRID_UNIT;

@@ -1,10 +1,10 @@
-import React, { FC, useState, MouseEvent } from 'react';
 import { Column, Table } from '@tanstack/react-table';
+import React, { FC, MouseEvent, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MdOutlineSearch } from 'react-icons/md';
 
-import { Icon } from '../../components';
 import DebouncedInput from './DebouncedInput';
+import { Icon } from '../../components';
 
 type FilterProps = {
   column: Column<any, unknown>;

@@ -1,12 +1,13 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MdErrorOutline } from 'react-icons/md';
+import useServiceStore from 'store/new-services.store';
+import useToastStore from 'store/toasts.store';
 import { v4 as uuid } from 'uuid';
+
 import { Button, FormInput, FormSelect, Icon, RequestVariables, Track } from '../../..';
 import { RequestTab } from '../../../../types';
 import { EndpointData, EndpointVariableData, PreDefinedEndpointEnvVariables } from '../../../../types/endpoint';
-import useServiceStore from 'store/new-services.store';
-import useToastStore from 'store/toasts.store';
 
 type EndpointCustomProps = {
   endpoint: EndpointData;

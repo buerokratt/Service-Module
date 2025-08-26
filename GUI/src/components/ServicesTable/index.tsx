@@ -1,13 +1,14 @@
+import ConnectServiceToIntentModel from 'pages/Integration/ConnectServiceToIntentModel';
 import { FC, useEffect, useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
+import useServiceListStore from 'store/services.store';
+import { Trigger } from 'types/Trigger';
+
 import { Button, Card, Modal, Track } from '..';
 import DataTable from '../DataTable';
-
-import useServiceListStore from 'store/services.store';
-import ConnectServiceToIntentModel from 'pages/Integration/ConnectServiceToIntentModel';
-import { Trigger } from 'types/Trigger';
 import { getColumns } from './columns';
+
 import '../../styles/main.scss';
 import './ServicesTable.scss';
 import { PaginationState, SortingState } from '@tanstack/react-table';

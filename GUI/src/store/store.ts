@@ -1,6 +1,6 @@
-import { create } from 'zustand';
-import { UserInfo } from 'types/userInfo';
 import { CHAT_STATUS, Chat as ChatType } from 'types/chat';
+import { UserInfo } from 'types/userInfo';
+import { create } from 'zustand';
 
 interface StoreState {
   userInfo: UserInfo | null;

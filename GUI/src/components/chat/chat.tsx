@@ -1,9 +1,10 @@
-import { motion } from 'framer-motion';
-import styles from './chat.module.scss';
 import ChatHeader from 'components/chat/chat-header';
+import { motion } from 'framer-motion';
+import useTestServiceStore from 'store/test-services.store';
+
 import ChatContent from './chat-content';
 import ChatKeyPad from './chat-keypad';
-import useTestServiceStore from 'store/test-services.store';
+import styles from './chat.module.scss';
 import Profile from './profile';
 
 const Chat = (): JSX.Element => {

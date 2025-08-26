@@ -1,7 +1,8 @@
-import { useEffect, useRef } from 'react';
 import { AnimatePresence } from 'framer-motion';
 import { OverlayScrollbarsComponent } from 'overlayscrollbars-react';
+import { useEffect, useRef } from 'react';
 import useTestServiceStore from 'store/test-services.store';
+
 import ChatMessage from './chat-message';
 import styles from './chat.module.scss';
 import 'overlayscrollbars/css/OverlayScrollbars.css';

@@ -1,9 +1,10 @@
+import withAuthorization, { ROLES } from 'hoc/with-authorization';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import useToastStore from 'store/toasts.store';
+
 import { Button, FormInput, Track } from '../components';
 import { getServiceSettings, saveServiceSettings } from '../resources/api-constants';
-import useToastStore from 'store/toasts.store';
-import withAuthorization, { ROLES } from 'hoc/with-authorization';
 import api from '../services/api-dev';
 
 const ServiceSettingPage: React.FC = () => {

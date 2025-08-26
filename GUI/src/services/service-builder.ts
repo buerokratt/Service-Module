@@ -1,18 +1,20 @@
-import { Assign } from 'types/assign';
+import { Edge, Node } from '@xyflow/react';
+import { AxiosError } from 'axios';
 import { Group, Rule } from 'components/FlowElementsPopup/RuleBuilder/types';
+import { format } from 'date-fns';
 import i18next, { t } from 'i18next';
 import { NodeHtmlMarkdown } from 'node-html-markdown';
-import { Edge, Node } from '@xyflow/react';
 import { createEndpoint, createNewService, editService, testService, updateEndpoint } from 'resources/api-constants';
 import useServiceStore from 'store/new-services.store';
 import useToastStore from 'store/toasts.store';
 import { StepType } from 'types';
+import { Assign } from 'types/assign';
 import { EndpointData, EndpointVariableData } from 'types/endpoint';
-import api from '../services/api-dev';
 import { NodeDataProps } from 'types/service-flow';
 import { getLastDigits, removeTrailingUnderscores, stringToArray, toSnakeCase } from 'utils/string-util';
-import { format } from 'date-fns';
-import { AxiosError } from 'axios';
+
+import api from '../services/api-dev';
+
 
 export async function saveEndpoints(endpoints: EndpointData[], onSuccess?: () => void, onError?: (e: any) => void) {
   const tasks: Promise<any>[] = [];

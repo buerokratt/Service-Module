@@ -1,11 +1,12 @@
+import withAuthorization, { ROLES } from 'hoc/with-authorization';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Button, Track } from '../components';
-import { trainingModuleTraining } from '../resources/api-constants';
-import ServicesTable from '../components/ServicesTable';
 import { useNavigate } from 'react-router-dom';
+
+import { Button, Track } from '../components';
+import ServicesTable from '../components/ServicesTable';
+import { trainingModuleTraining } from '../resources/api-constants';
 import { ROUTES } from '../resources/routes-constants';
-import withAuthorization, { ROLES } from 'hoc/with-authorization';
 
 const OverviewPage: React.FC = () => {
   const { t } = useTranslation();

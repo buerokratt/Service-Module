@@ -1,5 +1,5 @@
-import React, { ButtonHTMLAttributes, FC, PropsWithChildren, useRef } from 'react';
 import clsx from 'clsx';
+import React, { ButtonHTMLAttributes, FC, PropsWithChildren, useRef } from 'react';
 
 import './Button.scss';
 

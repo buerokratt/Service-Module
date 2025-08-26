@@ -1,8 +1,10 @@
+import OutputElementBox from 'components/OutputElementBox';
 import { FC } from 'react';
 import { KeyPath } from 'react-json-tree';
-import OutputElementBox from 'components/OutputElementBox';
-import { getKeyPathString, getTypeColor } from '../../utils/object-util';
 import { stringToTemplate } from 'utils/string-util';
+
+import { getKeyPathString, getTypeColor } from '../../utils/object-util';
+
 
 const escapeKey = (key: string) => {
   return key.replace(/"/g, '\\"');

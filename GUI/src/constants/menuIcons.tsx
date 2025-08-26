@@ -1,10 +1,10 @@
 import React, {
-  MdOutlineForum,
+  MdMiscellaneousServices,
   MdOutlineAdb,
   MdOutlineEqualizer,
-  MdSettings,
+  MdOutlineForum,
   MdOutlineMonitorWeight,
-  MdMiscellaneousServices,
+  MdSettings,
 } from 'react-icons/md';
 
 export const menuIcons = [

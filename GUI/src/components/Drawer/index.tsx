@@ -1,6 +1,6 @@
+import autoAnimate from '@formkit/auto-animate';
 import React, { CSSProperties, FC, PropsWithChildren, useEffect, useRef } from 'react';
 import { MdOutlineClose } from 'react-icons/md';
-import autoAnimate from '@formkit/auto-animate';
 
 import { Icon } from '../../components';
 import './Drawer.scss';

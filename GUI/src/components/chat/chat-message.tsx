@@ -1,9 +1,11 @@
-import styles from './chat.module.scss';
 import classNames from 'classnames';
-import { TestingMessage } from 'store/test-services.store';
-import UserMessage from './user-message';
-import BotMessage from './bot-message';
 import { useTranslation } from 'react-i18next';
+import { TestingMessage } from 'store/test-services.store';
+
+import BotMessage from './bot-message';
+import styles from './chat.module.scss';
+import UserMessage from './user-message';
+
 
 interface ChatMessageProps {
   message: TestingMessage;

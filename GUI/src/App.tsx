@@ -1,12 +1,14 @@
+import { useQuery } from '@tanstack/react-query';
+import UnsavedChangesDialog from 'handlers/unsavedChangesDialog';
+import { UnsavedChangesHandler } from 'handlers/unsavedChangesHandler';
 import React from 'react';
 import { BrowserRouter } from 'react-router-dom';
+
 import { ToastProvider } from './components/Toast/ToastProvider';
 import RootComponent from './RootComponent';
 import useStore from './store/store';
-import { useQuery } from '@tanstack/react-query';
 import { UserInfo } from './types/userInfo';
-import { UnsavedChangesHandler } from 'handlers/unsavedChangesHandler';
-import UnsavedChangesDialog from 'handlers/unsavedChangesDialog';
+
 
 const App: React.FC = () => {
   useQuery<{

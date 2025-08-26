@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { getOpenApiSpec } from '../../../../resources/api-constants';
-import { Button, FormInput, FormSelect, RequestVariables, Track } from '../../..';
 import { useTranslation } from 'react-i18next';
 import { v4 as uuid } from 'uuid';
-import { RequestTab, Option } from '../../../../types';
+
+import { Button, FormInput, FormSelect, RequestVariables, Track } from '../../..';
+import { getOpenApiSpec } from '../../../../resources/api-constants';
+import api from '../../../../services/api-dev';
+import { Option, RequestTab } from '../../../../types';
 import { ApiSpecProperty } from '../../../../types/api-spec-property';
 import {
   EndpointData,
@@ -12,7 +14,6 @@ import {
   PreDefinedEndpointEnvVariables,
 } from '../../../../types/endpoint';
 import { RequestVariablesRowData } from '../../../../types/request-variables';
-import api from '../../../../services/api-dev';
 
 type EndpointOpenAPIProps = {
   endpoint: EndpointData;

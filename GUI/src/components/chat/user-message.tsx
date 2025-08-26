@@ -1,8 +1,9 @@
+import classNames from 'classnames';
 import { motion } from 'framer-motion';
+import { TestingMessage } from 'store/test-services.store';
+
 import styles from './chat.module.scss';
 import PersonIcon from '../../static/icons/person.svg';
-import classNames from 'classnames';
-import { TestingMessage } from 'store/test-services.store';
 
 const rightAnimation = {
   animate: { opacity: 1, x: 0 },

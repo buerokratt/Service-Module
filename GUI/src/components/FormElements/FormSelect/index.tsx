@@ -1,11 +1,11 @@
-import React, { FC, SelectHTMLAttributes, useEffect, useId, useState } from 'react';
-import { useSelect } from 'downshift';
 import clsx from 'clsx';
+import { useSelect } from 'downshift';
+import React, { FC, SelectHTMLAttributes, useEffect, useId, useState } from 'react';
 import { MdArrowDropDown } from 'react-icons/md';
 
 import { Icon } from '../../../components';
+
 import './FormSelect.scss';
-import { t } from 'i18next';
 
 type FormSelectProps = SelectHTMLAttributes<HTMLSelectElement> & {
   label: string;

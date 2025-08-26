@@ -1,12 +1,12 @@
+import { createColumnHelper, PaginationState, SortingState } from '@tanstack/react-table';
+import { Card, DataTable, Icon } from 'components';
+import { format } from 'date-fns';
+import withAuthorization, { ROLES } from 'hoc/with-authorization';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { PaginationState, SortingState, createColumnHelper } from '@tanstack/react-table';
-import { format } from 'date-fns';
 import { AiFillCheckCircle, AiFillCloseCircle } from 'react-icons/ai';
-import { Card, DataTable, Icon } from 'components';
-import { Trigger } from 'types/Trigger';
 import useServiceStore from 'store/services.store';
-import withAuthorization, { ROLES } from 'hoc/with-authorization';
+import { Trigger } from 'types/Trigger';
 
 const ConnectionRequestsPage: React.FC = () => {
   const { t } = useTranslation();

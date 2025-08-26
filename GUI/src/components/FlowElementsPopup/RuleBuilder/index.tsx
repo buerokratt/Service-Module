@@ -1,9 +1,10 @@
-import React from 'react';
-import { MdDeleteOutline } from 'react-icons/md';
-import { useTranslation } from 'react-i18next';
 import { Icon, Track } from 'components';
-import { Group, Rule, RuleGroupBuilderProps, isInstanceOfRule } from './types';
+import React from 'react';
+import { useTranslation } from 'react-i18next';
+import { MdDeleteOutline } from 'react-icons/md';
+
 import RuleElement from './ruleElement';
+import { Group, isInstanceOfRule, Rule, RuleGroupBuilderProps } from './types';
 import { useRuleBuilder } from './useRuleBuilder';
 import '../styles.scss';
 

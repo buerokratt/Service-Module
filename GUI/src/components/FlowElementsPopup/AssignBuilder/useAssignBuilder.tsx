@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
-import { Assign } from '../../../types/assign';
 import { v4 as uuidv4 } from 'uuid';
+
+import { Assign } from '../../../types/assign';
 
 interface UseAssignBuilderProps {
   onChange: (group: Assign[]) => void;

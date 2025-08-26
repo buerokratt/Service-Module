@@ -1,8 +1,9 @@
-import { CSSProperties, FC, DragEvent, ReactNode } from 'react';
-import Box from '../Box';
-import { Assign, StepType } from 'types';
+import { CSSProperties, DragEvent, FC, ReactNode } from 'react';
 import useServiceStore from 'store/new-services.store';
+import { Assign, StepType } from 'types';
 import { ASSIGN_DRAG_TYPE } from 'utils/component-util';
+
+import Box from '../Box';
 
 type OutputElementBoxProps = {
   readonly children: ReactNode;

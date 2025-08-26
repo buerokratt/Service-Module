@@ -1,5 +1,5 @@
-import React, { forwardRef, PropsWithChildren, ReactNode } from 'react';
 import clsx from 'clsx';
+import React, { forwardRef, PropsWithChildren, ReactNode } from 'react';
 import { MdOutlineCheck } from 'react-icons/md';
 
 import './Label.scss';

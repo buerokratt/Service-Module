@@ -1,5 +1,5 @@
-import { Step } from 'types';
 import { Node } from '@xyflow/react';
+import { Step } from 'types';
 
 export const getNodeLabel = (step: Step, nodes: Node[]) => {
   const baseLabel = step.label.split(' - ').pop();

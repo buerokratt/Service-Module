@@ -1,13 +1,14 @@
+import { createColumnHelper, PaginationState, Row, SortingState } from '@tanstack/react-table';
+import { format } from 'date-fns';
+import withAuthorization, { ROLES } from 'hoc/with-authorization';
+import i18n from 'i18n';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Button, Card, DataTable, Icon, Track } from '../components';
-import { PaginationState, Row, SortingState, createColumnHelper } from '@tanstack/react-table';
 import { MdOutlineRemoveRedEye } from 'react-icons/md';
+
+import { Button, Card, DataTable, Icon, Track } from '../components';
 import Popup from '../components/Popup';
 import { getFaultyServices } from '../resources/api-constants';
-import { format } from 'date-fns';
-import i18n from 'i18n';
-import withAuthorization, { ROLES } from 'hoc/with-authorization';
 import api from '../services/api-dev';
 
 interface FaultyService {

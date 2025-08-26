@@ -1,28 +1,28 @@
-import React, { CSSProperties, FC, ReactNode, useId } from 'react';
+import { RankingInfo, rankItem } from '@tanstack/match-sorter-utils';
 import {
   ColumnDef,
-  useReactTable,
-  getCoreRowModel,
-  flexRender,
-  getSortedRowModel,
-  SortingState,
+  ColumnFiltersState,
   FilterFn,
+  flexRender,
+  getCoreRowModel,
   getFilteredRowModel,
-  VisibilityState,
   getPaginationRowModel,
+  getSortedRowModel,
   PaginationState,
-  TableMeta,
   Row,
   RowData,
-  ColumnFiltersState,
+  SortingState,
+  TableMeta,
+  useReactTable,
+  VisibilityState,
 } from '@tanstack/react-table';
-import { RankingInfo, rankItem } from '@tanstack/match-sorter-utils';
-import { MdUnfoldMore, MdExpandMore, MdExpandLess, MdOutlineEast, MdOutlineWest } from 'react-icons/md';
 import clsx from 'clsx';
-import { Link } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
-
 import { Icon, Track } from 'components';
+import React, { CSSProperties, FC, ReactNode, useId } from 'react';
+import { useTranslation } from 'react-i18next';
+import { MdExpandLess, MdExpandMore, MdOutlineEast, MdOutlineWest, MdUnfoldMore } from 'react-icons/md';
+import { Link } from 'react-router-dom';
+
 import Filter from './Filter';
 import './DataTable.scss';
 

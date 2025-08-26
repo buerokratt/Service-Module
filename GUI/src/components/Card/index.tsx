@@ -1,5 +1,5 @@
-import React, { FC, PropsWithChildren, ReactNode } from 'react';
 import clsx from 'clsx';
+import React, { FC, PropsWithChildren, ReactNode } from 'react';
 
 import './Card.scss';
 

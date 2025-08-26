@@ -1,10 +1,10 @@
+import { useQuery } from '@tanstack/react-query';
+import { Dialog, FormSelect, Track } from 'components';
 import { FC } from 'react';
 import { useTranslation } from 'react-i18next';
-import useServiceStore from 'store/new-services.store';
-import { Dialog, FormSelect, Track } from 'components';
-import { useQuery } from '@tanstack/react-query';
 import { getSlots } from 'resources/api-constants';
 import api from 'services/api';
+import useServiceStore from 'store/new-services.store';
 
 type ChooseSlotModelProps = {
   onModalClose: (selection?: string) => void;

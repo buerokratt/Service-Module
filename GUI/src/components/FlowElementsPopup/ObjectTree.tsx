@@ -1,5 +1,6 @@
-import { CSSProperties, FC, useState, useCallback } from 'react';
+import { CSSProperties, FC, useCallback, useState } from 'react';
 import { JSONTree, KeyPath } from 'react-json-tree';
+
 import { ObjectTreeLabel } from './ObjectTreeLabel';
 import { ObjectTreeValue } from './ObjectTreeValue';
 

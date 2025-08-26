@@ -1,8 +1,8 @@
+import { Table } from '@tanstack/react-table';
+import clsx from 'clsx';
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
-import { Table } from '@tanstack/react-table';
-import clsx from 'clsx';
 
 interface PagesRowProps {
   table: Table<any>;

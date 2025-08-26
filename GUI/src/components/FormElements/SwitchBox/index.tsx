@@ -1,5 +1,5 @@
-import React, { forwardRef, HTMLAttributes, useId } from 'react';
 import * as RadixSwitch from '@radix-ui/react-switch';
+import React, { forwardRef, HTMLAttributes, useId } from 'react';
 import { ControllerRenderProps } from 'react-hook-form';
 
 import './SwitchBox.scss';

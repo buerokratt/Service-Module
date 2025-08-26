@@ -1,11 +1,14 @@
+import { ApiEndpointCard, Button, Modal, Track } from 'components';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { v4 as uuid } from 'uuid';
-import { ApiEndpointCard, Button, Modal, Track } from 'components';
-import { EndpointData } from '../../../types/endpoint/endpoint-data';
-import useToastStore from 'store/toasts.store';
 import useServiceStore from 'store/new-services.store';
+import useToastStore from 'store/toasts.store';
+import { v4 as uuid } from 'uuid';
+
 import { saveEndpoints } from '../../../services/service-builder';
+import { EndpointData } from '../../../types/endpoint/endpoint-data';
+
+
 
 interface AddEndpointModalProps {
   onClose: () => void;

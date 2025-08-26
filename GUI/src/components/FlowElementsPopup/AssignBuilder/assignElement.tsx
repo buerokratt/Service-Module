@@ -1,15 +1,17 @@
-import React, { useState } from 'react';
 import { DragInput, FormInput, Icon, Tooltip, Track } from 'components';
+import React, { useState } from 'react';
 import { MdDataObject, MdDeleteOutline, MdEdit, MdMoveDown } from 'react-icons/md';
-import { Assign } from '../../../types/assign';
-import '../styles.scss';
-import { isTemplate, stringToTemplate, templateToString } from 'utils/string-util';
-import { isArray, isObject } from 'utils/object-util';
-import { t } from 'i18next';
-import { getDragData } from 'utils/component-util';
-import ObjectEditor from './ObjectEditor';
-import styles from './AssignElement.module.scss';
 import useToastStore from 'store/toasts.store';
+import { getDragData } from 'utils/component-util';
+import { isArray, isObject } from 'utils/object-util';
+import { isTemplate, stringToTemplate, templateToString } from 'utils/string-util';
+
+import styles from './AssignElement.module.scss';
+import ObjectEditor from './ObjectEditor';
+import { Assign } from '../../../types/assign';
+
+import '../styles.scss';
+import { t } from 'i18next';
 
 const showInvalidObjectError = () => {
   useToastStore.getState().error({

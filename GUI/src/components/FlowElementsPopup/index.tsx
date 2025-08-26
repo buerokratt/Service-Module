@@ -1,39 +1,50 @@
+import * as Tabs from '@radix-ui/react-tabs';
 import React, { useEffect, useState } from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
-import Popup from '../Popup';
-import { Button, Track } from '..';
-import FileGenerateContent from './FileGenerateContent';
-import ConditionBuilderContent from './ConditionBuilderContent';
 import { useTranslation } from 'react-i18next';
+import useServiceStore from 'store/new-services.store';
+import useServiceListStore from 'store/services.store';
+import { MultiChoiceQuestionButton } from 'types/multi-choice-question';
+import { NodeDataProps } from 'types/service-flow';
+import { getValueByPath } from 'utils/object-util';
+import { isTemplate, removeTrailingUnderscores, stringToTemplate, templateToString } from 'utils/string-util';
+
+import { Button, Track } from '..';
+import Popup from '../Popup';
+import ConditionBuilderContent from './ConditionBuilderContent';
+import FileGenerateContent from './FileGenerateContent';
+
+
+import FileSignContent from './FileSignContent';
+import JsonRequestContent from './JsonRequestContent';
+import OpenWebPageContent from './OpenWebPageContent';
 import TextfieldContent from './TextfieldContent';
-import * as Tabs from '@radix-ui/react-tabs';
 import TextfieldTestContent from './TextfieldTestContent';
 import DefaultMessageContent from './DefaultMessageContent';
 import EndConversationContent from './EndConversationContent';
-import JsonRequestContent from './JsonRequestContent';
 import { servicesRequestsExplain } from '../../resources/api-constants';
-import OpenWebPageContent from './OpenWebPageContent';
 import OpenWebPageTestContent from './OpenWebPageTestContent';
 import RasaRulesContent from './RasaRulesContent';
 import { StepType } from '../../types';
-import useServiceStore from 'store/new-services.store';
-import FileSignContent from './FileSignContent';
+
+
 import './styles.scss';
 import ConditionContent from './ConditionContent';
 import AssignContent from './AssignContent';
-import { isTemplate, removeTrailingUnderscores, stringToTemplate, templateToString } from 'utils/string-util';
-import { getValueByPath } from 'utils/object-util';
+
+
 import ApiContent from './ApiContent';
 import MultiChoiceQuestionContent from './MultiChoiceQuestionContent';
-import { NodeDataProps } from 'types/service-flow';
+
 import { Edge, getConnectedEdges, getIncomers, getOutgoers, Node } from '@xyflow/react';
-import { MultiChoiceQuestionButton } from 'types/multi-choice-question';
-import useServiceListStore from 'store/services.store';
+
 import api from '../../services/api-dev';
+
 import { EndpointData } from 'types/endpoint';
 import useToastStore from 'store/toasts.store';
 import { DynamicChoices } from 'types/dynamic-choices';
+
 import DynamicChoicesContent from './DynamicChoicesContent';
 
 const FlowElementsPopup: React.FC = () => {

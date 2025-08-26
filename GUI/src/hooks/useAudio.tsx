@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react';
 import { Howl } from 'howler';
+import { useEffect, useState } from 'react';
+
 import ding from '../assets/ding.mp3';
 import newMessageSound from '../assets/newMessageSound.mp3';
 

@@ -1,9 +1,8 @@
-import { FC, PropsWithChildren, ReactNode } from 'react';
 import * as RadixDialog from '@radix-ui/react-dialog';
-import { MdOutlineClose } from 'react-icons/md';
 import clsx from 'clsx';
-
 import { Icon, Track } from 'components';
+import { FC, PropsWithChildren, ReactNode } from 'react';
+import { MdOutlineClose } from 'react-icons/md';
 import './Dialog.scss';
 
 type DialogProps = {

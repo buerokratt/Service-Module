@@ -1,5 +1,5 @@
-import { FC } from 'react';
 import { Handle, Position } from '@xyflow/react';
+import { FC } from 'react';
 
 const GhostNode: FC = () => {
   return (

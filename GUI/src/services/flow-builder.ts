@@ -1,7 +1,7 @@
-import { Node, Edge, MarkerType, XYPosition, NodeChange, NodeDimensionChange } from '@xyflow/react';
+import { Edge, MarkerType, Node, NodeChange, NodeDimensionChange, XYPosition } from '@xyflow/react';
 import useServiceStore from 'store/new-services.store';
 import { ConditionRuleType, StepType } from 'types';
-import { GRID_UNIT, EDGE_LENGTH } from 'types/service-flow';
+import { EDGE_LENGTH, GRID_UNIT } from 'types/service-flow';
 
 // refactor this file later
 

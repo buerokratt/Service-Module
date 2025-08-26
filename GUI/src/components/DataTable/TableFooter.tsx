@@ -1,7 +1,8 @@
+import { Table } from '@tanstack/react-table';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Table } from '@tanstack/react-table';
 import { MdOutlineEast, MdOutlineWest } from 'react-icons/md';
+
 import PagesRow from './PagesRow';
 
 interface TableFooterProps {

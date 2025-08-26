@@ -1,6 +1,7 @@
+import { Track } from 'components';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Track } from 'components';
+
 import AssignElement from './AssignElement';
 import { useAssignBuilder } from './useAssignBuilder';
 import '../styles.scss';

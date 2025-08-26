@@ -1,7 +1,8 @@
-import React from 'react';
-import { Rule } from './types';
 import { FormInput, FormSelect, Icon, Track } from 'components';
+import React from 'react';
 import { MdDeleteOutline } from 'react-icons/md';
+
+import { Rule } from './types';
 
 export const conditionOptions = ['==', '===', '!=', '!==', '>', '<', '>=', '<='].map((x) => ({ label: x, value: x }));
 

@@ -1,6 +1,6 @@
 import { FC } from 'react';
-import { KeyPath } from 'react-json-tree';
 import { useTranslation } from 'react-i18next';
+import { KeyPath } from 'react-json-tree';
 import { getKeyPathString } from 'utils/object-util';
 import './styles.scss';
 

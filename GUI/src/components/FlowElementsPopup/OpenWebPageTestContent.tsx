@@ -1,4 +1,5 @@
 import { CSSProperties, FC } from 'react';
+
 import Button from '../Button';
 import Track from '../Track';
 
@@ -16,7 +17,7 @@ const OpenWebPageTestContent: FC<OpenWebPageTestContentProps> = ({ websiteUrl, w
   return (
     <Track direction="vertical" align="left" style={{ ...popupBodyCss }} gap={16}>
       {websiteName && websiteUrl && (
-        <a href={websiteUrl} target="_blank">
+        <a href={websiteUrl} target="_blank" rel="noreferrer">
           {websiteName}
         </a>
       )}

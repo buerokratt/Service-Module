@@ -1,15 +1,16 @@
-import React, { FC, useState } from 'react';
 import * as RadixToast from '@radix-ui/react-toast';
+import clsx from 'clsx';
+import React, { FC, useState } from 'react';
 import {
+  MdCheckCircleOutline,
+  MdErrorOutline,
   MdOutlineClose,
   MdOutlineInfo,
-  MdCheckCircleOutline,
   MdOutlineWarningAmber,
-  MdErrorOutline,
 } from 'react-icons/md';
-import clsx from 'clsx';
-import useToastStore, { ToastTypeWithId } from '../../store/toasts.store';
+
 import { Icon } from '../../components';
+import useToastStore, { ToastTypeWithId } from '../../store/toasts.store';
 import './Toast.scss';
 
 type ToastProps = {

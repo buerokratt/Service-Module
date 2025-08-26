@@ -1,17 +1,18 @@
-import { Row, createColumnHelper } from '@tanstack/react-table';
+import { Button, Icon, Track } from '@buerokratt-ria/header/src/components';
+import { createColumnHelper, Row } from '@tanstack/react-table';
+import Tooltip from 'components/Tooltip';
+import i18n from 'i18n';
+import { MdDeleteOutline } from 'react-icons/md';
+import { RequestTab } from 'types';
+import { PreDefinedEndpointEnvVariables } from 'types/endpoint';
 import {
   RequestVariablesRowData,
   RequestVariablesTableColumns,
   RequestVariablesTabsRowsData,
 } from 'types/request-variables';
-import VariableCell from './VariableCell';
-import Tooltip from 'components/Tooltip';
-import { Button, Icon, Track } from '@buerokratt-ria/header/src/components';
-import { MdDeleteOutline } from 'react-icons/md';
+
 import ValueCell from './ValueCell';
-import i18n from 'i18n';
-import { PreDefinedEndpointEnvVariables } from 'types/endpoint';
-import { RequestTab } from 'types';
+import VariableCell from './VariableCell';
 
 interface GetColumnsConfig {
   rowsData: RequestVariablesTabsRowsData;

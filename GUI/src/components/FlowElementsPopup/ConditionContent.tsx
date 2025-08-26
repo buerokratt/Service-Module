@@ -1,8 +1,9 @@
 import { FC } from 'react';
-import Track from '../Track';
-import RuleBuilder from './RuleBuilder';
 import useServiceStore from 'store/new-services.store';
+
+import Track from '../Track';
 import PreviousVariables from './PreviousVariables';
+import RuleBuilder from './RuleBuilder';
 
 type ConditionContentProps = {
   readonly nodeId: string;

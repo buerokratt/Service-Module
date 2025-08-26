@@ -1,10 +1,14 @@
+import { ReactFlowProvider } from '@xyflow/react';
 import withAuthorization, { ROLES } from 'hoc/with-authorization';
 import { FC, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { MdOutlineEdit } from 'react-icons/md';
+import { Mosaic } from 'react-loading-indicators';
 import { useNavigate, useParams } from 'react-router-dom';
-import { ReactFlowProvider } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import useServiceStore from 'store/new-services.store';
+import useServiceListStore from 'store/services.store';
+
 import {
   Button,
   Card,
@@ -19,10 +23,8 @@ import {
 } from '../components';
 import { ROUTES } from '../resources/routes-constants';
 import './ServiceFlowPage.scss';
-import { Mosaic } from 'react-loading-indicators';
-import { MdOutlineEdit } from 'react-icons/md';
+
 import ChooseSlotModel from './Integration/ChooseSlotModel';
-import useServiceListStore from 'store/services.store';
 
 const ServiceFlowPage: FC = () => {
   const { t } = useTranslation();

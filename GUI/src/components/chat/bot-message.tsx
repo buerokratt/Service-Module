@@ -1,10 +1,12 @@
+import classNames from 'classnames';
 import { motion } from 'framer-motion';
+import { useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
+import { TestingMessage } from 'store/test-services.store';
+
 import styles from './chat.module.scss';
 import RobotIcon from '../../static/icons/buerokratt.svg';
-import classNames from 'classnames';
-import { TestingMessage } from 'store/test-services.store';
-import { useTranslation } from 'react-i18next';
-import { useCallback } from 'react';
+
 
 const leftAnimation = {
   animate: { opacity: 1, x: 0 },
