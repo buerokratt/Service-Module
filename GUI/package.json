@@ -83,7 +83,7 @@
   "homepage": "/services/",
   "engines": {
     "node": "^22.18.0",
-    "npm": "^11.5.2"
+    "npm": "^10.9.3"
   },
   "devDependencies": {
     "@babel/preset-env": "^7.20.2",
