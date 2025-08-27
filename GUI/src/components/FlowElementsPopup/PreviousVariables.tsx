@@ -129,6 +129,7 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
           setAssignedObjectTree={setAssignedObjectTree}
           popupBodyCss={popupBodyCss}
           border={border}
+          isAssignSection={true}
         />
       )}
 
@@ -235,6 +236,7 @@ const VariableSection = ({
   setAssignedObjectTree,
   popupBodyCss,
   border,
+  isAssignSection = false,
 }: any) => {
   const { t } = useTranslation();
 
@@ -280,7 +282,7 @@ const VariableSection = ({
                       : {
                           data: variable.data,
                           path: variable.value,
-                        },
+                        }
                   );
                 }}
               >
@@ -298,6 +300,7 @@ const VariableSection = ({
                 dragData={variable.key ? variable : undefined}
                 style={{ cursor: variable.key ? "grab" : "default" }}
                 borderColor={typeColor.color}
+                isAssignElement={isAssignSection ? !predefinedInputKeys.includes(variable.id) : false}
               >
                 {name}
               </OutputElementBox>
