@@ -15,4 +15,4 @@ WHERE (intent,
      GROUP BY intent,
               service,
               service_name)
-  AND status in ('approved')
+  AND status = 'approved';
