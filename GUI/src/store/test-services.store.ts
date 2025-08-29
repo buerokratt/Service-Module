@@ -77,8 +77,8 @@ const useTestServiceStore = create<TestServiceStoreState>((set, get) => ({
 
     if (payload) {
       payload.stepName = fromSnakeCase(payload.stepName);
-      const errorTranslation = t('chat.service-test-error', { returnObjects: true });
 
+      const errorTranslation = t('chat.service-test-error', { returnObjects: true });
       payloadRecord = Object.fromEntries(
         Object.entries(payload).map(([key, value]) => [errorTranslation[key as keyof typeof errorTranslation], value]),
       );
