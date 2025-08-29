@@ -34,7 +34,7 @@ export const getInitialRule = () => {
     operator: '',
     value: '',
   };
-}
+};
 
 export const getInitialGroup = () => {
   return {
@@ -43,4 +43,4 @@ export const getInitialGroup = () => {
     type: 'and',
     not: false,
   } as Group;
-}
+};

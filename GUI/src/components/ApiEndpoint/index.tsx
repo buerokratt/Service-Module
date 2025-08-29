@@ -1,25 +1,25 @@
-import Box from "components/Box";
-import Button from "components/Button";
-import Icon from "components/Icon";
-import Track from "components/Track";
-import { FC, useMemo, useState } from "react";
-import { useTranslation } from "react-i18next";
-import { MdDeleteOutline, MdOutlineEdit, MdDragIndicator } from "react-icons/md";
-import { Link } from "react-router-dom";
-import { deleteEndpoint } from "resources/api-constants";
-import useServiceStore from "store/new-services.store";
-import useToastStore from "store/toasts.store";
-import { Step, StepType } from "types";
-import { EndpointData } from "types/endpoint";
+import { useSortable } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+import ApiEndpointCard from 'components/ApiEndpointCard';
+import Box from 'components/Box';
+import Button from 'components/Button';
+import Icon from 'components/Icon';
+import Modal from 'components/Modal';
+import Track from 'components/Track';
+import { FC, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { MdDeleteOutline, MdDragIndicator, MdOutlineEdit } from 'react-icons/md';
+import { Link } from 'react-router-dom';
+import { deleteEndpoint } from 'resources/api-constants';
+import { saveEndpoints } from 'services/service-builder';
+import useServiceStore from 'store/new-services.store';
+import useToastStore from 'store/toasts.store';
+import { Step, StepType } from 'types';
+import { EndpointData } from 'types/endpoint';
+import { removeTrailingUnderscores } from 'utils/string-util';
 
-import styles from "./ApiEndpoint.module.scss";
-import api from "../../services/api-dev";
-import Modal from "components/Modal";
-import ApiEndpointCard from "components/ApiEndpointCard";
-import { saveEndpoints } from "services/service-builder";
-import { removeTrailingUnderscores } from "utils/string-util";
-import { useSortable } from "@dnd-kit/sortable";
-import { CSS } from "@dnd-kit/utilities";
+import styles from './ApiEndpoint.module.scss';
+import api from '../../services/api-dev';
 
 interface RelatedService {
   serviceId: string;
@@ -50,7 +50,7 @@ const ApiEndpoint: FC<ApiEndpointProps> = ({ step, onClick }) => {
   const [endpointNameExists, setEndpointNameExists] = useState<boolean>(false);
   const serviceName = useServiceStore((state) => removeTrailingUnderscores(state.serviceNameDashed()));
   const nodes = useServiceStore((state) => state.nodes);
-  const [endpointName, setEndpointName] = useState<string>(step.data?.name ?? "");
+  const [endpointName, setEndpointName] = useState<string>(step.data?.name ?? '');
   const [isCommonEndpoint, setIsCommonEndpoint] = useState<boolean>(step.data?.isCommon ?? false);
   const originalEndpoint = useMemo(() => {
     return step.data ? JSON.parse(JSON.stringify(step.data)) : undefined;
@@ -66,7 +66,7 @@ const ApiEndpoint: FC<ApiEndpointProps> = ({ step, onClick }) => {
 
     try {
       const nodeIdsToDelete = nodes
-        .filter((node) => node.type === "custom" && node.data.originalDefinedNodeId === endpoint.endpointId)
+        .filter((node) => node.type === 'custom' && node.data.originalDefinedNodeId === endpoint.endpointId)
         .map((node) => node.id);
       nodeIdsToDelete.forEach((nodeId) => useServiceStore.getState().onDelete(nodeId));
 
@@ -75,11 +75,11 @@ const ApiEndpoint: FC<ApiEndpointProps> = ({ step, onClick }) => {
         service_name: serviceName,
         endpoint_name: endpoint.name,
       });
-      useToastStore.getState().success({ title: t("serviceFlow.apiElements.deleteSuccess") });
+      useToastStore.getState().success({ title: t('serviceFlow.apiElements.deleteSuccess') });
       deleteEndpointFromStore(endpoint.endpointId);
     } catch (error) {
       console.error(`Error deleting API endpoint: ${error}`);
-      useToastStore.getState().error({ title: t("serviceFlow.apiElements.deleteError") });
+      useToastStore.getState().error({ title: t('serviceFlow.apiElements.deleteError') });
     } finally {
       setIsDeleting(false);
       setShowDeleteModal(false);
@@ -90,20 +90,20 @@ const ApiEndpoint: FC<ApiEndpointProps> = ({ step, onClick }) => {
     <>
       {showDeleteModal && (
         <Modal
-          title={t("serviceFlow.apiElements.deleteConfirmationMessage")}
+          title={t('serviceFlow.apiElements.deleteConfirmationMessage')}
           onClose={() => {
             setShowDeleteModal(false);
           }}
         >
           <Track gap={10} align="center" justify="end">
             <Button
-              appearance={isDeleting ? "loading" : "error"}
+              appearance={isDeleting ? 'loading' : 'error'}
               onClick={() => {
                 setIsDeleting(true);
                 deleteSelectedEndpoint(step.data);
               }}
             >
-              {t("serviceFlow.apiElements.delete")}
+              {t('serviceFlow.apiElements.delete')}
             </Button>
             <Button
               appearance="primary"
@@ -113,7 +113,7 @@ const ApiEndpoint: FC<ApiEndpointProps> = ({ step, onClick }) => {
                 e.stopPropagation();
               }}
             >
-              {t("global.cancel")}
+              {t('global.cancel')}
             </Button>
           </Track>
         </Modal>
@@ -121,7 +121,7 @@ const ApiEndpoint: FC<ApiEndpointProps> = ({ step, onClick }) => {
 
       {showEditModal && step?.data && (
         <Modal
-          title={t("newService.editEndpoint")}
+          title={t('newService.editEndpoint')}
           onClose={() => {
             useServiceStore.getState().editEndpoint(originalEndpoint);
             setShowEditModal(false);
@@ -144,11 +144,11 @@ const ApiEndpoint: FC<ApiEndpointProps> = ({ step, onClick }) => {
                   e.stopPropagation();
                 }}
               >
-                {t("overview.cancel")}
+                {t('overview.cancel')}
               </Button>
               <Button
-                appearance={isEditing ? "loading" : "primary"}
-                disabled={endpointName === "" || endpointNameExists}
+                appearance={isEditing ? 'loading' : 'primary'}
+                disabled={endpointName === '' || endpointNameExists}
                 onClick={(e) => {
                   const stepData = step.data!;
                   stepData.name = endpointName;
@@ -161,17 +161,17 @@ const ApiEndpoint: FC<ApiEndpointProps> = ({ step, onClick }) => {
                       e.stopPropagation();
                       useServiceStore.getState().editEndpoint(stepData);
                       setIsEditing(false);
-                      useToastStore.getState().success({ title: t("serviceFlow.apiElements.editSuccess") });
+                      useToastStore.getState().success({ title: t('serviceFlow.apiElements.editSuccess') });
                     },
                     (error) => {
                       console.error(`Error Editing API endpoint: ${error}`);
-                      useToastStore.getState().error({ title: t("serviceFlow.apiElements.editError") });
+                      useToastStore.getState().error({ title: t('serviceFlow.apiElements.editError') });
                       setIsEditing(false);
-                    }
+                    },
                   );
                 }}
               >
-                {t("global.edit")}
+                {t('global.edit')}
               </Button>
             </Track>
           </Track>
@@ -179,8 +179,8 @@ const ApiEndpoint: FC<ApiEndpointProps> = ({ step, onClick }) => {
       )}
 
       {relatedServices.length > 0 && (
-        <Modal title={t("serviceFlow.apiElements.deletionImpossible")} onClose={() => setRelatedServices([])}>
-          <p>{t("serviceFlow.apiElements.deletionImpossibleMessage")}</p>
+        <Modal title={t('serviceFlow.apiElements.deletionImpossible')} onClose={() => setRelatedServices([])}>
+          <p>{t('serviceFlow.apiElements.deletionImpossibleMessage')}</p>
           <ol className={styles.popupList}>
             {relatedServices.map((service) => (
               <li key={service.serviceId}>
@@ -196,17 +196,17 @@ const ApiEndpoint: FC<ApiEndpointProps> = ({ step, onClick }) => {
         style={style}
         className={styles.box}
         key={step.id}
-        color={[StepType.FinishingStepEnd, StepType.FinishingStepRedirect].includes(step.type) ? "red" : "blue"}
+        color={[StepType.FinishingStepEnd, StepType.FinishingStepRedirect].includes(step.type) ? 'red' : 'blue'}
         onClick={() => onClick(step)}
       >
-        <Track gap={8} style={{ justifyContent: "space-between", overflow: "hidden" }}>
-          <Track gap={8} style={{ alignItems: "center" }}>
-            <div {...attributes} {...listeners} style={{ cursor: "grab", display: "flex", alignItems: "center" }}>
+        <Track gap={8} style={{ justifyContent: 'space-between', overflow: 'hidden' }}>
+          <Track gap={8} style={{ alignItems: 'center' }}>
+            <div {...attributes} {...listeners} style={{ cursor: 'grab', display: 'flex', alignItems: 'center' }}>
               <Icon icon={<MdDragIndicator size={16} />} size="small" />
             </div>
             <div className={styles.labelContainer}>
-              {step.type === "user-defined" && <span className={styles.apiBadge}>API</span>}
-              {step.data?.isCommon && <span className={styles.publicBadge}>{t("serviceFlow.apiElements.public")}</span>}
+              {step.type === 'user-defined' && <span className={styles.apiBadge}>API</span>}
+              {step.data?.isCommon && <span className={styles.publicBadge}>{t('serviceFlow.apiElements.public')}</span>}
               <span className={styles.label}>{step.label}</span>
             </div>
           </Track>

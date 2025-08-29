@@ -1,16 +1,16 @@
-import { Button, Icon, Track } from "@buerokratt-ria/header/src/components";
-import { createColumnHelper } from "@tanstack/react-table";
-import Label from "components/Label";
-import Tooltip from "components/Tooltip";
-import i18n from "i18n";
-import { IoCopyOutline } from "react-icons/io5";
-import { MdDeleteOutline, MdOutlineArrowForward, MdOutlineDescription, MdOutlineEdit } from "react-icons/md";
-import { NavigateFunction } from "react-router-dom";
-import { ROUTES } from "resources/routes-constants";
-import useServiceListStore from "store/services.store";
-import useStore from "store/store";
-import useToastStore from "store/toasts.store";
-import { Service, ServiceState } from "types";
+import { Button, Icon, Track } from '@buerokratt-ria/header/src/components';
+import { createColumnHelper } from '@tanstack/react-table';
+import Label from 'components/Label';
+import Tooltip from 'components/Tooltip';
+import i18n from 'i18n';
+import { IoCopyOutline } from 'react-icons/io5';
+import { MdDeleteOutline, MdOutlineArrowForward, MdOutlineDescription, MdOutlineEdit } from 'react-icons/md';
+import { NavigateFunction } from 'react-router-dom';
+import { ROUTES } from 'resources/routes-constants';
+import useServiceListStore from 'store/services.store';
+import useStore from 'store/store';
+import useToastStore from 'store/toasts.store';
+import { Service, ServiceState } from 'types';
 
 interface GetColumnsConfig {
   isCommon: boolean;
@@ -37,8 +37,8 @@ export const getColumns = ({
   const userInfo = useStore.getState().userInfo;
 
   return [
-    columnHelper.accessor("name", {
-      header: i18n.t("overview.service.name") ?? "",
+    columnHelper.accessor('name', {
+      header: i18n.t('overview.service.name') ?? '',
       meta: {
         size: 530,
       },
@@ -50,47 +50,47 @@ export const getColumns = ({
               <Track isMultiline={true}>
                 <label
                   style={{
-                    fontSize: "15px",
-                    maxWidth: "200px",
-                    maxHeight: "200px",
-                    overflow: "auto",
-                    overflowWrap: "break-word",
-                    wordWrap: "break-word",
-                    wordBreak: "break-word",
+                    fontSize: '15px',
+                    maxWidth: '200px',
+                    maxHeight: '200px',
+                    overflow: 'auto',
+                    overflowWrap: 'break-word',
+                    wordWrap: 'break-word',
+                    wordBreak: 'break-word',
                   }}
                 >
-                  {props.row.original.description ?? ""}
+                  {props.row.original.description ?? ''}
                 </label>
                 <Button
                   appearance="text"
                   onClick={() => {
-                    navigator.clipboard.writeText(props.row.original.description ?? "");
+                    navigator.clipboard.writeText(props.row.original.description ?? '');
                     useToastStore.getState().success({
-                      title: i18n.t("overview.descriptionCopiedSuccessfully"),
+                      title: i18n.t('overview.descriptionCopiedSuccessfully'),
                     });
                   }}
-                  style={{ paddingLeft: "5px" }}
+                  style={{ paddingLeft: '5px' }}
                 >
-                  <Icon style={{ color: "black" }} icon={<IoCopyOutline />} size="small" />
+                  <Icon style={{ color: 'black' }} icon={<IoCopyOutline />} size="small" />
                 </Button>
               </Track>
             }
           >
-            <div style={{ display: "inline-flex" }}>
+            <div style={{ display: 'inline-flex' }}>
               <Icon icon={<MdOutlineDescription />} size="medium" />
             </div>
           </Tooltip>
         </Track>
       ),
     }),
-    columnHelper.accessor("usedCount", {
-      header: i18n.t("overview.service.usedCount") ?? "",
+    columnHelper.accessor('usedCount', {
+      header: i18n.t('overview.service.usedCount') ?? '',
       meta: {
         size: 320,
       },
     }),
-    columnHelper.accessor("linkedIntent", {
-      header: i18n.t("overview.service.linkedIntent") ?? "",
+    columnHelper.accessor('linkedIntent', {
+      header: i18n.t('overview.service.linkedIntent') ?? '',
       meta: {
         size: 200,
       },
@@ -99,8 +99,8 @@ export const getColumns = ({
           {props.cell.getValue() ? (
             <Button
               style={{
-                textDecoration: props.row.original.state === ServiceState.Ready ? undefined : "none",
-                boxShadow: "none",
+                textDecoration: props.row.original.state === ServiceState.Ready ? undefined : 'none',
+                boxShadow: 'none',
               }}
               appearance="text"
               onClick={() => {
@@ -110,7 +110,7 @@ export const getColumns = ({
                 }
               }}
             >
-              <label style={{ paddingLeft: "15px", color: "black" }}>{props.cell.getValue()}</label>
+              <label style={{ paddingLeft: '15px', color: 'black' }}>{props.cell.getValue()}</label>
             </Button>
           ) : (
             <Button
@@ -122,14 +122,14 @@ export const getColumns = ({
               disabled={props.row.original.state === ServiceState.Draft}
             >
               <Icon icon={<MdOutlineArrowForward color="rgba(0, 0, 0, 0.54)" />} />
-              {i18n.t("overview.popup.connectToIntent")}
+              {i18n.t('overview.popup.connectToIntent')}
             </Button>
           )}
         </Track>
       ),
     }),
-    columnHelper.accessor("state", {
-      header: i18n.t("overview.service.state") ?? "",
+    columnHelper.accessor('state', {
+      header: i18n.t('overview.service.state') ?? '',
       meta: {
         size: 120,
       },
@@ -139,7 +139,7 @@ export const getColumns = ({
           onClick={() => {
             useServiceListStore.getState().setSelectedService(props.row.original);
             const state = props.row.original.state;
-            if (state === ServiceState.Ready && props.row.original.linkedIntent != "") {
+            if (state === ServiceState.Ready && props.row.original.linkedIntent != '') {
               checkIntentConnection();
               showReadyPopup();
             }
@@ -152,7 +152,7 @@ export const getColumns = ({
       ),
     }),
     columnHelper.display({
-      id: "edit",
+      id: 'edit',
       meta: {
         size: 90,
       },
@@ -166,13 +166,13 @@ export const getColumns = ({
             }}
           >
             <Icon icon={<MdOutlineEdit />} size="medium" />
-            {i18n.t("overview.edit")}
+            {i18n.t('overview.edit')}
           </Button>
         </Track>
       ),
     }),
     columnHelper.display({
-      id: "delete",
+      id: 'delete',
       meta: {
         size: 90,
       },
@@ -180,7 +180,7 @@ export const getColumns = ({
         <Track align="right">
           <Button
             disabled={
-              isCommon === true && !userInfo?.authorities.includes("ROLE_ADMINISTRATOR")
+              isCommon === true && !userInfo?.authorities.includes('ROLE_ADMINISTRATOR')
                 ? true
                 : props.row.original.state != ServiceState.Draft && props.row.original.state != ServiceState.Ready
             }
@@ -191,7 +191,7 @@ export const getColumns = ({
             }}
           >
             <Icon icon={<MdDeleteOutline />} size="medium" />
-            {i18n.t("overview.delete")}
+            {i18n.t('overview.delete')}
           </Button>
         </Track>
       ),
@@ -202,20 +202,20 @@ export const getColumns = ({
 const getLabelType = (serviceState: ServiceState) => {
   switch (serviceState) {
     case ServiceState.Ready:
-      return "warning-dark";
+      return 'warning-dark';
     case ServiceState.Active:
-      return "success-light";
+      return 'success-light';
     case ServiceState.Draft:
-      return "disabled";
+      return 'disabled';
     case ServiceState.Inactive:
-      return "warning-dark";
+      return 'warning-dark';
     default:
-      return "info";
+      return 'info';
   }
 };
 
 const getStatePopupContent = (state: ServiceState) => {
-  if (state === ServiceState.Draft) return i18n.t("overview.popup.setReady");
-  if (state === ServiceState.Active) return i18n.t("overview.popup.setInactive");
-  return i18n.t("overview.popup.setActive");
+  if (state === ServiceState.Draft) return i18n.t('overview.popup.setReady');
+  if (state === ServiceState.Active) return i18n.t('overview.popup.setInactive');
+  return i18n.t('overview.popup.setActive');
 };

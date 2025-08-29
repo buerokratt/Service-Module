@@ -23,7 +23,7 @@
 }
 
 @mixin veera-checkbox {
-  input[type=checkbox] {
+  input[type='checkbox'] {
     display: none;
 
     + label {

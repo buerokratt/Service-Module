@@ -1,8 +1,9 @@
-import { FC } from "react";
-import Track from "../Track";
-import useServiceStore from "store/new-services.store";
-import PreviousVariables from "./PreviousVariables";
-import AssignBuilder from "./AssignBuilder";
+import { FC } from 'react';
+import useServiceStore from 'store/new-services.store';
+
+import Track from '../Track';
+import AssignBuilder from './AssignBuilder';
+import PreviousVariables from './PreviousVariables';
 
 type AssignContentProps = {
   readonly nodeId: string;

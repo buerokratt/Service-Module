@@ -1,8 +1,9 @@
-import { FC, useEffect, useMemo } from "react";
-import Track from "../Track";
-import PreviousVariables from "./PreviousVariables";
-import { EndpointData } from "types/endpoint";
-import ApiEndpointCard from "components/ApiEndpointCard";
+import ApiEndpointCard from 'components/ApiEndpointCard';
+import { FC, useEffect, useMemo } from 'react';
+import { EndpointData } from 'types/endpoint';
+
+import Track from '../Track';
+import PreviousVariables from './PreviousVariables';
 
 type ApiContentProps = {
   readonly nodeId: string;

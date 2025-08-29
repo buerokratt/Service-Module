@@ -1,18 +1,19 @@
-import React, { useEffect, useState } from "react";
-import { getOpenApiSpec } from "../../../../resources/api-constants";
-import { Button, FormInput, FormSelect, RequestVariables, Track } from "../../..";
-import { useTranslation } from "react-i18next";
-import { v4 as uuid } from "uuid";
-import { RequestTab, Option } from "../../../../types";
-import { ApiSpecProperty } from "../../../../types/api-spec-property";
+import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { v4 as uuid } from 'uuid';
+
+import { Button, FormInput, FormSelect, RequestVariables, Track } from '../../..';
+import { getOpenApiSpec } from '../../../../resources/api-constants';
+import api from '../../../../services/api-dev';
+import { Option, RequestTab } from '../../../../types';
+import { ApiSpecProperty } from '../../../../types/api-spec-property';
 import {
   EndpointData,
   EndpointDefinition,
   EndpointVariableData,
   PreDefinedEndpointEnvVariables,
-} from "../../../../types/endpoint";
-import { RequestVariablesRowData } from "../../../../types/request-variables";
-import api from "../../../../services/api-dev";
+} from '../../../../types/endpoint';
+import { RequestVariablesRowData } from '../../../../types/request-variables';
 
 type EndpointOpenAPIProps = {
   endpoint: EndpointData;
@@ -29,9 +30,9 @@ const EndpointOpenAPI: React.FC<EndpointOpenAPIProps> = ({
   requestTab,
   setRequestTab,
 }) => {
-  const [openApiUrl, setOpenApiUrl] = useState<string>(endpoint?.definitions[0]?.openApiUrl ?? "");
+  const [openApiUrl, setOpenApiUrl] = useState<string>(endpoint?.definitions[0]?.openApiUrl ?? '');
   const [selectedEndpoint, setSelectedEndpoint] = useState<EndpointDefinition | undefined>(
-    endpoint.definitions.find((e) => e.isSelected)
+    endpoint.definitions.find((e) => e.isSelected),
   );
   const [openApiEndpoints, setOpenApiEndpoints] = useState<EndpointDefinition[]>(endpoint.definitions ?? []);
   const [key, setKey] = useState<number>(0);
@@ -41,7 +42,7 @@ const EndpointOpenAPI: React.FC<EndpointOpenAPIProps> = ({
 
   const getEndpointSchema = (
     apiSpec: ApiSpecProperty,
-    contentSchema?: ApiSpecProperty
+    contentSchema?: ApiSpecProperty,
   ): EndpointVariableData[] | undefined => {
     if (!contentSchema) return;
     if (contentSchema.items) {
@@ -49,9 +50,9 @@ const EndpointOpenAPI: React.FC<EndpointOpenAPIProps> = ({
       return [
         {
           id: uuid(),
-          name: schemaPath.split("/").pop() ?? "",
-          type: "array",
-          arrayType: "schema",
+          name: schemaPath.split('/').pop() ?? '',
+          type: 'array',
+          arrayType: 'schema',
           required: false,
           arrayData: parseSchemaProperty(apiSpec, getPropertySchema(apiSpec, schemaPath)),
         },
@@ -63,25 +64,25 @@ const EndpointOpenAPI: React.FC<EndpointOpenAPIProps> = ({
 
   const getEndpointResponse = (
     apiSpec: ApiSpecProperty,
-    response?: ApiSpecProperty
+    response?: ApiSpecProperty,
   ): EndpointVariableData[] | undefined => {
     if (!response) return;
-    if (response.type === "object")
+    if (response.type === 'object')
       return [
         {
           id: uuid(),
-          name: "response",
+          name: 'response',
           type: response.additionalProperties?.type,
           integerFormat: response.additionalProperties?.format,
         },
       ];
-    if (response.$ref || response.type === "array") return getEndpointSchema(apiSpec, response);
-    return [{ id: uuid(), name: "response", type: response.type }];
+    if (response.$ref || response.type === 'array') return getEndpointSchema(apiSpec, response);
+    return [{ id: uuid(), name: 'response', type: response.type }];
   };
 
   const parseSchemaProperty = (
     apiSpec: ApiSpecProperty,
-    schema: ApiSpecProperty
+    schema: ApiSpecProperty,
   ): EndpointVariableData[] | undefined => {
     if (!schema.properties) return;
 
@@ -91,25 +92,25 @@ const EndpointOpenAPI: React.FC<EndpointOpenAPIProps> = ({
         id: uuid(),
         name: variableName,
         required: false,
-        type: Object.keys(data).includes("$ref") ? "schema" : data.type,
+        type: Object.keys(data).includes('$ref') ? 'schema' : data.type,
       };
       variableData.description = data.description;
 
-      if (Object.keys(data).includes("$ref")) {
+      if (Object.keys(data).includes('$ref')) {
         const subSchema = getPropertySchema(apiSpec, data.$ref);
         const parsedSubSchema = parseSchemaProperty(apiSpec, subSchema);
         variableData.schemaData = parsedSubSchema;
       }
-      if (data.type === "array") {
-        if (!Object.keys(data.items).includes("$ref")) {
+      if (data.type === 'array') {
+        if (!Object.keys(data.items).includes('$ref')) {
           variableData.arrayType = data.items.type;
         } else {
-          variableData.arrayType = "schema";
+          variableData.arrayType = 'schema';
           variableData.arrayData = parseSchemaProperty(apiSpec, getPropertySchema(apiSpec, data.items.$ref));
         }
       }
-      if (Object.keys(data).includes("enum")) variableData.enum = data.enum;
-      if (data.type === "integer") variableData.integerFormat = data.format;
+      if (Object.keys(data).includes('enum')) variableData.enum = data.enum;
+      if (data.type === 'integer') variableData.integerFormat = data.format;
 
       result.push(variableData);
     });
@@ -124,7 +125,7 @@ const EndpointOpenAPI: React.FC<EndpointOpenAPIProps> = ({
   };
 
   const getPropertySchema = (apiSpec: ApiSpecProperty, propertyPath: string): ApiSpecProperty => {
-    const indices = propertyPath.split("/").slice(1);
+    const indices = propertyPath.split('/').slice(1);
     let schema = apiSpec;
     indices.forEach((indice) => (schema = schema[indice]));
     return schema;
@@ -157,38 +158,38 @@ const EndpointOpenAPI: React.FC<EndpointOpenAPIProps> = ({
       Object.entries(endpointData as ApiSpecProperty).forEach(([method, data]: [string, ApiSpecProperty]) => {
         const endpointUrl = url + path;
         const label = `${method.toUpperCase()} ${path}`;
-        if (!["get", "post"].includes(method.toLowerCase())) {
+        if (!['get', 'post'].includes(method.toLowerCase())) {
           paths.push({
             id: uuid(),
             label,
             path,
             url: endpointUrl,
             openApiUrl,
-            type: "openApi",
+            type: 'openApi',
             methodType: method,
             supported: true,
             isSelected: true,
-            dataType: "custom",
+            dataType: 'custom',
           });
           return;
         }
-        const body = getEndpointSchema(apiSpec, data.requestBody?.content["application/json"]?.schema);
+        const body = getEndpointSchema(apiSpec, data.requestBody?.content['application/json']?.schema);
         const params = getParams(data.parameters);
         const headers = undefined; // where to get headers ?
-        const response = getEndpointResponse(apiSpec, data.responses["200"]);
+        const response = getEndpointResponse(apiSpec, data.responses['200']);
 
         paths.push({
           id: uuid(),
           label,
           path,
-          type: "openApi",
+          type: 'openApi',
           methodType: method,
           supported: true,
           isSelected: true,
           description: data.summary ?? data.description,
           url: endpointUrl,
           openApiUrl,
-          dataType: "custom",
+          dataType: 'custom',
           body: body
             ? {
                 variables: body,
@@ -218,12 +219,12 @@ const EndpointOpenAPI: React.FC<EndpointOpenAPIProps> = ({
   };
 
   const checkNestedVariables = (variable: EndpointVariableData, data: RequestVariablesRowData[]) => {
-    const variableData = variable.type === "schema" ? variable.schemaData : variable.arrayData;
+    const variableData = variable.type === 'schema' ? variable.schemaData : variable.arrayData;
     if (variableData instanceof Array) {
       variableData.forEach((variableData) => {
         const updatedVariable = data.find((updated) => updated.endpointVariableId === variableData.id);
-        variableData[isLive ? "value" : "testValue"] = updatedVariable?.value;
-        if (["schema", "array"].includes(variableData.type)) {
+        variableData[isLive ? 'value' : 'testValue'] = updatedVariable?.value;
+        if (['schema', 'array'].includes(variableData.type)) {
           checkNestedVariables(variableData, data);
         }
       });
@@ -242,12 +243,12 @@ const EndpointOpenAPI: React.FC<EndpointOpenAPIProps> = ({
   return (
     <Track direction="vertical" align="stretch" gap={16}>
       <div>
-        <label htmlFor="endpointUrl">{t("newService.endpoint.url")}</label>
+        <label htmlFor="endpointUrl">{t('newService.endpoint.url')}</label>
         <Track gap={8}>
           <FormInput
             name="endpointUrl"
             label=""
-            placeholder={t("newService.endpoint.insert") ?? ""}
+            placeholder={t('newService.endpoint.insert') ?? ''}
             value={openApiUrl}
             onChange={(e) => setOpenApiUrl(e.target.value)}
           />
@@ -256,16 +257,16 @@ const EndpointOpenAPI: React.FC<EndpointOpenAPIProps> = ({
               fetchOpenApiSpecMock();
             }}
           >
-            {t("newService.endpoint.ask")}
+            {t('newService.endpoint.ask')}
           </Button>
         </Track>
       </div>
       {openApiEndpoints.length > 0 && (
         <div>
-          <label htmlFor="select-endpoint">{t("newService.endpoint.single")}</label>
+          <label htmlFor="select-endpoint">{t('newService.endpoint.single')}</label>
           <FormSelect
-            name={"select-endpoint"}
-            label={""}
+            name={'select-endpoint'}
+            label={''}
             defaultValue={selectedEndpoint?.label}
             options={openApiEndpoints.map((openApiEndpoint) => {
               return { label: openApiEndpoint.label, value: openApiEndpoint.label };
@@ -290,7 +291,7 @@ const EndpointOpenAPI: React.FC<EndpointOpenAPIProps> = ({
             />
           </>
         ) : (
-          <p>{t("newService.endpoint.unsupported")}</p>
+          <p>{t('newService.endpoint.unsupported')}</p>
         ))}
     </Track>
   );

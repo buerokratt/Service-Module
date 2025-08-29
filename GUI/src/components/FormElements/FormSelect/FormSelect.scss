@@ -1,7 +1,7 @@
-@import "src/styles/tools/spacing";
-@import "src/styles/tools/color";
-@import "src/styles/settings/variables/other";
-@import "src/styles/settings/variables/typography";
+@import 'src/styles/tools/spacing';
+@import 'src/styles/tools/color';
+@import 'src/styles/settings/variables/other';
+@import 'src/styles/settings/variables/typography';
 
 .select {
   $self: &;
@@ -45,7 +45,7 @@
       font-size: $veera-font-size-250;
     }
 
-    &[aria-expanded="true"] {
+    &[aria-expanded='true'] {
       border-color: get-color(sapphire-blue-10);
       border-radius: 4px 4px 0 0;
 
@@ -89,7 +89,7 @@
       color: get-color(black-coral-20);
     }
 
-    &[aria-selected="true"] {
+    &[aria-selected='true'] {
       background-color: get-color(sapphire-blue-10);
       color: get-color(white);
 

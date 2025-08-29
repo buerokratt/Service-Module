@@ -1,14 +1,14 @@
-import { Assign } from "types";
-import { DATE_CONSTANTS, HELPERS_CONSTANTS } from "utils/constants";
-import { stringToTemplate } from "utils/string-util";
-import { v4 } from "uuid";
+import { Assign } from 'types';
+import { DATE_CONSTANTS, HELPERS_CONSTANTS } from 'utils/constants';
+import { stringToTemplate } from 'utils/string-util';
+import { v4 } from 'uuid';
 
 const createTemplate = (
   id: string,
   key: string,
   value: string,
   tooltip: string | undefined = undefined,
-  valueFormat: "plain" | "formatted" = "formatted"
+  valueFormat: 'plain' | 'formatted' = 'formatted',
 ): Assign => ({
   id,
   key,
@@ -16,8 +16,8 @@ const createTemplate = (
   tooltip,
 });
 
-const datesTrPath = "serviceFlow.previousVariables.dates";
-const helpersTrPath = "serviceFlow.previousVariables.helpers";
+const datesTrPath = 'serviceFlow.previousVariables.dates';
+const helpersTrPath = 'serviceFlow.previousVariables.helpers';
 
 export const datesVariables: Assign[] = [
   createTemplate(v4(), `${datesTrPath}.currentDate`, DATE_CONSTANTS.TODAY),
@@ -45,6 +45,6 @@ export const helperVariables: Assign[] = [
 ];
 
 export const environmentVariables: Assign[] = [
-  createTemplate(v4(), "XTR", "[#XTR]", undefined, 'plain'),
-  createTemplate(v4(), "Open Search", "[#OPENSEARCH]", undefined, 'plain'),
+  createTemplate(v4(), 'XTR', '[#XTR]', undefined, 'plain'),
+  createTemplate(v4(), 'Open Search', '[#OPENSEARCH]', undefined, 'plain'),
 ];

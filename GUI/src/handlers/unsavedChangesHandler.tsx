@@ -1,5 +1,5 @@
-import { useEffect } from "react";
-import useServiceStore from "store/new-services.store";
+import { useEffect } from 'react';
+import useServiceStore from 'store/new-services.store';
 
 export function UnsavedChangesHandler() {
   const hasUnsavedChanges = useServiceStore((state) => state.hasUnsavedChanges);
@@ -11,9 +11,9 @@ export function UnsavedChangesHandler() {
       }
     };
 
-    window.addEventListener("beforeunload", handleBeforeUnload);
+    window.addEventListener('beforeunload', handleBeforeUnload);
     return () => {
-      window.removeEventListener("beforeunload", handleBeforeUnload);
+      window.removeEventListener('beforeunload', handleBeforeUnload);
     };
   }, [hasUnsavedChanges]);
 

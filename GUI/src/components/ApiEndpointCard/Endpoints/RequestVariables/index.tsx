@@ -1,23 +1,24 @@
-import React, { useEffect, useMemo, useState } from "react";
-import { useTranslation } from "react-i18next";
-import { Button, FormTextarea, SwitchBox, Track } from "../../..";
-import * as Tabs from "@radix-ui/react-tabs";
-import DataTable from "../../../DataTable";
-import { RequestTab } from "../../../../types";
+import * as Tabs from '@radix-ui/react-tabs';
+import { PaginationState, SortingState } from '@tanstack/react-table';
+import React, { useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import useServiceStore from 'store/new-services.store';
+
+import { getColumns } from './columns';
+import { Button, FormTextarea, SwitchBox, Track } from '../../..';
+import { RequestTab } from '../../../../types';
 import {
   EndpointData,
   EndpointTab,
   EndpointVariableData,
   PreDefinedEndpointEnvVariables,
-} from "../../../../types/endpoint";
+} from '../../../../types/endpoint';
 import {
-  RequestVariablesTabsRowsData,
-  RequestVariablesTabsRawData,
   RequestVariablesRowData,
-} from "../../../../types/request-variables";
-import useServiceStore from "store/new-services.store";
-import { getColumns } from "./columns";
-import { PaginationState, SortingState } from "@tanstack/react-table";
+  RequestVariablesTabsRawData,
+  RequestVariablesTabsRowsData,
+} from '../../../../types/request-variables';
+import DataTable from '../../../DataTable';
 
 type RequestVariablesProps = {
   disableRawData?: boolean;
@@ -60,7 +61,7 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
       required: data.required ?? false,
       variable: data.name,
       value,
-      isNameEditable: data.type === "custom",
+      isNameEditable: data.type === 'custom',
       type: data.type,
       description: data.description,
       arrayType: data.arrayType,
@@ -77,13 +78,13 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
         let rowIdx = 0;
         endpointData[tab].variables.forEach((variable) => {
           rows.push(constructRow(rowIdx, variable, 0));
-          if (["schema", "array"].includes(variable.type)) {
+          if (['schema', 'array'].includes(variable.type)) {
             rowIdx = getRowsFromNestedSchema(variable, rowIdx, rows, 1);
           }
           rowIdx++;
         });
       }
-      if (rows.length === 0 || endpointData.type === "custom") {
+      if (rows.length === 0 || endpointData.type === 'custom') {
         rows.push({
           id: `${rows.length}`,
           required: false,
@@ -99,15 +100,15 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
     variable: EndpointVariableData,
     oldRowIdx: number,
     rows: RequestVariablesRowData[],
-    nestedLevel: number
+    nestedLevel: number,
   ): number => {
     let rowIdx = oldRowIdx;
-    const variableData = variable.type === "schema" ? variable.schemaData : variable.arrayData;
+    const variableData = variable.type === 'schema' ? variable.schemaData : variable.arrayData;
     if (variableData instanceof Array) {
       variableData.forEach((data) => {
         rowIdx++;
         rows.push(constructRow(rowIdx, data, nestedLevel));
-        if (["schema", "array"].includes(data.type)) {
+        if (['schema', 'array'].includes(data.type)) {
           rowIdx = getRowsFromNestedSchema(data, rowIdx, rows, nestedLevel + 1);
         }
       });
@@ -128,18 +129,18 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
     return tabs.reduce((tabsRawData, tab) => {
       const endpointData = endpoint.definitions[0];
       if (!endpointData || !endpointData[tab]) return tabsRawData;
-      return { ...tabsRawData, [tab]: endpointData[tab]?.rawData[isLive ? "value" : "testValue"] ?? "" };
+      return { ...tabsRawData, [tab]: endpointData[tab]?.rawData[isLive ? 'value' : 'testValue'] ?? '' };
     }, {});
   };
   const [rowsData, setRowsData] = useState<RequestVariablesTabsRowsData>(getTabsRowsData());
   const [tabRawData, setTabRawData] = useState<RequestVariablesTabsRawData>(getInitialTabsRawData());
 
   const getTabTriggerClasses = (tab: EndpointTab) =>
-    `endpoint-tab-group__tab-btn ${requestTab.tab === tab ? "active" : ""}`;
+    `endpoint-tab-group__tab-btn ${requestTab.tab === tab ? 'active' : ''}`;
 
   const maintainSingleEmptyRow = (rows: RequestVariablesRowData[]) => {
-    const emptyRow = rows.find(row => row.value === undefined && row.variable === undefined);
-    const nonEmptyRows = rows.filter(row => row.value !== undefined || row.variable !== undefined);
+    const emptyRow = rows.find((row) => row.value === undefined && row.variable === undefined);
+    const nonEmptyRows = rows.filter((row) => row.value !== undefined || row.variable !== undefined);
 
     const baseEmptyRow: RequestVariablesRowData = {
       id: nonEmptyRows.length.toString(),
@@ -148,15 +149,10 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
       nestedLevel: 0,
     };
 
-    return [
-      ...nonEmptyRows,
-      emptyRow
-        ? { ...baseEmptyRow, ...emptyRow }
-        : baseEmptyRow,
-    ];
+    return [...nonEmptyRows, emptyRow ? { ...baseEmptyRow, ...emptyRow } : baseEmptyRow];
   };
 
-  const updateRowField = (id: string, field: "variable" | "value", newValue: string) => {
+  const updateRowField = (id: string, field: 'variable' | 'value', newValue: string) => {
     setRowsData((prevRowsData) => {
       const newRowsData = { ...prevRowsData };
       newRowsData[requestTab.tab] = [...(newRowsData[requestTab.tab] || [])];
@@ -166,37 +162,37 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
         row[field] = newValue;
       });
 
-      if (endpoint.type === "custom") {
+      if (endpoint.type === 'custom') {
         newRowsData[requestTab.tab] = maintainSingleEmptyRow(newRowsData[requestTab.tab] || []);
       }
       updateEndpointData(newRowsData, endpoint);
-      if (requestTab.tab === "params")
+      if (requestTab.tab === 'params')
         onParametersChange(
           newRowsData[requestTab.tab]
             ?.filter((row) => row.value && row.variable)
             .map((row) => ({
               id: row.endpointVariableId ?? row.id,
               name: row.variable!,
-              type: row.type ?? "custom",
+              type: row.type ?? 'custom',
               required: row.required ?? false,
               value: row.value!,
-            })) ?? []
+            })) ?? [],
         );
       return newRowsData;
     });
   };
 
   const checkNestedVariables = (rowVariableId: string, variable: EndpointVariableData) => {
-    const variableData = variable.type === "schema" ? variable.schemaData : variable.arrayData;
+    const variableData = variable.type === 'schema' ? variable.schemaData : variable.arrayData;
     if (variableData instanceof Array) {
       if (rowVariableId && variableData.map((v) => v.id).includes(rowVariableId)) {
-        variable[variable.type === "schema" ? "schemaData" : "arrayData"] = variableData.filter(
-          (v) => v.id !== rowVariableId
+        variable[variable.type === 'schema' ? 'schemaData' : 'arrayData'] = variableData.filter(
+          (v) => v.id !== rowVariableId,
         );
         return;
       }
       variableData.forEach((v) => {
-        if (["schema", "array"].includes(v.type)) {
+        if (['schema', 'array'].includes(v.type)) {
           checkNestedVariables(rowVariableId, v);
         }
       });
@@ -214,12 +210,12 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
         endpointTab.variables = endpointTab.variables.filter((v) => v.id !== rowData.endpointVariableId);
       } else {
         endpointTab.variables
-          .filter((variable) => ["schema", "array"].includes(variable.type))
+          .filter((variable) => ['schema', 'array'].includes(variable.type))
           .forEach((variable) => checkNestedVariables(rowData.endpointVariableId!, variable));
       }
     }
-    
-    if (requestTab.tab === "params") {
+
+    if (requestTab.tab === 'params') {
       onParametersChange(endpointTab?.variables ?? []);
     }
     setDeletedVariable(rowData);
@@ -244,21 +240,21 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
       const newVariable: EndpointVariableData = {
         id: row.endpointVariableId ?? row.id,
         name: row.variable,
-        type: row.type ?? "custom",
+        type: row.type ?? 'custom',
         required: row.required ?? false,
         value: row.value,
       };
       variables.push(newVariable);
     });
 
-    if (requestTab.tab === "params") {
+    if (requestTab.tab === 'params') {
       onParametersChange(variables);
-    } else if (requestTab.tab === "body") {
+    } else if (requestTab.tab === 'body') {
       endpoint.definitions[0].body = {
         variables: variables,
         rawData: {},
       };
-    } else if (requestTab.tab === "headers") {
+    } else if (requestTab.tab === 'headers') {
       endpoint.definitions[0].headers = {
         variables: variables,
         rawData: {},
@@ -279,20 +275,20 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
         isLive,
         getTabsRowsData,
       }),
-    [deletedVariable]
+    [deletedVariable],
   );
 
   const buildRawDataView = (): JSX.Element => {
     return (
       <>
-        <Track justify="between" style={{ padding: "8px 0 8px 0" }}>
-          <p style={{ color: "#d73e3e" }}>{jsonError}</p>
+        <Track justify="between" style={{ padding: '8px 0 8px 0' }}>
+          <p style={{ color: '#d73e3e' }}>{jsonError}</p>
           <Button
             appearance="text"
             onMouseDown={() => {
               setTabRawData((prevRawData) => {
                 try {
-                  const content = prevRawData[requestTab.tab] ?? "";
+                  const content = prevRawData[requestTab.tab] ?? '';
                   prevRawData[requestTab.tab] = JSON.stringify(JSON.parse(content), null, 4);
                 } catch (e: any) {
                   setJsonError(`Unable to format JSON. ${e.message}`);
@@ -302,13 +298,13 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
               setKey(key + 1);
             }}
           >
-            {t("newService.endpoint.formatJson")}
+            {t('newService.endpoint.formatJson')}
           </Button>
         </Track>
         <FormTextarea
           key={`${requestTab.tab}-raw-data`}
           name={`${requestTab.tab}-raw-data`}
-          label={""}
+          label={''}
           defaultValue={tabRawData[requestTab.tab]}
           onBlur={() => updateEndpointRawData(tabRawData, endpoint)}
           onChange={(event) => {
@@ -333,7 +329,7 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
       className="endpoint-tab-group"
       key={key}
     >
-      <Track justify="between" style={{ borderBottom: "solid 1px #5d6071" }}>
+      <Track justify="between" style={{ borderBottom: 'solid 1px #5d6071' }}>
         <Tabs.List className="endpoint-tab-group__list" aria-label="environment">
           {Object.keys(rowsData).map((tab) => {
             return (
@@ -346,9 +342,9 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
         {!disableRawData && (
           <Track style={{ paddingRight: 16 }} gap={8}>
             <SwitchBox
-              style={{ width: "fit-content" }}
-              label={""}
-              name={"raw-data"}
+              style={{ width: 'fit-content' }}
+              label={''}
+              name={'raw-data'}
               checked={requestTab.showRawData}
               onCheckedChange={(checked) => {
                 setRequestTab((rt) => {
@@ -358,7 +354,7 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
                 setKey(key + 1);
               }}
             />
-            <p style={{ whiteSpace: "nowrap", color: "#34394C" }}>Raw data</p>
+            <p style={{ whiteSpace: 'nowrap', color: '#34394C' }}>Raw data</p>
           </Track>
         )}
       </Track>
@@ -377,7 +373,7 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
                 pagination={pagination}
                 sorting={sorting}
               />
-              <hr style={{ margin: 0, borderTop: "1px solid #D2D3D8" }} />
+              <hr style={{ margin: 0, borderTop: '1px solid #D2D3D8' }} />
             </>
           )}
         </Tabs.Content>

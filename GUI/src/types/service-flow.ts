@@ -1,8 +1,9 @@
-import { DynamicChoices } from "./dynamic-choices";
-import { EndpointData } from "./endpoint";
-import { MultiChoiceQuestion } from "./multi-choice-question";
-import { StepType } from "./step-type.enum";
-import { Edge, Node } from "@xyflow/react";
+import { Edge, Node } from '@xyflow/react';
+
+import { DynamicChoices } from './dynamic-choices';
+import { EndpointData } from './endpoint';
+import { MultiChoiceQuestion } from './multi-choice-question';
+import { StepType } from './step-type.enum';
 
 export const GRID_UNIT = 16;
 export const EDGE_LENGTH = 5 * GRID_UNIT;
@@ -27,35 +28,35 @@ export type NodeDataProps = {
   multiChoiceQuestion?: MultiChoiceQuestion;
   dynamicChoices?: DynamicChoices;
   childrenCount?: number;
-  endpoint?: EndpointData
+  endpoint?: EndpointData;
 };
 
 export const initialNodes: Node[] = [
   {
     id: startNodeId,
-    type: "start",
+    type: 'start',
     position: {
       x: 0,
       y: 0,
     },
     data: {
-      type: "start",
+      type: 'start',
     },
-    className: "start",
+    className: 'start',
     selectable: false,
     draggable: false,
   },
   {
     id: ghostNodeId,
-    type: "ghost",
+    type: 'ghost',
     position: {
       x: 0,
       y: 150,
     },
     data: {
-      type: "ghost",
+      type: 'ghost',
     },
-    className: "ghost",
+    className: 'ghost',
     selectable: false,
     draggable: false,
   },
@@ -63,7 +64,7 @@ export const initialNodes: Node[] = [
 
 export const initialEdges: Edge[] = [
   {
-    type: "step",
+    type: 'step',
     id: `edge-${startNodeId}-${ghostNodeId}`,
     source: startNodeId,
     target: ghostNodeId,

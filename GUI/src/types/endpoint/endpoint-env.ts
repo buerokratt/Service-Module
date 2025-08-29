@@ -1,4 +1,4 @@
 export enum EndpointEnv {
-  Live = "live",
-  Test = "test",
+  Live = 'live',
+  Test = 'test',
 }

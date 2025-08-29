@@ -1,30 +1,30 @@
-import React, { CSSProperties, FC, ReactNode, useId } from "react";
+import { RankingInfo, rankItem } from '@tanstack/match-sorter-utils';
 import {
   ColumnDef,
-  useReactTable,
-  getCoreRowModel,
-  flexRender,
-  getSortedRowModel,
-  SortingState,
+  ColumnFiltersState,
   FilterFn,
+  flexRender,
+  getCoreRowModel,
   getFilteredRowModel,
-  VisibilityState,
   getPaginationRowModel,
+  getSortedRowModel,
   PaginationState,
-  TableMeta,
   Row,
   RowData,
-  ColumnFiltersState,
-} from "@tanstack/react-table";
-import { RankingInfo, rankItem } from "@tanstack/match-sorter-utils";
-import { MdUnfoldMore, MdExpandMore, MdExpandLess, MdOutlineEast, MdOutlineWest } from "react-icons/md";
-import clsx from "clsx";
-import { Link } from "react-router-dom";
-import { useTranslation } from "react-i18next";
+  SortingState,
+  TableMeta,
+  useReactTable,
+  VisibilityState,
+} from '@tanstack/react-table';
+import clsx from 'clsx';
+import { Icon, Track } from 'components';
+import React, { CSSProperties, FC, ReactNode, useId } from 'react';
+import { useTranslation } from 'react-i18next';
+import { MdExpandLess, MdExpandMore, MdOutlineEast, MdOutlineWest, MdUnfoldMore } from 'react-icons/md';
+import { Link } from 'react-router-dom';
 
-import { Icon, Track } from "components";
-import Filter from "./Filter";
-import "./DataTable.scss";
+import Filter from './Filter';
+import './DataTable.scss';
 
 type DataTableProps = {
   data: any;
@@ -54,7 +54,7 @@ type ColumnMeta = {
   };
 };
 
-declare module "@tanstack/table-core" {
+declare module '@tanstack/table-core' {
   interface FilterFns {
     fuzzy: FilterFn<unknown>;
   }
@@ -64,7 +64,7 @@ declare module "@tanstack/table-core" {
   }
 }
 
-declare module "@tanstack/react-table" {
+declare module '@tanstack/react-table' {
   interface TableMeta<TData extends RowData> {
     getRowStyles: (row: Row<TData>) => CSSProperties;
   }
@@ -123,18 +123,18 @@ const DataTable: FC<DataTableProps> = ({
     },
     meta,
     onColumnFiltersChange: (updater) => {
-      if (typeof updater !== "function") return;
+      if (typeof updater !== 'function') return;
       setFiltering?.(updater(table.getState().columnFilters));
     },
     onGlobalFilterChange: setGlobalFilter,
     onColumnVisibilityChange: setColumnVisibility,
     globalFilterFn: fuzzyFilter,
     onSortingChange: (updater) => {
-      if (typeof updater !== "function") return;
+      if (typeof updater !== 'function') return;
       setSorting?.(updater(table.getState().sorting));
     },
     onPaginationChange: (updater) => {
-      if (typeof updater !== "function") return;
+      if (typeof updater !== 'function') return;
       setPagination?.(updater(table.getState().pagination));
     },
     getCoreRowModel: getCoreRowModel(),
@@ -196,7 +196,7 @@ const DataTable: FC<DataTableProps> = ({
               <button className="previous" onClick={() => table.previousPage()} disabled={!table.getCanPreviousPage()}>
                 <MdOutlineWest />
               </button>
-              <nav role="navigation" aria-label={t("global.paginationNavigation") ?? ""}>
+              <nav role="navigation" aria-label={t('global.paginationNavigation') ?? ''}>
                 <ul className="links">
                   {[...Array(table.getPageCount())].map((_, index) => (
                     <li
@@ -206,7 +206,7 @@ const DataTable: FC<DataTableProps> = ({
                       <Link
                         to={`?page=${index + 1}`}
                         onClick={() => table.setPageIndex(index)}
-                        aria-label={t("global.gotoPage") + index}
+                        aria-label={t('global.gotoPage') + index}
                         aria-current={table.getState().pagination.pageIndex === index}
                       >
                         {index + 1}
@@ -227,7 +227,7 @@ const DataTable: FC<DataTableProps> = ({
             </div>
           )}
           <div className="data-table__page-size">
-            <label htmlFor={id}>{t("global.resultCount")}</label>
+            <label htmlFor={id}>{t('global.resultCount')}</label>
             <select
               id={id}
               value={table.getState().pagination.pageSize}

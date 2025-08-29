@@ -1,8 +1,8 @@
-@import "src/styles/tools/spacing";
-@import "src/styles/tools/color";
-@import "src/styles/settings/variables/other";
-@import "src/styles/settings/variables/typography";
-@import "src/styles/settings/mixins";
+@import 'src/styles/tools/spacing';
+@import 'src/styles/tools/color';
+@import 'src/styles/settings/variables/other';
+@import 'src/styles/settings/variables/typography';
+@import 'src/styles/settings/mixins';
 
 .yellow-tag {
   padding: 0 0.3rem;
@@ -174,7 +174,7 @@ li:not(:has(> div > div)) .object-tree-chip {
 .object-tree-checkbox {
   @include veera-checkbox;
 
-  input[type="checkbox"] {
+  input[type='checkbox'] {
     + label {
       display: inline;
       padding-left: 25px;

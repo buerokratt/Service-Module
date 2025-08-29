@@ -1,9 +1,9 @@
-import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
-import Icon from "components/Icon";
-import Track from "components/Track";
-import { FC, PropsWithChildren } from "react";
-import { MdOutlineClose } from "react-icons/md";
-import "./Dropdown.scss";
+import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
+import Icon from 'components/Icon';
+import Track from 'components/Track';
+import { FC, PropsWithChildren } from 'react';
+import { MdOutlineClose } from 'react-icons/md';
+import './Dropdown.scss';
 
 type DropdownProps = PropsWithChildren<{
   open?: boolean;
