@@ -463,7 +463,16 @@
     "ROLE_UNAUTHENTICATED": "Unauthenticated"
   },
   "chat": {
-    "service-test-error": "Service test error",
+    "service-test-error": {
+      "title": "Service test error",
+      "dslName": "Service file",
+      "stepName": "Step",
+      "causeCode": "Cause",
+      "causeUnknown": "Unknown",
+      "causeNull": "Null found in DSL",
+      "causeScript": "Generic scripting engine error",
+      "message": "Error message"
+    },
     "service-test-success": "Service test successful",
     "title": "TEST",
     "input-placeholder": "Enter your message...",

@@ -1,4 +1,5 @@
 import { runServiceTest } from 'services/service-tester';
+import { ServiceTestError } from 'types/service-test-error';
 import { v4 as uuid } from 'uuid';
 import { create } from 'zustand';
 
@@ -24,7 +25,7 @@ interface TestServiceStoreState {
   addUserMessage: (message: string) => void;
   addBotMessage: (message: string, payload?: string) => void;
   pushMessage: (message: string, author: TestingMessageAuthor, type?: TestingMessageType, payload?: any) => void;
-  addError: (error: string) => void;
+  addError: (error: string, payload?: ServiceTestError) => void;
   addInfo: (info: string, payload?: any) => void;
   addSuccess: (succes: string) => void;
   reset: () => void;
@@ -64,7 +65,7 @@ const useTestServiceStore = create<TestServiceStoreState>((set, get) => ({
       chat: [...get().chat, msg],
     });
   },
-  addError: (error) => get().pushMessage(error, 'system', 'error'),
+  addError: (error, payload) => get().pushMessage(error, 'system', 'error', payload),
   addInfo: (info, payload) => get().pushMessage(info, 'system', 'info', payload),
   addSuccess: (success) => get().pushMessage(success, 'system', 'success'),
   reset: () => {

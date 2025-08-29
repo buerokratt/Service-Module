@@ -1,16 +1,10 @@
 import { testService } from 'resources/api-constants';
 import useServiceStore from 'store/new-services.store';
 import useTestServiceStore from 'store/test-services.store';
+import { ServiceTestError } from 'types/service-test-error';
 import { removeTrailingUnderscores } from 'utils/string-util';
 
 import { createApiInstance } from './api';
-
-interface ServiceTestErrorResponse {
-  dslName: string;
-  stepName: string;
-  causeCode: string;
-  message: string;
-}
 
 export const runServiceTest = async (input: string) => {
   const store = useTestServiceStore.getState();
@@ -23,6 +17,10 @@ export const runServiceTest = async (input: string) => {
     console.error('runServiceTest: Service state is not set, not testing.');
     return;
   }
+
+  // todo display proper error message
+  // todo failing node highlight
+  // todo style and text
 
   try {
     const testApi = createApiInstance({
@@ -37,8 +35,8 @@ export const runServiceTest = async (input: string) => {
     if (hasResponseData(error)) {
       const errorData = error.response.data;
       if (isErrorResponse(errorData)) {
-        console.error('runServiceTest: Service test error:', errorData.message);
-        store.addError('chat.service-test-error');
+        console.error('runServiceTest: Service test error:', errorData);
+        store.addError('chat.service-test-error.title', errorData);
       } else {
         console.error('runServiceTest: Unknown error response format:', errorData);
         store.addError('chat.unknown-error');
@@ -50,7 +48,7 @@ export const runServiceTest = async (input: string) => {
   }
 };
 
-function isErrorResponse(response: unknown): response is ServiceTestErrorResponse {
+function isErrorResponse(response: unknown): response is ServiceTestError {
   return typeof response === 'object' && response !== null && 'causeCode' in response && 'message' in response;
 }
 

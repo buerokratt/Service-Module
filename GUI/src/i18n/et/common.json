@@ -464,7 +464,16 @@
     "ROLE_UNAUTHENTICATED": "Autentimata"
   },
   "chat": {
-    "service-test-error": "Teenuse testimise viga",
+    "service-test-error": {
+      "title": "Teenuse testimise viga",
+      "dslName": "Teenuse fail",
+      "stepName": "Samm",
+      "causeCode": "Põhjus",
+      "causeUnknown": "Tundmatu",
+      "causeNull": "Null leitud DSL-is",
+      "causeScript": "Üldine skriptimise viga",
+      "message": "Veateade"
+    },
     "service-test-success": "Teenuse test on edukas",
     "title": "TEST",
     "input-placeholder": "Kirjutage oma sõnum...",
