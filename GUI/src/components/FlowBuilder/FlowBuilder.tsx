@@ -1,4 +1,4 @@
-import React, { FC, useCallback } from "react";
+import { FC, useCallback } from "react";
 import { ReactFlow, Background, Controls, Edge, MiniMap, Node, useReactFlow } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import useServiceStore from "store/new-services.store";
@@ -9,6 +9,7 @@ import { useOnNodesDelete } from "hooks/flow/useOnNodeDelete";
 import { Button, Modal, Track } from "components";
 import { useTranslation } from "react-i18next";
 import { StepType } from "types";
+import Chat from "components/chat/chat";
 
 type FlowBuilderProps = {
   nodes: Node[];
@@ -31,7 +32,7 @@ const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
     setDeletedNodes,
     setNodeToDelete,
   } = useOnNodesDelete();
-    const { setHasUnsavedChanges } = useServiceStore();
+  const { setHasUnsavedChanges } = useServiceStore();
 
   const onConnect = useCallback(({ source, target }: any) => {
     const nodes = getNodes();
@@ -79,9 +80,13 @@ const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
           }
         }
 
-        if (nodesToDelete.length === 0 || 
-          ![StepType.MultiChoiceQuestion, StepType.Condition, StepType.Input]
-            .includes(nodesToDelete[0]?.data.stepType as StepType)) return true;
+        if (
+          nodesToDelete.length === 0 ||
+          ![StepType.MultiChoiceQuestion, StepType.Condition, StepType.Input].includes(
+            nodesToDelete[0]?.data.stepType as StepType,
+          )
+        )
+          return true;
 
         const shouldPreventDelete = hasConnectedNodes(nodesToDelete[0].id);
         if (shouldPreventDelete) {
@@ -94,7 +99,7 @@ const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
         return true;
       }
     },
-    [hasConnectedNodes]
+    [hasConnectedNodes],
   );
 
   return (
@@ -129,15 +134,19 @@ const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
         isValidConnection={isValidConnection}
         defaultEdgeOptions={{ type: "step", deletable: false }}
       >
+        <Chat />
         <MiniMap />
         <Background color="#D2D3D8" gap={16} lineWidth={9} />
         <Controls orientation="horizontal" showInteractive={false} />
       </ReactFlow>
       {isDeleteConnectionsModalVisible && (
-        <Modal title={t("overview.popup.deleteNodeConnections")} onClose={() => {
-          setNodeToDelete(null);
-          setIsDeleteConnectionsModalVisible(false);
-        }}>
+        <Modal
+          title={t("overview.popup.deleteNodeConnections")}
+          onClose={() => {
+            setNodeToDelete(null);
+            setIsDeleteConnectionsModalVisible(false);
+          }}
+        >
           <Track justify="end" gap={16}>
             <Button appearance="primary" onClick={onDeleteConfirmed}>
               {t("global.delete")}
