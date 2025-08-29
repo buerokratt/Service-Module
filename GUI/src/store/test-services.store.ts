@@ -76,9 +76,10 @@ const useTestServiceStore = create<TestServiceStoreState>((set, get) => ({
     console.log(errorTranslation);
     const payloadRecord = payload
       ? Object.fromEntries(
-          Object.entries({
-            ...payload,
-          }).map(([key, value]) => [errorTranslation[key as keyof typeof errorTranslation], value]),
+          Object.entries(payload).map(([key, value]) => [
+            errorTranslation[key as keyof typeof errorTranslation],
+            value,
+          ]),
         )
       : undefined;
     get().pushMessage(error, 'system', 'error', payloadRecord);
