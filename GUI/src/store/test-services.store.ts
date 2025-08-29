@@ -77,10 +77,7 @@ const useTestServiceStore = create<TestServiceStoreState>((set, get) => ({
     const payloadRecord = payload
       ? Object.fromEntries(
           Object.entries({
-            dslName: payload.dslName,
-            stepName: payload.stepName,
-            causeCode: payload.causeCode,
-            message: payload.message,
+            ...payload,
           }).map(([key, value]) => [errorTranslation[key as keyof typeof errorTranslation], value]),
         )
       : undefined;
