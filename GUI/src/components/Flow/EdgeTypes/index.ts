@@ -1,4 +1,4 @@
-import CustomEdge from "./CustomEdge";
+import CustomEdge from './CustomEdge';
 
 export const edgeTypes = {
   step: CustomEdge,

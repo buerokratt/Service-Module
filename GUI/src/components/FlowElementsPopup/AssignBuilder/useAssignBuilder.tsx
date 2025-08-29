@@ -1,6 +1,7 @@
-import { useEffect, useState } from "react";
-import { Assign } from "../../../types/assign";
-import { v4 as uuidv4 } from "uuid";
+import { useEffect, useState } from 'react';
+import { v4 as uuidv4 } from 'uuid';
+
+import { Assign } from '../../../types/assign';
 
 interface UseAssignBuilderProps {
   onChange: (group: Assign[]) => void;
@@ -10,8 +11,8 @@ interface UseAssignBuilderProps {
 export const createNewElement = () => {
   return {
     id: uuidv4(),
-    key: "",
-    value: "",
+    key: '',
+    value: '',
   };
 };
 

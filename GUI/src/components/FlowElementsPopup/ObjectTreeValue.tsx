@@ -1,8 +1,8 @@
-import { FC } from "react";
-import { KeyPath } from "react-json-tree";
-import { useTranslation } from "react-i18next";
-import { getKeyPathString } from "utils/object-util";
-import "./styles.scss";
+import { FC } from 'react';
+import { useTranslation } from 'react-i18next';
+import { KeyPath } from 'react-json-tree';
+import { getKeyPathString } from 'utils/object-util';
+import './styles.scss';
 
 const round = (n: number) => {
   return Math.round((n + Number.EPSILON) * 100) / 100;
@@ -33,7 +33,7 @@ export const ObjectTreeValue: FC<ObjectTreeValueProps> = ({ rawValue, keyPath, r
     });
   };
 
-  if (typeof rawValue === "number" && !Number.isInteger(rawValue)) {
+  if (typeof rawValue === 'number' && !Number.isInteger(rawValue)) {
     return (
       <span className="object-tree-checkbox">
         <input
@@ -41,7 +41,7 @@ export const ObjectTreeValue: FC<ObjectTreeValueProps> = ({ rawValue, keyPath, r
           type="checkbox"
           onClick={(e) => toggleRounding(keyPath, rawValue, (e.target as HTMLInputElement).checked)}
         />
-        <label htmlFor={key}>{t("serviceFlow.popup.round")}</label>
+        <label htmlFor={key}>{t('serviceFlow.popup.round')}</label>
         <span>{roundedValues.has(key) ? round(rawValue).toFixed(2) : rawValue}</span>
       </span>
     );

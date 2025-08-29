@@ -1,7 +1,7 @@
-@import "src/styles/tools/spacing";
-@import "src/styles/tools/color";
-@import "src/styles/settings/variables/other";
-@import "src/styles/settings/variables/typography";
+@import 'src/styles/tools/spacing';
+@import 'src/styles/tools/color';
+@import 'src/styles/settings/variables/other';
+@import 'src/styles/settings/variables/typography';
 
 .collapsible {
   border: 1px solid get-color(black-coral-2);
@@ -16,7 +16,7 @@
     background-color: get-color(extra-light);
     border-radius: 4px;
 
-    &[aria-expanded="true"] {
+    &[aria-expanded='true'] {
       border-bottom: 1px solid get-color(black-coral-2);
       border-radius: 4px 4px 0 0;
     }
