@@ -36,7 +36,6 @@ const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
 
   const onConnect = useCallback(
     ({ source, target }: any) => {
-      console.log('onConnect');
       const nodes = getNodes();
       const edges = getEdges();
 
@@ -74,14 +73,13 @@ const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
   }, []);
 
   const onBeforeDelete = useCallback(
-    async ({ nodes: nodesToDelete, edges: edgesToDelete }: { nodes: Node[]; edges: Edge[] }) => {
+    ({ nodes: nodesToDelete, edges: edgesToDelete }: { nodes: Node[]; edges: Edge[] }) => {
       setDeletedNodes(null);
-      console.log('onBeforeDelete');
       try {
         if (edgesToDelete.length > 0 && nodesToDelete.length === 0) {
           const shouldPreventDelete = getNode(edgesToDelete[0].source)?.data.stepType === StepType.MultiChoiceQuestion;
           if (shouldPreventDelete) {
-            return false;
+            return Promise.resolve(false);
           }
         }
 
@@ -91,17 +89,17 @@ const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
             nodesToDelete[0]?.data.stepType as StepType,
           )
         )
-          return true;
+          return Promise.resolve(true);
 
         const shouldPreventDelete = hasConnectedNodes(nodesToDelete[0].id);
         if (shouldPreventDelete) {
           setDeletedNodes(nodesToDelete);
           setIsDeleteConnectionsModalVisible(true);
         }
-        return !shouldPreventDelete;
+        return Promise.resolve(!shouldPreventDelete);
       } catch (error) {
         console.error('Error in onBeforeDelete:', error);
-        return true;
+        return Promise.resolve(true);
       }
     },
     [getNode, hasConnectedNodes, setDeletedNodes, setIsDeleteConnectionsModalVisible],
