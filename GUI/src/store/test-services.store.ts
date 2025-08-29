@@ -1,3 +1,4 @@
+import { t } from 'i18next';
 import { runServiceTest } from 'services/service-tester';
 import { ServiceTestError } from 'types/service-test-error';
 import { v4 as uuid } from 'uuid';
@@ -71,13 +72,17 @@ const useTestServiceStore = create<TestServiceStoreState>((set, get) => ({
     });
   },
   addError: (error, payload) => {
+    const errorTranslation = t('chat.service-test-error', { returnObjects: true });
+    console.log(errorTranslation);
     const payloadRecord = payload
-      ? {
-          dslName: payload.dslName,
-          stepName: payload.stepName,
-          causeCode: payload.causeCode,
-          message: payload.message,
-        }
+      ? Object.fromEntries(
+          Object.entries({
+            dslName: payload.dslName,
+            stepName: payload.stepName,
+            causeCode: payload.causeCode,
+            message: payload.message,
+          }).map(([key, value]) => [errorTranslation[key as keyof typeof errorTranslation], value]),
+        )
       : undefined;
     get().pushMessage(error, 'system', 'error', payloadRecord);
   },
