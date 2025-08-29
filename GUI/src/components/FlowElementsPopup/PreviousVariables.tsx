@@ -5,21 +5,16 @@ import { useTranslation } from 'react-i18next';
 import { datesVariables, environmentVariables, helperVariables } from 'resources/variables-constants';
 import { StepType } from 'types';
 import { EndpointResponseVariable } from 'types/endpoint/endpoint-response-variables';
+import { NodeDataProps } from 'types/service-flow';
+import { getHelperTooltips } from 'utils/constants';
+import { getTypeColor, isObject } from 'utils/object-util';
 import { stringToTemplate, templateToString } from 'utils/string-util';
-
 import { v4 } from 'uuid';
+
 import { ObjectTree } from './ObjectTree';
 import useServiceStore from '../../store/new-services.store';
-
 import { Assign } from '../../types/assign';
-
-import { getTypeColor, isObject } from 'utils/object-util';
-
 import Tooltip from '../Tooltip';
-
-import { getHelperTooltips } from 'utils/constants';
-import { NodeDataProps } from 'types/service-flow';
-
 import Track from '../Track';
 
 type PreviousVariablesProps = {

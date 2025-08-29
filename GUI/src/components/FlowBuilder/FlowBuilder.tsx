@@ -1,15 +1,15 @@
 import { Background, Controls, Edge, MiniMap, Node, ReactFlow, useReactFlow } from '@xyflow/react';
-import { FC, useCallback } from 'react';
-import '@xyflow/react/dist/style.css';
-import { useTranslation } from 'react-i18next';
-import useServiceStore from 'store/new-services.store';
+import { Button, Modal, Track } from 'components';
+import Chat from 'components/chat/chat';
 import edgeTypes from 'components/Flow/EdgeTypes';
 import nodeTypes from 'components/Flow/NodeTypes';
 import useLayout from 'hooks/flow/useLayout';
 import { useOnNodesDelete } from 'hooks/flow/useOnNodeDelete';
-import { Button, Modal, Track } from 'components';
+import { FC, useCallback } from 'react';
+import '@xyflow/react/dist/style.css';
+import { useTranslation } from 'react-i18next';
+import useServiceStore from 'store/new-services.store';
 import { StepType } from 'types';
-import Chat from 'components/chat/chat';
 
 type FlowBuilderProps = {
   nodes: Node[];

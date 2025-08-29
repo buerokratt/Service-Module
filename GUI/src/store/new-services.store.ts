@@ -24,20 +24,18 @@ import {
 import { alignNodesInCaseAnyGotOverlapped, updateFlowInputRules } from 'services/flow-builder';
 import { saveFlowClick } from 'services/service-builder';
 import { EndpointDefinitionJson, Service, ServiceState, Step, StepType } from 'types';
+import { Assign } from 'types/assign';
+import { Chip } from 'types/chip';
 import { EndpointData, EndpointEnv, EndpointTab, PreDefinedEndpointEnvVariables } from 'types/endpoint';
+import { EndpointResponseVariable } from 'types/endpoint/endpoint-response-variables';
+import { EndpointType } from 'types/endpoint/endpoint-type';
+import { RequestVariablesTabsRawData, RequestVariablesTabsRowsData } from 'types/request-variables';
+import { initialEdges, initialNodes, NodeDataProps } from 'types/service-flow';
 import { v4 as uuid } from 'uuid';
 import { create } from 'zustand';
-import { RequestVariablesTabsRawData, RequestVariablesTabsRowsData } from 'types/request-variables';
 
 import useTestServiceStore from './test-services.store';
 import useToastStore from './toasts.store';
-
-import { initialEdges, initialNodes, NodeDataProps } from 'types/service-flow';
-import { Chip } from 'types/chip';
-import { EndpointResponseVariable } from 'types/endpoint/endpoint-response-variables';
-import { Assign } from 'types/assign';
-import { EndpointType } from 'types/endpoint/endpoint-type';
-
 import api from '../services/api-dev';
 
 interface ServiceStoreState {
