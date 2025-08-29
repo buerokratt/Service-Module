@@ -1,5 +1,6 @@
 import ChatHeader from 'components/chat/chat-header';
 import { motion } from 'framer-motion';
+import React from 'react';
 import useTestServiceStore from 'store/test-services.store';
 
 import ChatContent from './chat-content';
@@ -7,7 +8,7 @@ import ChatKeyPad from './chat-keypad';
 import styles from './chat.module.scss';
 import Profile from './profile';
 
-const Chat = (): JSX.Element => {
+const Chat = (): React.JSX.Element => {
   const opened = useTestServiceStore((x) => x.isChatOpened);
 
   return !opened ? (
