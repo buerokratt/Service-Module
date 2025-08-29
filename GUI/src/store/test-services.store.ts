@@ -11,7 +11,7 @@ export interface TestingMessage {
   author: TestingMessageAuthor;
   message: string;
   type: TestingMessageType;
-  payload?: any;
+  payload?: Record<string, string>;
 }
 
 interface TestServiceStoreState {
@@ -23,10 +23,15 @@ interface TestServiceStoreState {
   changeCurrentNodeId: (currentNodeId?: string) => void;
   clearCurrentNodeId: () => void;
   addUserMessage: (message: string) => void;
-  addBotMessage: (message: string, payload?: string) => void;
-  pushMessage: (message: string, author: TestingMessageAuthor, type?: TestingMessageType, payload?: any) => void;
+  addBotMessage: (message: string, payload?: Record<string, string>) => void;
+  pushMessage: (
+    message: string,
+    author: TestingMessageAuthor,
+    type?: TestingMessageType,
+    payload?: Record<string, string>,
+  ) => void;
   addError: (error: string, payload?: ServiceTestError) => void;
-  addInfo: (info: string, payload?: any) => void;
+  addInfo: (info: string, payload?: Record<string, string>) => void;
   addSuccess: (succes: string) => void;
   reset: () => void;
   waitingForInput: boolean;
@@ -52,7 +57,7 @@ const useTestServiceStore = create<TestServiceStoreState>((set, get) => ({
   clearCurrentNodeId: () => set({ currentNodeId: null }),
   addUserMessage: (message) => get().pushMessage(message, 'enduser'),
   addBotMessage: (message, payload) => get().pushMessage(message, 'bot', 'normal', payload),
-  pushMessage: (message, author, type = 'normal', payload = null) => {
+  pushMessage: (message, author, type = 'normal', payload = undefined) => {
     const msg = {
       id: uuid(),
       message,
@@ -65,7 +70,17 @@ const useTestServiceStore = create<TestServiceStoreState>((set, get) => ({
       chat: [...get().chat, msg],
     });
   },
-  addError: (error, payload) => get().pushMessage(error, 'system', 'error', payload),
+  addError: (error, payload) => {
+    const payloadRecord = payload
+      ? {
+          dslName: payload.dslName,
+          stepName: payload.stepName,
+          causeCode: payload.causeCode,
+          message: payload.message,
+        }
+      : undefined;
+    get().pushMessage(error, 'system', 'error', payloadRecord);
+  },
   addInfo: (info, payload) => get().pushMessage(info, 'system', 'info', payload),
   addSuccess: (success) => get().pushMessage(success, 'system', 'success'),
   reset: () => {

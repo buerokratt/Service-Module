@@ -201,7 +201,7 @@
   padding: 0.25em;
   margin: 0.4em;
   text-align: center;
-  font-style: italic;
+  font-weight: bold;
 
   &.success {
     color: rgb(0, 138, 0);
@@ -225,6 +225,23 @@
   .link {
     text-decoration: underline;
     padding-left: 0.1em;
+  }
+
+  .payload {
+    margin-top: 0.5em;
+    text-align: left;
+    font-weight: normal;
+
+    .payloadItem {
+      margin: 0.25em 0;
+      padding: 0.25em 0.5em;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 4px;
+
+      strong {
+        color: inherit;
+      }
+    }
   }
 }
 

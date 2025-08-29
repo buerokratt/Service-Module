@@ -25,7 +25,15 @@ const ChatMessage = ({ message }: ChatMessageProps): React.JSX.Element => {
   return (
     <div className={classNames(styles.system, styles[message.type])}>
       {t(message.message)}
-      {JSON.stringify(message.payload)}
+      {message.payload && (
+        <div className={styles.payload}>
+          {Object.entries(message.payload).map(([key, value]) => (
+            <div key={key} className={styles.payloadItem}>
+              <strong>{key}:</strong> {value}
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 };
