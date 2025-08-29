@@ -4,7 +4,7 @@ import useTestServiceStore from 'store/test-services.store';
 import { removeTrailingUnderscores } from 'utils/string-util';
 
 import { createApiInstance } from './api';
-// Types for service test responses
+
 interface ServiceTestErrorResponse {
   dslName: string;
   stepName: string;
