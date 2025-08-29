@@ -32,14 +32,13 @@ export const runServiceTest = async (input: string) => {
       'x-ruuter-testing': 'voorshpellhappilo',
     });
     await testApi.post(testService(state, name), { input });
-
-    store.addSuccess('chat.end-of-chat' + '\n\n\n tests');
+    store.addSuccess('chat.service-test-success');
   } catch (error) {
     if (hasResponseData(error)) {
       const errorData = error.response.data;
       if (isErrorResponse(errorData)) {
         console.error('runServiceTest: Service test error:', errorData.message);
-        store.addError('chat.no-start-node');
+        store.addError('chat.service-test-error');
       } else {
         console.error('runServiceTest: Unknown error response format:', errorData);
         store.addError('chat.unknown-error');

@@ -464,8 +464,8 @@
     "ROLE_UNAUTHENTICATED": "Autentimata"
   },
   "chat": {
-    "no-start-node": "Alustamise sõlme ei leitud",
-    "end-of-chat": "Jõuti vestluse lõppu",
+    "service-test-error": "Teenuse testimise viga",
+    "service-test-success": "Teenuse test on edukas",
     "title": "TEST",
     "input-placeholder": "Kirjutage oma sõnum...",
     "unknown-error": "Tundmatu viga. Proovige uuesti."

@@ -463,8 +463,8 @@
     "ROLE_UNAUTHENTICATED": "Unauthenticated"
   },
   "chat": {
-    "no-start-node": "No Start Node found",
-    "end-of-chat": "Reached end of chat",
+    "service-test-error": "Service test error",
+    "service-test-success": "Service test successful",
     "title": "TEST",
     "input-placeholder": "Enter your message...",
     "unknown-error": "Unknown error. Please try again."

@@ -9,8 +9,6 @@ const ChatKeyPad = (): React.JSX.Element => {
   const [userInput, setUserInput] = useState<string>('');
   const { t } = useTranslation();
 
-  // todo remove unused translations
-
   const testService = (): void => {
     useTestServiceStore.getState().sendUserInput(userInput);
     setUserInput('');
