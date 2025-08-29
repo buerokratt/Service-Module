@@ -1,7 +1,4 @@
-import { t } from 'i18next';
 import { runServiceTest } from 'services/service-tester';
-import { ServiceTestError } from 'types/service-test-error';
-import { fromSnakeCase } from 'utils/string-util';
 import { v4 as uuid } from 'uuid';
 import { create } from 'zustand';
 
@@ -16,6 +13,8 @@ export interface TestingMessage {
   payload?: Record<string, string>;
 }
 
+type TestingMessagePayload = Record<string, string>;
+
 interface TestServiceStoreState {
   isChatOpened: boolean;
   openChat: () => void;
@@ -25,15 +24,15 @@ interface TestServiceStoreState {
   changeCurrentNodeId: (currentNodeId?: string) => void;
   clearCurrentNodeId: () => void;
   addUserMessage: (message: string) => void;
-  addBotMessage: (message: string, payload?: Record<string, string>) => void;
+  addBotMessage: (message: string, payload?: TestingMessagePayload) => void;
   pushMessage: (
     message: string,
     author: TestingMessageAuthor,
     type?: TestingMessageType,
-    payload?: Record<string, string>,
+    payload?: TestingMessagePayload,
   ) => void;
-  addError: (error: string, payload?: ServiceTestError) => void;
-  addInfo: (info: string, payload?: Record<string, string>) => void;
+  addError: (error: string, payload?: TestingMessagePayload) => void;
+  addInfo: (info: string, payload?: TestingMessagePayload) => void;
   addSuccess: (succes: string) => void;
   reset: () => void;
   waitingForInput: boolean;
@@ -72,19 +71,8 @@ const useTestServiceStore = create<TestServiceStoreState>((set, get) => ({
       chat: [...get().chat, msg],
     });
   },
-  addError: (error, payload) => {
-    let payloadRecord = undefined;
-
-    if (payload) {
-      payload.stepName = fromSnakeCase(payload.stepName);
-
-      const errorTranslation = t('chat.service-test-error', { returnObjects: true });
-      payloadRecord = Object.fromEntries(
-        Object.entries(payload).map(([key, value]) => [errorTranslation[key as keyof typeof errorTranslation], value]),
-      );
-    }
-
-    get().pushMessage(error, 'system', 'error', payloadRecord);
+  addError: (error: string, payload?: TestingMessagePayload) => {
+    get().pushMessage(error, 'system', 'error', payload);
   },
   addInfo: (info, payload) => get().pushMessage(info, 'system', 'info', payload),
   addSuccess: (success) => get().pushMessage(success, 'system', 'success'),

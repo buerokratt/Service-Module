@@ -1,3 +1,4 @@
+import { t } from 'i18next';
 import { testService } from 'resources/api-constants';
 import useServiceStore from 'store/new-services.store';
 import useTestServiceStore from 'store/test-services.store';
@@ -18,7 +19,6 @@ export const runServiceTest = async (input: string) => {
     return;
   }
 
-  // todo display proper error message
   // todo failing node highlight
   // todo style and text
 
@@ -36,12 +36,18 @@ export const runServiceTest = async (input: string) => {
       const errorData = error.response.data;
       if (isErrorResponse(errorData)) {
         console.error('runServiceTest: Service test error:', errorData);
-        console.log(serviceStore.nodes);
-        console.log(fromSnakeCase(errorData.stepName));
 
         const node = serviceStore.nodes.find((node) => node.data.label === fromSnakeCase(errorData.stepName));
-        console.log('node', node);
-        store.addError('chat.service-test-error.title', errorData);
+
+        if (!node) {
+          console.error('runServiceTest: Node not found:', errorData);
+          store.addError('chat.unknown-error');
+          return;
+        }
+
+        const payload = translateErrorPayload(errorData, node.data.label as string);
+
+        store.addError('chat.service-test-error.title', payload);
       } else {
         console.error('runServiceTest: Unknown error response format:', errorData);
         store.addError('chat.unknown-error');
@@ -65,5 +71,34 @@ function hasResponseData(error: unknown): error is { response: { data: unknown }
       error.response &&
       typeof error.response === 'object' &&
       'data' in error.response,
+  );
+}
+
+function translateErrorPayload(error: ServiceTestError, nodeLabel: string): Record<string, string> {
+  const translatedError = { ...error };
+  translatedError.stepName = nodeLabel;
+
+  // Map cause codes to translation keys
+  let translatedCauseCode: string;
+  switch (translatedError.causeCode) {
+    case 'E_unknown':
+      translatedCauseCode = 'chat.service-test-error.causeUnknown';
+      break;
+    case 'E_null':
+      translatedCauseCode = 'chat.service-test-error.causeNull';
+      break;
+    case 'E_script':
+      translatedCauseCode = 'chat.service-test-error.causeScript';
+      break;
+    default:
+      translatedCauseCode = translatedError.causeCode;
+  }
+
+  const errorTranslation = t('chat.service-test-error', { returnObjects: true });
+  return Object.fromEntries(
+    Object.entries(translatedError).map(([key, value]) => [
+      errorTranslation[key as keyof typeof errorTranslation],
+      key === 'causeCode' ? translatedCauseCode : String(value),
+    ]),
   );
 }
