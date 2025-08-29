@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 
-import { translateObjectKeys } from './translation-util';
+import { translateObjectKeys } from './i18n-util';
 
 // Mock i18next
 vi.mock('i18next', () => ({

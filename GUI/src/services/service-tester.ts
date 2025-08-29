@@ -2,8 +2,8 @@ import { testService } from 'resources/api-constants';
 import useServiceStore from 'store/new-services.store';
 import useTestServiceStore from 'store/test-services.store';
 import { ServiceTestError } from 'types/service-test-error';
+import { translateObjectKeys } from 'utils/i18n-util';
 import { fromSnakeCase, removeTrailingUnderscores } from 'utils/string-util';
-import { translateObjectKeys } from 'utils/translation-util';
 
 import { createApiInstance } from './api';
 
@@ -21,6 +21,7 @@ export const runServiceTest = async (input: string) => {
 
   // todo failing node highlight
   // todo style and text
+  // todo more tests
 
   try {
     const testApi = createApiInstance({
@@ -75,10 +76,9 @@ export function hasResponseData(error: unknown): error is { response: { data: un
 }
 
 export function translateErrorPayload(error: ServiceTestError, nodeLabel: string): Record<string, string> {
-  const translatedError = { ...error };
+  const translatedError: Record<string, string> = { ...error };
   translatedError.stepName = nodeLabel;
 
-  // Map cause codes to translation keys
   let translatedCauseCode: string;
   switch (translatedError.causeCode) {
     case 'E_unknown':
@@ -94,9 +94,7 @@ export function translateErrorPayload(error: ServiceTestError, nodeLabel: string
       translatedCauseCode = translatedError.causeCode;
   }
 
-  // Create a mapping for the causeCode value
-  const errorWithTranslatedCause: Record<string, string> = { ...translatedError };
-  errorWithTranslatedCause.causeCode = translatedCauseCode;
+  translatedError.causeCode = translatedCauseCode;
 
-  return translateObjectKeys(errorWithTranslatedCause, 'chat.service-test-error');
+  return translateObjectKeys(translatedError, 'chat.service-test-error');
 }
