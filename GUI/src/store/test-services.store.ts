@@ -1,4 +1,4 @@
-import { testServiceFlow } from 'services/flow-tester';
+import { runServiceTest } from 'services/service-tester';
 import { v4 as uuid } from 'uuid';
 import { create } from 'zustand';
 
@@ -28,7 +28,6 @@ interface TestServiceStoreState {
   addInfo: (info: string, payload?: any) => void;
   addSuccess: (succes: string) => void;
   reset: () => void;
-  restart: () => void;
   waitingForInput: boolean;
   userInput: string | null;
   waitForUserInput: () => void;
@@ -38,7 +37,6 @@ interface TestServiceStoreState {
 const useTestServiceStore = create<TestServiceStoreState>((set, get) => ({
   isChatOpened: false,
   openChat: () => {
-    testServiceFlow();
     set({ isChatOpened: true });
   },
   closeChat: () =>
@@ -68,7 +66,7 @@ const useTestServiceStore = create<TestServiceStoreState>((set, get) => ({
   },
   addError: (error) => get().pushMessage(error, 'system', 'error'),
   addInfo: (info, payload) => get().pushMessage(info, 'system', 'info', payload),
-  addSuccess: (succes) => get().pushMessage(succes, 'system', 'success'),
+  addSuccess: (success) => get().pushMessage(success, 'system', 'success'),
   reset: () => {
     set({
       chat: [],
@@ -77,10 +75,6 @@ const useTestServiceStore = create<TestServiceStoreState>((set, get) => ({
       userInput: null,
     });
   },
-  restart: () => {
-    get().reset();
-    testServiceFlow();
-  },
   waitingForInput: false,
   userInput: null,
   waitForUserInput: () =>
@@ -88,12 +82,13 @@ const useTestServiceStore = create<TestServiceStoreState>((set, get) => ({
       waitingForInput: true,
       userInput: null,
     }),
-  sendUserInput: (userInput) => {
+  sendUserInput: async (userInput) => {
     get().addUserMessage(userInput);
     set({
       waitingForInput: false,
       userInput,
     });
+    await runServiceTest(userInput);
   },
 }));
 

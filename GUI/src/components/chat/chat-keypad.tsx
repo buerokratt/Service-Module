@@ -5,11 +5,13 @@ import useTestServiceStore from 'store/test-services.store';
 import styles from './chat.module.scss';
 import Send from '../../static/icons/send.svg';
 
-const ChatKeyPad = (): JSX.Element => {
+const ChatKeyPad = (): React.JSX.Element => {
   const [userInput, setUserInput] = useState<string>('');
   const { t } = useTranslation();
 
-  const addNewMessageToState = (): void => {
+  // todo remove unused translations
+
+  const testService = (): void => {
     useTestServiceStore.getState().sendUserInput(userInput);
     setUserInput('');
   };
@@ -25,12 +27,12 @@ const ChatKeyPad = (): JSX.Element => {
           onKeyDown={(event) => {
             if (event.key === 'Enter') {
               event.preventDefault();
-              addNewMessageToState();
+              testService();
             }
           }}
         />
-        <button onClick={addNewMessageToState} className={styles.button}>
-          <img src={Send} alt="Send message icon" />
+        <button onClick={testService} className={styles.button}>
+          <img src={Send} />
         </button>
       </div>
     </div>
