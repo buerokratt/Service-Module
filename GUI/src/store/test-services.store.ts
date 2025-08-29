@@ -1,6 +1,7 @@
 import { t } from 'i18next';
 import { runServiceTest } from 'services/service-tester';
 import { ServiceTestError } from 'types/service-test-error';
+import { fromSnakeCase } from 'utils/string-util';
 import { v4 as uuid } from 'uuid';
 import { create } from 'zustand';
 
@@ -72,15 +73,17 @@ const useTestServiceStore = create<TestServiceStoreState>((set, get) => ({
     });
   },
   addError: (error, payload) => {
-    const errorTranslation = t('chat.service-test-error', { returnObjects: true });
-    const payloadRecord = payload
-      ? Object.fromEntries(
-          Object.entries(payload).map(([key, value]) => [
-            errorTranslation[key as keyof typeof errorTranslation],
-            value,
-          ]),
-        )
-      : undefined;
+    let payloadRecord = undefined;
+
+    if (payload) {
+      payload.stepName = fromSnakeCase(payload.stepName);
+      const errorTranslation = t('chat.service-test-error', { returnObjects: true });
+
+      payloadRecord = Object.fromEntries(
+        Object.entries(payload).map(([key, value]) => [errorTranslation[key as keyof typeof errorTranslation], value]),
+      );
+    }
+
     get().pushMessage(error, 'system', 'error', payloadRecord);
   },
   addInfo: (info, payload) => get().pushMessage(info, 'system', 'info', payload),
