@@ -12,23 +12,6 @@ interface ServiceTestErrorResponse {
   message: string;
 }
 
-interface ChatMessage {
-  chatId: string;
-  content: string;
-  buttons: string;
-  authorTimestamp: string;
-  authorId: string;
-  authorFirstName: string;
-  authorLastName: string;
-  created: string;
-}
-
-interface ServiceTestSuccessResponse {
-  response: ChatMessage[];
-}
-
-type ServiceTestResponse = ServiceTestErrorResponse | ServiceTestSuccessResponse;
-
 export const runServiceTest = async (input: string) => {
   const store = useTestServiceStore.getState();
   const serviceStore = useServiceStore.getState();
@@ -48,12 +31,12 @@ export const runServiceTest = async (input: string) => {
       // todo readme
       'x-ruuter-testing': 'voorshpellhappilo',
     });
-    const response = await testApi.post<ServiceTestResponse>(testService(state, name), { input });
+    await testApi.post(testService(state, name), { input });
 
     store.addSuccess('chat.end-of-chat' + '\n\n\n tests');
   } catch (error) {
     if (hasResponseData(error)) {
-      const errorData = error.response.data as ServiceTestErrorResponse;
+      const errorData = error.response.data;
       if (isErrorResponse(errorData)) {
         console.error('runServiceTest: Service test error:', errorData.message);
         store.addError('chat.no-start-node');
@@ -68,8 +51,8 @@ export const runServiceTest = async (input: string) => {
   }
 };
 
-function isErrorResponse(response: ServiceTestResponse): response is ServiceTestErrorResponse {
-  return 'causeCode' in response && 'message' in response;
+function isErrorResponse(response: unknown): response is ServiceTestErrorResponse {
+  return typeof response === 'object' && response !== null && 'causeCode' in response && 'message' in response;
 }
 
 function hasResponseData(error: unknown): error is { response: { data: unknown } } {
