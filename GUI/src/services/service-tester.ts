@@ -14,7 +14,6 @@ export const runServiceTest = async (input: string) => {
   const name = removeTrailingUnderscores(serviceStore.serviceNameDashed());
 
   if (!state) {
-    // todo actually implement lol
     // This should never happen, widget is hidden until state is set
     console.error('Service state is not set, not testing.');
     return;
