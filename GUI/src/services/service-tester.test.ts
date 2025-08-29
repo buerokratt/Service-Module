@@ -1,0 +1,431 @@
+import { t } from 'i18next';
+import { ServiceTestError } from 'types/service-test-error';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+
+import { hasResponseData, isErrorResponse, translateErrorPayload } from './service-tester';
+
+// Mock i18next
+vi.mock('i18next', () => ({
+  t: vi.fn(),
+}));
+
+describe('translateErrorPayload', () => {
+  const mockErrorTranslation = {
+    dslName: 'translated.dslName',
+    stepName: 'translated.stepName',
+    causeCode: 'translated.causeCode',
+    message: 'translated.message',
+  };
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    (t as any).mockReturnValue(mockErrorTranslation);
+  });
+
+  it('should translate E_unknown cause code correctly', () => {
+    const error: ServiceTestError = {
+      dslName: 'test-service',
+      stepName: 'original-step',
+      causeCode: 'E_unknown',
+      message: 'Unknown error occurred',
+    };
+    const nodeLabel = 'Test Node';
+
+    const result = translateErrorPayload(error, nodeLabel);
+
+    expect(t).toHaveBeenCalledWith('chat.service-test-error', { returnObjects: true });
+    expect(result).toEqual({
+      'translated.dslName': 'test-service',
+      'translated.stepName': 'Test Node',
+      'translated.causeCode': 'chat.service-test-error.causeUnknown',
+      'translated.message': 'Unknown error occurred',
+    });
+  });
+
+  it('should translate E_null cause code correctly', () => {
+    const error: ServiceTestError = {
+      dslName: 'test-service',
+      stepName: 'original-step',
+      causeCode: 'E_null',
+      message: 'Null value error',
+    };
+    const nodeLabel = 'Null Test Node';
+
+    const result = translateErrorPayload(error, nodeLabel);
+
+    expect(result).toEqual({
+      'translated.dslName': 'test-service',
+      'translated.stepName': 'Null Test Node',
+      'translated.causeCode': 'chat.service-test-error.causeNull',
+      'translated.message': 'Null value error',
+    });
+  });
+
+  it('should translate E_script cause code correctly', () => {
+    const error: ServiceTestError = {
+      dslName: 'test-service',
+      stepName: 'original-step',
+      causeCode: 'E_script',
+      message: 'Script execution error',
+    };
+    const nodeLabel = 'Script Test Node';
+
+    const result = translateErrorPayload(error, nodeLabel);
+
+    expect(result).toEqual({
+      'translated.dslName': 'test-service',
+      'translated.stepName': 'Script Test Node',
+      'translated.causeCode': 'chat.service-test-error.causeScript',
+      'translated.message': 'Script execution error',
+    });
+  });
+
+  it('should handle unknown cause codes by using the original value', () => {
+    const error: ServiceTestError = {
+      dslName: 'test-service',
+      stepName: 'original-step',
+      causeCode: 'E_unknown' as any, // Type assertion to test unknown cause code
+      message: 'Unknown cause code error',
+    };
+    const nodeLabel = 'Unknown Cause Node';
+
+    // Temporarily modify the cause code to test unknown case
+    const testError = { ...error, causeCode: 'E_custom' as any };
+
+    const result = translateErrorPayload(testError, nodeLabel);
+
+    expect(result).toEqual({
+      'translated.dslName': 'test-service',
+      'translated.stepName': 'Unknown Cause Node',
+      'translated.causeCode': 'E_custom',
+      'translated.message': 'Unknown cause code error',
+    });
+  });
+
+  it('should replace stepName with nodeLabel', () => {
+    const error: ServiceTestError = {
+      dslName: 'test-service',
+      stepName: 'original-step-name',
+      causeCode: 'E_unknown',
+      message: 'Test message',
+    };
+    const nodeLabel = 'New Node Label';
+
+    const result = translateErrorPayload(error, nodeLabel);
+
+    expect(result['translated.stepName']).toBe('New Node Label');
+    expect(result['translated.stepName']).not.toBe('original-step-name');
+  });
+
+  it('should convert all values to strings', () => {
+    const error: ServiceTestError = {
+      dslName: 'test-service',
+      stepName: 'original-step',
+      causeCode: 'E_null',
+      message: 'Test message',
+    };
+    const nodeLabel = 'Test Node';
+
+    const result = translateErrorPayload(error, nodeLabel);
+
+    // Verify all values are strings
+    Object.values(result).forEach((value) => {
+      expect(typeof value).toBe('string');
+    });
+  });
+
+  it('should preserve all original error properties', () => {
+    const error: ServiceTestError = {
+      dslName: 'test-service',
+      stepName: 'original-step',
+      causeCode: 'E_script',
+      message: 'Test message',
+    };
+    const nodeLabel = 'Test Node';
+
+    const result = translateErrorPayload(error, nodeLabel);
+
+    // Check that all original properties are present (with translated keys)
+    expect(result).toHaveProperty('translated.dslName');
+    expect(result).toHaveProperty('translated.stepName');
+    expect(result).toHaveProperty('translated.causeCode');
+    expect(result).toHaveProperty('translated.message');
+  });
+
+  it('should handle empty strings and special characters', () => {
+    const error: ServiceTestError = {
+      dslName: '',
+      stepName: 'original-step',
+      causeCode: 'E_unknown',
+      message: 'Special chars: !@#$%^&*()',
+    };
+    const nodeLabel = '';
+
+    const result = translateErrorPayload(error, nodeLabel);
+
+    expect(result).toEqual({
+      'translated.dslName': '',
+      'translated.stepName': '',
+      'translated.causeCode': 'chat.service-test-error.causeUnknown',
+      'translated.message': 'Special chars: !@#$%^&*()',
+    });
+  });
+
+  it('should call i18next with correct parameters', () => {
+    const error: ServiceTestError = {
+      dslName: 'test-service',
+      stepName: 'original-step',
+      causeCode: 'E_null',
+      message: 'Test message',
+    };
+    const nodeLabel = 'Test Node';
+
+    translateErrorPayload(error, nodeLabel);
+
+    expect(t).toHaveBeenCalledWith('chat.service-test-error', { returnObjects: true });
+    expect(t).toHaveBeenCalledTimes(1);
+  });
+
+  it('should handle different translation object structures', () => {
+    const customTranslation = {
+      dslName: 'custom.dslName',
+      stepName: 'custom.stepName',
+      causeCode: 'custom.causeCode',
+      message: 'custom.message',
+    };
+
+    (t as any).mockReturnValue(customTranslation);
+
+    const error: ServiceTestError = {
+      dslName: 'test-service',
+      stepName: 'original-step',
+      causeCode: 'E_unknown',
+      message: 'Test message',
+    };
+    const nodeLabel = 'Test Node';
+
+    const result = translateErrorPayload(error, nodeLabel);
+
+    expect(result).toEqual({
+      'custom.dslName': 'test-service',
+      'custom.stepName': 'Test Node',
+      'custom.causeCode': 'chat.service-test-error.causeUnknown',
+      'custom.message': 'Test message',
+    });
+  });
+});
+
+describe('isErrorResponse', () => {
+  it('should return true for valid ServiceTestError objects', () => {
+    const validError: ServiceTestError = {
+      dslName: 'test-service',
+      stepName: 'test-step',
+      causeCode: 'E_unknown',
+      message: 'Test error message',
+    };
+
+    expect(isErrorResponse(validError)).toBe(true);
+  });
+
+  it('should return false for null', () => {
+    expect(isErrorResponse(null)).toBe(false);
+  });
+
+  it('should return false for undefined', () => {
+    expect(isErrorResponse(undefined)).toBe(false);
+  });
+
+  it('should return false for primitive types', () => {
+    expect(isErrorResponse('string')).toBe(false);
+    expect(isErrorResponse(123)).toBe(false);
+    expect(isErrorResponse(true)).toBe(false);
+    expect(isErrorResponse(false)).toBe(false);
+  });
+
+  it('should return false for objects missing causeCode', () => {
+    const invalidError = {
+      dslName: 'test-service',
+      stepName: 'test-step',
+      message: 'Test error message',
+    };
+
+    expect(isErrorResponse(invalidError)).toBe(false);
+  });
+
+  it('should return false for objects missing message', () => {
+    const invalidError = {
+      dslName: 'test-service',
+      stepName: 'test-step',
+      causeCode: 'E_unknown',
+    };
+
+    expect(isErrorResponse(invalidError)).toBe(false);
+  });
+
+  it('should return false for objects missing both causeCode and message', () => {
+    const invalidError = {
+      dslName: 'test-service',
+      stepName: 'test-step',
+    };
+
+    expect(isErrorResponse(invalidError)).toBe(false);
+  });
+
+  it('should return true for objects with extra properties', () => {
+    const validErrorWithExtra = {
+      dslName: 'test-service',
+      stepName: 'test-step',
+      causeCode: 'E_null',
+      message: 'Test error message',
+      extraProperty: 'extra value',
+    };
+
+    expect(isErrorResponse(validErrorWithExtra)).toBe(true);
+  });
+
+  it('should return false for empty objects', () => {
+    expect(isErrorResponse({})).toBe(false);
+  });
+
+  it('should return false for arrays', () => {
+    expect(isErrorResponse([])).toBe(false);
+    expect(isErrorResponse([1, 2, 3])).toBe(false);
+  });
+});
+
+describe('hasResponseData', () => {
+  it('should return true for objects with valid response.data structure', () => {
+    const validError = {
+      response: {
+        data: { someData: 'value' },
+      },
+    };
+
+    expect(hasResponseData(validError)).toBe(true);
+  });
+
+  it('should return false for null', () => {
+    expect(hasResponseData(null)).toBe(false);
+  });
+
+  it('should return false for undefined', () => {
+    expect(hasResponseData(undefined)).toBe(false);
+  });
+
+  it('should return false for primitive types', () => {
+    expect(hasResponseData('string')).toBe(false);
+    expect(hasResponseData(123)).toBe(false);
+    expect(hasResponseData(true)).toBe(false);
+    expect(hasResponseData(false)).toBe(false);
+  });
+
+  it('should return false for objects missing response property', () => {
+    const invalidError = {
+      someOtherProperty: 'value',
+    };
+
+    expect(hasResponseData(invalidError)).toBe(false);
+  });
+
+  it('should return false for objects with null response', () => {
+    const invalidError = {
+      response: null,
+    };
+
+    expect(hasResponseData(invalidError)).toBe(false);
+  });
+
+  it('should return false for objects with undefined response', () => {
+    const invalidError = {
+      response: undefined,
+    };
+
+    expect(hasResponseData(invalidError)).toBe(false);
+  });
+
+  it('should return false for objects with non-object response', () => {
+    const invalidError = {
+      response: 'not an object',
+    };
+
+    expect(hasResponseData(invalidError)).toBe(false);
+  });
+
+  it('should return false for objects with response missing data property', () => {
+    const invalidError = {
+      response: {
+        someOtherProperty: 'value',
+      },
+    };
+
+    expect(hasResponseData(invalidError)).toBe(false);
+  });
+
+  it('should return true for objects with response.data as null', () => {
+    const validError = {
+      response: {
+        data: null,
+      },
+    };
+
+    expect(hasResponseData(validError)).toBe(true);
+  });
+
+  it('should return true for objects with response.data as undefined', () => {
+    const validError = {
+      response: {
+        data: undefined,
+      },
+    };
+
+    expect(hasResponseData(validError)).toBe(true);
+  });
+
+  it('should return true for objects with response.data as primitive values', () => {
+    const validError1 = {
+      response: {
+        data: 'string data',
+      },
+    };
+
+    const validError2 = {
+      response: {
+        data: 123,
+      },
+    };
+
+    const validError3 = {
+      response: {
+        data: true,
+      },
+    };
+
+    expect(hasResponseData(validError1)).toBe(true);
+    expect(hasResponseData(validError2)).toBe(true);
+    expect(hasResponseData(validError3)).toBe(true);
+  });
+
+  it('should return true for objects with response.data as complex objects', () => {
+    const validError = {
+      response: {
+        data: {
+          nested: {
+            property: 'value',
+          },
+          array: [1, 2, 3],
+        },
+      },
+    };
+
+    expect(hasResponseData(validError)).toBe(true);
+  });
+
+  it('should return false for empty objects', () => {
+    expect(hasResponseData({})).toBe(false);
+  });
+
+  it('should return false for arrays', () => {
+    expect(hasResponseData([])).toBe(false);
+    expect(hasResponseData([1, 2, 3])).toBe(false);
+  });
+});

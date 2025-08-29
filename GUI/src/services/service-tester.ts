@@ -1,9 +1,9 @@
-import { t } from 'i18next';
 import { testService } from 'resources/api-constants';
 import useServiceStore from 'store/new-services.store';
 import useTestServiceStore from 'store/test-services.store';
 import { ServiceTestError } from 'types/service-test-error';
 import { fromSnakeCase, removeTrailingUnderscores } from 'utils/string-util';
+import { translateObjectKeys } from 'utils/translation-util';
 
 import { createApiInstance } from './api';
 
@@ -59,11 +59,11 @@ export const runServiceTest = async (input: string) => {
   }
 };
 
-function isErrorResponse(response: unknown): response is ServiceTestError {
+export function isErrorResponse(response: unknown): response is ServiceTestError {
   return typeof response === 'object' && response !== null && 'causeCode' in response && 'message' in response;
 }
 
-function hasResponseData(error: unknown): error is { response: { data: unknown } } {
+export function hasResponseData(error: unknown): error is { response: { data: unknown } } {
   return Boolean(
     error &&
       typeof error === 'object' &&
@@ -74,7 +74,7 @@ function hasResponseData(error: unknown): error is { response: { data: unknown }
   );
 }
 
-function translateErrorPayload(error: ServiceTestError, nodeLabel: string): Record<string, string> {
+export function translateErrorPayload(error: ServiceTestError, nodeLabel: string): Record<string, string> {
   const translatedError = { ...error };
   translatedError.stepName = nodeLabel;
 
@@ -94,11 +94,9 @@ function translateErrorPayload(error: ServiceTestError, nodeLabel: string): Reco
       translatedCauseCode = translatedError.causeCode;
   }
 
-  const errorTranslation = t('chat.service-test-error', { returnObjects: true });
-  return Object.fromEntries(
-    Object.entries(translatedError).map(([key, value]) => [
-      errorTranslation[key as keyof typeof errorTranslation],
-      key === 'causeCode' ? translatedCauseCode : String(value),
-    ]),
-  );
+  // Create a mapping for the causeCode value
+  const errorWithTranslatedCause: Record<string, string> = { ...translatedError };
+  errorWithTranslatedCause.causeCode = translatedCauseCode;
+
+  return translateObjectKeys(errorWithTranslatedCause, 'chat.service-test-error');
 }
