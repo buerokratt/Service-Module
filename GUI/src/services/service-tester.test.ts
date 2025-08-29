@@ -2,7 +2,7 @@ import { t } from 'i18next';
 import { ServiceTestError } from 'types/service-test-error';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { hasResponseData, isErrorResponse, translateErrorPayload } from './service-tester';
+import { hasResponseData, isErrorResponse, translateError } from './service-tester';
 
 // Mock i18next
 vi.mock('i18next', () => ({
@@ -31,7 +31,7 @@ describe('translateErrorPayload', () => {
     };
     const nodeLabel = 'Test Node';
 
-    const result = translateErrorPayload(error, nodeLabel);
+    const result = translateError(error, nodeLabel);
 
     expect(t).toHaveBeenCalledWith('chat.service-test-error', { returnObjects: true });
     expect(result).toEqual({
@@ -51,7 +51,7 @@ describe('translateErrorPayload', () => {
     };
     const nodeLabel = 'Null Test Node';
 
-    const result = translateErrorPayload(error, nodeLabel);
+    const result = translateError(error, nodeLabel);
 
     expect(result).toEqual({
       'translated.dslName': 'test-service',
@@ -70,7 +70,7 @@ describe('translateErrorPayload', () => {
     };
     const nodeLabel = 'Script Test Node';
 
-    const result = translateErrorPayload(error, nodeLabel);
+    const result = translateError(error, nodeLabel);
 
     expect(result).toEqual({
       'translated.dslName': 'test-service',
@@ -92,7 +92,7 @@ describe('translateErrorPayload', () => {
     // Temporarily modify the cause code to test unknown case
     const testError = { ...error, causeCode: 'E_custom' as any };
 
-    const result = translateErrorPayload(testError, nodeLabel);
+    const result = translateError(testError, nodeLabel);
 
     expect(result).toEqual({
       'translated.dslName': 'test-service',
@@ -111,7 +111,7 @@ describe('translateErrorPayload', () => {
     };
     const nodeLabel = 'New Node Label';
 
-    const result = translateErrorPayload(error, nodeLabel);
+    const result = translateError(error, nodeLabel);
 
     expect(result['translated.stepName']).toBe('New Node Label');
     expect(result['translated.stepName']).not.toBe('original-step-name');
@@ -126,7 +126,7 @@ describe('translateErrorPayload', () => {
     };
     const nodeLabel = 'Test Node';
 
-    const result = translateErrorPayload(error, nodeLabel);
+    const result = translateError(error, nodeLabel);
 
     // Verify all values are strings
     Object.values(result).forEach((value) => {
@@ -143,7 +143,7 @@ describe('translateErrorPayload', () => {
     };
     const nodeLabel = 'Test Node';
 
-    const result = translateErrorPayload(error, nodeLabel);
+    const result = translateError(error, nodeLabel);
 
     // Check that all original properties are present (with translated keys)
     expect(result).toHaveProperty('translated.dslName');
@@ -161,7 +161,7 @@ describe('translateErrorPayload', () => {
     };
     const nodeLabel = '';
 
-    const result = translateErrorPayload(error, nodeLabel);
+    const result = translateError(error, nodeLabel);
 
     expect(result).toEqual({
       'translated.dslName': '',
@@ -180,7 +180,7 @@ describe('translateErrorPayload', () => {
     };
     const nodeLabel = 'Test Node';
 
-    translateErrorPayload(error, nodeLabel);
+    translateError(error, nodeLabel);
 
     expect(t).toHaveBeenCalledWith('chat.service-test-error', { returnObjects: true });
     expect(t).toHaveBeenCalledTimes(1);
@@ -204,7 +204,7 @@ describe('translateErrorPayload', () => {
     };
     const nodeLabel = 'Test Node';
 
-    const result = translateErrorPayload(error, nodeLabel);
+    const result = translateError(error, nodeLabel);
 
     expect(result).toEqual({
       'custom.dslName': 'test-service',

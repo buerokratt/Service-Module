@@ -46,7 +46,7 @@ export const runServiceTest = async (input: string) => {
           return;
         }
 
-        const payload = translateErrorPayload(errorData, node.data.label as string);
+        const payload = translateError(errorData, node.data.label as string);
 
         store.addError('chat.service-test-error.title', payload);
       } else {
@@ -75,7 +75,7 @@ export function hasResponseData(error: unknown): error is { response: { data: un
   );
 }
 
-export function translateErrorPayload(error: ServiceTestError, nodeLabel: string): Record<string, string> {
+export function translateError(error: ServiceTestError, nodeLabel: string): Record<string, string> {
   const translatedError: Record<string, string> = { ...error };
   translatedError.stepName = nodeLabel;
 
