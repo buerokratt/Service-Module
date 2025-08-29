@@ -22,7 +22,6 @@
 **/.eslintcache
 **/npm-debug.log*
 /.idea/
-**/package-lock.json
 
 # Cursor IDE
 .cursor/
