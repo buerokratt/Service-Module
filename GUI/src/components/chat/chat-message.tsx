@@ -26,11 +26,6 @@ const ChatMessage = ({ message }: ChatMessageProps): React.JSX.Element => {
     <div className={classNames(styles.system, styles[message.type])}>
       {t(message.message)}
       {JSON.stringify(message.payload)}
-      {/* {message.payload && (
-        <a className={styles.link} href={message.payload.link}>
-          {message.payload.title}
-        </a>
-      )} */}
     </div>
   );
 };
