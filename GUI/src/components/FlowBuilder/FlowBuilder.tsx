@@ -34,36 +34,40 @@ const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
   } = useOnNodesDelete();
   const { setHasUnsavedChanges } = useServiceStore();
 
-  const onConnect = useCallback(({ source, target }: any) => {
-    const nodes = getNodes();
-    const edges = getEdges();
+  const onConnect = useCallback(
+    ({ source, target }: any) => {
+      console.log('onConnect');
+      const nodes = getNodes();
+      const edges = getEdges();
 
-    const parentOutgoingEdges = edges.filter((edge) => edge.source === source);
+      const parentOutgoingEdges = edges.filter((edge) => edge.source === source);
 
-    const ghostEdges = parentOutgoingEdges.filter((edge) => {
-      const targetNode = nodes.find((n) => n.id === edge.target);
-      return targetNode?.type === 'ghost';
-    });
+      const ghostEdges = parentOutgoingEdges.filter((edge) => {
+        const targetNode = nodes.find((n) => n.id === edge.target);
+        return targetNode?.type === 'ghost';
+      });
 
-    if (ghostEdges.length > 0) {
-      const ghostNodeIds = ghostEdges.map((edge) => edge.target);
-      const updatedEdges = edges.filter((edge) => !ghostEdges.includes(edge));
-      const updatedNodes = nodes.filter((node) => !ghostNodeIds.includes(node.id));
-      setNodes(updatedNodes);
-      setEdges(updatedEdges);
-    }
+      if (ghostEdges.length > 0) {
+        const ghostNodeIds = ghostEdges.map((edge) => edge.target);
+        const updatedEdges = edges.filter((edge) => !ghostEdges.includes(edge));
+        const updatedNodes = nodes.filter((node) => !ghostNodeIds.includes(node.id));
+        setNodes(updatedNodes);
+        setEdges(updatedEdges);
+      }
 
-    setEdges((eds) => [
-      ...eds,
-      {
-        id: `${source}->${target}`,
-        source: source,
-        target: target,
-        type: 'step',
-      },
-    ]);
-    setHasUnsavedChanges(true);
-  }, []);
+      setEdges((eds) => [
+        ...eds,
+        {
+          id: `${source}->${target}`,
+          source: source,
+          target: target,
+          type: 'step',
+        },
+      ]);
+      setHasUnsavedChanges(true);
+    },
+    [getEdges, getNodes, setEdges, setHasUnsavedChanges, setNodes],
+  );
 
   const isValidConnection = useCallback((connection: any) => {
     return connection.source !== connection.target;
@@ -72,6 +76,7 @@ const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
   const onBeforeDelete = useCallback(
     async ({ nodes: nodesToDelete, edges: edgesToDelete }: { nodes: Node[]; edges: Edge[] }) => {
       setDeletedNodes(null);
+      console.log('onBeforeDelete');
       try {
         if (edgesToDelete.length > 0 && nodesToDelete.length === 0) {
           const shouldPreventDelete = getNode(edgesToDelete[0].source)?.data.stepType === StepType.MultiChoiceQuestion;
@@ -99,7 +104,7 @@ const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
         return true;
       }
     },
-    [hasConnectedNodes],
+    [getNode, hasConnectedNodes, setDeletedNodes, setIsDeleteConnectionsModalVisible],
   );
 
   return (
