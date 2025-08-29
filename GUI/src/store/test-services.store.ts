@@ -73,14 +73,13 @@ const useTestServiceStore = create<TestServiceStoreState>((set, get) => ({
   },
   addError: (error, payload) => {
     const errorTranslation = t('chat.service-test-error', { returnObjects: true });
-    console.log(errorTranslation);
     const payloadRecord = payload
-      ? Object.fromEntries(
+      ? (Object.fromEntries(
           Object.entries(payload).map(([key, value]) => [
             errorTranslation[key as keyof typeof errorTranslation],
             value,
           ]),
-        )
+        ) as Record<string, string>)
       : undefined;
     get().pushMessage(error, 'system', 'error', payloadRecord);
   },
