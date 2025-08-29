@@ -1,4 +1,5 @@
 import classNames from 'classnames';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { TestingMessage } from 'store/test-services.store';
 
@@ -10,7 +11,7 @@ interface ChatMessageProps {
   message: TestingMessage;
 }
 
-const ChatMessage = ({ message }: ChatMessageProps): JSX.Element => {
+const ChatMessage = ({ message }: ChatMessageProps): React.JSX.Element => {
   const { t } = useTranslation();
 
   if (message.author === 'enduser') {

@@ -1,13 +1,14 @@
 import { AnimatePresence } from 'framer-motion';
 import { OverlayScrollbarsComponent } from 'overlayscrollbars-react';
-import { useEffect, useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import useTestServiceStore from 'store/test-services.store';
 
 import ChatMessage from './chat-message';
 import styles from './chat.module.scss';
+
 import 'overlayscrollbars/css/OverlayScrollbars.css';
 
-const ChatContent = (): JSX.Element => {
+const ChatContent = (): React.JSX.Element => {
   const OSref = useRef<OverlayScrollbarsComponent>(null);
   const chat = useTestServiceStore((x) => x.chat);
 

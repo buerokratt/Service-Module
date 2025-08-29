@@ -20,15 +20,20 @@ export const runServiceTest = async (input: string) => {
   }
 
   try {
+    // todo needs types
     const testApi = createApiInstance({
       // todo remove hardcoded header value
+      // todo add to env and docker compose - test
+      // todo readme
       'x-ruuter-testing': 'voorshpellhappilo',
     });
-    await testApi.post(testService(state, name), { input });
+    const response = await testApi.post(testService(state, name), { input });
+    console.log('Response', response.data);
 
     store.addSuccess('chat.end-of-chat' + '\n\n\n tests');
   } catch (error) {
     console.log('Error testing service', error);
+    console.log('Error', error.response.data);
     store.addError('chat.no-start-node');
   }
 
