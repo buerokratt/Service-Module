@@ -463,18 +463,11 @@
     "ROLE_UNAUTHENTICATED": "Unauthenticated"
   },
   "chat": {
-    "forwarder": "Forwarded",
-    "unanswered": "Unanswered",
-    "pending": "Pending",
-    "incomplete-service-flow": "Incomplete Service Flow",
     "no-start-node": "No Start Node found",
     "end-of-chat": "Reached end of chat",
-    "loginWithTARA": "To continue please log in with TARA",
-    "fileSignYesNo": "Do you want to sign this file? Yes/No",
-    "redirectToCustomerSupport": "Conversation will be redirected to Customer Support",
-    "waiting-for-user-input": "Waiting for user input",
     "title": "TEST",
-    "input-placeholder": "Enter your message..."
+    "input-placeholder": "Enter your message...",
+    "unknown-error": "Unknown error. Please try again."
   },
   "objectEditor": {
     "array": "Array",

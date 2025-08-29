@@ -1,11 +1,33 @@
-import { Node } from '@xyflow/react';
 import { testService } from 'resources/api-constants';
 import useServiceStore from 'store/new-services.store';
 import useTestServiceStore from 'store/test-services.store';
-import { StepType } from 'types';
 import { removeTrailingUnderscores } from 'utils/string-util';
 
 import { createApiInstance } from './api';
+// Types for service test responses
+interface ServiceTestErrorResponse {
+  dslName: string;
+  stepName: string;
+  causeCode: string;
+  message: string;
+}
+
+interface ChatMessage {
+  chatId: string;
+  content: string;
+  buttons: string;
+  authorTimestamp: string;
+  authorId: string;
+  authorFirstName: string;
+  authorLastName: string;
+  created: string;
+}
+
+interface ServiceTestSuccessResponse {
+  response: ChatMessage[];
+}
+
+type ServiceTestResponse = ServiceTestErrorResponse | ServiceTestSuccessResponse;
 
 export const runServiceTest = async (input: string) => {
   const store = useTestServiceStore.getState();
@@ -15,112 +37,48 @@ export const runServiceTest = async (input: string) => {
 
   if (!state) {
     // This should never happen, widget is hidden until state is set
-    console.error('Service state is not set, not testing.');
+    console.error('runServiceTest: Service state is not set, not testing.');
     return;
   }
 
   try {
-    // todo needs types
     const testApi = createApiInstance({
       // todo remove hardcoded header value
       // todo add to env and docker compose - test
       // todo readme
       'x-ruuter-testing': 'voorshpellhappilo',
     });
-    const response = await testApi.post(testService(state, name), { input });
-    console.log('Response', response.data);
+    const response = await testApi.post<ServiceTestResponse>(testService(state, name), { input });
 
     store.addSuccess('chat.end-of-chat' + '\n\n\n tests');
   } catch (error) {
-    console.log('Error testing service', error);
-    console.log('Error', error.response.data);
-    store.addError('chat.no-start-node');
+    if (hasResponseData(error)) {
+      const errorData = error.response.data as ServiceTestErrorResponse;
+      if (isErrorResponse(errorData)) {
+        console.error('runServiceTest: Service test error:', errorData.message);
+        store.addError('chat.no-start-node');
+      } else {
+        console.error('runServiceTest: Unknown error response format:', errorData);
+        store.addError('chat.unknown-error');
+      }
+    } else {
+      console.error('runServiceTest: Network or other error:', error);
+      store.addError('chat.unknown-error');
+    }
   }
-
-  // TODO BELOW OLD CODE --------------------------------------------------
-
-  // let currentNode = findStartNode();
-  // if (!currentNode) {
-  //   store.addError('chat.no-start-node');
-  //   return;
-  // }
-
-  // while (currentNode) {
-  //   store.changeCurrentNodeId(currentNode?.id);
-  //   if (currentNode.type === 'placeholder') {
-  //     store.addError('chat.incomplete-service-flow');
-  //     return;
-  //   }
-
-  //   if (currentNode.type === 'custom') {
-  //     await performActionBasedOnNode(currentNode);
-  //   }
-
-  //   const nextNodes = findNextNodes(currentNode);
-
-  //   if (nextNodes.length === 0) break;
-  //   if (nextNodes.length === 1) currentNode = nextNodes[0];
-  //   else {
-  //     const input = useTestServiceStore.getState().userInput?.toLowerCase().trim() ?? '';
-  //     const confirmation = ['yes', 'jah', 'eks', 'yea'].some((x) => input.startsWith(x));
-  //     if (confirmation) {
-  //       currentNode = nextNodes[0];
-  //     } else {
-  //       currentNode = nextNodes[1];
-  //     }
-  //   }
-  // }
-
-  // store.addSuccess('chat.end-of-chat');
-  // store.clearCurrentNodeId();
 };
 
-function findStartNode(): Node | undefined {
-  const nodes = useServiceStore.getState().nodes;
-  return nodes.find((x) => x.type === 'start');
+function isErrorResponse(response: ServiceTestResponse): response is ServiceTestErrorResponse {
+  return 'causeCode' in response && 'message' in response;
 }
 
-function findNextNodes(node: Node): Node[] {
-  const nodes = useServiceStore.getState().nodes;
-  const edges = useServiceStore.getState().edges;
-
-  const targets = edges.filter((x) => x.source === node.id).map((x) => x.target);
-  if (!targets || targets.length === 0) return [];
-
-  return nodes.filter((x) => targets.includes(x.id));
-}
-
-async function performActionBasedOnNode(node: Node) {
-  const store = useTestServiceStore.getState();
-  switch (node.data.stepType) {
-    case StepType.Auth:
-      store.addBotMessage('chat.loginWithTARA');
-      break;
-    case StepType.Textfield:
-      store.addBotMessage(node.data.message);
-      break;
-    case StepType.OpenWebpage:
-      store.addBotMessage(node.data.linkText, node.data.link);
-      break;
-    case StepType.FileSign:
-      store.addBotMessage('chat.fileSignYesNo');
-      break;
-    case StepType.FileGenerate:
-      store.addBotMessage(node.data.fileName, 'data:' + node.data.fileContent);
-      break;
-    case StepType.FinishingStepRedirect:
-      store.addBotMessage('chat.redirectToCustomerSupport');
-      break;
-    case StepType.Input:
-      store.addInfo('chat.waiting-for-user-input');
-      store.waitForUserInput();
-      do {
-        await sleep(2000);
-      } while (useTestServiceStore.getState().waitingForInput);
-      break;
-  }
-}
-
-function sleep(ms: number) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
+function hasResponseData(error: unknown): error is { response: { data: unknown } } {
+  return Boolean(
+    error &&
+      typeof error === 'object' &&
+      'response' in error &&
+      error.response &&
+      typeof error.response === 'object' &&
+      'data' in error.response,
+  );
 }
