@@ -9,7 +9,6 @@ import RootComponent from './RootComponent';
 import useStore from './store/store';
 import { UserInfo } from './types/userInfo';
 
-
 const App: React.FC = () => {
   useQuery<{
     data: { custom_jwt_userinfo: UserInfo };

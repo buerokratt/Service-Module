@@ -15,7 +15,6 @@ import Popup from '../Popup';
 import ConditionBuilderContent from './ConditionBuilderContent';
 import FileGenerateContent from './FileGenerateContent';
 
-
 import FileSignContent from './FileSignContent';
 import JsonRequestContent from './JsonRequestContent';
 import OpenWebPageContent from './OpenWebPageContent';
@@ -28,11 +27,9 @@ import OpenWebPageTestContent from './OpenWebPageTestContent';
 import RasaRulesContent from './RasaRulesContent';
 import { StepType } from '../../types';
 
-
 import './styles.scss';
 import ConditionContent from './ConditionContent';
 import AssignContent from './AssignContent';
-
 
 import ApiContent from './ApiContent';
 import MultiChoiceQuestionContent from './MultiChoiceQuestionContent';

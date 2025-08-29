@@ -8,8 +8,6 @@ import { v4 as uuid } from 'uuid';
 import { saveEndpoints } from '../../../services/service-builder';
 import { EndpointData } from '../../../types/endpoint/endpoint-data';
 
-
-
 interface AddEndpointModalProps {
   onClose: () => void;
   onUpdatePreferences: (endpointIds: string[]) => void;

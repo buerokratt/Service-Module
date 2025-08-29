@@ -40,7 +40,6 @@ import { EndpointType } from 'types/endpoint/endpoint-type';
 
 import api from '../services/api-dev';
 
-
 interface ServiceStoreState {
   endpoints: EndpointData[];
   name: string;

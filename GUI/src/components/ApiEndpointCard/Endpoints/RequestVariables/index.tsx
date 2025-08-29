@@ -20,9 +20,6 @@ import {
 } from '../../../../types/request-variables';
 import DataTable from '../../../DataTable';
 
-
-
-
 type RequestVariablesProps = {
   disableRawData?: boolean;
   endpoint: EndpointData;

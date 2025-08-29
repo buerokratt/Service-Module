@@ -8,7 +8,6 @@ import Track from '../Track';
 import AssignElement from './AssignBuilder/AssignElement';
 import PreviousVariables from './PreviousVariables';
 
-
 type DynamicChoicesContentProps = {
   readonly nodeId: string;
   readonly dynamicChoices?: DynamicChoices;

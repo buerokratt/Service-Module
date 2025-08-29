@@ -6,7 +6,6 @@ import BotMessage from './bot-message';
 import styles from './chat.module.scss';
 import UserMessage from './user-message';
 
-
 interface ChatMessageProps {
   message: TestingMessage;
 }

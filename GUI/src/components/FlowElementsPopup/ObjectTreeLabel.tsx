@@ -5,7 +5,6 @@ import { stringToTemplate } from 'utils/string-util';
 
 import { getKeyPathString, getTypeColor } from '../../utils/object-util';
 
-
 const escapeKey = (key: string) => {
   return key.replace(/"/g, '\\"');
 };

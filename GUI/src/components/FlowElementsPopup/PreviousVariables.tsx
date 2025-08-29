@@ -288,7 +288,7 @@ const VariableSection = ({
                       : {
                           data: variable.data,
                           path: variable.value,
-                        }
+                        },
                   );
                 }}
               >
