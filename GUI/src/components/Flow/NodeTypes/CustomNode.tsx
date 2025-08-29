@@ -2,13 +2,12 @@ import { Dispatch, FC, SetStateAction, useEffect } from 'react';
 import { Handle, NodeProps, Position, useUpdateNodeInternals } from '@xyflow/react';
 import { MdDeleteOutline, MdOutlineEdit, MdOutlineRemoveRedEye } from 'react-icons/md';
 
-import StepNode from './StepNode';
-
 import './Node.scss';
 import Button from 'components/Button';
 import Icon from 'components/Icon';
 import Track from 'components/Track';
 import { StepType } from 'types';
+import StepNode from './StepNode';
 
 type NodeDataProps = {
   data: {

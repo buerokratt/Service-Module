@@ -2,7 +2,7 @@ import { testService } from 'resources/api-constants';
 import useServiceStore from 'store/new-services.store';
 import useTestServiceStore from 'store/test-services.store';
 import { ServiceTestError } from 'types/service-test-error';
-import { removeTrailingUnderscores } from 'utils/string-util';
+import { fromSnakeCase, removeTrailingUnderscores } from 'utils/string-util';
 
 import { createApiInstance } from './api';
 
@@ -36,6 +36,11 @@ export const runServiceTest = async (input: string) => {
       const errorData = error.response.data;
       if (isErrorResponse(errorData)) {
         console.error('runServiceTest: Service test error:', errorData);
+        console.log(serviceStore.nodes);
+        console.log(fromSnakeCase(errorData.stepName));
+
+        const node = serviceStore.nodes.find((node) => node.data.label === fromSnakeCase(errorData.stepName));
+        console.log('node', node);
         store.addError('chat.service-test-error.title', errorData);
       } else {
         console.error('runServiceTest: Unknown error response format:', errorData);
