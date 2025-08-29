@@ -1,8 +1,8 @@
-import { useCallback, useEffect, useRef } from "react";
-import { useReactFlow, useStore, Node, Edge, ReactFlowState } from "@xyflow/react";
-import { stratify, tree } from "d3-hierarchy";
-import { timer } from "d3-timer";
-import { StepType } from "types";
+import { Edge, Node, ReactFlowState, useReactFlow, useStore } from '@xyflow/react';
+import { stratify, tree } from 'd3-hierarchy';
+import { timer } from 'd3-timer';
+import { useCallback, useEffect, useRef } from 'react';
+import { StepType } from 'types';
 
 const layout = tree<Node>()
   .nodeSize([400, 180])
@@ -27,11 +27,11 @@ function layoutNodes(nodes: Node[], edges: Edge[]): Node[] {
   const rootNodes = filteredNodes.filter((node) => !filteredEdges.some((edge) => edge.target === node.id));
 
   if (rootNodes.length > 1) {
-    const virtualRootId = "virtual-root";
+    const virtualRootId = 'virtual-root';
 
     filteredNodes.push({
       id: virtualRootId,
-      type: "virtual",
+      type: 'virtual',
       data: {},
       position: { x: 0, y: 0 },
     });
@@ -51,7 +51,7 @@ function layoutNodes(nodes: Node[], edges: Edge[]): Node[] {
       .parentId((d: Node) => filteredEdges.find((e: Edge) => e.target === d.id)?.source)(filteredNodes);
 
     hierarchy.sort((a, b) => {
-      if (typeof a.id !== "string" || typeof b.id !== "string") return 0;
+      if (typeof a.id !== 'string' || typeof b.id !== 'string') return 0;
       const aPos = previousPositions.get(a.id);
       const bPos = previousPositions.get(b.id);
       if (!aPos || !bPos) return 0;
@@ -63,13 +63,13 @@ function layoutNodes(nodes: Node[], edges: Edge[]): Node[] {
     let resultNodes = root
       .descendants()
       .map((d) => ({ ...d.data, position: { x: d.x, y: d.y } }))
-      .filter((node) => node.id !== "virtual-root");
+      .filter((node) => node.id !== 'virtual-root');
 
     for (const node of multiParentNodes) {
       const parentEdges = edgesCopy.filter((e) => e.target === node.id);
       const parentNodes = resultNodes.filter((n) => parentEdges.some((e) => e.source === n.id));
       const isParentNodesContainMultiPathNode = parentNodes.some(
-        (n) => n.data.stepType === StepType.MultiChoiceQuestion || n.data.stepType === StepType.Condition
+        (n) => n.data.stepType === StepType.MultiChoiceQuestion || n.data.stepType === StepType.Condition,
       );
 
       if (parentNodes.length > 0) {
@@ -93,7 +93,7 @@ function layoutNodes(nodes: Node[], edges: Edge[]): Node[] {
 
     return resultNodes;
   } catch (error) {
-    console.error("Error in hierarchy layout:", error);
+    console.error('Error in hierarchy layout:', error);
     return nodes;
   }
 }
@@ -117,7 +117,7 @@ function useLayout() {
       return {
         id: node.id,
         from: getNode(node.id)?.position ?? node.position,
-        to: node.type === "starts" ? { x: 140, y: 0 } : node.position,
+        to: node.type === 'starts' ? { x: 140, y: 0 } : node.position,
         node,
       };
     });

@@ -1,8 +1,8 @@
-@import "src/styles/tools/spacing";
-@import "src/styles/tools/color";
-@import "src/styles/settings/variables/other";
-@import "src/styles/settings/variables/typography";
-@import "src/styles/settings/mixins";
+@import 'src/styles/tools/spacing';
+@import 'src/styles/tools/color';
+@import 'src/styles/settings/variables/other';
+@import 'src/styles/settings/variables/typography';
+@import 'src/styles/settings/mixins';
 
 .element {
   cursor: default !important;
@@ -26,7 +26,7 @@
 
     display: flex;
 
-    input[type="checkbox"] {
+    input[type='checkbox'] {
       + label {
         display: inline;
         padding-left: 25px;

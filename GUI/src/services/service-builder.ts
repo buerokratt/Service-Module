@@ -1,18 +1,19 @@
-import { Assign } from "types/assign";
-import { Group, Rule } from "components/FlowElementsPopup/RuleBuilder/types";
-import i18next, { t } from "i18next";
-import { NodeHtmlMarkdown } from "node-html-markdown";
-import { Edge, Node } from "@xyflow/react";
-import { createEndpoint, createNewService, editService, testService, updateEndpoint } from "resources/api-constants";
-import useServiceStore from "store/new-services.store";
-import useToastStore from "store/toasts.store";
-import { StepType } from "types";
-import { EndpointData, EndpointVariableData } from "types/endpoint";
-import api from "../services/api-dev";
-import { NodeDataProps } from "types/service-flow";
-import { getLastDigits, removeTrailingUnderscores, stringToArray, toSnakeCase } from "utils/string-util";
-import { format } from "date-fns";
-import { AxiosError } from "axios";
+import { Edge, Node } from '@xyflow/react';
+import { AxiosError } from 'axios';
+import { Group, Rule } from 'components/FlowElementsPopup/RuleBuilder/types';
+import { format } from 'date-fns';
+import i18next, { t } from 'i18next';
+import { NodeHtmlMarkdown } from 'node-html-markdown';
+import { createEndpoint, createNewService, editService, testService, updateEndpoint } from 'resources/api-constants';
+import useServiceStore from 'store/new-services.store';
+import useToastStore from 'store/toasts.store';
+import { StepType } from 'types';
+import { Assign } from 'types/assign';
+import { EndpointData, EndpointVariableData } from 'types/endpoint';
+import { NodeDataProps } from 'types/service-flow';
+import { getLastDigits, removeTrailingUnderscores, stringToArray, toSnakeCase } from 'utils/string-util';
+
+import api from '../services/api-dev';
 
 export async function saveEndpoints(endpoints: EndpointData[], onSuccess?: () => void, onError?: (e: any) => void) {
   const tasks: Promise<any>[] = [];
@@ -34,7 +35,7 @@ export async function saveEndpoints(endpoints: EndpointData[], onSuccess?: () =>
           ...endpoint,
           // Stringify needed for Resql to save nested data in a proper parsable format
           definitions: JSON.stringify(endpoint.definitions),
-        })
+        }),
       );
     }
   });
@@ -63,19 +64,19 @@ interface SaveFlowConfig {
   isCommon: boolean;
   serviceId: string;
   isNewService: boolean;
-  status: "draft" | "ready";
+  status: 'draft' | 'ready';
   showError?: boolean;
 }
 
 const hasInvalidRules = (elements: any[]): boolean => {
   return elements.some((e) => {
-    if ("children" in e) {
+    if ('children' in e) {
       const group = e as Group;
       if (group.children.length === 0) return true;
       return hasInvalidRules(group.children);
     } else {
       const rule = e as Rule;
-      return rule.value === "" || rule.field === "" || rule.operator === "";
+      return rule.value === '' || rule.field === '' || rule.operator === '';
     }
   });
 };
@@ -83,38 +84,38 @@ const hasInvalidRules = (elements: any[]): boolean => {
 const hasInvalidElements = (elements: any[]): boolean => {
   return elements.some((e) => {
     const element = e as Assign;
-    return element.key === "" || element.value === "";
+    return element.key === '' || element.value === '';
   });
 };
 
 const buildConditionString = (group: any): string => {
-  if ("children" in group) {
+  if ('children' in group) {
     const subgroup = group as Group;
     if (subgroup.children.length === 0) {
-      return "";
+      return '';
     }
 
     const conditions = subgroup.children.map((child) => {
-      if ("children" in child) {
+      if ('children' in child) {
         return `(${buildConditionString(child)})`;
       } else {
         const rule = child;
-        return `${rule.field.replaceAll("${", "").replaceAll("}", "")} ${rule.operator} ${rule.value
-          .replaceAll("${", "")
-          .replaceAll("}", "")}`;
+        return `${rule.field.replaceAll('${', '').replaceAll('}', '')} ${rule.operator} ${rule.value
+          .replaceAll('${', '')
+          .replaceAll('}', '')}`;
       }
     });
 
     if (subgroup.not) {
-      return `!(${subgroup.type === "and" ? conditions.join(" && ") : conditions.join(" || ")})`;
+      return `!(${subgroup.type === 'and' ? conditions.join(' && ') : conditions.join(' || ')})`;
     } else {
-      return subgroup.type === "and" ? conditions.join(" && ") : conditions.join(" || ");
+      return subgroup.type === 'and' ? conditions.join(' && ') : conditions.join(' || ');
     }
   } else {
     const rule = group as Rule;
-    return `${rule.field.replaceAll("${", "").replaceAll("}", "")} ${rule.operator} ${rule.value
-      .replaceAll("${", "")
-      .replaceAll("}", "")}`;
+    return `${rule.field.replaceAll('${', '').replaceAll('}', '')} ${rule.operator} ${rule.value
+      .replaceAll('${', '')
+      .replaceAll('}', '')}`;
   }
 };
 
@@ -129,20 +130,20 @@ export const saveFlow = async ({
   isCommon,
   serviceId,
   isNewService,
-  status = "ready",
+  status = 'ready',
   showError = true,
 }: SaveFlowConfig) => {
   try {
     let yamlContent = getYamlContent(nodes, edges, name, description, showError);
 
     const mcqNodes = nodes.filter(
-      (node) => node.data?.stepType === StepType.MultiChoiceQuestion
+      (node) => node.data?.stepType === StepType.MultiChoiceQuestion,
     ) as Node<NodeDataProps>[];
 
     if (mcqNodes.length > 0) {
       const nodesUpToFirstMcq = nodes.slice(
         0,
-        nodes.findIndex((node) => node.data?.stepType === StepType.MultiChoiceQuestion) + 1
+        nodes.findIndex((node) => node.data?.stepType === StepType.MultiChoiceQuestion) + 1,
       );
       yamlContent = getYamlContent(nodesUpToFirstMcq, edges, name, description, showError);
     }
@@ -153,7 +154,7 @@ export const saveFlow = async ({
       true,
       status,
       onSuccess,
-      onError
+      onError,
     );
 
     for (const mcqNode of mcqNodes) {
@@ -164,18 +165,18 @@ export const saveFlow = async ({
         if (!nextNode) continue;
 
         const buttonIndex = mcqNode?.data?.multiChoiceQuestion?.buttons.findIndex((e: any) => e.title === edge.label);
-        const mcqNodeId = getLastDigits(toSnakeCase(mcqNode.data.label ?? ""));
+        const mcqNodeId = getLastDigits(toSnakeCase(mcqNode.data.label ?? ''));
         const serviceName = `${name}_mcq_${mcqNodeId}_${buttonIndex}`;
         const branchNodes = getBranchNodes(nodes, edges, nextNode);
         const branchEdges = edges.filter((edge) =>
-          branchNodes.some((n: any) => n.id === edge.source || n.id === edge.target)
+          branchNodes.some((n: any) => n.id === edge.source || n.id === edge.target),
         );
 
         await saveService(
           getYamlContent(branchNodes, branchEdges, serviceName, description, showError),
           { name: serviceName, serviceId, description, slot, isCommon, nodes, edges, isNewService } as SaveFlowConfig,
           false,
-          status
+          status,
         );
       }
     }
@@ -188,9 +189,9 @@ async function saveService(
   content: any,
   config: SaveFlowConfig,
   updateServiceDb: boolean,
-  status: "draft" | "ready" = "ready",
+  status: 'draft' | 'ready' = 'ready',
   onSuccess?: (e: any) => void,
-  onError?: (e: any) => void
+  onError?: (e: any) => void,
 ) {
   const { isNewService, serviceId, name, description, slot, isCommon, edges, nodes } = config;
   if (updateServiceDb) {
@@ -204,7 +205,7 @@ async function saveService(
         serviceId,
         description,
         slot,
-        type: "POST",
+        type: 'POST',
         content: content,
         isCommon,
         structure: JSON.stringify({ edges, nodes }),
@@ -215,7 +216,7 @@ async function saveService(
         params: {
           location: `${import.meta.env.REACT_APP_RUUTER_SERVICES_POST_PATH}/${name}.yml`,
         },
-      }
+      },
     )
     .then(onSuccess)
     .catch(onError);
@@ -234,23 +235,23 @@ function getYamlContent(nodes: Node[], edges: Edge[], name: string, description:
       switch (node.data.stepType) {
         case StepType.Textfield:
           if (node.data.message === undefined) {
-            error = i18next.t("toast.missing-textfield-message");
+            error = i18next.t('toast.missing-textfield-message');
           }
           break;
         case StepType.OpenWebpage:
           if (node.data.link === undefined || node.data.linkText === undefined) {
-            error = i18next.t("toast.missing-website");
+            error = i18next.t('toast.missing-website');
           }
           break;
         case StepType.FileGenerate:
           if (node.data.fileName === undefined || node.data.fileContent === undefined) {
-            error = i18next.t("toast.missing-file-generation");
+            error = i18next.t('toast.missing-file-generation');
           }
           break;
         case StepType.Input:
         case StepType.Condition:
         case StepType.MultiChoiceQuestion:
-          if (followingNode?.type === "placeholder" && !allRelations.includes(node.id)) {
+          if (followingNode?.type === 'placeholder' && !allRelations.includes(node.id)) {
             allRelations.push(node.id);
             return;
           }
@@ -268,61 +269,61 @@ function getYamlContent(nodes: Node[], edges: Edge[], name: string, description:
   edges.forEach((edge) => {
     const current = edges.find((lastEdge) => lastEdge.source === edge.source);
     const nextStep = edges.find((lastEdge) => lastEdge.source === edge.target);
-    if (!nextStep && current?.type !== "placeholder") allRelations.push(edge.target);
+    if (!nextStep && current?.type !== 'placeholder') allRelations.push(edge.target);
   });
 
   const finishedFlow = new Map();
 
-  finishedFlow.set("declaration", {
-    call: "declare",
+  finishedFlow.set('declaration', {
+    call: 'declare',
     version: 0.1,
-    description: description ?? `Description placeholder for '${name ?? ""}'`,
-    method: "post",
-    accepts: "json",
-    returns: "json",
-    namespace: "service",
+    description: description ?? `Description placeholder for '${name ?? ''}'`,
+    method: 'post',
+    accepts: 'json',
+    returns: 'json',
+    namespace: 'service',
     allowList: {
       body: [
         {
-          field: "chatId",
-          type: "string",
-          description: "The chat ID for the message",
+          field: 'chatId',
+          type: 'string',
+          description: 'The chat ID for the message',
         },
         {
-          field: "authorId",
-          type: "string",
-          description: "The author ID for the message",
+          field: 'authorId',
+          type: 'string',
+          description: 'The author ID for the message',
         },
         {
-          field: "input",
-          type: "object",
-          description: "The Input from the user",
+          field: 'input',
+          type: 'object',
+          description: 'The Input from the user',
         },
       ],
     },
   });
 
-  const firstNode = nodes.find((node) => node.type === "custom");
-  finishedFlow.set("prepare", {
+  const firstNode = nodes.find((node) => node.type === 'custom');
+  finishedFlow.set('prepare', {
     assign: {
-      chatId: "${incoming.body.chatId}",
-      authorId: "${incoming.body.authorId}",
-      input: "${incoming.body.input}",
+      chatId: '${incoming.body.chatId}',
+      authorId: '${incoming.body.authorId}',
+      input: '${incoming.body.input}',
       buttons: [],
       res: {
-        result: "",
+        result: '',
       },
     },
-    next: firstNode ? toSnakeCase(firstNode.data.label?.toString() ?? "format_messages") : "format_messages",
+    next: firstNode ? toSnakeCase(firstNode.data.label?.toString() ?? 'format_messages') : 'format_messages',
   });
 
   try {
     allRelations.forEach((r) => {
-      const [parentNodeId, childNodeId] = r.split(",");
+      const [parentNodeId, childNodeId] = r.split(',');
       const parentNode = nodes.findLast((node) => node.id === parentNodeId) as Node<NodeDataProps> | undefined;
       if (
         !parentNode ||
-        parentNode.type !== "custom" ||
+        parentNode.type !== 'custom' ||
         [StepType.Rule, StepType.RuleDefinition].includes(parentNode.data.stepType)
       ) {
         return;
@@ -359,42 +360,42 @@ function getYamlContent(nodes: Node[], edges: Edge[], name: string, description:
         return handleEndpointStep(parentNode, finishedFlow, parentStepName, childNode);
       }
 
-      const nextStep = childNode ? toSnakeCase(childNode.data.label ?? "format_messages") : "format_messages";
+      const nextStep = childNode ? toSnakeCase(childNode.data.label ?? 'format_messages') : 'format_messages';
       const template = getTemplate(parentNode, parentStepName, nextStep);
 
       finishedFlow.set(parentStepName, template);
     });
   } catch (e: any) {
     if (showError) {
-      throw new Error(i18next.t("toast.cannot-save-flow") ?? e?.message ?? "Error");
+      throw new Error(i18next.t('toast.cannot-save-flow') ?? e?.message ?? 'Error');
     }
   }
 
-  finishedFlow.set("format_messages", {
-    call: "http.post",
+  finishedFlow.set('format_messages', {
+    call: 'http.post',
     args: {
-      url: "[#SERVICE_DMAPPER_HBS]/bot_responses_to_messages",
+      url: '[#SERVICE_DMAPPER_HBS]/bot_responses_to_messages',
       headers: {
-        type: "json",
+        type: 'json',
       },
       body: {
         data: {
-          botMessages: "${[res]}",
+          botMessages: '${[res]}',
           chatId: "${chatId ?? ''}",
           authorId: "${authorId ?? ''}",
-          authorFirstName: "",
-          authorLastName: "",
-          authorTimestamp: "${new Date().toISOString()}",
-          created: "${new Date().toISOString()}",
-          buttons: "${buttons ?? []}",
+          authorFirstName: '',
+          authorLastName: '',
+          authorTimestamp: '${new Date().toISOString()}',
+          created: '${new Date().toISOString()}',
+          buttons: '${buttons ?? []}',
         },
       },
     },
-    result: "formatMessage",
-    next: "service-end",
+    result: 'formatMessage',
+    next: 'service-end',
   });
 
-  finishedFlow.set("service-end", {
+  finishedFlow.set('service-end', {
     return: "${formatMessage.response.body ?? ''}",
   });
 
@@ -435,13 +436,13 @@ function handleTextField(
   finishedFlow: Map<any, any>,
   parentStepName: string,
   parentNode: Node,
-  childNode: Node<NodeDataProps> | undefined
+  childNode: Node<NodeDataProps> | undefined,
 ) {
   const htmlToMarkdown = new NodeHtmlMarkdown({
     textReplace: [
-      [/\\_/g, "_"],
-      [/\\\[/g, "["],
-      [/\\\]/g, "]"],
+      [/\\_/g, '_'],
+      [/\\\[/g, '['],
+      [/\\\]/g, ']'],
     ],
   });
 
@@ -449,13 +450,13 @@ function handleTextField(
     assign: {
       res: {
         result: `${htmlToMarkdown.translate(
-          typeof parentNode.data.message === "string"
-            ? parentNode.data.message.replace("{{", "${").replace("}}", "}")
-            : ""
+          typeof parentNode.data.message === 'string'
+            ? parentNode.data.message.replace('{{', '${').replace('}}', '}')
+            : '',
         )}`,
       },
     },
-    next: childNode ? toSnakeCase(childNode.data.label ?? "format_messages") : "format_messages",
+    next: childNode ? toSnakeCase(childNode.data.label ?? 'format_messages') : 'format_messages',
   });
 }
 
@@ -465,11 +466,11 @@ function handleConditionStep(
   nodes: Node[],
   parentNode: Node<NodeDataProps>,
   finishedFlow: Map<any, any>,
-  parentStepName: string
+  parentStepName: string,
 ) {
   const conditionRelations: string[] = allRelations.filter((r) => r.startsWith(parentNodeId));
-  const firstChildNode = conditionRelations[0].split(",")[1];
-  const secondChildNode = conditionRelations[1].split(",")[1];
+  const firstChildNode = conditionRelations[0].split(',')[1];
+  const secondChildNode = conditionRelations[1].split(',')[1];
 
   const firstChild = nodes.find((node) => node.id === firstChildNode) as Node<NodeDataProps> | undefined;
   const secondChild = nodes.find((node) => node.id === secondChildNode) as Node<NodeDataProps> | undefined;
@@ -478,17 +479,17 @@ function handleConditionStep(
   const isInvalid =
     parentNode.data.rules?.children === undefined || invalidRulesExist || parentNode.data.rules?.children.length === 0;
   if (isInvalid) {
-    throw new Error(i18next.t("toast.missing-condition-rules") ?? "Error");
+    throw new Error(i18next.t('toast.missing-condition-rules') ?? 'Error');
   }
 
   finishedFlow.set(parentStepName, {
     switch: [
       {
         condition: `\${${buildConditionString(parentNode.data.rules)}}`,
-        next: toSnakeCase(firstChild?.data?.label ?? "") ?? "",
+        next: toSnakeCase(firstChild?.data?.label ?? '') ?? '',
       },
     ],
-    next: toSnakeCase(secondChild?.data?.label ?? "") ?? "",
+    next: toSnakeCase(secondChild?.data?.label ?? '') ?? '',
   });
 }
 
@@ -496,7 +497,7 @@ function handleAssignStep(
   parentNode: Node<NodeDataProps>,
   finishedFlow: Map<any, any>,
   parentStepName: string,
-  childNode: Node<NodeDataProps> | undefined
+  childNode: Node<NodeDataProps> | undefined,
 ) {
   const invalidElementsExist = hasInvalidElements(parentNode.data.assignElements ?? []);
   const isInvalid =
@@ -505,7 +506,7 @@ function handleAssignStep(
     parentNode.data?.assignElements.length === 0;
 
   if (isInvalid) {
-    throw new Error(i18next.t("toast.missing-assign-elements") ?? "Error");
+    throw new Error(i18next.t('toast.missing-assign-elements') ?? 'Error');
   }
 
   finishedFlow.set(parentStepName, {
@@ -513,7 +514,7 @@ function handleAssignStep(
       acc[e.key] = e.value;
       return acc;
     }, {}),
-    next: childNode ? toSnakeCase(childNode.data.label ?? "format_messages") : "format_messages",
+    next: childNode ? toSnakeCase(childNode.data.label ?? 'format_messages') : 'format_messages',
   });
 }
 
@@ -521,7 +522,7 @@ function handleEndpointStep(
   parentNode: Node<NodeDataProps>,
   finishedFlow: Map<any, any>,
   parentStepName: string,
-  childNode: Node<NodeDataProps> | undefined
+  childNode: Node<NodeDataProps> | undefined,
 ) {
   const endpointDefinition = parentNode.data.endpoint?.definitions[0];
   const paramsVariables = endpointDefinition?.params?.variables;
@@ -532,10 +533,10 @@ function handleEndpointStep(
   const stepConfig: any = {
     call: `http.${methodType ?? 'post'}`,
     args: {
-      url: endpointDefinition?.url?.split("?")[0] ?? "",
+      url: endpointDefinition?.url?.split('?')[0] ?? '',
     },
-    result: `${parentNode.data.endpoint?.name.replaceAll(" ", "_")}_res`,
-    next: childNode ? toSnakeCase(childNode.data.label ?? "format_messages") : "format_messages",
+    result: `${parentNode.data.endpoint?.name.replaceAll(' ', '_')}_res`,
+    next: childNode ? toSnakeCase(childNode.data.label ?? 'format_messages') : 'format_messages',
   };
 
   if (Array.isArray(paramsVariables) && paramsVariables.length > 0) {
@@ -566,16 +567,16 @@ function handleMultiChoiceQuestion(
   finishedFlow: Map<any, any>,
   parentStepName: string,
   parentNode: Node<NodeDataProps>,
-  childNode: Node<NodeDataProps> | undefined
+  childNode: Node<NodeDataProps> | undefined,
 ) {
   return finishedFlow.set(parentStepName, {
     assign: {
       buttons: parentNode?.data?.multiChoiceQuestion?.buttons ?? [],
       res: {
-        result: parentNode?.data?.multiChoiceQuestion?.question ?? "",
+        result: parentNode?.data?.multiChoiceQuestion?.question ?? '',
       },
     },
-    next: childNode ? toSnakeCase(childNode.data.label ?? "format_messages") : "format_messages",
+    next: childNode ? toSnakeCase(childNode.data.label ?? 'format_messages') : 'format_messages',
   });
 }
 
@@ -583,64 +584,64 @@ function handleDynamicChoices(
   finishedFlow: Map<any, any>,
   parentStepName: string,
   parentNode: Node<NodeDataProps>,
-  childNode: Node<NodeDataProps> | undefined
+  childNode: Node<NodeDataProps> | undefined,
 ) {
-  const list = parentNode.data.dynamicChoices?.list ?? "";
+  const list = parentNode.data.dynamicChoices?.list ?? '';
   finishedFlow.set(parentStepName, {
-    call: "http.post",
+    call: 'http.post',
     args: {
-      url: "[#SERVICE_DMAPPER]/generate/buttons-list",
+      url: '[#SERVICE_DMAPPER]/generate/buttons-list',
       body: {
         list: stringToArray(list, list),
-        service_name: parentNode.data.dynamicChoices?.serviceName ?? "",
-        key: parentNode.data.dynamicChoices?.key ?? "",
-        payload_prefix: "#service, /POST/",
-        payload_keys: parentNode.data.dynamicChoices?.payloadKeys.split(",").filter((item) => item.trim()) ?? [],
+        service_name: parentNode.data.dynamicChoices?.serviceName ?? '',
+        key: parentNode.data.dynamicChoices?.key ?? '',
+        payload_prefix: '#service, /POST/',
+        payload_keys: parentNode.data.dynamicChoices?.payloadKeys.split(',').filter((item) => item.trim()) ?? [],
       },
     },
-    result: "dynamic_choices_res",
-    next: "assign_dynamic_choices_buttons",
+    result: 'dynamic_choices_res',
+    next: 'assign_dynamic_choices_buttons',
   });
 
-  return finishedFlow.set("assign_dynamic_choices_buttons", {
+  return finishedFlow.set('assign_dynamic_choices_buttons', {
     assign: {
-      buttons: "${dynamic_choices_res.response.body.response ?? []}",
+      buttons: '${dynamic_choices_res.response.body.response ?? []}',
     },
-    next: childNode ? toSnakeCase(childNode.data.label ?? "format_messages") : "format_messages",
+    next: childNode ? toSnakeCase(childNode.data.label ?? 'format_messages') : 'format_messages',
   });
 }
 
 const getMapEntry = (value: string) => {
   const secrets = useServiceStore.getState().secrets;
 
-  const parts = value.replace("{{", "").replace("}}", "").split(".");
-  const key = value.replace("{{", '"').replace("}}", '"');
+  const parts = value.replace('{{', '').replace('}}', '').split('.');
+  const key = value.replace('{{', '"').replace('}}', '"');
   if ([...(secrets?.prod ?? []), ...(secrets?.test ?? [])].includes(value)) {
-    return `[${key}, secrets.response.body.${parts.join(".")}]`;
+    return `[${key}, secrets.response.body.${parts.join('.')}]`;
   }
-  if (!value.includes("ClientInput")) parts.splice(1, 0, "response", "body");
-  return `[${key}, ${parts.join(".")}]`;
+  if (!value.includes('ClientInput')) parts.splice(1, 0, 'response', 'body');
+  return `[${key}, ${parts.join('.')}]`;
 };
 
 const getNestedPreDefinedRawVariables = (data: { [key: string]: any }, result: string[]) => {
   Object.keys(data).forEach((k) => {
-    if (typeof data[k] === "object") {
+    if (typeof data[k] === 'object') {
       return getNestedPreDefinedRawVariables(data[k], result);
     }
-    if (typeof data[k] === "string" && data[k].startsWith("{{")) {
+    if (typeof data[k] === 'string' && data[k].startsWith('{{')) {
       result.push(getMapEntry(data[k]));
     }
   });
 };
 
 const getNestedPreDefinedEndpointVariables = (variable: EndpointVariableData, result: string[]) => {
-  const variableData = variable.type === "schema" ? variable.schemaData : variable.arrayData;
+  const variableData = variable.type === 'schema' ? variable.schemaData : variable.arrayData;
   if (variableData instanceof Array) {
     variableData.forEach((v) => {
-      if (["schema", "array"].includes(v.type)) getNestedPreDefinedEndpointVariables(v, result);
+      if (['schema', 'array'].includes(v.type)) getNestedPreDefinedEndpointVariables(v, result);
 
-      if (v.value?.startsWith("{{")) result.push(getMapEntry(v.value));
-      if (v.testValue?.startsWith("{{")) result.push(getMapEntry(v.testValue));
+      if (v.value?.startsWith('{{')) result.push(getMapEntry(v.value));
+      if (v.testValue?.startsWith('{{')) result.push(getMapEntry(v.testValue));
     });
   }
 };
@@ -650,73 +651,73 @@ const getTemplate = (node: Node, stepName: string, nextStep?: string) => {
 
   return {
     template: `${data?.templateName}`,
-    requestType: "templates",
+    requestType: 'templates',
     body: data?.body,
     result: data?.resultName ?? `${stepName}_result`,
-    next: nextStep ?? "format_messages",
+    next: nextStep ?? 'format_messages',
   };
 };
 
 const getTemplateDataFromNode = (node: Node): { templateName: string; body?: any; resultName?: string } | undefined => {
   if (node.data.stepType === StepType.Auth) {
     return {
-      templateName: "[#SERVICE_PROJECT_LAYER]/tara",
-      resultName: "TARA",
+      templateName: '[#SERVICE_PROJECT_LAYER]/tara',
+      resultName: 'TARA',
     };
   }
   if (node.data.stepType === StepType.Input) {
     return {
-      templateName: "[#SERVICE_PROJECT_LAYER]/client-input",
+      templateName: '[#SERVICE_PROJECT_LAYER]/client-input',
       resultName: `client_input_${node.data.clientInputId}_result`,
     };
   }
   if (node.data.stepType === StepType.FileGenerate) {
     return {
-      templateName: "[#SERVICE_PROJECT_LAYER]/file-generate",
+      templateName: '[#SERVICE_PROJECT_LAYER]/file-generate',
       body: {
-        fileName: node.data.fileName ?? "",
-        fileContent: node.data.fileContent ?? "",
+        fileName: node.data.fileName ?? '',
+        fileContent: node.data.fileContent ?? '',
       },
     };
   }
   if (node.data.stepType === StepType.FileSign) {
     return {
-      templateName: "[#SERVICE_PROJECT_LAYER]/siga",
+      templateName: '[#SERVICE_PROJECT_LAYER]/siga',
       body: {
-        type: "smart_id",
-        country: "EE",
+        type: 'smart_id',
+        country: 'EE',
       },
-      resultName: "SiGa",
+      resultName: 'SiGa',
     };
   }
   if (node.data.stepType === StepType.FinishingStepRedirect) {
     return {
-      templateName: "[#SERVICE_PROJECT_LAYER]/direct-to-cs",
+      templateName: '[#SERVICE_PROJECT_LAYER]/direct-to-cs',
       body: {
-        message: node.data.message ?? "",
+        message: node.data.message ?? '',
       },
     };
   }
   if (node.data.stepType === StepType.FinishingStepEnd) {
     return {
-      templateName: "[#SERVICE_PROJECT_LAYER]/end-conversation",
+      templateName: '[#SERVICE_PROJECT_LAYER]/end-conversation',
       body: {
-        message: node.data.message ?? "",
+        message: node.data.message ?? '',
       },
     };
   }
   if (node.data.stepType === StepType.OpenWebpage) {
     return {
-      templateName: "[#SERVICE_PROJECT_LAYER]/open-webpage",
+      templateName: '[#SERVICE_PROJECT_LAYER]/open-webpage',
       body: {
-        link: node.data.link ?? "",
-        linkText: node.data.linkText ?? "",
+        link: node.data.link ?? '',
+        linkText: node.data.linkText ?? '',
       },
     };
   }
 };
 
-export const saveFlowClick = async (status: "draft" | "ready" = "ready", showError: boolean = true) => {
+export const saveFlowClick = async (status: 'draft' | 'ready' = 'ready', showError: boolean = true) => {
   const name = removeTrailingUnderscores(useServiceStore.getState().serviceNameDashed());
   const serviceId = useServiceStore.getState().serviceId;
   const description = useServiceStore.getState().description;
@@ -728,23 +729,25 @@ export const saveFlowClick = async (status: "draft" | "ready" = "ready", showErr
 
   await saveFlow({
     name: !name
-      ? `${t("newService.defaultServiceName").toString()}_${format(new Date(), "dd_MM_yyyy_HH_mm_ss")}`
+      ? `${t('newService.defaultServiceName').toString()}_${format(new Date(), 'dd_MM_yyyy_HH_mm_ss')}`
       : name,
     edges,
     nodes,
     onSuccess: () => {
       useToastStore.getState().success({
-        title: i18next.t("newService.toast.success"),
-        message: i18next.t("newService.toast.savedSuccessfully"),
+        title: i18next.t('newService.toast.success'),
+        message: i18next.t('newService.toast.savedSuccessfully'),
       });
       useServiceStore.getState().enableTestButton();
     },
     onError: (e: AxiosError) => {
       useToastStore.getState().error({
-        title: i18next.t("newService.toast.failed"),
-        message: e.response?.status === 409 ? t("newService.toast.serviceNameAlreadyExists") : e?.message,
+        title: i18next.t('newService.toast.failed'),
+        message: e.response?.status === 409 ? t('newService.toast.serviceNameAlreadyExists') : e?.message,
       });
-      throw new Error(e.response?.status === 409 ? t("newService.toast.serviceNameAlreadyExists").toString() : e?.message);
+      throw new Error(
+        e.response?.status === 409 ? t('newService.toast.serviceNameAlreadyExists').toString() : e?.message,
+      );
     },
     description,
     slot,
@@ -769,22 +772,22 @@ export const editServiceInfo = async () => {
       name,
       description,
       slot,
-      type: "POST",
+      type: 'POST',
       updateServiceDb: true,
-      state: "ready",
-    })
+      state: 'ready',
+    }),
   );
 
   await Promise.all(tasks)
     .then(() =>
       useToastStore.getState().success({
-        title: i18next.t("newService.toast.success"),
-        message: i18next.t("newService.toast.savedSuccessfully"),
-      })
+        title: i18next.t('newService.toast.success'),
+        message: i18next.t('newService.toast.savedSuccessfully'),
+      }),
     )
     .catch((e) => {
       useToastStore.getState().error({
-        title: i18next.t("newService.toast.saveFailed"),
+        title: i18next.t('newService.toast.saveFailed'),
         message: e?.message,
       });
     });
@@ -797,12 +800,12 @@ export const runServiceTest = async () => {
   try {
     await api.post(testService(state, name), {});
     useToastStore.getState().success({
-      title: i18next.t("newService.toast.testResultSuccess"),
+      title: i18next.t('newService.toast.testResultSuccess'),
     });
   } catch (error) {
-    console.log("ERROR: ", error);
+    console.log('ERROR: ', error);
     useToastStore.getState().error({
-      title: i18next.t("newService.toast.testResultError"),
+      title: i18next.t('newService.toast.testResultError'),
     });
   }
 };

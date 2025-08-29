@@ -1,37 +1,35 @@
-import { Node } from "@xyflow/react";
-import useServiceStore from "store/new-services.store";
-import useTestServiceStore from "store/test-services.store";
-import { StepType } from "types";
+import { Node } from '@xyflow/react';
+import useServiceStore from 'store/new-services.store';
+import useTestServiceStore from 'store/test-services.store';
+import { StepType } from 'types';
 
 export const testServiceFlow = async () => {
   const store = useTestServiceStore.getState();
   let currentNode = findStartNode();
-  if(!currentNode) {
-    store.addError("chat.no-start-node");
+  if (!currentNode) {
+    store.addError('chat.no-start-node');
     return;
   }
 
-  while(currentNode) {
+  while (currentNode) {
     store.changeCurrentNodeId(currentNode?.id);
-    if(currentNode.type === "placeholder") {
-      store.addError("chat.incomplete-service-flow");
+    if (currentNode.type === 'placeholder') {
+      store.addError('chat.incomplete-service-flow');
       return;
     }
 
-    if (currentNode.type === "custom") {
+    if (currentNode.type === 'custom') {
       await performActionBasedOnNode(currentNode);
-    } 
+    }
 
     const nextNodes = findNextNodes(currentNode);
 
-    if(nextNodes.length === 0)
-      break;
-    if(nextNodes.length === 1)
-      currentNode = nextNodes[0];
-    else {      
+    if (nextNodes.length === 0) break;
+    if (nextNodes.length === 1) currentNode = nextNodes[0];
+    else {
       const input = useTestServiceStore.getState().userInput?.toLowerCase().trim() ?? '';
-      const confirmation = ['yes', 'jah', 'eks', 'yea'].some(x => input.startsWith(x));
-      if(confirmation) {
+      const confirmation = ['yes', 'jah', 'eks', 'yea'].some((x) => input.startsWith(x));
+      if (confirmation) {
         currentNode = nextNodes[0];
       } else {
         currentNode = nextNodes[1];
@@ -41,55 +39,54 @@ export const testServiceFlow = async () => {
 
   store.addSuccess('chat.end-of-chat');
   store.clearCurrentNodeId();
-}
+};
 
 function findStartNode(): Node | undefined {
   const nodes = useServiceStore.getState().nodes;
-  return nodes.find(x => x.type === "start");
+  return nodes.find((x) => x.type === 'start');
 }
 
 function findNextNodes(node: Node): Node[] {
   const nodes = useServiceStore.getState().nodes;
   const edges = useServiceStore.getState().edges;
 
-  const targets = edges.filter(x => x.source === node.id).map(x => x.target);
-  if(!targets || targets.length === 0) 
-    return [];
+  const targets = edges.filter((x) => x.source === node.id).map((x) => x.target);
+  if (!targets || targets.length === 0) return [];
 
-  return nodes.filter(x => targets.includes(x.id));
+  return nodes.filter((x) => targets.includes(x.id));
 }
 
 async function performActionBasedOnNode(node: Node) {
   const store = useTestServiceStore.getState();
-  switch(node.data.stepType) {
-    case StepType.Auth: 
-      store.addBotMessage("chat.loginWithTARA"); 
+  switch (node.data.stepType) {
+    case StepType.Auth:
+      store.addBotMessage('chat.loginWithTARA');
       break;
     case StepType.Textfield:
       store.addBotMessage(node.data.message);
       break;
     case StepType.OpenWebpage:
-      store.addBotMessage(node.data.linkText, node.data.link); 
+      store.addBotMessage(node.data.linkText, node.data.link);
       break;
     case StepType.FileSign:
-      store.addBotMessage("chat.fileSignYesNo"); 
+      store.addBotMessage('chat.fileSignYesNo');
       break;
     case StepType.FileGenerate:
-      store.addBotMessage(node.data.fileName, "data:" + node.data.fileContent); 
-    break;
+      store.addBotMessage(node.data.fileName, 'data:' + node.data.fileContent);
+      break;
     case StepType.FinishingStepRedirect:
-      store.addBotMessage("chat.redirectToCustomerSupport"); 
+      store.addBotMessage('chat.redirectToCustomerSupport');
       break;
     case StepType.Input:
-      store.addInfo("chat.waiting-for-user-input");
+      store.addInfo('chat.waiting-for-user-input');
       store.waitForUserInput();
       do {
         await sleep(2000);
-      } while(useTestServiceStore.getState().waitingForInput);
+      } while (useTestServiceStore.getState().waitingForInput);
       break;
   }
 }
 
 function sleep(ms: number) {
-  return new Promise(resolve => setTimeout(resolve, ms));
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }

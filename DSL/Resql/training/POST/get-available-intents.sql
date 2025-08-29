@@ -17,7 +17,7 @@ WITH connected_intents AS (
            GROUP BY intent,
                     service,
                     service_name)
-      AND status in ('pending', 'approved')
+      AND status IN ('pending', 'approved')
 ),
 latest_intent_status AS (
     SELECT intent,
@@ -25,6 +25,7 @@ latest_intent_status AS (
            created,
            ROW_NUMBER() OVER (PARTITION BY intent ORDER BY created DESC) AS rn
     FROM intent
+    WHERE status = 'ACTIVE'
 )
 SELECT intent,
        CEIL(COUNT(*) OVER() / :page_size::DECIMAL) AS total_pages,

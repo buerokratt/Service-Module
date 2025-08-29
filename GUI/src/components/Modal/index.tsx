@@ -1,8 +1,8 @@
-import React, { FC, PropsWithChildren, ReactNode } from "react";
-import * as RadixDialog from "@radix-ui/react-dialog";
+import * as RadixDialog from '@radix-ui/react-dialog';
+import React, { FC, PropsWithChildren, ReactNode } from 'react';
 
-import { Track } from "..";
-import "./Modal.scss";
+import { Track } from '..';
+import './Modal.scss';
 
 type ModalProps = {
   title: string | null;
@@ -19,7 +19,7 @@ const Modal: FC<PropsWithChildren<ModalProps>> = ({ title, footer, onClose, chil
         <RadixDialog.Content
           onClick={(e) => e.stopPropagation()}
           className="modal"
-          aria-describedby={description ? "modal-description" : undefined}
+          aria-describedby={description ? 'modal-description' : undefined}
         >
           {title && (
             <div className="modal__header">

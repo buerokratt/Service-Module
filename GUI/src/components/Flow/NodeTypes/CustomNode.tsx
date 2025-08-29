@@ -1,12 +1,14 @@
-import { Dispatch, FC, SetStateAction, useEffect } from "react";
-import { Handle, NodeProps, Position, useUpdateNodeInternals } from "@xyflow/react";
-import { MdDeleteOutline, MdOutlineEdit, MdOutlineRemoveRedEye } from "react-icons/md";
-import StepNode from "./StepNode";
-import "./Node.scss";
-import { StepType } from "types";
-import Button from "components/Button";
-import Icon from "components/Icon";
-import Track from "components/Track";
+import { Dispatch, FC, SetStateAction, useEffect } from 'react';
+import { Handle, NodeProps, Position, useUpdateNodeInternals } from '@xyflow/react';
+import { MdDeleteOutline, MdOutlineEdit, MdOutlineRemoveRedEye } from 'react-icons/md';
+
+import StepNode from './StepNode';
+
+import './Node.scss';
+import Button from 'components/Button';
+import Icon from 'components/Icon';
+import Track from 'components/Track';
+import { StepType } from 'types';
 
 type NodeDataProps = {
   data: {
@@ -32,7 +34,7 @@ const CustomNode: FC<NodeProps & NodeDataProps> = (props) => {
   }, [data.childrenCount]);
 
   const isFinishingStep = () => {
-    return data.type === "finishing-step";
+    return data.type === 'finishing-step';
   };
 
   const bottomHandles = (): JSX.Element => {
@@ -49,7 +51,7 @@ const CustomNode: FC<NodeProps & NodeDataProps> = (props) => {
               shouldOffsetHandles
                 ? {
                     left: `${(100 / (data.childrenCount + 1)) * (i + 1)}%`,
-                    visibility: isFinishingStep() ? "hidden" : "visible",
+                    visibility: isFinishingStep() ? 'hidden' : 'visible',
                   }
                 : {}
             }
@@ -64,8 +66,8 @@ const CustomNode: FC<NodeProps & NodeDataProps> = (props) => {
     <>
       <Handle type="target" position={Position.Top} isConnectable={isConnectable} />
       <StepNode data={data} />
-      {data.stepType !== "rule" && (
-        <Track style={{ position: "fixed", top: 8, right: 8 }}>
+      {data.stepType !== 'rule' && (
+        <Track style={{ position: 'fixed', top: 8, right: 8 }}>
           <Button
             appearance="text"
             onClick={() => {

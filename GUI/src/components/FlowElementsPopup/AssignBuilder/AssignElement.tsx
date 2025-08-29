@@ -1,20 +1,22 @@
-import React, { useState } from "react";
-import { DragInput, FormInput, Icon, Tooltip, Track } from "components";
-import { MdDataObject, MdDeleteOutline, MdEdit, MdMoveDown } from "react-icons/md";
-import { Assign } from "../../../types/assign";
-import "../styles.scss";
-import { isTemplate, stringToTemplate, templateToString } from "utils/string-util";
-import { isArray, isObject } from "utils/object-util";
-import { t } from "i18next";
-import { getDragData } from "utils/component-util";
-import ObjectEditor from "./ObjectEditor";
-import styles from "./AssignElement.module.scss";
-import useToastStore from "store/toasts.store";
+import { DragInput, FormInput, Icon, Tooltip, Track } from 'components';
+import React, { useState } from 'react';
+import { MdDataObject, MdDeleteOutline, MdEdit, MdMoveDown } from 'react-icons/md';
+import useToastStore from 'store/toasts.store';
+import { getDragData } from 'utils/component-util';
+import { isArray, isObject } from 'utils/object-util';
+import { isTemplate, stringToTemplate, templateToString } from 'utils/string-util';
+
+import styles from './AssignElement.module.scss';
+import ObjectEditor from './ObjectEditor';
+import { Assign } from '../../../types/assign';
+
+import '../styles.scss';
+import { t } from 'i18next';
 
 const showInvalidObjectError = () => {
   useToastStore.getState().error({
-    title: t("serviceFlow.apiElements.cannotOpenEditor"),
-    message: t("serviceFlow.apiElements.invalidObjectError"),
+    title: t('serviceFlow.apiElements.cannotOpenEditor'),
+    message: t('serviceFlow.apiElements.invalidObjectError'),
   });
 };
 
@@ -86,7 +88,7 @@ const AssignElement: React.FC<AssignElementProps> = ({
       setIsEditingManually(true);
     } else {
       // New empty element
-      if (element.value === "") {
+      if (element.value === '') {
         setIsObjectEditorOpen(!isObjectEditorOpen);
         return;
       }
@@ -100,7 +102,7 @@ const AssignElement: React.FC<AssignElementProps> = ({
         JSON.parse(templateToString(element.value));
         setIsObjectEditorOpen(!isObjectEditorOpen);
       } catch (error) {
-        console.log("Error parsing input", error);
+        console.log('Error parsing input', error);
         showInvalidObjectError();
       }
     }
@@ -120,7 +122,7 @@ const AssignElement: React.FC<AssignElementProps> = ({
           hideLabel
         />
         :
-        <Track style={{ flex: "1 0 75%", justifyContent: "flex-end" }} gap={5}>
+        <Track style={{ flex: '1 0 75%', justifyContent: 'flex-end' }} gap={5}>
           {!isObjectEditorOpen && (
             <>
               {isEditingManually ? (
@@ -140,14 +142,16 @@ const AssignElement: React.FC<AssignElementProps> = ({
                   {slots.length && isObject(slots[0].data) && !isArray(slots[0].data) ? (
                     <Tooltip
                       content={t(
-                        isSecondSlotOpen ? "serviceFlow.popup.removeValueAssignment" : "serviceFlow.popup.assignAsValue"
+                        isSecondSlotOpen
+                          ? 'serviceFlow.popup.removeValueAssignment'
+                          : 'serviceFlow.popup.assignAsValue',
                       )}
                       onButtonClick={() => {
                         setIsSecondSlotOpen(!isSecondSlotOpen);
                         if (!isSecondSlotOpen) resetSecondSlot();
                       }}
                     >
-                      <div className={`small-assign-button ${isSecondSlotOpen ? "assign-red" : "assign-blue"}`}>
+                      <div className={`small-assign-button ${isSecondSlotOpen ? 'assign-red' : 'assign-blue'}`}>
                         <Icon icon={<MdMoveDown />} />
                       </div>
                     </Tooltip>
@@ -160,7 +164,7 @@ const AssignElement: React.FC<AssignElementProps> = ({
               )}
 
               {!isEditingManually ? (
-                <Tooltip content={t("serviceFlow.popup.assignManualEdit")} onButtonClick={enableManualEdit}>
+                <Tooltip content={t('serviceFlow.popup.assignManualEdit')} onButtonClick={enableManualEdit}>
                   <div className="small-assign-button assign-blue">
                     <Icon icon={<MdEdit />} />
                   </div>
@@ -170,7 +174,7 @@ const AssignElement: React.FC<AssignElementProps> = ({
           )}
 
           {!isEditingManually && (
-            <Tooltip content={t("serviceFlow.popup.openObjectEditor")} onButtonClick={toggleObjectEditor}>
+            <Tooltip content={t('serviceFlow.popup.openObjectEditor')} onButtonClick={toggleObjectEditor}>
               <div className="small-assign-button assign-blue">
                 <Icon icon={<MdDataObject />} />
               </div>

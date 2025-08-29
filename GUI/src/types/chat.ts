@@ -81,4 +81,4 @@ export enum MessageSseEvent {
 export type MessageStatus = {
   messageId: string | null;
   readTime: any;
-}
+};

@@ -1,15 +1,15 @@
-import { FC, useCallback } from "react";
-import { ReactFlow, Background, Controls, Edge, MiniMap, Node, useReactFlow } from "@xyflow/react";
-import "@xyflow/react/dist/style.css";
-import useServiceStore from "store/new-services.store";
-import edgeTypes from "components/Flow/EdgeTypes";
-import nodeTypes from "components/Flow/NodeTypes";
-import useLayout from "hooks/flow/useLayout";
-import { useOnNodesDelete } from "hooks/flow/useOnNodeDelete";
-import { Button, Modal, Track } from "components";
-import { useTranslation } from "react-i18next";
-import { StepType } from "types";
-import Chat from "components/chat/chat";
+import { Background, Controls, Edge, MiniMap, Node, ReactFlow, useReactFlow } from '@xyflow/react';
+import { FC, useCallback } from 'react';
+import '@xyflow/react/dist/style.css';
+import { useTranslation } from 'react-i18next';
+import useServiceStore from 'store/new-services.store';
+import edgeTypes from 'components/Flow/EdgeTypes';
+import nodeTypes from 'components/Flow/NodeTypes';
+import useLayout from 'hooks/flow/useLayout';
+import { useOnNodesDelete } from 'hooks/flow/useOnNodeDelete';
+import { Button, Modal, Track } from 'components';
+import { StepType } from 'types';
+import Chat from 'components/chat/chat';
 
 type FlowBuilderProps = {
   nodes: Node[];
@@ -42,7 +42,7 @@ const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
 
     const ghostEdges = parentOutgoingEdges.filter((edge) => {
       const targetNode = nodes.find((n) => n.id === edge.target);
-      return targetNode?.type === "ghost";
+      return targetNode?.type === 'ghost';
     });
 
     if (ghostEdges.length > 0) {
@@ -59,7 +59,7 @@ const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
         id: `${source}->${target}`,
         source: source,
         target: target,
-        type: "step",
+        type: 'step',
       },
     ]);
     setHasUnsavedChanges(true);
@@ -95,7 +95,7 @@ const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
         }
         return !shouldPreventDelete;
       } catch (error) {
-        console.error("Error in onBeforeDelete:", error);
+        console.error('Error in onBeforeDelete:', error);
         return true;
       }
     },
@@ -132,7 +132,7 @@ const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
         fitView
         fitViewOptions={{ padding: 5 }}
         isValidConnection={isValidConnection}
-        defaultEdgeOptions={{ type: "step", deletable: false }}
+        defaultEdgeOptions={{ type: 'step', deletable: false }}
       >
         <Chat />
         <MiniMap />
@@ -141,7 +141,7 @@ const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
       </ReactFlow>
       {isDeleteConnectionsModalVisible && (
         <Modal
-          title={t("overview.popup.deleteNodeConnections")}
+          title={t('overview.popup.deleteNodeConnections')}
           onClose={() => {
             setNodeToDelete(null);
             setIsDeleteConnectionsModalVisible(false);
@@ -149,10 +149,10 @@ const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
         >
           <Track justify="end" gap={16}>
             <Button appearance="primary" onClick={onDeleteConfirmed}>
-              {t("global.delete")}
+              {t('global.delete')}
             </Button>
             <Button appearance="primary" onClick={onKeepItConfirmed}>
-              {t("global.keepIt")}
+              {t('global.keepIt')}
             </Button>
           </Track>
         </Modal>

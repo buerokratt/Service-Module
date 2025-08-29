@@ -1,16 +1,17 @@
-import React, { FC, useState } from "react";
-import { t } from "i18next";
-import { Button, HeaderStepCounter, Modal, Track } from "..";
-import useServiceStore from "store/new-services.store";
-import "@buerokratt-ria/header/src/Header.scss";
-import { ROUTES } from "resources/routes-constants";
-import { useNavigate, useParams } from "react-router-dom";
-import useServiceListStore from "../../store/services.store";
-import { ServiceState } from "types";
-import { deleteService } from "resources/api-constants";
-import api from "../../services/api-dev";
-import { removeTrailingUnderscores } from "utils/string-util";
-import useToastStore from "store/toasts.store";
+import { t } from 'i18next';
+import React, { FC, useState } from 'react';
+import useServiceStore from 'store/new-services.store';
+import '@buerokratt-ria/header/src/Header.scss';
+import { useNavigate, useParams } from 'react-router-dom';
+import { deleteService } from 'resources/api-constants';
+import { ROUTES } from 'resources/routes-constants';
+import useToastStore from 'store/toasts.store';
+import { ServiceState } from 'types';
+import { removeTrailingUnderscores } from 'utils/string-util';
+
+import { Button, HeaderStepCounter, Modal, Track } from '..';
+import api from '../../services/api-dev';
+import useServiceListStore from '../../store/services.store';
 
 type NewServiceHeaderProps = {
   activeStep: number;
@@ -34,12 +35,12 @@ const NewServiceHeader: FC<NewServiceHeaderProps> = ({ activeStep, backOnClick, 
     <>
       <header className="header" style={{ paddingLeft: 24 }}>
         <Track justify="between" gap={16}>
-          <Button appearance="text" style={{ textDecoration: "none", boxShadow: "none" }} onClick={backOnClick}>
-            <h1 style={{ whiteSpace: "nowrap", color: "black" }}>{`< ${t("menu.backToServiceListing")}`}</h1>
+          <Button appearance="text" style={{ textDecoration: 'none', boxShadow: 'none' }} onClick={backOnClick}>
+            <h1 style={{ whiteSpace: 'nowrap', color: 'black' }}>{`< ${t('menu.backToServiceListing')}`}</h1>
           </Button>
           <HeaderStepCounter activeStep={activeStep} />
           <Button
-            appearance={isDeleting ? "loading" : "error"}
+            appearance={isDeleting ? 'loading' : 'error'}
             disabled={
               serviceState && id ? serviceState !== ServiceState.Draft && serviceState !== ServiceState.Ready : true
             }
@@ -47,10 +48,10 @@ const NewServiceHeader: FC<NewServiceHeaderProps> = ({ activeStep, backOnClick, 
               setIsDeleteServiceModalVisible(true);
             }}
           >
-            {t("serviceFlow.apiElements.delete")}
+            {t('serviceFlow.apiElements.delete')}
           </Button>
           <Button
-            appearance={isSaving ? "loading" : "primary"}
+            appearance={isSaving ? 'loading' : 'primary'}
             onClick={async () => {
               setIsSaving(true);
               await useServiceStore.getState().onServiceSave(ServiceState.Draft, false);
@@ -58,13 +59,13 @@ const NewServiceHeader: FC<NewServiceHeaderProps> = ({ activeStep, backOnClick, 
               saveOnClick();
             }}
           >
-            {t("global.save")}
+            {t('global.save')}
           </Button>
           <Button
-            appearance={isContinuing ? "loading" : "primary"}
+            appearance={isContinuing ? 'loading' : 'primary'}
             onClick={() => {
               if (isSaving) {
-                useToastStore.getState().info({ title: t("overview.service.toast.cannotContinueUntilServiceIsSaved") });
+                useToastStore.getState().info({ title: t('overview.service.toast.cannotContinueUntilServiceIsSaved') });
                 return;
               }
               setIsContinuing(true);
@@ -82,15 +83,15 @@ const NewServiceHeader: FC<NewServiceHeaderProps> = ({ activeStep, backOnClick, 
             }}
             disabled={!name}
           >
-            {t("global.confirm")}
+            {t('global.confirm')}
           </Button>
         </Track>
       </header>
       {isDeleteServiceModalVisible && (
-        <Modal title={t("overview.popup.delete")} onClose={() => setIsDeleteServiceModalVisible(false)}>
+        <Modal title={t('overview.popup.delete')} onClose={() => setIsDeleteServiceModalVisible(false)}>
           <Track justify="end" gap={16}>
             <Button appearance="secondary" onClick={() => setIsDeleteServiceModalVisible(false)}>
-              {t("overview.cancel")}
+              {t('overview.cancel')}
             </Button>
             <Button
               appearance="error"
@@ -113,7 +114,7 @@ const NewServiceHeader: FC<NewServiceHeaderProps> = ({ activeStep, backOnClick, 
                   });
               }}
             >
-              {t("overview.delete")}
+              {t('overview.delete')}
             </Button>
           </Track>
         </Modal>

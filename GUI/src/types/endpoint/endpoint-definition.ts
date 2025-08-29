@@ -1,6 +1,6 @@
-import { RawData } from "../raw-data";
-import { EndpointType } from "./endpoint-type";
-import { EndpointVariableData } from "./endpoint-variable-data";
+import { RawData } from '../raw-data';
+import { EndpointType } from './endpoint-type';
+import { EndpointVariableData } from './endpoint-variable-data';
 
 export type EndpointDefinition = {
   id: string;
@@ -8,7 +8,7 @@ export type EndpointDefinition = {
   path: string;
   methodType: string;
   type: EndpointType;
-  dataType: "raw" | "custom";
+  dataType: 'raw' | 'custom';
   supported: boolean;
   isSelected: boolean;
   url?: string;
