@@ -10,7 +10,7 @@ import { Assign } from 'types/assign';
 import { DynamicChoices } from 'types/dynamic-choices';
 import { MultiChoiceQuestion } from 'types/multi-choice-question';
 
-type NodeDataProps = {
+type StepNodeProps = {
   data: {
     childrenCount: number;
     clientInputId: number;
@@ -37,7 +37,7 @@ type NodeDataProps = {
   };
 };
 
-const StepNode: FC<NodeDataProps> = ({ data }) => {
+const StepNode: FC<StepNodeProps> = ({ data }) => {
   const { t } = useTranslation();
   const endpoints = useServiceStore((state) => state.endpoints);
   const [isTestedAndPassed, setIsTestedAndPassed] = useState<boolean | null>(null);
