@@ -1,7 +1,6 @@
 import { testService } from 'resources/api-constants';
 import useServiceStore from 'store/new-services.store';
 import useTestServiceStore from 'store/test-services.store';
-import { ServiceState } from 'types/service-state';
 import { ServiceTestError } from 'types/service-test-error';
 import { translateObjectKeys } from 'utils/i18n-util';
 import { fromSnakeCase, removeTrailingUnderscores } from 'utils/string-util';
@@ -9,42 +8,13 @@ import { fromSnakeCase, removeTrailingUnderscores } from 'utils/string-util';
 import { createApiInstance } from './api';
 
 export const runServiceTest = async (input: string) => {
-  const headerValue = validateTestEnvironment();
-  if (!headerValue) {
-    return;
-  }
-
-  const serviceData = getServiceTestData();
-  if (!serviceData) {
-    return;
-  }
-
-  const { state, name, serviceStore } = serviceData;
-
-  clearPreviousTestStates(serviceStore);
-
-  try {
-    await executeServiceTest(headerValue, state, name, input);
-    useTestServiceStore.getState().addSuccess('chat.service-test-success');
-  } catch (error) {
-    handleTestError(error, serviceStore);
-  }
-};
-
-const validateTestEnvironment = (): string | null => {
   const headerValue = import.meta.env.REACT_APP_RUUTER_SERVICES_TESTING_HEADER;
   if (!headerValue) {
     console.error('runServiceTest: Header value is not set, not testing.');
-    return null;
+    return;
   }
-  return headerValue;
-};
 
-const getServiceTestData = (): {
-  state: ServiceState;
-  name: string;
-  serviceStore: ReturnType<typeof useServiceStore.getState>;
-} | null => {
+  const store = useTestServiceStore.getState();
   const serviceStore = useServiceStore.getState();
   const state = serviceStore.serviceState;
   const name = removeTrailingUnderscores(serviceStore.serviceNameDashed());
@@ -52,13 +22,10 @@ const getServiceTestData = (): {
   if (!state) {
     // This should never happen, widget is hidden until state is set
     console.error('runServiceTest: Service state is not set, not testing.');
-    return null;
+    return;
   }
 
-  return { state, name, serviceStore };
-};
-
-const clearPreviousTestStates = (serviceStore: ReturnType<typeof useServiceStore.getState>) => {
+  // Clear any previous test states
   serviceStore.setNodes((prevNodes) =>
     prevNodes.map((prevNode) => ({
       ...prevNode,
@@ -68,61 +35,54 @@ const clearPreviousTestStates = (serviceStore: ReturnType<typeof useServiceStore
       },
     })),
   );
-};
 
-const executeServiceTest = async (headerValue: string, state: ServiceState, name: string, input: string) => {
-  const testApi = createApiInstance({
-    'x-ruuter-testing': headerValue,
-  });
-  return testApi.post(testService(state, name), { input });
-};
+  // todo style and text
 
-const updateNodeTestState = (
-  serviceStore: ReturnType<typeof useServiceStore.getState>,
-  nodeId: string,
-  passed: boolean,
-) => {
-  serviceStore.setNodes((prevNodes) =>
-    prevNodes.map((prevNode) => {
-      if (prevNode.id !== nodeId) return prevNode;
-      return {
-        ...prevNode,
-        data: {
-          ...prevNode.data,
-          testingPassed: passed,
-        },
-      };
-    }),
-  );
-};
+  try {
+    const testApi = createApiInstance({
+      'x-ruuter-testing': headerValue,
+    });
+    await testApi.post(testService(state, name), { input });
+    store.addSuccess('chat.service-test-success');
+  } catch (error) {
+    if (hasResponseData(error)) {
+      const errorData = error.response.data;
+      if (isErrorResponse(errorData)) {
+        console.error('runServiceTest: Service test error:', errorData);
 
-const handleTestError = (error: unknown, serviceStore: ReturnType<typeof useServiceStore.getState>) => {
-  const store = useTestServiceStore.getState();
+        const node = serviceStore.nodes.find((node) => node.data.label === fromSnakeCase(errorData.stepName));
 
-  if (hasResponseData(error)) {
-    const errorData = error.response.data;
-    if (isErrorResponse(errorData)) {
-      console.error('runServiceTest: Service test error:', errorData);
+        if (!node) {
+          console.error('runServiceTest: Node not found:', errorData);
+          store.addError('chat.unknown-error');
+          return;
+        }
 
-      const node = serviceStore.nodes.find((node) => node.data.label === fromSnakeCase(errorData.stepName));
+        // Update the node to show test failure
+        serviceStore.setNodes((prevNodes) =>
+          prevNodes.map((prevNode) => {
+            if (prevNode.id !== node.id) return prevNode;
+            return {
+              ...prevNode,
+              data: {
+                ...prevNode.data,
+                testingPassed: false,
+              },
+            };
+          }),
+        );
 
-      if (!node) {
-        console.error('runServiceTest: Node not found:', errorData);
+        const payload = translateError(errorData, node.data.label as string);
+
+        store.addError('chat.service-test-error.title', payload);
+      } else {
+        console.error('runServiceTest: Unknown error response format:', errorData);
         store.addError('chat.unknown-error');
-        return;
       }
-
-      updateNodeTestState(serviceStore, node.id, false);
-
-      const payload = translateError(errorData, node.data.label as string);
-      store.addError('chat.service-test-error.title', payload);
     } else {
-      console.error('runServiceTest: Unknown error response format:', errorData);
+      console.error('runServiceTest: Network or other error:', error);
       store.addError('chat.unknown-error');
     }
-  } else {
-    console.error('runServiceTest: Network or other error:', error);
-    store.addError('chat.unknown-error');
   }
 };
 
