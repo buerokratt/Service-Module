@@ -1,9 +1,9 @@
-import { t } from "i18next";
-import { FormRichText, Track } from "..";
-import { CSSProperties, FC, useRef, useState } from "react";
-import PreviousVariables from "./PreviousVariables";
-import { removeNestedTemplates } from "utils/string-util";
-import ReactQuill from "react-quill";
+import { t } from 'i18next';
+import { FormRichText, Track } from '..';
+import { CSSProperties, FC, useRef, useState } from 'react';
+import PreviousVariables from './PreviousVariables';
+import { removeNestedTemplates } from 'utils/string-util';
+import ReactQuill from 'react-quill';
 
 type TextfieldContentProps = {
   readonly defaultMessage?: string;
@@ -33,29 +33,25 @@ const TextfieldContent: FC<TextfieldContentProps> = ({ defaultMessage, onChange,
 
   const handleEditorChange = (value: string | null) => {
     if (!onChange) return;
-    
-    const formattedValue = removeNestedTemplates(value ?? "");
+
+    const formattedValue = removeNestedTemplates(value ?? '');
     if (value !== formattedValue && quillRef.current) {
       const editor = quillRef.current.getEditor();
       editor.setText(formattedValue.replaceAll(/<\/?p>/g, '') || '');
     }
-    
+
     const placeholders = findMessagePlaceholders(formattedValue);
     onChange(formattedValue, placeholders);
     setEditorValue(formattedValue);
   };
-  
+
   return (
     <>
       <Track direction="vertical" align="left" style={{ width: '100%', ...popupBodyCss }}>
         <label htmlFor="message" style={{ marginBottom: '10px' }}>
           {t('serviceFlow.popup.messageLabel')}
         </label>
-        <FormRichText
-          quill={quillRef}
-          onChange={handleEditorChange}
-          defaultValue={editorValue ?? ''}
-        />
+        <FormRichText quill={quillRef} onChange={handleEditorChange} defaultValue={editorValue ?? ''} />
       </Track>
       <PreviousVariables nodeId={nodeId} />
     </>
