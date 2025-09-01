@@ -15,7 +15,7 @@ export interface TestingMessage {
 
 type TestingMessagePayload = Record<string, string>;
 
-interface TestServiceStoreState {
+export interface TestServiceStoreState {
   isChatOpened: boolean;
   openChat: () => void;
   closeChat: () => void;
