@@ -37,7 +37,6 @@ export const runServiceTest = async (input: string) => {
   );
 
   // todo style and text
-  // todo more tests - for new functionality
 
   try {
     const testApi = createApiInstance({
