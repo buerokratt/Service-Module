@@ -24,13 +24,13 @@ const ChatKeyPad = (): React.JSX.Element => {
           placeholder={t('chat.input-placeholder') ?? ''}
           onChange={(e) => setUserInput(e.target.value)}
           onKeyDown={(event) => {
-            if (event.key === 'Enter') {
+            if (event.key === 'Enter' && userInput.trim()) {
               event.preventDefault();
               testService();
             }
           }}
         />
-        <button onClick={testService} className={styles.button}>
+        <button onClick={testService} className={styles.button} disabled={!userInput.trim()}>
           <img src={Send} />
         </button>
       </div>
