@@ -26,8 +26,6 @@ export const runServiceTest = async (input: string) => {
   try {
     const testApi = createApiInstance({
       // todo remove hardcoded header value
-      // todo add to env and docker compose - test
-      // todo readme
       'x-ruuter-testing': 'voorshpellhappilo',
     });
     await testApi.post(testService(state, name), { input });
