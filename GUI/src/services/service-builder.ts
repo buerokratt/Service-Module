@@ -222,7 +222,13 @@ async function saveService(
     .catch(onError);
 }
 
-function getYamlContent(nodes: Node<NodeDataProps>[], edges: Edge[], name: string, description: string, showError = true): any {
+function getYamlContent(
+  nodes: Node<NodeDataProps>[],
+  edges: Edge[],
+  name: string,
+  description: string,
+  showError = true,
+): any {
   const allRelations: any[] = [];
 
   nodes.forEach((node) => {
