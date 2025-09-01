@@ -9,6 +9,7 @@ import {
   hasResponseData,
   isErrorResponse,
   translateError,
+  updateNodeTestState,
   validateTestEnvironment,
 } from './service-tester';
 
@@ -532,7 +533,7 @@ describe('clearPreviousTestStates', () => {
       },
     ];
 
-    clearPreviousTestStates(mockServiceStore as any);
+    clearPreviousTestStates(mockServiceStore as unknown as ServiceStoreState);
 
     expect(mockServiceStore.setNodes).toHaveBeenCalledWith(expect.any(Function));
 
@@ -730,5 +731,195 @@ describe('executeServiceTest', () => {
     const result = await executeServiceTest(headerValue, state, name, input);
 
     expect(result).toBe(expectedResponse);
+  });
+});
+
+describe('updateNodeTestState', () => {
+  it('should update testingPassed for the specified node', () => {
+    const mockServiceStore = {
+      setNodes: vi.fn(),
+    };
+
+    const mockNodes = [
+      {
+        id: 'node1',
+        data: {
+          label: 'Test Node 1',
+          testingPassed: true,
+        },
+      },
+      {
+        id: 'node2',
+        data: {
+          label: 'Test Node 2',
+          testingPassed: false,
+        },
+      },
+      {
+        id: 'node3',
+        data: {
+          label: 'Test Node 3',
+          testingPassed: null,
+        },
+      },
+    ];
+
+    updateNodeTestState(mockServiceStore as unknown as ServiceStoreState, 'node2', true);
+
+    expect(mockServiceStore.setNodes).toHaveBeenCalledWith(expect.any(Function));
+
+    const setNodesCallback = mockServiceStore.setNodes.mock.calls[0][0];
+    const result = setNodesCallback(mockNodes);
+
+    expect(result).toEqual([
+      {
+        id: 'node1',
+        data: {
+          label: 'Test Node 1',
+          testingPassed: true,
+        },
+      },
+      {
+        id: 'node2',
+        data: {
+          label: 'Test Node 2',
+          testingPassed: true,
+        },
+      },
+      {
+        id: 'node3',
+        data: {
+          label: 'Test Node 3',
+          testingPassed: null,
+        },
+      },
+    ]);
+  });
+
+  it('should set testingPassed to false when passed is false', () => {
+    const mockServiceStore = {
+      setNodes: vi.fn(),
+    };
+
+    const mockNodes = [
+      {
+        id: 'node1',
+        data: {
+          label: 'Test Node 1',
+          testingPassed: true,
+        },
+      },
+    ];
+
+    updateNodeTestState(mockServiceStore as unknown as ServiceStoreState, 'node1', false);
+
+    const setNodesCallback = mockServiceStore.setNodes.mock.calls[0][0];
+    const result = setNodesCallback(mockNodes);
+
+    expect(result[0].data.testingPassed).toBe(false);
+  });
+
+  it('should not modify other nodes when updating a specific node', () => {
+    const mockServiceStore = {
+      setNodes: vi.fn(),
+    };
+
+    const mockNodes = [
+      {
+        id: 'node1',
+        data: {
+          label: 'Test Node 1',
+          testingPassed: true,
+          otherProperty: 'value1',
+        },
+      },
+      {
+        id: 'node2',
+        data: {
+          label: 'Test Node 2',
+          testingPassed: false,
+          otherProperty: 'value2',
+        },
+      },
+    ];
+
+    updateNodeTestState(mockServiceStore as unknown as ServiceStoreState, 'node1', false);
+
+    const setNodesCallback = mockServiceStore.setNodes.mock.calls[0][0];
+    const result = setNodesCallback(mockNodes);
+
+    // node1 should be updated
+    expect(result[0].data.testingPassed).toBe(false);
+    expect(result[0].data.otherProperty).toBe('value1');
+
+    // node2 should remain unchanged
+    expect(result[1].data.testingPassed).toBe(false);
+    expect(result[1].data.otherProperty).toBe('value2');
+  });
+
+  it('should preserve all other node properties when updating', () => {
+    const mockServiceStore = {
+      setNodes: vi.fn(),
+    };
+
+    const mockNodes = [
+      {
+        id: 'node1',
+        type: 'custom',
+        position: { x: 100, y: 200 },
+        data: {
+          label: 'Test Node',
+          type: 'custom',
+          stepType: 'ASSIGN',
+          readonly: false,
+          childrenCount: 0,
+          testingPassed: true,
+          endpoint: { id: 'endpoint1', name: 'Test Endpoint' },
+        },
+      },
+    ];
+
+    updateNodeTestState(mockServiceStore as unknown as ServiceStoreState, 'node1', false);
+
+    const setNodesCallback = mockServiceStore.setNodes.mock.calls[0][0];
+    const result = setNodesCallback(mockNodes);
+
+    expect(result[0]).toEqual({
+      id: 'node1',
+      type: 'custom',
+      position: { x: 100, y: 200 },
+      data: {
+        label: 'Test Node',
+        type: 'custom',
+        stepType: 'ASSIGN',
+        readonly: false,
+        childrenCount: 0,
+        testingPassed: false,
+        endpoint: { id: 'endpoint1', name: 'Test Endpoint' },
+      },
+    });
+  });
+
+  it('should handle nodes without testingPassed property', () => {
+    const mockServiceStore = {
+      setNodes: vi.fn(),
+    };
+
+    const mockNodes = [
+      {
+        id: 'node1',
+        data: {
+          label: 'Test Node 1',
+        },
+      },
+    ];
+
+    updateNodeTestState(mockServiceStore as unknown as ServiceStoreState, 'node1', true);
+
+    const setNodesCallback = mockServiceStore.setNodes.mock.calls[0][0];
+    const result = setNodesCallback(mockNodes);
+
+    expect(result[0].data.testingPassed).toBe(true);
+    expect(result[0].data.label).toBe('Test Node 1');
   });
 });

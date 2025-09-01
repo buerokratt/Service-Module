@@ -77,7 +77,7 @@ export const executeServiceTest = async (headerValue: string, state: ServiceStat
   return testApi.post(testService(state, name), { input });
 };
 
-const updateNodeTestState = (serviceStore: ServiceStoreState, nodeId: string, passed: boolean) => {
+export const updateNodeTestState = (serviceStore: ServiceStoreState, nodeId: string, passed: boolean) => {
   serviceStore.setNodes((prevNodes) =>
     prevNodes.map((prevNode) => {
       if (prevNode.id !== nodeId) return prevNode;
