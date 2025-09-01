@@ -1,8 +1,8 @@
 import { t } from 'i18next';
 import { ServiceTestError } from 'types/service-test-error';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { hasResponseData, isErrorResponse, translateError } from './service-tester';
+import { hasResponseData, isErrorResponse, translateError, validateTestEnvironment } from './service-tester';
 
 // Mock i18next
 vi.mock('i18next', () => ({
@@ -427,5 +427,60 @@ describe('hasResponseData', () => {
   it('should return false for arrays', () => {
     expect(hasResponseData([])).toBe(false);
     expect(hasResponseData([1, 2, 3])).toBe(false);
+  });
+});
+
+describe('validateTestEnvironment', () => {
+  let consoleSpy: ReturnType<typeof vi.spyOn>;
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+  });
+
+  afterEach(() => {
+    consoleSpy.mockRestore();
+    vi.unstubAllEnvs();
+  });
+
+  it('should return header value when REACT_APP_RUUTER_SERVICES_TESTING_HEADER is set', () => {
+    const testHeaderValue = 'test-header-value';
+    vi.stubEnv('REACT_APP_RUUTER_SERVICES_TESTING_HEADER', testHeaderValue);
+
+    const result = validateTestEnvironment();
+
+    expect(result).toBe(testHeaderValue);
+    expect(consoleSpy).not.toHaveBeenCalled();
+  });
+
+  it('should return null when REACT_APP_RUUTER_SERVICES_TESTING_HEADER is not set', () => {
+    // Don't set the environment variable at all
+
+    const result = validateTestEnvironment();
+
+    expect(result).toBeNull();
+    expect(consoleSpy).toHaveBeenCalledWith(
+      'runServiceTest: REACT_APP_RUUTER_SERVICES_TESTING_HEADER value is not set, not testing.',
+    );
+  });
+
+  it('should return header value when REACT_APP_RUUTER_SERVICES_TESTING_HEADER contains special characters', () => {
+    const testHeaderValue = 'test-header-with-special-chars!@#$%^&*()';
+    vi.stubEnv('REACT_APP_RUUTER_SERVICES_TESTING_HEADER', testHeaderValue);
+
+    const result = validateTestEnvironment();
+
+    expect(result).toBe(testHeaderValue);
+    expect(consoleSpy).not.toHaveBeenCalled();
+  });
+
+  it('should return header value when REACT_APP_RUUTER_SERVICES_TESTING_HEADER is a long string', () => {
+    const testHeaderValue = 'a'.repeat(1000);
+    vi.stubEnv('REACT_APP_RUUTER_SERVICES_TESTING_HEADER', testHeaderValue);
+
+    const result = validateTestEnvironment();
+
+    expect(result).toBe(testHeaderValue);
+    expect(consoleSpy).not.toHaveBeenCalled();
   });
 });

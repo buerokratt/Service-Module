@@ -31,10 +31,10 @@ export const runServiceTest = async (input: string) => {
   }
 };
 
-const validateTestEnvironment = (): string | null => {
+export const validateTestEnvironment = (): string | null => {
   const headerValue = import.meta.env.REACT_APP_RUUTER_SERVICES_TESTING_HEADER;
   if (!headerValue) {
-    console.error('runServiceTest: Header value is not set, not testing.');
+    console.error('runServiceTest: REACT_APP_RUUTER_SERVICES_TESTING_HEADER value is not set, not testing.');
     return null;
   }
   return headerValue;
