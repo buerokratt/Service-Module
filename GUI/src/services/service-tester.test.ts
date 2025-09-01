@@ -7,6 +7,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   clearPreviousTestStates,
   executeServiceTest,
+  handleTestError,
   hasResponseData,
   isErrorResponse,
   translateError,
@@ -26,6 +27,19 @@ vi.mock('./api', () => ({
 
 vi.mock('resources/api-constants', () => ({
   testService: vi.fn(),
+}));
+
+// Mock dependencies for handleTestError
+vi.mock('store/test-services.store', () => ({
+  default: {
+    getState: vi.fn(() => ({
+      addError: vi.fn(),
+    })),
+  },
+}));
+
+vi.mock('utils/string-util', () => ({
+  fromSnakeCase: vi.fn((str) => str),
 }));
 
 describe('translateErrorPayload', () => {
@@ -732,6 +746,126 @@ describe('executeServiceTest', () => {
     const result = await executeServiceTest(headerValue, state, name, input);
 
     expect(result).toBe(expectedResponse);
+  });
+});
+
+describe('handleTestError', () => {
+  let mockServiceStore: any;
+  let mockTestStore: any;
+  let mockFromSnakeCase: any;
+  let mockAddError: any;
+
+  beforeEach(async () => {
+    vi.clearAllMocks();
+    mockAddError = vi.fn();
+    mockServiceStore = {
+      nodes: [
+        {
+          id: 'node1',
+          data: { label: 'test_step' },
+        },
+      ],
+      setNodes: vi.fn(),
+    };
+    mockTestStore = vi.mocked((await import('store/test-services.store')).default);
+    mockTestStore.getState.mockReturnValue({ addError: mockAddError });
+    mockFromSnakeCase = vi.mocked((await import('utils/string-util')).fromSnakeCase);
+  });
+
+  it('should handle error with response data and valid error response', () => {
+    const error = {
+      response: {
+        data: {
+          stepName: 'test_step',
+          causeCode: 'E_unknown',
+          message: 'Test error',
+        },
+      },
+    };
+
+    handleTestError(error, mockServiceStore as unknown as ServiceStoreState);
+
+    expect(mockAddError).toHaveBeenCalledWith('chat.service-test-error.title', expect.any(Object));
+    expect(mockFromSnakeCase).toHaveBeenCalledWith('test_step');
+  });
+
+  it('should handle error without response data', () => {
+    const error = new Error('Network error');
+
+    handleTestError(error, mockServiceStore as unknown as ServiceStoreState);
+
+    expect(mockAddError).toHaveBeenCalledWith('chat.unknown-error');
+  });
+
+  it('should handle error with response data but invalid error response format', () => {
+    const error = {
+      response: {
+        data: {
+          someOtherProperty: 'value',
+        },
+      },
+    };
+
+    handleTestError(error, mockServiceStore as unknown as ServiceStoreState);
+
+    expect(mockAddError).toHaveBeenCalledWith('chat.unknown-error');
+  });
+
+  it('should handle error when node is not found', () => {
+    const error = {
+      response: {
+        data: {
+          stepName: 'non_existent_step',
+          causeCode: 'E_unknown',
+          message: 'Test error',
+        },
+      },
+    };
+
+    handleTestError(error, mockServiceStore as unknown as ServiceStoreState);
+
+    expect(mockAddError).toHaveBeenCalledWith('chat.unknown-error');
+  });
+
+  it('should handle error with null response data', () => {
+    const error = {
+      response: {
+        data: null,
+      },
+    };
+
+    handleTestError(error, mockServiceStore as unknown as ServiceStoreState);
+
+    expect(mockAddError).toHaveBeenCalledWith('chat.unknown-error');
+  });
+
+  it('should handle error with undefined response data', () => {
+    const error = {
+      response: {
+        data: undefined,
+      },
+    };
+
+    handleTestError(error, mockServiceStore as unknown as ServiceStoreState);
+
+    expect(mockAddError).toHaveBeenCalledWith('chat.unknown-error');
+  });
+
+  it('should handle error with empty nodes array', () => {
+    const error = {
+      response: {
+        data: {
+          stepName: 'test_step',
+          causeCode: 'E_unknown',
+          message: 'Test error',
+        },
+      },
+    };
+    const emptyServiceStore = { nodes: [] };
+
+    handleTestError(error, emptyServiceStore as unknown as ServiceStoreState);
+
+    expect(mockAddError).toHaveBeenCalledWith('chat.unknown-error');
   });
 });
 

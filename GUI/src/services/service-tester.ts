@@ -92,7 +92,7 @@ export const updateNodeTestState = (serviceStore: ServiceStoreState, nodeId: str
   );
 };
 
-const handleTestError = (error: unknown, serviceStore: ServiceStoreState) => {
+export const handleTestError = (error: unknown, serviceStore: ServiceStoreState) => {
   const store = useTestServiceStore.getState();
 
   if (hasResponseData(error)) {
