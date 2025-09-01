@@ -452,7 +452,12 @@
     "missing-file-generation": "Please enter file name and content",
     "missing-client_input-rules": "Please enter client input rules",
     "missing-condition-rules": "Please enter condition rules",
-    "missing-assign-elements": "Please enter assign elements"
+    "missing-assign-elements": "Please enter assign elements",
+    "missing-mcq-question": "Please enter MCQ question",
+    "missing-mcq-options": "Please include at least two MCQ options",
+    "missing-dynamic-choices-list": "Please enter dynamic choices list",
+    "missing-dynamic-choices-service-name": "Please enter dynamic choices service name",
+    "missing-dynamic-choices-key": "Please enter dynamic choices key"
   },
   "roles": {
     "ROLE_ADMINISTRATOR": "Administrator",
