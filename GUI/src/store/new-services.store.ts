@@ -38,7 +38,7 @@ import useTestServiceStore from './test-services.store';
 import useToastStore from './toasts.store';
 import api from '../services/api-dev';
 
-interface ServiceStoreState {
+export interface ServiceStoreState {
   endpoints: EndpointData[];
   name: string;
   serviceId: string;

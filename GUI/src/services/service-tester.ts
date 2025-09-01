@@ -1,5 +1,5 @@
 import { testService } from 'resources/api-constants';
-import useServiceStore from 'store/new-services.store';
+import useServiceStore, { ServiceStoreState } from 'store/new-services.store';
 import useTestServiceStore from 'store/test-services.store';
 import { ServiceState } from 'types/service-state';
 import { ServiceTestError } from 'types/service-test-error';
@@ -43,7 +43,7 @@ const validateTestEnvironment = (): string | null => {
 const getServiceTestData = (): {
   state: ServiceState;
   name: string;
-  serviceStore: ReturnType<typeof useServiceStore.getState>;
+  serviceStore: ServiceStoreState;
 } | null => {
   const serviceStore = useServiceStore.getState();
   const state = serviceStore.serviceState;
@@ -58,7 +58,7 @@ const getServiceTestData = (): {
   return { state, name, serviceStore };
 };
 
-const clearPreviousTestStates = (serviceStore: ReturnType<typeof useServiceStore.getState>) => {
+const clearPreviousTestStates = (serviceStore: ServiceStoreState) => {
   serviceStore.setNodes((prevNodes) =>
     prevNodes.map((prevNode) => ({
       ...prevNode,
@@ -77,11 +77,7 @@ const executeServiceTest = async (headerValue: string, state: ServiceState, name
   return testApi.post(testService(state, name), { input });
 };
 
-const updateNodeTestState = (
-  serviceStore: ReturnType<typeof useServiceStore.getState>,
-  nodeId: string,
-  passed: boolean,
-) => {
+const updateNodeTestState = (serviceStore: ServiceStoreState, nodeId: string, passed: boolean) => {
   serviceStore.setNodes((prevNodes) =>
     prevNodes.map((prevNode) => {
       if (prevNode.id !== nodeId) return prevNode;
@@ -96,7 +92,7 @@ const updateNodeTestState = (
   );
 };
 
-const handleTestError = (error: unknown, serviceStore: ReturnType<typeof useServiceStore.getState>) => {
+const handleTestError = (error: unknown, serviceStore: ServiceStoreState) => {
   const store = useTestServiceStore.getState();
 
   if (hasResponseData(error)) {
