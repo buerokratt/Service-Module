@@ -25,6 +25,17 @@ export const runServiceTest = async (input: string) => {
     return;
   }
 
+  // Clear any previous test states
+  serviceStore.setNodes((prevNodes) =>
+    prevNodes.map((prevNode) => ({
+      ...prevNode,
+      data: {
+        ...prevNode.data,
+        testingPassed: true,
+      },
+    })),
+  );
+
   // todo style and text
   // todo more tests - for new functionality
 
@@ -48,6 +59,20 @@ export const runServiceTest = async (input: string) => {
           store.addError('chat.unknown-error');
           return;
         }
+
+        // Update the node to show test failure
+        serviceStore.setNodes((prevNodes) =>
+          prevNodes.map((prevNode) => {
+            if (prevNode.id !== node.id) return prevNode;
+            return {
+              ...prevNode,
+              data: {
+                ...prevNode.data,
+                testingPassed: false,
+              },
+            };
+          }),
+        );
 
         const payload = translateError(errorData, node.data.label as string);
 
