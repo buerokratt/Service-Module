@@ -7,34 +7,10 @@ import { useTranslation } from 'react-i18next';
 import useServiceStore from 'store/new-services.store';
 import { StepType } from 'types';
 import { Assign } from 'types/assign';
-import { DynamicChoices } from 'types/dynamic-choices';
-import { MultiChoiceQuestion } from 'types/multi-choice-question';
+import { NodeDataProps } from 'types/service-flow';
 
 type StepNodeProps = {
-  data: {
-    childrenCount: number;
-    clientInputId: number;
-    label: string;
-    onDelete: (id: string) => void;
-    onEdit: (id: string) => void;
-    type: string;
-    stepType: StepType;
-    readonly: boolean;
-    name?: string;
-    condition?: string;
-    value?: string;
-    message?: string;
-    link?: string;
-    linkText?: string;
-    fileName?: string;
-    fileContent?: string;
-    signOption?: { label: string; value: string };
-    originalDefinedNodeId?: string;
-    rules?: Group;
-    assignElements?: Assign[];
-    multiChoiceQuestion?: MultiChoiceQuestion;
-    dynamicChoices?: DynamicChoices;
-  };
+  data: NodeDataProps;
 };
 
 const StepNode: FC<StepNodeProps> = ({ data }) => {
@@ -53,6 +29,8 @@ const StepNode: FC<StepNodeProps> = ({ data }) => {
 
   const isStepInvalid = () => {
     // todo here
+    if (data.testingPassed === false) return true;
+
     if (data.stepType === StepType.Input || data.stepType === StepType.Condition) {
       const hasInvalidRules = (elements: any[]): boolean => {
         return elements.some((e) => {

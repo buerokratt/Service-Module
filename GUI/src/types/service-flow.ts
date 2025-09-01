@@ -1,5 +1,7 @@
 import { Edge, Node } from '@xyflow/react';
+import { Group } from 'components/FlowElementsPopup/RuleBuilder/types';
 
+import { Assign } from './assign';
 import { DynamicChoices } from './dynamic-choices';
 import { EndpointData } from './endpoint';
 import { MultiChoiceQuestion } from './multi-choice-question';
@@ -17,18 +19,24 @@ export type NodeDataProps = {
   type: string;
   stepType: StepType;
   readonly: boolean;
+  name?: string;
+  condition?: string;
+  value?: string;
   message?: string;
   link?: string;
   linkText?: string;
   fileName?: string;
   fileContent?: string;
-  signOption?: any;
-  rules?: any;
-  assignElements?: any;
+  signOption?: { label: string; value: string };
+  originalDefinedNodeId?: string;
+  rules?: Group;
+  assignElements?: Assign[];
   multiChoiceQuestion?: MultiChoiceQuestion;
   dynamicChoices?: DynamicChoices;
   childrenCount?: number;
+  clientInputId?: number;
   endpoint?: EndpointData;
+  testingPassed?: boolean;
 };
 
 export const initialNodes: Node[] = [
