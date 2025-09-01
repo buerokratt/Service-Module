@@ -453,7 +453,12 @@
     "missing-file-generation": "Sisestage faili nimi ja sisu",
     "missing-client_input-rules": "Määrake kliendi sisestusreeglid",
     "missing-condition-rules": "Sisestage tingimuste reeglid",
-    "missing-assign-elements": "Sisestage elementide määramine"
+    "missing-assign-elements": "Sisestage elementide määramine",
+    "missing-mcq-question": "Palun sisestage MCQ küsimus",
+    "missing-mcq-options": "Palun lisage vähemalt kaks MCQ valikut",
+    "missing-dynamic-choices-list": "Palun sisestage dünaamiliste valikute nimekiri",
+    "missing-dynamic-choices-service-name": "Palun sisestage dünaamiliste valikute teenuse nimi",
+    "missing-dynamic-choices-key": "Palun sisestage dünaamiliste valikute võti"
   },
   "roles": {
     "ROLE_ADMINISTRATOR": "Administraator",
