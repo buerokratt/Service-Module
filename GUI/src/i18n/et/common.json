@@ -481,7 +481,8 @@
     },
     "service-test-success": "Teenuse test on edukas",
     "title": "TEST",
-    "input-placeholder": "Kirjutage oma sõnum...",
+    "input-placeholder": "Sisestage sisend, eraldatud komadega",
+    "service-input": "Teenuse sisend",
     "unknown-error": "Tundmatu viga. Proovige uuesti."
   },
   "objectEditor": {

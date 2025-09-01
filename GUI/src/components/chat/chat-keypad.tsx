@@ -17,6 +17,7 @@ const ChatKeyPad = (): React.JSX.Element => {
   return (
     <div>
       <div className={styles.keypad}>
+        <div>{t('chat.service-input')}</div>
         <input
           className={styles.input}
           value={userInput}

@@ -480,7 +480,8 @@
     },
     "service-test-success": "Service test successful",
     "title": "TEST",
-    "input-placeholder": "Enter your message...",
+    "input-placeholder": "Enter input, separated by commas",
+    "service-input": "Service input",
     "unknown-error": "Unknown error. Please try again."
   },
   "objectEditor": {
