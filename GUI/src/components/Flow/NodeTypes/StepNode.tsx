@@ -2,7 +2,7 @@ import CheckBadge from 'components/CheckBadge';
 import ExclamationBadge from 'components/ExclamationBadge';
 import { Group, Rule } from 'components/FlowElementsPopup/RuleBuilder/types';
 import Track from 'components/Track';
-import { FC, memo, useEffect, useState } from 'react';
+import { FC, memo, useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import useServiceStore from 'store/new-services.store';
 import { StepType } from 'types';
@@ -27,7 +27,7 @@ const StepNode: FC<StepNodeProps> = ({ data }) => {
     };
   };
 
-  const isStepInvalid = () => {
+  const isStepInvalid = useCallback(() => {
     if (data.testingPassed === false) return true;
 
     if (data.stepType === StepType.Input || data.stepType === StepType.Condition) {
@@ -75,9 +75,9 @@ const StepNode: FC<StepNodeProps> = ({ data }) => {
     }
 
     return !data.readonly && !data.message?.length;
-  };
+  }, [data]);
 
-  const updateIsTestedAndPassed = async () => {
+  const updateIsTestedAndPassed = useCallback(async () => {
     if (isStepInvalid()) {
       setIsTestedAndPassed(false);
       return;
@@ -100,11 +100,11 @@ const StepNode: FC<StepNodeProps> = ({ data }) => {
       () => setIsTestedAndPassed(false),
       () => setIsTestedAndPassed(true),
     );
-  };
+  }, [data, endpoints, isStepInvalid]);
 
   useEffect(() => {
-    updateIsTestedAndPassed();
-  }, [data]);
+    void updateIsTestedAndPassed();
+  }, [updateIsTestedAndPassed]);
 
   return (
     <Track
