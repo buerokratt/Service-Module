@@ -15,9 +15,9 @@ const ChatKeyPad = (): React.JSX.Element => {
   };
 
   return (
-    <div>
+    <div className={styles.keypadContainer}>
       <div className={styles.keypad}>
-        <div>{t('chat.service-input')}</div>
+        <span className={styles.label}>{t('chat.service-input')}:</span>
         <input
           className={styles.input}
           value={userInput}
@@ -31,7 +31,7 @@ const ChatKeyPad = (): React.JSX.Element => {
           }}
         />
         <button onClick={testService} className={styles.button} disabled={!userInput.trim()}>
-          <img src={Send} />
+          <img src={Send} alt="Send" />
         </button>
       </div>
     </div>
