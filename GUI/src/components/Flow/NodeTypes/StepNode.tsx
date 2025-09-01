@@ -1,67 +1,15 @@
 import CheckBadge from 'components/CheckBadge';
 import ExclamationBadge from 'components/ExclamationBadge';
-import { Group, Rule } from 'components/FlowElementsPopup/RuleBuilder/types';
 import Track from 'components/Track';
 import { FC, memo, useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import useServiceStore from 'store/new-services.store';
 import { StepType } from 'types';
-import { Assign } from 'types/assign';
 import { NodeDataProps } from 'types/service-flow';
+import { isStepInvalid } from 'utils/flow-utils';
 
 type StepNodeProps = {
   data: NodeDataProps;
-};
-
-export const isStepInvalid = (data: NodeDataProps): boolean => {
-  if (data.testingPassed === false) return true;
-
-  if (data.stepType === StepType.Input || data.stepType === StepType.Condition) {
-    const hasInvalidRules = (elements: any[]): boolean => {
-      return elements.some((e) => {
-        if ('children' in e) {
-          const group = e as Group;
-          if (group.children.length === 0) return true;
-          return hasInvalidRules(group.children);
-        } else {
-          const rule = e as Rule;
-          return rule.value === '' || rule.field === '' || rule.operator === '';
-        }
-      });
-    };
-
-    const invalidRulesExist = hasInvalidRules(data.rules?.children ?? []);
-    return data.rules?.children === undefined || invalidRulesExist || data.rules?.children.length === 0;
-  }
-
-  if (data.stepType === StepType.MultiChoiceQuestion) {
-    return (
-      !data?.multiChoiceQuestion?.question ||
-      data.multiChoiceQuestion?.buttons?.find((e) => e.title === '') != undefined
-    );
-  }
-
-  if (data.stepType === StepType.DynamicChoices) {
-    return !data?.dynamicChoices?.list || !data?.dynamicChoices?.serviceName || !data?.dynamicChoices?.key;
-  }
-
-  if (data.stepType === StepType.UserDefined) return false;
-  if (data.stepType === StepType.OpenWebpage) return !data.link || !data.linkText;
-  if (data.stepType === StepType.FileGenerate) return !data.fileName || !data.fileContent;
-  if (data.stepType === StepType.FileSign) return !data.signOption;
-  if (data.stepType === StepType.Assign) {
-    const hasInvalidElements = (elements: any[]): boolean => {
-      return elements.some((e) => {
-        const element = e as Assign;
-        return element.key === '' || element.value === '';
-      });
-    };
-
-    const invalidElementsExist = hasInvalidElements(data.assignElements ?? []);
-    return data?.assignElements === undefined || invalidElementsExist || data?.assignElements.length === 0;
-  }
-
-  return !data.readonly && !data.message?.length;
 };
 
 const StepNode: FC<StepNodeProps> = ({ data }) => {

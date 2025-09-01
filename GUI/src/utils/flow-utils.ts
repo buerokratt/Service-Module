@@ -1,5 +1,7 @@
 import { Node } from '@xyflow/react';
-import { Step } from 'types';
+import { Group, Rule } from 'components/FlowElementsPopup/RuleBuilder/types';
+import { Assign, Step, StepType } from 'types';
+import { NodeDataProps } from 'types/service-flow';
 
 export const getNodeLabel = (step: Step, nodes: Node[]) => {
   const baseLabel = step.label.split(' - ').pop();
@@ -27,4 +29,55 @@ export const getNodeLabel = (step: Step, nodes: Node[]) => {
   }
 
   return `${baseLabel} - ${nextNumber}`;
+};
+
+export const isStepInvalid = (node: NodeDataProps): boolean => {
+  if (node.testingPassed === false) return true;
+
+  if (node.stepType === StepType.Input || node.stepType === StepType.Condition) {
+    const hasInvalidRules = (elements: any[]): boolean => {
+      return elements.some((e) => {
+        if ('children' in e) {
+          const group = e as Group;
+          if (group.children.length === 0) return true;
+          return hasInvalidRules(group.children);
+        } else {
+          const rule = e as Rule;
+          return rule.value === '' || rule.field === '' || rule.operator === '';
+        }
+      });
+    };
+
+    const invalidRulesExist = hasInvalidRules(node.rules?.children ?? []);
+    return node.rules?.children === undefined || invalidRulesExist || node.rules?.children.length === 0;
+  }
+
+  if (node.stepType === StepType.MultiChoiceQuestion) {
+    return (
+      !node?.multiChoiceQuestion?.question ||
+      node.multiChoiceQuestion?.buttons?.find((e) => e.title === '') != undefined
+    );
+  }
+
+  if (node.stepType === StepType.DynamicChoices) {
+    return !node?.dynamicChoices?.list || !node?.dynamicChoices?.serviceName || !node?.dynamicChoices?.key;
+  }
+
+  if (node.stepType === StepType.UserDefined) return false;
+  if (node.stepType === StepType.OpenWebpage) return !node.link || !node.linkText;
+  if (node.stepType === StepType.FileGenerate) return !node.fileName || !node.fileContent;
+  if (node.stepType === StepType.FileSign) return !node.signOption;
+  if (node.stepType === StepType.Assign) {
+    const hasInvalidElements = (elements: any[]): boolean => {
+      return elements.some((e) => {
+        const element = e as Assign;
+        return element.key === '' || element.value === '';
+      });
+    };
+
+    const invalidElementsExist = hasInvalidElements(node.assignElements ?? []);
+    return node?.assignElements === undefined || invalidElementsExist || node?.assignElements.length === 0;
+  }
+
+  return !node.readonly && !node.message?.length;
 };

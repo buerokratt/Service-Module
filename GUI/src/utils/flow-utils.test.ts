@@ -1,9 +1,7 @@
-import { render, screen } from '@testing-library/react';
 import { StepType } from 'types';
 import { NodeDataProps } from 'types/service-flow';
+import { isStepInvalid } from 'utils/flow-utils';
 import { describe, expect, it, vi } from 'vitest';
-
-import StepNode, { isStepInvalid } from './StepNode';
 
 describe('isStepInvalid', () => {
   const createMockData = (overrides: Partial<NodeDataProps> = {}): NodeDataProps => ({
@@ -366,24 +364,5 @@ describe('isStepInvalid', () => {
       });
       expect(isStepInvalid(data)).toBe(false);
     });
-  });
-});
-
-describe('StepNode Component', () => {
-  it('should render without crashing', () => {
-    const mockData: NodeDataProps = {
-      label: 'Test Step',
-      onDelete: vi.fn(),
-      onEdit: vi.fn(),
-      type: 'step',
-      stepType: StepType.Textfield,
-      readonly: false,
-      childrenCount: 0,
-      setClickedNode: vi.fn(),
-      message: 'Test message',
-    };
-
-    render(<StepNode data={mockData} />);
-    expect(screen.getByText('Test Step')).toBeInTheDocument();
   });
 });
