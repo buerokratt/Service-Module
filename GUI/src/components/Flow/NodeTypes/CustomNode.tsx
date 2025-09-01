@@ -9,8 +9,6 @@ import { NodeDataProps } from 'types/service-flow';
 
 import StepNode from './StepNode';
 
-// In the future, should have common type with StepNode
-// todo pass data only
 type CustomNodeProps = {
   data: NodeDataProps;
 };
