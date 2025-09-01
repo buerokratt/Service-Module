@@ -62,7 +62,7 @@ const StepNode: FC<StepNodeProps> = ({ data }) => {
       align="left"
     >
       <p>
-        <TestStatue isTestedAndPassed={isTestedAndPassed} isStepInvalid={isStepInvalid} data={data} />
+        <TestStatue isTestedAndPassed={isTestedAndPassed} data={data} />
         {data.label}
       </p>
       {data.stepType === StepType.Textfield && (
@@ -118,15 +118,7 @@ const StepNode: FC<StepNodeProps> = ({ data }) => {
   );
 };
 
-const TestStatue = ({
-  isTestedAndPassed,
-  isStepInvalid,
-  data,
-}: {
-  isTestedAndPassed: boolean | null;
-  isStepInvalid: (data: NodeDataProps) => boolean;
-  data: NodeDataProps;
-}) => {
+const TestStatue = ({ isTestedAndPassed, data }: { isTestedAndPassed: boolean | null; data: NodeDataProps }) => {
   if (isTestedAndPassed) return <CheckBadge />;
   if (isStepInvalid(data)) return <ExclamationBadge />;
   return <ExclamationBadge color="purple" />;
