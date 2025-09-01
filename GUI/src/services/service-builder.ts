@@ -222,7 +222,7 @@ async function saveService(
     .catch(onError);
 }
 
-function getYamlContent(nodes: Node[], edges: Edge[], name: string, description: string, showError = true): any {
+function getYamlContent(nodes: Node<NodeDataProps>[], edges: Edge[], name: string, description: string, showError = true): any {
   const allRelations: any[] = [];
 
   nodes.forEach((node) => {
@@ -248,9 +248,26 @@ function getYamlContent(nodes: Node[], edges: Edge[], name: string, description:
             error = i18next.t('toast.missing-file-generation');
           }
           break;
+        case StepType.Assign:
+          if (node.data.assignElements === undefined || node.data?.assignElements?.length === 0) {
+            error = i18next.t('toast.missing-assign-elements');
+          }
+          break;
+        case StepType.MultiChoiceQuestion:
+          if (node.data.multiChoiceQuestion?.question === undefined || node.data.multiChoiceQuestion.question === '') {
+            error = i18next.t('toast.missing-mcq-question');
+            break;
+          }
+          if (
+            !node.data.multiChoiceQuestion?.buttons ||
+            node.data.multiChoiceQuestion.buttons.length === 0
+          ) {
+            error = i18next.t('toast.missing-mcq-options');
+            break;
+          }
+          break;
         case StepType.Input:
         case StepType.Condition:
-        case StepType.MultiChoiceQuestion:
           if (followingNode?.type === 'placeholder' && !allRelations.includes(node.id)) {
             allRelations.push(node.id);
             return;

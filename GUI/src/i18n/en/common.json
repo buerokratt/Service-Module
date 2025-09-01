@@ -452,7 +452,9 @@
     "missing-file-generation": "Please enter file name and content",
     "missing-client_input-rules": "Please enter client input rules",
     "missing-condition-rules": "Please enter condition rules",
-    "missing-assign-elements": "Please enter assign elements"
+    "missing-assign-elements": "Please enter assign elements",
+    "missing-mcq-question": "Please enter MCQ question",
+    "missing-mcq-options": "Please include at least two MCQ options"
   },
   "roles": {
     "ROLE_ADMINISTRATOR": "Administrator",
