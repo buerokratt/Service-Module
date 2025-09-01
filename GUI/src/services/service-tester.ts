@@ -70,7 +70,7 @@ export const clearPreviousTestStates = (serviceStore: ServiceStoreState) => {
   );
 };
 
-const executeServiceTest = async (headerValue: string, state: ServiceState, name: string, input: string) => {
+export const executeServiceTest = async (headerValue: string, state: ServiceState, name: string, input: string) => {
   const testApi = createApiInstance({
     'x-ruuter-testing': headerValue,
   });

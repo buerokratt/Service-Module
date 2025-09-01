@@ -1,9 +1,11 @@
 import { t } from 'i18next';
+import { ServiceStoreState } from 'store/new-services.store';
 import { ServiceTestError } from 'types/service-test-error';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import {
   clearPreviousTestStates,
+  executeServiceTest,
   hasResponseData,
   isErrorResponse,
   translateError,
@@ -13,6 +15,15 @@ import {
 // Mock i18next
 vi.mock('i18next', () => ({
   t: vi.fn(),
+}));
+
+// Mock dependencies for executeServiceTest
+vi.mock('./api', () => ({
+  createApiInstance: vi.fn(),
+}));
+
+vi.mock('resources/api-constants', () => ({
+  testService: vi.fn(),
 }));
 
 describe('translateErrorPayload', () => {
@@ -575,7 +586,7 @@ describe('clearPreviousTestStates', () => {
       },
     ];
 
-    clearPreviousTestStates(mockServiceStore as any);
+    clearPreviousTestStates(mockServiceStore as unknown as ServiceStoreState);
 
     const setNodesCallback = mockServiceStore.setNodes.mock.calls[0][0];
     const result = setNodesCallback(mockNodes);
@@ -601,7 +612,7 @@ describe('clearPreviousTestStates', () => {
       setNodes: vi.fn(),
     };
 
-    clearPreviousTestStates(mockServiceStore as any);
+    clearPreviousTestStates(mockServiceStore as unknown as ServiceStoreState);
 
     const setNodesCallback = mockServiceStore.setNodes.mock.calls[0][0];
     const result = setNodesCallback([]);
@@ -630,7 +641,7 @@ describe('clearPreviousTestStates', () => {
       },
     ];
 
-    clearPreviousTestStates(mockServiceStore as any);
+    clearPreviousTestStates(mockServiceStore as unknown as ServiceStoreState);
 
     const setNodesCallback = mockServiceStore.setNodes.mock.calls[0][0];
     const result = setNodesCallback(mockNodes);
@@ -651,5 +662,73 @@ describe('clearPreviousTestStates', () => {
         },
       },
     ]);
+  });
+});
+
+describe('executeServiceTest', () => {
+  let mockCreateApiInstance: ReturnType<typeof vi.fn>;
+  let mockTestService: ReturnType<typeof vi.fn>;
+  let mockPost: ReturnType<typeof vi.fn>;
+
+  beforeEach(async () => {
+    vi.clearAllMocks();
+    mockPost = vi.fn();
+    mockCreateApiInstance = vi.mocked((await import('./api')).createApiInstance);
+    mockTestService = vi.mocked((await import('resources/api-constants')).testService);
+
+    mockCreateApiInstance.mockReturnValue({
+      post: mockPost,
+    } as any);
+    mockTestService.mockReturnValue('/test-endpoint');
+  });
+
+  it('should call createApiInstance with correct header', async () => {
+    const headerValue = 'test-header';
+    const state = 'ACTIVE' as any;
+    const name = 'test-service';
+    const input = 'test-input';
+
+    await executeServiceTest(headerValue, state, name, input);
+
+    expect(mockCreateApiInstance).toHaveBeenCalledWith({
+      'x-ruuter-testing': headerValue,
+    });
+  });
+
+  it('should call testService with correct parameters', async () => {
+    const headerValue = 'test-header';
+    const state = 'ACTIVE' as any;
+    const name = 'test-service';
+    const input = 'test-input';
+
+    await executeServiceTest(headerValue, state, name, input);
+
+    expect(mockTestService).toHaveBeenCalledWith(state, name);
+  });
+
+  it('should call post with correct endpoint and payload', async () => {
+    const headerValue = 'test-header';
+    const state = 'ACTIVE' as any;
+    const name = 'test-service';
+    const input = 'test-input';
+    const expectedEndpoint = '/test-endpoint';
+
+    await executeServiceTest(headerValue, state, name, input);
+
+    expect(mockPost).toHaveBeenCalledWith(expectedEndpoint, { input });
+  });
+
+  it('should return the result from post call', async () => {
+    const headerValue = 'test-header';
+    const state = 'ACTIVE' as any;
+    const name = 'test-service';
+    const input = 'test-input';
+    const expectedResponse = { success: true, data: 'test-data' };
+
+    mockPost.mockResolvedValue(expectedResponse);
+
+    const result = await executeServiceTest(headerValue, state, name, input);
+
+    expect(result).toBe(expectedResponse);
   });
 });
