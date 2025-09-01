@@ -21,7 +21,7 @@ export const runServiceTest = async (input: string) => {
 
   // todo failing node highlight
   // todo style and text
-  // todo more tests
+  // todo more tests - for new functionality
 
   try {
     const testApi = createApiInstance({
