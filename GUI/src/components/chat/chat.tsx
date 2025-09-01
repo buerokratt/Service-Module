@@ -5,7 +5,7 @@ import useServiceStore from 'store/new-services.store';
 import useTestServiceStore from 'store/test-services.store';
 
 import ChatContent from './chat-content';
-import ChatKeyPad from './chat-keypad';
+import ChatInput from './chat-input';
 import styles from './chat.module.scss';
 import Profile from './profile';
 
@@ -22,7 +22,7 @@ const Chat = (): React.JSX.Element => {
       <motion.div className={styles.chat} animate={{ y: 0 }} style={{ y: 400 }}>
         <ChatHeader />
         <ChatContent />
-        <ChatKeyPad />
+        <ChatInput />
       </motion.div>
     </div>
   );

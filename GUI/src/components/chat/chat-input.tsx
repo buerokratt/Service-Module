@@ -5,7 +5,7 @@ import useTestServiceStore from 'store/test-services.store';
 import styles from './chat.module.scss';
 import Send from '../../static/icons/send.svg';
 
-const ChatKeyPad = (): React.JSX.Element => {
+const ChatInput = (): React.JSX.Element => {
   const [userInput, setUserInput] = useState<string>('');
   const { t } = useTranslation();
 
@@ -38,4 +38,4 @@ const ChatKeyPad = (): React.JSX.Element => {
   );
 };
 
-export default ChatKeyPad;
+export default ChatInput;
