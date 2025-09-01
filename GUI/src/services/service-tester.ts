@@ -8,6 +8,12 @@ import { fromSnakeCase, removeTrailingUnderscores } from 'utils/string-util';
 import { createApiInstance } from './api';
 
 export const runServiceTest = async (input: string) => {
+  const headerValue = import.meta.env.REACT_APP_RUUTER_SERVICES_TESTING_HEADER;
+  if (!headerValue) {
+    console.error('runServiceTest: Header value is not set, not testing.');
+    return;
+  }
+
   const store = useTestServiceStore.getState();
   const serviceStore = useServiceStore.getState();
   const state = serviceStore.serviceState;
@@ -25,8 +31,7 @@ export const runServiceTest = async (input: string) => {
 
   try {
     const testApi = createApiInstance({
-      // todo remove hardcoded header value
-      'x-ruuter-testing': 'voorshpellhappilo',
+      'x-ruuter-testing': headerValue,
     });
     await testApi.post(testService(state, name), { input });
     store.addSuccess('chat.service-test-success');
