@@ -1,8 +1,8 @@
-import React, { useMemo } from "react";
-import { useTranslation } from "react-i18next";
-import { Link } from "react-router-dom";
-import { Table } from "@tanstack/react-table";
-import clsx from 'clsx'
+import { Table } from '@tanstack/react-table';
+import clsx from 'clsx';
+import React, { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router-dom';
 
 interface PagesRowProps {
   table: Table<any>;
@@ -10,11 +10,7 @@ interface PagesRowProps {
   pagesShown?: number;
 }
 
-const PagesRow: React.FC<PagesRowProps> = ({ 
-  table,
-  setPageIndex,
-  pagesShown = 7,
-}) => {
+const PagesRow: React.FC<PagesRowProps> = ({ table, setPageIndex, pagesShown = 7 }) => {
   const { t } = useTranslation();
 
   const pages = useMemo(() => {
@@ -38,17 +34,13 @@ const PagesRow: React.FC<PagesRowProps> = ({
     <nav role="navigation" aria-label={t('global.paginationNavigation') || ''}>
       <ul className="links">
         {pages.map((page, i) => {
-          if ((i === 0 && page !== 0) ||
-            (i === pagesShown - 1 && page !== table.getPageCount() - 1)) {
+          if ((i === 0 && page !== 0) || (i === pagesShown - 1 && page !== table.getPageCount() - 1)) {
             return <p key={page}>...</p>;
           }
           return (
-            <li
-              key={page}
-              className={clsx({ active: table.getState().pagination.pageIndex === page })}
-            >
+            <li key={page} className={clsx({ active: table.getState().pagination.pageIndex === page })}>
               <Link
-                to='#'
+                to="#"
                 onClick={() => setPageIndex(page)}
                 aria-label={t('global.gotoPage') + page}
                 aria-current={table.getState().pagination.pageIndex === page}
@@ -61,6 +53,6 @@ const PagesRow: React.FC<PagesRowProps> = ({
       </ul>
     </nav>
   );
-}
+};
 
 export default PagesRow;

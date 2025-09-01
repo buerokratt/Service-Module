@@ -1,10 +1,11 @@
-import { FC } from "react";
-import { AiOutlineExclamation } from "react-icons/ai";
-import Icon from "../Icon";
+import { FC } from 'react';
+import { AiOutlineExclamation } from 'react-icons/ai';
+
+import Icon from '../Icon';
 
 import './ExclamationBadge.scss';
 
-interface ExclamationBadgeProps { 
+interface ExclamationBadgeProps {
   color?: 'red' | 'purple';
 }
 

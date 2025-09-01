@@ -4,6 +4,9 @@ import { CSSProperties, FC } from "react";
 import PreviousVariables from "./PreviousVariables";
 import { removeNestedTemplates } from "utils/string-util";
 
+import { FormRichText, Track } from '..';
+import PreviousVariables from './PreviousVariables';
+
 type TextfieldContentProps = {
   readonly defaultMessage?: string;
   readonly nodeId: string;
@@ -23,15 +26,15 @@ const TextfieldContent: FC<TextfieldContentProps> = ({ defaultMessage, onChange,
     const placeholders: { [key: string]: string } = {};
     let match;
 
-    while ((match = pattern.exec(text))) placeholders[match[0]] = "";
+    while ((match = pattern.exec(text))) placeholders[match[0]] = '';
     return placeholders;
   };
 
   return (
     <>
-      <Track direction="vertical" align="left" style={{ width: "100%", ...popupBodyCss }}>
-        <label htmlFor="message" style={{ marginBottom: "10px" }}>
-          {t("serviceFlow.popup.messageLabel")}
+      <Track direction="vertical" align="left" style={{ width: '100%', ...popupBodyCss }}>
+        <label htmlFor="message" style={{ marginBottom: '10px' }}>
+          {t('serviceFlow.popup.messageLabel')}
         </label>
         <FormRichText
           onChange={(value) => {

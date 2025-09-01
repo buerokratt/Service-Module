@@ -1,7 +1,7 @@
-import { Button, Modal, Track } from "components";
-import { t } from "i18next";
-import { useNavigate } from "react-router-dom";
-import useServiceStore from "store/new-services.store";
+import { Button, Modal, Track } from 'components';
+import { t } from 'i18next';
+import { useNavigate } from 'react-router-dom';
+import useServiceStore from 'store/new-services.store';
 
 export default function UnsavedChangesDialog() {
   const nextLocation = useServiceStore((state) => state.nextLocation);
@@ -12,10 +12,10 @@ export default function UnsavedChangesDialog() {
   if (!nextLocation) return null;
 
   return (
-    <Modal title={t("newService.popup.unsavedChanges")} onClose={() => {}}>
+    <Modal title={t('newService.popup.unsavedChanges')} onClose={() => {}}>
       <Track gap={10} align="center" justify="end">
         <Button appearance="error" onClick={cancelNavigation}>
-          {t("global.cancel")}
+          {t('global.cancel')}
         </Button>
         <Button
           appearance="primary"
@@ -28,7 +28,7 @@ export default function UnsavedChangesDialog() {
             }
           }}
         >
-          {t("global.continue")}
+          {t('global.continue')}
         </Button>
       </Track>
     </Modal>

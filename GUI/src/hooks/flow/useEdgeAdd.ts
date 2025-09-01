@@ -1,7 +1,7 @@
-import { Edge, Node, useReactFlow } from "@xyflow/react";
-import useServiceStore from "store/new-services.store";
-import { Step, StepType } from "types";
-import { getNodeLabel } from "utils/flow-utils";
+import { Edge, Node, useReactFlow } from '@xyflow/react';
+import useServiceStore from 'store/new-services.store';
+import { Step, StepType } from 'types';
+import { getNodeLabel } from 'utils/flow-utils';
 
 function useEdgeAdd(id: string) {
   const { setEdges, setNodes, getNodes, getNode, getEdge } = useReactFlow();
@@ -26,27 +26,27 @@ function useEdgeAdd(id: string) {
         onDelete: useServiceStore.getState().onDelete,
         onEdit: useServiceStore.getState().handleNodeEdit,
         type: [StepType.DynamicChoices, StepType.FinishingStepEnd, StepType.FinishingStepRedirect].includes(stepType)
-          ? "finishing-step"
-          : "step",
+          ? 'finishing-step'
+          : 'step',
         stepType: stepType,
         readonly: [StepType.Auth, StepType.FinishingStepEnd, StepType.FinishingStepRedirect].includes(stepType),
         endpoint: step.data,
         setClickedNode: useServiceStore.getState().setClickedNode,
       },
       className: [StepType.FinishingStepEnd, StepType.FinishingStepRedirect].includes(stepType)
-        ? "finishing-step"
+        ? 'finishing-step'
         : [StepType.DynamicChoices].includes(stepType)
-        ? "dynamic-choices"
-        : "step",
-      type: "custom",
+          ? 'dynamic-choices'
+          : 'step',
+      type: 'custom',
     };
 
     const sourceEdge = {
       id: `${edge.source}->${newNodeId}`,
       source: edge.source,
       target: newNodeId,
-      type: "step",
-      label: edge.label
+      type: 'step',
+      label: edge.label,
     };
 
     let targetEdge: Edge | null = null;
@@ -60,26 +60,26 @@ function useEdgeAdd(id: string) {
         id: `${newNodeId}->${edge.target}`,
         source: newNodeId,
         target: edge.target,
-        type: "step",
-        animated: getNode(edge.target)?.type === "ghost",
-        deletable: getNode(edge.target)?.type != "ghost",
+        type: 'step',
+        animated: getNode(edge.target)?.type === 'ghost',
+        deletable: getNode(edge.target)?.type != 'ghost',
       };
     }
 
     let ghostNodes: Node[] = [];
-    let ghostEdges: Edge[] = []; 
+    let ghostEdges: Edge[] = [];
 
     if (stepType === StepType.MultiChoiceQuestion || stepType === StepType.Condition || stepType === StepType.Input) {
-      const labels = stepType === StepType.MultiChoiceQuestion ? ["Jah", "Ei"] : ["Success", "Failure"];
+      const labels = stepType === StepType.MultiChoiceQuestion ? ['Jah', 'Ei'] : ['Success', 'Failure'];
       ghostNodes = labels.slice(1).map((_, i) => ({
         id: crypto.randomUUID(),
-        type: "ghost",
+        type: 'ghost',
         position: {
           x: targetNode.position.x,
           y: targetNode.position.y,
         },
-        data: { type: "ghost" },
-        className: "ghost",
+        data: { type: 'ghost' },
+        className: 'ghost',
         selectable: false,
         draggable: false,
       }));
@@ -89,7 +89,7 @@ function useEdgeAdd(id: string) {
           id: `${newNodeId}->${ghostNode.id}`,
           source: newNodeId,
           target: ghostNode.id,
-          type: "step",
+          type: 'step',
           animated: true,
           deletable: false,
           label: labels[i],
@@ -97,11 +97,11 @@ function useEdgeAdd(id: string) {
       });
 
       if (targetEdge) {
-        targetEdge.label = labels[labels.length - 1] ?? "+";
+        targetEdge.label = labels[labels.length - 1] ?? '+';
       }
     }
 
-    let newEdges: Edge[] = []
+    let newEdges: Edge[] = [];
 
     setEdges((edges) => {
       newEdges = edges.filter((e) => e.id !== id).concat([sourceEdge], targetEdge ?? [], ghostEdges);

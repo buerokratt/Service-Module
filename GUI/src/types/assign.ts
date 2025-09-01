@@ -4,5 +4,5 @@ export interface Assign {
   value: string;
   data?: unknown;
   slots?: [Assign] | [Assign, Assign];
-  tooltip? : string;
+  tooltip?: string;
 }

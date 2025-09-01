@@ -1,9 +1,9 @@
 export const isTemplate = (value: string | number) => {
-  return String(value).startsWith("${") && String(value).endsWith("}");
+  return String(value).startsWith('${') && String(value).endsWith('}');
 };
 
 export const stringToTemplate = (value: string | number) => {
-  return value ? "${" + value + "}" : '${""}';
+  return value ? '${' + value + '}' : '${""}';
 };
 
 export const templateToString = (value: string | number) => {
@@ -17,11 +17,11 @@ export const templateToString = (value: string | number) => {
 };
 
 export const toSnakeCase = (value: string) => {
-  return value.toLowerCase().trim().replace(/\s+/g, "_").replace(/-+/g, "_").replace(/_+/g, "_");
+  return value.toLowerCase().trim().replace(/\s+/g, '_').replace(/-+/g, '_').replace(/_+/g, '_');
 };
 
 export const getLastDigits = (value: string) => {
-  let lastDigits = "";
+  let lastDigits = '';
   for (let i = value.length - 1; i >= 0; i--) {
     if (/\d/.test(value[i])) {
       lastDigits = value[i] + lastDigits;
@@ -34,13 +34,13 @@ export const getLastDigits = (value: string) => {
 
 export const removeTrailingUnderscores = (value: string) => {
   let end = value.length;
-  while (end > 0 && value[end - 1] === "_") end--;
+  while (end > 0 && value[end - 1] === '_') end--;
   return value.slice(0, end);
 };
 
 export function stringToArray(str: string, fallback: any = []) {
   try {
-    if (!str || typeof str !== "string" || str.trim() === "") {
+    if (!str || typeof str !== 'string' || str.trim() === '') {
       return fallback;
     }
     const parsed = JSON.parse(str);

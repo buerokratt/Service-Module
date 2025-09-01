@@ -1,6 +1,6 @@
-import React, { CSSProperties, forwardRef, ReactNode, StyleHTMLAttributes } from 'react';
 import * as AccessibleIcon from '@radix-ui/react-accessible-icon';
 import clsx from 'clsx';
+import React, { CSSProperties, forwardRef, ReactNode, StyleHTMLAttributes } from 'react';
 
 import './Icon.scss';
 
@@ -11,18 +11,17 @@ type IconProps = StyleHTMLAttributes<CSSProperties> & {
 };
 
 const Icon = forwardRef<HTMLSpanElement, IconProps>(({ label, icon, size = 'small', ...rest }, ref) => {
-  const iconClasses = clsx(
-    'icon',
-    `icon--${size}`
-  );
+  const iconClasses = clsx('icon', `icon--${size}`);
 
   return (
     <AccessibleIcon.Root label={label ?? ''}>
-      <span ref={ref} className={iconClasses} style={rest.style}>{icon}</span>
+      <span ref={ref} className={iconClasses} style={rest.style}>
+        {icon}
+      </span>
     </AccessibleIcon.Root>
   );
 });
 
-Icon.displayName = 'icon'
+Icon.displayName = 'icon';
 
 export default Icon;

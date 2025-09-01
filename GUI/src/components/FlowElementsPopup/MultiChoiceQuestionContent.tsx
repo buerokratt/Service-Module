@@ -1,24 +1,26 @@
-import { useState, FC } from "react";
-import { useTranslation } from "react-i18next";
-import { FormTextarea, FormInput } from "../FormElements";
-import Track from "../Track";
-import Button from "../Button";
-import Icon from "../Icon";
-import { MdEdit, MdDeleteOutline, MdCheck } from "react-icons/md";
-import "./styles.scss";
-import FormError from "components/FormElements/FormError";
-import { v4 } from "uuid";
-import useServiceStore from "store/new-services.store";
-import useServiceListStore from "store/services.store";
-import { removeTrailingUnderscores } from "utils/string-util";
+import { FC, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { MdCheck, MdDeleteOutline, MdEdit } from 'react-icons/md';
+import useServiceStore from 'store/new-services.store';
+import useServiceListStore from 'store/services.store';
+import { removeTrailingUnderscores } from 'utils/string-util';
+import { v4 } from 'uuid';
 
-const maxButtons = parseInt(process.env.REACT_APP_MULTI_CHOICE_QUESTION_MAX_BUTTONS ?? "4");
+import Button from '../Button';
+import { FormInput, FormTextarea } from '../FormElements';
+import Icon from '../Icon';
+import Track from '../Track';
+
+import './styles.scss';
+import FormError from 'components/FormElements/FormError';
+
+const maxButtons = parseInt(process.env.REACT_APP_MULTI_CHOICE_QUESTION_MAX_BUTTONS ?? '4');
 
 export interface MultiChoiceQuestionContentProps {
   question: string;
-  buttons: { id: string, title: string; payload: string }[];
+  buttons: { id: string; title: string; payload: string }[];
   setQuestion: (q: string) => void;
-  setButtons: (b: { id: string, title: string; payload: string }[]) => void;
+  setButtons: (b: { id: string; title: string; payload: string }[]) => void;
   setIsSaveEnabled: (b: boolean) => void;
 }
 
@@ -31,7 +33,7 @@ const MultiChoiceQuestionContent: FC<MultiChoiceQuestionContentProps> = ({
 }) => {
   const { t } = useTranslation();
   const [editIndex, setEditIndex] = useState<number | null>(null);
-  const [editValue, setEditValue] = useState<string>("");
+  const [editValue, setEditValue] = useState<string>('');
   const node = useServiceStore((state) => state.selectedNode);
   const serviceName = useServiceStore((state) => removeTrailingUnderscores(state.serviceNameDashed()));
   const selectedService = useServiceListStore((state) => state.selectedService);
@@ -43,16 +45,16 @@ const MultiChoiceQuestionContent: FC<MultiChoiceQuestionContentProps> = ({
 
   const handleEditSave = (idx: number) => {
     const currentTitles = buttons.map((btn) => btn.title);
-    if (currentTitles.includes(editValue) || editValue === "") {
+    if (currentTitles.includes(editValue) || editValue === '') {
       setEditIndex(null);
-      setEditValue("");
+      setEditValue('');
       return;
     }
     const newButtons = [...buttons];
     newButtons[idx] = { ...newButtons[idx], title: editValue };
     setButtons(newButtons);
     setEditIndex(null);
-    setEditValue("");
+    setEditValue('');
     setIsSaveEnabled(newButtons.length > 1 && newButtons.every((btn) => btn.title.length > 0));
   };
 
@@ -61,7 +63,7 @@ const MultiChoiceQuestionContent: FC<MultiChoiceQuestionContentProps> = ({
     setButtons(newButtons);
     if (editIndex === idx) {
       setEditIndex(null);
-      setEditValue("");
+      setEditValue('');
     }
     setIsSaveEnabled(newButtons.length > 1 && newButtons.every((btn) => btn.title.length > 0));
   };
@@ -71,8 +73,8 @@ const MultiChoiceQuestionContent: FC<MultiChoiceQuestionContentProps> = ({
       ...buttons,
       {
         id: crypto.randomUUID(),
-        title: "",
-        payload: `#service, /${selectedService?.type ?? "POST"}/services/active/${serviceName}_mcq_${
+        title: '',
+        payload: `#service, /${selectedService?.type ?? 'POST'}/services/active/${serviceName}_mcq_${
           node?.data.label[node?.data.label.length - 1]
         }_${buttons.length}`,
       },
@@ -82,48 +84,48 @@ const MultiChoiceQuestionContent: FC<MultiChoiceQuestionContentProps> = ({
   };
 
   return (
-    <Track direction="vertical" align="stretch" style={{ width: "100%", padding: 16 }}>
+    <Track direction="vertical" align="stretch" style={{ width: '100%', padding: 16 }}>
       <div>
         <FormTextarea
           name="multiChoiceQuestion-question"
           label=""
-          placeholder={t("serviceFlow.multiChoiceQuestion.questionPlaceholder")!}
+          placeholder={t('serviceFlow.multiChoiceQuestion.questionPlaceholder')!}
           value={question}
           onChange={(e) => {
             setQuestion(e.target.value);
             setIsSaveEnabled(buttons.length > 1);
           }}
-          style={{ resize: "none", width: "100%" }}
+          style={{ resize: 'none', width: '100%' }}
           maxRows={5}
           minRows={2}
           hideLabel
         />
         {!question.length && (
-          <FormError style={{ marginTop: 2 }}>{t("serviceFlow.multiChoiceQuestion.questionError")}</FormError>
+          <FormError style={{ marginTop: 2 }}>{t('serviceFlow.multiChoiceQuestion.questionError')}</FormError>
         )}
       </div>
       <div style={{ marginTop: 16 }}>
-        <div style={{ fontWeight: 500 }}>{t("serviceFlow.multiChoiceQuestion.userChoices")}</div>
+        <div style={{ fontWeight: 500 }}>{t('serviceFlow.multiChoiceQuestion.userChoices')}</div>
         <Track direction="vertical" gap={8} style={{ marginTop: 8 }}>
           {buttons.map((btn, idx) => (
-            <Track key={v4()} gap={8} align="center" style={{ width: "100%" }}>
+            <Track key={v4()} gap={8} align="center" style={{ width: '100%' }}>
               {editIndex === idx ? (
                 <>
                   <FormInput
                     name={`button-title-${idx}`}
                     label=""
-                    placeholder={t("serviceFlow.multiChoiceQuestion.ellipsis")!}
+                    placeholder={t('serviceFlow.multiChoiceQuestion.ellipsis')!}
                     value={editValue}
                     onChange={(e) => setEditValue(e.target.value)}
                     autoFocus
                     onKeyDown={(e) => {
-                      if (e.key === "Enter") handleEditSave(idx);
-                      if (e.key === "Escape") setEditIndex(null);
+                      if (e.key === 'Enter') handleEditSave(idx);
+                      if (e.key === 'Escape') setEditIndex(null);
                     }}
                     style={{ minWidth: 120, flex: 1 }}
                     hideLabel
                   />
-                  <Button appearance="icon" size="s" onClick={() => handleEditSave(idx)} aria-label={t("global.save")!}>
+                  <Button appearance="icon" size="s" onClick={() => handleEditSave(idx)} aria-label={t('global.save')!}>
                     <Icon icon={<MdCheck />} size="medium" />
                   </Button>
                 </>
@@ -136,14 +138,14 @@ const MultiChoiceQuestionContent: FC<MultiChoiceQuestionContentProps> = ({
                     }}
                   >
                     <Button disabled className="multiple-choice-question-button">
-                      {btn.title.length > 0 ? btn.title : t("serviceFlow.multiChoiceQuestion.ellipsis")}
+                      {btn.title.length > 0 ? btn.title : t('serviceFlow.multiChoiceQuestion.ellipsis')}
                     </Button>
                   </div>
                   <Button
                     appearance="icon"
                     size="s"
                     onClick={() => handleEdit(idx)}
-                    aria-label={t("serviceFlow.multiChoiceQuestion.edit")!}
+                    aria-label={t('serviceFlow.multiChoiceQuestion.edit')!}
                   >
                     <Icon icon={<MdEdit />} size="medium" />
                   </Button>
@@ -153,7 +155,7 @@ const MultiChoiceQuestionContent: FC<MultiChoiceQuestionContentProps> = ({
                 appearance="icon"
                 size="s"
                 onClick={() => handleDelete(idx)}
-                aria-label={t("serviceFlow.multiChoiceQuestion.delete")!}
+                aria-label={t('serviceFlow.multiChoiceQuestion.delete')!}
               >
                 <Icon icon={<MdDeleteOutline />} size="medium" />
               </Button>
@@ -165,20 +167,20 @@ const MultiChoiceQuestionContent: FC<MultiChoiceQuestionContentProps> = ({
             appearance="secondary"
             onClick={handleAdd}
             disabled={buttons.length >= maxButtons}
-            aria-label={t("serviceFlow.multiChoiceQuestion.addButton")!}
+            aria-label={t('serviceFlow.multiChoiceQuestion.addButton')!}
           >
-            {t("serviceFlow.multiChoiceQuestion.addButton")}
+            {t('serviceFlow.multiChoiceQuestion.addButton')}
           </Button>
         </Track>
         {buttons.length >= maxButtons && (
           <FormError style={{ marginTop: 2 }}>
-            {t("serviceFlow.multiChoiceQuestion.maxButtonsStart")}
+            {t('serviceFlow.multiChoiceQuestion.maxButtonsStart')}
             {maxButtons}
-            {t("serviceFlow.multiChoiceQuestion.maxButtonsEnd")}
+            {t('serviceFlow.multiChoiceQuestion.maxButtonsEnd')}
           </FormError>
         )}
         {buttons.length < 2 && (
-          <FormError style={{ marginTop: 2 }}>{t("serviceFlow.multiChoiceQuestion.minButtons")}</FormError>
+          <FormError style={{ marginTop: 2 }}>{t('serviceFlow.multiChoiceQuestion.minButtons')}</FormError>
         )}
       </div>
     </Track>

@@ -1,12 +1,12 @@
-FROM node:22.0.0-alpine AS image
+FROM node:22.18.0-alpine AS image
 WORKDIR /app
-COPY ./package.json .
+COPY ./package.json ./package-lock.json ./
 ENV PORT=3006
 
 FROM image AS build
-RUN npm install --legacy-peer-deps --mode=development --ignore-scripts
+RUN npm ci --legacy-peer-deps --ignore-scripts
 COPY . .
-RUN ./node_modules/.bin/vite build --mode=development
+RUN ./node_modules/.bin/vite build
 VOLUME /app
 
 FROM nginx:1.25.4-alpine AS web
