@@ -9,6 +9,7 @@ import { StepType } from 'types';
 import { Assign } from 'types/assign';
 import { NodeDataProps } from 'types/service-flow';
 
+// todo pass data only
 type StepNodeProps = {
   data: NodeDataProps;
 };

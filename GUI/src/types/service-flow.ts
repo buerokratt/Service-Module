@@ -1,5 +1,6 @@
 import { Edge, Node } from '@xyflow/react';
 import { Group } from 'components/FlowElementsPopup/RuleBuilder/types';
+import { Dispatch, SetStateAction } from 'react';
 
 import { Assign } from './assign';
 import { DynamicChoices } from './dynamic-choices';
@@ -12,6 +13,7 @@ export const EDGE_LENGTH = 5 * GRID_UNIT;
 const startNodeId = crypto.randomUUID();
 const ghostNodeId = crypto.randomUUID();
 
+// todo can we extend NodeProps
 export type NodeDataProps = {
   label: string;
   onDelete: (id: string) => void;
@@ -33,10 +35,11 @@ export type NodeDataProps = {
   assignElements?: Assign[];
   multiChoiceQuestion?: MultiChoiceQuestion;
   dynamicChoices?: DynamicChoices;
-  childrenCount?: number;
+  childrenCount: number;
   clientInputId?: number;
   endpoint?: EndpointData;
   testingPassed?: boolean;
+  setClickedNode: Dispatch<SetStateAction<string>>;
 };
 
 export const initialNodes: Node[] = [
