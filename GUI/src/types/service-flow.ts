@@ -13,7 +13,6 @@ export const EDGE_LENGTH = 5 * GRID_UNIT;
 const startNodeId = crypto.randomUUID();
 const ghostNodeId = crypto.randomUUID();
 
-// todo can we extend NodeProps
 export type NodeDataProps = {
   label: string;
   onDelete: (id: string) => void;

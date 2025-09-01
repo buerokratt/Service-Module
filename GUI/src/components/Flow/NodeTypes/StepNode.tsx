@@ -29,7 +29,6 @@ const StepNode: FC<StepNodeProps> = ({ data }) => {
   };
 
   const isStepInvalid = () => {
-    // todo here
     if (data.testingPassed === false) return true;
 
     if (data.stepType === StepType.Input || data.stepType === StepType.Condition) {
