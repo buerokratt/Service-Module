@@ -1,5 +1,6 @@
 import { t } from 'i18next';
 import { ServiceStoreState } from 'store/new-services.store';
+import { ServiceState } from 'types';
 import { ServiceTestError } from 'types/service-test-error';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -685,7 +686,7 @@ describe('executeServiceTest', () => {
 
   it('should call createApiInstance with correct header', async () => {
     const headerValue = 'test-header';
-    const state = 'ACTIVE' as any;
+    const state = ServiceState.Active;
     const name = 'test-service';
     const input = 'test-input';
 
@@ -698,7 +699,7 @@ describe('executeServiceTest', () => {
 
   it('should call testService with correct parameters', async () => {
     const headerValue = 'test-header';
-    const state = 'ACTIVE' as any;
+    const state = ServiceState.Active;
     const name = 'test-service';
     const input = 'test-input';
 
@@ -709,7 +710,7 @@ describe('executeServiceTest', () => {
 
   it('should call post with correct endpoint and payload', async () => {
     const headerValue = 'test-header';
-    const state = 'ACTIVE' as any;
+    const state = ServiceState.Active;
     const name = 'test-service';
     const input = 'test-input';
     const expectedEndpoint = '/test-endpoint';
@@ -721,7 +722,7 @@ describe('executeServiceTest', () => {
 
   it('should return the result from post call', async () => {
     const headerValue = 'test-header';
-    const state = 'ACTIVE' as any;
+    const state = ServiceState.Active;
     const name = 'test-service';
     const input = 'test-input';
     const expectedResponse = { success: true, data: 'test-data' };
