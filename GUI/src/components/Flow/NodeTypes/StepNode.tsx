@@ -52,6 +52,7 @@ const StepNode: FC<NodeDataProps> = ({ data }) => {
   };
 
   const isStepInvalid = () => {
+    // todo here
     if (data.stepType === StepType.Input || data.stepType === StepType.Condition) {
       const hasInvalidRules = (elements: any[]): boolean => {
         return elements.some((e) => {
@@ -144,7 +145,7 @@ const StepNode: FC<NodeDataProps> = ({ data }) => {
       {data.stepType === StepType.MultiChoiceQuestion && (
         <div style={boldText} dangerouslySetInnerHTML={createMarkup(data.multiChoiceQuestion?.question ?? '')}></div>
       )}
-      {data.stepType === StepType.Auth && <p style={boldText}>"{t('serviceFlow.popup.loginWithTARA')}"</p>}
+      {data.stepType === StepType.Auth && <p style={boldText}>&quot;{t('serviceFlow.popup.loginWithTARA')}&quot;</p>}
       {data.stepType === StepType.Input && (
         <p>
           <span style={boldText}>{t('newService.endpoint.variable')}</span>
