@@ -281,8 +281,18 @@ function getYamlContent(nodes: Node<NodeDataProps>[], edges: Edge[], name: strin
             error = i18next.t('toast.missing-dynamic-choices-key');
           }
           break;
+        case StepType.Condition: {
+          const invalidRulesExist = hasInvalidRules(followingNode?.rules?.children ?? []);
+          const isInvalid =
+            followingNode?.rules?.children === undefined ||
+            invalidRulesExist ||
+            followingNode?.rules?.children.length === 0;
+          if (isInvalid) {
+            throw new Error(i18next.t('toast.missing-condition-rules') ?? 'Error');
+          }
+          break;
+        }
         case StepType.Input:
-        case StepType.Condition:
           if (followingNode?.type === 'placeholder' && !allRelations.includes(node.id)) {
             allRelations.push(node.id);
             return;
