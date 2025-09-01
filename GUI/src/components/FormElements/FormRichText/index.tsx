@@ -5,10 +5,11 @@ import './FormRichText.scss';
 
 type FormRichTextProps = {
   readonly defaultValue?: string;
+  quill?: React.Ref<ReactQuill>;
   onChange(value: string | null): void;
 };
 
-const FormRichText: FC<FormRichTextProps> = ({ defaultValue, onChange }) => {
+const FormRichText: FC<FormRichTextProps> = ({ defaultValue, onChange, quill }) => {
   const modules = {
     toolbar: [
       ['italic', 'bold', 'underline', 'strike', 'blockquote'],
@@ -20,6 +21,7 @@ const FormRichText: FC<FormRichTextProps> = ({ defaultValue, onChange }) => {
 
   return (
     <ReactQuill
+      ref={quill}
       defaultValue={defaultValue}
       onChange={(value) => {
         value = value === '<p><br></p>' ? '' : value;
