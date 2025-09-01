@@ -229,41 +229,56 @@ function getYamlContent(nodes: Node<NodeDataProps>[], edges: Edge[], name: strin
     const outgoingEdges = edges.filter((edge) => edge.source === node.id);
 
     outgoingEdges.forEach((edge) => {
-      const followingNode = nodes.find((n) => n.id === edge.target);
+      const followingNode = nodes.find((n) => n.id === edge.target)?.data;
       let error;
 
-      switch (node.data.stepType) {
+      switch (followingNode?.stepType) {
         case StepType.Textfield:
-          if (node.data.message === undefined) {
+          if (followingNode?.message === undefined) {
             error = i18next.t('toast.missing-textfield-message');
           }
           break;
         case StepType.OpenWebpage:
-          if (node.data.link === undefined || node.data.linkText === undefined) {
+          if (followingNode?.link === undefined || followingNode?.linkText === undefined) {
             error = i18next.t('toast.missing-website');
           }
           break;
         case StepType.FileGenerate:
-          if (node.data.fileName === undefined || node.data.fileContent === undefined) {
+          if (followingNode?.fileName === undefined || followingNode?.fileContent === undefined) {
             error = i18next.t('toast.missing-file-generation');
           }
           break;
         case StepType.Assign:
-          if (node.data.assignElements === undefined || node.data?.assignElements?.length === 0) {
+          if (followingNode?.assignElements === undefined || followingNode?.assignElements?.length === 0) {
             error = i18next.t('toast.missing-assign-elements');
           }
           break;
         case StepType.MultiChoiceQuestion:
-          if (node.data.multiChoiceQuestion?.question === undefined || node.data.multiChoiceQuestion.question === '') {
+          if (
+            followingNode?.multiChoiceQuestion?.question === undefined ||
+            followingNode?.multiChoiceQuestion.question === ''
+          ) {
             error = i18next.t('toast.missing-mcq-question');
             break;
           }
-          if (
-            !node.data.multiChoiceQuestion?.buttons ||
-            node.data.multiChoiceQuestion.buttons.length === 0
-          ) {
+          if (!followingNode?.multiChoiceQuestion?.buttons || followingNode?.multiChoiceQuestion.buttons.length === 0) {
             error = i18next.t('toast.missing-mcq-options');
+          }
+          break;
+        case StepType.DynamicChoices:
+          if (followingNode?.dynamicChoices?.list === undefined || followingNode?.dynamicChoices.list === '') {
+            error = i18next.t('toast.missing-dynamic-choices-list');
             break;
+          }
+          if (
+            followingNode?.dynamicChoices?.serviceName === undefined ||
+            followingNode?.dynamicChoices.serviceName === ''
+          ) {
+            error = i18next.t('toast.missing-dynamic-choices-service-name');
+            break;
+          }
+          if (followingNode?.dynamicChoices?.key === undefined || followingNode?.dynamicChoices.key === '') {
+            error = i18next.t('toast.missing-dynamic-choices-key');
           }
           break;
         case StepType.Input:
