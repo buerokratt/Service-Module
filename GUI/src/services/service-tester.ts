@@ -58,7 +58,7 @@ const getServiceTestData = (): {
   return { state, name, serviceStore };
 };
 
-const clearPreviousTestStates = (serviceStore: ServiceStoreState) => {
+export const clearPreviousTestStates = (serviceStore: ServiceStoreState) => {
   serviceStore.setNodes((prevNodes) =>
     prevNodes.map((prevNode) => ({
       ...prevNode,

@@ -2,7 +2,13 @@ import { t } from 'i18next';
 import { ServiceTestError } from 'types/service-test-error';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { hasResponseData, isErrorResponse, translateError, validateTestEnvironment } from './service-tester';
+import {
+  clearPreviousTestStates,
+  hasResponseData,
+  isErrorResponse,
+  translateError,
+  validateTestEnvironment,
+} from './service-tester';
 
 // Mock i18next
 vi.mock('i18next', () => ({
@@ -482,5 +488,168 @@ describe('validateTestEnvironment', () => {
 
     expect(result).toBe(testHeaderValue);
     expect(consoleSpy).not.toHaveBeenCalled();
+  });
+});
+
+describe('clearPreviousTestStates', () => {
+  it('should set testingPassed to true for all nodes', () => {
+    const mockServiceStore = {
+      setNodes: vi.fn(),
+    };
+
+    const mockNodes = [
+      {
+        id: 'node1',
+        data: {
+          label: 'Test Node 1',
+          testingPassed: false,
+        },
+      },
+      {
+        id: 'node2',
+        data: {
+          label: 'Test Node 2',
+          testingPassed: null,
+        },
+      },
+      {
+        id: 'node3',
+        data: {
+          label: 'Test Node 3',
+          testingPassed: true,
+        },
+      },
+    ];
+
+    clearPreviousTestStates(mockServiceStore as any);
+
+    expect(mockServiceStore.setNodes).toHaveBeenCalledWith(expect.any(Function));
+
+    const setNodesCallback = mockServiceStore.setNodes.mock.calls[0][0];
+    const result = setNodesCallback(mockNodes);
+
+    expect(result).toEqual([
+      {
+        id: 'node1',
+        data: {
+          label: 'Test Node 1',
+          testingPassed: true,
+        },
+      },
+      {
+        id: 'node2',
+        data: {
+          label: 'Test Node 2',
+          testingPassed: true,
+        },
+      },
+      {
+        id: 'node3',
+        data: {
+          label: 'Test Node 3',
+          testingPassed: true,
+        },
+      },
+    ]);
+  });
+
+  it('should preserve all other node properties', () => {
+    const mockServiceStore = {
+      setNodes: vi.fn(),
+    };
+
+    const mockNodes = [
+      {
+        id: 'node1',
+        type: 'custom',
+        position: { x: 100, y: 200 },
+        data: {
+          label: 'Test Node',
+          type: 'custom',
+          stepType: 'ASSIGN',
+          readonly: false,
+          childrenCount: 0,
+          testingPassed: false,
+          endpoint: { id: 'endpoint1', name: 'Test Endpoint' },
+        },
+      },
+    ];
+
+    clearPreviousTestStates(mockServiceStore as any);
+
+    const setNodesCallback = mockServiceStore.setNodes.mock.calls[0][0];
+    const result = setNodesCallback(mockNodes);
+
+    expect(result[0]).toEqual({
+      id: 'node1',
+      type: 'custom',
+      position: { x: 100, y: 200 },
+      data: {
+        label: 'Test Node',
+        type: 'custom',
+        stepType: 'ASSIGN',
+        readonly: false,
+        childrenCount: 0,
+        testingPassed: true,
+        endpoint: { id: 'endpoint1', name: 'Test Endpoint' },
+      },
+    });
+  });
+
+  it('should handle empty nodes array', () => {
+    const mockServiceStore = {
+      setNodes: vi.fn(),
+    };
+
+    clearPreviousTestStates(mockServiceStore as any);
+
+    const setNodesCallback = mockServiceStore.setNodes.mock.calls[0][0];
+    const result = setNodesCallback([]);
+
+    expect(result).toEqual([]);
+  });
+
+  it('should handle nodes without testingPassed property', () => {
+    const mockServiceStore = {
+      setNodes: vi.fn(),
+    };
+
+    const mockNodes = [
+      {
+        id: 'node1',
+        data: {
+          label: 'Test Node 1',
+        },
+      },
+      {
+        id: 'node2',
+        data: {
+          label: 'Test Node 2',
+          testingPassed: false,
+        },
+      },
+    ];
+
+    clearPreviousTestStates(mockServiceStore as any);
+
+    const setNodesCallback = mockServiceStore.setNodes.mock.calls[0][0];
+    const result = setNodesCallback(mockNodes);
+
+    expect(result).toEqual([
+      {
+        id: 'node1',
+        data: {
+          label: 'Test Node 1',
+          testingPassed: true,
+        },
+      },
+      {
+        id: 'node2',
+        data: {
+          label: 'Test Node 2',
+          testingPassed: true,
+        },
+      },
+    ]);
   });
 });
