@@ -25,7 +25,6 @@ export const runServiceTest = async (input: string) => {
     return;
   }
 
-  // todo failing node highlight
   // todo style and text
   // todo more tests - for new functionality
 
@@ -41,6 +40,7 @@ export const runServiceTest = async (input: string) => {
       if (isErrorResponse(errorData)) {
         console.error('runServiceTest: Service test error:', errorData);
 
+        // todo failing node highlight
         const node = serviceStore.nodes.find((node) => node.data.label === fromSnakeCase(errorData.stepName));
 
         if (!node) {
