@@ -53,8 +53,8 @@ const processDeletedNodes = (
           id: crypto.randomUUID(),
           type: 'ghost',
           position: {
-            x: node.position.x + (Math.random() * 40 - 20),
-            y: node.position.y + (Math.random() * 40 - 20),
+            x: node.position.x,
+            y: node.position.y,
           },
           data: { type: 'ghost' },
           className: 'ghost',
