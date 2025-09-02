@@ -1,4 +1,5 @@
 import classNames from 'classnames';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { TestingMessage } from 'store/test-services.store';
 
@@ -10,7 +11,7 @@ interface ChatMessageProps {
   message: TestingMessage;
 }
 
-const ChatMessage = ({ message }: ChatMessageProps): JSX.Element => {
+const ChatMessage = ({ message }: ChatMessageProps): React.JSX.Element => {
   const { t } = useTranslation();
 
   if (message.author === 'enduser') {
@@ -25,9 +26,13 @@ const ChatMessage = ({ message }: ChatMessageProps): JSX.Element => {
     <div className={classNames(styles.system, styles[message.type])}>
       {t(message.message)}
       {message.payload && (
-        <a className={styles.link} href={message.payload.link}>
-          {message.payload.title}
-        </a>
+        <div className={styles.payload}>
+          {Object.entries(message.payload).map(([key, value]) => (
+            <div key={key} className={styles.payloadItem}>
+              <strong>{key}:</strong> {value}
+            </div>
+          ))}
+        </div>
       )}
     </div>
   );

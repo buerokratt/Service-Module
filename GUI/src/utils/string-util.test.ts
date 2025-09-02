@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import {
+  fromSnakeCase,
   getLastDigits,
   isTemplate,
   removeTrailingUnderscores,
@@ -61,6 +62,21 @@ describe('String Utils', () => {
       expect(toSnakeCase('')).toBe('');
       expect(toSnakeCase('   ')).toBe('');
       expect(toSnakeCase('TEST')).toBe('test');
+    });
+  });
+
+  describe('fromSnakeCase', () => {
+    it('should convert from snake case to display format', () => {
+      expect(fromSnakeCase('hello_world')).toBe('Hello World');
+      expect(fromSnakeCase('send_message_to_client_1')).toBe('Send message to client - 1');
+      expect(fromSnakeCase('test_value')).toBe('Test Value');
+    });
+
+    it('should handle edge cases', () => {
+      expect(fromSnakeCase('')).toBe('');
+      expect(fromSnakeCase('single')).toBe('Single');
+      expect(fromSnakeCase('UPPER_CASE')).toBe('Upper Case');
+      expect(fromSnakeCase('just_1')).toBe('Just - 1');
     });
   });
 

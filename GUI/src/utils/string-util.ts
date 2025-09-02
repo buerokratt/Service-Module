@@ -20,6 +20,35 @@ export const toSnakeCase = (value: string) => {
   return value.toLowerCase().trim().replace(/\s+/g, '_').replace(/-+/g, '_').replace(/_+/g, '_');
 };
 
+export const fromSnakeCase = (value: string) => {
+  const parts = value.split('_');
+
+  // Check if the last part is a number
+  const lastPart = parts[parts.length - 1];
+  const isLastPartNumber = /^\d+$/.test(lastPart);
+
+  if (isLastPartNumber && parts.length > 1) {
+    // Handle case like "send_message_to_client_1" -> "Send message to client - 1"
+    const words = parts.slice(0, -1);
+    const number = lastPart;
+
+    const displayWords = words.map((word, index) => {
+      if (index === 0) {
+        // First word: capitalize first letter, lowercase rest
+        return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+      } else {
+        // Other words: all lowercase
+        return word.toLowerCase();
+      }
+    });
+
+    return `${displayWords.join(' ')} - ${number}`;
+  } else {
+    // Handle regular snake case conversion
+    return parts.map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ');
+  }
+};
+
 export const getLastDigits = (value: string) => {
   let lastDigits = '';
   for (let i = value.length - 1; i >= 0; i--) {
@@ -46,7 +75,7 @@ export function stringToArray(str: string, fallback: any = []) {
     const parsed = JSON.parse(str);
     return Array.isArray(parsed) ? parsed : fallback;
   } catch (e) {
-    console.error(e);
+    console.error('stringToArray: Error converting to array:', e);
     return fallback;
   }
 }

@@ -4,7 +4,7 @@ import { Group, Rule } from 'components/FlowElementsPopup/RuleBuilder/types';
 import { format } from 'date-fns';
 import i18next, { t } from 'i18next';
 import { NodeHtmlMarkdown } from 'node-html-markdown';
-import { createEndpoint, createNewService, editService, testService, updateEndpoint } from 'resources/api-constants';
+import { createEndpoint, createNewService, editService, updateEndpoint } from 'resources/api-constants';
 import useServiceStore from 'store/new-services.store';
 import useToastStore from 'store/toasts.store';
 import { StepType } from 'types';
@@ -839,21 +839,4 @@ export const editServiceInfo = async () => {
         message: e?.message,
       });
     });
-};
-
-export const runServiceTest = async () => {
-  const name = removeTrailingUnderscores(useServiceStore.getState().serviceNameDashed());
-  const state = useServiceStore.getState().serviceState;
-
-  try {
-    await api.post(testService(state, name), {});
-    useToastStore.getState().success({
-      title: i18next.t('newService.toast.testResultSuccess'),
-    });
-  } catch (error) {
-    console.log('ERROR: ', error);
-    useToastStore.getState().error({
-      title: i18next.t('newService.toast.testResultError'),
-    });
-  }
 };
