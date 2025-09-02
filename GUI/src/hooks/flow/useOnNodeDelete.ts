@@ -44,24 +44,58 @@ const processDeletedNodes = (
       outgoers = [];
     }
 
-    if (outgoers.length === 0 || outgoers.length > 1) {
-      const ghostNode: Node = {
-        id: crypto.randomUUID(),
-        type: 'ghost',
-        position: { x: node.position.x, y: node.position.y },
-        data: { type: 'ghost' },
-        className: 'ghost',
-        selectable: false,
-        draggable: false,
-      };
-      outgoers = [ghostNode];
-      updatedNodes = [...updatedNodes.filter((n) => n.id !== node.id), ghostNode];
-    } else {
-      updatedNodes = updatedNodes.filter((n) => n.id !== node.id);
-    }
+    if (incomers.length > 1) {
+      const newGhostNodes: Node[] = [];
+      const newEdges: Edge[] = [];
 
-    const newEdges = createNewEdges(incomers, outgoers, updatedNodes, getConnectedEdges([node], updatedEdges));
-    updatedEdges = [...getRemainingEdges(updatedEdges, getConnectedEdges([node], updatedEdges)), ...newEdges];
+      incomers.forEach((incomer) => {
+        const ghostNode: Node = {
+          id: crypto.randomUUID(),
+          type: 'ghost',
+          position: {
+            x: node.position.x + (Math.random() * 40 - 20),
+            y: node.position.y + (Math.random() * 40 - 20),
+          },
+          data: { type: 'ghost' },
+          className: 'ghost',
+          selectable: false,
+          draggable: false,
+        };
+
+        newGhostNodes.push(ghostNode);
+        newEdges.push({
+          id: `${incomer.id}->${ghostNode.id}`,
+          source: incomer.id,
+          target: ghostNode.id,
+          type: 'step',
+          animated: true,
+          deletable: false,
+          label: updatedEdges.find((edge) => edge.source === incomer.id && edge.target === node.id)?.label ?? '+',
+        });
+      });
+
+      updatedNodes = [...updatedNodes.filter((n) => n.id !== node.id), ...newGhostNodes];
+      updatedEdges = [...getRemainingEdges(updatedEdges, getConnectedEdges([node], updatedEdges)), ...newEdges];
+    } else {
+      if (outgoers.length === 0 || outgoers.length > 1) {
+        const ghostNode: Node = {
+          id: crypto.randomUUID(),
+          type: 'ghost',
+          position: { x: node.position.x, y: node.position.y },
+          data: { type: 'ghost' },
+          className: 'ghost',
+          selectable: false,
+          draggable: false,
+        };
+        outgoers = [ghostNode];
+        updatedNodes = [...updatedNodes.filter((n) => n.id !== node.id), ghostNode];
+      } else {
+        updatedNodes = updatedNodes.filter((n) => n.id !== node.id);
+      }
+
+      const newEdges = createNewEdges(incomers, outgoers, updatedNodes, getConnectedEdges([node], updatedEdges));
+      updatedEdges = [...getRemainingEdges(updatedEdges, getConnectedEdges([node], updatedEdges)), ...newEdges];
+    }
   }
 
   updatedNodes = updatedNodes.filter(
