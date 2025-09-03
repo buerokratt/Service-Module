@@ -1,6 +1,6 @@
 import { DragInput, FormInput, Icon, Tooltip, Track } from 'components';
 import { t } from 'i18next';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { MdDataObject, MdDeleteOutline, MdEdit, MdMoveDown } from 'react-icons/md';
 import useToastStore from 'store/toasts.store';
 import { getDragData } from 'utils/component-util';
@@ -43,10 +43,6 @@ const AssignElement: React.FC<AssignElementProps> = ({
   const [isSecondSlotOpen, setIsSecondSlotOpen] = useState(!!slots[1]);
   const [isEditingManually, setIsEditingManually] = useState(manualEdit || (element.value && !slots.length));
   const [isObjectEditorOpen, setIsObjectEditorOpen] = useState(element.isObject ?? false);
-
-  useEffect(() => {
-    console.log('element', element);
-  }, [element]);
 
   const changeKey = (e: React.ChangeEvent<HTMLInputElement>) => {
     onChange({ ...element, key: e.target.value });
