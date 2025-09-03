@@ -35,35 +35,6 @@ const findNodePath = (node: Element, data: Record<string, unknown>): string | nu
   return null;
 };
 
-/**
- * Handles drag over events for the ObjectEditor
- * Manages highlighting of elements under the cursor during drag operations
- */
-const handleDragOver = (
-  e: React.DragEvent<HTMLDivElement>,
-  hoveredElement: Element | null,
-  setHoveredElement: (element: Element | null) => void,
-): void => {
-  e.preventDefault();
-
-  // Get the element under the cursor
-  const element = document.elementFromPoint(e.clientX, e.clientY);
-  if (element) {
-    const jsonNode = element.closest('.jsoneditor-value');
-
-    // Remove highlight from previously hovered element
-    if (hoveredElement && hoveredElement !== jsonNode) {
-      hoveredElement.classList.remove(styles.dragHoverHighlight);
-    }
-
-    // Add highlight to currently hovered element
-    if (jsonNode && jsonNode !== hoveredElement) {
-      jsonNode.classList.add(styles.dragHoverHighlight);
-      setHoveredElement(jsonNode);
-    }
-  }
-};
-
 interface ObjectEditorProps {
   onChange: (value: string) => void;
   data: Record<string, unknown> | unknown[];
@@ -111,6 +82,27 @@ const ObjectEditor: React.FC<ObjectEditorProps> = ({ onChange, data }) => {
       }
     };
   }, [hoveredElement]);
+
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+
+    // Get the element under the cursor
+    const element = document.elementFromPoint(e.clientX, e.clientY);
+    if (element) {
+      const jsonNode = element.closest('.jsoneditor-value');
+
+      // Remove highlight from previously hovered element
+      if (hoveredElement && hoveredElement !== jsonNode) {
+        hoveredElement.classList.remove(styles.dragHoverHighlight);
+      }
+
+      // Add highlight to currently hovered element
+      if (jsonNode && jsonNode !== hoveredElement) {
+        jsonNode.classList.add(styles.dragHoverHighlight);
+        setHoveredElement(jsonNode);
+      }
+    }
+  };
 
   const handleDragLeave = () => {
     // Remove highlight when leaving the drop zone
@@ -166,7 +158,7 @@ const ObjectEditor: React.FC<ObjectEditorProps> = ({ onChange, data }) => {
   return (
     <div
       ref={editorRef}
-      onDragOver={(e) => handleDragOver(e, hoveredElement, setHoveredElement)}
+      onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
       className={styles.editor}
