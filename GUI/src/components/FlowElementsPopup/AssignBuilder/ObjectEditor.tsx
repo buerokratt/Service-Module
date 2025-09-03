@@ -176,7 +176,7 @@ const ObjectEditor: React.FC<ObjectEditorProps> = ({ onChange, data }) => {
 
           if (jsonNode) {
             // Get the current JSON data
-            const currentData = jsonEditorRef.current.get();
+            const currentData = jsonEditorRef.current.get() as Record<string, unknown>;
 
             // Try to find the path to the dropped node
             const path = findNodePath(jsonNode, currentData);
