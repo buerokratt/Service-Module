@@ -169,7 +169,7 @@ export const updateValueAtPath = (
   return newObj;
 };
 
-// Helper function to search for value in a collection
+// Helper function to search for value in a collection (arrays and objects)
 export const searchForValue = (collection: object, value: string, currentPath = ''): string | null => {
   // Convert arrays to entries for unified iteration
   const entries: (string | number)[][] = Array.isArray(collection)
@@ -209,7 +209,7 @@ const isValueMatch = (objValue: unknown, value: string): boolean => {
   );
 };
 
-// Helper function to search for a property name in the data structure
+// Helper function to search for a property name in a collection (arrays and objects)
 export const searchForProperty = (data: unknown, propertyName: string, currentPath = ''): string | null => {
   if (!isObject(data)) return null;
 
