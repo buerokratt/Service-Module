@@ -69,9 +69,12 @@ const ObjectEditor: React.FC<ObjectEditorProps> = ({ onChange, data }) => {
         jsonEditorRef.current = null;
       }
     };
-  }, []); // todo fix
+    // Dependencies array is intentionally empty - JSONEditor manages its own state
+    // so no need to re-render the component when the data changes
+    // Adding dependencies would cause inputs in JSONEditor to lose focus on typing
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-  // Cleanup effect to remove highlight when component unmounts
   useEffect(() => {
     return () => {
       if (hoveredElement) {
