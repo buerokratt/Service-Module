@@ -191,7 +191,8 @@ export const searchForValue = (collection: object, value: string, currentPath = 
   return null;
 };
 
-// Helper function to check if values match (handling different types)
+// Compares an object value with a string value, handling type conversions for numbers, booleans, and null
+// Returns true if the object value matches the string value after appropriate type conversion
 export const isStringValueMatch = (objValue: unknown, value: string): boolean => {
   // Handle boolean conversion
   let booleanValue: boolean | null = null;
