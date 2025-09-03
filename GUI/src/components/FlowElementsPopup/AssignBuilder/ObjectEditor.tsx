@@ -3,7 +3,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import 'jsoneditor/dist/jsoneditor.css';
 import { getDragData } from 'utils/component-util';
-import { isObject, updateValueAtPath } from 'utils/object-util';
+import { searchForProperty, searchInCollection, updateValueAtPath } from 'utils/object-util';
 import { stringToTemplate } from 'utils/string-util';
 
 import styles from './ObjectEditor.module.scss';
@@ -33,117 +33,6 @@ const findNodePath = (node: Element, data: Record<string, unknown>): string | nu
   }
 
   return null;
-};
-
-// Helper function to check if values match (handling different types)
-const isValueMatch = (objValue: unknown, value: string): boolean => {
-  // Handle boolean conversion
-  let booleanValue: boolean | null = null;
-  if (value.toLowerCase() === 'true') {
-    booleanValue = true;
-  } else if (value.toLowerCase() === 'false') {
-    booleanValue = false;
-  }
-
-  return (
-    objValue === value ||
-    (typeof objValue === 'number' && !isNaN(Number(value)) && objValue === Number(value)) ||
-    (typeof objValue === 'boolean' && objValue === booleanValue) ||
-    (objValue === null && value.toLowerCase() === 'null')
-  );
-};
-
-// Helper function to search for a property name in an array
-const searchForPropertyInArray = (array: unknown[], propertyName: string, currentPath = ''): string | null => {
-  for (let index = 0; index < array.length; index++) {
-    const item = array[index];
-    const newPath = currentPath ? `${currentPath}[${index}]` : `[${index}]`;
-
-    if (isObject(item)) {
-      const result = searchForProperty(item, propertyName, newPath);
-      if (result) return result;
-    }
-  }
-  return null;
-};
-
-// Helper function to search for a property name in an object
-const searchForPropertyInObject = (
-  obj: Record<string, unknown>,
-  propertyName: string,
-  currentPath = '',
-): string | null => {
-  // Check if this object has the property
-  if (propertyName in obj) {
-    return currentPath ? `${currentPath}.${propertyName}` : propertyName;
-  }
-
-  // Search deeper in nested objects
-  for (const [key, value] of Object.entries(obj)) {
-    const newPath = currentPath ? `${currentPath}.${key}` : key;
-
-    if (isObject(value)) {
-      const result = searchForProperty(value, propertyName, newPath);
-      if (result) return result;
-    }
-  }
-
-  return null;
-};
-
-// Helper function to search for a property name in the data structure
-const searchForProperty = (data: unknown, propertyName: string, currentPath = ''): string | null => {
-  if (Array.isArray(data)) {
-    return searchForPropertyInArray(data, propertyName, currentPath);
-  }
-
-  if (isObject(data)) {
-    return searchForPropertyInObject(data as Record<string, unknown>, propertyName, currentPath);
-  }
-
-  return null;
-};
-
-// Helper function to search for value in an array
-const searchInArray = (array: unknown[], value: string, currentPath = ''): string | null => {
-  for (let index = 0; index < array.length; index++) {
-    const objValue = array[index];
-    const newPath = currentPath ? `${currentPath}[${index}]` : `[${index}]`;
-
-    if (isValueMatch(objValue, value)) return newPath;
-
-    if (isObject(objValue)) {
-      const result = searchInCollection(objValue, value, newPath);
-      if (result) return result;
-    }
-  }
-
-  return null;
-};
-
-// Helper function to search for value in an object
-const searchInObject = (obj: Record<string, unknown>, value: string, currentPath = ''): string | null => {
-  for (const [key, objValue] of Object.entries(obj)) {
-    const newPath = currentPath ? `${currentPath}.${key}` : String(key);
-
-    if (isValueMatch(objValue, value)) return newPath;
-
-    if (isObject(objValue)) {
-      const result = searchInCollection(objValue, value, newPath);
-      if (result) return result;
-    }
-  }
-
-  return null;
-};
-
-// Helper function to search for value in a collection
-const searchInCollection = (collection: object, value: string, currentPath = ''): string | null => {
-  if (Array.isArray(collection)) {
-    return searchInArray(collection, value, currentPath);
-  }
-
-  return searchInObject(collection as Record<string, unknown>, value, currentPath);
 };
 
 interface ObjectEditorProps {
