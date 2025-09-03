@@ -93,8 +93,50 @@ export const getKeyPathString = (keyPath: KeyPath) => {
   return keyPath.toReversed().join('"]["');
 };
 
+// Helper function to update value at a specific object path
+export const updateValueAtPath = (
+  obj: Record<string, unknown> | unknown[],
+  path: string,
+  newValue: unknown,
+): Record<string, unknown> | unknown[] => {
+  // Handle empty path - return original object unchanged
+  if (!path || path.trim() === '') {
+    return obj;
+  }
+
+  const pathParts = parsePath(path);
+
+  // Handle case where parsePath returns empty array (shouldn't happen with non-empty path, but safety check)
+  if (pathParts.length === 0) {
+    return obj;
+  }
+
+  const newObj = Array.isArray(obj) ? [...obj] : { ...obj };
+  let current: any = newObj;
+
+  // Navigate to the parent of the target, creating new objects/arrays for each level
+  for (let i = 0; i < pathParts.length - 1; i++) {
+    const part = pathParts[i];
+    const nextPart = pathParts[i + 1];
+
+    // Create new object/array for this level to ensure immutability
+    if (current[part] === undefined) {
+      current[part] = createNewContainer(nextPart);
+    } else {
+      current[part] = cloneValue(current[part]);
+    }
+    current = current[part];
+  }
+
+  // Update the value at the target path
+  const lastPart = pathParts[pathParts.length - 1];
+  current[lastPart] = newValue;
+
+  return newObj;
+};
+
 // Helper function to parse object path into parts
-const parsePath = (path: string): (string | number)[] => {
+export const parsePath = (path: string): (string | number)[] => {
   const pathParts: (string | number)[] = [];
   let currentPath = path;
 
@@ -108,7 +150,7 @@ const parsePath = (path: string): (string | number)[] => {
     }
 
     // Then check for property name followed by array index
-    const propertyArrayMatch = /^([^.\[\]]+)\[(\d+)\]/.exec(currentPath);
+    const propertyArrayMatch = /^([^.[\]]+)\[(\d+)\]/.exec(currentPath);
     if (propertyArrayMatch) {
       pathParts.push(propertyArrayMatch[1]); // property name
       pathParts.push(parseInt(propertyArrayMatch[2])); // array index
@@ -136,37 +178,20 @@ const parsePath = (path: string): (string | number)[] => {
   return pathParts;
 };
 
-// Helper function to update value at a specific object path
-export const updateValueAtPath = (
-  obj: Record<string, unknown> | unknown[],
-  path: string,
-  newValue: unknown,
-): Record<string, unknown> | unknown[] => {
-  const pathParts = parsePath(path);
-  const newObj = Array.isArray(obj) ? [...obj] : { ...obj };
-  let current: any = newObj;
+// Helper function to create new container based on next part type
+const createNewContainer = (nextPart: string | number): unknown[] | Record<string, unknown> => {
+  return typeof nextPart === 'number' ? [] : {};
+};
 
-  // Navigate to the parent of the target
-  for (let i = 0; i < pathParts.length - 1; i++) {
-    const part = pathParts[i];
-    const nextPart = pathParts[i + 1];
-
-    if (current[part] === undefined) {
-      // Check if the next part is a number (array index) or string (object key)
-      if (typeof nextPart === 'number') {
-        current[part] = [];
-      } else {
-        current[part] = {};
-      }
-    }
-    current = current[part];
+// Helper function to clone value for immutability
+const cloneValue = (value: unknown): unknown => {
+  if (Array.isArray(value)) {
+    return [...value];
   }
-
-  // Update the value at the target path
-  const lastPart = pathParts[pathParts.length - 1];
-  current[lastPart] = newValue;
-
-  return newObj;
+  if (typeof value === 'object' && value !== null) {
+    return { ...value };
+  }
+  return value;
 };
 
 // Helper function to search for value in a collection (arrays and objects)

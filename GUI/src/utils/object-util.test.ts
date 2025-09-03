@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { buildPath, isStringValueMatch, searchForProperty, searchForValue } from './object-util';
+import { buildPath, isStringValueMatch, searchForProperty, searchForValue, updateValueAtPath } from './object-util';
 
 describe('Object Utils', () => {
   describe('buildPath', () => {
@@ -261,6 +261,130 @@ describe('Object Utils', () => {
 
       // Should return the first match found
       expect(searchForValue(data, 'duplicate')).toBe('first');
+    });
+  });
+
+  describe('updateValueAtPath', () => {
+    it('should update simple object properties', () => {
+      const obj = { name: 'John', age: 30 };
+      const result = updateValueAtPath(obj, 'name', 'Jane');
+
+      expect(result).toEqual({ name: 'Jane', age: 30 });
+      expect(result).not.toBe(obj); // Should return new object
+      expect(obj.name).toBe('John'); // Original should be unchanged
+    });
+
+    it('should update nested object properties', () => {
+      const obj = {
+        user: {
+          profile: {
+            name: 'John',
+            email: 'john@example.com',
+          },
+        },
+      };
+
+      const result = updateValueAtPath(obj, 'user.profile.name', 'Jane') as typeof obj;
+
+      expect(result.user.profile.name).toBe('Jane');
+      expect(result.user.profile.email).toBe('john@example.com');
+      expect(result).not.toBe(obj);
+    });
+
+    it('should update array elements', () => {
+      const arr = ['apple', 'banana', 'cherry'];
+      const result = updateValueAtPath(arr, '[1]', 'blueberry');
+
+      expect(result).toEqual(['apple', 'blueberry', 'cherry']);
+      expect(result).not.toBe(arr);
+      expect(arr[1]).toBe('banana'); // Original should be unchanged
+    });
+
+    it('should update nested array elements', () => {
+      const obj = {
+        fruits: [
+          { name: 'apple', color: 'red' },
+          { name: 'banana', color: 'yellow' },
+        ],
+      };
+
+      const result = updateValueAtPath(obj, 'fruits[0].color', 'green') as typeof obj;
+
+      expect(result.fruits[0].color).toBe('green');
+      expect(result.fruits[1].color).toBe('yellow');
+      expect(result).not.toBe(obj);
+    });
+
+    it('should create missing object properties', () => {
+      const obj = { existing: 'value' };
+      const result = updateValueAtPath(obj, 'newProp.nestedProp', 'newValue');
+
+      expect(result.newProp.nestedProp).toBe('newValue');
+      expect(result.existing).toBe('value');
+      expect(result).not.toBe(obj);
+    });
+
+    it('should handle root level updates', () => {
+      const obj = { prop1: 'value1', prop2: 'value2' };
+      const result = updateValueAtPath(obj, 'prop1', 'updated');
+
+      expect(result.prop1).toBe('updated');
+      expect(result.prop2).toBe('value2');
+    });
+
+    it('should handle empty paths', () => {
+      const obj = { prop: 'value' };
+      const result = updateValueAtPath(obj, '', 'newValue');
+
+      // Empty path should not change anything
+      expect(result).toEqual(obj);
+      expect(result).toBe(obj); // Should return the same object reference
+    });
+
+    it('should handle complex nested structures', () => {
+      const obj = {
+        level1: {
+          level2: [
+            {
+              level3: {
+                level4: {
+                  target: 'oldValue',
+                },
+              },
+            },
+          ],
+        },
+      };
+
+      const result = updateValueAtPath(obj, 'level1.level2[0].level3.level4.target', 'newValue');
+
+      expect(result.level1.level2[0].level3.level4.target).toBe('newValue');
+      expect(result).not.toBe(obj);
+    });
+
+    it('should preserve object structure', () => {
+      const obj = {
+        nested: {
+          deep: {
+            value: 'original',
+          },
+        },
+      };
+
+      const result = updateValueAtPath(obj, 'nested.deep.value', 'updated');
+
+      expect(result.nested.deep.value).toBe('updated');
+      expect(result.nested.deep).not.toBe(obj.nested.deep);
+      expect(result.nested).not.toBe(obj.nested);
+      expect(result).not.toBe(obj);
+    });
+
+    it('should handle special characters in property names', () => {
+      const obj = { 'special-prop': 'value1', 'another.prop': 'value2' };
+      const result = updateValueAtPath(obj, 'special-prop', 'updated');
+
+      expect(result['special-prop']).toBe('updated');
+      expect(result['another.prop']).toBe('value2');
     });
   });
 });
