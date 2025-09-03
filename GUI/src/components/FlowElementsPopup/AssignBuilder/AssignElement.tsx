@@ -1,4 +1,5 @@
 import { DragInput, FormInput, Icon, Tooltip, Track } from 'components';
+import { t } from 'i18next';
 import React, { useState } from 'react';
 import { MdDataObject, MdDeleteOutline, MdEdit, MdMoveDown } from 'react-icons/md';
 import useToastStore from 'store/toasts.store';
@@ -11,7 +12,6 @@ import ObjectEditor from './ObjectEditor';
 import { Assign } from '../../../types/assign';
 
 import '../styles.scss';
-import { t } from 'i18next';
 
 const showInvalidObjectError = () => {
   useToastStore.getState().error({
