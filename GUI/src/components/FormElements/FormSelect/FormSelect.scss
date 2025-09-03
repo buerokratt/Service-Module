@@ -73,11 +73,11 @@
     overflow: auto;
 
     &--absolute {
-      position: absolute;
+      position: absolute !important;
     }
 
     &--relative {
-      position: relative;
+      position: relative !important;
     }
   }
 
