@@ -146,3 +146,9 @@ The repository uses [SQLFluff](https://sqlfluff.com/) for linting and formatting
 1. Install SQLFluff: `pipx install sqlfluff`.
 2. Run `sqlfluff lint <some-path>`.
 3. Additionally, using an IDE extension is highly recommended. For [VSCode](https://marketplace.visualstudio.com/items?itemName=dorzey.vscode-sqlfluff) or [Jetbrains editors](https://plugins.jetbrains.com/plugin/20494-sqlfluff-linter-community-edition).
+
+## Environment variables
+
+| Ruuter Variable                    | GUI Variable                               | Description                                          | Required | Default Value       |
+| ---------------------------------- | ------------------------------------------ | ---------------------------------------------------- | -------- | ------------------- |
+| `application.apiRequestTestingKey` | `REACT_APP_RUUTER_SERVICES_TESTING_HEADER` | `x-ruuter-testing` header value for testing services |          | `voorshpellhappilo` |

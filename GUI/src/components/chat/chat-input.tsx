@@ -5,36 +5,37 @@ import useTestServiceStore from 'store/test-services.store';
 import styles from './chat.module.scss';
 import Send from '../../static/icons/send.svg';
 
-const ChatKeyPad = (): JSX.Element => {
+const ChatInput = (): React.JSX.Element => {
   const [userInput, setUserInput] = useState<string>('');
   const { t } = useTranslation();
 
-  const addNewMessageToState = (): void => {
+  const testService = (): void => {
     useTestServiceStore.getState().sendUserInput(userInput);
     setUserInput('');
   };
 
   return (
-    <div>
+    <div className={styles.keypadContainer}>
       <div className={styles.keypad}>
+        <span className={styles.label}>{t('chat.service-input')}:</span>
         <input
           className={styles.input}
           value={userInput}
           placeholder={t('chat.input-placeholder') ?? ''}
           onChange={(e) => setUserInput(e.target.value)}
           onKeyDown={(event) => {
-            if (event.key === 'Enter') {
+            if (event.key === 'Enter' && userInput.trim()) {
               event.preventDefault();
-              addNewMessageToState();
+              testService();
             }
           }}
         />
-        <button onClick={addNewMessageToState} className={styles.button}>
-          <img src={Send} alt="Send message icon" />
+        <button onClick={testService} className={styles.button} disabled={!userInput.trim()}>
+          <img src={Send} alt="Send" />
         </button>
       </div>
     </div>
   );
 };
 
-export default ChatKeyPad;
+export default ChatInput;

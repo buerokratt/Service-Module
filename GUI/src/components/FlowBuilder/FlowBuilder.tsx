@@ -1,11 +1,12 @@
-import React, { FC, useCallback } from 'react';
 import { Background, Controls, Edge, MiniMap, Node, ReactFlow, useReactFlow } from '@xyflow/react';
-import '@xyflow/react/dist/style.css';
 import { Button, Modal, Track } from 'components';
+import Chat from 'components/chat/chat';
 import edgeTypes from 'components/Flow/EdgeTypes';
 import nodeTypes from 'components/Flow/NodeTypes';
 import useLayout from 'hooks/flow/useLayout';
 import { useOnNodesDelete } from 'hooks/flow/useOnNodeDelete';
+import { FC, useCallback } from 'react';
+import '@xyflow/react/dist/style.css';
 import { useTranslation } from 'react-i18next';
 import useServiceStore from 'store/new-services.store';
 import { StepType } from 'types';
@@ -33,49 +34,52 @@ const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
   } = useOnNodesDelete();
   const { setHasUnsavedChanges } = useServiceStore();
 
-  const onConnect = useCallback(({ source, target }: any) => {
-    const nodes = getNodes();
-    const edges = getEdges();
+  const onConnect = useCallback(
+    ({ source, target }: any) => {
+      const nodes = getNodes();
+      const edges = getEdges();
 
-    const parentOutgoingEdges = edges.filter((edge) => edge.source === source);
+      const parentOutgoingEdges = edges.filter((edge) => edge.source === source);
 
-    const ghostEdges = parentOutgoingEdges.filter((edge) => {
-      const targetNode = nodes.find((n) => n.id === edge.target);
-      return targetNode?.type === 'ghost';
-    });
+      const ghostEdges = parentOutgoingEdges.filter((edge) => {
+        const targetNode = nodes.find((n) => n.id === edge.target);
+        return targetNode?.type === 'ghost';
+      });
 
-    if (ghostEdges.length > 0) {
-      const ghostNodeIds = ghostEdges.map((edge) => edge.target);
-      const updatedEdges = edges.filter((edge) => !ghostEdges.includes(edge));
-      const updatedNodes = nodes.filter((node) => !ghostNodeIds.includes(node.id));
-      setNodes(updatedNodes);
-      setEdges(updatedEdges);
-    }
+      if (ghostEdges.length > 0) {
+        const ghostNodeIds = ghostEdges.map((edge) => edge.target);
+        const updatedEdges = edges.filter((edge) => !ghostEdges.includes(edge));
+        const updatedNodes = nodes.filter((node) => !ghostNodeIds.includes(node.id));
+        setNodes(updatedNodes);
+        setEdges(updatedEdges);
+      }
 
-    setEdges((eds) => [
-      ...eds,
-      {
-        id: `${source}->${target}`,
-        source: source,
-        target: target,
-        type: 'step',
-      },
-    ]);
-    setHasUnsavedChanges(true);
-  }, []);
+      setEdges((eds) => [
+        ...eds,
+        {
+          id: `${source}->${target}`,
+          source: source,
+          target: target,
+          type: 'step',
+        },
+      ]);
+      setHasUnsavedChanges(true);
+    },
+    [getEdges, getNodes, setEdges, setHasUnsavedChanges, setNodes],
+  );
 
   const isValidConnection = useCallback((connection: any) => {
     return connection.source !== connection.target;
   }, []);
 
   const onBeforeDelete = useCallback(
-    async ({ nodes: nodesToDelete, edges: edgesToDelete }: { nodes: Node[]; edges: Edge[] }) => {
+    ({ nodes: nodesToDelete, edges: edgesToDelete }: { nodes: Node[]; edges: Edge[] }) => {
       setDeletedNodes(null);
       try {
         if (edgesToDelete.length > 0 && nodesToDelete.length === 0) {
           const shouldPreventDelete = getNode(edgesToDelete[0].source)?.data.stepType === StepType.MultiChoiceQuestion;
           if (shouldPreventDelete) {
-            return false;
+            return Promise.resolve(false);
           }
         }
 
@@ -85,20 +89,20 @@ const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
             nodesToDelete[0]?.data.stepType as StepType,
           )
         )
-          return true;
+          return Promise.resolve(true);
 
         const shouldPreventDelete = hasConnectedNodes(nodesToDelete[0].id);
         if (shouldPreventDelete) {
           setDeletedNodes(nodesToDelete);
           setIsDeleteConnectionsModalVisible(true);
         }
-        return !shouldPreventDelete;
+        return Promise.resolve(!shouldPreventDelete);
       } catch (error) {
         console.error('Error in onBeforeDelete:', error);
-        return true;
+        return Promise.resolve(true);
       }
     },
-    [hasConnectedNodes],
+    [getNode, hasConnectedNodes, setDeletedNodes, setIsDeleteConnectionsModalVisible],
   );
 
   return (
@@ -133,6 +137,7 @@ const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
         isValidConnection={isValidConnection}
         defaultEdgeOptions={{ type: 'step', deletable: false }}
       >
+        <Chat />
         <MiniMap />
         <Background color="#D2D3D8" gap={16} lineWidth={9} />
         <Controls orientation="horizontal" showInteractive={false} />

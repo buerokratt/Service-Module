@@ -453,7 +453,12 @@
     "missing-file-generation": "Sisestage faili nimi ja sisu",
     "missing-client_input-rules": "Määrake kliendi sisestusreeglid",
     "missing-condition-rules": "Sisestage tingimuste reeglid",
-    "missing-assign-elements": "Sisestage elementide määramine"
+    "missing-assign-elements": "Sisestage elementide määramine",
+    "missing-mcq-question": "Palun sisestage MCQ küsimus",
+    "missing-mcq-options": "Palun lisage vähemalt kaks MCQ valikut",
+    "missing-dynamic-choices-list": "Palun sisestage dünaamiliste valikute nimekiri",
+    "missing-dynamic-choices-service-name": "Palun sisestage dünaamiliste valikute teenuse nimi",
+    "missing-dynamic-choices-key": "Palun sisestage dünaamiliste valikute võti"
   },
   "roles": {
     "ROLE_ADMINISTRATOR": "Administraator",
@@ -464,18 +469,21 @@
     "ROLE_UNAUTHENTICATED": "Autentimata"
   },
   "chat": {
-    "unanswered": "Vastamata",
-    "forwarded": "Suunatud",
-    "pending": "Ootel",
-    "incomplete-service-flow": "Puudulik teenusvoog",
-    "no-start-node": "Alustamise sõlme ei leitud",
-    "end-of-chat": "Jõuti vestluse lõppu",
-    "loginWithTARA": "Jätkamiseks palun logi sisse",
-    "fileSignYesNo": "Kas soovid faili allkirjastada? Jah/Ei",
-    "redirectToCustomerSupport": "Vestlus suunatakse nõustajale",
-    "waiting-for-user-input": "Ootan kasutaja sisendit",
-    "title": "Chat Integration",
-    "input-placeholder": "Kirjutage oma sõnum..."
+    "service-test-error": {
+      "title": "Teenuse testimise viga",
+      "dslName": "Teenuse fail",
+      "stepName": "Samm",
+      "causeCode": "Põhjus",
+      "causeUnknown": "Tundmatu",
+      "causeNull": "Null leitud DSL-is",
+      "causeScript": "Üldine skriptimise viga",
+      "message": "Veateade"
+    },
+    "service-test-success": "Teenuse test on edukas",
+    "title": "TEST",
+    "input-placeholder": "Sisestage sisend, eraldatud komadega",
+    "service-input": "Teenuse sisend",
+    "unknown-error": "Tundmatu viga. Proovige uuesti."
   },
   "objectEditor": {
     "array": "Massiiv",

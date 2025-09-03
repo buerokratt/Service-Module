@@ -1,29 +1,19 @@
-import { Dispatch, FC, SetStateAction, useEffect } from 'react';
 import { Handle, NodeProps, Position, useUpdateNodeInternals } from '@xyflow/react';
-import { MdDeleteOutline, MdOutlineEdit, MdOutlineRemoveRedEye } from 'react-icons/md';
-
-import StepNode from './StepNode';
-
 import './Node.scss';
 import Button from 'components/Button';
 import Icon from 'components/Icon';
 import Track from 'components/Track';
-import { StepType } from 'types';
+import React, { FC, useEffect } from 'react';
+import { MdDeleteOutline, MdOutlineEdit, MdOutlineRemoveRedEye } from 'react-icons/md';
+import { NodeDataProps } from 'types/service-flow';
 
-type NodeDataProps = {
-  data: {
-    label: string;
-    onDelete: (id: string) => void;
-    onEdit: (id: string) => void;
-    setClickedNode: Dispatch<SetStateAction<string>>;
-    type: string;
-    stepType: StepType;
-    readonly: boolean;
-    childrenCount: number;
-  };
+import StepNode from './StepNode';
+
+type CustomNodeProps = {
+  data: NodeDataProps;
 };
 
-const CustomNode: FC<NodeProps & NodeDataProps> = (props) => {
+const CustomNode: FC<NodeProps & CustomNodeProps> = (props) => {
   const { data, isConnectable, id } = props;
   const shouldOffsetHandles = data.childrenCount > 1;
 
@@ -31,13 +21,13 @@ const CustomNode: FC<NodeProps & NodeDataProps> = (props) => {
 
   useEffect(() => {
     updateNodeInternals(id);
-  }, [data.childrenCount]);
+  }, [data.childrenCount, id, updateNodeInternals]);
 
   const isFinishingStep = () => {
     return data.type === 'finishing-step';
   };
 
-  const bottomHandles = (): JSX.Element => {
+  const bottomHandles = (): React.JSX.Element => {
     return (
       <>
         {new Array(data.childrenCount).fill(0).map((_, i) => (
@@ -77,7 +67,7 @@ const CustomNode: FC<NodeProps & NodeDataProps> = (props) => {
           >
             <Icon icon={data.readonly ? <MdOutlineRemoveRedEye /> : <MdOutlineEdit />} size="medium" />
           </Button>
-          <Button appearance="text" onClick={() => data.onDelete(id, true)}>
+          <Button appearance="text" onClick={() => data.onDelete(id)}>
             <Icon icon={<MdDeleteOutline />} size="medium" />
           </Button>
         </Track>

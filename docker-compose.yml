@@ -15,6 +15,7 @@ services:
       - application.logging.printStackTrace=true
       - application.internalRequests.disabled=true
       - application.internalRequests.allowedIPs=127.0.0.1
+      - application.apiRequestTestingKey=voorshpellhappilo
     volumes:
       - ./DSL/Ruuter:/DSL
       - ./constants.ini:/app/constants.ini

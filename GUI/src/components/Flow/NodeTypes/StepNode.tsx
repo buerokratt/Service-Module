@@ -1,43 +1,18 @@
 import CheckBadge from 'components/CheckBadge';
 import ExclamationBadge from 'components/ExclamationBadge';
-import { Group, Rule } from 'components/FlowElementsPopup/RuleBuilder/types';
 import Track from 'components/Track';
-import { FC, memo, useEffect, useState } from 'react';
+import { FC, memo, useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import useServiceStore from 'store/new-services.store';
 import { StepType } from 'types';
-import { Assign } from 'types/assign';
-import { DynamicChoices } from 'types/dynamic-choices';
-import { MultiChoiceQuestion } from 'types/multi-choice-question';
+import { NodeDataProps } from 'types/service-flow';
+import { isStepInvalid } from 'utils/flow-utils';
 
-type NodeDataProps = {
-  data: {
-    childrenCount: number;
-    clientInputId: number;
-    label: string;
-    onDelete: (id: string) => void;
-    onEdit: (id: string) => void;
-    type: string;
-    stepType: StepType;
-    readonly: boolean;
-    name?: string;
-    condition?: string;
-    value?: string;
-    message?: string;
-    link?: string;
-    linkText?: string;
-    fileName?: string;
-    fileContent?: string;
-    signOption?: { label: string; value: string };
-    originalDefinedNodeId?: string;
-    rules?: Group;
-    assignElements?: Assign[];
-    multiChoiceQuestion?: MultiChoiceQuestion;
-    dynamicChoices?: DynamicChoices;
-  };
+type StepNodeProps = {
+  data: NodeDataProps;
 };
 
-const StepNode: FC<NodeDataProps> = ({ data }) => {
+const StepNode: FC<StepNodeProps> = ({ data }) => {
   const { t } = useTranslation();
   const endpoints = useServiceStore((state) => state.endpoints);
   const [isTestedAndPassed, setIsTestedAndPassed] = useState<boolean | null>(null);
@@ -51,56 +26,8 @@ const StepNode: FC<NodeDataProps> = ({ data }) => {
     };
   };
 
-  const isStepInvalid = () => {
-    if (data.stepType === StepType.Input || data.stepType === StepType.Condition) {
-      const hasInvalidRules = (elements: any[]): boolean => {
-        return elements.some((e) => {
-          if ('children' in e) {
-            const group = e as Group;
-            if (group.children.length === 0) return true;
-            return hasInvalidRules(group.children);
-          } else {
-            const rule = e as Rule;
-            return rule.value === '' || rule.field === '' || rule.operator === '';
-          }
-        });
-      };
-
-      const invalidRulesExist = hasInvalidRules(data.rules?.children ?? []);
-      return data.rules?.children === undefined || invalidRulesExist || data.rules?.children.length === 0;
-    }
-    if (data.stepType === StepType.MultiChoiceQuestion) {
-      return (
-        !data?.multiChoiceQuestion?.question ||
-        data.multiChoiceQuestion?.buttons?.find((e) => e.title === '') != undefined
-      );
-    }
-
-    if (data.stepType === StepType.DynamicChoices) {
-      return !data?.dynamicChoices?.list || !data?.dynamicChoices?.serviceName || !data?.dynamicChoices?.key;
-    }
-
-    if (data.stepType === StepType.UserDefined) return;
-    if (data.stepType === StepType.OpenWebpage) return !data.link || !data.linkText;
-    if (data.stepType === StepType.FileGenerate) return !data.fileName || !data.fileContent;
-    if (data.stepType === StepType.FileSign) return !data.signOption;
-    if (data.stepType === StepType.Assign) {
-      const hasInvalidElements = (elements: any[]): boolean => {
-        return elements.some((e) => {
-          const element = e as Assign;
-          return element.key === '' || element.value === '';
-        });
-      };
-
-      const invalidElementsExist = hasInvalidElements(data.assignElements ?? []);
-      return data?.assignElements === undefined || invalidElementsExist || data?.assignElements.length === 0;
-    }
-
-    return !data.readonly && !data.message?.length;
-  };
-
-  const updateIsTestedAndPassed = async () => {
-    if (isStepInvalid()) {
+  const updateIsTestedAndPassed = useCallback(async () => {
+    if (isStepInvalid(data)) {
       setIsTestedAndPassed(false);
       return;
     }
@@ -122,11 +49,11 @@ const StepNode: FC<NodeDataProps> = ({ data }) => {
       () => setIsTestedAndPassed(false),
       () => setIsTestedAndPassed(true),
     );
-  };
+  }, [data, endpoints]);
 
   useEffect(() => {
-    updateIsTestedAndPassed();
-  }, [data]);
+    void updateIsTestedAndPassed();
+  }, [updateIsTestedAndPassed]);
 
   return (
     <Track
@@ -135,7 +62,7 @@ const StepNode: FC<NodeDataProps> = ({ data }) => {
       align="left"
     >
       <p>
-        <TestStatue isTestedAndPassed={isTestedAndPassed} isStepInvalid={isStepInvalid} />
+        <TestStatue isTestedAndPassed={isTestedAndPassed} data={data} />
         {data.label}
       </p>
       {data.stepType === StepType.Textfield && (
@@ -144,7 +71,7 @@ const StepNode: FC<NodeDataProps> = ({ data }) => {
       {data.stepType === StepType.MultiChoiceQuestion && (
         <div style={boldText} dangerouslySetInnerHTML={createMarkup(data.multiChoiceQuestion?.question ?? '')}></div>
       )}
-      {data.stepType === StepType.Auth && <p style={boldText}>"{t('serviceFlow.popup.loginWithTARA')}"</p>}
+      {data.stepType === StepType.Auth && <p style={boldText}>&quot;{t('serviceFlow.popup.loginWithTARA')}&quot;</p>}
       {data.stepType === StepType.Input && (
         <p>
           <span style={boldText}>{t('newService.endpoint.variable')}</span>
@@ -191,15 +118,9 @@ const StepNode: FC<NodeDataProps> = ({ data }) => {
   );
 };
 
-const TestStatue = ({
-  isTestedAndPassed,
-  isStepInvalid,
-}: {
-  isTestedAndPassed: boolean | null;
-  isStepInvalid: () => boolean | undefined;
-}) => {
+const TestStatue = ({ isTestedAndPassed, data }: { isTestedAndPassed: boolean | null; data: NodeDataProps }) => {
   if (isTestedAndPassed) return <CheckBadge />;
-  if (isStepInvalid()) return <ExclamationBadge />;
+  if (isStepInvalid(data)) return <ExclamationBadge />;
   return <ExclamationBadge color="purple" />;
 };
 

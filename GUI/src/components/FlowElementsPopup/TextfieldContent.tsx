@@ -1,8 +1,9 @@
 import { t } from 'i18next';
-import { CSSProperties, FC } from 'react';
-
 import { FormRichText, Track } from '..';
+import { CSSProperties, FC, useRef, useState } from 'react';
 import PreviousVariables from './PreviousVariables';
+import { removeNestedTemplates } from 'utils/string-util';
+import ReactQuill from 'react-quill';
 
 type TextfieldContentProps = {
   readonly defaultMessage?: string;
@@ -11,6 +12,9 @@ type TextfieldContentProps = {
 };
 
 const TextfieldContent: FC<TextfieldContentProps> = ({ defaultMessage, onChange, nodeId }) => {
+  const [editorValue, setEditorValue] = useState<string | null>(defaultMessage || null);
+  const quillRef = useRef<ReactQuill>(null);
+
   const popupBodyCss: CSSProperties = {
     padding: 16,
     borderBottom: `1px solid #D2D3D8`,
@@ -27,20 +31,27 @@ const TextfieldContent: FC<TextfieldContentProps> = ({ defaultMessage, onChange,
     return placeholders;
   };
 
+  const handleEditorChange = (value: string | null) => {
+    if (!onChange) return;
+
+    const formattedValue = removeNestedTemplates(value ?? '');
+    if (value !== formattedValue && quillRef.current) {
+      const editor = quillRef.current.getEditor();
+      editor.setText(formattedValue.replaceAll(/<\/?p>/g, '') || '');
+    }
+
+    const placeholders = findMessagePlaceholders(formattedValue);
+    onChange(formattedValue, placeholders);
+    setEditorValue(formattedValue);
+  };
+
   return (
     <>
       <Track direction="vertical" align="left" style={{ width: '100%', ...popupBodyCss }}>
         <label htmlFor="message" style={{ marginBottom: '10px' }}>
           {t('serviceFlow.popup.messageLabel')}
         </label>
-        <FormRichText
-          onChange={(value) => {
-            if (!onChange) return;
-            const placeholders = findMessagePlaceholders(value);
-            onChange(value, placeholders);
-          }}
-          defaultValue={defaultMessage}
-        ></FormRichText>
+        <FormRichText quill={quillRef} onChange={handleEditorChange} defaultValue={editorValue ?? ''} />
       </Track>
       <PreviousVariables nodeId={nodeId} />
     </>
