@@ -169,37 +169,16 @@ export const updateValueAtPath = (
   return newObj;
 };
 
-// todo simplify
 // Helper function to search for value in a collection
 export const searchInCollection = (collection: object, value: string, currentPath = ''): string | null => {
-  if (Array.isArray(collection)) {
-    return searchInArray(collection, value, currentPath);
-  }
+  // Convert arrays to entries for unified iteration
+  const entries: (string | number)[][] = Array.isArray(collection)
+    ? collection.map((val, index) => [index, val])
+    : Object.entries(collection);
 
-  return searchInObject(collection as Record<string, unknown>, value, currentPath);
-};
-
-// Helper function to search for value in an array
-const searchInArray = (array: unknown[], value: string, currentPath = ''): string | null => {
-  for (let index = 0; index < array.length; index++) {
-    const objValue = array[index];
-    const newPath = currentPath ? `${currentPath}[${index}]` : `[${index}]`;
-
-    if (isValueMatch(objValue, value)) return newPath;
-
-    if (isObject(objValue)) {
-      const result = searchInCollection(objValue, value, newPath);
-      if (result) return result;
-    }
-  }
-
-  return null;
-};
-
-// Helper function to search for value in an object
-const searchInObject = (obj: Record<string, unknown>, value: string, currentPath = ''): string | null => {
-  for (const [key, objValue] of Object.entries(obj)) {
-    const newPath = currentPath ? `${currentPath}.${key}` : String(key);
+  // Single loop for both arrays and objects
+  for (const [key, objValue] of entries) {
+    const newPath = buildPath(currentPath, key);
 
     if (isValueMatch(objValue, value)) return newPath;
 
@@ -230,54 +209,38 @@ const isValueMatch = (objValue: unknown, value: string): boolean => {
   );
 };
 
-// todo ???
 // Helper function to search for a property name in the data structure
 export const searchForProperty = (data: unknown, propertyName: string, currentPath = ''): string | null => {
-  if (Array.isArray(data)) {
-    return searchForPropertyInArray(data, propertyName, currentPath);
-  }
+  if (!isObject(data)) return null;
 
-  if (isObject(data)) {
-    return searchForPropertyInObject(data as Record<string, unknown>, propertyName, currentPath);
-  }
+  // Convert arrays to entries for unified iteration
+  const entries: (string | number)[][] = Array.isArray(data)
+    ? data.map((val, index) => [index, val])
+    : Object.entries(data);
 
-  return null;
-};
-
-// Helper function to search for a property name in an array
-const searchForPropertyInArray = (array: unknown[], propertyName: string, currentPath = ''): string | null => {
-  for (let index = 0; index < array.length; index++) {
-    const item = array[index];
-    const newPath = currentPath ? `${currentPath}[${index}]` : `[${index}]`;
-
-    if (isObject(item)) {
-      const result = searchForProperty(item, propertyName, newPath);
-      if (result) return result;
+  // Single loop for both arrays and objects
+  for (const [key, value] of entries) {
+    // Check if this object has the property (for objects only)
+    if (!Array.isArray(data) && key === propertyName) {
+      return currentPath ? `${currentPath}.${propertyName}` : propertyName;
     }
-  }
-  return null;
-};
 
-// Helper function to search for a property name in an object
-const searchForPropertyInObject = (
-  obj: Record<string, unknown>,
-  propertyName: string,
-  currentPath = '',
-): string | null => {
-  // Check if this object has the property
-  if (propertyName in obj) {
-    return currentPath ? `${currentPath}.${propertyName}` : propertyName;
-  }
-
-  // Search deeper in nested objects
-  for (const [key, value] of Object.entries(obj)) {
-    const newPath = currentPath ? `${currentPath}.${key}` : key;
-
+    // Search deeper in nested objects
     if (isObject(value)) {
+      const newPath = buildPath(currentPath, key);
       const result = searchForProperty(value, propertyName, newPath);
       if (result) return result;
     }
   }
 
   return null;
+};
+
+// Helper function to build path based on key type
+const buildPath = (currentPath: string, key: string | number): string => {
+  if (currentPath) {
+    const keyPart = typeof key === 'number' ? `[${key}]` : `.${key}`;
+    return `${currentPath}${keyPart}`;
+  }
+  return typeof key === 'number' ? `[${key}]` : String(key);
 };
