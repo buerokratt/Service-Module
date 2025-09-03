@@ -317,7 +317,9 @@ describe('Object Utils', () => {
 
     it('should create missing object properties', () => {
       const obj = { existing: 'value' };
-      const result = updateValueAtPath(obj, 'newProp.nestedProp', 'newValue');
+      const result = updateValueAtPath(obj, 'newProp.nestedProp', 'newValue') as typeof obj & {
+        newProp: { nestedProp: string };
+      };
 
       expect(result.newProp.nestedProp).toBe('newValue');
       expect(result.existing).toBe('value');
@@ -326,7 +328,7 @@ describe('Object Utils', () => {
 
     it('should handle root level updates', () => {
       const obj = { prop1: 'value1', prop2: 'value2' };
-      const result = updateValueAtPath(obj, 'prop1', 'updated');
+      const result = updateValueAtPath(obj, 'prop1', 'updated') as typeof obj;
 
       expect(result.prop1).toBe('updated');
       expect(result.prop2).toBe('value2');
@@ -356,7 +358,7 @@ describe('Object Utils', () => {
         },
       };
 
-      const result = updateValueAtPath(obj, 'level1.level2[0].level3.level4.target', 'newValue');
+      const result = updateValueAtPath(obj, 'level1.level2[0].level3.level4.target', 'newValue') as typeof obj;
 
       expect(result.level1.level2[0].level3.level4.target).toBe('newValue');
       expect(result).not.toBe(obj);
@@ -371,7 +373,7 @@ describe('Object Utils', () => {
         },
       };
 
-      const result = updateValueAtPath(obj, 'nested.deep.value', 'updated');
+      const result = updateValueAtPath(obj, 'nested.deep.value', 'updated') as typeof obj;
 
       expect(result.nested.deep.value).toBe('updated');
       expect(result.nested.deep).not.toBe(obj.nested.deep);
@@ -381,7 +383,7 @@ describe('Object Utils', () => {
 
     it('should handle special characters in property names', () => {
       const obj = { 'special-prop': 'value1', 'another.prop': 'value2' };
-      const result = updateValueAtPath(obj, 'special-prop', 'updated');
+      const result = updateValueAtPath(obj, 'special-prop', 'updated') as typeof obj;
 
       expect(result['special-prop']).toBe('updated');
       expect(result['another.prop']).toBe('value2');

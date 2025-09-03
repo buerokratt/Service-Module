@@ -121,7 +121,7 @@ export const updateValueAtPath = (
 
     // Create new object/array for this level to ensure immutability
     if (current[part] === undefined) {
-      current[part] = createNewContainer(nextPart);
+      current[part] = typeof nextPart === 'number' ? [] : {};
     } else {
       current[part] = cloneValue(current[part]);
     }
@@ -176,11 +176,6 @@ export const parsePath = (path: string): (string | number)[] => {
   }
 
   return pathParts;
-};
-
-// Helper function to create new container based on next part type
-const createNewContainer = (nextPart: string | number): unknown[] | Record<string, unknown> => {
-  return typeof nextPart === 'number' ? [] : {};
 };
 
 // Helper function to clone value for immutability
