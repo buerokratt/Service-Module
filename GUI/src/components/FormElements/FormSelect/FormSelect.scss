@@ -29,7 +29,7 @@
     appearance: none;
     background-color: get-color(white);
     border: 1px solid get-color(black-coral-6);
-    border-radius: $veera-radius-s;
+    border-radius: $veera-radius-s !important;
     color: get-color(black);
     font-size: $veera-font-size-100;
     height: 40px;
