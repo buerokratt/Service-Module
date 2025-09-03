@@ -170,7 +170,7 @@ export const updateValueAtPath = (
 };
 
 // Helper function to search for value in a collection
-export const searchInCollection = (collection: object, value: string, currentPath = ''): string | null => {
+export const searchForValue = (collection: object, value: string, currentPath = ''): string | null => {
   // Convert arrays to entries for unified iteration
   const entries: (string | number)[][] = Array.isArray(collection)
     ? collection.map((val, index) => [index, val])
@@ -183,7 +183,7 @@ export const searchInCollection = (collection: object, value: string, currentPat
     if (isValueMatch(objValue, value)) return newPath;
 
     if (isObject(objValue)) {
-      const result = searchInCollection(objValue, value, newPath);
+      const result = searchForValue(objValue, value, newPath);
       if (result) return result;
     }
   }

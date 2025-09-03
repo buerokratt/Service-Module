@@ -3,7 +3,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import 'jsoneditor/dist/jsoneditor.css';
 import { getDragData } from 'utils/component-util';
-import { searchForProperty, searchInCollection, updateValueAtPath } from 'utils/object-util';
+import { searchForProperty, searchForValue, updateValueAtPath } from 'utils/object-util';
 import { stringToTemplate } from 'utils/string-util';
 
 import styles from './ObjectEditor.module.scss';
@@ -13,7 +13,7 @@ const findNodePath = (node: Element, data: Record<string, unknown>): string | nu
   // Try to find by text content (for values)
   const textContent = node.textContent?.trim();
   if (textContent) {
-    const path = searchInCollection(data, textContent);
+    const path = searchForValue(data, textContent);
     return path;
   }
 
