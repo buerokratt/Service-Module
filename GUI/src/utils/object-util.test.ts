@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { buildPath, isStringValueMatch, searchForProperty } from './object-util';
+import { buildPath, isStringValueMatch, searchForProperty, searchForValue } from './object-util';
 
 describe('Object Utils', () => {
   describe('buildPath', () => {
@@ -167,6 +167,100 @@ describe('Object Utils', () => {
       expect(isStringValueMatch(42, 'not-a-number')).toBe(false);
       expect(isStringValueMatch(0, 'abc')).toBe(false);
       expect(isStringValueMatch(-5, 'xyz')).toBe(false);
+    });
+  });
+
+  describe('searchForValue', () => {
+    it('should find string values in simple objects', () => {
+      const data = { prop1: 'hello', prop2: 'world' };
+
+      expect(searchForValue(data, 'hello')).toBe('prop1');
+      expect(searchForValue(data, 'world')).toBe('prop2');
+      expect(searchForValue(data, 'nonexistent')).toBe(null);
+    });
+
+    it('should find number values in objects', () => {
+      const data = { count: 42, price: 19.99, zero: 0 };
+
+      expect(searchForValue(data, '42')).toBe('count');
+      expect(searchForValue(data, '19.99')).toBe('price');
+      expect(searchForValue(data, '0')).toBe('zero');
+      expect(searchForValue(data, '100')).toBe(null);
+    });
+
+    it('should find boolean values in objects', () => {
+      const data = { isActive: true, isVisible: false };
+
+      expect(searchForValue(data, 'true')).toBe('isActive');
+      expect(searchForValue(data, 'false')).toBe('isVisible');
+      expect(searchForValue(data, 'TRUE')).toBe('isActive'); // case insensitive
+      expect(searchForValue(data, 'FALSE')).toBe('isVisible'); // case insensitive
+    });
+
+    it('should find null values in objects', () => {
+      const data = { nullable: null, defined: 'value' };
+
+      expect(searchForValue(data, 'null')).toBe('nullable');
+      expect(searchForValue(data, 'NULL')).toBe('nullable'); // case insensitive
+      expect(searchForValue(data, 'value')).toBe('defined');
+    });
+
+    it('should find values in arrays', () => {
+      const data = ['apple', 'banana', 'cherry'];
+
+      expect(searchForValue(data, 'apple')).toBe('[0]');
+      expect(searchForValue(data, 'banana')).toBe('[1]');
+      expect(searchForValue(data, 'cherry')).toBe('[2]');
+      expect(searchForValue(data, 'orange')).toBe(null);
+    });
+
+    it('should find values in nested objects', () => {
+      const data = {
+        level1: {
+          level2: {
+            target: 'found',
+          },
+        },
+      };
+
+      expect(searchForValue(data, 'found')).toBe('level1.level2.target');
+    });
+
+    it('should find values in mixed structures', () => {
+      const data = {
+        users: [
+          { name: 'John', age: 30 },
+          { name: 'Jane', age: 25 },
+        ],
+        settings: {
+          theme: 'dark',
+          enabled: true,
+        },
+      };
+
+      expect(searchForValue(data, 'John')).toBe('users[0].name');
+      expect(searchForValue(data, '30')).toBe('users[0].age');
+      expect(searchForValue(data, 'dark')).toBe('settings.theme');
+      expect(searchForValue(data, 'true')).toBe('settings.enabled');
+    });
+
+    it('should handle edge cases', () => {
+      const data = { empty: '', zero: 0, falsy: false };
+
+      expect(searchForValue(data, '')).toBe('empty');
+      expect(searchForValue(data, '0')).toBe('zero');
+      expect(searchForValue(data, 'false')).toBe('falsy');
+    });
+
+    it('should return first match when duplicates exist', () => {
+      const data = {
+        first: 'duplicate',
+        second: 'duplicate',
+        third: 'unique',
+      };
+
+      // Should return the first match found
+      expect(searchForValue(data, 'duplicate')).toBe('first');
     });
   });
 });
