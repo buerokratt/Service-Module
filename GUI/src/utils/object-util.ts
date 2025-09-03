@@ -222,7 +222,7 @@ export const searchForProperty = (data: unknown, propertyName: string, currentPa
   for (const [key, value] of entries) {
     // Check if this object has the property (for objects only)
     if (!Array.isArray(data) && key === propertyName) {
-      return currentPath ? `${currentPath}.${propertyName}` : propertyName;
+      return buildPath(currentPath, propertyName);
     }
 
     // Search deeper in nested objects
