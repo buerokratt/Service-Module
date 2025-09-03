@@ -1,6 +1,13 @@
 import { describe, expect, it } from 'vitest';
 
-import { buildPath, isStringValueMatch, searchForProperty, searchForValue, updateValueAtPath } from './object-util';
+import {
+  buildPath,
+  isStringValueMatch,
+  parsePath,
+  searchForProperty,
+  searchForValue,
+  updateValueAtPath,
+} from './object-util';
 
 describe('Object Utils', () => {
   describe('buildPath', () => {
@@ -387,6 +394,78 @@ describe('Object Utils', () => {
 
       expect(result['special-prop']).toBe('updated');
       expect(result['another.prop']).toBe('value2');
+    });
+  });
+
+  describe('parsePath', () => {
+    it('should parse simple property paths', () => {
+      expect(parsePath('property')).toEqual(['property']);
+      expect(parsePath('simpleName')).toEqual(['simpleName']);
+      expect(parsePath('camelCase')).toEqual(['camelCase']);
+    });
+
+    it('should parse dot notation paths', () => {
+      expect(parsePath('parent.child')).toEqual(['parent', 'child']);
+      expect(parsePath('level1.level2.level3')).toEqual(['level1', 'level2', 'level3']);
+      expect(parsePath('user.profile.name')).toEqual(['user', 'profile', 'name']);
+    });
+
+    it('should parse array index paths', () => {
+      expect(parsePath('[0]')).toEqual([0]);
+      expect(parsePath('[42]')).toEqual([42]);
+      expect(parsePath('[999]')).toEqual([999]);
+    });
+
+    it('should parse property followed by array index', () => {
+      expect(parsePath('items[0]')).toEqual(['items', 0]);
+      expect(parsePath('users[42]')).toEqual(['users', 42]);
+      expect(parsePath('data[999]')).toEqual(['data', 999]);
+    });
+
+    it('should parse array index followed by property', () => {
+      expect(parsePath('[0].name')).toEqual([0, 'name']);
+      expect(parsePath('[42].value')).toEqual([42, 'value']);
+      expect(parsePath('[999].property')).toEqual([999, 'property']);
+    });
+
+    it('should parse complex mixed paths', () => {
+      expect(parsePath('users[0].profile.name')).toEqual(['users', 0, 'profile', 'name']);
+      expect(parsePath('data[42].items[7].value')).toEqual(['data', 42, 'items', 7, 'value']);
+      expect(parsePath('level1[0].level2[1].level3')).toEqual(['level1', 0, 'level2', 1, 'level3']);
+    });
+
+    it('should handle consecutive array indices', () => {
+      expect(parsePath('[0][1]')).toEqual([0, 1]);
+      expect(parsePath('[42][7]')).toEqual([42, 7]);
+      expect(parsePath('items[0][1]')).toEqual(['items', 0, 1]);
+    });
+
+    it('should handle empty paths', () => {
+      expect(parsePath('')).toEqual([]);
+    });
+
+    it('should handle paths with empty segments', () => {
+      // parsePath skips empty segments, so these return empty arrays
+      expect(parsePath('..')).toEqual([]);
+      expect(parsePath('prop..value')).toEqual(['prop', 'value']);
+      expect(parsePath('..prop')).toEqual(['prop']);
+    });
+
+    it('should handle edge cases', () => {
+      expect(parsePath('single')).toEqual(['single']);
+      expect(parsePath('a.b.c')).toEqual(['a', 'b', 'c']);
+      expect(parsePath('[0].a[1].b')).toEqual([0, 'a', 1, 'b']);
+    });
+
+    it('should handle large numbers in array indices', () => {
+      expect(parsePath('[123456789]')).toEqual([123456789]);
+      expect(parsePath('items[999999]')).toEqual(['items', 999999]);
+    });
+
+    it('should handle zero values correctly', () => {
+      expect(parsePath('[0]')).toEqual([0]);
+      expect(parsePath('items[0]')).toEqual(['items', 0]);
+      expect(parsePath('[0].value')).toEqual([0, 'value']);
     });
   });
 });

@@ -123,7 +123,7 @@ export const updateValueAtPath = (
     if (current[part] === undefined) {
       current[part] = typeof nextPart === 'number' ? [] : {};
     } else {
-      current[part] = cloneValue(current[part]);
+      current[part] = typeof nextPart === 'number' ? [...current[part]] : { ...current[part] };
     }
     current = current[part];
   }
@@ -176,17 +176,6 @@ export const parsePath = (path: string): (string | number)[] => {
   }
 
   return pathParts;
-};
-
-// Helper function to clone value for immutability
-const cloneValue = (value: unknown): unknown => {
-  if (Array.isArray(value)) {
-    return [...value];
-  }
-  if (typeof value === 'object' && value !== null) {
-    return { ...value };
-  }
-  return value;
 };
 
 // Helper function to search for value in a collection (arrays and objects)
