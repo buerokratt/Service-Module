@@ -17,6 +17,21 @@ const findNodePath = (node: Element, data: Record<string, unknown>): string | nu
     return path;
   }
 
+  // If no text content (empty value), try to find by the associated property name
+  // Look for the property name in the same table row
+  const tableRow = node.closest('tr');
+  if (tableRow) {
+    const fieldElement = tableRow.querySelector('.jsoneditor-field');
+    if (fieldElement) {
+      const propertyName = fieldElement.textContent?.trim();
+      if (propertyName) {
+        // Search for the property name in the data structure
+        const path = searchForProperty(data, propertyName);
+        return path;
+      }
+    }
+  }
+
   return null;
 };
 
@@ -36,6 +51,57 @@ const isValueMatch = (objValue: unknown, value: string): boolean => {
     (typeof objValue === 'boolean' && objValue === booleanValue) ||
     (objValue === null && value.toLowerCase() === 'null')
   );
+};
+
+// Helper function to search for a property name in an array
+const searchForPropertyInArray = (array: unknown[], propertyName: string, currentPath = ''): string | null => {
+  for (let index = 0; index < array.length; index++) {
+    const item = array[index];
+    const newPath = currentPath ? `${currentPath}[${index}]` : `[${index}]`;
+
+    if (isObject(item)) {
+      const result = searchForProperty(item, propertyName, newPath);
+      if (result) return result;
+    }
+  }
+  return null;
+};
+
+// Helper function to search for a property name in an object
+const searchForPropertyInObject = (
+  obj: Record<string, unknown>,
+  propertyName: string,
+  currentPath = '',
+): string | null => {
+  // Check if this object has the property
+  if (propertyName in obj) {
+    return currentPath ? `${currentPath}.${propertyName}` : propertyName;
+  }
+
+  // Search deeper in nested objects
+  for (const [key, value] of Object.entries(obj)) {
+    const newPath = currentPath ? `${currentPath}.${key}` : key;
+
+    if (isObject(value)) {
+      const result = searchForProperty(value, propertyName, newPath);
+      if (result) return result;
+    }
+  }
+
+  return null;
+};
+
+// Helper function to search for a property name in the data structure
+const searchForProperty = (data: unknown, propertyName: string, currentPath = ''): string | null => {
+  if (Array.isArray(data)) {
+    return searchForPropertyInArray(data, propertyName, currentPath);
+  }
+
+  if (isObject(data)) {
+    return searchForPropertyInObject(data as Record<string, unknown>, propertyName, currentPath);
+  }
+
+  return null;
 };
 
 // Helper function to search for value in an array
