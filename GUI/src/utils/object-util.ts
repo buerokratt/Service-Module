@@ -180,7 +180,7 @@ export const searchForValue = (collection: object, value: string, currentPath = 
   for (const [key, objValue] of entries) {
     const newPath = buildPath(currentPath, key);
 
-    if (isValueMatch(objValue, value)) return newPath;
+    if (isStringValueMatch(objValue, value)) return newPath;
 
     if (isObject(objValue)) {
       const result = searchForValue(objValue, value, newPath);
@@ -192,7 +192,7 @@ export const searchForValue = (collection: object, value: string, currentPath = 
 };
 
 // Helper function to check if values match (handling different types)
-const isValueMatch = (objValue: unknown, value: string): boolean => {
+export const isStringValueMatch = (objValue: unknown, value: string): boolean => {
   // Handle boolean conversion
   let booleanValue: boolean | null = null;
   if (value.toLowerCase() === 'true') {
@@ -237,7 +237,7 @@ export const searchForProperty = (data: unknown, propertyName: string, currentPa
 };
 
 // Helper function to build path based on key type
-const buildPath = (currentPath: string, key: string | number): string => {
+export const buildPath = (currentPath: string, key: string | number): string => {
   if (currentPath) {
     const keyPart = typeof key === 'number' ? `[${key}]` : `.${key}`;
     return `${currentPath}${keyPart}`;

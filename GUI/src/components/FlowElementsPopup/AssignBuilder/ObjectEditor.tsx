@@ -69,7 +69,7 @@ const ObjectEditor: React.FC<ObjectEditorProps> = ({ onChange, data }) => {
         jsonEditorRef.current = null;
       }
     };
-  }, []);
+  }, []); // todo fix
 
   // Cleanup effect to remove highlight when component unmounts
   useEffect(() => {
