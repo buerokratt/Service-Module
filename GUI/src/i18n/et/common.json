@@ -58,7 +58,9 @@
     "delete": "Kustuta",
     "keepIt": "Jäta alles",
     "create": "Loo",
-    "edit": "Muuda"
+    "edit": "Muuda",
+    "import": "Impordi",
+    "export": "Ekspordi"
   },
   "menu": {
     "overview": "Ülevaade",
@@ -392,6 +394,8 @@
     "elements": "Elemendid",
     "allElements": "Üldelemendid",
     "serviceInfo": "Teenuse teave",
+    "invalidFileFormat": "Kehtetu voofaili formaat",
+    "parseError": "Viga voofaili parsimisel",
     "apiElements": {
       "title": "API elemendid",
       "delete": "Kustuta",

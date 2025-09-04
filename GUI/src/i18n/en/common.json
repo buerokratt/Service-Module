@@ -58,7 +58,9 @@
     "delete": "Delete",
     "keepIt": "Keep it",
     "create": "Create",
-    "edit": "Edit"
+    "edit": "Edit",
+    "import": "Import",
+    "export": "Export"
   },
   "menu": {
     "overview": "Overview",
@@ -392,6 +394,8 @@
     "elements": "Elements",
     "allElements": "All elements",
     "serviceInfo": "Service info",
+    "invalidFileFormat": "Invalid flow file format",
+    "parseError": "Error parsing flow file",
     "apiElements": {
       "title": "API elements",
       "delete": "Delete",
