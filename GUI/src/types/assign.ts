@@ -5,4 +5,5 @@ export interface Assign {
   data?: unknown;
   slots?: [Assign] | [Assign, Assign];
   tooltip?: string;
+  isObject?: boolean;
 }

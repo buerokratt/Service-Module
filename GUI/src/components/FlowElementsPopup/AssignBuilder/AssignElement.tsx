@@ -1,4 +1,5 @@
 import { DragInput, FormInput, Icon, Tooltip, Track } from 'components';
+import { t } from 'i18next';
 import React, { useState } from 'react';
 import { MdDataObject, MdDeleteOutline, MdEdit, MdMoveDown } from 'react-icons/md';
 import useToastStore from 'store/toasts.store';
@@ -11,7 +12,6 @@ import ObjectEditor from './ObjectEditor';
 import { Assign } from '../../../types/assign';
 
 import '../styles.scss';
-import { t } from 'i18next';
 
 const showInvalidObjectError = () => {
   useToastStore.getState().error({
@@ -42,7 +42,7 @@ const AssignElement: React.FC<AssignElementProps> = ({
   const slots = element.slots ?? [];
   const [isSecondSlotOpen, setIsSecondSlotOpen] = useState(!!slots[1]);
   const [isEditingManually, setIsEditingManually] = useState(manualEdit || (element.value && !slots.length));
-  const [isObjectEditorOpen, setIsObjectEditorOpen] = useState(false);
+  const [isObjectEditorOpen, setIsObjectEditorOpen] = useState(element.isObject ?? false);
 
   const changeKey = (e: React.ChangeEvent<HTMLInputElement>) => {
     onChange({ ...element, key: e.target.value });
@@ -192,7 +192,7 @@ const AssignElement: React.FC<AssignElementProps> = ({
       {isObjectEditorOpen && (
         <ObjectEditor
           data={element.value ? JSON.parse(templateToString(element.value)) : {}}
-          onChange={(value) => onChange({ ...element, value })}
+          onChange={(value) => onChange({ ...element, value, isObject: true })}
         />
       )}
     </>
