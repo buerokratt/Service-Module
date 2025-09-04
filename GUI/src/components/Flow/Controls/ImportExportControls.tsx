@@ -16,15 +16,7 @@ const ImportExportControls: FC = () => {
   const serviceName = useServiceStore((state) => removeTrailingUnderscores(state.serviceNameDashed()));
 
   const handleExport = useCallback(() => {
-    const flowData = {
-      nodes: getNodes(),
-      edges: getEdges(),
-      metadata: {
-        exportedAt: new Date().toISOString(),
-      },
-    };
-
-    const dataString = JSON.stringify(flowData, null, 2);
+    const dataString = JSON.stringify({ nodes: getNodes(), edges: getEdges() });
     const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataString);
 
     const fileName = `${serviceName != undefined && serviceName != '' ? serviceName : 'flow'}_${format(new Date(), 'yyyy_MM_dd_HH_mm_ss')}.json`;
