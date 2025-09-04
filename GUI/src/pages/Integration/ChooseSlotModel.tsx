@@ -45,6 +45,7 @@ const ChooseSlotModel: FC<ChooseSlotModelProps> = ({ onModalClose }) => {
             label=""
             isOpen={true}
             menuPosition="relative"
+            style={{ fontSize: '15px' }}
             options={[{ label: t('global.none'), value: '' }].concat(
               slots?.map((slot) => ({ label: slot, value: slot })) ?? [],
             )}

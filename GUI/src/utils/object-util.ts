@@ -93,8 +93,50 @@ export const getKeyPathString = (keyPath: KeyPath) => {
   return keyPath.toReversed().join('"]["');
 };
 
+// Helper function to update value at a specific object path
+export const updateValueAtPath = (
+  obj: Record<string, unknown> | unknown[],
+  path: string,
+  newValue: unknown,
+): Record<string, unknown> | unknown[] => {
+  // Handle empty path - return original object unchanged
+  if (!path || path.trim() === '') {
+    return obj;
+  }
+
+  const pathParts = parsePath(path);
+
+  // Handle case where parsePath returns empty array (shouldn't happen with non-empty path, but safety check)
+  if (pathParts.length === 0) {
+    return obj;
+  }
+
+  const newObj = Array.isArray(obj) ? [...obj] : { ...obj };
+  let current: any = newObj;
+
+  // Navigate to the parent of the target, creating new objects/arrays for each level
+  for (let i = 0; i < pathParts.length - 1; i++) {
+    const part = pathParts[i];
+    const nextPart = pathParts[i + 1];
+
+    // Create new object/array for this level to ensure immutability
+    if (current[part] === undefined) {
+      current[part] = typeof nextPart === 'number' ? [] : {};
+    } else {
+      current[part] = typeof nextPart === 'number' ? [...current[part]] : { ...current[part] };
+    }
+    current = current[part];
+  }
+
+  // Update the value at the target path
+  const lastPart = pathParts[pathParts.length - 1];
+  current[lastPart] = newValue;
+
+  return newObj;
+};
+
 // Helper function to parse object path into parts
-const parsePath = (path: string): (string | number)[] => {
+export const parsePath = (path: string): (string | number)[] => {
   const pathParts: (string | number)[] = [];
   let currentPath = path;
 
@@ -108,7 +150,7 @@ const parsePath = (path: string): (string | number)[] => {
     }
 
     // Then check for property name followed by array index
-    const propertyArrayMatch = /^([^.\[\]]+)\[(\d+)\]/.exec(currentPath);
+    const propertyArrayMatch = /^([^.[\]]+)\[(\d+)\]/.exec(currentPath);
     if (propertyArrayMatch) {
       pathParts.push(propertyArrayMatch[1]); // property name
       pathParts.push(parseInt(propertyArrayMatch[2])); // array index
@@ -136,35 +178,79 @@ const parsePath = (path: string): (string | number)[] => {
   return pathParts;
 };
 
-// Helper function to update value at a specific object path
-export const updateValueAtPath = (
-  obj: Record<string, unknown> | unknown[],
-  path: string,
-  newValue: unknown,
-): Record<string, unknown> | unknown[] => {
-  const pathParts = parsePath(path);
-  const newObj = Array.isArray(obj) ? [...obj] : { ...obj };
-  let current: any = newObj;
+// Helper function to search for value in a collection (arrays and objects)
+export const searchForValue = (collection: object, value: string, currentPath = ''): string | null => {
+  // Convert arrays to entries for unified iteration
+  const entries: (string | number)[][] = Array.isArray(collection)
+    ? collection.map((val, index) => [index, val])
+    : Object.entries(collection);
 
-  // Navigate to the parent of the target
-  for (let i = 0; i < pathParts.length - 1; i++) {
-    const part = pathParts[i];
-    const nextPart = pathParts[i + 1];
+  // Single loop for both arrays and objects
+  for (const [key, objValue] of entries) {
+    const newPath = buildPath(currentPath, key);
 
-    if (current[part] === undefined) {
-      // Check if the next part is a number (array index) or string (object key)
-      if (typeof nextPart === 'number') {
-        current[part] = [];
-      } else {
-        current[part] = {};
-      }
+    if (isStringValueMatch(objValue, value)) return newPath;
+
+    if (isObject(objValue)) {
+      const result = searchForValue(objValue, value, newPath);
+      if (result) return result;
     }
-    current = current[part];
   }
 
-  // Update the value at the target path
-  const lastPart = pathParts[pathParts.length - 1];
-  current[lastPart] = newValue;
+  return null;
+};
 
-  return newObj;
+// Compares an object value with a string value, handling type conversions for numbers, booleans, and null
+// Returns true if the object value matches the string value after appropriate type conversion
+export const isStringValueMatch = (objValue: unknown, value: string): boolean => {
+  // Handle boolean conversion
+  let booleanValue: boolean | null = null;
+  if (value.toLowerCase() === 'true') {
+    booleanValue = true;
+  } else if (value.toLowerCase() === 'false') {
+    booleanValue = false;
+  }
+
+  return (
+    objValue === value ||
+    (typeof objValue === 'number' && !isNaN(Number(value)) && objValue === Number(value)) ||
+    (typeof objValue === 'boolean' && objValue === booleanValue) ||
+    (objValue === null && value.toLowerCase() === 'null')
+  );
+};
+
+// Helper function to search for a property name in a collection (arrays and objects)
+export const searchForProperty = (data: unknown, propertyName: string, currentPath = ''): string | null => {
+  if (!isObject(data)) return null;
+
+  // Convert arrays to entries for unified iteration
+  const entries: (string | number)[][] = Array.isArray(data)
+    ? data.map((val, index) => [index, val])
+    : Object.entries(data);
+
+  // Single loop for both arrays and objects
+  for (const [key, value] of entries) {
+    // Check if this object has the property (for objects only)
+    if (!Array.isArray(data) && key === propertyName) {
+      return buildPath(currentPath, propertyName);
+    }
+
+    // Search deeper in nested objects
+    if (isObject(value)) {
+      const newPath = buildPath(currentPath, key);
+      const result = searchForProperty(value, propertyName, newPath);
+      if (result) return result;
+    }
+  }
+
+  return null;
+};
+
+// Helper function to build path based on key type
+export const buildPath = (currentPath: string, key: string | number): string => {
+  if (currentPath) {
+    const keyPart = typeof key === 'number' ? `[${key}]` : `.${key}`;
+    return `${currentPath}${keyPart}`;
+  }
+  return typeof key === 'number' ? `[${key}]` : String(key);
 };
