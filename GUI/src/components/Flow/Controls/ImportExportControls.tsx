@@ -7,6 +7,7 @@ import { AiOutlineExport, AiOutlineImport } from 'react-icons/ai';
 import useToastStore from 'store/toasts.store';
 import { format } from 'date-fns';
 import { removeTrailingUnderscores } from 'utils/string-util';
+import { updateFlowInputRules } from 'services/flow-builder';
 
 const ImportExportControls: FC = () => {
   const { getNodes, getEdges, setNodes, setEdges } = useReactFlow();
@@ -39,7 +40,18 @@ const ImportExportControls: FC = () => {
           const flowData = JSON.parse(content);
 
           if (isValidFlowData(flowData)) {
-            setNodes(flowData.nodes);
+            const nodes = flowData.nodes.map((node: any) => {
+              if (node.type !== 'custom') return node;
+              node.data = {
+                ...node.data,
+                onDelete: useServiceStore.getState().onDelete,
+                setClickedNode: useServiceStore.getState().setClickedNode,
+                onEdit: useServiceStore.getState().handleNodeEdit,
+                update: updateFlowInputRules,
+              };
+              return node;
+            });
+            setNodes(nodes);
             setEdges(flowData.edges);
             setHasUnsavedChanges(true);
           } else {
