@@ -3,7 +3,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import 'jsoneditor/dist/jsoneditor.css';
 import { getDragData } from 'utils/component-util';
-import { isObject, updateValueAtPath } from 'utils/object-util';
+import { searchForProperty, searchForValue, updateValueAtPath } from 'utils/object-util';
 import { stringToTemplate } from 'utils/string-util';
 
 import styles from './ObjectEditor.module.scss';
@@ -13,71 +13,26 @@ const findNodePath = (node: Element, data: Record<string, unknown>): string | nu
   // Try to find by text content (for values)
   const textContent = node.textContent?.trim();
   if (textContent) {
-    const path = searchInCollection(data, textContent);
+    const path = searchForValue(data, textContent);
     return path;
   }
 
-  return null;
-};
-
-// Helper function to check if values match (handling different types)
-const isValueMatch = (objValue: unknown, value: string): boolean => {
-  // Handle boolean conversion
-  let booleanValue: boolean | null = null;
-  if (value.toLowerCase() === 'true') {
-    booleanValue = true;
-  } else if (value.toLowerCase() === 'false') {
-    booleanValue = false;
-  }
-
-  return (
-    objValue === value ||
-    (typeof objValue === 'number' && !isNaN(Number(value)) && objValue === Number(value)) ||
-    (typeof objValue === 'boolean' && objValue === booleanValue) ||
-    (objValue === null && value.toLowerCase() === 'null')
-  );
-};
-
-// Helper function to search for value in an array
-const searchInArray = (array: unknown[], value: string, currentPath = ''): string | null => {
-  for (let index = 0; index < array.length; index++) {
-    const objValue = array[index];
-    const newPath = currentPath ? `${currentPath}[${index}]` : `[${index}]`;
-
-    if (isValueMatch(objValue, value)) return newPath;
-
-    if (isObject(objValue)) {
-      const result = searchInCollection(objValue, value, newPath);
-      if (result) return result;
+  // If no text content (empty value), try to find by the associated property name
+  // Look for the property name in the same table row
+  const tableRow = node.closest('tr');
+  if (tableRow) {
+    const fieldElement = tableRow.querySelector('.jsoneditor-field');
+    if (fieldElement) {
+      const propertyName = fieldElement.textContent?.trim();
+      if (propertyName) {
+        // Search for the property name in the data structure
+        const path = searchForProperty(data, propertyName);
+        return path;
+      }
     }
   }
 
   return null;
-};
-
-// Helper function to search for value in an object
-const searchInObject = (obj: Record<string, unknown>, value: string, currentPath = ''): string | null => {
-  for (const [key, objValue] of Object.entries(obj)) {
-    const newPath = currentPath ? `${currentPath}.${key}` : String(key);
-
-    if (isValueMatch(objValue, value)) return newPath;
-
-    if (isObject(objValue)) {
-      const result = searchInCollection(objValue, value, newPath);
-      if (result) return result;
-    }
-  }
-
-  return null;
-};
-
-// Helper function to search for value in a collection
-const searchInCollection = (collection: object, value: string, currentPath = ''): string | null => {
-  if (Array.isArray(collection)) {
-    return searchInArray(collection, value, currentPath);
-  }
-
-  return searchInObject(collection as Record<string, unknown>, value, currentPath);
 };
 
 interface ObjectEditorProps {
@@ -114,9 +69,12 @@ const ObjectEditor: React.FC<ObjectEditorProps> = ({ onChange, data }) => {
         jsonEditorRef.current = null;
       }
     };
+    // Dependencies array is intentionally empty - JSONEditor manages its own state
+    // so no need to re-render the component when the data changes
+    // Adding dependencies would cause inputs in JSONEditor to lose focus on typing
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Cleanup effect to remove highlight when component unmounts
   useEffect(() => {
     return () => {
       if (hoveredElement) {
@@ -176,7 +134,7 @@ const ObjectEditor: React.FC<ObjectEditorProps> = ({ onChange, data }) => {
 
           if (jsonNode) {
             // Get the current JSON data
-            const currentData = jsonEditorRef.current.get();
+            const currentData = jsonEditorRef.current.get() as Record<string, unknown>;
 
             // Try to find the path to the dropped node
             const path = findNodePath(jsonNode, currentData);

@@ -93,6 +93,8 @@ export default [
       ...sonarjs.configs.recommended.rules,
       // SonarCloud does not seem to support Vitest
       'sonarjs/assertions-in-tests': 'off',
+      // Causes issues and forces to use unknown instead of more specific types
+      'sonarjs/function-return-type': 'off',
     },
   },
 

@@ -1,3 +1,4 @@
+import React from 'react';
 import { Step } from 'types';
 
 export const ASSIGN_DRAG_TYPE = 'text/plain';
