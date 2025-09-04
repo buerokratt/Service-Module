@@ -23,10 +23,12 @@ latest_intent_status AS (
     SELECT intent,
            isforservice,
            created,
+           status,
            ROW_NUMBER() OVER (PARTITION BY intent ORDER BY created DESC) AS rn
     FROM intent
 )
 SELECT intent,
+       status,
        CEIL(COUNT(*) OVER() / :page_size::DECIMAL) AS total_pages,
        created
 FROM latest_intent_status
