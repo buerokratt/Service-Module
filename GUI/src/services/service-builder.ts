@@ -643,7 +643,7 @@ function handleDynamicChoices(
         list: stringToArray(list, list),
         service_name: parentNode.data.dynamicChoices?.serviceName ?? '',
         key: parentNode.data.dynamicChoices?.key ?? '',
-        payload_prefix: '#service, /POST/',
+        payload_prefix: '#service, /POST/services/active/',
         payload_keys: parentNode.data.dynamicChoices?.payloadKeys.split(',').filter((item) => item.trim()) ?? [],
       },
     },
