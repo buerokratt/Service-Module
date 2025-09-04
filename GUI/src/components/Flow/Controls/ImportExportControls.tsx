@@ -5,19 +5,21 @@ import { FC, useRef, useCallback } from 'react';
 import useServiceStore from 'store/new-services.store';
 import { AiOutlineExport, AiOutlineImport } from 'react-icons/ai';
 import useToastStore from 'store/toasts.store';
+import { format } from 'date-fns';
+import { removeTrailingUnderscores } from 'utils/string-util';
 
 const ImportExportControls: FC = () => {
   const { getNodes, getEdges, setNodes, setEdges } = useReactFlow();
   const { t } = useTranslation();
   const { setHasUnsavedChanges } = useServiceStore();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const serviceName = useServiceStore((state) => removeTrailingUnderscores(state.serviceNameDashed()));
 
   const handleExport = useCallback(() => {
     const flowData = {
       nodes: getNodes(),
       edges: getEdges(),
       metadata: {
-        version: '1.0',
         exportedAt: new Date().toISOString(),
       },
     };
@@ -25,7 +27,7 @@ const ImportExportControls: FC = () => {
     const dataString = JSON.stringify(flowData, null, 2);
     const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataString);
 
-    const fileName = `flow-export-${new Date().toISOString().split('T')[0]}.json`;
+    const fileName = `${serviceName != undefined && serviceName != '' ? serviceName : 'flow'}_${format(new Date(), 'yyyy_MM_dd_HH_mm_ss')}.json`;
 
     const linkElement = document.createElement('a');
     linkElement.setAttribute('href', dataUri);
