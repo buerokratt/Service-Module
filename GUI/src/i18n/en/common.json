@@ -397,7 +397,7 @@
     "allElements": "All elements",
     "serviceInfo": "Service info",
     "invalidFileFormat": "Invalid flow file format",
-    "parseError": "Error parsing flow file",
+    "parseError": "Service generation failed! Either not JSON, the file has been modified or is corrupt",
     "apiElements": {
       "title": "API elements",
       "delete": "Delete",

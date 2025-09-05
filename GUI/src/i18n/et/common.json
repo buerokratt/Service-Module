@@ -397,7 +397,7 @@
     "allElements": "Üldelemendid",
     "serviceInfo": "Teenuse teave",
     "invalidFileFormat": "Kehtetu voofaili formaat",
-    "parseError": "Viga voofaili parsimisel",
+    "parseError": "Teenuse genereerimine ebaõnnestus! Fail ei ole kas JSON, seda on muudetud või see on vigane",
     "apiElements": {
       "title": "API elemendid",
       "delete": "Kustuta",

@@ -74,7 +74,9 @@ const ImportExportControls: FC = () => {
           }
         } catch (error) {
           console.error('Error parsing flow file:', error);
-          useToastStore.getState().error({ title: t('serviceFlow.parseError'), message: (error as Error).message });
+          useToastStore
+            .getState()
+            .error({ title: t('global.notificationError'), message: t('serviceFlow.parseError') });
         }
       };
       reader.readAsText(file);
