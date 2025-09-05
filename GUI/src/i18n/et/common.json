@@ -411,7 +411,7 @@
       "deleteError": "API elementi kustutamine ebaõnnestus",
       "editSuccess": "API element edukalt muudetud",
       "editError": "API elemendi muutmine ebaõnnestus",
-      "parseError": "Teenuse genereerimine ebaõnnestus! Fail ei ole kas JSON, seda on muudetud või see on vigane",
+      "parseError": "JSON väärtuse parsimine ebaõnnestus",
       "cannotOpenEditor": "Objektiredaktorit ei saa avada",
       "invalidObjectError": "Sisendi parsimine ebaõnnestus, väärtus pole kehtiv objekt",
       "public": "Avalik"

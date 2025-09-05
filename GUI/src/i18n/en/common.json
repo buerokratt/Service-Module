@@ -411,7 +411,7 @@
       "deleteError": "Failed to delete API element",
       "editSuccess": "API element edited successfully",
       "editError": "Failed to edit API element",
-      "parseError": "Service generation failed! Either not JSON, the file has been modified or is corrupt",
+      "parseError": "Failed to parse JSON value",
       "cannotOpenEditor": "Cannot open object editor",
       "invalidObjectError": "Parsing input failed, the value is not a valid object",
       "public": "Public"
