@@ -18,17 +18,41 @@ const ImportExportControls: FC = () => {
   const [isConfirmImportModalVisible, setIsConfirmImportModalVisible] = useState(false);
   const [importedFlowData, setImportedFlowData] = useState<{ nodes: any[]; edges: any[] } | null>(null);
 
-  const handleExport = useCallback(() => {
-    const dataString = JSON.stringify({ nodes: getNodes(), edges: getEdges() });
-    const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataString);
+  const handleExport = useCallback(async () => {
+    try {
+      const dataString = JSON.stringify({ nodes: getNodes(), edges: getEdges() });
+      const fileName = `${serviceName != undefined && serviceName != '' ? serviceName : 'flow'}_${format(new Date(), 'yyyy_MM_dd_HH_mm_ss')}.json`;
 
-    const fileName = `${serviceName != undefined && serviceName != '' ? serviceName : 'flow'}_${format(new Date(), 'yyyy_MM_dd_HH_mm_ss')}.json`;
+      if ('showSaveFilePicker' in window) {
+        try {
+          const blob = new Blob([dataString], { type: 'application/json' });
+          const handle = await (window as any).showSaveFilePicker({
+            suggestedName: fileName,
+            types: [
+              {
+                description: 'JSON Files',
+                accept: { 'application/json': ['.json'] },
+              },
+            ],
+          });
 
-    const linkElement = document.createElement('a');
-    linkElement.setAttribute('href', dataUri);
-    linkElement.setAttribute('download', fileName);
-    linkElement.click();
-  }, [getNodes, getEdges, serviceName]);
+          const writableStream = await handle.createWritable();
+          await writableStream.write(blob);
+          await writableStream.close();
+        } catch (error: any) {
+          useToastStore.getState().error({ title: t('global.notificationError'), message: (error as Error).message });
+        }
+      } else {
+        const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataString);
+        const linkElement = document.createElement('a');
+        linkElement.setAttribute('href', dataUri);
+        linkElement.setAttribute('download', fileName);
+        linkElement.click();
+      }
+    } catch (error) {
+      useToastStore.getState().error({ title: t('global.notificationError'), message: (error as Error).message });
+    }
+  }, [getNodes, getEdges, serviceName, t]);
 
   const handleImport = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
