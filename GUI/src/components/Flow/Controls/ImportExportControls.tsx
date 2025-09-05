@@ -106,9 +106,7 @@ const ImportExportControls: FC = () => {
         setEdges(flowData.edges);
         setHasUnsavedChanges(true);
       } else {
-        useToastStore
-          .getState()
-          .error({ title: t('global.notificationError'), message: t('serviceFlow.invalidFileFormat') });
+        useToastStore.getState().error({ title: t('global.notificationError'), message: t('serviceFlow.parseError') });
       }
     },
     [setNodes, setEdges, setHasUnsavedChanges, t],
