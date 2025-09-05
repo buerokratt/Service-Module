@@ -60,7 +60,8 @@
     "create": "Loo",
     "edit": "Muuda",
     "import": "Impordi",
-    "export": "Ekspordi"
+    "export": "Ekspordi",
+    "proceed": "Jätka"
   },
   "menu": {
     "overview": "Ülevaade",
@@ -341,7 +342,8 @@
       "assignAsValue": "Määra teine element väärtuseks",
       "removeValueAssignment": "Eemalda element, mis on määratud väärtuseks",
       "assignManualEdit": "Muutke muutuja määramist käsitsi",
-      "openObjectEditor": "Ava objekti redaktor"
+      "openObjectEditor": "Ava objekti redaktor",
+      "confirmImport": "Teenus kirjutatakse üle!"
     },
     "previousVariables": {
       "assignElements": "Määra elemendid",
@@ -409,7 +411,7 @@
       "deleteError": "API elementi kustutamine ebaõnnestus",
       "editSuccess": "API element edukalt muudetud",
       "editError": "API elemendi muutmine ebaõnnestus",
-      "parseError": "JSON väärtuse parsimine ebaõnnestus",
+      "parseError": "Teenuse genereerimine ebaõnnestus! Fail ei ole kas JSON, seda on muudetud või see on vigane",
       "cannotOpenEditor": "Objektiredaktorit ei saa avada",
       "invalidObjectError": "Sisendi parsimine ebaõnnestus, väärtus pole kehtiv objekt",
       "public": "Avalik"

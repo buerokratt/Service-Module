@@ -60,7 +60,8 @@
     "create": "Create",
     "edit": "Edit",
     "import": "Import",
-    "export": "Export"
+    "export": "Export",
+    "proceed": "Proceed"
   },
   "menu": {
     "overview": "Overview",
@@ -341,7 +342,8 @@
       "assignAsValue": "Assign another element to use as value",
       "removeValueAssignment": "Remove element assigned as value",
       "assignManualEdit": "Manually edit variable assignment",
-      "openObjectEditor": "Open object editor"
+      "openObjectEditor": "Open object editor",
+      "confirmImport": "The current service will be rewritten!"
     },
     "previousVariables": {
       "assignElements": "Assign Elements",
@@ -409,7 +411,7 @@
       "deleteError": "Failed to delete API element",
       "editSuccess": "API element edited successfully",
       "editError": "Failed to edit API element",
-      "parseError": "Failed to parse JSON value",
+      "parseError": "Service generation failed! Either not JSON, the file has been modified or is corrupt",
       "cannotOpenEditor": "Cannot open object editor",
       "invalidObjectError": "Parsing input failed, the value is not a valid object",
       "public": "Public"

@@ -1,7 +1,7 @@
 import { useReactFlow } from '@xyflow/react';
-import { Button, Icon, Track } from 'components';
+import { Button, Icon, Modal, Track } from 'components';
 import { useTranslation } from 'react-i18next';
-import { FC, useRef, useCallback } from 'react';
+import { FC, useRef, useCallback, useState } from 'react';
 import useServiceStore from 'store/new-services.store';
 import { AiOutlineExport, AiOutlineImport } from 'react-icons/ai';
 import useToastStore from 'store/toasts.store';
@@ -15,6 +15,8 @@ const ImportExportControls: FC = () => {
   const { setHasUnsavedChanges } = useServiceStore();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const serviceName = useServiceStore((state) => removeTrailingUnderscores(state.serviceNameDashed()));
+  const [isConfirmImportModalVisible, setIsConfirmImportModalVisible] = useState(false);
+  const [importedFlowData, setImportedFlowData] = useState<{ nodes: any[]; edges: any[] } | null>(null);
 
   const handleExport = useCallback(() => {
     const dataString = JSON.stringify({ nodes: getNodes(), edges: getEdges() });
@@ -26,7 +28,7 @@ const ImportExportControls: FC = () => {
     linkElement.setAttribute('href', dataUri);
     linkElement.setAttribute('download', fileName);
     linkElement.click();
-  }, [getNodes, getEdges]);
+  }, [getNodes, getEdges, serviceName]);
 
   const handleImport = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -38,26 +40,13 @@ const ImportExportControls: FC = () => {
         try {
           const content = e.target?.result as string;
           const flowData = JSON.parse(content);
+          const currentNodes = getNodes().filter((node) => node.type !== 'ghost');
 
-          if (isValidFlowData(flowData)) {
-            const nodes = flowData.nodes.map((node: any) => {
-              if (node.type !== 'custom') return node;
-              node.data = {
-                ...node.data,
-                onDelete: useServiceStore.getState().onDelete,
-                setClickedNode: useServiceStore.getState().setClickedNode,
-                onEdit: useServiceStore.getState().handleNodeEdit,
-                update: updateFlowInputRules,
-              };
-              return node;
-            });
-            setNodes(nodes);
-            setEdges(flowData.edges);
-            setHasUnsavedChanges(true);
+          if (currentNodes.length === 1 && currentNodes[0].type === 'start') {
+            applyImportedFlow(flowData);
           } else {
-            useToastStore
-              .getState()
-              .error({ title: t('global.notificationError'), message: t('serviceFlow.invalidFileFormat') });
+            setImportedFlowData(flowData);
+            setIsConfirmImportModalVisible(true);
           }
         } catch (error) {
           console.error('Error parsing flow file:', error);
@@ -70,8 +59,47 @@ const ImportExportControls: FC = () => {
         fileInputRef.current.value = '';
       }
     },
+    [getNodes, setNodes, setEdges, setHasUnsavedChanges, t],
+  );
+
+  const applyImportedFlow = useCallback(
+    (flowData: { nodes: any[]; edges: any[] }) => {
+      if (isValidFlowData(flowData)) {
+        const nodes = flowData.nodes.map((node: any) => {
+          if (node.type !== 'custom') return node;
+          node.data = {
+            ...node.data,
+            onDelete: useServiceStore.getState().onDelete,
+            setClickedNode: useServiceStore.getState().setClickedNode,
+            onEdit: useServiceStore.getState().handleNodeEdit,
+            update: updateFlowInputRules,
+          };
+          return node;
+        });
+        setNodes(nodes);
+        setEdges(flowData.edges);
+        setHasUnsavedChanges(true);
+      } else {
+        useToastStore
+          .getState()
+          .error({ title: t('global.notificationError'), message: t('serviceFlow.invalidFileFormat') });
+      }
+    },
     [setNodes, setEdges, setHasUnsavedChanges, t],
   );
+
+  const handleConfirmImport = useCallback(() => {
+    if (importedFlowData) {
+      applyImportedFlow(importedFlowData);
+    }
+    setIsConfirmImportModalVisible(false);
+    setImportedFlowData(null);
+  }, [importedFlowData, applyImportedFlow]);
+
+  const handleCancelImport = useCallback(() => {
+    setIsConfirmImportModalVisible(false);
+    setImportedFlowData(null);
+  }, []);
 
   const isValidFlowData = (data: any): data is { nodes: any[]; edges: any[] } => {
     return (
@@ -90,17 +118,31 @@ const ImportExportControls: FC = () => {
   }, []);
 
   return (
-    <Track style={{ gap: 8 }} align="center" justify="start">
-      <input type="file" ref={fileInputRef} onChange={handleImport} accept=".json" style={{ display: 'none' }} />
-      <Button onClick={triggerFileInput} size="s" style={{ backgroundColor: '#308653' }}>
-        <Icon icon={<AiOutlineImport />} />
-        {t('global.import')}
-      </Button>
-      <Button onClick={handleExport} size="s">
-        <Icon icon={<AiOutlineExport />} />
-        {t('global.export')}
-      </Button>
-    </Track>
+    <>
+      <Track style={{ gap: 8 }} align="center" justify="start">
+        <input type="file" ref={fileInputRef} onChange={handleImport} accept=".json" style={{ display: 'none' }} />
+        <Button onClick={triggerFileInput} size="s" style={{ backgroundColor: '#308653' }}>
+          <Icon icon={<AiOutlineImport />} />
+          {t('global.import')}
+        </Button>
+        <Button onClick={handleExport} size="s">
+          <Icon icon={<AiOutlineExport />} />
+          {t('global.export')}
+        </Button>
+      </Track>
+      {isConfirmImportModalVisible && (
+        <Modal title={t('serviceFlow.popup.confirmImport')} onClose={handleCancelImport}>
+          <Track justify="end" gap={16}>
+            <Button appearance="primary" onClick={handleConfirmImport}>
+              {t('global.proceed')}
+            </Button>
+            <Button appearance="secondary" onClick={handleCancelImport}>
+              {t('global.cancel')}
+            </Button>
+          </Track>
+        </Modal>
+      )}
+    </>
   );
 };
 
