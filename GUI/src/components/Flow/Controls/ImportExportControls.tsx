@@ -90,7 +90,7 @@ const ImportExportControls: FC = () => {
   }, []);
 
   return (
-    <Track style={{ gap: 8, padding: 10 }} align="center" justify="start">
+    <Track style={{ gap: 8 }} align="center" justify="start">
       <input type="file" ref={fileInputRef} onChange={handleImport} accept=".json" style={{ display: 'none' }} />
       <Button onClick={triggerFileInput} size="s" style={{ backgroundColor: '#308653' }}>
         <Icon icon={<AiOutlineImport />} />
