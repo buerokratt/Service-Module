@@ -27,7 +27,7 @@ const StepNode: FC<StepNodeProps> = ({ data }) => {
   };
 
   const updateIsTestedAndPassed = useCallback(async () => {
-    if (isStepInvalid(data).isInvalid) {
+    if (!isStepInvalid(data).isValid) {
       setIsTestedAndPassed(false);
       return;
     }
@@ -120,7 +120,7 @@ const StepNode: FC<StepNodeProps> = ({ data }) => {
 
 const TestStatue = ({ isTestedAndPassed, data }: { isTestedAndPassed: boolean | null; data: NodeDataProps }) => {
   if (isTestedAndPassed) return <CheckBadge />;
-  if (isStepInvalid(data).isInvalid) return <ExclamationBadge />;
+  if (!isStepInvalid(data).isValid) return <ExclamationBadge />;
   return <ExclamationBadge color="purple" />;
 };
 

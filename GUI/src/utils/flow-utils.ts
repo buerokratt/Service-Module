@@ -4,7 +4,7 @@ import { Assign, Step, StepType } from 'types';
 import { NodeDataProps } from 'types/service-flow';
 
 export interface ValidationResult {
-  isInvalid: boolean;
+  isValid: boolean;
   error?: string;
 }
 
@@ -37,7 +37,7 @@ export const getNodeLabel = (step: Step, nodes: Node[]) => {
 };
 
 export const isStepInvalid = (node: NodeDataProps): ValidationResult => {
-  if (node.testingPassed === false) return { isInvalid: true };
+  if (node.testingPassed === false) return { isValid: false };
 
   console.log('node', node.stepType, node.name);
 
@@ -57,39 +57,39 @@ export const isStepInvalid = (node: NodeDataProps): ValidationResult => {
     };
 
     const invalidRulesExist = hasInvalidRules(node.rules?.children ?? []);
-    const isInvalid = node.rules?.children === undefined || invalidRulesExist || node.rules?.children.length === 0;
-    if (isInvalid) {
+    const isValid = node.rules?.children !== undefined && !invalidRulesExist && node.rules?.children.length > 0;
+    if (!isValid) {
       const errorMessage =
         node.stepType === StepType.Input ? 'Please enter client input rules' : 'Please enter condition rules';
-      return { isInvalid: true, error: errorMessage };
+      return { isValid: false, error: errorMessage };
     }
-    return { isInvalid: false };
+    return { isValid: true };
   }
 
   // todo multi
   if (node.stepType === StepType.MultiChoiceQuestion) {
-    const isInvalid =
-      !node?.multiChoiceQuestion?.question ||
-      node.multiChoiceQuestion?.buttons?.find((e) => e.title === '') != undefined;
-    if (isInvalid) {
-      return { isInvalid: true, error: 'Please enter MCQ question' };
+    const isValid =
+      node?.multiChoiceQuestion?.question &&
+      node.multiChoiceQuestion?.buttons?.find((e) => e.title === '') === undefined;
+    if (!isValid) {
+      return { isValid: false, error: 'Please enter MCQ question' };
     }
-    return { isInvalid: false };
+    return { isValid: true };
   }
 
   // todo dynamic choices
   if (node.stepType === StepType.DynamicChoices) {
-    const isInvalid = !node?.dynamicChoices?.list || !node?.dynamicChoices?.serviceName || !node?.dynamicChoices?.key;
-    if (isInvalid) {
-      return { isInvalid: true, error: 'Please enter dynamic choices list' };
+    const isValid = node?.dynamicChoices?.list && node?.dynamicChoices?.serviceName && node?.dynamicChoices?.key;
+    if (!isValid) {
+      return { isValid: false, error: 'Please enter dynamic choices list' };
     }
-    return { isInvalid: false };
+    return { isValid: true };
   }
 
-  if (node.stepType === StepType.UserDefined) return { isInvalid: false };
-  if (node.stepType === StepType.OpenWebpage) return { isInvalid: !node.link || !node.linkText };
-  if (node.stepType === StepType.FileGenerate) return { isInvalid: !node.fileName || !node.fileContent };
-  if (node.stepType === StepType.FileSign) return { isInvalid: !node.signOption };
+  if (node.stepType === StepType.UserDefined) return { isValid: true };
+  if (node.stepType === StepType.OpenWebpage) return { isValid: Boolean(node.link && node.linkText) };
+  if (node.stepType === StepType.FileGenerate) return { isValid: Boolean(node.fileName && node.fileContent) };
+  if (node.stepType === StepType.FileSign) return { isValid: Boolean(node.signOption) };
   // todo assign
   if (node.stepType === StepType.Assign) {
     const hasInvalidElements = (elements: any[]): boolean => {
@@ -100,17 +100,17 @@ export const isStepInvalid = (node: NodeDataProps): ValidationResult => {
     };
 
     const invalidElementsExist = hasInvalidElements(node.assignElements ?? []);
-    const isInvalid = node?.assignElements === undefined || invalidElementsExist || node?.assignElements.length === 0;
-    if (isInvalid) {
-      return { isInvalid: true, error: 'Please enter assign elements' };
+    const isValid = node?.assignElements !== undefined && !invalidElementsExist && node?.assignElements.length > 0;
+    if (!isValid) {
+      return { isValid: false, error: 'Please enter assign elements' };
     }
-    return { isInvalid: false };
+    return { isValid: true };
   }
 
   // todo message length
-  const isInvalid = !node.readonly && !node.message?.length;
-  if (isInvalid) {
-    return { isInvalid: true, error: 'Message text is missing' };
+  const isValid = node.readonly || node.message?.length;
+  if (!isValid) {
+    return { isValid: false, error: 'Message text is missing' };
   }
-  return { isInvalid: false };
+  return { isValid: true };
 };
