@@ -39,8 +39,8 @@ export const runServiceTest = async (input: string) => {
     const store = useTestServiceStore.getState();
 
     const response = await api.post<{ response: { content: string }[] }>(testService(state, name), { input });
-    store.addBotMessage(response.data.response[0].content);
 
+    store.addBotMessage(response.data.response[0].content);
     store.addSuccess('chat.service-test-success');
   } catch (error) {
     handleTestError(error, serviceStore);
