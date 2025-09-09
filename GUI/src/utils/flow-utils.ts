@@ -18,7 +18,7 @@ export const getNodeLabel = (step: Step, nodes: Node[]) => {
     .map((label) => {
       const parts = label.split(' - ');
       if (parts.length > 1) {
-        const num = parseInt(parts[parts.length - 1]);
+        const num = parseInt(parts[parts.length - 1] as string);
         return isNaN(num) ? 0 : num;
       }
       return 0;
@@ -35,6 +35,47 @@ export const getNodeLabel = (step: Step, nodes: Node[]) => {
   }
 
   return `${baseLabel} - ${nextNumber}`;
+};
+
+export const validateStep = (node: NodeDataProps): ValidationResult => {
+  // End service node and similar
+  if (node.readonly) return { isValid: true };
+
+  // Failed testing with Ruuter request
+  if (node.testingPassed === false) return { isValid: false };
+
+  switch (node.stepType) {
+    case StepType.Input:
+    case StepType.Condition:
+      return validateInputOrConditionStep(node);
+
+    case StepType.MultiChoiceQuestion:
+      return validateMultiChoiceQuestionStep(node);
+
+    case StepType.DynamicChoices:
+      return validateDynamicChoicesStep(node);
+
+    case StepType.Assign:
+      return validateAssignStep(node);
+
+    case StepType.Textfield:
+      return validateTextfieldStep(node);
+
+    case StepType.UserDefined:
+      return { isValid: true };
+
+    case StepType.OpenWebpage:
+      return { isValid: Boolean(node.link && node.linkText) };
+
+    case StepType.FileGenerate:
+      return { isValid: Boolean(node.fileName && node.fileContent) };
+
+    case StepType.FileSign:
+      return { isValid: Boolean(node.signOption) };
+
+    default:
+      return { isValid: true };
+  }
 };
 
 // Error messages are implemented only for the steps that are actually enabled
@@ -127,45 +168,4 @@ const validateTextfieldStep = (node: NodeDataProps): ValidationResult => {
   return node.message?.length
     ? { isValid: true }
     : { isValid: false, error: t('chat.service-flow-error.message-text-missing') as string };
-};
-
-export const isStepValid = (node: NodeDataProps): ValidationResult => {
-  // End service node and similar
-  if (node.readonly) return { isValid: true };
-
-  // Failed testing with Ruuter request
-  if (node.testingPassed === false) return { isValid: false };
-
-  switch (node.stepType) {
-    case StepType.Input:
-    case StepType.Condition:
-      return validateInputOrConditionStep(node);
-
-    case StepType.MultiChoiceQuestion:
-      return validateMultiChoiceQuestionStep(node);
-
-    case StepType.DynamicChoices:
-      return validateDynamicChoicesStep(node);
-
-    case StepType.Assign:
-      return validateAssignStep(node);
-
-    case StepType.Textfield:
-      return validateTextfieldStep(node);
-
-    case StepType.UserDefined:
-      return { isValid: true };
-
-    case StepType.OpenWebpage:
-      return { isValid: Boolean(node.link && node.linkText) };
-
-    case StepType.FileGenerate:
-      return { isValid: Boolean(node.fileName && node.fileContent) };
-
-    case StepType.FileSign:
-      return { isValid: Boolean(node.signOption) };
-
-    default:
-      return { isValid: true };
-  }
 };
