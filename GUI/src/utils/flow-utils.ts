@@ -36,6 +36,8 @@ export const getNodeLabel = (step: Step, nodes: Node[]) => {
   return `${baseLabel} - ${nextNumber}`;
 };
 
+// Error messages are implemented only for the steps that are actually enabled
+// More need to be added later
 export const isStepValid = (node: NodeDataProps): ValidationResult => {
   // End service node and similar
   if (node.readonly) return { isValid: true };
@@ -63,29 +65,37 @@ export const isStepValid = (node: NodeDataProps): ValidationResult => {
     const isValid = node.rules?.children !== undefined && !invalidRulesExist && node.rules?.children.length > 0;
     if (!isValid) {
       const errorMessage =
-        node.stepType === StepType.Input ? 'Please enter client input rules' : 'Please enter condition rules';
+        node.stepType === StepType.Input ? 'Client input rules required' : 'Condition rules required';
       return { isValid: false, error: errorMessage };
     }
     return { isValid: true };
   }
 
-  // todo multi
   if (node.stepType === StepType.MultiChoiceQuestion) {
-    const isValid =
-      node?.multiChoiceQuestion?.question &&
-      node.multiChoiceQuestion?.buttons?.find((e) => e.title === '') === undefined;
-    if (!isValid) {
-      return { isValid: false, error: 'Please enter MCQ question' };
+    if (!node?.multiChoiceQuestion?.question) {
+      return { isValid: false, error: 'Question is required' };
     }
+
+    if (node.multiChoiceQuestion?.buttons?.find((e) => e.title === '') !== undefined) {
+      return { isValid: false, error: 'Button titles are required' };
+    }
+
     return { isValid: true };
   }
 
-  // todo dynamic choices
   if (node.stepType === StepType.DynamicChoices) {
-    const isValid = node?.dynamicChoices?.list && node?.dynamicChoices?.serviceName && node?.dynamicChoices?.key;
-    if (!isValid) {
-      return { isValid: false, error: 'Please enter dynamic choices list' };
+    if (!node?.dynamicChoices?.list) {
+      return { isValid: false, error: 'Dynamic choices list is required' };
     }
+
+    if (!node?.dynamicChoices?.serviceName) {
+      return { isValid: false, error: 'Service name is required' };
+    }
+
+    if (!node?.dynamicChoices?.key) {
+      return { isValid: false, error: 'Key is required' };
+    }
+
     return { isValid: true };
   }
 
@@ -93,7 +103,7 @@ export const isStepValid = (node: NodeDataProps): ValidationResult => {
   if (node.stepType === StepType.OpenWebpage) return { isValid: Boolean(node.link && node.linkText) };
   if (node.stepType === StepType.FileGenerate) return { isValid: Boolean(node.fileName && node.fileContent) };
   if (node.stepType === StepType.FileSign) return { isValid: Boolean(node.signOption) };
-  // todo assign
+
   if (node.stepType === StepType.Assign) {
     const hasInvalidElements = (elements: any[]): boolean => {
       return elements.some((e) => {
@@ -103,14 +113,18 @@ export const isStepValid = (node: NodeDataProps): ValidationResult => {
     };
 
     const invalidElementsExist = hasInvalidElements(node.assignElements ?? []);
-    const isValid = node?.assignElements !== undefined && !invalidElementsExist && node?.assignElements.length > 0;
-    if (!isValid) {
-      return { isValid: false, error: 'Please enter assign elements' };
+
+    if (node?.assignElements === undefined || node?.assignElements.length === 0) {
+      return { isValid: false, error: 'Assign elements are required' };
     }
+
+    if (invalidElementsExist) {
+      return { isValid: false, error: 'Key and value fields are required' };
+    }
+
     return { isValid: true };
   }
 
-  // todo message length
   if (node.stepType === StepType.Textfield) {
     return node.message?.length ? { isValid: true } : { isValid: false, error: 'Message text is missing' };
   }
