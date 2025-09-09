@@ -472,6 +472,7 @@
       "title": "Service test error",
       "dslName": "Service file",
       "stepName": "Step",
+      "invalidNode": "Invalid node",
       "causeCode": "Cause",
       "causeUnknown": "Unknown",
       "causeNull": "Null found in DSL",

@@ -473,6 +473,7 @@
       "title": "Teenuse testimise viga",
       "dslName": "Teenuse fail",
       "stepName": "Samm",
+      "invalidNode": "Kehtetu samm",
       "causeCode": "Põhjus",
       "causeUnknown": "Tundmatu",
       "causeNull": "Null leitud DSL-is",

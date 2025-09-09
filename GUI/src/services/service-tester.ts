@@ -1,8 +1,11 @@
+import { t } from 'i18next';
 import { testService } from 'resources/api-constants';
 import useServiceStore, { ServiceStoreState } from 'store/new-services.store';
 import useTestServiceStore from 'store/test-services.store';
+import { NodeDataProps } from 'types/service-flow';
 import { ServiceState } from 'types/service-state';
 import { ServiceTestError } from 'types/service-test-error';
+import { validateStep } from 'utils/flow-utils';
 import { translateObjectKeys } from 'utils/i18n-util';
 import { fromSnakeCase, removeTrailingUnderscores } from 'utils/string-util';
 
@@ -20,6 +23,31 @@ export const runServiceTest = async (input: string) => {
   }
 
   const { state, name, serviceStore } = serviceData;
+
+  const nodes = serviceStore.nodes;
+  const store = useTestServiceStore.getState();
+
+  const invalidNodes: { label: string; error: string }[] = [];
+  nodes.forEach((node) => {
+    if (node.type === 'start' || node.type === 'ghost') return;
+
+    const result = validateStep(node.data as NodeDataProps);
+    if (!result.isValid) {
+      invalidNodes.push({ label: node.data.label as string, error: result.error as string });
+    }
+  });
+
+  if (invalidNodes.length > 0) {
+    invalidNodes.forEach((node) => {
+      store.addError('chat.service-test-error.invalidNode', {
+        [t('chat.service-test-error.stepName')]: node.label,
+        [t('chat.service-test-error.message')]: node.error,
+      });
+    });
+
+    // Do not run Ruuter test if there are invalid nodes
+    return;
+  }
 
   clearPreviousTestStates(serviceStore);
 
