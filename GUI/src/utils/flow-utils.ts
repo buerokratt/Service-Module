@@ -112,10 +112,6 @@ export const isStepValid = (node: NodeDataProps): ValidationResult => {
 
   // todo message length
   if (node.stepType === StepType.Textfield) {
-    const isValid = node.message?.length;
-    if (!isValid) {
-      return { isValid: false, error: 'Message text is missing' };
-    }
-    return { isValid: true };
+    return node.message?.length ? { isValid: true } : { isValid: false, error: 'Message text is missing' };
   }
 };
