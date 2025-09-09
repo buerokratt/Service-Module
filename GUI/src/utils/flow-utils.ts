@@ -1,5 +1,6 @@
 import { Node } from '@xyflow/react';
 import { Group, Rule } from 'components/FlowElementsPopup/RuleBuilder/types';
+import { t } from 'i18next';
 import { Assign, Step, StepType } from 'types';
 import { NodeDataProps } from 'types/service-flow';
 
@@ -36,10 +37,98 @@ export const getNodeLabel = (step: Step, nodes: Node[]) => {
   return `${baseLabel} - ${nextNumber}`;
 };
 
-// todo translate
-
 // Error messages are implemented only for the steps that are actually enabled
 // More need to be added later
+const validateInputOrConditionStep = (node: NodeDataProps): ValidationResult => {
+  const hasInvalidRules = (elements: any[]): boolean => {
+    return elements.some((e) => {
+      if ('children' in e) {
+        const group = e as Group;
+        if (group.children.length === 0) return true;
+        return hasInvalidRules(group.children);
+      } else {
+        const rule = e as Rule;
+        return rule.value === '' || rule.field === '' || rule.operator === '';
+      }
+    });
+  };
+
+  const invalidRulesExist = hasInvalidRules(node.rules?.children ?? []);
+
+  if (node.rules?.children === undefined || node.rules.children.length === 0) {
+    const errorMessage =
+      node.stepType === StepType.Input
+        ? (t('toast.validation.client-input-rules-required') as string)
+        : (t('toast.validation.condition-rules-required') as string);
+    return { isValid: false, error: errorMessage };
+  }
+
+  if (invalidRulesExist) {
+    const errorMessage =
+      node.stepType === StepType.Input
+        ? (t('toast.validation.client-input-rule-fields-required') as string)
+        : (t('toast.validation.condition-rule-fields-required') as string);
+    return { isValid: false, error: errorMessage };
+  }
+
+  return { isValid: true };
+};
+
+const validateMultiChoiceQuestionStep = (node: NodeDataProps): ValidationResult => {
+  if (!node?.multiChoiceQuestion?.question) {
+    return { isValid: false, error: t('toast.validation.question-required') as string };
+  }
+
+  if (node.multiChoiceQuestion?.buttons?.find((e) => e.title === '') !== undefined) {
+    return { isValid: false, error: t('toast.validation.button-titles-required') as string };
+  }
+
+  return { isValid: true };
+};
+
+const validateDynamicChoicesStep = (node: NodeDataProps): ValidationResult => {
+  if (!node?.dynamicChoices?.list) {
+    return { isValid: false, error: t('toast.validation.dynamic-choices-list-required') as string };
+  }
+
+  if (!node?.dynamicChoices?.serviceName) {
+    return { isValid: false, error: t('toast.validation.service-name-required') as string };
+  }
+
+  if (!node?.dynamicChoices?.key) {
+    return { isValid: false, error: t('toast.validation.key-required') as string };
+  }
+
+  return { isValid: true };
+};
+
+const validateAssignStep = (node: NodeDataProps): ValidationResult => {
+  const hasInvalidElements = (elements: any[]): boolean => {
+    return elements.some((e) => {
+      const element = e as Assign;
+      return element.key === '' || element.value === '';
+    });
+  };
+
+  const invalidElementsExist = hasInvalidElements(node.assignElements ?? []);
+
+  if (node?.assignElements === undefined || node?.assignElements.length === 0) {
+    return { isValid: false, error: t('toast.validation.assign-elements-required') as string };
+  }
+
+  if (invalidElementsExist) {
+    return { isValid: false, error: t('toast.validation.key-value-fields-required') as string };
+  }
+
+  return { isValid: true };
+};
+
+const validateTextfieldStep = (node: NodeDataProps): ValidationResult => {
+  return node.message?.length
+    ? { isValid: true }
+    : { isValid: false, error: t('toast.validation.message-text-missing') as string };
+};
+
 export const isStepValid = (node: NodeDataProps): ValidationResult => {
   // End service node and similar
   if (node.readonly) return { isValid: true };
@@ -47,94 +136,36 @@ export const isStepValid = (node: NodeDataProps): ValidationResult => {
   // Failed testing with Ruuter request
   if (node.testingPassed === false) return { isValid: false };
 
-  if (node.stepType === StepType.Input || node.stepType === StepType.Condition) {
-    const hasInvalidRules = (elements: any[]): boolean => {
-      return elements.some((e) => {
-        if ('children' in e) {
-          const group = e as Group;
-          if (group.children.length === 0) return true;
-          return hasInvalidRules(group.children);
-        } else {
-          const rule = e as Rule;
-          return rule.value === '' || rule.field === '' || rule.operator === '';
-        }
-      });
-    };
+  switch (node.stepType) {
+    case StepType.Input:
+    case StepType.Condition:
+      return validateInputOrConditionStep(node);
 
-    const invalidRulesExist = hasInvalidRules(node.rules?.children ?? []);
+    case StepType.MultiChoiceQuestion:
+      return validateMultiChoiceQuestionStep(node);
 
-    if (node.rules?.children === undefined || node.rules.children.length === 0) {
-      const errorMessage =
-        node.stepType === StepType.Input ? 'Client input rules are required' : 'Condition rules are required';
-      return { isValid: false, error: errorMessage };
-    }
+    case StepType.DynamicChoices:
+      return validateDynamicChoicesStep(node);
 
-    if (invalidRulesExist) {
-      const errorMessage =
-        node.stepType === StepType.Input
-          ? 'Client input rule fields are required'
-          : 'Condition rule fields are required';
-      return { isValid: false, error: errorMessage };
-    }
+    case StepType.Assign:
+      return validateAssignStep(node);
 
-    return { isValid: true };
-  }
+    case StepType.Textfield:
+      return validateTextfieldStep(node);
 
-  if (node.stepType === StepType.MultiChoiceQuestion) {
-    if (!node?.multiChoiceQuestion?.question) {
-      return { isValid: false, error: 'Question is required' };
-    }
+    case StepType.UserDefined:
+      return { isValid: true };
 
-    if (node.multiChoiceQuestion?.buttons?.find((e) => e.title === '') !== undefined) {
-      return { isValid: false, error: 'Button titles are required' };
-    }
+    case StepType.OpenWebpage:
+      return { isValid: Boolean(node.link && node.linkText) };
 
-    return { isValid: true };
-  }
+    case StepType.FileGenerate:
+      return { isValid: Boolean(node.fileName && node.fileContent) };
 
-  if (node.stepType === StepType.DynamicChoices) {
-    if (!node?.dynamicChoices?.list) {
-      return { isValid: false, error: 'Dynamic choices list is required' };
-    }
+    case StepType.FileSign:
+      return { isValid: Boolean(node.signOption) };
 
-    if (!node?.dynamicChoices?.serviceName) {
-      return { isValid: false, error: 'Service name is required' };
-    }
-
-    if (!node?.dynamicChoices?.key) {
-      return { isValid: false, error: 'Key is required' };
-    }
-
-    return { isValid: true };
-  }
-
-  if (node.stepType === StepType.UserDefined) return { isValid: true };
-  if (node.stepType === StepType.OpenWebpage) return { isValid: Boolean(node.link && node.linkText) };
-  if (node.stepType === StepType.FileGenerate) return { isValid: Boolean(node.fileName && node.fileContent) };
-  if (node.stepType === StepType.FileSign) return { isValid: Boolean(node.signOption) };
-
-  if (node.stepType === StepType.Assign) {
-    const hasInvalidElements = (elements: any[]): boolean => {
-      return elements.some((e) => {
-        const element = e as Assign;
-        return element.key === '' || element.value === '';
-      });
-    };
-
-    const invalidElementsExist = hasInvalidElements(node.assignElements ?? []);
-
-    if (node?.assignElements === undefined || node?.assignElements.length === 0) {
-      return { isValid: false, error: 'Assign elements are required' };
-    }
-
-    if (invalidElementsExist) {
-      return { isValid: false, error: 'Key and value fields are required' };
-    }
-
-    return { isValid: true };
-  }
-
-  if (node.stepType === StepType.Textfield) {
-    return node.message?.length ? { isValid: true } : { isValid: false, error: 'Message text is missing' };
+    default:
+      return { isValid: true };
   }
 };

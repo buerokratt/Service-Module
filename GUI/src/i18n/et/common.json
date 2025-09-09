@@ -458,7 +458,21 @@
     "missing-mcq-options": "Palun lisage vähemalt kaks MCQ valikut",
     "missing-dynamic-choices-list": "Palun sisestage dünaamiliste valikute nimekiri",
     "missing-dynamic-choices-service-name": "Palun sisestage dünaamiliste valikute teenuse nimi",
-    "missing-dynamic-choices-key": "Palun sisestage dünaamiliste valikute võti"
+    "missing-dynamic-choices-key": "Palun sisestage dünaamiliste valikute võti",
+    "validation": {
+      "client-input-rules-required": "Kliendi sisestusreeglid on nõutud",
+      "condition-rules-required": "Tingimuste reeglid on nõutud",
+      "client-input-rule-fields-required": "Kliendi sisestusreegli väljad on nõutud",
+      "condition-rule-fields-required": "Tingimuste reegli väljad on nõutud",
+      "question-required": "Küsimus on nõutud",
+      "button-titles-required": "Nuppude pealkirjad on nõutud",
+      "dynamic-choices-list-required": "Dünaamiliste valikute nimekiri on nõutud",
+      "service-name-required": "Teenuse nimi on nõutud",
+      "key-required": "Võti on nõutud",
+      "assign-elements-required": "Määramise elemendid on nõutud",
+      "key-value-fields-required": "Võtme ja väärtuse väljad on nõutud",
+      "message-text-missing": "Sõnumi tekst puudub"
+    }
   },
   "roles": {
     "ROLE_ADMINISTRATOR": "Administraator",
