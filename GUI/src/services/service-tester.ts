@@ -1,3 +1,4 @@
+import { Node } from '@xyflow/react';
 import { t } from 'i18next';
 import { testService } from 'resources/api-constants';
 import useServiceStore, { ServiceStoreState } from 'store/new-services.store';
@@ -24,29 +25,10 @@ export const runServiceTest = async (input: string) => {
 
   const { state, name, serviceStore } = serviceData;
 
-  const nodes = serviceStore.nodes;
-  const store = useTestServiceStore.getState();
-
-  const invalidNodes: { label: string; error: string }[] = [];
-  nodes.forEach((node) => {
-    if (node.type === 'start' || node.type === 'ghost') return;
-
-    const result = validateStep(node.data as NodeDataProps);
-    if (!result.isValid) {
-      invalidNodes.push({ label: node.data.label as string, error: result.error as string });
-    }
-  });
-
+  const invalidNodes = getInvalidNodes(serviceStore.nodes);
   if (invalidNodes.length > 0) {
-    invalidNodes.forEach((node) => {
-      store.addError('chat.service-test-error.invalidNode', {
-        [t('chat.service-test-error.stepName')]: node.label,
-        [t('chat.service-test-error.message')]: node.error,
-      });
-    });
-
-    // Do not run Ruuter test if there are invalid nodes
-    return;
+    reportInvalidNodes(invalidNodes);
+    return true;
   }
 
   clearPreviousTestStates(serviceStore);
@@ -58,6 +40,36 @@ export const runServiceTest = async (input: string) => {
     handleTestError(error, serviceStore);
   }
 };
+
+function getInvalidNodes(nodes: Node[]): { label: string; error: string }[] {
+  const invalidNodes: { label: string; error: string }[] = [];
+
+  nodes.forEach((node) => {
+    // Skip start and ghost nodes as they don't need validation
+    if (node.type === 'start' || node.type === 'ghost') return;
+
+    const result = validateStep(node.data as NodeDataProps);
+    if (!result.isValid) {
+      invalidNodes.push({
+        label: node.data.label as string,
+        error: result.error as string,
+      });
+    }
+  });
+
+  return invalidNodes;
+}
+
+function reportInvalidNodes(invalidNodes: { label: string; error: string }[]): void {
+  const store = useTestServiceStore.getState();
+
+  invalidNodes.forEach((node) => {
+    store.addError('chat.service-test-error.invalidNode', {
+      [t('chat.service-test-error.stepName')]: node.label,
+      [t('chat.service-test-error.message')]: node.error,
+    });
+  });
+}
 
 export const validateTestEnvironment = (): string | null => {
   const headerValue = import.meta.env.REACT_APP_RUUTER_SERVICES_TESTING_HEADER;
