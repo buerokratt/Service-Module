@@ -58,16 +58,16 @@ const validateInputOrConditionStep = (node: NodeDataProps): ValidationResult => 
   if (node.rules?.children === undefined || node.rules.children.length === 0) {
     const errorMessage =
       node.stepType === StepType.Input
-        ? (t('toast.validation.client-input-rules-required') as string)
-        : (t('toast.validation.condition-rules-required') as string);
+        ? (t('chat.service-flow-error.client-input-rules-required') as string)
+        : (t('chat.service-flow-error.condition-rules-required') as string);
     return { isValid: false, error: errorMessage };
   }
 
   if (invalidRulesExist) {
     const errorMessage =
       node.stepType === StepType.Input
-        ? (t('toast.validation.client-input-rule-fields-required') as string)
-        : (t('toast.validation.condition-rule-fields-required') as string);
+        ? (t('chat.service-flow-error.client-input-rule-fields-required') as string)
+        : (t('chat.service-flow-error.condition-rule-fields-required') as string);
     return { isValid: false, error: errorMessage };
   }
 
@@ -76,11 +76,11 @@ const validateInputOrConditionStep = (node: NodeDataProps): ValidationResult => 
 
 const validateMultiChoiceQuestionStep = (node: NodeDataProps): ValidationResult => {
   if (!node?.multiChoiceQuestion?.question) {
-    return { isValid: false, error: t('toast.validation.question-required') as string };
+    return { isValid: false, error: t('chat.service-flow-error.question-required') as string };
   }
 
   if (node.multiChoiceQuestion?.buttons?.find((e) => e.title === '') !== undefined) {
-    return { isValid: false, error: t('toast.validation.button-titles-required') as string };
+    return { isValid: false, error: t('chat.service-flow-error.button-titles-required') as string };
   }
 
   return { isValid: true };
@@ -88,15 +88,15 @@ const validateMultiChoiceQuestionStep = (node: NodeDataProps): ValidationResult 
 
 const validateDynamicChoicesStep = (node: NodeDataProps): ValidationResult => {
   if (!node?.dynamicChoices?.list) {
-    return { isValid: false, error: t('toast.validation.dynamic-choices-list-required') as string };
+    return { isValid: false, error: t('chat.service-flow-error.dynamic-choices-list-required') as string };
   }
 
   if (!node?.dynamicChoices?.serviceName) {
-    return { isValid: false, error: t('toast.validation.service-name-required') as string };
+    return { isValid: false, error: t('chat.service-flow-error.service-name-required') as string };
   }
 
   if (!node?.dynamicChoices?.key) {
-    return { isValid: false, error: t('toast.validation.key-required') as string };
+    return { isValid: false, error: t('chat.service-flow-error.key-required') as string };
   }
 
   return { isValid: true };
@@ -113,11 +113,11 @@ const validateAssignStep = (node: NodeDataProps): ValidationResult => {
   const invalidElementsExist = hasInvalidElements(node.assignElements ?? []);
 
   if (node?.assignElements === undefined || node?.assignElements.length === 0) {
-    return { isValid: false, error: t('toast.validation.assign-elements-required') as string };
+    return { isValid: false, error: t('chat.service-flow-error.assign-elements-required') as string };
   }
 
   if (invalidElementsExist) {
-    return { isValid: false, error: t('toast.validation.key-value-fields-required') as string };
+    return { isValid: false, error: t('chat.service-flow-error.key-value-fields-required') as string };
   }
 
   return { isValid: true };
@@ -126,7 +126,7 @@ const validateAssignStep = (node: NodeDataProps): ValidationResult => {
 const validateTextfieldStep = (node: NodeDataProps): ValidationResult => {
   return node.message?.length
     ? { isValid: true }
-    : { isValid: false, error: t('toast.validation.message-text-missing') as string };
+    : { isValid: false, error: t('chat.service-flow-error.message-text-missing') as string };
 };
 
 export const isStepValid = (node: NodeDataProps): ValidationResult => {

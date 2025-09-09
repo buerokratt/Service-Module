@@ -457,21 +457,7 @@
     "missing-mcq-options": "Please include at least two MCQ options",
     "missing-dynamic-choices-list": "Please enter dynamic choices list",
     "missing-dynamic-choices-service-name": "Please enter dynamic choices service name",
-    "missing-dynamic-choices-key": "Please enter dynamic choices key",
-    "validation": {
-      "client-input-rules-required": "Client input rules are required",
-      "condition-rules-required": "Condition rules are required",
-      "client-input-rule-fields-required": "Client input rule fields are required",
-      "condition-rule-fields-required": "Condition rule fields are required",
-      "question-required": "Question is required",
-      "button-titles-required": "Button titles are required",
-      "dynamic-choices-list-required": "Dynamic choices list is required",
-      "service-name-required": "Service name is required",
-      "key-required": "Key is required",
-      "assign-elements-required": "Assign elements are required",
-      "key-value-fields-required": "Key and value fields are required",
-      "message-text-missing": "Message text is missing"
-    }
+    "missing-dynamic-choices-key": "Please enter dynamic choices key"
   },
   "roles": {
     "ROLE_ADMINISTRATOR": "Administrator",
@@ -496,7 +482,21 @@
     "title": "TEST",
     "input-placeholder": "Enter input, separated by commas",
     "service-input": "Service input",
-    "unknown-error": "Unknown error. Please try again."
+    "unknown-error": "Unknown error. Please try again.",
+    "service-flow-error": {
+      "client-input-rules-required": "Client input rules are required",
+      "condition-rules-required": "Condition rules are required",
+      "client-input-rule-fields-required": "Client input rule fields are required",
+      "condition-rule-fields-required": "Condition rule fields are required",
+      "question-required": "Question is required",
+      "button-titles-required": "Button titles are required",
+      "dynamic-choices-list-required": "Dynamic choices list is required",
+      "service-name-required": "Service name is required",
+      "key-required": "Key is required",
+      "assign-elements-required": "Assign elements are required",
+      "key-value-fields-required": "Key and value fields are required",
+      "message-text-missing": "Message text is missing"
+    }
   },
   "objectEditor": {
     "array": "Array",
