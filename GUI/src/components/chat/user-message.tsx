@@ -15,8 +15,6 @@ interface ChatMessageProps {
   message: TestingMessage;
 }
 
-// todo fix css for empty string input
-
 const UserMessage = ({ message }: ChatMessageProps) => (
   <motion.div animate={rightAnimation.animate} initial={rightAnimation.initial} transition={rightAnimation.transition}>
     <div className={classNames(styles.message, styles.client)}>
