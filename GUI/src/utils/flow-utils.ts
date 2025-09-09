@@ -36,7 +36,7 @@ export const getNodeLabel = (step: Step, nodes: Node[]) => {
   return `${baseLabel} - ${nextNumber}`;
 };
 
-export const isStepInvalid = (node: NodeDataProps): ValidationResult => {
+export const isStepValid = (node: NodeDataProps): ValidationResult => {
   if (node.testingPassed === false) return { isValid: false };
 
   console.log('node', node.stepType, node.name);

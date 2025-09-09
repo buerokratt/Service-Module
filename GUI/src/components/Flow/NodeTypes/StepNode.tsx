@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 import useServiceStore from 'store/new-services.store';
 import { StepType } from 'types';
 import { NodeDataProps } from 'types/service-flow';
-import { isStepInvalid } from 'utils/flow-utils';
+import { isStepValid } from 'utils/flow-utils';
 
 type StepNodeProps = {
   data: NodeDataProps;
@@ -27,7 +27,7 @@ const StepNode: FC<StepNodeProps> = ({ data }) => {
   };
 
   const updateIsTestedAndPassed = useCallback(async () => {
-    if (!isStepInvalid(data).isValid) {
+    if (!isStepValid(data).isValid) {
       setIsTestedAndPassed(false);
       return;
     }
@@ -120,7 +120,7 @@ const StepNode: FC<StepNodeProps> = ({ data }) => {
 
 const TestStatue = ({ isTestedAndPassed, data }: { isTestedAndPassed: boolean | null; data: NodeDataProps }) => {
   if (isTestedAndPassed) return <CheckBadge />;
-  if (!isStepInvalid(data).isValid) return <ExclamationBadge />;
+  if (!isStepValid(data).isValid) return <ExclamationBadge />;
   return <ExclamationBadge color="purple" />;
 };
 

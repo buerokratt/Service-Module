@@ -1,6 +1,6 @@
 import { StepType } from 'types';
 import { NodeDataProps } from 'types/service-flow';
-import { isStepInvalid } from 'utils/flow-utils';
+import { isStepValid } from 'utils/flow-utils';
 import { describe, expect, it, vi } from 'vitest';
 
 describe('isStepInvalid', () => {
@@ -19,19 +19,19 @@ describe('isStepInvalid', () => {
   describe('testingPassed flag', () => {
     it('should return true when testingPassed is false', () => {
       const data = createMockData({ testingPassed: false });
-      expect(isStepInvalid(data)).toBe(true);
+      expect(isStepValid(data)).toBe(true);
     });
 
     it('should continue validation when testingPassed is true', () => {
       const data = createMockData({ testingPassed: true, readonly: true, message: 'test' });
-      expect(isStepInvalid(data)).toBe(false);
+      expect(isStepValid(data)).toBe(false);
     });
   });
 
   describe('Input and Condition step types', () => {
     it('should return true when rules.children is undefined', () => {
       const data = createMockData({ stepType: StepType.Input });
-      expect(isStepInvalid(data)).toBe(true);
+      expect(isStepValid(data)).toBe(true);
     });
 
     it('should return true when rules.children is empty array', () => {
@@ -44,7 +44,7 @@ describe('isStepInvalid', () => {
           not: false,
         },
       });
-      expect(isStepInvalid(data)).toBe(true);
+      expect(isStepValid(data)).toBe(true);
     });
 
     it('should return true when rule has empty values', () => {
@@ -57,7 +57,7 @@ describe('isStepInvalid', () => {
           not: false,
         },
       });
-      expect(isStepInvalid(data)).toBe(true);
+      expect(isStepValid(data)).toBe(true);
     });
 
     it('should return false when rule has valid values', () => {
@@ -70,7 +70,7 @@ describe('isStepInvalid', () => {
           not: false,
         },
       });
-      expect(isStepInvalid(data)).toBe(false);
+      expect(isStepValid(data)).toBe(false);
     });
 
     it('should return true when group has empty children', () => {
@@ -90,7 +90,7 @@ describe('isStepInvalid', () => {
           not: false,
         },
       });
-      expect(isStepInvalid(data)).toBe(true);
+      expect(isStepValid(data)).toBe(true);
     });
   });
 
@@ -103,7 +103,7 @@ describe('isStepInvalid', () => {
           question: '',
         },
       });
-      expect(isStepInvalid(data)).toBe(true);
+      expect(isStepValid(data)).toBe(true);
     });
 
     it('should return true when button has empty title', () => {
@@ -120,7 +120,7 @@ describe('isStepInvalid', () => {
           ],
         },
       });
-      expect(isStepInvalid(data)).toBe(true);
+      expect(isStepValid(data)).toBe(true);
     });
 
     it('should return false when question and buttons are valid', () => {
@@ -137,7 +137,7 @@ describe('isStepInvalid', () => {
           ],
         },
       });
-      expect(isStepInvalid(data)).toBe(false);
+      expect(isStepValid(data)).toBe(false);
     });
   });
 
@@ -152,7 +152,7 @@ describe('isStepInvalid', () => {
           payloadKeys: '',
         },
       });
-      expect(isStepInvalid(data)).toBe(true);
+      expect(isStepValid(data)).toBe(true);
     });
 
     it('should return true when serviceName is missing', () => {
@@ -165,7 +165,7 @@ describe('isStepInvalid', () => {
           payloadKeys: '',
         },
       });
-      expect(isStepInvalid(data)).toBe(true);
+      expect(isStepValid(data)).toBe(true);
     });
 
     it('should return true when key is missing', () => {
@@ -178,7 +178,7 @@ describe('isStepInvalid', () => {
           payloadKeys: '',
         },
       });
-      expect(isStepInvalid(data)).toBe(true);
+      expect(isStepValid(data)).toBe(true);
     });
 
     it('should return false when all required fields are present', () => {
@@ -191,14 +191,14 @@ describe('isStepInvalid', () => {
           payloadKeys: '',
         },
       });
-      expect(isStepInvalid(data)).toBe(false);
+      expect(isStepValid(data)).toBe(false);
     });
   });
 
   describe('UserDefined step type', () => {
     it('should return false for UserDefined step type', () => {
       const data = createMockData({ stepType: StepType.UserDefined });
-      expect(isStepInvalid(data)).toBe(false);
+      expect(isStepValid(data)).toBe(false);
     });
   });
 
@@ -208,7 +208,7 @@ describe('isStepInvalid', () => {
         stepType: StepType.OpenWebpage,
         linkText: 'Click here',
       });
-      expect(isStepInvalid(data)).toBe(true);
+      expect(isStepValid(data)).toBe(true);
     });
 
     it('should return true when linkText is missing', () => {
@@ -216,7 +216,7 @@ describe('isStepInvalid', () => {
         stepType: StepType.OpenWebpage,
         link: 'https://example.com',
       });
-      expect(isStepInvalid(data)).toBe(true);
+      expect(isStepValid(data)).toBe(true);
     });
 
     it('should return false when both link and linkText are present', () => {
@@ -225,7 +225,7 @@ describe('isStepInvalid', () => {
         link: 'https://example.com',
         linkText: 'Click here',
       });
-      expect(isStepInvalid(data)).toBe(false);
+      expect(isStepValid(data)).toBe(false);
     });
   });
 
@@ -235,7 +235,7 @@ describe('isStepInvalid', () => {
         stepType: StepType.FileGenerate,
         fileContent: 'test content',
       });
-      expect(isStepInvalid(data)).toBe(true);
+      expect(isStepValid(data)).toBe(true);
     });
 
     it('should return true when fileContent is missing', () => {
@@ -243,7 +243,7 @@ describe('isStepInvalid', () => {
         stepType: StepType.FileGenerate,
         fileName: 'test.txt',
       });
-      expect(isStepInvalid(data)).toBe(true);
+      expect(isStepValid(data)).toBe(true);
     });
 
     it('should return false when both fileName and fileContent are present', () => {
@@ -252,14 +252,14 @@ describe('isStepInvalid', () => {
         fileName: 'test.txt',
         fileContent: 'test content',
       });
-      expect(isStepInvalid(data)).toBe(false);
+      expect(isStepValid(data)).toBe(false);
     });
   });
 
   describe('FileSign step type', () => {
     it('should return true when signOption is missing', () => {
       const data = createMockData({ stepType: StepType.FileSign });
-      expect(isStepInvalid(data)).toBe(true);
+      expect(isStepValid(data)).toBe(true);
     });
 
     it('should return false when signOption is present', () => {
@@ -267,14 +267,14 @@ describe('isStepInvalid', () => {
         stepType: StepType.FileSign,
         signOption: { label: 'Sign', value: 'sign' },
       });
-      expect(isStepInvalid(data)).toBe(false);
+      expect(isStepValid(data)).toBe(false);
     });
   });
 
   describe('Assign step type', () => {
     it('should return true when assignElements is undefined', () => {
       const data = createMockData({ stepType: StepType.Assign });
-      expect(isStepInvalid(data)).toBe(true);
+      expect(isStepValid(data)).toBe(true);
     });
 
     it('should return true when assignElements is empty array', () => {
@@ -282,7 +282,7 @@ describe('isStepInvalid', () => {
         stepType: StepType.Assign,
         assignElements: [],
       });
-      expect(isStepInvalid(data)).toBe(true);
+      expect(isStepValid(data)).toBe(true);
     });
 
     it('should return true when assign element has empty key', () => {
@@ -296,7 +296,7 @@ describe('isStepInvalid', () => {
           },
         ],
       });
-      expect(isStepInvalid(data)).toBe(true);
+      expect(isStepValid(data)).toBe(true);
     });
 
     it('should return true when assign element has empty value', () => {
@@ -310,7 +310,7 @@ describe('isStepInvalid', () => {
           },
         ],
       });
-      expect(isStepInvalid(data)).toBe(true);
+      expect(isStepValid(data)).toBe(true);
     });
 
     it('should return false when assign elements are valid', () => {
@@ -324,7 +324,7 @@ describe('isStepInvalid', () => {
           },
         ],
       });
-      expect(isStepInvalid(data)).toBe(false);
+      expect(isStepValid(data)).toBe(false);
     });
   });
 
@@ -335,7 +335,7 @@ describe('isStepInvalid', () => {
         readonly: false,
         message: '',
       });
-      expect(isStepInvalid(data)).toBe(true);
+      expect(isStepValid(data)).toBe(true);
     });
 
     it('should return true when readonly is false and message is undefined', () => {
@@ -344,7 +344,7 @@ describe('isStepInvalid', () => {
         readonly: false,
         message: undefined,
       });
-      expect(isStepInvalid(data)).toBe(true);
+      expect(isStepValid(data)).toBe(true);
     });
 
     it('should return false when readonly is true', () => {
@@ -353,7 +353,7 @@ describe('isStepInvalid', () => {
         readonly: true,
         message: '',
       });
-      expect(isStepInvalid(data)).toBe(false);
+      expect(isStepValid(data)).toBe(false);
     });
 
     it('should return false when message has content', () => {
@@ -362,7 +362,7 @@ describe('isStepInvalid', () => {
         readonly: false,
         message: 'Test message',
       });
-      expect(isStepInvalid(data)).toBe(false);
+      expect(isStepValid(data)).toBe(false);
     });
   });
 });
