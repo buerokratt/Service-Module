@@ -3,6 +3,11 @@ import { Group, Rule } from 'components/FlowElementsPopup/RuleBuilder/types';
 import { Assign, Step, StepType } from 'types';
 import { NodeDataProps } from 'types/service-flow';
 
+export interface ValidationResult {
+  isInvalid: boolean;
+  error?: string;
+}
+
 export const getNodeLabel = (step: Step, nodes: Node[]) => {
   const baseLabel = step.label.split(' - ').pop();
   const existingNumbers = nodes
@@ -31,8 +36,8 @@ export const getNodeLabel = (step: Step, nodes: Node[]) => {
   return `${baseLabel} - ${nextNumber}`;
 };
 
-export const isStepInvalid = (node: NodeDataProps): boolean => {
-  if (node.testingPassed === false) return true;
+export const isStepInvalid = (node: NodeDataProps): ValidationResult => {
+  if (node.testingPassed === false) return { isInvalid: true };
 
   console.log('node', node.stepType, node.name);
 
@@ -52,26 +57,39 @@ export const isStepInvalid = (node: NodeDataProps): boolean => {
     };
 
     const invalidRulesExist = hasInvalidRules(node.rules?.children ?? []);
-    return node.rules?.children === undefined || invalidRulesExist || node.rules?.children.length === 0;
+    const isInvalid = node.rules?.children === undefined || invalidRulesExist || node.rules?.children.length === 0;
+    if (isInvalid) {
+      const errorMessage =
+        node.stepType === StepType.Input ? 'Please enter client input rules' : 'Please enter condition rules';
+      return { isInvalid: true, error: errorMessage };
+    }
+    return { isInvalid: false };
   }
 
   // todo multi
   if (node.stepType === StepType.MultiChoiceQuestion) {
-    return (
+    const isInvalid =
       !node?.multiChoiceQuestion?.question ||
-      node.multiChoiceQuestion?.buttons?.find((e) => e.title === '') != undefined
-    );
+      node.multiChoiceQuestion?.buttons?.find((e) => e.title === '') != undefined;
+    if (isInvalid) {
+      return { isInvalid: true, error: 'Please enter MCQ question' };
+    }
+    return { isInvalid: false };
   }
 
   // todo dynamic choices
   if (node.stepType === StepType.DynamicChoices) {
-    return !node?.dynamicChoices?.list || !node?.dynamicChoices?.serviceName || !node?.dynamicChoices?.key;
+    const isInvalid = !node?.dynamicChoices?.list || !node?.dynamicChoices?.serviceName || !node?.dynamicChoices?.key;
+    if (isInvalid) {
+      return { isInvalid: true, error: 'Please enter dynamic choices list' };
+    }
+    return { isInvalid: false };
   }
 
-  if (node.stepType === StepType.UserDefined) return false;
-  if (node.stepType === StepType.OpenWebpage) return !node.link || !node.linkText;
-  if (node.stepType === StepType.FileGenerate) return !node.fileName || !node.fileContent;
-  if (node.stepType === StepType.FileSign) return !node.signOption;
+  if (node.stepType === StepType.UserDefined) return { isInvalid: false };
+  if (node.stepType === StepType.OpenWebpage) return { isInvalid: !node.link || !node.linkText };
+  if (node.stepType === StepType.FileGenerate) return { isInvalid: !node.fileName || !node.fileContent };
+  if (node.stepType === StepType.FileSign) return { isInvalid: !node.signOption };
   // todo assign
   if (node.stepType === StepType.Assign) {
     const hasInvalidElements = (elements: any[]): boolean => {
@@ -82,9 +100,17 @@ export const isStepInvalid = (node: NodeDataProps): boolean => {
     };
 
     const invalidElementsExist = hasInvalidElements(node.assignElements ?? []);
-    return node?.assignElements === undefined || invalidElementsExist || node?.assignElements.length === 0;
+    const isInvalid = node?.assignElements === undefined || invalidElementsExist || node?.assignElements.length === 0;
+    if (isInvalid) {
+      return { isInvalid: true, error: 'Please enter assign elements' };
+    }
+    return { isInvalid: false };
   }
 
   // todo message length
-  return !node.readonly && !node.message?.length;
+  const isInvalid = !node.readonly && !node.message?.length;
+  if (isInvalid) {
+    return { isInvalid: true, error: 'Please enter missing message' };
+  }
+  return { isInvalid: false };
 };
