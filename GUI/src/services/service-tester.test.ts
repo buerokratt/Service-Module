@@ -5,8 +5,9 @@ import { ServiceTestError } from 'types/service-test-error';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import {
-  callTestService,
+  addSuccessMessages,
   clearPreviousTestStates,
+  executeService,
   executeServiceTest,
   getInvalidNodes,
   handleTestError,
@@ -1213,7 +1214,7 @@ describe('reportInvalidNodes', () => {
   });
 });
 
-describe('callTestService', () => {
+describe('executeService', () => {
   let mockApi: ReturnType<typeof vi.fn>;
   let mockTestService: ReturnType<typeof vi.fn>;
 
@@ -1230,9 +1231,37 @@ describe('callTestService', () => {
     const name = 'test-service';
     const input = 'test-input';
 
-    await callTestService(state, name, input);
+    await executeService(state, name, input);
 
     expect(mockTestService).toHaveBeenCalledWith(state, name);
     expect(mockApi).toHaveBeenCalledWith('/test-endpoint', { input });
+  });
+});
+
+describe('addSuccessMessages', () => {
+  let mockAddBotMessage: ReturnType<typeof vi.fn>;
+  let mockAddSuccess: ReturnType<typeof vi.fn>;
+  let mockTestStore: ReturnType<typeof vi.fn>;
+
+  beforeEach(async () => {
+    vi.clearAllMocks();
+    mockAddBotMessage = vi.fn();
+    mockAddSuccess = vi.fn();
+    mockTestStore = vi.mocked((await import('store/test-services.store')).default);
+    (mockTestStore as any).getState.mockReturnValue({
+      addBotMessage: mockAddBotMessage,
+      addSuccess: mockAddSuccess,
+    });
+  });
+
+  it('should add bot message and success notification', () => {
+    const responseData = {
+      response: [{ content: 'Test response content' }],
+    };
+
+    addSuccessMessages(responseData);
+
+    expect(mockAddBotMessage).toHaveBeenCalledWith('Test response content');
+    expect(mockAddSuccess).toHaveBeenCalledWith('chat.service-test-success');
   });
 });

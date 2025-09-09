@@ -36,11 +36,9 @@ export const runServiceTest = async (input: string) => {
   try {
     await executeServiceTest(headerValue, state, name, input);
 
-    const response = await callTestService(state, name, input);
+    const response = await executeService(state, name, input);
 
-    const store = useTestServiceStore.getState();
-    store.addBotMessage(response.data.response[0].content);
-    store.addSuccess('chat.service-test-success');
+    addSuccessMessages(response.data);
   } catch (error) {
     handleTestError(error, serviceStore);
   }
@@ -206,6 +204,12 @@ export function translateError(error: ServiceTestError, nodeLabel: string): Reco
   return translateObjectKeys(translatedError, 'chat.service-test-error');
 }
 
-export const callTestService = async (state: ServiceState, name: string, input: string) => {
+export const executeService = async (state: ServiceState, name: string, input: string) => {
   return api.post<{ response: { content: string }[] }>(testService(state, name), { input });
+};
+
+export const addSuccessMessages = (responseData: { response: { content: string }[] }): void => {
+  const store = useTestServiceStore.getState();
+  store.addBotMessage(responseData.response[0].content);
+  store.addSuccess('chat.service-test-success');
 };
