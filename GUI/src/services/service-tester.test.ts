@@ -5,6 +5,7 @@ import { ServiceTestError } from 'types/service-test-error';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import {
+  callTestService,
   clearPreviousTestStates,
   executeServiceTest,
   getInvalidNodes,
@@ -24,6 +25,9 @@ vi.mock('i18next', () => ({
 
 // Mock dependencies for executeServiceTest
 vi.mock('./api', () => ({
+  default: {
+    post: vi.fn(),
+  },
   createApiInstance: vi.fn(),
 }));
 
@@ -1206,5 +1210,29 @@ describe('reportInvalidNodes', () => {
     expect(mockT).toHaveBeenCalledTimes(4); // 2 nodes × 2 translations each
     expect(mockT).toHaveBeenCalledWith('chat.service-test-error.stepName');
     expect(mockT).toHaveBeenCalledWith('chat.service-test-error.message');
+  });
+});
+
+describe('callTestService', () => {
+  let mockApi: ReturnType<typeof vi.fn>;
+  let mockTestService: ReturnType<typeof vi.fn>;
+
+  beforeEach(async () => {
+    vi.clearAllMocks();
+    mockApi = vi.mocked((await import('./api')).default.post);
+    mockTestService = vi.mocked((await import('resources/api-constants')).testService);
+
+    mockTestService.mockReturnValue('/test-endpoint');
+  });
+
+  it('should call api.post with correct parameters', async () => {
+    const state = ServiceState.Active;
+    const name = 'test-service';
+    const input = 'test-input';
+
+    await callTestService(state, name, input);
+
+    expect(mockTestService).toHaveBeenCalledWith(state, name);
+    expect(mockApi).toHaveBeenCalledWith('/test-endpoint', { input });
   });
 });

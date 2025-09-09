@@ -36,7 +36,7 @@ export const runServiceTest = async (input: string) => {
   try {
     await executeServiceTest(headerValue, state, name, input);
 
-    const response = await api.post<{ response: { content: string }[] }>(testService(state, name), { input });
+    const response = await callTestService(state, name, input);
 
     const store = useTestServiceStore.getState();
     store.addBotMessage(response.data.response[0].content);
@@ -205,3 +205,7 @@ export function translateError(error: ServiceTestError, nodeLabel: string): Reco
 
   return translateObjectKeys(translatedError, 'chat.service-test-error');
 }
+
+export const callTestService = async (state: ServiceState, name: string, input: string) => {
+  return api.post<{ response: { content: string }[] }>(testService(state, name), { input });
+};
