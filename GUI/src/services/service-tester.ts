@@ -41,7 +41,7 @@ export const runServiceTest = async (input: string) => {
   }
 };
 
-function getInvalidNodes(nodes: Node[]): { label: string; error: string }[] {
+export function getInvalidNodes(nodes: Node[]): { label: string; error: string }[] {
   const invalidNodes: { label: string; error: string }[] = [];
 
   nodes.forEach((node) => {
@@ -60,7 +60,7 @@ function getInvalidNodes(nodes: Node[]): { label: string; error: string }[] {
   return invalidNodes;
 }
 
-function reportInvalidNodes(invalidNodes: { label: string; error: string }[]): void {
+export function reportInvalidNodes(invalidNodes: { label: string; error: string }[]): void {
   const store = useTestServiceStore.getState();
 
   invalidNodes.forEach((node) => {
