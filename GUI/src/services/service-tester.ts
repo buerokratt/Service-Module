@@ -12,6 +12,10 @@ import { fromSnakeCase, removeTrailingUnderscores } from 'utils/string-util';
 
 import api, { createApiInstance } from './api';
 
+interface ServiceResponse {
+  response: { content: string }[];
+}
+
 export const runServiceTest = async (input: string) => {
   const headerValue = validateTestEnvironment();
   if (!headerValue) {
@@ -205,10 +209,10 @@ export function translateError(error: ServiceTestError, nodeLabel: string): Reco
 }
 
 export const executeService = async (state: ServiceState, name: string, input: string) => {
-  return api.post<{ response: { content: string }[] }>(testService(state, name), { input });
+  return api.post<ServiceResponse>(testService(state, name), { input });
 };
 
-export const addSuccessMessages = (responseData: { response: { content: string }[] }): void => {
+export const addSuccessMessages = (responseData: ServiceResponse): void => {
   const store = useTestServiceStore.getState();
   store.addBotMessage(responseData.response[0].content);
   store.addSuccess('chat.service-test-success');
