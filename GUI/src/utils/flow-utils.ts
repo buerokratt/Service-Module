@@ -110,7 +110,7 @@ export const isStepInvalid = (node: NodeDataProps): ValidationResult => {
   // todo message length
   const isInvalid = !node.readonly && !node.message?.length;
   if (isInvalid) {
-    return { isInvalid: true, error: 'Please enter missing message' };
+    return { isInvalid: true, error: 'Message text is missing' };
   }
   return { isInvalid: false };
 };
