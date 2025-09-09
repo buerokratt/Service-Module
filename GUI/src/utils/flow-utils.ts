@@ -3,7 +3,7 @@ import { Group, Rule } from 'components/FlowElementsPopup/RuleBuilder/types';
 import { Assign, Step, StepType } from 'types';
 import { NodeDataProps } from 'types/service-flow';
 
-export interface ValidationResult {
+interface ValidationResult {
   isValid: boolean;
   error?: string;
 }
