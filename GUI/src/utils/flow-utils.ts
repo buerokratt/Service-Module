@@ -37,6 +37,9 @@ export const getNodeLabel = (step: Step, nodes: Node[]) => {
 };
 
 export const isStepValid = (node: NodeDataProps): ValidationResult => {
+  // End service node and similar
+  if (node.readonly) return { isValid: true };
+
   if (node.testingPassed === false) return { isValid: false };
 
   console.log('node', node.stepType, node.name);
@@ -108,9 +111,11 @@ export const isStepValid = (node: NodeDataProps): ValidationResult => {
   }
 
   // todo message length
-  const isValid = node.readonly || node.message?.length;
-  if (!isValid) {
-    return { isValid: false, error: 'Message text is missing' };
+  if (node.stepType === StepType.Textfield) {
+    const isValid = node.message?.length;
+    if (!isValid) {
+      return { isValid: false, error: 'Message text is missing' };
+    }
+    return { isValid: true };
   }
-  return { isValid: true };
 };
