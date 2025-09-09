@@ -42,9 +42,8 @@ export const isStepValid = (node: NodeDataProps): ValidationResult => {
   // End service node and similar
   if (node.readonly) return { isValid: true };
 
+  // Failed testing with Ruuter request
   if (node.testingPassed === false) return { isValid: false };
-
-  console.log('node', node.stepType, node.name);
 
   // todo condition
   if (node.stepType === StepType.Input || node.stepType === StepType.Condition) {
