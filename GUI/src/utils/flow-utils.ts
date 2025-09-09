@@ -62,16 +62,16 @@ export const validateStep = (node: NodeDataProps): ValidationResult => {
       return validateTextfieldStep(node);
 
     case StepType.UserDefined:
-      return { isValid: true };
+      return validateUserDefinedStep();
 
     case StepType.OpenWebpage:
-      return { isValid: Boolean(node.link && node.linkText) };
+      return validateOpenWebpageStep(node);
 
     case StepType.FileGenerate:
-      return { isValid: Boolean(node.fileName && node.fileContent) };
+      return validateFileGenerateStep(node);
 
     case StepType.FileSign:
-      return { isValid: Boolean(node.signOption) };
+      return validateFileSignStep(node);
 
     default:
       return { isValid: true };
@@ -80,7 +80,7 @@ export const validateStep = (node: NodeDataProps): ValidationResult => {
 
 // Error messages are implemented only for the steps that are actually enabled
 // More need to be added later
-const validateInputOrConditionStep = (node: NodeDataProps): ValidationResult => {
+export const validateInputOrConditionStep = (node: NodeDataProps): ValidationResult => {
   const hasInvalidRules = (elements: any[]): boolean => {
     return elements.some((e) => {
       if ('children' in e) {
@@ -115,7 +115,7 @@ const validateInputOrConditionStep = (node: NodeDataProps): ValidationResult => 
   return { isValid: true };
 };
 
-const validateMultiChoiceQuestionStep = (node: NodeDataProps): ValidationResult => {
+export const validateMultiChoiceQuestionStep = (node: NodeDataProps): ValidationResult => {
   if (!node?.multiChoiceQuestion?.question) {
     return { isValid: false, error: t('chat.service-flow-error.question-required') as string };
   }
@@ -127,7 +127,7 @@ const validateMultiChoiceQuestionStep = (node: NodeDataProps): ValidationResult 
   return { isValid: true };
 };
 
-const validateDynamicChoicesStep = (node: NodeDataProps): ValidationResult => {
+export const validateDynamicChoicesStep = (node: NodeDataProps): ValidationResult => {
   if (!node?.dynamicChoices?.list) {
     return { isValid: false, error: t('chat.service-flow-error.dynamic-choices-list-required') as string };
   }
@@ -143,7 +143,7 @@ const validateDynamicChoicesStep = (node: NodeDataProps): ValidationResult => {
   return { isValid: true };
 };
 
-const validateAssignStep = (node: NodeDataProps): ValidationResult => {
+export const validateAssignStep = (node: NodeDataProps): ValidationResult => {
   const hasInvalidElements = (elements: any[]): boolean => {
     return elements.some((e) => {
       const element = e as Assign;
@@ -164,8 +164,24 @@ const validateAssignStep = (node: NodeDataProps): ValidationResult => {
   return { isValid: true };
 };
 
-const validateTextfieldStep = (node: NodeDataProps): ValidationResult => {
+export const validateTextfieldStep = (node: NodeDataProps): ValidationResult => {
   return node.message?.length
     ? { isValid: true }
     : { isValid: false, error: t('chat.service-flow-error.message-text-missing') as string };
+};
+
+export const validateUserDefinedStep = (): ValidationResult => {
+  return { isValid: true };
+};
+
+export const validateOpenWebpageStep = (node: NodeDataProps): ValidationResult => {
+  return { isValid: Boolean(node.link && node.linkText) };
+};
+
+export const validateFileGenerateStep = (node: NodeDataProps): ValidationResult => {
+  return { isValid: Boolean(node.fileName && node.fileContent) };
+};
+
+export const validateFileSignStep = (node: NodeDataProps): ValidationResult => {
+  return { isValid: Boolean(node.signOption) };
 };
