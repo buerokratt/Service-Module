@@ -36,6 +36,8 @@ export const getNodeLabel = (step: Step, nodes: Node[]) => {
   return `${baseLabel} - ${nextNumber}`;
 };
 
+// todo translate
+
 // Error messages are implemented only for the steps that are actually enabled
 // More need to be added later
 export const isStepValid = (node: NodeDataProps): ValidationResult => {
@@ -45,7 +47,6 @@ export const isStepValid = (node: NodeDataProps): ValidationResult => {
   // Failed testing with Ruuter request
   if (node.testingPassed === false) return { isValid: false };
 
-  // todo condition
   if (node.stepType === StepType.Input || node.stepType === StepType.Condition) {
     const hasInvalidRules = (elements: any[]): boolean => {
       return elements.some((e) => {
@@ -61,12 +62,21 @@ export const isStepValid = (node: NodeDataProps): ValidationResult => {
     };
 
     const invalidRulesExist = hasInvalidRules(node.rules?.children ?? []);
-    const isValid = node.rules?.children !== undefined && !invalidRulesExist && node.rules?.children.length > 0;
-    if (!isValid) {
+
+    if (node.rules?.children === undefined || node.rules.children.length === 0) {
       const errorMessage =
-        node.stepType === StepType.Input ? 'Client input rules required' : 'Condition rules required';
+        node.stepType === StepType.Input ? 'Client input rules are required' : 'Condition rules are required';
       return { isValid: false, error: errorMessage };
     }
+
+    if (invalidRulesExist) {
+      const errorMessage =
+        node.stepType === StepType.Input
+          ? 'Client input rule fields are required'
+          : 'Condition rule fields are required';
+      return { isValid: false, error: errorMessage };
+    }
+
     return { isValid: true };
   }
 
