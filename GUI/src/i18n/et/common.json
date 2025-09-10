@@ -473,6 +473,7 @@
       "title": "Teenuse testimise viga",
       "dslName": "Teenuse fail",
       "stepName": "Samm",
+      "invalidNode": "Kehtetu samm",
       "causeCode": "Põhjus",
       "causeUnknown": "Tundmatu",
       "causeNull": "Null leitud DSL-is",
@@ -483,7 +484,21 @@
     "title": "TEST",
     "input-placeholder": "Sisestage sisend, eraldatud komadega",
     "service-input": "Teenuse sisend",
-    "unknown-error": "Tundmatu viga. Proovige uuesti."
+    "unknown-error": "Tundmatu viga. Proovige uuesti.",
+    "service-flow-error": {
+      "client-input-rules-required": "Kliendi sisestusreeglid on nõutud",
+      "condition-rules-required": "Tingimuste reeglid on nõutud",
+      "client-input-rule-fields-required": "Kliendi sisestusreegli väljad on nõutud",
+      "condition-rule-fields-required": "Tingimuste reegli väljad on nõutud",
+      "question-required": "Küsimus on nõutud",
+      "button-titles-required": "Nuppude pealkirjad on nõutud",
+      "dynamic-choices-list-required": "Dünaamiliste valikute nimekiri on nõutud",
+      "service-name-required": "Teenuse nimi on nõutud",
+      "key-required": "Võti on nõutud",
+      "assign-elements-required": "Määramise elemendid on nõutud",
+      "key-value-fields-required": "Võtme ja väärtuse väljad on nõutud",
+      "message-text-missing": "Sõnumi tekst puudub"
+    }
   },
   "objectEditor": {
     "array": "Massiiv",

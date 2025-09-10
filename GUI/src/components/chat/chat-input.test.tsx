@@ -76,7 +76,7 @@ describe('ChatInput', () => {
     expect(input).toHaveValue('');
   });
 
-  it('should not call sendUserInput when Enter is pressed with empty input', () => {
+  it('should call sendUserInput when Enter is pressed with empty input', () => {
     render(<ChatInput />);
 
     const input = screen.getByPlaceholderText('chat.input-placeholder');
@@ -84,10 +84,11 @@ describe('ChatInput', () => {
     // Press Enter with empty input
     fireEvent.keyDown(input, { key: 'Enter' });
 
-    expect(mockSendUserInput).not.toHaveBeenCalled();
+    expect(mockSendUserInput).toHaveBeenCalledWith('');
+    expect(input).toHaveValue('');
   });
 
-  it('should not call sendUserInput when Enter is pressed with whitespace-only input', () => {
+  it('should call sendUserInput when Enter is pressed with whitespace-only input', () => {
     render(<ChatInput />);
 
     const input = screen.getByPlaceholderText('chat.input-placeholder');
@@ -98,14 +99,15 @@ describe('ChatInput', () => {
     // Press Enter
     fireEvent.keyDown(input, { key: 'Enter' });
 
-    expect(mockSendUserInput).not.toHaveBeenCalled();
+    expect(mockSendUserInput).toHaveBeenCalledWith('   ');
+    expect(input).toHaveValue('');
   });
 
-  it('should disable send button when input is empty', () => {
+  it('should enable send button when input is empty', () => {
     render(<ChatInput />);
 
     const sendButton = screen.getByRole('button');
-    expect(sendButton).toBeDisabled();
+    expect(sendButton).not.toBeDisabled();
   });
 
   it('should enable send button when input has content', () => {
@@ -119,7 +121,18 @@ describe('ChatInput', () => {
     expect(sendButton).not.toBeDisabled();
   });
 
-  it('should disable send button when input has only whitespace', () => {
+  it('should call sendUserInput with empty string when send button is clicked with empty input', () => {
+    render(<ChatInput />);
+
+    const sendButton = screen.getByRole('button');
+
+    // Click send button with empty input
+    fireEvent.click(sendButton);
+
+    expect(mockSendUserInput).toHaveBeenCalledWith('');
+  });
+
+  it('should enable send button when input has only whitespace', () => {
     render(<ChatInput />);
 
     const input = screen.getByPlaceholderText('chat.input-placeholder');
@@ -127,6 +140,6 @@ describe('ChatInput', () => {
 
     fireEvent.change(input, { target: { value: '   ' } });
 
-    expect(sendButton).toBeDisabled();
+    expect(sendButton).not.toBeDisabled();
   });
 });

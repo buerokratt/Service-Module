@@ -60,6 +60,7 @@ export interface ServiceStoreState {
   markAsNewService: () => void;
   unmarkAsNewService: () => void;
   setServiceId: (id: string) => void;
+  // In the future, this needs to use a common interface with NodeDataProps and not Node
   setNodes: (nodes: Node[] | ((prev: Node[]) => Node[])) => void;
   setEdges: (edges: Edge[] | ((prev: Edge[]) => Edge[])) => void;
   vaildServiceInfo: () => boolean;
