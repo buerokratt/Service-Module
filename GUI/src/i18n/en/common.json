@@ -58,7 +58,10 @@
     "delete": "Delete",
     "keepIt": "Keep it",
     "create": "Create",
-    "edit": "Edit"
+    "edit": "Edit",
+    "import": "Import",
+    "export": "Export",
+    "proceed": "Proceed"
   },
   "menu": {
     "overview": "Overview",
@@ -339,7 +342,8 @@
       "assignAsValue": "Assign another element to use as value",
       "removeValueAssignment": "Remove element assigned as value",
       "assignManualEdit": "Manually edit variable assignment",
-      "openObjectEditor": "Open object editor"
+      "openObjectEditor": "Open object editor",
+      "confirmImport": "The current service will be rewritten!"
     },
     "previousVariables": {
       "assignElements": "Assign Elements",
@@ -392,6 +396,7 @@
     "elements": "Elements",
     "allElements": "All elements",
     "serviceInfo": "Service info",
+    "parseError": "Service generation failed! Either not JSON, the file has been modified or is corrupt",
     "apiElements": {
       "title": "API elements",
       "delete": "Delete",
@@ -472,6 +477,7 @@
       "title": "Service test error",
       "dslName": "Service file",
       "stepName": "Step",
+      "invalidNode": "Invalid node",
       "causeCode": "Cause",
       "causeUnknown": "Unknown",
       "causeNull": "Null found in DSL",
@@ -482,7 +488,21 @@
     "title": "TEST",
     "input-placeholder": "Enter input, separated by commas",
     "service-input": "Service input",
-    "unknown-error": "Unknown error. Please try again."
+    "unknown-error": "Unknown error. Please try again.",
+    "service-flow-error": {
+      "client-input-rules-required": "Client input rules are required",
+      "condition-rules-required": "Condition rules are required",
+      "client-input-rule-fields-required": "Client input rule fields are required",
+      "condition-rule-fields-required": "Condition rule fields are required",
+      "question-required": "Question is required",
+      "button-titles-required": "Button titles are required",
+      "dynamic-choices-list-required": "Dynamic choices list is required",
+      "service-name-required": "Service name is required",
+      "key-required": "Key is required",
+      "assign-elements-required": "Assign elements are required",
+      "key-value-fields-required": "Key and value fields are required",
+      "message-text-missing": "Message text is missing"
+    }
   },
   "objectEditor": {
     "array": "Array",

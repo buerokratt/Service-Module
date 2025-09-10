@@ -5,11 +5,15 @@ import { ServiceTestError } from 'types/service-test-error';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import {
+  addSuccessMessages,
   clearPreviousTestStates,
+  executeService,
   executeServiceTest,
+  getInvalidNodes,
   handleTestError,
   hasResponseData,
   isErrorResponse,
+  reportInvalidNodes,
   translateError,
   updateNodeTestState,
   validateTestEnvironment,
@@ -22,6 +26,9 @@ vi.mock('i18next', () => ({
 
 // Mock dependencies for executeServiceTest
 vi.mock('./api', () => ({
+  default: {
+    post: vi.fn(),
+  },
   createApiInstance: vi.fn(),
 }));
 
@@ -40,6 +47,10 @@ vi.mock('store/test-services.store', () => ({
 
 vi.mock('utils/string-util', () => ({
   fromSnakeCase: vi.fn((str) => str),
+}));
+
+vi.mock('utils/flow-utils', () => ({
+  validateStep: vi.fn(),
 }));
 
 describe('translateErrorPayload', () => {
@@ -1015,5 +1026,242 @@ describe('handleTestError', () => {
     handleTestError(error, mockServiceStore as unknown as ServiceStoreState);
 
     expect(mockAddError).toHaveBeenCalledWith('chat.unknown-error');
+  });
+});
+
+describe('getInvalidNodes', () => {
+  let mockValidateStep: ReturnType<typeof vi.fn>;
+
+  beforeEach(async () => {
+    vi.clearAllMocks();
+    mockValidateStep = vi.mocked((await import('utils/flow-utils')).validateStep);
+  });
+
+  it('should return empty array when all nodes are valid', () => {
+    const mockNodes = [
+      {
+        id: 'node1',
+        type: 'custom',
+        position: { x: 0, y: 0 },
+        data: { label: 'Valid Node 1', stepType: 'input' },
+      },
+      {
+        id: 'node2',
+        type: 'custom',
+        position: { x: 0, y: 0 },
+        data: { label: 'Valid Node 2', stepType: 'condition' },
+      },
+    ];
+
+    mockValidateStep.mockReturnValue({ isValid: true });
+
+    const result = getInvalidNodes(mockNodes);
+
+    expect(result).toEqual([]);
+    expect(mockValidateStep).toHaveBeenCalledTimes(2);
+  });
+
+  it('should skip start and ghost nodes', () => {
+    const mockNodes = [
+      {
+        id: 'start-node',
+        type: 'start',
+        position: { x: 0, y: 0 },
+        data: { label: 'Start Node' },
+      },
+      {
+        id: 'ghost-node',
+        type: 'ghost',
+        position: { x: 0, y: 0 },
+        data: { label: 'Ghost Node' },
+      },
+      {
+        id: 'custom-node',
+        type: 'custom',
+        position: { x: 0, y: 0 },
+        data: { label: 'Custom Node', stepType: 'input' },
+      },
+    ];
+
+    mockValidateStep.mockReturnValue({ isValid: true });
+
+    const result = getInvalidNodes(mockNodes);
+
+    expect(result).toEqual([]);
+    expect(mockValidateStep).toHaveBeenCalledTimes(1);
+    expect(mockValidateStep).toHaveBeenCalledWith(mockNodes[2].data);
+  });
+
+  it('should return invalid nodes with their labels and errors', () => {
+    const mockNodes = [
+      {
+        id: 'node1',
+        type: 'custom',
+        position: { x: 0, y: 0 },
+        data: { label: 'Valid Node', stepType: 'input' },
+      },
+      {
+        id: 'node2',
+        type: 'custom',
+        position: { x: 0, y: 0 },
+        data: { label: 'Invalid Node 1', stepType: 'condition' },
+      },
+      {
+        id: 'node3',
+        type: 'custom',
+        position: { x: 0, y: 0 },
+        data: { label: 'Invalid Node 2', stepType: 'assign' },
+      },
+    ];
+
+    mockValidateStep
+      .mockReturnValueOnce({ isValid: true })
+      .mockReturnValueOnce({ isValid: false, error: 'Missing condition value' })
+      .mockReturnValueOnce({ isValid: false, error: 'Invalid assignment' });
+
+    const result = getInvalidNodes(mockNodes);
+
+    expect(result).toEqual([
+      {
+        label: 'Invalid Node 1',
+        error: 'Missing condition value',
+      },
+      {
+        label: 'Invalid Node 2',
+        error: 'Invalid assignment',
+      },
+    ]);
+    expect(mockValidateStep).toHaveBeenCalledTimes(3);
+  });
+
+  it('should handle empty nodes array', () => {
+    const result = getInvalidNodes([]);
+
+    expect(result).toEqual([]);
+    expect(mockValidateStep).not.toHaveBeenCalled();
+  });
+});
+
+describe('reportInvalidNodes', () => {
+  let mockTestStore: any;
+  let mockAddError: any;
+  let mockT: ReturnType<typeof vi.fn>;
+
+  beforeEach(async () => {
+    vi.clearAllMocks();
+    mockAddError = vi.fn();
+    mockTestStore = vi.mocked((await import('store/test-services.store')).default);
+    mockTestStore.getState.mockReturnValue({ addError: mockAddError });
+    mockT = vi.mocked(t);
+  });
+
+  it('should report invalid nodes with translated keys', () => {
+    const invalidNodes = [
+      {
+        label: 'Invalid Node 1',
+        error: 'Missing required field',
+      },
+      {
+        label: 'Invalid Node 2',
+        error: 'Invalid configuration',
+      },
+    ];
+
+    mockT
+      .mockReturnValueOnce('Step Name')
+      .mockReturnValueOnce('Error Message')
+      .mockReturnValueOnce('Step Name')
+      .mockReturnValueOnce('Error Message');
+
+    reportInvalidNodes(invalidNodes);
+
+    expect(mockAddError).toHaveBeenCalledTimes(2);
+    expect(mockAddError).toHaveBeenNthCalledWith(1, 'chat.service-test-error.invalidNode', {
+      'Step Name': 'Invalid Node 1',
+      'Error Message': 'Missing required field',
+    });
+    expect(mockAddError).toHaveBeenNthCalledWith(2, 'chat.service-test-error.invalidNode', {
+      'Step Name': 'Invalid Node 2',
+      'Error Message': 'Invalid configuration',
+    });
+  });
+
+  it('should handle empty invalid nodes array', () => {
+    reportInvalidNodes([]);
+
+    expect(mockAddError).not.toHaveBeenCalled();
+  });
+
+  it('should call translation function for each node', () => {
+    const invalidNodes = [
+      {
+        label: 'Node 1',
+        error: 'Error 1',
+      },
+      {
+        label: 'Node 2',
+        error: 'Error 2',
+      },
+    ];
+
+    mockT.mockReturnValue('Translated Key');
+
+    reportInvalidNodes(invalidNodes);
+
+    expect(mockT).toHaveBeenCalledTimes(4); // 2 nodes × 2 translations each
+    expect(mockT).toHaveBeenCalledWith('chat.service-test-error.stepName');
+    expect(mockT).toHaveBeenCalledWith('chat.service-test-error.message');
+  });
+});
+
+describe('executeService', () => {
+  let mockApi: ReturnType<typeof vi.fn>;
+  let mockTestService: ReturnType<typeof vi.fn>;
+
+  beforeEach(async () => {
+    vi.clearAllMocks();
+    mockApi = vi.mocked((await import('./api')).default.post);
+    mockTestService = vi.mocked((await import('resources/api-constants')).testService);
+
+    mockTestService.mockReturnValue('/test-endpoint');
+  });
+
+  it('should call api.post with correct parameters', async () => {
+    const state = ServiceState.Active;
+    const name = 'test-service';
+    const input = 'test-input';
+
+    await executeService(state, name, input);
+
+    expect(mockTestService).toHaveBeenCalledWith(state, name);
+    expect(mockApi).toHaveBeenCalledWith('/test-endpoint', { input });
+  });
+});
+
+describe('addSuccessMessages', () => {
+  let mockAddBotMessage: ReturnType<typeof vi.fn>;
+  let mockAddSuccess: ReturnType<typeof vi.fn>;
+  let mockTestStore: ReturnType<typeof vi.fn>;
+
+  beforeEach(async () => {
+    vi.clearAllMocks();
+    mockAddBotMessage = vi.fn();
+    mockAddSuccess = vi.fn();
+    mockTestStore = vi.mocked((await import('store/test-services.store')).default);
+    (mockTestStore as any).getState.mockReturnValue({
+      addBotMessage: mockAddBotMessage,
+      addSuccess: mockAddSuccess,
+    });
+  });
+
+  it('should add bot message and success notification', () => {
+    const responseData = {
+      response: [{ content: 'Test response content' }],
+    };
+
+    addSuccessMessages(responseData);
+
+    expect(mockAddBotMessage).toHaveBeenCalledWith('Test response content');
+    expect(mockAddSuccess).toHaveBeenCalledWith('chat.service-test-success');
   });
 });

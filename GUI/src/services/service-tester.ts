@@ -1,12 +1,20 @@
+import { Node } from '@xyflow/react';
+import { t } from 'i18next';
 import { testService } from 'resources/api-constants';
 import useServiceStore, { ServiceStoreState } from 'store/new-services.store';
 import useTestServiceStore from 'store/test-services.store';
+import { NodeDataProps } from 'types/service-flow';
 import { ServiceState } from 'types/service-state';
 import { ServiceTestError } from 'types/service-test-error';
+import { validateStep } from 'utils/flow-utils';
 import { translateObjectKeys } from 'utils/i18n-util';
 import { fromSnakeCase, removeTrailingUnderscores } from 'utils/string-util';
 
-import { createApiInstance } from './api';
+import api, { createApiInstance } from './api';
+
+interface ServiceResponse {
+  response: { content: string }[];
+}
 
 export const runServiceTest = async (input: string) => {
   const headerValue = validateTestEnvironment();
@@ -21,15 +29,54 @@ export const runServiceTest = async (input: string) => {
 
   const { state, name, serviceStore } = serviceData;
 
+  const invalidNodes = getInvalidNodes(serviceStore.nodes);
+  if (invalidNodes.length > 0) {
+    reportInvalidNodes(invalidNodes);
+    return true;
+  }
+
   clearPreviousTestStates(serviceStore);
 
   try {
     await executeServiceTest(headerValue, state, name, input);
-    useTestServiceStore.getState().addSuccess('chat.service-test-success');
+
+    const response = await executeService(state, name, input);
+
+    addSuccessMessages(response.data);
   } catch (error) {
     handleTestError(error, serviceStore);
   }
 };
+
+export function getInvalidNodes(nodes: Node[]): { label: string; error: string }[] {
+  const invalidNodes: { label: string; error: string }[] = [];
+
+  nodes.forEach((node) => {
+    // Skip start and ghost nodes as they don't need validation
+    if (node.type === 'start' || node.type === 'ghost') return;
+
+    const result = validateStep(node.data as NodeDataProps);
+    if (!result.isValid) {
+      invalidNodes.push({
+        label: node.data.label as string,
+        error: result.error as string,
+      });
+    }
+  });
+
+  return invalidNodes;
+}
+
+export function reportInvalidNodes(invalidNodes: { label: string; error: string }[]): void {
+  const store = useTestServiceStore.getState();
+
+  invalidNodes.forEach((node) => {
+    store.addError('chat.service-test-error.invalidNode', {
+      [t('chat.service-test-error.stepName')]: node.label,
+      [t('chat.service-test-error.message')]: node.error,
+    });
+  });
+}
 
 export const validateTestEnvironment = (): string | null => {
   const headerValue = import.meta.env.REACT_APP_RUUTER_SERVICES_TESTING_HEADER;
@@ -160,3 +207,13 @@ export function translateError(error: ServiceTestError, nodeLabel: string): Reco
 
   return translateObjectKeys(translatedError, 'chat.service-test-error');
 }
+
+export const executeService = async (state: ServiceState, name: string, input: string) => {
+  return api.post<ServiceResponse>(testService(state, name), { input });
+};
+
+export const addSuccessMessages = (responseData: ServiceResponse): void => {
+  const store = useTestServiceStore.getState();
+  store.addBotMessage(responseData.response[0].content);
+  store.addSuccess('chat.service-test-success');
+};

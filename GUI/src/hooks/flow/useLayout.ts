@@ -78,7 +78,6 @@ function layoutNodes(nodes: Node[], edges: Edge[]): Node[] {
         const newY = maxParentY + 180;
         const multipathNewY = maxParentY + 300;
 
-        console.log(isParentNodesContainMultiPathNode);
         resultNodes.push({
           ...node,
           position: {
