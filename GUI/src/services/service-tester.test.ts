@@ -5,7 +5,9 @@ import { ServiceTestError } from 'types/service-test-error';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import {
+  addSuccessMessages,
   clearPreviousTestStates,
+  executeService,
   executeServiceTest,
   getInvalidNodes,
   handleTestError,
@@ -24,6 +26,9 @@ vi.mock('i18next', () => ({
 
 // Mock dependencies for executeServiceTest
 vi.mock('./api', () => ({
+  default: {
+    post: vi.fn(),
+  },
   createApiInstance: vi.fn(),
 }));
 
@@ -1206,5 +1211,57 @@ describe('reportInvalidNodes', () => {
     expect(mockT).toHaveBeenCalledTimes(4); // 2 nodes × 2 translations each
     expect(mockT).toHaveBeenCalledWith('chat.service-test-error.stepName');
     expect(mockT).toHaveBeenCalledWith('chat.service-test-error.message');
+  });
+});
+
+describe('executeService', () => {
+  let mockApi: ReturnType<typeof vi.fn>;
+  let mockTestService: ReturnType<typeof vi.fn>;
+
+  beforeEach(async () => {
+    vi.clearAllMocks();
+    mockApi = vi.mocked((await import('./api')).default.post);
+    mockTestService = vi.mocked((await import('resources/api-constants')).testService);
+
+    mockTestService.mockReturnValue('/test-endpoint');
+  });
+
+  it('should call api.post with correct parameters', async () => {
+    const state = ServiceState.Active;
+    const name = 'test-service';
+    const input = 'test-input';
+
+    await executeService(state, name, input);
+
+    expect(mockTestService).toHaveBeenCalledWith(state, name);
+    expect(mockApi).toHaveBeenCalledWith('/test-endpoint', { input });
+  });
+});
+
+describe('addSuccessMessages', () => {
+  let mockAddBotMessage: ReturnType<typeof vi.fn>;
+  let mockAddSuccess: ReturnType<typeof vi.fn>;
+  let mockTestStore: ReturnType<typeof vi.fn>;
+
+  beforeEach(async () => {
+    vi.clearAllMocks();
+    mockAddBotMessage = vi.fn();
+    mockAddSuccess = vi.fn();
+    mockTestStore = vi.mocked((await import('store/test-services.store')).default);
+    (mockTestStore as any).getState.mockReturnValue({
+      addBotMessage: mockAddBotMessage,
+      addSuccess: mockAddSuccess,
+    });
+  });
+
+  it('should add bot message and success notification', () => {
+    const responseData = {
+      response: [{ content: 'Test response content' }],
+    };
+
+    addSuccessMessages(responseData);
+
+    expect(mockAddBotMessage).toHaveBeenCalledWith('Test response content');
+    expect(mockAddSuccess).toHaveBeenCalledWith('chat.service-test-success');
   });
 });

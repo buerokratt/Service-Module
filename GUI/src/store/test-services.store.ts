@@ -24,7 +24,7 @@ export interface TestServiceStoreState {
   changeCurrentNodeId: (currentNodeId?: string) => void;
   clearCurrentNodeId: () => void;
   addUserMessage: (message: string) => void;
-  addBotMessage: (message: string, payload?: TestingMessagePayload) => void;
+  addBotMessage: (message: string) => void;
   pushMessage: (
     message: string,
     author: TestingMessageAuthor,
@@ -57,7 +57,7 @@ const useTestServiceStore = create<TestServiceStoreState>((set, get) => ({
   changeCurrentNodeId: (currentNodeId) => set({ currentNodeId }),
   clearCurrentNodeId: () => set({ currentNodeId: null }),
   addUserMessage: (message) => get().pushMessage(message, 'enduser'),
-  addBotMessage: (message, payload) => get().pushMessage(message, 'bot', 'normal', payload),
+  addBotMessage: (message) => get().pushMessage(message, 'bot'),
   pushMessage: (message, author, type = 'normal', payload = undefined) => {
     const msg = {
       id: uuid(),

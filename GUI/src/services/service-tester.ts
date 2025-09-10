@@ -10,7 +10,11 @@ import { validateStep } from 'utils/flow-utils';
 import { translateObjectKeys } from 'utils/i18n-util';
 import { fromSnakeCase, removeTrailingUnderscores } from 'utils/string-util';
 
-import { createApiInstance } from './api';
+import api, { createApiInstance } from './api';
+
+interface ServiceResponse {
+  response: { content: string }[];
+}
 
 export const runServiceTest = async (input: string) => {
   const headerValue = validateTestEnvironment();
@@ -35,7 +39,10 @@ export const runServiceTest = async (input: string) => {
 
   try {
     await executeServiceTest(headerValue, state, name, input);
-    useTestServiceStore.getState().addSuccess('chat.service-test-success');
+
+    const response = await executeService(state, name, input);
+
+    addSuccessMessages(response.data);
   } catch (error) {
     handleTestError(error, serviceStore);
   }
@@ -200,3 +207,13 @@ export function translateError(error: ServiceTestError, nodeLabel: string): Reco
 
   return translateObjectKeys(translatedError, 'chat.service-test-error');
 }
+
+export const executeService = async (state: ServiceState, name: string, input: string) => {
+  return api.post<ServiceResponse>(testService(state, name), { input });
+};
+
+export const addSuccessMessages = (responseData: ServiceResponse): void => {
+  const store = useTestServiceStore.getState();
+  store.addBotMessage(responseData.response[0].content);
+  store.addSuccess('chat.service-test-success');
+};
