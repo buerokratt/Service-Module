@@ -40,7 +40,7 @@ const ImportExportControls: FC = () => {
           await writableStream.write(blob);
           await writableStream.close();
         } catch (error: any) {
-          useToastStore.getState().error({ title: t('global.notificationError'), message: (error as Error).message });
+          console.error(error);
         }
       } else {
         const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataString);
