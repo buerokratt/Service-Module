@@ -1,4 +1,4 @@
-import { Background, Controls, Edge, MiniMap, Node, ReactFlow, useReactFlow } from '@xyflow/react';
+import { Background, Controls, Edge, MiniMap, Node, Panel, ReactFlow, useReactFlow } from '@xyflow/react';
 import { Button, Modal, Track } from 'components';
 import Chat from 'components/chat/chat';
 import edgeTypes from 'components/Flow/EdgeTypes';
@@ -10,6 +10,7 @@ import '@xyflow/react/dist/style.css';
 import { useTranslation } from 'react-i18next';
 import useServiceStore from 'store/new-services.store';
 import { StepType } from 'types';
+import ImportExportControls from 'components/Flow/Controls/ImportExportControls';
 
 type FlowBuilderProps = {
   nodes: Node[];
@@ -141,6 +142,9 @@ const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
         <MiniMap />
         <Background color="#D2D3D8" gap={16} lineWidth={9} />
         <Controls orientation="horizontal" showInteractive={false} />
+        <Panel position="top-left">
+          <ImportExportControls />
+        </Panel>
       </ReactFlow>
       {isDeleteConnectionsModalVisible && (
         <Modal

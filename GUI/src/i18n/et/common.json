@@ -58,7 +58,10 @@
     "delete": "Kustuta",
     "keepIt": "Jäta alles",
     "create": "Loo",
-    "edit": "Muuda"
+    "edit": "Muuda",
+    "import": "Impordi",
+    "export": "Ekspordi",
+    "proceed": "Jätka"
   },
   "menu": {
     "overview": "Ülevaade",
@@ -339,7 +342,8 @@
       "assignAsValue": "Määra teine element väärtuseks",
       "removeValueAssignment": "Eemalda element, mis on määratud väärtuseks",
       "assignManualEdit": "Muutke muutuja määramist käsitsi",
-      "openObjectEditor": "Ava objekti redaktor"
+      "openObjectEditor": "Ava objekti redaktor",
+      "confirmImport": "Teenus kirjutatakse üle!"
     },
     "previousVariables": {
       "assignElements": "Määra elemendid",
@@ -392,6 +396,7 @@
     "elements": "Elemendid",
     "allElements": "Üldelemendid",
     "serviceInfo": "Teenuse teave",
+    "parseError": "Teenuse genereerimine ebaõnnestus! Fail ei ole kas JSON, seda on muudetud või see on vigane",
     "apiElements": {
       "title": "API elemendid",
       "delete": "Kustuta",

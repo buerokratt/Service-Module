@@ -58,7 +58,10 @@
     "delete": "Delete",
     "keepIt": "Keep it",
     "create": "Create",
-    "edit": "Edit"
+    "edit": "Edit",
+    "import": "Import",
+    "export": "Export",
+    "proceed": "Proceed"
   },
   "menu": {
     "overview": "Overview",
@@ -339,7 +342,8 @@
       "assignAsValue": "Assign another element to use as value",
       "removeValueAssignment": "Remove element assigned as value",
       "assignManualEdit": "Manually edit variable assignment",
-      "openObjectEditor": "Open object editor"
+      "openObjectEditor": "Open object editor",
+      "confirmImport": "The current service will be rewritten!"
     },
     "previousVariables": {
       "assignElements": "Assign Elements",
@@ -392,6 +396,7 @@
     "elements": "Elements",
     "allElements": "All elements",
     "serviceInfo": "Service info",
+    "parseError": "Service generation failed! Either not JSON, the file has been modified or is corrupt",
     "apiElements": {
       "title": "API elements",
       "delete": "Delete",
