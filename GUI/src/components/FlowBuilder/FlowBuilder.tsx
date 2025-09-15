@@ -8,7 +8,8 @@ import { useOnNodesDelete } from 'hooks/flow/useOnNodeDelete';
 import { FC, useCallback } from 'react';
 import '@xyflow/react/dist/style.css';
 import { useTranslation } from 'react-i18next';
-import useServiceStore from 'store/new-services.store';
+import useNewServiceStore from 'store/new-services.store';
+import useServiceStore from 'store/services.store';
 import { StepType } from 'types';
 import ImportExportControls from 'components/Flow/Controls/ImportExportControls';
 
@@ -20,7 +21,7 @@ type FlowBuilderProps = {
 const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
   useLayout();
   const { getNodes, getEdges, setNodes, setEdges, getNode } = useReactFlow();
-  const setReactFlowInstance = useServiceStore((state) => state.setReactFlowInstance);
+  const setReactFlowInstance = useNewServiceStore((state) => state.setReactFlowInstance);
   const { t } = useTranslation();
   const {
     onNodesDelete,
@@ -33,7 +34,10 @@ const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
     setDeletedNodes,
     setNodeToDelete,
   } = useOnNodesDelete();
-  const { setHasUnsavedChanges } = useServiceStore();
+  const { setHasUnsavedChanges } = useNewServiceStore();
+  const orientation = useServiceStore((state) => state.orientation);
+  const toggleOrientation = useServiceStore((state) => state.toggleOrientation);
+  useLayout(orientation);
 
   const onConnect = useCallback(
     ({ source, target }: any) => {
@@ -111,8 +115,8 @@ const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
       <ReactFlow
         nodes={nodes}
         edges={edges}
-        onNodesChange={useServiceStore.getState().onNodesChange}
-        onEdgesChange={useServiceStore.getState().onEdgesChange}
+        onNodesChange={useNewServiceStore.getState().onNodesChange}
+        onEdgesChange={useNewServiceStore.getState().onEdgesChange}
         snapToGrid
         proOptions={{ hideAttribution: true }}
         panOnScroll
@@ -120,7 +124,7 @@ const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
         edgeTypes={edgeTypes}
         onInit={(instance) => {
           setReactFlowInstance(instance);
-          useServiceStore.getState().loadEndpointsResponseVariables();
+          useNewServiceStore.getState().loadEndpointsResponseVariables();
         }}
         nodesDraggable={false}
         onConnect={onConnect}
@@ -144,6 +148,11 @@ const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
         <Controls orientation="horizontal" showInteractive={false} />
         <Panel position="top-left">
           <ImportExportControls />
+        </Panel>
+        <Panel position="top-right">
+          <Button onClick={toggleOrientation} size="s">
+            {orientation === 'vertical' ? 'Horizontal' : 'Vertical'}
+          </Button>
         </Panel>
       </ReactFlow>
       {isDeleteConnectionsModalVisible && (
