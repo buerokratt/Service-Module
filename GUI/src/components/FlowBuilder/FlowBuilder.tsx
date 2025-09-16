@@ -1,5 +1,5 @@
 import { Background, Controls, Edge, MiniMap, Node, Panel, ReactFlow, useReactFlow } from '@xyflow/react';
-import { Button, Modal, Track } from 'components';
+import { Button, Modal, Tooltip, Track } from 'components';
 import Chat from 'components/chat/chat';
 import edgeTypes from 'components/Flow/EdgeTypes';
 import nodeTypes from 'components/Flow/NodeTypes';
@@ -12,6 +12,8 @@ import useNewServiceStore from 'store/new-services.store';
 import useServiceStore from 'store/services.store';
 import { StepType } from 'types';
 import ImportExportControls from 'components/Flow/Controls/ImportExportControls';
+import HorizontalFlow from '../../static/icons/horizontal_flow.svg';
+import VerticalFlow from '../../static/icons/vertical_flow.svg';
 
 type FlowBuilderProps = {
   nodes: Node[];
@@ -150,9 +152,17 @@ const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
           <ImportExportControls />
         </Panel>
         <Panel position="top-right">
-          <Button onClick={toggleOrientation} size="s">
-            {orientation === 'vertical' ? 'Horizontal' : 'Vertical'}
-          </Button>
+          <Tooltip content={t('serviceFlow.orientationTooltip')}>
+            <Button onClick={toggleOrientation} size="s" style={{ backgroundColor: '#005aa3' }}>
+              <img
+                src={orientation === 'horizontal' ? HorizontalFlow : VerticalFlow}
+                width={35}
+                className="logo"
+                loading="eager"
+                alt="orientation toggle"
+              />
+            </Button>
+          </Tooltip>
         </Panel>
       </ReactFlow>
       {isDeleteConnectionsModalVisible && (

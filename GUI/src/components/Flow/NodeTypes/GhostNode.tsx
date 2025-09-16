@@ -6,7 +6,7 @@ const GhostNode: FC<NodeProps> = (props) => {
   const { id } = props;
   const orientation = useServiceStore((state) => state.orientation);
 
-  const handlePosition = orientation === 'horizontal' ? Position.Top : Position.Left;
+  const handlePosition = orientation === 'vertical' ? Position.Top : Position.Left;
 
   const updateNodeInternals = useUpdateNodeInternals();
 

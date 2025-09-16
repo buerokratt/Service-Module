@@ -397,6 +397,7 @@
     "allElements": "All elements",
     "serviceInfo": "Service info",
     "parseError": "Service generation failed! Either not JSON, the file has been modified or is corrupt",
+    "orientationTooltip": "Toggle flow orientation",
     "apiElements": {
       "title": "API elements",
       "delete": "Delete",

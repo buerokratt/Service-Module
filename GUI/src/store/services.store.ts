@@ -23,7 +23,6 @@ interface ServiceStoreState {
   commonServices: Service[];
   notCommonServices: Service[];
   orientation: 'horizontal' | 'vertical';
-  setOrientation: (orientation: 'horizontal' | 'vertical') => void;
   toggleOrientation: () => void;
   loadServicesList: (pagination: PaginationState, sorting: SortingState) => Promise<void>;
   loadCommonServicesList: (pagination: PaginationState, sorting: SortingState) => Promise<void>;
@@ -88,7 +87,6 @@ const useServiceListStore = create<ServiceStoreState>((set, get, store) => ({
   commonServices: [],
   notCommonServices: [],
   orientation: 'vertical',
-  setOrientation: (orientation) => set({ orientation }),
   toggleOrientation: () =>
     set((state) => ({
       orientation: state.orientation === 'horizontal' ? 'vertical' : 'horizontal',

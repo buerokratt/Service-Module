@@ -114,7 +114,7 @@ function useLayout(orientation: 'horizontal' | 'vertical' = 'horizontal') {
       return {
         id: node.id,
         from: getNode(node.id)?.position ?? node.position,
-        to: node.position,
+        to: node.type === 'start' ? { x: 140, y: 0 } : node.position,
         node,
       };
     });
