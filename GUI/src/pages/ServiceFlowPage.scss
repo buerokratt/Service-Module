@@ -52,6 +52,8 @@
     line-height: $veera-line-height-500;
     max-width: 350px;
     width: 100%;
+    min-height: 65px;
+    align-content: center;
 
     &.selected {
       &.step {
