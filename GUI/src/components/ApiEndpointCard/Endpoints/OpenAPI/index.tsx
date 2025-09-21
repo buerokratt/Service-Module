@@ -151,7 +151,7 @@ const EndpointOpenAPI: React.FC<EndpointOpenAPIProps> = ({
   const fetchOpenApiSpecMock = async () => {
     const result = await api.post(getOpenApiSpec(), { url: openApiUrl });
     const apiSpec = result.data.response;
-    const url = new URL(openApiUrl).origin + apiSpec.basePath;
+    const url = new URL(openApiUrl).origin + (apiSpec.basePath ?? '');
     const paths: EndpointDefinition[] = [];
 
     Object.entries(apiSpec.paths).forEach(([path, endpointData]) => {
