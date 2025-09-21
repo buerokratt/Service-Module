@@ -191,6 +191,7 @@ const FlowElementsPopup: React.FC = () => {
         },
         dynamicChoices: dynamicChoices,
         endpoint: nodeEndpoint ?? node.data?.endpoint,
+        testingPassed: undefined,
       },
     };
 
