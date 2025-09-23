@@ -1,9 +1,12 @@
+import { RequestOperator } from "./request-operator";
+
 export type EndpointVariableData = {
   id: string;
   name: string;
   required?: boolean;
   description?: string;
   type: string;
+  operator?: RequestOperator;
   schemaData?: string | EndpointVariableData[];
   arrayData?: string | EndpointVariableData[];
   arrayType?: string;

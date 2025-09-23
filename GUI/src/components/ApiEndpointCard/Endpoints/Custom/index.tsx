@@ -8,6 +8,7 @@ import { v4 as uuid } from 'uuid';
 import { Button, FormInput, FormSelect, Icon, RequestVariables, Track } from '../../..';
 import { RequestTab } from '../../../../types';
 import { EndpointData, EndpointVariableData, PreDefinedEndpointEnvVariables } from '../../../../types/endpoint';
+import { RequestOperator } from 'types/endpoint/request-operator';
 
 type EndpointCustomProps = {
   endpoint: EndpointData;
@@ -93,6 +94,7 @@ const EndpointCustom: React.FC<EndpointCustomProps> = ({
               onChange={(event) => {
                 const parsedUrl = parseURL(event.target.value);
                 endpoint.definitions[0].url = parsedUrl.url;
+
                 const parameters: EndpointVariableData[] = [];
                 Object.keys(parsedUrl.params).forEach((key) => {
                   parameters.push({
@@ -101,6 +103,7 @@ const EndpointCustom: React.FC<EndpointCustomProps> = ({
                     type: 'custom',
                     required: false,
                     value: parsedUrl.params[key],
+                    operator: (parsedUrl.operators[key] as RequestOperator) || '=',
                   });
                 });
 
@@ -152,16 +155,23 @@ const EndpointCustom: React.FC<EndpointCustomProps> = ({
           url.searchParams.forEach((_, key) => {
             url.searchParams.delete(key);
           });
+
           parameters.forEach((param: EndpointVariableData) => {
-            url.searchParams.set(param.name, param.value ?? '');
+            if (param.value && param.name) {
+              const paramName = param.operator ? `${param.name}${param.operator}` : param.name;
+
+              url.searchParams.set(paramName, param.value);
+            }
           });
+
           endpoint.definitions[0].params = {
             variables: parameters,
             rawData: {},
           };
           endpoint.definitions[0].url = url.href ?? '';
+
           if (ref?.current) {
-            ref.current.value = url.href ?? '';
+            ref.current.value = formatURLWithOperators(url.href, parameters);
           }
         }}
       />
@@ -169,20 +179,61 @@ const EndpointCustom: React.FC<EndpointCustomProps> = ({
   );
 };
 
+function formatURLWithOperators(url: string, parameters: EndpointVariableData[]): string {
+  try {
+    const urlObj = new URL(url);
+    const baseUrl = `${urlObj.origin}${urlObj.pathname}`;
+
+    if (parameters.length === 0) {
+      return baseUrl;
+    }
+
+    const queryString = parameters
+      .filter((param) => param.value && param.name)
+      .map((param) => {
+        return `${param.name}${param.operator ?? '='}${encodeURIComponent(param.value ?? '')}`;
+      })
+      .join('&');
+
+    return `${baseUrl}?${queryString}`;
+  } catch (e) {
+    console.error('Error formatting URL with operators:', e);
+    return url;
+  }
+}
+
 function parseURL(url: string) {
   try {
     const parsedURL = new URL(url);
-    const params: { [key: string]: any } = Object.fromEntries(parsedURL.searchParams);
+    const params: { [key: string]: any } = {};
+    const operators: { [key: string]: string } = {};
+
+    parsedURL.searchParams.forEach((value, key) => {
+      const operatorMatch = RegExp(/(.*?)(>=|<=|>|<|=)$/).exec(key);
+
+      if (operatorMatch) {
+        const paramName = operatorMatch[1];
+        const operator = operatorMatch[2];
+
+        params[paramName] = value;
+        operators[paramName] = operator;
+      } else {
+        params[key] = value;
+        operators[key] = '=';
+      }
+    });
 
     return {
       url: parsedURL.href,
       params,
+      operators,
     };
   } catch (e) {
     console.error('Invalid URL format:', e);
     return {
       url,
       params: {},
+      operators: {},
     };
   }
 }

@@ -233,6 +233,7 @@
       "url": "API endpoint URL",
       "value": "Value",
       "variable": "Variable",
+      "operator": "Operator",
       "unsupported": "Sorry, we currently only support GET and POST requests.",
       "insertName": "Insert endpoint name...",
       "type": "Endpoint type",
