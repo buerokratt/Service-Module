@@ -152,55 +152,30 @@ const EndpointCustom: React.FC<EndpointCustomProps> = ({
         parentEndpointId={endpoint.endpointId}
         onParametersChange={(parameters) => {
           const url = new URL(endpoint.definitions[0].url ?? '');
-          url.searchParams.forEach((_, key) => {
-            url.searchParams.delete(key);
-          });
+          const baseUrl = `${url.origin}${url.pathname}`;
 
-          parameters.forEach((param: EndpointVariableData) => {
-            if (param.value && param.name) {
-              const paramName = param.operator ? `${param.name}${param.operator}` : param.name;
+          const queryString = parameters
+            .filter((param) => param.value && param.name)
+            .map((param) => {
+              const operator = param.operator ? param.operator : '=';
+              return `${param.name}${operator}${encodeURIComponent(param.value ?? '')}`;
+            })
+            .join('&');
 
-              url.searchParams.set(paramName, param.value);
-            }
-          });
-
+          endpoint.definitions[0].url = queryString ? `${baseUrl}?${queryString}` : baseUrl;
           endpoint.definitions[0].params = {
             variables: parameters,
             rawData: {},
           };
-          endpoint.definitions[0].url = url.href ?? '';
 
           if (ref?.current) {
-            ref.current.value = formatURLWithOperators(url.href, parameters);
+            ref.current.value = endpoint.definitions[0].url;
           }
         }}
       />
     </Track>
   );
 };
-
-function formatURLWithOperators(url: string, parameters: EndpointVariableData[]): string {
-  try {
-    const urlObj = new URL(url);
-    const baseUrl = `${urlObj.origin}${urlObj.pathname}`;
-
-    if (parameters.length === 0) {
-      return baseUrl;
-    }
-
-    const queryString = parameters
-      .filter((param) => param.value && param.name)
-      .map((param) => {
-        return `${param.name}${param.operator ?? '='}${encodeURIComponent(param.value ?? '')}`;
-      })
-      .join('&');
-
-    return `${baseUrl}?${queryString}`;
-  } catch (e) {
-    console.error('Error formatting URL with operators:', e);
-    return url;
-  }
-}
 
 function parseURL(url: string) {
   try {
