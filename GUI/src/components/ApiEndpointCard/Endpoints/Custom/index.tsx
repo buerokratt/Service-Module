@@ -179,38 +179,35 @@ const EndpointCustom: React.FC<EndpointCustomProps> = ({
 
 function parseURL(url: string) {
   try {
-    const parsedURL = new URL(url);
-    const params: { [key: string]: any } = {};
-    const operators: { [key: string]: string } = {};
+    const [_, queryString = ''] = url.split('?');
+    const params: Record<string, any> = {};
+    const operators: Record<string, string> = {};
 
-    parsedURL.searchParams.forEach((value, key) => {
-      const operatorMatch = RegExp(/(.*?)(>=|<=|>|<|=)$/).exec(key);
-
-      if (operatorMatch) {
-        const paramName = operatorMatch[1];
-        const operator = operatorMatch[2];
-
-        params[paramName] = value;
-        operators[paramName] = operator;
-      } else {
-        params[key] = value;
-        operators[key] = '=';
+    queryString.split('&').filter(Boolean).forEach(segment => {
+      const { index, token } = findOperators(segment);
+      const name = decodeURIComponent(index !== -1 ? segment.slice(0, index) : segment);
+      const value = decodeURIComponent(index !== -1 ? segment.slice(index + token.length) : '');
+      const operator = index !== -1 ? token : '=';
+      if (name) {
+        params[name] = value;
+        operators[name] = operator;
       }
     });
 
-    return {
-      url: parsedURL.href,
-      params,
-      operators,
-    };
+    return { url, params, operators };
   } catch (e) {
     console.error('Invalid URL format:', e);
-    return {
-      url,
-      params: {},
-      operators: {},
-    };
+    return { url, params: {}, operators: {} };
   }
+}
+
+function findOperators(segment: string): { index: number; token: string } {
+  const operatorTokens = ['>=', '<=', '>', '<', '='];
+  let found = operatorTokens
+    .map(token => ({ token, idx: segment.indexOf(token) }))
+    .filter(({ idx }) => idx !== -1)
+    .sort((a, b) => a.idx - b.idx || b.token.length - a.token.length)[0];
+  return found ? { index: found.idx, token: found.token } : { index: -1, token: '' };
 }
 
 export default EndpointCustom;
