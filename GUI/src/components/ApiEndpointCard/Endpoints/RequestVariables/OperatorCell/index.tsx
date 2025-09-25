@@ -5,7 +5,6 @@ import { EndpointTab } from 'types/endpoint';
 import { RequestVariablesTableColumns } from 'types/request-variables';
 import { RequestOperator } from 'types/endpoint/request-operator';
 
-
 type OperatorCellProps = {
   row: Row<RequestVariablesTableColumns>;
   operator: RequestOperator;
@@ -41,21 +40,19 @@ const OperatorCell: React.FC<OperatorCellProps> = ({
   const currentOperator = operator && operatorOptions.some((op) => op.value === operator) ? operator : '=';
 
   return (
-    <div>
-      <FormSelect
-        style={{ borderRadius: '4px', minWidth: '80px' }}
-        name={`endpoint-operator-${row.id}`}
-        label=""
-        options={operatorOptions}
-        defaultValue={currentOperator}
-        onSelectionChange={(selection) => {
-          const selectedOperator = selection?.value || '=';
-          onOperatorChange(row.id, selectedOperator);
-          updateRowOperator(row.id, selectedOperator);
-        }}
-        placeholder="="
-      />
-    </div>
+    <FormSelect
+      style={{ borderRadius: '4px', minWidth: '80px' }}
+      name={`endpoint-operator-${row.id}`}
+      label=""
+      options={operatorOptions}
+      defaultValue={currentOperator}
+      onSelectionChange={(selection) => {
+        const selectedOperator = selection?.value || '=';
+        onOperatorChange(row.id, selectedOperator);
+        updateRowOperator(row.id, selectedOperator);
+      }}
+      placeholder="="
+    />
   );
 };
 

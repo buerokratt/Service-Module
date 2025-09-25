@@ -413,6 +413,7 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
                 setSorting={setSorting}
                 pagination={pagination}
                 sorting={sorting}
+                withScrollWrapper={false}
               />
               <hr style={{ margin: 0, borderTop: '1px solid #D2D3D8' }} />
             </>
