@@ -29,10 +29,7 @@ interface GetColumnsConfig {
   getTabsRowsData: () => RequestVariablesTabsRowsData;
 }
 
-const getSortValue = (
-  rowData: RequestVariablesRowData | undefined,
-  type: FieldType,
-): string => {
+const getSortValue = (rowData: RequestVariablesRowData | undefined, type: FieldType): string => {
   if (!rowData) return '';
 
   return rowData[type] ?? '';

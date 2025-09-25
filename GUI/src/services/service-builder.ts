@@ -582,7 +582,7 @@ function handleEndpointStep(
   const stepConfig: any = {
     call: `http.${methodType ?? 'post'}`,
     args: {
-      url: hasNonEqualOperator ?  endpointDefinition?.url ?? '' : endpointDefinition?.url?.split('?')[0] ?? '',
+      url: hasNonEqualOperator ? (endpointDefinition?.url ?? '') : (endpointDefinition?.url?.split('?')[0] ?? ''),
     },
     result: `${parentNode.data.endpoint?.name.replaceAll(' ', '_')}_res`,
     next: childNode ? toSnakeCase(childNode.data.label ?? 'format_messages') : 'format_messages',

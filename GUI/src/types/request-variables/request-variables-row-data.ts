@@ -1,4 +1,4 @@
-import { RequestOperator } from "types/endpoint/request-operator";
+import { RequestOperator } from 'types/endpoint/request-operator';
 
 export type RequestVariablesRowData = {
   id: string;

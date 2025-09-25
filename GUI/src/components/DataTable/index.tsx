@@ -46,7 +46,7 @@ type DataTableProps = {
   disableHead?: boolean;
   pagesCount?: number;
   meta?: TableMeta<any>;
-  withScrollWrapper?: boolean
+  withScrollWrapper?: boolean;
 };
 
 type ColumnMeta = {
@@ -101,7 +101,7 @@ const DataTable: FC<DataTableProps> = ({
   disableHead,
   pagesCount,
   meta,
-  withScrollWrapper = true
+  withScrollWrapper = true,
 }) => {
   const id = useId();
   const { t } = useTranslation();
