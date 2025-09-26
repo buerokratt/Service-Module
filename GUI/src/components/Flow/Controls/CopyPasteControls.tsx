@@ -13,7 +13,11 @@ interface ClipboardData {
   edges: Edge[];
 }
 
-const CopyPasteControls: FC = () => {
+interface CopyPasteControlsProps {
+  onNodesDelete?: (nodes: Node[]) => void;
+}
+
+const CopyPasteControls: FC<CopyPasteControlsProps> = ({ onNodesDelete }) => {
   const { getNodes, getEdges, setNodes, setEdges, getViewport } = useReactFlow();
   const { t } = useTranslation();
   const { setHasUnsavedChanges } = useServiceStore();
@@ -223,13 +227,19 @@ const CopyPasteControls: FC = () => {
       return;
     }
     await copyNodes(false);
-    reactFlowInstance?.deleteElements({ nodes: selectedNodes });
+    
+    if (onNodesDelete) {
+      onNodesDelete(selectedNodes);
+    } else {
+      reactFlowInstance?.deleteElements({ nodes: selectedNodes });
+    }
+    
     setHasUnsavedChanges(true);
 
     useToastStore.getState().success({
       title: t('serviceFlow.nodesCut', { count: selectedNodes.length, s: selectedNodes.length > 1 ? 's' : '' }),
     });
-  }, [selectedNodes, copyNodes, getNodes, getEdges, setNodes, setEdges, setHasUnsavedChanges]);
+  }, [selectedNodes, copyNodes, onNodesDelete, getNodes, getEdges, setNodes, setEdges, setHasUnsavedChanges]);
 
   useEffect(() => {
     const handleKeyDown = async (event: KeyboardEvent) => {

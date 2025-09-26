@@ -155,7 +155,7 @@ const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
         <Panel position="top-left">
           <Track gap={10} direction="vertical" align="left">
             <ImportExportControls />
-            <CopyPasteControls />
+            <CopyPasteControls onNodesDelete={onNodesDelete} />
           </Track>
         </Panel>
       </ReactFlow>
