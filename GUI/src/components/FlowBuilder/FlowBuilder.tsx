@@ -11,6 +11,7 @@ import { useTranslation } from 'react-i18next';
 import useServiceStore from 'store/new-services.store';
 import { StepType } from 'types';
 import ImportExportControls from 'components/Flow/Controls/ImportExportControls';
+import CopyPasteControls from 'components/Flow/Controls/CopyPasteControls';
 
 type FlowBuilderProps = {
   nodes: Node[];
@@ -33,7 +34,7 @@ const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
     setDeletedNodes,
     setNodeToDelete,
   } = useOnNodesDelete();
-  const { setHasUnsavedChanges } = useServiceStore();
+  const { setFlowSelectedNodes, setHasUnsavedChanges } = useServiceStore();
 
   const onConnect = useCallback(
     ({ source, target }: any) => {
@@ -72,6 +73,14 @@ const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
   const isValidConnection = useCallback((connection: any) => {
     return connection.source !== connection.target;
   }, []);
+
+  const onSelectionChange = useCallback(
+    ({ nodes: selectedNodes }: { nodes: Node[] }) => {
+      setFlowSelectedNodes(selectedNodes);
+      setHasUnsavedChanges(true);
+    },
+    [setFlowSelectedNodes, setHasUnsavedChanges],
+  );
 
   const onBeforeDelete = useCallback(
     ({ nodes: nodesToDelete, edges: edgesToDelete }: { nodes: Node[]; edges: Edge[] }) => {
@@ -123,6 +132,7 @@ const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
           useServiceStore.getState().loadEndpointsResponseVariables();
         }}
         nodesDraggable={false}
+        onSelectionChange={onSelectionChange}
         onConnect={onConnect}
         onEdgesDelete={(edges) => {
           onEdgesDelete(edges);
@@ -143,7 +153,10 @@ const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
         <Background color="#D2D3D8" gap={16} lineWidth={9} />
         <Controls orientation="horizontal" showInteractive={false} />
         <Panel position="top-left">
-          <ImportExportControls />
+          <Track gap={10} direction="vertical" align="left">
+            <ImportExportControls />
+            <CopyPasteControls />
+          </Track>
         </Panel>
       </ReactFlow>
       {isDeleteConnectionsModalVisible && (
