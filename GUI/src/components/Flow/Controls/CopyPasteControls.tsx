@@ -171,6 +171,83 @@ const CopyPasteControls: FC<CopyPasteControlsProps> = ({ onNodesDelete }) => {
     const ghostNodes: Node[] = [];
     const ghostEdges: Edge[] = [];
 
+    const createGhostBranch = (node: Node, newId: string, label: string, index: number) => {
+      const ghostNode: Node = {
+        id: generateUniqueId(),
+        type: 'ghost',
+        position: {
+          x: node.position.x + 200,
+          y: node.position.y + (index * 100),
+        },
+        data: { type: 'ghost' },
+        className: 'ghost',
+        selectable: false,
+        draggable: false,
+      };
+
+      const ghostEdge: Edge = {
+        id: generateUniqueId(),
+        source: newId,
+        target: ghostNode.id,
+        type: 'step',
+        animated: true,
+        deletable: false,
+        label: label,
+      };
+
+      ghostNodes.push(ghostNode);
+      ghostEdges.push(ghostEdge);
+    };
+
+    const processConditionLabel = (node: Node, newId: string, label: string, index: number) => {
+      const hasExistingBranch = clipboardData.edges.some(edge => 
+        edge.source === node.id && edge.label === label
+      );
+      if (!hasExistingBranch) {
+        createGhostBranch(node, newId, label, index);
+      }
+    };
+
+    const processMultiChoiceButton = (node: Node, newId: string, button: any, index: number) => {
+      const hasExistingBranch = clipboardData.edges.some(edge => 
+        edge.source === node.id && edge.label === button.title
+      );
+      if (!hasExistingBranch) {
+        createGhostBranch(node, newId, button.title, index);
+      }
+    };
+
+    const createConditionBranches = (node: Node, newId: string) => {
+      const labels = ['Success', 'Failure'];
+      labels.forEach((label, index) => processConditionLabel(node, newId, label, index));
+    };
+
+    const createMultiChoiceBranches = (node: Node, newId: string) => {
+      const multiChoiceData = node.data?.multiChoiceQuestion as any;
+      const buttons = multiChoiceData?.buttons || [
+        { id: '1', title: 'Jah' },
+        { id: '2', title: 'Ei' }
+      ];
+      buttons.forEach((button: any, index: number) => processMultiChoiceButton(node, newId, button, index));
+    };
+
+    const createBranchesForNode = (node: Node, newId: string) => {
+      const stepType = node.data?.stepType;
+      
+      if (stepType === StepType.Condition || stepType === StepType.Input) {
+        createConditionBranches(node, newId);
+      } else if (stepType === StepType.MultiChoiceQuestion) {
+        createMultiChoiceBranches(node, newId);
+      }
+    };
+
+    clipboardData.nodes.forEach((node) => {
+      const newId = idMap.get(node.id);
+      if (newId) {
+        createBranchesForNode(node, newId);
+      }
+    });
+
     endNodes.forEach((endNode) => {
       const newEndNodeId = idMap.get(endNode.id);
       if (newEndNodeId) {
@@ -179,7 +256,10 @@ const CopyPasteControls: FC<CopyPasteControlsProps> = ({ onNodesDelete }) => {
         if (
           stepType === StepType.FinishingStepEnd ||
           stepType === StepType.FinishingStepRedirect ||
-          stepType === StepType.DynamicChoices
+          stepType === StepType.DynamicChoices ||
+          stepType === StepType.Condition ||
+          stepType === StepType.Input ||
+          stepType === StepType.MultiChoiceQuestion
         ) {
           return;
         }
