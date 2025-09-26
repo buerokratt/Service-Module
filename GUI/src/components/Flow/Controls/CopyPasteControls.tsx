@@ -21,30 +21,33 @@ const CopyPasteControls: FC = () => {
   const selectedNodes = useServiceStore((state) => state.flowSelectedNodes);
   const reactFlowInstance = useServiceStore.getState().reactFlowInstance;
 
-  const copyNodes = useCallback((showToast = true) => {
-    if (selectedNodes.length === 0) {
-      useToastStore.getState().warning({ title: t('serviceFlow.noNodesSelected') });
-      return;
-    }
+  const copyNodes = useCallback(
+    (showToast = true) => {
+      if (selectedNodes.length === 0) {
+        useToastStore.getState().warning({ title: t('serviceFlow.noNodesSelected') });
+        return;
+      }
 
-    const selectedNodeIds = selectedNodes.map((node) => node.id);
-    const internalEdges = getEdges().filter(
-      (edge) => selectedNodeIds.includes(edge.source) && selectedNodeIds.includes(edge.target),
-    );
+      const selectedNodeIds = selectedNodes.map((node) => node.id);
+      const internalEdges = getEdges().filter(
+        (edge) => selectedNodeIds.includes(edge.source) && selectedNodeIds.includes(edge.target),
+      );
 
-    const clipboardData: ClipboardData = {
-      nodes: selectedNodes.map((node) => ({ ...node })),
-      edges: internalEdges,
-    };
+      const clipboardData: ClipboardData = {
+        nodes: selectedNodes.map((node) => ({ ...node })),
+        edges: internalEdges,
+      };
 
-    setClipboardData(clipboardData);
+      setClipboardData(clipboardData);
 
-    if (showToast) {
-      useToastStore.getState().success({
-        title: t('serviceFlow.nodesCopied', { count: selectedNodes.length, s: selectedNodes.length > 1 ? 's' : '' }),
-      });
-    }
-  }, [selectedNodes, getNodes, getEdges]);
+      if (showToast) {
+        useToastStore.getState().success({
+          title: t('serviceFlow.nodesCopied', { count: selectedNodes.length, s: selectedNodes.length > 1 ? 's' : '' }),
+        });
+      }
+    },
+    [selectedNodes, getNodes, getEdges],
+  );
 
   const pasteNodes = useCallback(() => {
     if (!clipboardData) {
@@ -101,7 +104,7 @@ const CopyPasteControls: FC = () => {
       const newEndNodeId = idMap.get(endNode.id);
       if (newEndNodeId) {
         const stepType = endNode.data?.stepType;
-        
+
         if (
           stepType === StepType.FinishingStepEnd ||
           stepType === StepType.FinishingStepRedirect ||
