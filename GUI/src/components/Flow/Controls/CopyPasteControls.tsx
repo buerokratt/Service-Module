@@ -17,12 +17,30 @@ const CopyPasteControls: FC = () => {
   const { getNodes, getEdges, setNodes, setEdges, getViewport } = useReactFlow();
   const { t } = useTranslation();
   const { setHasUnsavedChanges } = useServiceStore();
-  const [clipboardData, setClipboardData] = useState<ClipboardData | null>(null);
+  const [hasClipboardData, setHasClipboardData] = useState<boolean>(false);
   const selectedNodes = useServiceStore((state) => state.flowSelectedNodes);
   const reactFlowInstance = useServiceStore.getState().reactFlowInstance;
 
+  const isClipboardSupported = () => {
+    return navigator.clipboard && typeof navigator.clipboard.writeText === 'function';
+  };
+
+  const checkClipboardPermissions = async () => {
+    if (!isClipboardSupported()) return false;
+
+    try {
+      const permission = await navigator.permissions.query({ name: 'clipboard-write' as PermissionName });
+      return permission.state === 'granted' || permission.state === 'prompt';
+    } catch (error) {
+      console.warn('Clipboard permissions query not supported:', error);
+      return true;
+    }
+  };
+
+  const [fallbackClipboardData, setFallbackClipboardData] = useState<ClipboardData | null>(null);
+
   const copyNodes = useCallback(
-    (showToast = true) => {
+    async (showToast = true) => {
       if (selectedNodes.length === 0) {
         useToastStore.getState().warning({ title: t('serviceFlow.noNodesSelected') });
         return;
@@ -38,18 +56,67 @@ const CopyPasteControls: FC = () => {
         edges: internalEdges,
       };
 
-      setClipboardData(clipboardData);
+      try {
+        if (isClipboardSupported() && (await checkClipboardPermissions())) {
+          const jsonData = JSON.stringify(clipboardData);
+          await navigator.clipboard.writeText(jsonData);
+          setHasClipboardData(true);
+        } else {
+          setFallbackClipboardData(clipboardData);
+          setHasClipboardData(true);
+        }
 
-      if (showToast) {
-        useToastStore.getState().success({
-          title: t('serviceFlow.nodesCopied', { count: selectedNodes.length, s: selectedNodes.length > 1 ? 's' : '' }),
-        });
+        if (showToast) {
+          useToastStore.getState().success({
+            title: t('serviceFlow.nodesCopied', {
+              count: selectedNodes.length,
+              s: selectedNodes.length > 1 ? 's' : '',
+            }),
+          });
+        }
+      } catch (error) {
+        console.error('Failed to copy to clipboard:', error);
+        setFallbackClipboardData(clipboardData);
+        setHasClipboardData(true);
+
+        if (showToast) {
+          useToastStore.getState().success({
+            title: t('serviceFlow.nodesCopied', {
+              count: selectedNodes.length,
+              s: selectedNodes.length > 1 ? 's' : '',
+            }),
+          });
+        }
       }
     },
     [selectedNodes, getNodes, getEdges],
   );
 
-  const pasteNodes = useCallback(() => {
+  const pasteNodes = useCallback(async () => {
+    let clipboardData: ClipboardData | null = null;
+
+    try {
+      if (isClipboardSupported()) {
+        const clipboardText = await navigator.clipboard.readText();
+        if (clipboardText) {
+          try {
+            clipboardData = JSON.parse(clipboardText) as ClipboardData;
+            if (!clipboardData.nodes || !Array.isArray(clipboardData.nodes)) {
+              clipboardData = null;
+            }
+          } catch (parseError) {
+            console.warn('Failed to parse clipboard data:', parseError);
+            clipboardData = null;
+          }
+        }
+      } else {
+        clipboardData = fallbackClipboardData;
+      }
+    } catch (error) {
+      console.error('Failed to read from clipboard:', error);
+      clipboardData = fallbackClipboardData;
+    }
+
     if (!clipboardData) {
       useToastStore.getState().warning({ title: t('serviceFlow.nothingToPaste') });
       return;
@@ -148,14 +215,14 @@ const CopyPasteControls: FC = () => {
     useToastStore
       .getState()
       .success({ title: t('serviceFlow.nodesPasted', { count: newNodes.length, s: newNodes.length > 1 ? 's' : '' }) });
-  }, [clipboardData, getNodes, getEdges, getViewport, setNodes, setEdges, setHasUnsavedChanges]);
+  }, [fallbackClipboardData, getNodes, getEdges, getViewport, setNodes, setEdges, setHasUnsavedChanges]);
 
-  const cutNodes = useCallback(() => {
+  const cutNodes = useCallback(async () => {
     if (selectedNodes.length === 0) {
       useToastStore.getState().warning({ title: t('serviceFlow.noNodesSelected') });
       return;
     }
-    copyNodes(false);
+    await copyNodes(false);
     reactFlowInstance?.deleteElements({ nodes: selectedNodes });
     setHasUnsavedChanges(true);
 
@@ -165,19 +232,19 @@ const CopyPasteControls: FC = () => {
   }, [selectedNodes, copyNodes, getNodes, getEdges, setNodes, setEdges, setHasUnsavedChanges]);
 
   useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
+    const handleKeyDown = async (event: KeyboardEvent) => {
       const isMac = navigator.userAgent.toUpperCase().indexOf('MAC') >= 0;
       const isCtrlOrCmd = isMac ? event.metaKey : event.ctrlKey;
 
       if (isCtrlOrCmd && event.key === 'c' && !event.shiftKey) {
         event.preventDefault();
-        copyNodes();
+        await copyNodes();
       } else if (isCtrlOrCmd && event.key === 'v' && !event.shiftKey) {
         event.preventDefault();
-        pasteNodes();
+        await pasteNodes();
       } else if (isCtrlOrCmd && event.key === 'x' && !event.shiftKey) {
         event.preventDefault();
-        cutNodes();
+        await cutNodes();
       }
     };
 
@@ -196,7 +263,7 @@ const CopyPasteControls: FC = () => {
         <Icon icon={<MdContentCopy />} />
         {t('global.copy')}
       </Button>
-      <Button onClick={pasteNodes} size="s" disabled={!clipboardData} title={t('serviceFlow.pasteNodes').toString()}>
+      <Button onClick={pasteNodes} size="s" disabled={!hasClipboardData} title={t('serviceFlow.pasteNodes').toString()}>
         <Icon icon={<MdContentPaste />} />
         {t('global.paste')}
       </Button>
