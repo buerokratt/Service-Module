@@ -260,14 +260,14 @@ const VariableSection = ({
           const rawName =
             title === t('serviceFlow.previousVariables.environmentVariables.title') ||
             title === t('serviceFlow.previousVariables.assignElements')
-              ? variable.key
-              : t(variable.key);
+              ? variable?.key ?? ''
+              : t(variable?.key ?? '');
           const name = rawName.length > 0 ? rawName : t('serviceFlow.previousVariables.noName');
 
-          return isObject(variable.data) && !predefinedInputKeys.includes(variable.id) ? (
+          return isObject(variable?.data ?? '') && !predefinedInputKeys.includes(variable?.id ?? '') ? (
             <Tooltip
               content={
-                variable.tooltip ? `${variable.value}\n\n${variable.tooltip}` : `${variable.value} : ${typeColor.type}`
+                variable?.tooltip ? `${variable?.value ?? ''}\n\n${variable?.tooltip ?? ''}` : `${variable?.value ?? ''} : ${typeColor.type}`
               }
               key={variable.id}
             >
@@ -293,15 +293,15 @@ const VariableSection = ({
           ) : (
             <Tooltip
               content={
-                variable.tooltip ? `${variable.value}\n\n${variable.tooltip}` : `${variable.value} : ${typeColor.type}`
+                variable?.tooltip ? `${variable?.value ?? ''}\n\n${variable?.tooltip ?? ''}` : `${variable?.value ?? ''} : ${typeColor.type}`
               }
-              key={variable.id}
+              key={variable?.id ?? ''}
             >
               <OutputElementBox
-                dragData={variable.key ? variable : undefined}
-                style={{ cursor: variable.key ? 'grab' : 'default' }}
+                dragData={variable?.key ? variable : undefined}
+                style={{ cursor: variable?.key ? 'grab' : 'default' }}
                 borderColor={typeColor.color}
-                isAssignElement={isAssignSection ? !predefinedInputKeys.includes(variable.id) : false}
+                isAssignElement={isAssignSection ? !predefinedInputKeys.includes(variable?.id ?? '') : false}
               >
                 {name}
               </OutputElementBox>
