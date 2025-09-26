@@ -33,11 +33,15 @@ function useEdgeAdd(id: string) {
         endpoint: step.data,
         setClickedNode: useServiceStore.getState().setClickedNode,
       },
-      className: [StepType.FinishingStepEnd, StepType.FinishingStepRedirect].includes(stepType)
-        ? 'finishing-step'
-        : [StepType.DynamicChoices].includes(stepType)
-          ? 'dynamic-choices'
-          : 'step',
+      className: (() => {
+        if ([StepType.FinishingStepEnd, StepType.FinishingStepRedirect].includes(stepType)) {
+          return 'finishing-step';
+        }
+        if ([StepType.DynamicChoices].includes(stepType)) {
+          return 'dynamic-choices';
+        }
+        return 'step';
+      })(),
       type: 'custom',
     };
 
