@@ -28,8 +28,7 @@ const processDeletedNodes = (
   edges: Edge[],
   deletedNodes: Node[],
   nodes: Node[],
-  setNodes: (nodes: Node[]) => void,
-): Edge[] => {
+): { updatedNodes: Node[]; updatedEdges: Edge[] } => {
   let updatedNodes = [...nodes];
   let updatedEdges = [...edges];
 
@@ -106,8 +105,7 @@ const processDeletedNodes = (
       getOutgoers(node, updatedNodes, updatedEdges).length > 0,
   );
 
-  setNodes(updatedNodes);
-  return updatedEdges;
+  return { updatedNodes, updatedEdges };
 };
 
 function getDirectlyConnectedNodes(nodeId: string, nodes: Node[], edges: Edge[], withGhost: boolean = true): Node[] {
@@ -158,14 +156,18 @@ export const useOnNodesDelete = () => {
     const descendantNodes = nodes.filter((node) => uniqueDescendantIds.includes(node.id));
     const nodesToDelete = [nodeToDelete, ...descendantNodes];
 
-    setEdges(processDeletedNodes(getEdges(), nodesToDelete, getNodes(), setNodes));
+    const { updatedNodes, updatedEdges } = processDeletedNodes(getEdges(), nodesToDelete, getNodes());
+    setNodes(updatedNodes);
+    setEdges(updatedEdges);
     setIsDeleteConnectionsModalVisible(false);
     setNodeToDelete(null);
   }, [nodeToDelete, getNodes, getEdges, setEdges, setNodes]);
 
   const onKeepItConfirmed = useCallback(() => {
     if (!nodeToDelete) return;
-    setEdges(processDeletedNodes(getEdges(), [nodeToDelete], getNodes(), setNodes));
+    const { updatedNodes, updatedEdges } = processDeletedNodes(getEdges(), [nodeToDelete], getNodes());
+    setNodes(updatedNodes);
+    setEdges(updatedEdges);
     setIsDeleteConnectionsModalVisible(false);
     setNodeToDelete(null);
   }, [nodeToDelete, getNodes, getEdges, setEdges, setNodes]);
@@ -193,7 +195,18 @@ export const useOnNodesDelete = () => {
           console.error(error);
         }
 
-        setEdges(deleted.reduce((acc: Edge[], node: Node) => processDeletedNodes(acc, [node], nodes, setNodes), edges));
+        const { updatedNodes, updatedEdges } = deleted.reduce(
+          (acc: { updatedNodes: Node[]; updatedEdges: Edge[] }, node: Node) => {
+            const result = processDeletedNodes(acc.updatedEdges, [node], acc.updatedNodes);
+            return {
+              updatedNodes: result.updatedNodes,
+              updatedEdges: result.updatedEdges,
+            };
+          },
+          { updatedNodes: nodes, updatedEdges: edges }
+        );
+        setNodes(updatedNodes);
+        setEdges(updatedEdges);
       },
       [getNodes, getEdges, setEdges, setNodes, hasConnectedNodes],
     ),
