@@ -21,7 +21,7 @@ const CopyPasteControls: FC = () => {
   const selectedNodes = useServiceStore((state) => state.flowSelectedNodes);
   const reactFlowInstance = useServiceStore.getState().reactFlowInstance;
 
-  const copyNodes = useCallback(() => {
+  const copyNodes = useCallback((showToast = true) => {
     if (selectedNodes.length === 0) {
       useToastStore.getState().warning({ title: t('serviceFlow.noNodesSelected') });
       return;
@@ -39,9 +39,11 @@ const CopyPasteControls: FC = () => {
 
     setClipboardData(clipboardData);
 
-    useToastStore.getState().success({
-      title: t('serviceFlow.nodesCopied', { count: selectedNodes.length, s: selectedNodes.length > 1 ? 's' : '' }),
-    });
+    if (showToast) {
+      useToastStore.getState().success({
+        title: t('serviceFlow.nodesCopied', { count: selectedNodes.length, s: selectedNodes.length > 1 ? 's' : '' }),
+      });
+    }
   }, [selectedNodes, getNodes, getEdges]);
 
   const pasteNodes = useCallback(() => {
@@ -150,7 +152,7 @@ const CopyPasteControls: FC = () => {
       useToastStore.getState().warning({ title: t('serviceFlow.noNodesSelected') });
       return;
     }
-    copyNodes();
+    copyNodes(false);
     reactFlowInstance?.deleteElements({ nodes: selectedNodes });
     setHasUnsavedChanges(true);
 
@@ -183,7 +185,7 @@ const CopyPasteControls: FC = () => {
   return (
     <Track style={{ gap: 8 }} align="center" justify="start">
       <Button
-        onClick={copyNodes}
+        onClick={() => copyNodes(true)}
         size="s"
         disabled={selectedNodes.length === 0}
         title={t('serviceFlow.copyNodes').toString()}
