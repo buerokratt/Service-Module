@@ -13,6 +13,7 @@ import Track from '../Track';
 
 import './styles.scss';
 import FormError from 'components/FormElements/FormError';
+import { generateUniqueId } from 'utils/flow-utils';
 
 const maxButtons = parseInt(process.env.REACT_APP_MULTI_CHOICE_QUESTION_MAX_BUTTONS ?? '4');
 
@@ -72,7 +73,7 @@ const MultiChoiceQuestionContent: FC<MultiChoiceQuestionContentProps> = ({
     const newButtons = [
       ...buttons,
       {
-        id: crypto.randomUUID(),
+        id: generateUniqueId(),
         title: '',
         payload: `#service, /${selectedService?.type ?? 'POST'}/services/active/${serviceName}_mcq_${
           node?.data.label[node?.data.label.length - 1]

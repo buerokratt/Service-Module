@@ -1,6 +1,7 @@
 import { Edge, getConnectedEdges, getIncomers, getOutgoers, Node, useReactFlow } from '@xyflow/react';
 import { useCallback, useState } from 'react';
 import { StepType } from 'types';
+import { generateUniqueId } from 'utils/flow-utils';
 
 const getRemainingEdges = (allEdges: Edge[], edgesToRemove: Edge[]): Edge[] =>
   allEdges.filter((edge) => !edgesToRemove.includes(edge));
@@ -50,7 +51,7 @@ const processDeletedNodes = (
 
       incomers.forEach((incomer) => {
         const ghostNode: Node = {
-          id: crypto.randomUUID(),
+          id: generateUniqueId(),
           type: 'ghost',
           position: {
             x: node.position.x,
@@ -79,7 +80,7 @@ const processDeletedNodes = (
     } else {
       if (outgoers.length === 0 || outgoers.length > 1) {
         const ghostNode: Node = {
-          id: crypto.randomUUID(),
+          id: generateUniqueId(),
           type: 'ghost',
           position: { x: node.position.x, y: node.position.y },
           data: { type: 'ghost' },
@@ -201,7 +202,7 @@ export const useOnNodesDelete = () => {
         const parentNode = getNode(deleted[0].source);
         if (parentNode) {
           const ghostNode: Node = {
-            id: crypto.randomUUID(),
+            id: generateUniqueId(),
             type: 'ghost',
             position: { x: parentNode.position.x + 50, y: parentNode.position.y + 50 },
             data: { type: 'ghost' },

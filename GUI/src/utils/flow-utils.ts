@@ -37,6 +37,39 @@ export const getNodeLabel = (step: Step, nodes: Node[]) => {
   return `${baseLabel} - ${nextNumber}`;
 };
 
+export const generateUniqueId = () => {
+  return crypto.randomUUID();
+};
+
+export const generateUniqueLabel = (originalLabel: string, existingNodes: Node[]): string => {
+  const parts = originalLabel.split(' - ');
+  const baseLabel = parts.length > 1 ? parts.slice(0, -1).join(' - ') : originalLabel;
+
+  const existingLabels = existingNodes
+    .map((node: any) => node.data?.label)
+    .filter((label) => label?.startsWith(baseLabel))
+    .map((label) => {
+      const labelParts = label.split(' - ');
+      if (labelParts.length > 1) {
+        const num = parseInt(labelParts[labelParts.length - 1] as string);
+        return isNaN(num) ? 0 : num;
+      }
+      return 0;
+    })
+    .sort((a, b) => a - b);
+
+  let nextNumber = 1;
+  for (const num of existingLabels) {
+    if (num === nextNumber) {
+      nextNumber++;
+    } else if (num > nextNumber) {
+      break;
+    }
+  }
+
+  return `${baseLabel} - ${nextNumber}`;
+};
+
 export const validateStep = (node: NodeDataProps): ValidationResult => {
   // End service node and similar
   if (node.readonly) return { isValid: true };

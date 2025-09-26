@@ -5,6 +5,7 @@ import { FC, useCallback, useEffect, useState } from 'react';
 import useServiceStore from 'store/new-services.store';
 import { MdContentCopy, MdContentPaste, MdContentCut } from 'react-icons/md';
 import useToastStore from 'store/toasts.store';
+import { generateUniqueId, generateUniqueLabel } from 'utils/flow-utils';
 
 interface ClipboardData {
   nodes: Node[];
@@ -18,10 +19,6 @@ const CopyPasteControls: FC = () => {
   const [clipboardData, setClipboardData] = useState<ClipboardData | null>(null);
   const selectedNodes = useServiceStore((state) => state.flowSelectedNodes);
   const reactFlowInstance = useServiceStore.getState().reactFlowInstance;
-
-  const generateUniqueId = useCallback(() => {
-    return crypto.randomUUID();
-  }, []);
 
   const copyNodes = useCallback(() => {
     if (selectedNodes.length === 0) {
@@ -52,10 +49,24 @@ const CopyPasteControls: FC = () => {
       return;
     }
 
+    const currentNodes = getNodes();
     const idMap = new Map<string, string>();
+    const processedLabels = new Set<string>();
+
     const newNodes = clipboardData.nodes.map((node) => {
       const newId = generateUniqueId();
       idMap.set(node.id, newId);
+
+      const allExistingNodes = [...currentNodes];
+      processedLabels.forEach((label) => {
+        allExistingNodes.push({
+          id: 'virtual',
+          data: { label },
+        } as any);
+      });
+
+      const uniqueLabel = generateUniqueLabel(node.data.label as string, allExistingNodes);
+      processedLabels.add(uniqueLabel);
 
       return {
         ...node,
@@ -63,6 +74,7 @@ const CopyPasteControls: FC = () => {
         selected: false,
         data: {
           ...node.data,
+          label: uniqueLabel,
           onDelete: useServiceStore.getState().onDelete,
           setClickedNode: useServiceStore.getState().setClickedNode,
           onEdit: useServiceStore.getState().handleNodeEdit,
@@ -77,8 +89,44 @@ const CopyPasteControls: FC = () => {
       target: idMap.get(edge.target) || edge.target,
     }));
 
-    setNodes((prevNodes) => [...prevNodes, ...newNodes]);
-    setEdges((prevEdges) => [...prevEdges, ...newEdges]);
+    const endNodes = clipboardData.nodes.filter((node) => !clipboardData.edges.some((edge) => edge.source === node.id));
+
+    const ghostNodes: Node[] = [];
+    const ghostEdges: Edge[] = [];
+
+    endNodes.forEach((endNode) => {
+      const newEndNodeId = idMap.get(endNode.id);
+      if (newEndNodeId) {
+        const ghostNode: Node = {
+          id: generateUniqueId(),
+          type: 'ghost',
+          position: {
+            x: endNode.position.x,
+            y: endNode.position.y,
+          },
+          data: { type: 'ghost' },
+          className: 'ghost',
+          selectable: false,
+          draggable: false,
+        };
+
+        const ghostEdge: Edge = {
+          id: generateUniqueId(),
+          source: newEndNodeId,
+          target: ghostNode.id,
+          type: 'step',
+          animated: true,
+          deletable: false,
+          label: '+',
+        };
+
+        ghostNodes.push(ghostNode);
+        ghostEdges.push(ghostEdge);
+      }
+    });
+
+    setNodes((prevNodes) => [...prevNodes, ...newNodes, ...ghostNodes]);
+    setEdges((prevEdges) => [...prevEdges, ...newEdges, ...ghostEdges]);
     setHasUnsavedChanges(true);
 
     useToastStore
