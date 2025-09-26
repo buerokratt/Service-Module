@@ -6,6 +6,7 @@ import useServiceStore from 'store/new-services.store';
 import { MdContentCopy, MdContentPaste, MdContentCut } from 'react-icons/md';
 import useToastStore from 'store/toasts.store';
 import { generateUniqueId, generateUniqueLabel } from 'utils/flow-utils';
+import { StepType } from 'types';
 
 interface ClipboardData {
   nodes: Node[];
@@ -97,6 +98,16 @@ const CopyPasteControls: FC = () => {
     endNodes.forEach((endNode) => {
       const newEndNodeId = idMap.get(endNode.id);
       if (newEndNodeId) {
+        const stepType = endNode.data?.stepType;
+        
+        if (
+          stepType === StepType.FinishingStepEnd ||
+          stepType === StepType.FinishingStepRedirect ||
+          stepType === StepType.DynamicChoices
+        ) {
+          return;
+        }
+
         const ghostNode: Node = {
           id: generateUniqueId(),
           type: 'ghost',
@@ -132,7 +143,7 @@ const CopyPasteControls: FC = () => {
     useToastStore
       .getState()
       .success({ title: t('serviceFlow.nodesPasted', { count: newNodes.length, s: newNodes.length > 1 ? 's' : '' }) });
-  }, [clipboardData, getNodes, getEdges, getViewport, generateUniqueId, setNodes, setEdges, setHasUnsavedChanges]);
+  }, [clipboardData, getNodes, getEdges, getViewport, setNodes, setEdges, setHasUnsavedChanges]);
 
   const cutNodes = useCallback(() => {
     if (selectedNodes.length === 0) {
