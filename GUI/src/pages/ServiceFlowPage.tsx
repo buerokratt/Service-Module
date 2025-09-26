@@ -118,130 +118,134 @@ const ServiceFlowPage: FC = () => {
         </div>
       ) : (
         <>
-          <Collapsible
-            title={t('serviceFlow.serviceInfo')}
-            defaultOpen={!id}
-            contentStyle={{ padding: '0' }}
-            onStateChange={(open) => setIsInfoOpen(open)}
-          >
-            <Card isBodyDivided={true} borderless={true} isBackground={true}>
-              <Track style={{ alignItems: 'center', gap: 8, width: '100%' }}>
-                <div>
-                  <FormInput
-                    ref={titleRef}
-                    name={''}
-                    placeholder={t('newService.title').toString()}
-                    value={name}
-                    onChange={(e) => {
-                      setHasUnsavedChanges(true);
-                      const value = e.target.value.trimStart().replaceAll(/_+/g, '_');
-                      const hasSpecialCharacters = /[^\p{L}\p{N}_ ]/u;
-                      if (!hasSpecialCharacters.test(value) && !value.startsWith(' ')) {
-                        useServiceStore.getState().changeServiceName(value);
-                      }
-                    }}
-                    style={{
-                      minWidth: '250px',
-                      width: '20vw',
-                      backgroundColor: 'transparent',
-                      border: 'none',
-                      fontSize: '1.5em',
-                    }}
-                  />
-                </div>
-                {getEditingButton(() => {
-                  titleRef?.current?.focus();
-                })}
-                {!name && <label style={{ color: '#d73e3e' }}>{t('newService.titleRequired')}</label>}
-              </Track>
-              <Track style={{ alignItems: 'center', gap: 8, width: '100%' }}>
-                <div>
-                  <FormInput
-                    ref={descriptionRef}
-                    name={''}
-                    placeholder={t('newService.description').toString()}
-                    value={description}
-                    onChange={(e) => {
-                      setHasUnsavedChanges(true);
-                      useServiceStore.getState().setDescription(e.target.value);
-                    }}
-                    style={{
-                      minWidth: '250px',
-                      width: '20vw',
-                      backgroundColor: 'transparent',
-                      border: 'none',
-                      textOverflow: 'ellipsis',
-                    }}
-                  />
-                </div>
-                {getEditingButton(() => {
-                  descriptionRef?.current?.focus();
-                })}
-              </Track>
-              <Track style={{ alignItems: 'center', gap: 8, width: '100%' }}>
-                <div style={{ flexDirection: 'row', display: 'flex', alignItems: 'center' }}>
-                  <FormInput
-                    name={''}
-                    placeholder={t('newService.chooseMemorySlots').toString()}
-                    value={''}
-                    readOnly={true}
-                    onClick={() => setIsChooseSlotsModalVisible(true)}
-                    style={{
-                      minWidth: slot ? '130px' : '250px',
-                      width: slot ? '17vw' : '20vw',
-                      backgroundColor: 'transparent',
-                      border: 'none',
-                      textOverflow: 'ellipsis',
-                      cursor: 'pointer',
-                    }}
-                  />
-                  {slot && (
-                    <button
+          <div style={{ position: "absolute", top: '100px', left: '0', width: `${name ? 500 : 630}px`, zIndex: '10'}}>
+            <Collapsible
+              title={t('serviceFlow.serviceInfo')}
+              defaultOpen={!id}
+              contentStyle={{ padding: '0' }}
+              onStateChange={(open) => setIsInfoOpen(open)}
+            >
+              <Card isBodyDivided={true} borderless={true} isBackground={true}>
+                <Track style={{ alignItems: 'center', gap: 8, width: '100%' }}>
+                  <div>
+                    <FormInput
+                      ref={titleRef}
+                      name={''}
+                      placeholder={t('newService.title').toString()}
+                      value={name}
+                      onChange={(e) => {
+                        setHasUnsavedChanges(true);
+                        const value = e.target.value.trimStart().replaceAll(/_+/g, '_');
+                        const hasSpecialCharacters = /[^\p{L}\p{N}_ ]/u;
+                        if (!hasSpecialCharacters.test(value) && !value.startsWith(' ')) {
+                          useServiceStore.getState().changeServiceName(value);
+                        }
+                      }}
                       style={{
-                        border: '1px solid',
-                        padding: '7px',
-                        fontSize: '0.9em',
-                        minWidth: '130px',
-                        maxWidth: '130px',
-                        whiteSpace: 'nowrap',
-                        overflow: 'hidden',
+                        minWidth: '250px',
+                        width: '20vw',
+                        backgroundColor: 'transparent',
+                        border: 'none',
+                        fontSize: '1.5em',
+                      }}
+                    />
+                  </div>
+                  {getEditingButton(() => {
+                    titleRef?.current?.focus();
+                  })}
+                  {!name && <label style={{ color: '#d73e3e' }}>{t('newService.titleRequired')}</label>}
+                </Track>
+                <Track style={{ alignItems: 'center', gap: 8, width: '100%' }}>
+                  <div>
+                    <FormInput
+                      ref={descriptionRef}
+                      name={''}
+                      placeholder={t('newService.description').toString()}
+                      value={description}
+                      onChange={(e) => {
+                        setHasUnsavedChanges(true);
+                        useServiceStore.getState().setDescription(e.target.value);
+                      }}
+                      style={{
+                        minWidth: '250px',
+                        width: '20vw',
+                        backgroundColor: 'transparent',
+                        border: 'none',
                         textOverflow: 'ellipsis',
-                        display: 'inline-block',
                       }}
-                      onClick={() => {
-                        setIsChooseSlotsModalVisible(true);
+                    />
+                  </div>
+                  {getEditingButton(() => {
+                    descriptionRef?.current?.focus();
+                  })}
+                </Track>
+                <Track style={{ alignItems: 'center', gap: 8, width: '100%' }}>
+                  <div style={{ flexDirection: 'row', display: 'flex', alignItems: 'center' }}>
+                    <FormInput
+                      name={''}
+                      placeholder={t('newService.chooseMemorySlots').toString()}
+                      value={''}
+                      readOnly={true}
+                      onClick={() => setIsChooseSlotsModalVisible(true)}
+                      style={{
+                        minWidth: slot ? '130px' : '250px',
+                        width: slot ? '17vw' : '20vw',
+                        backgroundColor: 'transparent',
+                        border: 'none',
+                        textOverflow: 'ellipsis',
+                        cursor: 'pointer',
                       }}
-                    >
-                      {slot ?? ''}
-                    </button>
-                  )}
-                </div>
-                {getEditingButton(() => {
-                  setIsChooseSlotsModalVisible(true);
-                })}
-              </Track>
-              <Track style={{ paddingLeft: '26px' }}>
-                <Switch
-                  name="isCommon"
-                  label={t('newService.isCommon')}
-                  onLabel={t('global.yes').toString()}
-                  offLabel={t('global.no').toString()}
-                  value={isCommon}
-                  checked={isCommon}
-                  onCheckedChange={(e) => {
-                    setHasUnsavedChanges(true);
-                    useServiceStore.getState().setIsCommon(e);
-                  }}
-                />
-              </Track>
-            </Card>
-          </Collapsible>
+                    />
+                    {slot && (
+                      <button
+                        style={{
+                          border: '1px solid',
+                          padding: '7px',
+                          fontSize: '0.9em',
+                          minWidth: '130px',
+                          maxWidth: '130px',
+                          whiteSpace: 'nowrap',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          display: 'inline-block',
+                        }}
+                        onClick={() => {
+                          setIsChooseSlotsModalVisible(true);
+                        }}
+                      >
+                        {slot ?? ''}
+                      </button>
+                    )}
+                  </div>
+                  {getEditingButton(() => {
+                    setIsChooseSlotsModalVisible(true);
+                  })}
+                </Track>
+                <Track style={{ paddingLeft: '26px' }}>
+                  <Switch
+                    name="isCommon"
+                    label={t('newService.isCommon')}
+                    onLabel={t('global.yes').toString()}
+                    offLabel={t('global.no').toString()}
+                    value={isCommon}
+                    checked={isCommon}
+                    onCheckedChange={(e) => {
+                      setHasUnsavedChanges(true);
+                      useServiceStore.getState().setIsCommon(e);
+                    }}
+                  />
+                </Track>
+              </Card>
+            </Collapsible>
+          </div>
           <FlowElementsPopup />
+          <div style={{ position:"relative", width:'100%', height:'100%'}}>
           <ReactFlowProvider>
-            <div style={{ width: '100%', height: `${isInfoOpen ? 55 : 84.5}%` }}>
-              <FlowBuilder nodes={nodes} edges={edges} />
+            <div style={{ width: '100%', height: '100%' }}>
+              <FlowBuilder nodes={nodes} edges={edges} triggerIsOpened={isInfoOpen}/>
             </div>
           </ReactFlowProvider>
+          </div>
           {isChooseSlotsModalVisible && (
             <ChooseSlotModel
               onModalClose={(selection) => {
