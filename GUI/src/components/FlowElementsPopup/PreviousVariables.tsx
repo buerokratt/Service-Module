@@ -260,14 +260,16 @@ const VariableSection = ({
           const rawName =
             title === t('serviceFlow.previousVariables.environmentVariables.title') ||
             title === t('serviceFlow.previousVariables.assignElements')
-              ? variable?.key ?? ''
+              ? (variable?.key ?? '')
               : t(variable?.key ?? '');
           const name = rawName.length > 0 ? rawName : t('serviceFlow.previousVariables.noName');
 
           return isObject(variable?.data ?? '') && !predefinedInputKeys.includes(variable?.id ?? '') ? (
             <Tooltip
               content={
-                variable?.tooltip ? `${variable?.value ?? ''}\n\n${variable?.tooltip ?? ''}` : `${variable?.value ?? ''} : ${typeColor.type}`
+                variable?.tooltip
+                  ? `${variable?.value ?? ''}\n\n${variable?.tooltip ?? ''}`
+                  : `${variable?.value ?? ''} : ${typeColor.type}`
               }
               key={variable.id}
             >
@@ -293,7 +295,9 @@ const VariableSection = ({
           ) : (
             <Tooltip
               content={
-                variable?.tooltip ? `${variable?.value ?? ''}\n\n${variable?.tooltip ?? ''}` : `${variable?.value ?? ''} : ${typeColor.type}`
+                variable?.tooltip
+                  ? `${variable?.value ?? ''}\n\n${variable?.tooltip ?? ''}`
+                  : `${variable?.value ?? ''} : ${typeColor.type}`
               }
               key={variable?.id ?? ''}
             >

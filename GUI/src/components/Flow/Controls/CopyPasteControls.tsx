@@ -177,7 +177,7 @@ const CopyPasteControls: FC<CopyPasteControlsProps> = ({ onNodesDelete }) => {
         type: 'ghost',
         position: {
           x: node.position.x + 200,
-          y: node.position.y + (index * 100),
+          y: node.position.y + index * 100,
         },
         data: { type: 'ghost' },
         className: 'ghost',
@@ -200,17 +200,15 @@ const CopyPasteControls: FC<CopyPasteControlsProps> = ({ onNodesDelete }) => {
     };
 
     const processConditionLabel = (node: Node, newId: string, label: string, index: number) => {
-      const hasExistingBranch = clipboardData.edges.some(edge => 
-        edge.source === node.id && edge.label === label
-      );
+      const hasExistingBranch = clipboardData.edges.some((edge) => edge.source === node.id && edge.label === label);
       if (!hasExistingBranch) {
         createGhostBranch(node, newId, label, index);
       }
     };
 
     const processMultiChoiceButton = (node: Node, newId: string, button: any, index: number) => {
-      const hasExistingBranch = clipboardData.edges.some(edge => 
-        edge.source === node.id && edge.label === button.title
+      const hasExistingBranch = clipboardData.edges.some(
+        (edge) => edge.source === node.id && edge.label === button.title,
       );
       if (!hasExistingBranch) {
         createGhostBranch(node, newId, button.title, index);
@@ -226,14 +224,14 @@ const CopyPasteControls: FC<CopyPasteControlsProps> = ({ onNodesDelete }) => {
       const multiChoiceData = node.data?.multiChoiceQuestion as any;
       const buttons = multiChoiceData?.buttons || [
         { id: '1', title: 'Jah' },
-        { id: '2', title: 'Ei' }
+        { id: '2', title: 'Ei' },
       ];
       buttons.forEach((button: any, index: number) => processMultiChoiceButton(node, newId, button, index));
     };
 
     const createBranchesForNode = (node: Node, newId: string) => {
       const stepType = node.data?.stepType;
-      
+
       if (stepType === StepType.Condition || stepType === StepType.Input) {
         createConditionBranches(node, newId);
       } else if (stepType === StepType.MultiChoiceQuestion) {
@@ -307,13 +305,13 @@ const CopyPasteControls: FC<CopyPasteControlsProps> = ({ onNodesDelete }) => {
       return;
     }
     await copyNodes(false);
-    
+
     if (onNodesDelete) {
       onNodesDelete(selectedNodes);
     } else {
       reactFlowInstance?.deleteElements({ nodes: selectedNodes });
     }
-    
+
     setHasUnsavedChanges(true);
 
     useToastStore.getState().success({

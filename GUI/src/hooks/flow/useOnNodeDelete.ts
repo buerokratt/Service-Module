@@ -203,7 +203,7 @@ export const useOnNodesDelete = () => {
               updatedEdges: result.updatedEdges,
             };
           },
-          { updatedNodes: nodes, updatedEdges: edges }
+          { updatedNodes: nodes, updatedEdges: edges },
         );
         setNodes(updatedNodes);
         setEdges(updatedEdges);
