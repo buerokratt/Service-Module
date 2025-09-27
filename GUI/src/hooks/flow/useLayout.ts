@@ -11,7 +11,9 @@ function layoutNodes(nodes: Node[], edges: Edge[], orientation: 'horizontal' | '
     return [];
   }
 
-  const layout = tree<Node>().nodeSize(orientation === 'vertical' ? [400, 180] : [400, 500]).separation(() => 1);
+  const layout = tree<Node>()
+    .nodeSize(orientation === 'vertical' ? [400, 180] : [400, 500])
+    .separation(() => 1);
 
   const nodesCopy = [...nodes];
   const edgesCopy = [...edges];

@@ -57,11 +57,11 @@
     align-items: center;
     justify-content: center;
 
-    &[data-orientation="horizontal"] {
+    &[data-orientation='horizontal'] {
       padding-left: 5px;
     }
 
-    &[data-orientation="vertical"] {
+    &[data-orientation='vertical'] {
       padding-top: 5px;
     }
   }
