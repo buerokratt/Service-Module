@@ -11,6 +11,7 @@ import { useTranslation } from 'react-i18next';
 import useServiceStore from 'store/new-services.store';
 import { StepType } from 'types';
 import ImportExportControls from 'components/Flow/Controls/ImportExportControls';
+import UndoRedoControls from 'components/Flow/Controls/UndoRedoControls';
 
 type FlowBuilderProps = {
   nodes: Node[];
@@ -33,7 +34,7 @@ const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
     setDeletedNodes,
     setNodeToDelete,
   } = useOnNodesDelete();
-  const { setHasUnsavedChanges } = useServiceStore();
+  const { setHasUnsavedChanges, saveToHistory } = useServiceStore();
 
   const onConnect = useCallback(
     ({ source, target }: any) => {
@@ -65,8 +66,9 @@ const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
         },
       ]);
       setHasUnsavedChanges(true);
+      saveToHistory();
     },
-    [getEdges, getNodes, setEdges, setHasUnsavedChanges, setNodes],
+    [getEdges, getNodes, setEdges, setHasUnsavedChanges, setNodes, saveToHistory],
   );
 
   const isValidConnection = useCallback((connection: any) => {
@@ -127,11 +129,13 @@ const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
         onEdgesDelete={(edges) => {
           onEdgesDelete(edges);
           setHasUnsavedChanges(true);
+          saveToHistory();
         }}
         onBeforeDelete={onBeforeDelete}
         onNodesDelete={(nodes) => {
           onNodesDelete(nodes);
           setHasUnsavedChanges(true);
+          saveToHistory();
         }}
         fitView
         fitViewOptions={{ padding: 5 }}
@@ -143,7 +147,10 @@ const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
         <Background color="#D2D3D8" gap={16} lineWidth={9} />
         <Controls orientation="horizontal" showInteractive={false} />
         <Panel position="top-left">
-          <ImportExportControls />
+          <Track gap={10} direction="vertical" align="left">
+            <ImportExportControls />
+            <UndoRedoControls />
+          </Track>
         </Panel>
       </ReactFlow>
       {isDeleteConnectionsModalVisible && (

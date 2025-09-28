@@ -130,6 +130,13 @@ export interface ServiceStoreState {
   cancelNavigation: () => void;
   handleNavigationAttempt: (to: string) => boolean;
   handleProgrammaticNavigation: (to: string) => boolean;
+  history: { nodes: Node[]; edges: Edge[] }[];
+  historyIndex: number;
+  saveToHistory: () => void;
+  undo: () => void;
+  redo: () => void;
+  canUndo: () => boolean;
+  canRedo: () => boolean;
 }
 
 const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
@@ -149,6 +156,8 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
   isYesNoQuestion: false,
   stepPreferences: [],
   endpointsResponseVariables: [],
+  history: [{ nodes: initialNodes, edges: initialEdges }],
+  historyIndex: 0,
   setIsYesNoQuestion: (value: boolean) => set({ isYesNoQuestion: value }),
   changeAssignNode: (assignElements) => {
     const { nodes } = get();
@@ -398,6 +407,8 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
       isTestButtonVisible: false,
       selectedNode: null,
       serviceState: undefined,
+      history: [{ nodes: initialNodes, edges: initialEdges }],
+      historyIndex: 0,
     });
     useTestServiceStore.getState().reset();
   },
@@ -441,6 +452,11 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
         return node;
       });
 
+      const initialHistoryState = {
+        nodes: JSON.parse(JSON.stringify(nodes)),
+        edges: JSON.parse(JSON.stringify(edges)),
+      };
+
       set({
         serviceId: id,
         name: serviceResponse.data.name,
@@ -452,6 +468,13 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
         endpoints,
         isNewService: false,
         serviceState: serviceResponse.data.state,
+        history: [initialHistoryState],
+        historyIndex: 0,
+      });
+    } else {
+      set({
+        history: [{ nodes: initialNodes, edges: initialEdges }],
+        historyIndex: 0,
       });
     }
 
@@ -683,7 +706,6 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
   onEdgesChange: (changes: EdgeChange[]) => {
     get().setEdges((eds) => applyEdgeChanges(changes, eds));
   },
-
   onNodeAdded: (node: Node) => {
     const cleanupGhostNodes = () => {
       const instance = get().reactFlowInstance;
@@ -745,6 +767,8 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
         };
       }),
     );
+
+    get().saveToHistory();
   },
   testUrl: async (endpoint, onError, onSuccess) => {
     try {
@@ -792,6 +816,60 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
   cancelNavigation: () => {
     set({ nextLocation: null });
   },
+  saveToHistory: () => {
+    const { nodes, edges, history, historyIndex } = get();
+
+    const currentState = {
+      nodes: JSON.parse(JSON.stringify(nodes)),
+      edges: JSON.parse(JSON.stringify(edges)),
+    };
+
+    const lastState = history[historyIndex];
+
+    const statesAreEqual =
+      lastState &&
+      JSON.stringify(lastState.nodes) === JSON.stringify(currentState.nodes) &&
+      JSON.stringify(lastState.edges) === JSON.stringify(currentState.edges);
+
+    if (statesAreEqual) {
+      return;
+    }
+
+    history.push(currentState);
+
+    set({
+      history,
+      historyIndex: historyIndex + 1,
+      hasUnsavedChanges: true,
+    });
+  },
+  undo: () => {
+    const { history, historyIndex } = get();
+    if (historyIndex > 0) {
+      const previousState = history[historyIndex - 1];
+      set({
+        nodes: JSON.parse(JSON.stringify(previousState.nodes)),
+        edges: JSON.parse(JSON.stringify(previousState.edges)),
+        historyIndex: historyIndex - 1,
+        hasUnsavedChanges: true,
+      });
+    }
+  },
+
+  redo: () => {
+    const { history, historyIndex } = get();
+    if (historyIndex < history.length - 1) {
+      const nextState = history[historyIndex + 1];
+      set({
+        nodes: JSON.parse(JSON.stringify(nextState.nodes)),
+        edges: JSON.parse(JSON.stringify(nextState.edges)),
+        historyIndex: historyIndex + 1,
+        hasUnsavedChanges: true,
+      });
+    }
+  },
+  canUndo: () => get().historyIndex > 0,
+  canRedo: () => get().historyIndex < get().history.length - 1,
 }));
 
 function extractMapValues(element: any) {

@@ -61,7 +61,9 @@
     "edit": "Muuda",
     "import": "Impordi",
     "export": "Ekspordi",
-    "proceed": "Jätka"
+    "proceed": "Jätka",
+    "undo": "Võta tagasi",
+    "redo": "Taasta"
   },
   "menu": {
     "overview": "Ülevaade",

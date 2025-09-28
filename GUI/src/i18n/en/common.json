@@ -61,7 +61,9 @@
     "edit": "Edit",
     "import": "Import",
     "export": "Export",
-    "proceed": "Proceed"
+    "proceed": "Proceed",
+    "undo": "Undo",
+    "redo": "Redo"
   },
   "menu": {
     "overview": "Overview",
