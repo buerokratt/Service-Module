@@ -6,12 +6,7 @@ import { MdUndo, MdRedo } from 'react-icons/md';
 
 const UndoRedoControls: FC = () => {
   const { t } = useTranslation();
-  const { 
-    undo, 
-    redo, 
-    canUndo, 
-    canRedo
-  } = useServiceStore();
+  const { undo, redo, canUndo, canRedo } = useServiceStore();
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -40,11 +35,11 @@ const UndoRedoControls: FC = () => {
 
   return (
     <Track style={{ gap: 8 }} align="center" justify="start">
-      <Button 
-        onClick={handleUndo} 
-        size="s" 
+      <Button
+        onClick={handleUndo}
+        size="s"
         disabled={!canUndo()}
-        style={{ 
+        style={{
           backgroundColor: canUndo() ? '#308653' : '#ccc',
         }}
         title={t('global.undo').toString()}
@@ -52,11 +47,11 @@ const UndoRedoControls: FC = () => {
         <Icon icon={<MdUndo />} />
         {t('global.undo')}
       </Button>
-      <Button 
-        onClick={handleRedo} 
+      <Button
+        onClick={handleRedo}
         size="s"
         disabled={!canRedo()}
-        style={{ 
+        style={{
           backgroundColor: canRedo() ? '#308653' : '#ccc',
         }}
         title={t('global.redo').toString()}

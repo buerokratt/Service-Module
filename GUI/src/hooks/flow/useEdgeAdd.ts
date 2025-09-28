@@ -118,7 +118,9 @@ function useEdgeAdd(id: string) {
       return newNodes;
     });
 
-    setTimeout(() => {  useServiceStore.getState().saveToHistory(); } , 0);
+    setTimeout(() => {
+      useServiceStore.getState().saveToHistory();
+    }, 0);
   };
   return handleEdgeClick;
 }

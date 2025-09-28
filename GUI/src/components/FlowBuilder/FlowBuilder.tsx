@@ -5,7 +5,7 @@ import edgeTypes from 'components/Flow/EdgeTypes';
 import nodeTypes from 'components/Flow/NodeTypes';
 import useLayout from 'hooks/flow/useLayout';
 import { useOnNodesDelete } from 'hooks/flow/useOnNodeDelete';
-import { FC, useCallback } from 'react';
+import { FC, useCallback, useEffect } from 'react';
 import '@xyflow/react/dist/style.css';
 import { useTranslation } from 'react-i18next';
 import useServiceStore from 'store/new-services.store';
@@ -34,7 +34,9 @@ const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
     setDeletedNodes,
     setNodeToDelete,
   } = useOnNodesDelete();
-  const { setHasUnsavedChanges, saveToHistory } = useServiceStore();
+  const { setHasUnsavedChanges, saveToHistory, historyIndex } = useServiceStore();
+
+  const { runLayout } = useLayout();
 
   const onConnect = useCallback(
     ({ source, target }: any) => {
@@ -107,6 +109,10 @@ const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
     },
     [getNode, hasConnectedNodes, setDeletedNodes, setIsDeleteConnectionsModalVisible],
   );
+
+  useEffect(() => {
+    runLayout();
+  }, [historyIndex]);
 
   return (
     <>
