@@ -73,6 +73,8 @@ const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
     [getEdges, getNodes, setEdges, setHasUnsavedChanges, setNodes],
   );
 
+  const zIndexStyle = { zIndex: 20 };
+
   const isValidConnection = useCallback((connection: any) => {
     return connection.source !== connection.target;
   }, []);
@@ -147,14 +149,14 @@ const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
         defaultEdgeOptions={{ type: 'step', deletable: false }}
       >
         <Chat />
-        <MiniMap />
+        <MiniMap style={zIndexStyle} />
         <Background color="#D2D3D8" gap={16} lineWidth={9} />
-        <Controls orientation="horizontal" showInteractive={false} />
+        <Controls orientation="horizontal" showInteractive={false} style={zIndexStyle} />
         {isLassoActive && <Lasso />}
-        <Panel position="top-left">
+        <Panel position="top-left" style={zIndexStyle}>
           <ImportExportControls />
         </Panel>
-        <Panel position="top-right">
+        <Panel position="top-right" style={zIndexStyle}>
           <LassoSelectionControls isLassoActive={isLassoActive} onToggleLasso={handleToggleLasso} />
         </Panel>
       </ReactFlow>
