@@ -5,12 +5,15 @@ import edgeTypes from 'components/Flow/EdgeTypes';
 import nodeTypes from 'components/Flow/NodeTypes';
 import useLayout from 'hooks/flow/useLayout';
 import { useOnNodesDelete } from 'hooks/flow/useOnNodeDelete';
-import { FC, useCallback } from 'react';
+import { FC, useCallback, useState } from 'react';
 import '@xyflow/react/dist/style.css';
 import { useTranslation } from 'react-i18next';
 import useServiceStore from 'store/new-services.store';
 import { StepType } from 'types';
 import ImportExportControls from 'components/Flow/Controls/ImportExportControls';
+import '../Flow/LassoSelection/Lasso.css';
+import LassoSelectionControls from 'components/Flow/Controls/LassoSelectionControls';
+import { Lasso } from 'components/Flow/LassoSelection/Lasso';
 
 type FlowBuilderProps = {
   nodes: Node[];
@@ -34,6 +37,9 @@ const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
     setNodeToDelete,
   } = useOnNodesDelete();
   const { setHasUnsavedChanges } = useServiceStore();
+
+  // Add state for lasso selection
+  const [isLassoActive, setIsLassoActive] = useState(false);
 
   const onConnect = useCallback(
     ({ source, target }: any) => {
@@ -106,6 +112,10 @@ const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
     [getNode, hasConnectedNodes, setDeletedNodes, setIsDeleteConnectionsModalVisible],
   );
 
+  const handleToggleLasso = useCallback(() => {
+    setIsLassoActive((prev) => !prev);
+  }, []);
+
   return (
     <>
       <ReactFlow
@@ -142,8 +152,15 @@ const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
         <MiniMap />
         <Background color="#D2D3D8" gap={16} lineWidth={9} />
         <Controls orientation="horizontal" showInteractive={false} />
+
+        {/* Render Lasso directly in ReactFlow (not in Panel) */}
+        {isLassoActive && <Lasso />}
+
         <Panel position="top-left">
           <ImportExportControls />
+        </Panel>
+        <Panel position="top-right">
+          <LassoSelectionControls isLassoActive={isLassoActive} onToggleLasso={handleToggleLasso} />
         </Panel>
       </ReactFlow>
       {isDeleteConnectionsModalVisible && (
