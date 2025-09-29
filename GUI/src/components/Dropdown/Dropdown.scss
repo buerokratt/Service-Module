@@ -10,7 +10,7 @@
   z-index: 1000;
   resize: both;
   overflow: auto;
-  width: 400px;
+  width: 600px;
   min-width: 400px;
   max-width: 600px;
   min-height: 235px;
@@ -35,6 +35,7 @@
   }
 
   &__content {
+    width: 600px;
     padding: 10px;
     flex: 1;
     overflow-y: auto;
