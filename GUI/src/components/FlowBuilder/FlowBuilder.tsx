@@ -37,8 +37,6 @@ const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
     setNodeToDelete,
   } = useOnNodesDelete();
   const { setHasUnsavedChanges } = useServiceStore();
-
-  // Add state for lasso selection
   const [isLassoActive, setIsLassoActive] = useState(false);
 
   const onConnect = useCallback(
@@ -152,10 +150,7 @@ const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
         <MiniMap />
         <Background color="#D2D3D8" gap={16} lineWidth={9} />
         <Controls orientation="horizontal" showInteractive={false} />
-
-        {/* Render Lasso directly in ReactFlow (not in Panel) */}
         {isLassoActive && <Lasso />}
-
         <Panel position="top-left">
           <ImportExportControls />
         </Panel>

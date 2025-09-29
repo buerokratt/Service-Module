@@ -1,6 +1,7 @@
-import { Button, Track } from 'components';
+import { Button, Icon, Track } from 'components';
 import { useTranslation } from 'react-i18next';
 import { FC } from 'react';
+import { MdDraw } from 'react-icons/md';
 
 interface LassoSelectionControlsProps {
   isLassoActive: boolean;
@@ -13,7 +14,8 @@ const LassoSelectionControls: FC<LassoSelectionControlsProps> = ({ isLassoActive
   return (
     <Track style={{ gap: 8 }} align="center" justify="start">
       <Button onClick={onToggleLasso} size="s" appearance={isLassoActive ? 'primary' : 'secondary'}>
-        {isLassoActive ? t('flow.disableLasso') : t('flow.enableLasso')}
+        <Icon icon={<MdDraw />} size="small" label={t('serviceFlow.lasso')} />
+        {t('serviceFlow.lasso')}
       </Button>
     </Track>
   );

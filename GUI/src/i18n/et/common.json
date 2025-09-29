@@ -432,7 +432,8 @@
       "setup": "Seadistamine",
       "test": "Testimine"
     },
-    "rule": "Reegel"
+    "rule": "Reegel",
+    "lasso": "Lohistus"
   },
   "logs": {
     "service": "Teenus",

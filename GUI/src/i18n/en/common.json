@@ -431,7 +431,8 @@
       "setup": "Setup",
       "test": "Test"
     },
-    "rule": "Rule"
+    "rule": "Rule",
+    "lasso": "Lasso"
   },
   "logs": {
     "service": "Service",
