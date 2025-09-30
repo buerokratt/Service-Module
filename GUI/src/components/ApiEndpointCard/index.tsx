@@ -23,7 +23,6 @@ type EndpointCardProps = {
 
 const ApiEndpointCard: FC<EndpointCardProps> = ({
   endpoint,
-  isDeletable = true,
   isNameDisabled = false,
   showCommonSwitch = true,
   onNameExists,
@@ -45,7 +44,7 @@ const ApiEndpointCard: FC<EndpointCardProps> = ({
 
   const getTabTriggerClasses = (tab: EndpointEnv) => `tab-group__tab-btn ${selectedTab === tab ? 'active' : ''}`;
 
-  const requestValues = useMemo(() => getAvailableRequestValues(endpoint), []);
+  const requestValues = useMemo(() => getAvailableRequestValues(endpoint), [endpoint, getAvailableRequestValues]);
 
   return (
     <Tabs.Root

@@ -27,7 +27,6 @@ const ApiContent: FC<ApiContentProps> = ({ nodeId, endpoint, onEndpointChange })
       {endpointCopy && (
         <ApiEndpointCard
           endpoint={endpointCopy}
-          isDeletable={false}
           showCommonSwitch={false}
           onNameChange={(name) => {
             endpointCopy.name = name;

@@ -130,7 +130,6 @@ const ApiEndpoint: FC<ApiEndpointProps> = ({ step, onClick }) => {
           <Track isMultiline gap={16} direction="vertical" align="stretch">
             <ApiEndpointCard
               endpoint={step?.data}
-              isDeletable={false}
               onNameExists={setEndpointNameExists}
               onNameChange={setEndpointName}
               onCommonChange={setIsCommonEndpoint}
