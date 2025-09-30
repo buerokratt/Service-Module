@@ -223,4 +223,8 @@ const getColumns = (setViewFaultyServiceLog: (data: FaultyService) => void) => {
   ];
 };
 
-export default withAuthorization(FaultyServicesPage, [ROLES.ROLE_ADMINISTRATOR, ROLES.ROLE_SERVICE_MANAGER]);
+const AuthorizedFaultyServicesPage = withAuthorization(FaultyServicesPage, [
+  ROLES.ROLE_ADMINISTRATOR,
+  ROLES.ROLE_SERVICE_MANAGER,
+]);
+export default AuthorizedFaultyServicesPage;

@@ -78,4 +78,8 @@ const ServiceSettingPage: React.FC = () => {
   );
 };
 
-export default withAuthorization(ServiceSettingPage, [ROLES.ROLE_ADMINISTRATOR, ROLES.ROLE_SERVICE_MANAGER]);
+const AuthorizedServiceSettingPage = withAuthorization(ServiceSettingPage, [
+  ROLES.ROLE_ADMINISTRATOR,
+  ROLES.ROLE_SERVICE_MANAGER,
+]);
+export default AuthorizedServiceSettingPage;

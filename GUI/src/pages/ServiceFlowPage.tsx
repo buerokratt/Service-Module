@@ -258,4 +258,8 @@ const ServiceFlowPage: FC = () => {
   );
 };
 
-export default withAuthorization(ServiceFlowPage, [ROLES.ROLE_ADMINISTRATOR, ROLES.ROLE_SERVICE_MANAGER]);
+const AuthorizedServiceFlowPage = withAuthorization(ServiceFlowPage, [
+  ROLES.ROLE_ADMINISTRATOR,
+  ROLES.ROLE_SERVICE_MANAGER,
+]);
+export default AuthorizedServiceFlowPage;
