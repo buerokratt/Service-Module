@@ -151,6 +151,7 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
   endpointsResponseVariables: [],
   setIsYesNoQuestion: (value: boolean) => set({ isYesNoQuestion: value }),
   changeAssignNode: (assignElements) => {
+    // In the future, NodeDataProps and not any (or Node) should be used here as well
     const { nodes } = get();
     const elementsMap = new Map(
       (
@@ -180,7 +181,7 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
       }
 
       if (slot.slots) {
-        checkSlots(slot.slots, elementsMap);
+        checkSlots(slot.slots as any[], elementsMap);
       }
 
       return changed;
@@ -191,7 +192,7 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
     };
 
     const processElement = (element: any, elementsMap: Map<any, any>): boolean => {
-      const slotsChanged = element.slots && checkSlots(element.slots, elementsMap);
+      const slotsChanged = element.slots && checkSlots(element.slots as any[], elementsMap);
 
       if (element.slots?.length) {
         element.value = element.slots[0].value;
