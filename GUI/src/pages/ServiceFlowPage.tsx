@@ -42,24 +42,22 @@ const ServiceFlowPage: FC = () => {
   const { id } = useParams();
 
   useEffect(() => {
-    if (!id) {
-      useServiceStore.getState().loadStepPreferences();
-      useServiceStore.getState().loadCommonEndpoints();
-      return;
-    }
-    setLoading(true);
-    useServiceStore
-      .getState()
-      .loadService(id)
-      .then(() => {
-        useServiceStore
-          .getState()
-          .loadStepPreferences()
-          .then(() => {
-            setLoading(false);
-          });
-      });
-  }, []);
+    const loadData = async () => {
+      if (!id) {
+        await Promise.all([
+          useServiceStore.getState().loadStepPreferences(),
+          useServiceStore.getState().loadCommonEndpoints(),
+        ]);
+        return;
+      }
+
+      setLoading(true);
+      await Promise.all([useServiceStore.getState().loadService(id), useServiceStore.getState().loadStepPreferences()]);
+      setLoading(false);
+    };
+
+    void loadData();
+  }, [id]);
 
   const edges = useServiceStore((state) => state.edges);
   const nodes = useServiceStore((state) => state.nodes);
@@ -101,7 +99,7 @@ const ServiceFlowPage: FC = () => {
               navigate(ROUTES.replaceWithId(ROUTES.EDITSERVICE_ROUTE, serviceId));
             }
           } else {
-            useServiceStore.getState().loadService(id);
+            await useServiceStore.getState().loadService(id);
           }
         }}
       />
