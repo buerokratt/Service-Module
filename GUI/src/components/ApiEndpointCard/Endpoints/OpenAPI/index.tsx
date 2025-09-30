@@ -267,6 +267,7 @@ const EndpointOpenAPI: React.FC<EndpointOpenAPIProps> = ({
           <FormSelect
             name={'select-endpoint'}
             label={''}
+            style={{ fontSize: '15px' }}
             defaultValue={selectedEndpoint?.label}
             options={openApiEndpoints.map((openApiEndpoint) => {
               return { label: openApiEndpoint.label, value: openApiEndpoint.label };

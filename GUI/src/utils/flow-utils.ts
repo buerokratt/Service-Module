@@ -1,7 +1,13 @@
 import { Node } from '@xyflow/react';
 import { Group, Rule } from 'components/FlowElementsPopup/RuleBuilder/types';
+import { t } from 'i18next';
 import { Assign, Step, StepType } from 'types';
 import { NodeDataProps } from 'types/service-flow';
+
+interface ValidationResult {
+  isValid: boolean;
+  error?: string;
+}
 
 export const getNodeLabel = (step: Step, nodes: Node[]) => {
   const baseLabel = step.label.split(' - ').pop() ?? '';
@@ -12,7 +18,7 @@ export const getNodeLabel = (step: Step, nodes: Node[]) => {
     .map((label) => {
       const parts = label.split(' - ');
       if (parts.length > 1) {
-        const num = parseInt(parts[parts.length - 1]);
+        const num = parseInt(parts[parts.length - 1] as string);
         return isNaN(num) ? 0 : num;
       }
       return 0;
@@ -31,53 +37,151 @@ export const getNodeLabel = (step: Step, nodes: Node[]) => {
   return `${baseLabel} - ${nextNumber}`;
 };
 
-export const isStepInvalid = (node: NodeDataProps): boolean => {
-  if (node.testingPassed === false) return true;
+export const validateStep = (node: NodeDataProps): ValidationResult => {
+  // End service node and similar
+  if (node.readonly) return { isValid: true };
 
-  if (node.stepType === StepType.Input || node.stepType === StepType.Condition) {
-    const hasInvalidRules = (elements: any[]): boolean => {
-      return elements.some((e) => {
-        if ('children' in e) {
-          const group = e as Group;
-          if (group.children.length === 0) return true;
-          return hasInvalidRules(group.children);
-        } else {
-          const rule = e as Rule;
-          return rule.value === '' || rule.field === '' || rule.operator === '';
-        }
-      });
-    };
+  // Failed testing with Ruuter request
+  if (node.testingPassed === false) return { isValid: false };
 
-    const invalidRulesExist = hasInvalidRules(node.rules?.children ?? []);
-    return node.rules?.children === undefined || invalidRulesExist || node.rules?.children.length === 0;
+  switch (node.stepType) {
+    case StepType.Input:
+    case StepType.Condition:
+      return validateInputOrConditionStep(node);
+
+    case StepType.MultiChoiceQuestion:
+      return validateMultiChoiceQuestionStep(node);
+
+    case StepType.DynamicChoices:
+      return validateDynamicChoicesStep(node);
+
+    case StepType.Assign:
+      return validateAssignStep(node);
+
+    case StepType.Textfield:
+      return validateTextfieldStep(node);
+
+    case StepType.UserDefined:
+      return validateUserDefinedStep();
+
+    case StepType.OpenWebpage:
+      return validateOpenWebpageStep(node);
+
+    case StepType.FileGenerate:
+      return validateFileGenerateStep(node);
+
+    case StepType.FileSign:
+      return validateFileSignStep(node);
+
+    default:
+      return { isValid: true };
+  }
+};
+
+// Error messages are implemented only for the steps that are actually enabled
+// More need to be added later
+export const validateInputOrConditionStep = (node: NodeDataProps): ValidationResult => {
+  const hasInvalidRules = (elements: any[]): boolean => {
+    return elements.some((e) => {
+      if ('children' in e) {
+        const group = e as Group;
+        if (group.children.length === 0) return true;
+        return hasInvalidRules(group.children);
+      } else {
+        const rule = e as Rule;
+        return rule.value === '' || rule.field === '' || rule.operator === '';
+      }
+    });
+  };
+
+  const invalidRulesExist = hasInvalidRules(node.rules?.children ?? []);
+
+  if (node.rules?.children === undefined || node.rules.children.length === 0) {
+    const errorMessage =
+      node.stepType === StepType.Input
+        ? (t('chat.service-flow-error.client-input-rules-required') as string)
+        : (t('chat.service-flow-error.condition-rules-required') as string);
+    return { isValid: false, error: errorMessage };
   }
 
-  if (node.stepType === StepType.MultiChoiceQuestion) {
-    return (
-      !node?.multiChoiceQuestion?.question ||
-      node.multiChoiceQuestion?.buttons?.find((e) => e.title === '') != undefined
-    );
+  if (invalidRulesExist) {
+    const errorMessage =
+      node.stepType === StepType.Input
+        ? (t('chat.service-flow-error.client-input-rule-fields-required') as string)
+        : (t('chat.service-flow-error.condition-rule-fields-required') as string);
+    return { isValid: false, error: errorMessage };
   }
 
-  if (node.stepType === StepType.DynamicChoices) {
-    return !node?.dynamicChoices?.list || !node?.dynamicChoices?.serviceName || !node?.dynamicChoices?.key;
+  return { isValid: true };
+};
+
+export const validateMultiChoiceQuestionStep = (node: NodeDataProps): ValidationResult => {
+  if (!node?.multiChoiceQuestion?.question) {
+    return { isValid: false, error: t('chat.service-flow-error.question-required') as string };
   }
 
-  if (node.stepType === StepType.UserDefined) return false;
-  if (node.stepType === StepType.OpenWebpage) return !node.link || !node.linkText;
-  if (node.stepType === StepType.FileGenerate) return !node.fileName || !node.fileContent;
-  if (node.stepType === StepType.FileSign) return !node.signOption;
-  if (node.stepType === StepType.Assign) {
-    const hasInvalidElements = (elements: any[]): boolean => {
-      return elements.some((e) => {
-        const element = e as Assign;
-        return element.key === '' || element.value === '';
-      });
-    };
-
-    const invalidElementsExist = hasInvalidElements(node.assignElements ?? []);
-    return node?.assignElements === undefined || invalidElementsExist || node?.assignElements.length === 0;
+  if (node.multiChoiceQuestion?.buttons?.find((e) => e.title === '') !== undefined) {
+    return { isValid: false, error: t('chat.service-flow-error.button-titles-required') as string };
   }
 
-  return !node.readonly && !node.message?.length;
+  return { isValid: true };
+};
+
+export const validateDynamicChoicesStep = (node: NodeDataProps): ValidationResult => {
+  if (!node?.dynamicChoices?.list) {
+    return { isValid: false, error: t('chat.service-flow-error.dynamic-choices-list-required') as string };
+  }
+
+  if (!node?.dynamicChoices?.serviceName) {
+    return { isValid: false, error: t('chat.service-flow-error.service-name-required') as string };
+  }
+
+  if (!node?.dynamicChoices?.key) {
+    return { isValid: false, error: t('chat.service-flow-error.key-required') as string };
+  }
+
+  return { isValid: true };
+};
+
+export const validateAssignStep = (node: NodeDataProps): ValidationResult => {
+  const hasInvalidElements = (elements: any[]): boolean => {
+    return elements.some((e) => {
+      const element = e as Assign;
+      return element.key === '' || element.value === '';
+    });
+  };
+
+  const invalidElementsExist = hasInvalidElements(node.assignElements ?? []);
+
+  if (node?.assignElements === undefined || node?.assignElements.length === 0) {
+    return { isValid: false, error: t('chat.service-flow-error.assign-elements-required') as string };
+  }
+
+  if (invalidElementsExist) {
+    return { isValid: false, error: t('chat.service-flow-error.key-value-fields-required') as string };
+  }
+
+  return { isValid: true };
+};
+
+export const validateTextfieldStep = (node: NodeDataProps): ValidationResult => {
+  return node.message?.length
+    ? { isValid: true }
+    : { isValid: false, error: t('chat.service-flow-error.message-text-missing') as string };
+};
+
+export const validateUserDefinedStep = (): ValidationResult => {
+  return { isValid: true };
+};
+
+export const validateOpenWebpageStep = (node: NodeDataProps): ValidationResult => {
+  return { isValid: Boolean(node.link && node.linkText) };
+};
+
+export const validateFileGenerateStep = (node: NodeDataProps): ValidationResult => {
+  return { isValid: Boolean(node.fileName && node.fileContent) };
+};
+
+export const validateFileSignStep = (node: NodeDataProps): ValidationResult => {
+  return { isValid: Boolean(node.signOption) };
 };

@@ -23,11 +23,12 @@ latest_intent_status AS (
     SELECT intent,
            isforservice,
            created,
+           status,
            ROW_NUMBER() OVER (PARTITION BY intent ORDER BY created DESC) AS rn
     FROM intent
-    WHERE status = 'ACTIVE'
 )
 SELECT intent,
+       status,
        CEIL(COUNT(*) OVER() / :page_size::DECIMAL) AS total_pages,
        created
 FROM latest_intent_status
@@ -38,6 +39,7 @@ WHERE rn = 1
       FROM connected_intents
   )
   AND (:search IS NULL OR intent ILIKE '%' || :search || '%')
+  AND status = 'ACTIVE'
 ORDER BY
     CASE WHEN :sorting = 'intent asc' THEN intent END ASC,
     CASE WHEN :sorting = 'intent desc' THEN intent END DESC
