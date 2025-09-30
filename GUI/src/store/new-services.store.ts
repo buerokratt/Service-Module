@@ -688,24 +688,23 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
     get().setEdges((eds) => applyEdgeChanges(changes, eds));
   },
 
-  onNodeAdded: (node: Node) => {
-    const cleanupGhostNodes = () => {
+  onNodeAdded: () => {
+    const cleanupGhostNodes = async () => {
       const instance = get().reactFlowInstance;
       if (!instance) return;
 
       const nodes = instance.getNodes() ?? [];
       const edges = instance.getEdges() ?? [];
 
-      nodes
-        .filter((n) => n.type === 'ghost')
-        .forEach((ghostNode) => {
-          const incomers = getIncomers(ghostNode, nodes, edges);
-          const outgoers = getOutgoers(ghostNode, nodes, edges);
+      const ghostNodes = nodes.filter((n) => n.type === 'ghost');
+      for (const ghostNode of ghostNodes) {
+        const incomers = getIncomers(ghostNode, nodes, edges);
+        const outgoers = getOutgoers(ghostNode, nodes, edges);
 
-          if (incomers.length === 0 && outgoers.length === 0) {
-            instance.deleteElements({ nodes: [ghostNode] });
-          }
-        });
+        if (incomers.length === 0 && outgoers.length === 0) {
+          await instance.deleteElements({ nodes: [ghostNode] });
+        }
+      }
     };
 
     requestAnimationFrame(cleanupGhostNodes);

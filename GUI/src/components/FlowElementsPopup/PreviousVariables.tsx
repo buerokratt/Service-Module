@@ -1,6 +1,6 @@
 import { Edge, Node } from '@xyflow/react';
 import OutputElementBox from 'components/OutputElementBox';
-import React, { CSSProperties, FC, useEffect, useState } from 'react';
+import { CSSProperties, FC, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { datesVariables, environmentVariables, helperVariables } from 'resources/variables-constants';
 import { StepType } from 'types';
