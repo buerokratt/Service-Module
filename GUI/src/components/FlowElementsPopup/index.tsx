@@ -1,4 +1,5 @@
 import * as Tabs from '@radix-ui/react-tabs';
+import { Edge, getConnectedEdges, getIncomers, getOutgoers, Node } from '@xyflow/react';
 import React, { useEffect, useState } from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
@@ -15,30 +16,26 @@ import { isTemplate, removeTrailingUnderscores, stringToTemplate, templateToStri
 
 import { Button, Track } from '..';
 import Popup from '../Popup';
+import ApiContent from './ApiContent';
+import AssignContent from './AssignContent';
 import ConditionBuilderContent from './ConditionBuilderContent';
+import ConditionContent from './ConditionContent';
 import DefaultMessageContent from './DefaultMessageContent';
+import DynamicChoicesContent from './DynamicChoicesContent';
 import EndConversationContent from './EndConversationContent';
 import FileGenerateContent from './FileGenerateContent';
 import FileSignContent from './FileSignContent';
 import JsonRequestContent from './JsonRequestContent';
+import MultiChoiceQuestionContent from './MultiChoiceQuestionContent';
 import OpenWebPageContent from './OpenWebPageContent';
 import OpenWebPageTestContent from './OpenWebPageTestContent';
 import RasaRulesContent from './RasaRulesContent';
 import TextfieldContent from './TextfieldContent';
 import TextfieldTestContent from './TextfieldTestContent';
 import { servicesRequestsExplain } from '../../resources/api-constants';
-import { StepType } from '../../types';
-
-import './styles.scss';
-import ConditionContent from './ConditionContent';
-import AssignContent from './AssignContent';
-import ApiContent from './ApiContent';
-import MultiChoiceQuestionContent from './MultiChoiceQuestionContent';
-
-import { Edge, getConnectedEdges, getIncomers, getOutgoers, Node } from '@xyflow/react';
-
 import api from '../../services/api-dev';
-import DynamicChoicesContent from './DynamicChoicesContent';
+import { StepType } from '../../types';
+import './styles.scss';
 
 const FlowElementsPopup: React.FC = () => {
   const { t } = useTranslation();
