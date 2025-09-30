@@ -16,7 +16,7 @@ export interface Service {
   readonly isCommon: boolean;
   readonly description?: string;
   readonly slot: string;
-  readonly structure: any;
+  readonly structure?: { value: string };
   readonly endpoints: Array<
     Pick<EndpointData, 'endpointId' | 'name' | 'type' | 'fileName' | 'isCommon'> & {
       // Passing as JSON from Resql because ruuter cannot handle parsing properly
