@@ -200,7 +200,7 @@ const getColumns = (setViewFaultyServiceLog: (data: FaultyService) => void) => {
     columnHelper.accessor('timestamp', {
       header: i18n.t('logs.failedTime') ?? '',
       cell: (props) => <span>{format(new Date(parseInt(props.getValue() ?? '0')), 'dd-MM-yyyy HH:mm:ss')}</span>,
-      filterFn: (row: Row<FaultyService>, _, filterValue) => {
+      filterFn: (row: Row<FaultyService>, _, filterValue: string) => {
         return format(new Date(parseInt(row.original.timestamp ?? '0')), 'dd-MM-yyyy HH:mm:ss')
           .toLowerCase()
           .includes(filterValue.toLowerCase());

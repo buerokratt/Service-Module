@@ -105,7 +105,7 @@ function useLayout() {
 
   const nodeCount = useStore(nodeCountSelector);
   const edgeCount = useStore(edgeCountSelector);
-  const { getNodes, getNode, setNodes, setEdges, getEdges, fitView } = useReactFlow();
+  const { getNodes, getNode, setNodes, getEdges, fitView } = useReactFlow();
 
   const runLayout = useCallback(() => {
     const nodes = getNodes();
@@ -121,7 +121,7 @@ function useLayout() {
       };
     });
 
-    const t = timer((elapsed: number) => {
+    const t = timer(async (elapsed: number) => {
       const s = elapsed / options.duration;
 
       const currNodes = transitions.map(({ node, from, to }) => {
@@ -152,7 +152,7 @@ function useLayout() {
         t.stop();
 
         if (!initial.current) {
-          fitView({ duration: 200, padding: 3 });
+          await fitView({ duration: 200, padding: 3 });
         }
         initial.current = false;
       }
@@ -161,7 +161,7 @@ function useLayout() {
     return () => {
       t.stop();
     };
-  }, [getEdges, getNodes, getNode, setNodes, fitView, setEdges]);
+  }, [getEdges, getNodes, getNode, setNodes, fitView]);
 
   useEffect(() => {
     runLayout();

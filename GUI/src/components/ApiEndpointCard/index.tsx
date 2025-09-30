@@ -1,15 +1,12 @@
 import * as Tabs from '@radix-ui/react-tabs';
 import { FC, useMemo, useState } from 'react';
-
-import { EndpointCustom, EndpointOpenAPI, FormInput, FormSelect, Switch, Track } from '..';
-
 import { useTranslation } from 'react-i18next';
-
 import './ApiEndpointCard.scss';
 import useServiceStore from 'store/new-services.store';
 import { EndpointType } from 'types/endpoint/endpoint-type';
 import { removeTrailingUnderscores } from 'utils/string-util';
 
+import { EndpointCustom, EndpointOpenAPI, FormInput, FormSelect, Switch, Track } from '..';
 import { RequestTab } from '../../types';
 import { EndpointData, EndpointEnv, EndpointTab } from '../../types/endpoint';
 import { Option } from '../../types/option';

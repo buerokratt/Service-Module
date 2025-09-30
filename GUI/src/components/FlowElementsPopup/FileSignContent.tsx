@@ -1,3 +1,4 @@
+import { FC } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { FormSelect, FormTextarea } from '../FormElements';
@@ -8,7 +9,7 @@ type FileSignContentProps = {
   signOption?: { label: string; value: string } | null;
 };
 
-const FileSignContent: React.FC<FileSignContentProps> = ({ onOptionChange, signOption }) => {
+const FileSignContent: FC<FileSignContentProps> = ({ onOptionChange, signOption }) => {
   const { t } = useTranslation();
   const signOptions = [
     { label: 'ID Card', value: 'ID Card', name: '' },
