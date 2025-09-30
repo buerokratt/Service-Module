@@ -88,6 +88,66 @@ const hasInvalidElements = (elements: any[]): boolean => {
   });
 };
 
+export const validateTextField = (nodeData: any): string | null => {
+  if (nodeData?.message === undefined) {
+    return i18next.t('toast.missing-textfield-message');
+  }
+  return null;
+};
+
+export const validateOpenWebpage = (nodeData: any): string | null => {
+  if (nodeData?.link === undefined || nodeData?.linkText === undefined) {
+    return i18next.t('toast.missing-website');
+  }
+  return null;
+};
+
+export const validateFileGenerate = (nodeData: any): string | null => {
+  if (nodeData?.fileName === undefined || nodeData?.fileContent === undefined) {
+    return i18next.t('toast.missing-file-generation');
+  }
+  return null;
+};
+
+export const validateAssign = (nodeData: any): string | null => {
+  if (nodeData?.assignElements === undefined || nodeData?.assignElements?.length === 0) {
+    return i18next.t('toast.missing-assign-elements');
+  }
+  return null;
+};
+
+export const validateMultiChoiceQuestion = (nodeData: any): string | null => {
+  if (nodeData?.multiChoiceQuestion?.question === undefined || nodeData?.multiChoiceQuestion.question === '') {
+    return i18next.t('toast.missing-mcq-question');
+  }
+  if (!nodeData?.multiChoiceQuestion?.buttons || nodeData?.multiChoiceQuestion.buttons.length === 0) {
+    return i18next.t('toast.missing-mcq-options');
+  }
+  return null;
+};
+
+export const validateDynamicChoices = (nodeData: any): string | null => {
+  if (nodeData?.dynamicChoices?.list === undefined || nodeData?.dynamicChoices.list === '') {
+    return i18next.t('toast.missing-dynamic-choices-list');
+  }
+  if (nodeData?.dynamicChoices?.serviceName === undefined || nodeData?.dynamicChoices.serviceName === '') {
+    return i18next.t('toast.missing-dynamic-choices-service-name');
+  }
+  if (nodeData?.dynamicChoices?.key === undefined || nodeData?.dynamicChoices.key === '') {
+    return i18next.t('toast.missing-dynamic-choices-key');
+  }
+  return null;
+};
+
+export const validateCondition = (nodeData: any): void => {
+  const invalidRulesExist = hasInvalidRules(nodeData?.rules?.children ?? []);
+  const isInvalid =
+    nodeData?.rules?.children === undefined || invalidRulesExist || nodeData?.rules?.children.length === 0;
+  if (isInvalid) {
+    throw new Error(i18next.t('toast.missing-condition-rules') ?? 'Error');
+  }
+};
+
 const buildConditionString = (group: any): string => {
   if ('children' in group) {
     const subgroup = group as Group;
@@ -236,68 +296,30 @@ function getYamlContent(
 
     outgoingEdges.forEach((edge) => {
       const followingNode = nodes.find((n) => n.id === edge.target)?.data;
-      let error;
+      let error: string | null = null;
 
       switch (followingNode?.stepType) {
         case StepType.Textfield:
-          if (followingNode?.message === undefined) {
-            error = i18next.t('toast.missing-textfield-message');
-          }
+          error = validateTextField(followingNode);
           break;
         case StepType.OpenWebpage:
-          if (followingNode?.link === undefined || followingNode?.linkText === undefined) {
-            error = i18next.t('toast.missing-website');
-          }
+          error = validateOpenWebpage(followingNode);
           break;
         case StepType.FileGenerate:
-          if (followingNode?.fileName === undefined || followingNode?.fileContent === undefined) {
-            error = i18next.t('toast.missing-file-generation');
-          }
+          error = validateFileGenerate(followingNode);
           break;
         case StepType.Assign:
-          if (followingNode?.assignElements === undefined || followingNode?.assignElements?.length === 0) {
-            error = i18next.t('toast.missing-assign-elements');
-          }
+          error = validateAssign(followingNode);
           break;
         case StepType.MultiChoiceQuestion:
-          if (
-            followingNode?.multiChoiceQuestion?.question === undefined ||
-            followingNode?.multiChoiceQuestion.question === ''
-          ) {
-            error = i18next.t('toast.missing-mcq-question');
-            break;
-          }
-          if (!followingNode?.multiChoiceQuestion?.buttons || followingNode?.multiChoiceQuestion.buttons.length === 0) {
-            error = i18next.t('toast.missing-mcq-options');
-          }
+          error = validateMultiChoiceQuestion(followingNode);
           break;
         case StepType.DynamicChoices:
-          if (followingNode?.dynamicChoices?.list === undefined || followingNode?.dynamicChoices.list === '') {
-            error = i18next.t('toast.missing-dynamic-choices-list');
-            break;
-          }
-          if (
-            followingNode?.dynamicChoices?.serviceName === undefined ||
-            followingNode?.dynamicChoices.serviceName === ''
-          ) {
-            error = i18next.t('toast.missing-dynamic-choices-service-name');
-            break;
-          }
-          if (followingNode?.dynamicChoices?.key === undefined || followingNode?.dynamicChoices.key === '') {
-            error = i18next.t('toast.missing-dynamic-choices-key');
-          }
+          error = validateDynamicChoices(followingNode);
           break;
-        case StepType.Condition: {
-          const invalidRulesExist = hasInvalidRules(followingNode?.rules?.children ?? []);
-          const isInvalid =
-            followingNode?.rules?.children === undefined ||
-            invalidRulesExist ||
-            followingNode?.rules?.children.length === 0;
-          if (isInvalid) {
-            throw new Error(i18next.t('toast.missing-condition-rules') ?? 'Error');
-          }
+        case StepType.Condition:
+          validateCondition(followingNode);
           break;
-        }
         case StepType.Input:
           if (followingNode?.type === 'placeholder' && !allRelations.includes(node.id)) {
             allRelations.push(node.id);
