@@ -9,7 +9,7 @@ import useServiceStore from 'store/new-services.store';
 import useToastStore from 'store/toasts.store';
 import { StepType } from 'types';
 import { Assign } from 'types/assign';
-import { EndpointData, EndpointVariableData } from 'types/endpoint';
+import { EndpointData } from 'types/endpoint';
 import { NodeDataProps } from 'types/service-flow';
 import { getLastDigits, removeTrailingUnderscores, stringToArray, toSnakeCase } from 'utils/string-util';
 
@@ -56,7 +56,7 @@ async function createEndpointAndUpdateState(endpoint: EndpointData): Promise<any
 interface SaveFlowConfig {
   name: string;
   edges: Edge[];
-  nodes: Node[];
+  nodes: Node<NodeDataProps>[];
   onSuccess: (e: any) => void;
   onError: (e: any) => void;
   description: string;
@@ -415,7 +415,7 @@ function getYamlContent(
     });
   } catch (e: any) {
     if (showError) {
-      throw new Error(i18next.t('toast.cannot-save-flow') ?? e?.message ?? 'Error');
+      throw new Error(i18next.t('toast.cannot-save-flow') ?? (e?.message as string) ?? 'Error');
     }
   }
 
@@ -450,8 +450,12 @@ function getYamlContent(
   return Object.fromEntries(finishedFlow.entries());
 }
 
-function getBranchNodes(nodes: Node[], edges: Edge[], startNode: Node): Node[] {
-  const branchNodes: Node[] = [startNode];
+function getBranchNodes(
+  nodes: Node<NodeDataProps>[],
+  edges: Edge[],
+  startNode: Node<NodeDataProps>,
+): Node<NodeDataProps>[] {
+  const branchNodes: Node<NodeDataProps>[] = [startNode];
   const visited = new Set<string>([startNode.id]);
   const queue: string[] = [startNode.id];
 
@@ -558,7 +562,7 @@ function handleAssignStep(
   }
 
   finishedFlow.set(parentStepName, {
-    assign: parentNode.data.assignElements.reduce((acc: any, e: any) => {
+    assign: parentNode.data.assignElements?.reduce((acc: Record<string, any>, e: Assign) => {
       acc[e.key] = e.value;
       return acc;
     }, {}),
@@ -659,41 +663,6 @@ function handleDynamicChoices(
   });
 }
 
-const getMapEntry = (value: string) => {
-  const secrets = useServiceStore.getState().secrets;
-
-  const parts = value.replace('{{', '').replace('}}', '').split('.');
-  const key = value.replace('{{', '"').replace('}}', '"');
-  if ([...(secrets?.prod ?? []), ...(secrets?.test ?? [])].includes(value)) {
-    return `[${key}, secrets.response.body.${parts.join('.')}]`;
-  }
-  if (!value.includes('ClientInput')) parts.splice(1, 0, 'response', 'body');
-  return `[${key}, ${parts.join('.')}]`;
-};
-
-const getNestedPreDefinedRawVariables = (data: { [key: string]: any }, result: string[]) => {
-  Object.keys(data).forEach((k) => {
-    if (typeof data[k] === 'object') {
-      return getNestedPreDefinedRawVariables(data[k], result);
-    }
-    if (typeof data[k] === 'string' && data[k].startsWith('{{')) {
-      result.push(getMapEntry(data[k]));
-    }
-  });
-};
-
-const getNestedPreDefinedEndpointVariables = (variable: EndpointVariableData, result: string[]) => {
-  const variableData = variable.type === 'schema' ? variable.schemaData : variable.arrayData;
-  if (variableData instanceof Array) {
-    variableData.forEach((v) => {
-      if (['schema', 'array'].includes(v.type)) getNestedPreDefinedEndpointVariables(v, result);
-
-      if (v.value?.startsWith('{{')) result.push(getMapEntry(v.value));
-      if (v.testValue?.startsWith('{{')) result.push(getMapEntry(v.testValue));
-    });
-  }
-};
-
 const getTemplate = (node: Node, stepName: string, nextStep?: string) => {
   const data = getTemplateDataFromNode(node);
 
@@ -773,7 +742,7 @@ export const saveFlowClick = async (status: 'draft' | 'ready' = 'ready', showErr
   const isCommon = useServiceStore.getState().isCommon;
   const isNewService = useServiceStore.getState().isNewService;
   const edges = useServiceStore.getState().edges;
-  const nodes = useServiceStore.getState().nodes;
+  const nodes = useServiceStore.getState().nodes as Node<NodeDataProps>[];
 
   await saveFlow({
     name: !name

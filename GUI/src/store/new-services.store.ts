@@ -46,6 +46,7 @@ export interface ServiceStoreState {
   slot: string;
   isCommon: boolean;
   edges: Edge[];
+  // In the future, this needs to use a common interface with NodeDataProps and not Node
   nodes: Node[];
   isNewService: boolean;
   serviceState?: ServiceState;
