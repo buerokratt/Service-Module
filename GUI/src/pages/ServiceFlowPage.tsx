@@ -23,7 +23,6 @@ import {
 } from '../components';
 import { ROUTES } from '../resources/routes-constants';
 import './ServiceFlowPage.scss';
-
 import ChooseSlotModel from './Integration/ChooseSlotModel';
 
 const ServiceFlowPage: FC = () => {
