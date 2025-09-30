@@ -652,7 +652,7 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
     try {
       await onServiceSave(ServiceState.Ready);
     } catch (e: any) {
-      return Promise.reject(new Error(i18next.t('toast.cannot-save-flow') ?? e?.message ?? 'Error'));
+      return Promise.reject(new Error(i18next.t('toast.cannot-save-flow') ?? (e?.message as string) ?? 'Error'));
     }
 
     if (isNewService) {
