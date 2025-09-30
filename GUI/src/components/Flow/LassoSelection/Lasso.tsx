@@ -2,8 +2,8 @@ import { useRef, type PointerEvent, useEffect } from 'react';
 import { useReactFlow, useStore } from '@xyflow/react';
 import { getSvgPathFromStroke } from 'utils/lasso-utils';
 
-type NodePoints = ([number, number] | [number, number, number])[];
-type NodePointObject = Record<string, NodePoints>;
+type Point = [number, number];
+type NodeBounds = Record<string, Point[]>;
 
 export function Lasso() {
   const { screenToFlowPosition, setNodes } = useReactFlow();
@@ -12,15 +12,15 @@ export function Lasso() {
     height: state.height,
     nodeLookup: state.nodeLookup,
   }));
+
   const canvas = useRef<HTMLCanvasElement>(null);
-  const ctx = useRef<CanvasRenderingContext2D | undefined | null>(null);
-
-  const nodePoints = useRef<NodePointObject>({});
-  const pointRef = useRef<[number, number][]>([]);
+  const ctx = useRef<CanvasRenderingContext2D | null>(null);
+  const nodeBounds = useRef<NodeBounds>({});
+  const points = useRef<Point[]>([]);
   const isDrawing = useRef(false);
-  const startPoint = useRef<[number, number] | null>(null);
+  const startPoint = useRef<Point | null>(null);
 
-  function isPointInPolygon(point: [number, number], polygon: [number, number][]): boolean {
+  const isPointInPolygon = (point: Point, polygon: Point[]): boolean => {
     const [x, y] = point;
     let inside = false;
     
@@ -32,161 +32,119 @@ export function Lasso() {
         inside = !inside;
       }
     }
-    
     return inside;
-  }
+  };
 
-  function calculatePolygonArea(polygon: [number, number][]): number {
+  const getPolygonArea = (polygon: Point[]): number => {
     if (polygon.length < 3) return 0;
     
     let area = 0;
     for (let i = 0; i < polygon.length; i++) {
       const j = (i + 1) % polygon.length;
-      area += polygon[i][0] * polygon[j][1];
-      area -= polygon[j][0] * polygon[i][1];
+      area += polygon[i][0] * polygon[j][1] - polygon[j][0] * polygon[i][1];
     }
     return Math.abs(area) / 2;
-  }
+  };
 
-  function calculateIntersectionArea(nodeId: string, polygon: [number, number][]): number {
+  const getNodeIntersectionRatio = (nodeId: string, polygon: Point[]): number => {
     const node = nodeLookup.get(nodeId);
     if (!node) return 0;
 
     const { x, y } = node.internals.positionAbsolute;
     const { width = 0, height = 0 } = node.measured;
     
-    // Use flow coordinates directly since polygon is now in flow coordinates
-    const nodeBounds = [
-      [x, y],
-      [x + width, y],
-      [x + width, y + height],
-      [x, y + height],
-    ] as [number, number][];
+    const corners = [
+      [x, y], [x + width, y], [x + width, y + height], [x, y + height]
+    ] as Point[];
 
-    let cornersInside = 0;
-    for (const corner of nodeBounds) {
-      if (isPointInPolygon(corner, polygon)) {
-        cornersInside++;
-      }
-    }
-
-    const center = [x + width / 2, y + height / 2] as [number, number];
+    const cornersInside = corners.filter(corner => isPointInPolygon(corner, polygon)).length;
+    const center = [x + width / 2, y + height / 2] as Point;
     const centerInside = isPointInPolygon(center, polygon);
 
     return centerInside ? 1 : cornersInside / 4;
-  }
+  };
 
-  function handlePointerDown(e: PointerEvent) {
+  const handlePointerDown = (e: PointerEvent) => {
     if (!canvas.current) return;
 
     canvas.current.setPointerCapture(e.pointerId);
     isDrawing.current = true;
 
     const rect = canvas.current.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
+    const point: Point = [e.clientX - rect.left, e.clientY - rect.top];
+    
+    points.current = [point];
+    startPoint.current = point;
 
-    pointRef.current = [[x, y]];
-    startPoint.current = [x, y];
-
-    nodePoints.current = {};
+    nodeBounds.current = {};
     for (const node of nodeLookup.values()) {
-      if (node.type === 'start' || node.type === 'ghost') {
-        continue;
-      }
+      if (node.type === 'start' || node.type === 'ghost') continue;
 
       const { x, y } = node.internals.positionAbsolute;
       const { width = 0, height = 0 } = node.measured;
-      const points = [
-        [x, y],
-        [x + width, y],
-        [x + width, y + height],
-        [x, y + height],
-      ] satisfies NodePoints;
-      nodePoints.current[node.id] = points;
+      nodeBounds.current[node.id] = [
+        [x, y], [x + width, y], [x + width, y + height], [x, y + height]
+      ];
     }
 
     ctx.current = canvas.current.getContext('2d');
     if (!ctx.current) return;
 
-    ctx.current.lineWidth = 2;
-    ctx.current.fillStyle = 'rgba(0, 89, 220, 0.1)';
-    ctx.current.strokeStyle = 'rgba(0, 89, 220, 0.8)';
-    ctx.current.setLineDash([5, 5]);
-  }
+    Object.assign(ctx.current, {
+      lineWidth: 2,
+      fillStyle: 'rgba(0, 89, 220, 0.1)',
+      strokeStyle: 'rgba(0, 89, 220, 0.8)',
+      setLineDash: [5, 5]
+    });
+  };
 
-  function handlePointerMove(e: PointerEvent) {
-    if (!isDrawing.current || !ctx.current) return;
+  const handlePointerMove = (e: PointerEvent) => {
+    if (!isDrawing.current || !ctx.current || !canvas.current) return;
 
-    const rect = canvas.current?.getBoundingClientRect();
-    if (!rect) return;
+    const rect = canvas.current.getBoundingClientRect();
+    const point: Point = [e.clientX - rect.left, e.clientY - rect.top];
+    points.current.push(point);
 
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-
-    pointRef.current = [...pointRef.current, [x, y]];
-
-    // Convert screen coordinates to flow coordinates for testing
-    // Use the actual client coordinates directly, just like in flow-builder.ts
-    const flowPoints = pointRef.current.map(([canvasX, canvasY]) => {
-      // Convert canvas coordinates back to client coordinates
+    const flowPoints = points.current.map(([canvasX, canvasY]) => {
       const clientX = canvasX + rect.left;
       const clientY = canvasY + rect.top;
       const flowPos = screenToFlowPosition({ x: clientX, y: clientY });
-      return [flowPos.x, flowPos.y] as [number, number];
+      return [flowPos.x, flowPos.y] as Point;
     });
-    
-    
-    // Create a simple polygon from the flow coordinates for testing
-    const closedPolygon = [...flowPoints, flowPoints[0]] as [number, number][];
-    
-    // Create the smooth path for visual display
-    const path = new Path2D(getSvgPathFromStroke(pointRef.current));
+
+    const closedPolygon = [...flowPoints, flowPoints[0]];
+    const path = new Path2D(getSvgPathFromStroke(points.current));
 
     ctx.current.clearRect(0, 0, width, height);
     ctx.current.fill(path);
     ctx.current.stroke(path);
 
-    const nodesToSelect = new Set<string>();
-
-    // Only perform selection if the polygon has a meaningful area (minimum 100 square pixels)
-    // and the user has dragged a reasonable distance (minimum 10 pixels)
-    const polygonArea = calculatePolygonArea(closedPolygon);
+    const polygonArea = getPolygonArea(closedPolygon);
     const hasMinimumDrag = startPoint.current && 
-      pointRef.current.length > 1 && 
-      Math.sqrt(
-        Math.pow(pointRef.current[pointRef.current.length - 1][0] - startPoint.current[0], 2) + 
-        Math.pow(pointRef.current[pointRef.current.length - 1][1] - startPoint.current[1], 2)
+      points.current.length > 1 && 
+      Math.hypot(
+        points.current[points.current.length - 1][0] - startPoint.current[0],
+        points.current[points.current.length - 1][1] - startPoint.current[1]
       ) >= 10;
-    
-    // Use a more conservative approach - only select if we have a meaningful selection
-    if (polygonArea >= 200 && hasMinimumDrag && pointRef.current.length >= 3) {
-      for (const nodeId of Object.keys(nodePoints.current)) {
-        const intersectionArea = calculateIntersectionArea(nodeId, closedPolygon);
-        
-        if (intersectionArea >= 0.7) {
+
+    const nodesToSelect = new Set<string>();
+    if (polygonArea >= 200 && hasMinimumDrag && points.current.length >= 3) {
+      for (const nodeId of Object.keys(nodeBounds.current)) {
+        if (getNodeIntersectionRatio(nodeId, closedPolygon) >= 0.7) {
           nodesToSelect.add(nodeId);
         }
       }
     }
 
     setNodes((nodes) =>
-      nodes.map((node) => {
-        if (node.type === 'start' || node.type === 'ghost') {
-          return node;
-        }
-
-        const shouldSelect = nodesToSelect.has(node.id);
-        
-        return {
-          ...node,
-          selected: shouldSelect,
-        };
-      }),
+      nodes.map((node) => ({
+        ...node,
+        selected: node.type !== 'start' && node.type !== 'ghost' && nodesToSelect.has(node.id)
+      }))
     );
-  }
+  };
 
-  function handlePointerUp(e: PointerEvent) {
+  const handlePointerUp = (e: PointerEvent) => {
     if (!canvas.current) return;
 
     canvas.current.releasePointerCapture(e.pointerId);
@@ -195,20 +153,17 @@ export function Lasso() {
     if (ctx.current) {
       ctx.current.clearRect(0, 0, width, height);
     }
-    pointRef.current = [];
+    points.current = [];
     startPoint.current = null;
-  }
+  };
+
+  const clearSelection = () => setNodes((nodes) => 
+    nodes.map((node) => ({ ...node, selected: false }))
+  );
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        setNodes((nodes) =>
-          nodes.map((node) => ({
-            ...node,
-            selected: false,
-          })),
-        );
-      }
+      if (e.key === 'Escape') clearSelection();
     };
 
     document.addEventListener('keydown', handleKeyDown);
