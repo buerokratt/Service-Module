@@ -1,12 +1,11 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
+import useServiceStore from 'store/new-services.store';
 
 import { OutputElementBox, Track } from '..';
 import { FormInput } from '../FormElements';
 import FormRichText from '../FormElements/FormRichText';
-
 import './styles.scss';
-import { useTranslation } from 'react-i18next';
-import useServiceStore from 'store/new-services.store';
 
 type FileGenerateContentProps = {
   readonly onFileNameChange: (name: string) => void;

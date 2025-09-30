@@ -32,7 +32,7 @@ const ServiceSettingPage: React.FC = () => {
   }, []);
 
   const handleSave = async (value: number) => {
-    api
+    await api
       .post(saveServiceSettings(), {
         name: 'maxInputTry',
         value: value,

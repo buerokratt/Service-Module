@@ -1,17 +1,9 @@
 import { Icon, Track } from '@buerokratt-ria/header/src/header/components';
-import { ColumnDef, flexRender, Table } from '@tanstack/react-table';
+import { flexRender, Table } from '@tanstack/react-table';
 import React from 'react';
 import { MdExpandLess, MdExpandMore, MdUnfoldMore } from 'react-icons/md';
 
 import Filter from './Filter';
-
-type ColumnMeta = {
-  meta: {
-    size: number | string;
-  };
-};
-
-type CustomColumnDef = ColumnDef<any> & ColumnMeta;
 
 interface TableHeaderProps {
   table: Table<any>;

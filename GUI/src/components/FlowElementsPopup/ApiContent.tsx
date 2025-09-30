@@ -13,7 +13,7 @@ type ApiContentProps = {
 
 const ApiContent: FC<ApiContentProps> = ({ nodeId, endpoint, onEndpointChange }) => {
   const endpointCopy = useMemo(() => {
-    return endpoint ? JSON.parse(JSON.stringify(endpoint)) : undefined;
+    return endpoint ? (JSON.parse(JSON.stringify(endpoint)) as EndpointData) : undefined;
   }, [endpoint]);
 
   useEffect(() => {
