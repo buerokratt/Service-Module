@@ -153,15 +153,19 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
   changeAssignNode: (assignElements) => {
     const { nodes } = get();
     const elementsMap = new Map(
-      nodes
-        .filter((node) => node.data.stepType === StepType.Assign)
-        .flatMap((node) => node.data?.assignElements ?? [])
-        .map((element) => [element.id, element]),
+      (
+        nodes
+          .filter((node) => node.data.stepType === StepType.Assign)
+          .flatMap((node) => node.data?.assignElements ?? []) as Assign[]
+      ).map((element) => [element.id, element]),
     );
 
-    assignElements.forEach(
-      (updated) => elementsMap.get(updated.id) && Object.assign(elementsMap.get(updated.id), updated),
-    );
+    assignElements.forEach((updated) => {
+      const existing = elementsMap.get(updated.id);
+      if (existing) {
+        Object.assign(existing, updated);
+      }
+    });
 
     const hasChangedSlot = (slot: any, elementsMap: Map<any, any>): boolean => {
       const ref = elementsMap.get(slot.id);
