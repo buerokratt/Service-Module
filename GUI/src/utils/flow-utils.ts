@@ -18,7 +18,7 @@ export const getNodeLabel = (step: Step, nodes: Node[]) => {
     .map((label) => {
       const parts = label.split(' - ');
       if (parts.length > 1) {
-        const num = parseInt(parts[parts.length - 1] as string);
+        const num = parseInt(parts[parts.length - 1]);
         return isNaN(num) ? 0 : num;
       }
       return 0;
