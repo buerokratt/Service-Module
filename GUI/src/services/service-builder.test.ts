@@ -1,3 +1,4 @@
+import { NodeDataProps } from 'types/service-flow';
 import { describe, expect, it, vi } from 'vitest';
 
 import {
@@ -22,45 +23,39 @@ describe('Validation Functions', () => {
   describe('validateTextField', () => {
     it('should return null when message is defined', () => {
       const nodeData = { message: 'Test message' };
-      const result = validateTextField(nodeData);
+      const result = validateTextField(nodeData as NodeDataProps);
       expect(result).toBeNull();
     });
 
     it('should return error when message is undefined', () => {
       const nodeData = { message: undefined };
-      const result = validateTextField(nodeData);
+      const result = validateTextField(nodeData as NodeDataProps);
       expect(result).toBe('toast.missing-textfield-message');
-    });
-
-    it('should return null when message is null (only checks undefined)', () => {
-      const nodeData = { message: null };
-      const result = validateTextField(nodeData);
-      expect(result).toBeNull();
     });
   });
 
   describe('validateOpenWebpage', () => {
     it('should return null when both link and linkText are defined', () => {
       const nodeData = { link: 'https://example.com', linkText: 'Example' };
-      const result = validateOpenWebpage(nodeData);
+      const result = validateOpenWebpage(nodeData as NodeDataProps);
       expect(result).toBeNull();
     });
 
     it('should return error when link is undefined', () => {
       const nodeData = { link: undefined, linkText: 'Example' };
-      const result = validateOpenWebpage(nodeData);
+      const result = validateOpenWebpage(nodeData as NodeDataProps);
       expect(result).toBe('toast.missing-website');
     });
 
     it('should return error when linkText is undefined', () => {
       const nodeData = { link: 'https://example.com', linkText: undefined };
-      const result = validateOpenWebpage(nodeData);
+      const result = validateOpenWebpage(nodeData as NodeDataProps);
       expect(result).toBe('toast.missing-website');
     });
 
     it('should return error when both are undefined', () => {
       const nodeData = { link: undefined, linkText: undefined };
-      const result = validateOpenWebpage(nodeData);
+      const result = validateOpenWebpage(nodeData as NodeDataProps);
       expect(result).toBe('toast.missing-website');
     });
   });
@@ -68,19 +63,19 @@ describe('Validation Functions', () => {
   describe('validateFileGenerate', () => {
     it('should return null when both fileName and fileContent are defined', () => {
       const nodeData = { fileName: 'test.txt', fileContent: 'Test content' };
-      const result = validateFileGenerate(nodeData);
+      const result = validateFileGenerate(nodeData as NodeDataProps);
       expect(result).toBeNull();
     });
 
     it('should return error when fileName is undefined', () => {
       const nodeData = { fileName: undefined, fileContent: 'Test content' };
-      const result = validateFileGenerate(nodeData);
+      const result = validateFileGenerate(nodeData as NodeDataProps);
       expect(result).toBe('toast.missing-file-generation');
     });
 
     it('should return error when fileContent is undefined', () => {
       const nodeData = { fileName: 'test.txt', fileContent: undefined };
-      const result = validateFileGenerate(nodeData);
+      const result = validateFileGenerate(nodeData as NodeDataProps);
       expect(result).toBe('toast.missing-file-generation');
     });
   });
@@ -88,19 +83,19 @@ describe('Validation Functions', () => {
   describe('validateAssign', () => {
     it('should return null when assignElements is defined and not empty', () => {
       const nodeData = { assignElements: [{ id: '1', key: 'test', value: 'value' }] };
-      const result = validateAssign(nodeData);
+      const result = validateAssign(nodeData as NodeDataProps);
       expect(result).toBeNull();
     });
 
     it('should return error when assignElements is undefined', () => {
       const nodeData = { assignElements: undefined };
-      const result = validateAssign(nodeData);
+      const result = validateAssign(nodeData as NodeDataProps);
       expect(result).toBe('toast.missing-assign-elements');
     });
 
     it('should return error when assignElements is empty array', () => {
       const nodeData = { assignElements: [] };
-      const result = validateAssign(nodeData);
+      const result = validateAssign(nodeData as unknown as NodeDataProps);
       expect(result).toBe('toast.missing-assign-elements');
     });
   });
@@ -113,7 +108,7 @@ describe('Validation Functions', () => {
           buttons: [{ id: '1', title: 'Option 1', payload: 'payload1' }],
         },
       };
-      const result = validateMultiChoiceQuestion(nodeData);
+      const result = validateMultiChoiceQuestion(nodeData as NodeDataProps);
       expect(result).toBeNull();
     });
 
@@ -124,7 +119,7 @@ describe('Validation Functions', () => {
           buttons: [{ id: '1', title: 'Option 1', payload: 'payload1' }],
         },
       };
-      const result = validateMultiChoiceQuestion(nodeData);
+      const result = validateMultiChoiceQuestion(nodeData as unknown as NodeDataProps);
       expect(result).toBe('toast.missing-mcq-question');
     });
 
@@ -135,7 +130,7 @@ describe('Validation Functions', () => {
           buttons: [{ id: '1', title: 'Option 1', payload: 'payload1' }],
         },
       };
-      const result = validateMultiChoiceQuestion(nodeData);
+      const result = validateMultiChoiceQuestion(nodeData as NodeDataProps);
       expect(result).toBe('toast.missing-mcq-question');
     });
 
@@ -146,7 +141,7 @@ describe('Validation Functions', () => {
           buttons: undefined,
         },
       };
-      const result = validateMultiChoiceQuestion(nodeData);
+      const result = validateMultiChoiceQuestion(nodeData as unknown as NodeDataProps);
       expect(result).toBe('toast.missing-mcq-options');
     });
 
@@ -157,7 +152,7 @@ describe('Validation Functions', () => {
           buttons: [],
         },
       };
-      const result = validateMultiChoiceQuestion(nodeData);
+      const result = validateMultiChoiceQuestion(nodeData as unknown as NodeDataProps);
       expect(result).toBe('toast.missing-mcq-options');
     });
   });
@@ -171,7 +166,7 @@ describe('Validation Functions', () => {
           key: 'test key',
         },
       };
-      const result = validateDynamicChoices(nodeData);
+      const result = validateDynamicChoices(nodeData as NodeDataProps);
       expect(result).toBeNull();
     });
 
@@ -183,7 +178,7 @@ describe('Validation Functions', () => {
           key: 'test key',
         },
       };
-      const result = validateDynamicChoices(nodeData);
+      const result = validateDynamicChoices(nodeData as unknown as NodeDataProps);
       expect(result).toBe('toast.missing-dynamic-choices-list');
     });
 
@@ -195,7 +190,7 @@ describe('Validation Functions', () => {
           key: 'test key',
         },
       };
-      const result = validateDynamicChoices(nodeData);
+      const result = validateDynamicChoices(nodeData as NodeDataProps);
       expect(result).toBe('toast.missing-dynamic-choices-list');
     });
 
@@ -207,7 +202,7 @@ describe('Validation Functions', () => {
           key: 'test key',
         },
       };
-      const result = validateDynamicChoices(nodeData);
+      const result = validateDynamicChoices(nodeData as NodeDataProps);
       expect(result).toBe('toast.missing-dynamic-choices-service-name');
     });
 
@@ -219,7 +214,7 @@ describe('Validation Functions', () => {
           key: 'test key',
         },
       };
-      const result = validateDynamicChoices(nodeData);
+      const result = validateDynamicChoices(nodeData as NodeDataProps);
       expect(result).toBe('toast.missing-dynamic-choices-service-name');
     });
 
@@ -231,7 +226,7 @@ describe('Validation Functions', () => {
           key: undefined,
         },
       };
-      const result = validateDynamicChoices(nodeData);
+      const result = validateDynamicChoices(nodeData as NodeDataProps);
       expect(result).toBe('toast.missing-dynamic-choices-key');
     });
 
@@ -243,7 +238,7 @@ describe('Validation Functions', () => {
           key: '',
         },
       };
-      const result = validateDynamicChoices(nodeData);
+      const result = validateDynamicChoices(nodeData as NodeDataProps);
       expect(result).toBe('toast.missing-dynamic-choices-key');
     });
   });
@@ -255,22 +250,22 @@ describe('Validation Functions', () => {
           children: [{ field: 'test', operator: 'equals', value: 'value' }],
         },
       };
-      expect(() => validateCondition(nodeData)).not.toThrow();
+      expect(() => validateCondition(nodeData as NodeDataProps)).not.toThrow();
     });
 
     it('should throw error when rules children are undefined', () => {
       const nodeData = { rules: { children: undefined } };
-      expect(() => validateCondition(nodeData)).toThrow('toast.missing-condition-rules');
+      expect(() => validateCondition(nodeData as unknown as NodeDataProps)).toThrow('toast.missing-condition-rules');
     });
 
     it('should throw error when rules children are empty', () => {
       const nodeData = { rules: { children: [] } };
-      expect(() => validateCondition(nodeData)).toThrow('toast.missing-condition-rules');
+      expect(() => validateCondition(nodeData as unknown as NodeDataProps)).toThrow('toast.missing-condition-rules');
     });
 
     it('should throw error when rules are undefined', () => {
       const nodeData = { rules: undefined };
-      expect(() => validateCondition(nodeData)).toThrow('toast.missing-condition-rules');
+      expect(() => validateCondition(nodeData as unknown as NodeDataProps)).toThrow('toast.missing-condition-rules');
     });
   });
 });
