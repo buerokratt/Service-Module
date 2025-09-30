@@ -6,12 +6,11 @@ type NodePoints = ([number, number] | [number, number, number])[];
 type NodePointObject = Record<string, NodePoints>;
 
 export function Lasso() {
-  const { flowToScreenPosition, setNodes } = useReactFlow();
+  const { screenToFlowPosition, setNodes } = useReactFlow();
   const { width, height, nodeLookup } = useStore((state) => ({
     width: state.width,
     height: state.height,
     nodeLookup: state.nodeLookup,
-    transform: state.transform,
   }));
   const canvas = useRef<HTMLCanvasElement>(null);
   const ctx = useRef<CanvasRenderingContext2D | undefined | null>(null);
@@ -19,6 +18,7 @@ export function Lasso() {
   const nodePoints = useRef<NodePointObject>({});
   const pointRef = useRef<[number, number][]>([]);
   const isDrawing = useRef(false);
+  const startPoint = useRef<[number, number] | null>(null);
 
   function isPointInPolygon(point: [number, number], polygon: [number, number][]): boolean {
     const [x, y] = point;
@@ -36,6 +36,18 @@ export function Lasso() {
     return inside;
   }
 
+  function calculatePolygonArea(polygon: [number, number][]): number {
+    if (polygon.length < 3) return 0;
+    
+    let area = 0;
+    for (let i = 0; i < polygon.length; i++) {
+      const j = (i + 1) % polygon.length;
+      area += polygon[i][0] * polygon[j][1];
+      area -= polygon[j][0] * polygon[i][1];
+    }
+    return Math.abs(area) / 2;
+  }
+
   function calculateIntersectionArea(nodeId: string, polygon: [number, number][]): number {
     const node = nodeLookup.get(nodeId);
     if (!node) return 0;
@@ -43,22 +55,23 @@ export function Lasso() {
     const { x, y } = node.internals.positionAbsolute;
     const { width = 0, height = 0 } = node.measured;
     
+    // Use flow coordinates directly since polygon is now in flow coordinates
     const nodeBounds = [
-      flowToScreenPosition({ x, y }),
-      flowToScreenPosition({ x: x + width, y }),
-      flowToScreenPosition({ x: x + width, y: y + height }),
-      flowToScreenPosition({ x, y: y + height }),
-    ];
+      [x, y],
+      [x + width, y],
+      [x + width, y + height],
+      [x, y + height],
+    ] as [number, number][];
 
     let cornersInside = 0;
     for (const corner of nodeBounds) {
-      if (isPointInPolygon([corner.x, corner.y], polygon)) {
+      if (isPointInPolygon(corner, polygon)) {
         cornersInside++;
       }
     }
 
-    const center = flowToScreenPosition({ x: x + width / 2, y: y + height / 2 });
-    const centerInside = isPointInPolygon([center.x, center.y], polygon);
+    const center = [x + width / 2, y + height / 2] as [number, number];
+    const centerInside = isPointInPolygon(center, polygon);
 
     return centerInside ? 1 : cornersInside / 4;
   }
@@ -74,6 +87,7 @@ export function Lasso() {
     const y = e.clientY - rect.top;
 
     pointRef.current = [[x, y]];
+    startPoint.current = [x, y];
 
     nodePoints.current = {};
     for (const node of nodeLookup.values()) {
@@ -112,7 +126,21 @@ export function Lasso() {
 
     pointRef.current = [...pointRef.current, [x, y]];
 
-    const closedPolygon = [...pointRef.current, pointRef.current[0]] as [number, number][];
+    // Convert screen coordinates to flow coordinates for testing
+    // Use the actual client coordinates directly, just like in flow-builder.ts
+    const flowPoints = pointRef.current.map(([canvasX, canvasY]) => {
+      // Convert canvas coordinates back to client coordinates
+      const clientX = canvasX + rect.left;
+      const clientY = canvasY + rect.top;
+      const flowPos = screenToFlowPosition({ x: clientX, y: clientY });
+      return [flowPos.x, flowPos.y] as [number, number];
+    });
+    
+    
+    // Create a simple polygon from the flow coordinates for testing
+    const closedPolygon = [...flowPoints, flowPoints[0]] as [number, number][];
+    
+    // Create the smooth path for visual display
     const path = new Path2D(getSvgPathFromStroke(pointRef.current));
 
     ctx.current.clearRect(0, 0, width, height);
@@ -121,11 +149,24 @@ export function Lasso() {
 
     const nodesToSelect = new Set<string>();
 
-    for (const nodeId of Object.keys(nodePoints.current)) {
-      const intersectionArea = calculateIntersectionArea(nodeId, closedPolygon);
-      
-      if (intersectionArea >= 0.7) {
-        nodesToSelect.add(nodeId);
+    // Only perform selection if the polygon has a meaningful area (minimum 100 square pixels)
+    // and the user has dragged a reasonable distance (minimum 10 pixels)
+    const polygonArea = calculatePolygonArea(closedPolygon);
+    const hasMinimumDrag = startPoint.current && 
+      pointRef.current.length > 1 && 
+      Math.sqrt(
+        Math.pow(pointRef.current[pointRef.current.length - 1][0] - startPoint.current[0], 2) + 
+        Math.pow(pointRef.current[pointRef.current.length - 1][1] - startPoint.current[1], 2)
+      ) >= 10;
+    
+    // Use a more conservative approach - only select if we have a meaningful selection
+    if (polygonArea >= 200 && hasMinimumDrag && pointRef.current.length >= 3) {
+      for (const nodeId of Object.keys(nodePoints.current)) {
+        const intersectionArea = calculateIntersectionArea(nodeId, closedPolygon);
+        
+        if (intersectionArea >= 0.7) {
+          nodesToSelect.add(nodeId);
+        }
       }
     }
 
@@ -155,6 +196,7 @@ export function Lasso() {
       ctx.current.clearRect(0, 0, width, height);
     }
     pointRef.current = [];
+    startPoint.current = null;
   }
 
   useEffect(() => {
