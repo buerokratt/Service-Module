@@ -109,8 +109,8 @@ export interface ServiceStoreState {
   resetSelectedNode: () => void;
   handleNodeEdit: (selectedNodeId: string) => void;
   onDelete: (id: string) => void;
-  clickedNode: any;
-  setClickedNode: (clickedNode: any) => void;
+  clickedNode: string | null;
+  setClickedNode: (clickedNode: string | null) => void;
   onNodesChange: (changes: NodeChange[]) => void;
   onEdgesChange: (changes: EdgeChange[]) => void;
   onNodeAdded: (node: Node) => void;
