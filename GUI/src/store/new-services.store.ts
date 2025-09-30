@@ -132,7 +132,7 @@ export interface ServiceStoreState {
   handleProgrammaticNavigation: (to: string) => boolean;
 }
 
-const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
+const useServiceStore = create<ServiceStoreState>((set, get) => ({
   endpoints: [],
   name: '',
   slot: '',
@@ -275,13 +275,13 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
         })),
       );
 
-      const response = await api.post(servicesRequestsExplain(), {
+      const response = await api.post<{ response: Record<string, unknown>[] }>(servicesRequestsExplain(), {
         requests: requests,
       });
 
       const variables: EndpointResponseVariable[] = [];
 
-      response.data.response.forEach((res: any, i: number) => {
+      response.data.response.forEach((res, i) => {
         const endpoint = endpointsFromNodes[i];
         const chips: Chip[] = [];
 
