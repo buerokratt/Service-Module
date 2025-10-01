@@ -95,6 +95,8 @@ export default [
       'sonarjs/assertions-in-tests': 'off',
       // Causes issues and forces to use unknown instead of more specific types
       'sonarjs/function-return-type': 'off',
+      // This rules causes false positives for object parameters with NAMED properties
+      'sonarjs/no-selector-parameter': 'off',
     },
   },
 
