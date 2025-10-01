@@ -303,7 +303,6 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
         </Track>
         <FormTextarea
           key={`${requestTab.tab}-raw-data`}
-          name={`${requestTab.tab}-raw-data`}
           label={''}
           defaultValue={tabRawData[requestTab.tab]}
           onBlur={() => updateEndpointRawData(tabRawData, endpoint)}
