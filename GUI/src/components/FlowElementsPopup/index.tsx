@@ -47,7 +47,7 @@ const FlowElementsPopup: React.FC = () => {
   const selectedService = useServiceListStore((state) => state.selectedService);
   const instance = useServiceStore.getState().reactFlowInstance;
 
-  const isUserDefinedNode = node?.data?.stepType === 'user-defined';
+  const isUserDefinedNode = node?.data?.stepType === StepType.UserDefined;
 
   const serviceName = useServiceStore((state) => removeTrailingUnderscores(state.serviceNameDashed()));
   const rules = useServiceStore((state) => state.rules);
