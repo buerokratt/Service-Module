@@ -48,15 +48,16 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
 
   useEffect(() => {
     const currentNodeIndex = nodes.findIndex((node) => node.id === nodeId);
+
     const currentNode = nodes[currentNodeIndex];
 
-    let startIndex = nodes.findLastIndex(
+    const startIndex = nodes.findLastIndex(
       (node, i) => i < currentNodeIndex && node.data.stepType === StepType.MultiChoiceQuestion,
-    );
+    ) as number;
 
     let previousNodes = nodes.slice(startIndex === -1 ? 0 : startIndex, currentNodeIndex);
 
-    if (startIndex != -1) {
+    if (startIndex !== -1) {
       previousNodes = getCurrentBranchNodesUp(nodes, edges, currentNode);
     }
 
@@ -69,7 +70,10 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
     // Get Assign variables
     const assignNodes: Node<NodeDataProps>[] =
       (previousNodes.filter((node) => node.data.stepType === StepType.Assign) as Node<NodeDataProps>[]) ?? [];
-    const assignElements = assignNodes.map((node) => node.data.assignElements).flat();
+    const assignElements = assignNodes
+      .map((node) => node.data.assignElements)
+      .filter((elements): elements is Assign[] => elements !== undefined)
+      .flat();
     const predefinedInputElements: Assign[] = [
       {
         id: predefinedInputKeys[0],
@@ -230,6 +234,16 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
   );
 };
 
+type VariableSectionProps = {
+  title: string;
+  variables: Assign[];
+  assignedObjectTree: { data: unknown; path: string | number } | null;
+  setAssignedObjectTree: (value: { data: unknown; path: string | number } | null) => void;
+  popupBodyCss: CSSProperties;
+  border: string;
+  isAssignSection?: boolean;
+};
+
 const VariableSection = ({
   title,
   variables,
@@ -238,7 +252,7 @@ const VariableSection = ({
   popupBodyCss,
   border,
   isAssignSection = false,
-}: any) => {
+}: VariableSectionProps) => {
   const { t } = useTranslation();
 
   return (
@@ -254,7 +268,7 @@ const VariableSection = ({
         {title}
       </label>
       <Track direction="horizontal" gap={4} justify="start" isMultiline style={{ maxHeight: '30vh', overflow: 'auto' }}>
-        {variables.map((variable: any) => {
+        {variables.map((variable) => {
           const typeColor = getTypeColor(variable?.value);
 
           const rawName =
