@@ -24,6 +24,8 @@ type EndpointOpenAPIProps = {
 
 const EndpointOpenAPI: React.FC<EndpointOpenAPIProps> = ({
   endpoint,
+  // This needs to be removed in the future
+  // This is always true as we have removed the Test tab
   isLive,
   requestValues,
   requestTab,
