@@ -49,6 +49,21 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
   });
 
   useEffect(() => {
+    function getCurrentBranchNodesUp(nodes: Node[], edges: Edge[], currentNode: Node) {
+      const branchNodes: Node[] = [];
+      let parentNode: Node | undefined = getParentNode(nodes, edges, currentNode);
+
+      while (parentNode) {
+        if (parentNode.data?.stepType === StepType.MultiChoiceQuestion) {
+          break;
+        }
+        branchNodes.unshift(parentNode);
+        parentNode = getParentNode(nodes, edges, parentNode);
+      }
+
+      return branchNodes;
+    }
+
     const currentNodeIndex = nodes.findIndex((node) => node.id === nodeId);
 
     const currentNode = nodes[currentNodeIndex];
@@ -96,22 +111,7 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
     ];
 
     setAssignedVariables([...assignElements, ...predefinedInputElements, ...newAssignElements]);
-  }, [endpointsVariables, newAssignElements]);
-
-  function getCurrentBranchNodesUp(nodes: Node[], edges: Edge[], currentNode: Node) {
-    const branchNodes: Node[] = [];
-    let parentNode: Node | undefined = getParentNode(nodes, edges, currentNode);
-
-    while (parentNode) {
-      if (parentNode.data?.stepType === StepType.MultiChoiceQuestion) {
-        break;
-      }
-      branchNodes.unshift(parentNode);
-      parentNode = getParentNode(nodes, edges, parentNode);
-    }
-
-    return branchNodes;
-  }
+  }, [edges, endpointsVariables, newAssignElements, nodeId, nodes]);
 
   function getParentNode(nodes: Node[], edges: Edge[], node: Node): Node | undefined {
     const parentEdge = edges.findLast((edge) => edge.target === node.id);
