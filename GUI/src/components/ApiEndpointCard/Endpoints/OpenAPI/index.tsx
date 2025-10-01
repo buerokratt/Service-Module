@@ -154,7 +154,7 @@ const EndpointOpenAPI: React.FC<EndpointOpenAPIProps> = ({
     const paths: EndpointDefinition[] = [];
 
     Object.entries(apiSpec.paths).forEach(([path, endpointData]) => {
-      Object.entries(endpointData as ApiSpecProperty).forEach(([method, data]: [string, ApiSpecProperty]) => {
+      Object.entries(endpointData).forEach(([method, data]) => {
         const endpointUrl = url + path;
         const label = `${method.toUpperCase()} ${path}`;
         if (!['get', 'post'].includes(method.toLowerCase())) {

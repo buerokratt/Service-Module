@@ -4,4 +4,5 @@ export type ApiSpecProperty = {
   items: ApiSpecProperty;
   // todo ???
   required: Record<string, string>;
+  paths: Record<string, Record<string, ApiSpecProperty>>;
 };
