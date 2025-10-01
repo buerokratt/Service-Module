@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 import { et } from 'date-fns/locale';
-import React, { forwardRef, useId } from 'react';
+import { forwardRef, useId } from 'react';
 import ReactDatePicker, { registerLocale } from 'react-datepicker';
 import { ControllerRenderProps } from 'react-hook-form';
 import { MdChevronLeft, MdChevronRight, MdOutlineSchedule, MdOutlineToday } from 'react-icons/md';
@@ -13,7 +13,6 @@ registerLocale('et-EE', et);
 
 type FormDatepickerProps = ControllerRenderProps & {
   label: string;
-  name: string;
   hideLabel?: boolean;
   disabled?: boolean;
   placeholder?: string;
@@ -23,10 +22,7 @@ type FormDatepickerProps = ControllerRenderProps & {
 };
 
 const FormDatepicker = forwardRef<any, FormDatepickerProps>(
-  (
-    { label, name, hideLabel, disabled, placeholder, timePicker, monthPicker, portalId = 'overlay-root', ...rest },
-    ref,
-  ) => {
+  ({ label, hideLabel, disabled, placeholder, timePicker, monthPicker, portalId = 'overlay-root', ...rest }) => {
     const id = useId();
     const { value, onChange } = rest;
 
