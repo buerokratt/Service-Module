@@ -56,6 +56,7 @@ const EndpointCustom: React.FC<EndpointCustomProps> = ({
     });
   }
 
+  // todo fixing this breaks request variables
   useEffect(() => setKey(key + 1), [isLive]);
 
   const refereshEndpoint = () => {
