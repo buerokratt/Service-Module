@@ -22,6 +22,7 @@ export const useRuleBuilder = (config: UseRuleBuilderProps) => {
       ...groupInfo,
       children: elements,
     });
+    // todo breaks condition builder
   }, [elements, groupInfo]);
 
   const addRule = () => {
@@ -52,7 +53,7 @@ export const useRuleBuilder = (config: UseRuleBuilderProps) => {
 
   const changeRule = (rule: Rule) => setElementById(rule.id, rule);
 
-  const onSubGroupChange = (parentId: string) => (rule: any) => setElementById(parentId, rule);
+  const onSubGroupChange = (parentId: string) => (rule: GroupOrRule) => setElementById(parentId, rule);
 
   const setElementById = (id: string, element: GroupOrRule) => {
     const newElements = elements.map((x) => (x.id === id ? { ...element } : x));
