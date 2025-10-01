@@ -240,7 +240,7 @@ const EndpointOpenAPI: React.FC<EndpointOpenAPIProps> = ({
           />
           <Button
             onClick={() => {
-              fetchOpenApiSpecMock();
+              void fetchOpenApiSpecMock();
             }}
           >
             {t('newService.endpoint.ask')}
