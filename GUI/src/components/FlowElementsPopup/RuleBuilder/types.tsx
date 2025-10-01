@@ -4,7 +4,7 @@ export interface RuleGroupBuilderProps {
   group?: Group;
   onRemove?: (id: string) => void;
   onChange: (config: any) => void;
-  seedGroup?: GroupOrRule[];
+  seedGroup?: any;
 }
 
 export interface Rule {
