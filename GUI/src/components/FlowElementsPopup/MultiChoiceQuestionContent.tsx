@@ -87,7 +87,6 @@ const MultiChoiceQuestionContent: FC<MultiChoiceQuestionContentProps> = ({
     <Track direction="vertical" align="stretch" style={{ width: '100%', padding: 16 }}>
       <div>
         <FormTextarea
-          name="multiChoiceQuestion-question"
           label=""
           placeholder={t('serviceFlow.multiChoiceQuestion.questionPlaceholder')!}
           value={question}
