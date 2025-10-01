@@ -58,7 +58,7 @@ const FaultyServicesPage: React.FC = () => {
       order = sorting[0].desc ? 'desc' : 'asc';
     }
     api
-      .get(getFaultyServices(pagination.pageIndex + 1, pagination.pageSize, sort, order))
+      .get<[FaultyService[], number]>(getFaultyServices(pagination.pageIndex + 1, pagination.pageSize, sort, order))
       .then((res) => {
         setData(res.data[0]);
         setPageCount(Math.ceil(res.data[1] / pagination.pageSize));
