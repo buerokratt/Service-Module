@@ -6,14 +6,13 @@ interface UseRuleBuilderProps {
   group?: Group;
   root?: boolean;
   onChange: (group: Group) => void;
-  seedGroup?: any;
+  seedGroup?: GroupOrRule[];
 }
 
 export const useRuleBuilder = (config: UseRuleBuilderProps) => {
-  const elementsInitialValue = config.root ? (config.seedGroup?.children ?? []) : config.group!.children;
-  const seedGroup =
-    config.seedGroup?.length > 0 || config.seedGroup?.children?.length ? config.seedGroup : getInitialGroup();
-  const groupInfoInitialValue = config.root ? seedGroup : config.group!;
+  const elementsInitialValue = config.root ? [] : config.group!.children;
+  const seedGroup = config.seedGroup?.length && config.seedGroup.length > 0 ? config.seedGroup : getInitialGroup();
+  const groupInfoInitialValue = config.root ? (seedGroup as Group) : config.group!;
   const [elements, setElements] = useState<GroupOrRule[]>(elementsInitialValue);
   const [groupInfo, setGroupInfo] = useState<Group>(groupInfoInitialValue);
 
