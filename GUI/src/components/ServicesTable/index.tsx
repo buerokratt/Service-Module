@@ -147,12 +147,6 @@ const ServicesTable: FC<ServicesTableProps> = ({ isCommon = false }) => {
     }
   };
 
-  // const getChangeServiceStateButtonTitle = () => {
-  //   if (popupText === t('overview.popup.setInactive')) return t('overview.popup.deactivate');
-  //   if (popupText === t('overview.popup.setReady')) return t('overview.popup.setState');
-  //   return t('overview.popup.activate');
-  // };
-
   const getActiveAndConnectionButton = () => {
     if (readyPopupText === t('overview.popup.setActive')) {
       return (
@@ -196,19 +190,6 @@ const ServicesTable: FC<ServicesTableProps> = ({ isCommon = false }) => {
           </Track>
         </Modal>
       )}
-      {/* {isStatePopupVisible && (
-        <Modal title={popupText} onClose={() => setIsStatePopupVisible(false)}>
-          <Track justify="end" gap={16}>
-            <Button appearance="secondary" onClick={() => setIsStatePopupVisible(false)}>
-              {t('overview.cancel')}
-            </Button>
-            {popupText === t('overview.popup.setInactive') && (
-              <Button onClick={() => changeServiceState(false, true)}>{t('overview.popup.setToDraft')}</Button>
-            )}
-            <Button onClick={() => changeServiceState()}>{getChangeServiceStateButtonTitle()}</Button>
-          </Track>
-        </Modal>
-      )} */}
       {isReadyPopupVisible && (
         <Modal title={isReadyStatusChecking ? null : readyPopupText} onClose={() => setIsReadyPopupVisible(false)}>
           {isReadyStatusChecking ? (

@@ -176,7 +176,6 @@
       "setReady": "Kas olete kindel, et soovite selle teenuse olekuks märkida Valmis?",
       "setDraft": "Kas olete kindel, et soovite selle teenuse olekuks märkida Mustand?",
       "setInactive": "Kas oled kindel, et tahate teenuse deaktiveerida?",
-      "setState": "Uuenda olek",
       "checking": "Kontrollitakse, kas teenus on teemaga ühendatud",
       "setToDraft": "Määra mustandiks",
       "connectToIntent": "Ühendage teemaga",
@@ -192,8 +191,6 @@
       "noIntentsAvailable": "Ühenduse loomiseks ei ole ühtegi teemat saadaval",
       "noSlotsAvailable": "Ühtegi pesa pole saadaval",
       "connectionQuestion": "Kas olete kindel, et soovite teenuse selle teemaga ühendada?",
-      "activate": "Aktiveerige",
-      "deactivate": "Deaktiveerige",
       "createNewIntent": "Loo uus teema",
       "deleteNodeConnections": "Kas soovid kustutada kõik loogikateed, mis on seotud selle plokiga, või jätta need alles?"
     }
