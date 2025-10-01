@@ -56,7 +56,7 @@ const EndpointCustom: React.FC<EndpointCustomProps> = ({
     });
   }
 
-  useEffect(() => setKey(key + 1), [isLive, key]);
+  useEffect(() => setKey(key + 1), [isLive]);
 
   const refereshEndpoint = () => {
     setEndpoints((endpoint) => endpoint);
