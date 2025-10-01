@@ -104,6 +104,6 @@ export default [
 
   // Global ignores
   {
-    ignores: ['eslint.config.mjs', 'dist', 'build', 'node_modules', 'vitest.config.ts', 'vite.config.ts'],
+    ignores: ['eslint.config.mjs', 'dist', 'build', 'node_modules', 'vitest.config.ts', 'vite.config.ts', 'coverage'],
   },
 ];
