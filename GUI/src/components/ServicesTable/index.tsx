@@ -54,49 +54,6 @@ const ServicesTable: FC<ServicesTableProps> = ({ isCommon = false }) => {
     }
   }, [isCommon, pagination, sorting]);
 
-  const checkIntentConnection = () => {
-    void useServiceListStore.getState().checkServiceIntentConnection(
-      (response) => {
-        setSelectedConnectionTrigger(response);
-        setIsReadyStatusChecking(false);
-        if (response.status === 'pending') {
-          setReadyPopupText(t('overview.popup.connectionPending').toString());
-        } else {
-          setReadyPopupText(t('overview.popup.setActive').toString());
-        }
-      },
-      () => {
-        setIsReadyStatusChecking(false);
-        setReadyPopupText(t('overview.popup.intentNotConnected').toString());
-      },
-    );
-  };
-
-  const columns = useMemo(
-    () =>
-      getColumns({
-        isCommon,
-        navigate,
-        checkIntentConnection,
-        hideDeletePopup: () => setIsDeletePopupVisible(true),
-        showStatePopup: (text: string) => {
-          setPopupText(text);
-          setIsStatePopupVisible(true);
-        },
-        showReadyPopup: () => {
-          setIsReadyStatusChecking(true);
-          setIsReadyPopupVisible(true);
-        },
-        showIntentConnectionModal: () => {
-          setIsIntentConnectionPopupVisible(true);
-        },
-        editService: () => {
-          changeServiceState(false, true);
-        },
-      }),
-    [],
-  );
-
   const changeServiceState = (activate: boolean = false, draft: boolean = false) => {
     useServiceListStore
       .getState()
@@ -119,6 +76,47 @@ const ServicesTable: FC<ServicesTableProps> = ({ isCommon = false }) => {
         setIsActivating(false);
       });
   };
+
+  const columns = useMemo(() => {
+    const checkIntentConnection = () => {
+      void useServiceListStore.getState().checkServiceIntentConnection(
+        (response) => {
+          setSelectedConnectionTrigger(response);
+          setIsReadyStatusChecking(false);
+          if (response.status === 'pending') {
+            setReadyPopupText(t('overview.popup.connectionPending').toString());
+          } else {
+            setReadyPopupText(t('overview.popup.setActive').toString());
+          }
+        },
+        () => {
+          setIsReadyStatusChecking(false);
+          setReadyPopupText(t('overview.popup.intentNotConnected').toString());
+        },
+      );
+    };
+
+    return getColumns({
+      isCommon,
+      navigate,
+      checkIntentConnection,
+      hideDeletePopup: () => setIsDeletePopupVisible(true),
+      showStatePopup: (text: string) => {
+        setPopupText(text);
+        setIsStatePopupVisible(true);
+      },
+      showReadyPopup: () => {
+        setIsReadyStatusChecking(true);
+        setIsReadyPopupVisible(true);
+      },
+      showIntentConnectionModal: () => {
+        setIsIntentConnectionPopupVisible(true);
+      },
+      editService: () => {
+        changeServiceState(false, true);
+      },
+    });
+  }, [changeServiceState, isCommon, navigate, t]);
 
   const deleteSelectedService = () => {
     setIsDeletingService(true);
