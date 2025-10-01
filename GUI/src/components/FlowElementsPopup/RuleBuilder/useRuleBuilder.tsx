@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { getInitialGroup, getInitialRule, Group, GroupOrRule, GroupType, Rule } from './types';
 
@@ -17,12 +17,15 @@ export const useRuleBuilder = (config: UseRuleBuilderProps) => {
   const [elements, setElements] = useState<GroupOrRule[]>(elementsInitialValue);
   const [groupInfo, setGroupInfo] = useState<Group>(groupInfoInitialValue);
 
+  // Use ref to store the latest onChange function to avoid dependency issues
+  const onChangeRef = useRef(config.onChange);
+  onChangeRef.current = config.onChange;
+
   useEffect(() => {
-    config.onChange({
+    onChangeRef.current({
       ...groupInfo,
       children: elements,
     });
-    // todo breaks condition builder
   }, [elements, groupInfo]);
 
   const addRule = () => {
