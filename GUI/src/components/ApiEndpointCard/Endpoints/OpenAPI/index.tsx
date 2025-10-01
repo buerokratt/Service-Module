@@ -114,6 +114,10 @@ const EndpointOpenAPI: React.FC<EndpointOpenAPIProps> = ({
       result.push(variableData);
     });
     if (!schema.required) return result;
+    // The types are ambiguous here
+    // Required can a record of strings (here) or a boolean (in getParams)
+    // This might be a bug, impossible to resolve without refactoring this old component
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     Object.values(schema?.required).forEach((name) => {
       result.forEach((variable) => {
         if (variable.name !== name) return;
