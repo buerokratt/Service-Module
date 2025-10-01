@@ -68,7 +68,7 @@ const FaultyServicesPage: React.FC = () => {
 
   useEffect(() => {
     loadFaultyServices(pagination, sorting);
-  }, []);
+  }, [pagination, sorting]);
 
   return (
     <>
