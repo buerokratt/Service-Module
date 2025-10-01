@@ -23,7 +23,6 @@ import { useTranslation } from 'react-i18next';
 import { MdExpandLess, MdExpandMore, MdOutlineEast, MdOutlineWest, MdUnfoldMore } from 'react-icons/md';
 import { Link } from 'react-router-dom';
 
-import Filter from './Filter';
 import './DataTable.scss';
 
 type DataTableProps = {
