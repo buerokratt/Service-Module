@@ -1,11 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { MdErrorOutline } from 'react-icons/md';
 import useServiceStore from 'store/new-services.store';
-import useToastStore from 'store/toasts.store';
 import { v4 as uuid } from 'uuid';
 
-import { Button, FormInput, FormSelect, Icon, RequestVariables, Track } from '../../..';
+import { Button, FormInput, FormSelect, RequestVariables, Track } from '../../..';
 import { RequestTab } from '../../../../types';
 import { EndpointData, EndpointVariableData, PreDefinedEndpointEnvVariables } from '../../../../types/endpoint';
 
@@ -25,9 +23,8 @@ const EndpointCustom: React.FC<EndpointCustomProps> = ({
   setRequestTab,
 }) => {
   const { t } = useTranslation();
-  const [urlError, setUrlError] = useState<string>();
   const [key, setKey] = useState<number>(0);
-  const { setEndpoints, testUrl } = useServiceStore();
+  const { setEndpoints, triggerJsonRequest } = useServiceStore();
   const ref = useRef<HTMLInputElement>(null);
 
   // initial endpoint data
@@ -57,6 +54,10 @@ const EndpointCustom: React.FC<EndpointCustomProps> = ({
   }
 
   useEffect(() => setKey(key + 1), [isLive]);
+
+  const handleJsonRequestClick = () => {
+    triggerJsonRequest(endpoint);
+  };
 
   const refereshEndpoint = () => {
     setEndpoints((endpoint) => endpoint);
@@ -114,31 +115,12 @@ const EndpointCustom: React.FC<EndpointCustomProps> = ({
             />
           </Track>
           <Button
-            onClick={() =>
-              testUrl(
-                endpoint,
-                () => setUrlError(t('newService.endpoint.error') ?? undefined),
-                () => {
-                  setUrlError(undefined);
-                  useToastStore.getState().success({
-                    title: t('newService.endpoint.success'),
-                  });
-                },
-              )
-            }
+            onClick={handleJsonRequestClick}
           >
             {t('newService.test')}
           </Button>
         </Track>
       </div>
-      {urlError && (
-        <div className={'toast toast--error'} style={{ padding: '8px 16px 8px 16px' }}>
-          <div className="toast__title">
-            <Icon icon={<MdErrorOutline />} />
-            {urlError}
-          </div>
-        </div>
-      )}
       <RequestVariables
         key={key}
         requestValues={requestValues}

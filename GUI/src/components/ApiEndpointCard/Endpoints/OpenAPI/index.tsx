@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { v4 as uuid } from 'uuid';
-
+import useServiceStore from '../../../../store/new-services.store';
 import { Button, FormInput, FormSelect, RequestVariables, Track } from '../../..';
 import { getOpenApiSpec } from '../../../../resources/api-constants';
-import api from '../../../../services/api-dev';
 import { Option, RequestTab } from '../../../../types';
 import { ApiSpecProperty } from '../../../../types/api-spec-property';
 import {
@@ -14,6 +13,7 @@ import {
   PreDefinedEndpointEnvVariables,
 } from '../../../../types/endpoint';
 import { RequestVariablesRowData } from '../../../../types/request-variables';
+import api from 'services/api';
 
 type EndpointOpenAPIProps = {
   endpoint: EndpointData;
@@ -36,9 +36,17 @@ const EndpointOpenAPI: React.FC<EndpointOpenAPIProps> = ({
   );
   const [openApiEndpoints, setOpenApiEndpoints] = useState<EndpointDefinition[]>(endpoint.definitions ?? []);
   const [key, setKey] = useState<number>(0);
+  const { triggerJsonRequest } = useServiceStore();
   const { t } = useTranslation();
 
   useEffect(() => setKey(key + 1), [isLive]);
+
+  const handleJsonRequestClick = () => {
+    if (selectedEndpoint) {
+      const endpointData = { ...endpoint, definitions: [selectedEndpoint] };
+      triggerJsonRequest(endpointData);
+    }
+  };
 
   const getEndpointSchema = (
     apiSpec: ApiSpecProperty,
@@ -282,9 +290,7 @@ const EndpointOpenAPI: React.FC<EndpointOpenAPIProps> = ({
             <Track justify="between" gap={16}>
               <p>{selectedEndpoint?.description}</p>
               <Button
-                onClick={() => {
-                  console.log('selectedEndpoint', selectedEndpoint);
-                }}
+                onClick={handleJsonRequestClick}
               >
                 {t('newService.test')}
               </Button>

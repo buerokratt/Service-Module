@@ -11,7 +11,7 @@ import {
 } from '@xyflow/react';
 import { AxiosResponse } from 'axios';
 import { GroupOrRule } from 'components/FlowElementsPopup/RuleBuilder/types';
-import i18next from 'i18next';
+import i18next, { t } from 'i18next';
 import {
   getCommonEndpoints,
   getEndpointValidation,
@@ -37,6 +37,7 @@ import { create } from 'zustand';
 import useTestServiceStore from './test-services.store';
 import useToastStore from './toasts.store';
 import api from '../services/api-dev';
+import { generateJsonRequest } from 'utils/json-request-utils';
 
 export interface ServiceStoreState {
   endpoints: EndpointData[];
@@ -118,8 +119,11 @@ export interface ServiceStoreState {
   enableTestButton: () => void;
   handlePopupSave: (updatedNode: Node<NodeDataProps>) => void;
   testUrl: (endpoint: EndpointData, onError: () => void, onSuccess: () => void) => Promise<void>;
-
-  // remove the following funtions and refactor the code to use more specific functions later
+  isJsonRequestVisible: boolean;
+  jsonRequestContent: any;
+  setJsonRequestVisible: (visible: boolean) => void;
+  setJsonRequestContent: (content: any) => void;
+  triggerJsonRequest: (endpoint: EndpointData) => void;
   setEndpoints: (callback: (prev: EndpointData[]) => EndpointData[]) => void;
   reactFlowInstance: ReactFlowInstance | null;
   setReactFlowInstance: (reactFlowInstance: ReactFlowInstance | null) => void;
@@ -791,6 +795,24 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
   },
   cancelNavigation: () => {
     set({ nextLocation: null });
+  },
+  isJsonRequestVisible: false,
+  jsonRequestContent: null,
+  setJsonRequestVisible: (visible: boolean) => set({ isJsonRequestVisible: visible }),
+  setJsonRequestContent: (content: any) => set({ jsonRequestContent: content }),
+  triggerJsonRequest: (endpoint: EndpointData) => {
+    generateJsonRequest(endpoint.definitions[0])
+      .then((content) => {
+        set({ jsonRequestContent: content, isJsonRequestVisible: true });
+        useToastStore.getState().success({
+          title: t('newService.endpoint.success'),
+        });
+      })
+      .catch((error) => {
+        useToastStore.getState().error({
+          title: error.message || t('newService.endpoint.error')
+        });
+      });
   },
 }));
 
