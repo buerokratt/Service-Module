@@ -1,3 +1,4 @@
+import { PaginationState, SortingState } from '@tanstack/react-table';
 import ConnectServiceToIntentModel from 'pages/Integration/ConnectServiceToIntentModel';
 import { FC, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -11,7 +12,6 @@ import { getColumns } from './columns';
 
 import '../../styles/main.scss';
 import './ServicesTable.scss';
-import { PaginationState, SortingState } from '@tanstack/react-table';
 
 type ServicesTableProps = {
   isCommon?: boolean;
@@ -37,11 +37,11 @@ const ServicesTable: FC<ServicesTableProps> = ({ isCommon = false }) => {
   const [isActivating, setIsActivating] = useState(false);
 
   const loadServices = (paginationState: PaginationState, sortingState: SortingState) => {
-    useServiceListStore.getState().loadServicesList(paginationState, sortingState);
+    void useServiceListStore.getState().loadServicesList(paginationState, sortingState);
   };
 
   const loadCommonServices = (paginationState: PaginationState, sortingState: SortingState) => {
-    useServiceListStore.getState().loadCommonServicesList(paginationState, sortingState);
+    void useServiceListStore.getState().loadCommonServicesList(paginationState, sortingState);
   };
 
   const [isDeletingService, setIsDeletingService] = useState(false);
@@ -52,10 +52,10 @@ const ServicesTable: FC<ServicesTableProps> = ({ isCommon = false }) => {
     } else {
       loadServices(pagination, sorting);
     }
-  }, []);
+  }, [isCommon, pagination, sorting]);
 
   const checkIntentConnection = () => {
-    useServiceListStore.getState().checkServiceIntentConnection(
+    void useServiceListStore.getState().checkServiceIntentConnection(
       (response) => {
         setSelectedConnectionTrigger(response);
         setIsReadyStatusChecking(false);
@@ -145,7 +145,7 @@ const ServicesTable: FC<ServicesTableProps> = ({ isCommon = false }) => {
 
   const cancelConnectionRequest = () => {
     if (selectedConnectionTrigger) {
-      useServiceListStore
+      void useServiceListStore
         .getState()
         .cancelConnectionRequest(
           () => setIsReadyPopupVisible(false),
