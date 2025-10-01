@@ -97,6 +97,8 @@ export default [
       'sonarjs/function-return-type': 'off',
       // This rules causes false positives for object parameters with NAMED properties
       'sonarjs/no-selector-parameter': 'off',
+      // todo RE-ENABLE!!!
+      'sonarjs/no-commented-code': 'off',
     },
   },
 

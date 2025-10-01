@@ -17,10 +17,8 @@ interface GetColumnsConfig {
   navigate: NavigateFunction;
   checkIntentConnection: () => void;
   hideDeletePopup: () => void;
-  showStatePopup: (text: string) => void;
   showReadyPopup: () => void;
   showIntentConnectionModal: () => void;
-  editService: () => void;
 }
 
 export const getColumns = ({
@@ -28,10 +26,8 @@ export const getColumns = ({
   navigate,
   checkIntentConnection,
   hideDeletePopup,
-  showStatePopup,
   showReadyPopup,
   showIntentConnectionModal,
-  editService,
 }: GetColumnsConfig) => {
   const columnHelper = createColumnHelper<Service>();
   const userInfo = useStore.getState().userInfo;
