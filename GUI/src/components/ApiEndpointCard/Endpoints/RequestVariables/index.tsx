@@ -1,6 +1,6 @@
 import * as Tabs from '@radix-ui/react-tabs';
 import { PaginationState, SortingState } from '@tanstack/react-table';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { ReactElement, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import useServiceStore from 'store/new-services.store';
 
@@ -278,7 +278,7 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
     [deletedVariable],
   );
 
-  const buildRawDataView = (): JSX.Element => {
+  const buildRawDataView = (): ReactElement => {
     return (
       <>
         <Track justify="between" style={{ padding: '8px 0 8px 0' }}>
