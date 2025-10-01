@@ -23,12 +23,12 @@ export function Lasso() {
   const isPointInPolygon = (point: Point, polygon: Point[]): boolean => {
     const [x, y] = point;
     let inside = false;
-    
+
     for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
       const [xi, yi] = polygon[i];
       const [xj, yj] = polygon[j];
-      
-      if (((yi > y) !== (yj > y)) && (x < (xj - xi) * (y - yi) / (yj - yi) + xi)) {
+
+      if (yi > y !== yj > y && x < ((xj - xi) * (y - yi)) / (yj - yi) + xi) {
         inside = !inside;
       }
     }
@@ -37,7 +37,7 @@ export function Lasso() {
 
   const getPolygonArea = (polygon: Point[]): number => {
     if (polygon.length < 3) return 0;
-    
+
     let area = 0;
     for (let i = 0; i < polygon.length; i++) {
       const j = (i + 1) % polygon.length;
@@ -52,12 +52,15 @@ export function Lasso() {
 
     const { x, y } = node.internals.positionAbsolute;
     const { width = 0, height = 0 } = node.measured;
-    
+
     const corners = [
-      [x, y], [x + width, y], [x + width, y + height], [x, y + height]
+      [x, y],
+      [x + width, y],
+      [x + width, y + height],
+      [x, y + height],
     ] as Point[];
 
-    const cornersInside = corners.filter(corner => isPointInPolygon(corner, polygon)).length;
+    const cornersInside = corners.filter((corner) => isPointInPolygon(corner, polygon)).length;
     const center = [x + width / 2, y + height / 2] as Point;
     const centerInside = isPointInPolygon(center, polygon);
 
@@ -72,7 +75,7 @@ export function Lasso() {
 
     const rect = canvas.current.getBoundingClientRect();
     const point: Point = [e.clientX - rect.left, e.clientY - rect.top];
-    
+
     points.current = [point];
     startPoint.current = point;
 
@@ -83,7 +86,10 @@ export function Lasso() {
       const { x, y } = node.internals.positionAbsolute;
       const { width = 0, height = 0 } = node.measured;
       nodeBounds.current[node.id] = [
-        [x, y], [x + width, y], [x + width, y + height], [x, y + height]
+        [x, y],
+        [x + width, y],
+        [x + width, y + height],
+        [x, y + height],
       ];
     }
 
@@ -94,7 +100,7 @@ export function Lasso() {
       lineWidth: 2,
       fillStyle: 'rgba(0, 89, 220, 0.1)',
       strokeStyle: 'rgba(0, 89, 220, 0.8)',
-      setLineDash: [5, 5]
+      setLineDash: [5, 5],
     });
   };
 
@@ -120,11 +126,12 @@ export function Lasso() {
     ctx.current.stroke(path);
 
     const polygonArea = getPolygonArea(closedPolygon);
-    const hasMinimumDrag = startPoint.current && 
-      points.current.length > 1 && 
+    const hasMinimumDrag =
+      startPoint.current &&
+      points.current.length > 1 &&
       Math.hypot(
         points.current[points.current.length - 1][0] - startPoint.current[0],
-        points.current[points.current.length - 1][1] - startPoint.current[1]
+        points.current[points.current.length - 1][1] - startPoint.current[1],
       ) >= 10;
 
     const nodesToSelect = new Set<string>();
@@ -139,8 +146,8 @@ export function Lasso() {
     setNodes((nodes) =>
       nodes.map((node) => ({
         ...node,
-        selected: node.type !== 'start' && node.type !== 'ghost' && nodesToSelect.has(node.id)
-      }))
+        selected: node.type !== 'start' && node.type !== 'ghost' && nodesToSelect.has(node.id),
+      })),
     );
   };
 
@@ -157,9 +164,7 @@ export function Lasso() {
     startPoint.current = null;
   };
 
-  const clearSelection = () => setNodes((nodes) => 
-    nodes.map((node) => ({ ...node, selected: false }))
-  );
+  const clearSelection = () => setNodes((nodes) => nodes.map((node) => ({ ...node, selected: false })));
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
