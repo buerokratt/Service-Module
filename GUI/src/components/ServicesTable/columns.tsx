@@ -60,7 +60,7 @@ export const getColumns = ({
                 <Button
                   appearance="text"
                   onClick={() => {
-                    navigator.clipboard.writeText(props.row.original.description ?? '');
+                    void navigator.clipboard.writeText(props.row.original.description ?? '');
                     useToastStore.getState().success({
                       title: i18n.t('overview.descriptionCopiedSuccessfully'),
                     });
