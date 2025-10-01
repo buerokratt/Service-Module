@@ -38,7 +38,7 @@ const EndpointOpenAPI: React.FC<EndpointOpenAPIProps> = ({
   const [key, setKey] = useState<number>(0);
   const { t } = useTranslation();
 
-  useEffect(() => setKey(key + 1), [isLive]);
+  useEffect(() => setKey(key + 1), [isLive, key]);
 
   const getEndpointSchema = (
     apiSpec: ApiSpecProperty,
