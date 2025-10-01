@@ -41,7 +41,7 @@ const AddEndpointModal: React.FC<AddEndpointModalProps> = ({ onClose, onUpdatePr
     passedEndpoint.isCommon = isCommonEndpoint;
     setIsCreatingEndpoint(true);
 
-    saveEndpoints(
+    void saveEndpoints(
       [passedEndpoint],
       () => {
         useServiceStore.getState().addEndpoint(passedEndpoint);
