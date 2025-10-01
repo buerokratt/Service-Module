@@ -25,6 +25,8 @@ type PreviousVariablesProps = {
 // All other assign element keys are UUIDs
 const predefinedInputKeys = ['-1', '-2'];
 
+// This file actually has several components
+// In the future, each needs to be in its own file
 const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
   const { t } = useTranslation();
   let endpointsVariables = useServiceStore((state) => state.endpointsResponseVariables);
@@ -244,6 +246,123 @@ type VariableSectionProps = {
   isAssignSection?: boolean;
 };
 
+// Helper function to get variable name
+const getVariableName = (title: string, variable: Assign, t: (key: string) => string): string => {
+  const isEnvironmentOrAssign =
+    title === t('serviceFlow.previousVariables.environmentVariables.title') ||
+    title === t('serviceFlow.previousVariables.assignElements');
+
+  const rawName = isEnvironmentOrAssign ? variable.key : t(variable.key);
+  return rawName.length > 0 ? rawName : t('serviceFlow.previousVariables.noName');
+};
+
+// Helper function to get tooltip content
+const getTooltipContent = (variable: Assign, typeColor: { type: string }): string => {
+  return variable.tooltip ? `${variable.value}\n\n${variable.tooltip}` : `${variable.value} : ${typeColor.type}`;
+};
+
+// Helper function to handle object tree toggle
+const handleObjectTreeToggle = (
+  variable: Assign,
+  assignedObjectTree: { data: unknown; path: string | number } | null,
+  setAssignedObjectTree: (value: { data: unknown; path: string | number } | null) => void,
+) => {
+  setAssignedObjectTree(
+    assignedObjectTree?.path === variable.value
+      ? null
+      : {
+          data: variable.data,
+          path: variable.value,
+        },
+  );
+};
+
+// Component for object variables
+const ObjectVariable = ({
+  variable,
+  typeColor,
+  assignedObjectTree,
+  setAssignedObjectTree,
+  t,
+}: {
+  variable: Assign;
+  typeColor: { type: string; color: string };
+  assignedObjectTree: { data: unknown; path: string | number } | null;
+  setAssignedObjectTree: (value: { data: unknown; path: string | number } | null) => void;
+  t: (key: string) => string;
+}) => (
+  <Tooltip content={getTooltipContent(variable, typeColor)} key={variable.id}>
+    <OutputElementBox
+      className="tooltip"
+      dragData={variable}
+      style={{ cursor: 'pointer' }}
+      borderColor={typeColor.color}
+      onClick={() => handleObjectTreeToggle(variable, assignedObjectTree, setAssignedObjectTree)}
+    >
+      {assignedObjectTree?.path === variable.value ? t(variable.key) + ' ▲' : t(variable.key) + ' ▼'}
+    </OutputElementBox>
+  </Tooltip>
+);
+
+// Component for simple variables
+const SimpleVariable = ({
+  variable,
+  typeColor,
+  name,
+  isAssignSection,
+}: {
+  variable: Assign;
+  typeColor: { type: string; color: string };
+  name: string;
+  isAssignSection: boolean;
+}) => (
+  <Tooltip content={getTooltipContent(variable, typeColor)} key={variable.id}>
+    <OutputElementBox
+      dragData={variable.key ? variable : undefined}
+      style={{ cursor: variable.key ? 'grab' : 'default' }}
+      borderColor={typeColor.color}
+      isAssignElement={isAssignSection ? !predefinedInputKeys.includes(variable.id) : false}
+    >
+      {name}
+    </OutputElementBox>
+  </Tooltip>
+);
+
+// Component for individual variable
+const VariableItem = ({
+  variable,
+  title,
+  assignedObjectTree,
+  setAssignedObjectTree,
+  isAssignSection,
+  t,
+}: {
+  variable: Assign;
+  title: string;
+  assignedObjectTree: { data: unknown; path: string | number } | null;
+  setAssignedObjectTree: (value: { data: unknown; path: string | number } | null) => void;
+  isAssignSection: boolean;
+  t: (key: string) => string;
+}) => {
+  const typeColor = getTypeColor(variable?.value);
+  const name = getVariableName(title, variable, t);
+  const isObjectVariable = isObject(variable.data) && !predefinedInputKeys.includes(variable.id);
+
+  if (isObjectVariable) {
+    return (
+      <ObjectVariable
+        variable={variable}
+        typeColor={typeColor}
+        assignedObjectTree={assignedObjectTree}
+        setAssignedObjectTree={setAssignedObjectTree}
+        t={t}
+      />
+    );
+  }
+
+  return <SimpleVariable variable={variable} typeColor={typeColor} name={name} isAssignSection={isAssignSection} />;
+};
+
 const VariableSection = ({
   title,
   variables,
@@ -268,60 +387,17 @@ const VariableSection = ({
         {title}
       </label>
       <Track direction="horizontal" gap={4} justify="start" isMultiline style={{ maxHeight: '30vh', overflow: 'auto' }}>
-        {variables.map((variable) => {
-          const typeColor = getTypeColor(variable?.value);
-
-          const rawName =
-            title === t('serviceFlow.previousVariables.environmentVariables.title') ||
-            title === t('serviceFlow.previousVariables.assignElements')
-              ? variable.key
-              : t(variable.key);
-          const name = rawName.length > 0 ? rawName : t('serviceFlow.previousVariables.noName');
-
-          return isObject(variable.data) && !predefinedInputKeys.includes(variable.id) ? (
-            <Tooltip
-              content={
-                variable.tooltip ? `${variable.value}\n\n${variable.tooltip}` : `${variable.value} : ${typeColor.type}`
-              }
-              key={variable.id}
-            >
-              <OutputElementBox
-                className="tooltip"
-                dragData={variable}
-                style={{ cursor: 'pointer' }}
-                borderColor={typeColor.color}
-                onClick={() => {
-                  setAssignedObjectTree(
-                    assignedObjectTree?.path === variable.value
-                      ? null
-                      : {
-                          data: variable.data,
-                          path: variable.value,
-                        },
-                  );
-                }}
-              >
-                {assignedObjectTree?.path === variable.value ? t(variable.key) + ' ▲' : t(variable.key) + ' ▼'}
-              </OutputElementBox>
-            </Tooltip>
-          ) : (
-            <Tooltip
-              content={
-                variable.tooltip ? `${variable.value}\n\n${variable.tooltip}` : `${variable.value} : ${typeColor.type}`
-              }
-              key={variable.id}
-            >
-              <OutputElementBox
-                dragData={variable.key ? variable : undefined}
-                style={{ cursor: variable.key ? 'grab' : 'default' }}
-                borderColor={typeColor.color}
-                isAssignElement={isAssignSection ? !predefinedInputKeys.includes(variable.id) : false}
-              >
-                {name}
-              </OutputElementBox>
-            </Tooltip>
-          );
-        })}
+        {variables.map((variable) => (
+          <VariableItem
+            key={variable.id}
+            variable={variable}
+            title={title}
+            assignedObjectTree={assignedObjectTree}
+            setAssignedObjectTree={setAssignedObjectTree}
+            isAssignSection={isAssignSection}
+            t={t}
+          />
+        ))}
       </Track>
     </Track>
   );
