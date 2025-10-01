@@ -35,6 +35,7 @@ const FileSignContent: FC<FileSignContentProps> = ({ onOptionChange, signOption 
         {t('serviceFlow.popup.clientSeesMessage')}
       </label>
       <FormTextarea
+        name={'messageToClient'}
         label={''}
         defaultValue={t('serviceFlow.popup.fileSignYesNo').toString()}
         style={{
