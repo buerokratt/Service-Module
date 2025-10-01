@@ -13,7 +13,6 @@ import {
   EndpointVariableData,
   PreDefinedEndpointEnvVariables,
 } from '../../../../types/endpoint';
-import { RequestVariablesRowData } from '../../../../types/request-variables';
 
 type EndpointOpenAPIProps = {
   endpoint: EndpointData;
@@ -149,7 +148,7 @@ const EndpointOpenAPI: React.FC<EndpointOpenAPIProps> = ({
   };
 
   const fetchOpenApiSpecMock = async () => {
-    const result = await api.post(getOpenApiSpec(), { url: openApiUrl });
+    const result = await api.post<{ response: ApiSpecProperty }>(getOpenApiSpec(), { url: openApiUrl });
     const apiSpec = result.data.response;
     const url = new URL(openApiUrl).origin + apiSpec.basePath;
     const paths: EndpointDefinition[] = [];
@@ -216,19 +215,6 @@ const EndpointOpenAPI: React.FC<EndpointOpenAPIProps> = ({
     endpoint.definitions = paths;
     endpoint.definitions[0].openApiUrl = openApiUrl;
     setKey(key + 1);
-  };
-
-  const checkNestedVariables = (variable: EndpointVariableData, data: RequestVariablesRowData[]) => {
-    const variableData = variable.type === 'schema' ? variable.schemaData : variable.arrayData;
-    if (variableData instanceof Array) {
-      variableData.forEach((variableData) => {
-        const updatedVariable = data.find((updated) => updated.endpointVariableId === variableData.id);
-        variableData[isLive ? 'value' : 'testValue'] = updatedVariable?.value;
-        if (['schema', 'array'].includes(variableData.type)) {
-          checkNestedVariables(variableData, data);
-        }
-      });
-    }
   };
 
   const onSelectEndpoint = (selection: Option | null) => {
