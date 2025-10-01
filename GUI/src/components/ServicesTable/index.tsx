@@ -1,6 +1,6 @@
 import { PaginationState, SortingState } from '@tanstack/react-table';
 import ConnectServiceToIntentModel from 'pages/Integration/ConnectServiceToIntentModel';
-import { FC, useEffect, useMemo, useState } from 'react';
+import { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import useServiceListStore from 'store/services.store';
@@ -54,28 +54,31 @@ const ServicesTable: FC<ServicesTableProps> = ({ isCommon = false }) => {
     }
   }, [isCommon, pagination, sorting]);
 
-  const changeServiceState = (activate: boolean = false, draft: boolean = false) => {
-    useServiceListStore
-      .getState()
-      .changeServiceState(
-        () => {
-          setIsReadyPopupVisible(false);
-          setIsStatePopupVisible(false);
-        },
-        t('overview.service.toast.updated'),
-        t('overview.service.toast.failed.state'),
-        activate,
-        draft,
-        pagination,
-        sorting,
-      )
-      .then(() => {
-        setIsActivating(false);
-      })
-      .catch(() => {
-        setIsActivating(false);
-      });
-  };
+  const changeServiceState = useCallback(
+    (activate: boolean = false, draft: boolean = false) => {
+      useServiceListStore
+        .getState()
+        .changeServiceState(
+          () => {
+            setIsReadyPopupVisible(false);
+            setIsStatePopupVisible(false);
+          },
+          t('overview.service.toast.updated'),
+          t('overview.service.toast.failed.state'),
+          activate,
+          draft,
+          pagination,
+          sorting,
+        )
+        .then(() => {
+          setIsActivating(false);
+        })
+        .catch(() => {
+          setIsActivating(false);
+        });
+    },
+    [t, pagination, sorting],
+  );
 
   const columns = useMemo(() => {
     const checkIntentConnection = () => {
