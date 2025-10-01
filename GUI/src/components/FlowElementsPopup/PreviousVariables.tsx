@@ -66,8 +66,8 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
     // Get Endpoints variables
     const endpointNodes = previousNodes.filter((node) => node.data.stepType === StepType.UserDefined);
     const names = endpointNodes.map((node) => node.data.label?.toString().split(' ')[0]);
-    endpointsVariables = endpointsVariables.filter((endpoint) => names.includes(endpoint.name));
-    setEndpoints(endpointsVariables);
+    const filteredEndpointsVariables = endpointsVariables.filter((endpoint) => names.includes(endpoint.name));
+    setEndpoints(filteredEndpointsVariables);
 
     // Get Assign variables
     const assignNodes: Node<NodeDataProps>[] =
