@@ -285,13 +285,15 @@ const FlowElementsPopup: React.FC = () => {
   };
 
   function extractMapValues(element: any) {
-    if (element.rawData && element.rawData.length > 0) {
-      return element.rawData.value; //  element.rawData.testValue
+    if (element?.rawData && element?.rawData?.length > 0) {
+      return element.rawData.value;
     }
 
     let result: any = {};
-    for (const entry of element.variables) {
-      result = { ...result, [entry.name]: entry.value };
+    if (element?.variables) {
+      for (const entry of element.variables) {
+        result = { ...result, [entry.name]: entry.value };
+      }
     }
     return result;
   }

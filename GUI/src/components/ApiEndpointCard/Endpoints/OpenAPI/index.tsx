@@ -279,7 +279,16 @@ const EndpointOpenAPI: React.FC<EndpointOpenAPIProps> = ({
       {selectedEndpoint &&
         (selectedEndpoint?.supported ? (
           <>
-            <p>{selectedEndpoint?.description}</p>
+            <Track justify="between" gap={16}>
+              <p>{selectedEndpoint?.description}</p>
+              <Button
+                onClick={() => {
+                  console.log('selectedEndpoint', selectedEndpoint);
+                }}
+              >
+                {t('newService.test')}
+              </Button>
+            </Track>
             <RequestVariables
               key={key}
               disableRawData
