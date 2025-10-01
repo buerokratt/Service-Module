@@ -116,6 +116,8 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
     return rowIdx;
   };
 
+  const [rowsData, setRowsData] = useState<RequestVariablesTabsRowsData>(getTabsRowsData());
+
   useEffect(() => {
     setRequestTab((rt) => {
       const availableTabs = Object.keys(rowsData);
@@ -123,7 +125,7 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
       return rt;
     });
     setKey(key + 1);
-  }, []);
+  }, [key, rowsData, setRequestTab]);
 
   const getInitialTabsRawData = (): RequestVariablesTabsRawData => {
     return tabs.reduce((tabsRawData, tab) => {
@@ -132,7 +134,6 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
       return { ...tabsRawData, [tab]: endpointData[tab]?.rawData[isLive ? 'value' : 'testValue'] ?? '' };
     }, {});
   };
-  const [rowsData, setRowsData] = useState<RequestVariablesTabsRowsData>(getTabsRowsData());
   const [tabRawData, setTabRawData] = useState<RequestVariablesTabsRawData>(getInitialTabsRawData());
 
   const getTabTriggerClasses = (tab: EndpointTab) =>
