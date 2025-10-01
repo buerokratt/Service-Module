@@ -11,7 +11,7 @@ import './FormDatepicker.scss';
 
 registerLocale('et-EE', et);
 
-type FormDatepickerProps = ControllerRenderProps & {
+type FormDatepickerProps = Omit<ControllerRenderProps, 'value'> & {
   label: string;
   hideLabel?: boolean;
   disabled?: boolean;
@@ -19,12 +19,13 @@ type FormDatepickerProps = ControllerRenderProps & {
   timePicker?: boolean;
   monthPicker?: boolean;
   portalId?: string;
+  value?: Date | string;
 };
 
 const FormDatepicker = forwardRef<any, FormDatepickerProps>(
-  ({ label, hideLabel, disabled, placeholder, timePicker, monthPicker, portalId = 'overlay-root', ...rest }) => {
+  ({ label, hideLabel, disabled, placeholder, timePicker, monthPicker, portalId = 'overlay-root', value, ...rest }) => {
     const id = useId();
-    const { value, onChange } = rest;
+    const { onChange } = rest;
 
     const datepickerClasses = clsx('datepicker', disabled && 'datepicker--disabled');
 
@@ -41,7 +42,7 @@ const FormDatepicker = forwardRef<any, FormDatepickerProps>(
         )}
         <div className="datepicker__wrapper">
           <ReactDatePicker
-            selected={new Date(value)}
+            selected={value ? new Date(value) : null}
             dateFormat={format}
             locale="et-EE"
             placeholderText={placeholder}
