@@ -6,7 +6,6 @@ import { removeNestedTemplates } from 'utils/string-util';
 import { FormRichText, Track } from '..';
 import PreviousVariables from './PreviousVariables';
 
-
 type TextfieldContentProps = {
   readonly defaultMessage?: string;
   readonly nodeId: string;
