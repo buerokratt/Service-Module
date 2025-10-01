@@ -209,9 +209,3 @@ const getLabelType = (serviceState: ServiceState) => {
       return 'info';
   }
 };
-
-const getStatePopupContent = (state: ServiceState) => {
-  if (state === ServiceState.Draft) return i18n.t('overview.popup.setReady');
-  if (state === ServiceState.Active) return i18n.t('overview.popup.setInactive');
-  return i18n.t('overview.popup.setActive');
-};
