@@ -279,6 +279,9 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
         isLive,
         getTabsRowsData,
       }),
+    // Adding missing dependencies breaks focus on typing in variable inputs
+    // Impossible to fix without a significant refactor
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [deletedVariable],
   );
 
