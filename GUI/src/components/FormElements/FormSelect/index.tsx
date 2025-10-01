@@ -18,7 +18,6 @@ type FormSelectProps = SelectHTMLAttributes<HTMLSelectElement> & {
   }[];
   onSelectionChange?: (selection: { label: string; value: string } | null) => void;
   isOpen?: boolean;
-  isMenuAbsolute?: boolean;
   menuPosition?: 'absolute' | 'relative';
 };
 
@@ -35,7 +34,6 @@ const FormSelect: FC<FormSelectProps> = ({
   defaultValue,
   onSelectionChange,
   isOpen: isMenuOpen = false,
-  isMenuAbsolute = true,
   menuPosition = 'absolute',
   ...rest
 }) => {
