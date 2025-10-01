@@ -18,6 +18,7 @@ export const useRuleBuilder = (config: UseRuleBuilderProps) => {
   const [groupInfo, setGroupInfo] = useState<Group>(groupInfoInitialValue);
 
   // Use ref to store the latest onChange function to avoid dependency issues
+  // Without this, component crashes completely OR we violate the rules of hooks below
   const onChangeRef = useRef(config.onChange);
   onChangeRef.current = config.onChange;
 
