@@ -1,6 +1,6 @@
 import * as Tabs from '@radix-ui/react-tabs';
 import { Edge, getConnectedEdges, getIncomers, getOutgoers, Node } from '@xyflow/react';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { useTranslation } from 'react-i18next';
@@ -54,37 +54,43 @@ const FlowElementsPopup: React.FC = () => {
   const assignElements = useServiceStore((state) => state.assignElements);
   const endpointsVariables = useServiceStore((state) => state.endpointsResponseVariables);
 
-  const defaultMultiChoiceQuestionButtons = [
-    {
-      id: '1',
-      title: 'Jah',
-      payload: `#service, /${selectedService?.type ?? 'POST'}/services/active/${serviceName}_mcq_${
-        node?.data.label[node?.data.label.length - 1]
-      }_0`,
-    },
-    {
-      id: '2',
-      title: 'Ei',
-      payload: `#service, /${selectedService?.type ?? 'POST'}/services/active/${serviceName}_mcq_${
-        node?.data.label[node?.data.label.length - 1]
-      }_1`,
-    },
-  ];
+  const defaultMultiChoiceQuestionButtons = useMemo(
+    () => [
+      {
+        id: '1',
+        title: 'Jah',
+        payload: `#service, /${selectedService?.type ?? 'POST'}/services/active/${serviceName}_mcq_${
+          node?.data.label[node?.data.label.length - 1]
+        }_0`,
+      },
+      {
+        id: '2',
+        title: 'Ei',
+        payload: `#service, /${selectedService?.type ?? 'POST'}/services/active/${serviceName}_mcq_${
+          node?.data.label[node?.data.label.length - 1]
+        }_1`,
+      },
+    ],
+    [selectedService?.type, serviceName, node?.data.label],
+  );
 
-  const defaultDynamicChoices: DynamicChoices = {
-    list: '',
-    serviceName: '',
-    key: '',
-    payloadKeys: '',
-  };
+  const defaultDynamicChoices: DynamicChoices = useMemo(
+    () => ({
+      list: '',
+      serviceName: '',
+      key: '',
+      payloadKeys: '',
+    }),
+    [],
+  );
 
   useEffect(() => {
     if (node) node.data.rules = rules;
-  }, [rules]);
+  }, [node, rules]);
 
   useEffect(() => {
     if (node) node.data.assignElements = assignElements;
-  }, [assignElements]);
+  }, [assignElements, node]);
 
   // StepType.Textfield
   const [textfieldMessage, setTextfieldMessage] = useState<string | null>(null);
@@ -145,7 +151,7 @@ const FlowElementsPopup: React.FC = () => {
       default:
         break;
     }
-  }, [stepType]);
+  }, [defaultDynamicChoices, defaultMultiChoiceQuestionButtons, node, stepType]);
 
   if (!node) return <></>;
 
