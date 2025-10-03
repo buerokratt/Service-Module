@@ -128,10 +128,8 @@ const useServiceListStore = create<ServiceStoreState>((set, get, store) => ({
       sorting: sort,
     });
 
-    const services = mapServicesWithLinkedIntent(result.data.response);
-
     set({
-      notCommonServices: services,
+      notCommonServices: mapServicesWithLinkedIntent(result.data.response),
     });
   },
   loadCommonServicesList: async (pagination, sorting) => {
@@ -145,10 +143,8 @@ const useServiceListStore = create<ServiceStoreState>((set, get, store) => ({
       sorting: sort,
     });
 
-    const services = mapServicesWithLinkedIntent(result.data.response);
-
     set({
-      commonServices: services,
+      commonServices: mapServicesWithLinkedIntent(result.data.response),
     });
   },
   deleteService: async (id) => {
