@@ -125,3 +125,10 @@ export function removeNestedTemplates(str: string): string {
 
   return str;
 }
+
+export const formatStatusText = (status: string): string => {
+  return status
+    .toLowerCase()
+    .replace(/_/g, ' ')
+    .replace(/\b\w/g, (l) => l.toUpperCase());
+};

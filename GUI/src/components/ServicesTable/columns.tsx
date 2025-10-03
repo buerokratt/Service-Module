@@ -11,6 +11,7 @@ import useServiceListStore from 'store/services.store';
 import useStore from 'store/store';
 import useToastStore from 'store/toasts.store';
 import { Service, ServiceState } from 'types';
+import { formatStatusText } from 'utils/string-util';
 
 interface GetColumnsConfig {
   isCommon: boolean;
@@ -89,14 +90,12 @@ export const getColumns = ({
         size: 320,
       },
     }),
-    // todo this here
     columnHelper.accessor('linkedIntent', {
       header: i18n.t('overview.service.linkedIntent') ?? '',
       meta: {
         size: 200,
       },
       cell: (props) => {
-        console.log('igor', props.row.original);
         return (
           <Track justify="start">
             {props.cell.getValue() ? (
@@ -115,14 +114,16 @@ export const getColumns = ({
               >
                 <Track align="center" gap={8}>
                   {props.cell.getValue().name && (
-                    <div
-                      style={{
-                        width: '8px',
-                        height: '8px',
-                        borderRadius: '50%',
-                        backgroundColor: props.cell.getValue().status === 'TRAINED' ? '#4CAF50' : '#F44336',
-                      }}
-                    />
+                    <Tooltip content={formatStatusText(props.cell.getValue().status)}>
+                      <div
+                        style={{
+                          width: '8px',
+                          height: '8px',
+                          borderRadius: '50%',
+                          backgroundColor: props.cell.getValue().status === 'TRAINED' ? '#4CAF50' : '#F44336',
+                        }}
+                      />
+                    </Tooltip>
                   )}
                   <label style={{ color: 'black' }}>{props.cell.getValue().name}</label>
                 </Track>
