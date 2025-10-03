@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
 import {
-  formatStatusText,
   fromSnakeCase,
+  fromUpperSnakeCase,
   getLastDigits,
   isTemplate,
   removeNestedTemplates,
@@ -14,45 +14,51 @@ import {
 } from './string-util';
 
 describe('string-util', () => {
-  describe('formatStatusText', () => {
+  describe('fromUpperSnakeCase', () => {
     it('should format TRAINED to Trained', () => {
-      expect(formatStatusText('TRAINED')).toBe('Trained');
+      expect(fromUpperSnakeCase('TRAINED')).toBe('Trained');
     });
 
     it('should format NOT_TRAINED to Not Trained', () => {
-      expect(formatStatusText('NOT_TRAINED')).toBe('Not Trained');
+      expect(fromUpperSnakeCase('NOT_TRAINED')).toBe('Not Trained');
     });
 
     it('should format DELETED to Deleted', () => {
-      expect(formatStatusText('DELETED')).toBe('Deleted');
+      expect(fromUpperSnakeCase('DELETED')).toBe('Deleted');
     });
 
     it('should format PENDING to Pending', () => {
-      expect(formatStatusText('PENDING')).toBe('Pending');
+      expect(fromUpperSnakeCase('PENDING')).toBe('Pending');
     });
 
     it('should format ACTIVE to Active', () => {
-      expect(formatStatusText('ACTIVE')).toBe('Active');
+      expect(fromUpperSnakeCase('ACTIVE')).toBe('Active');
     });
 
     it('should handle already lowercase text', () => {
-      expect(formatStatusText('trained')).toBe('Trained');
+      expect(fromUpperSnakeCase('trained')).toBe('Trained');
     });
 
     it('should handle mixed case text', () => {
-      expect(formatStatusText('NoT_tRaInEd')).toBe('Not Trained');
+      expect(fromUpperSnakeCase('NoT_tRaInEd')).toBe('Not Trained');
     });
 
     it('should handle empty string', () => {
-      expect(formatStatusText('')).toBe('');
+      expect(fromUpperSnakeCase('')).toBe('');
     });
 
     it('should handle single word', () => {
-      expect(formatStatusText('SINGLE')).toBe('Single');
+      expect(fromUpperSnakeCase('SINGLE')).toBe('Single');
     });
 
     it('should handle multiple underscores', () => {
-      expect(formatStatusText('MULTIPLE_UNDERSCORES_HERE')).toBe('Multiple Underscores Here');
+      expect(fromUpperSnakeCase('MULTIPLE_UNDERSCORES_HERE')).toBe('Multiple Underscores Here');
+    });
+
+    it('should format other variable types', () => {
+      expect(fromUpperSnakeCase('USER_ROLE')).toBe('User Role');
+      expect(fromUpperSnakeCase('API_ENDPOINT')).toBe('Api Endpoint');
+      expect(fromUpperSnakeCase('DATABASE_CONNECTION')).toBe('Database Connection');
     });
   });
 

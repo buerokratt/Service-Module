@@ -126,8 +126,8 @@ export function removeNestedTemplates(str: string): string {
   return str;
 }
 
-export const formatStatusText = (status: string): string => {
-  return status
+export const fromUpperSnakeCase = (variable: string): string => {
+  return variable
     .toLowerCase()
     .replace(/_/g, ' ')
     .replace(/\b\w/g, (l) => l.toUpperCase());

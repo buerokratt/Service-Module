@@ -11,7 +11,7 @@ import useServiceListStore from 'store/services.store';
 import useStore from 'store/store';
 import useToastStore from 'store/toasts.store';
 import { Service, ServiceState } from 'types';
-import { formatStatusText } from 'utils/string-util';
+import { fromUpperSnakeCase } from 'utils/string-util';
 
 interface GetColumnsConfig {
   isCommon: boolean;
@@ -114,7 +114,7 @@ export const getColumns = ({
               >
                 <Track align="center" gap={8}>
                   {props.cell.getValue().name && (
-                    <Tooltip content={formatStatusText(props.cell.getValue().status)}>
+                    <Tooltip content={fromUpperSnakeCase(props.cell.getValue().status)}>
                       <div
                         style={{
                           width: '8px',
