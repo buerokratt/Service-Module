@@ -99,35 +99,36 @@ export const getColumns = ({
         return (
           <Track justify="start">
             {props.cell.getValue() ? (
-              <Button
-                style={{
-                  textDecoration: props.row.original.state === ServiceState.Ready ? undefined : 'none',
-                  boxShadow: 'none',
-                }}
-                appearance="text"
-                onClick={() => {
-                  useServiceListStore.getState().setSelectedService(props.row.original);
-                  if (props.row.original.state === ServiceState.Ready) {
-                    showIntentConnectionModal();
-                  }
-                }}
-              >
-                <Track align="center" gap={8}>
-                  {props.cell.getValue().name && (
-                    <Tooltip content={fromUpperSnakeCase(props.cell.getValue().status)}>
-                      <div
-                        style={{
-                          width: '8px',
-                          height: '8px',
-                          borderRadius: '50%',
-                          backgroundColor: props.cell.getValue().status === 'TRAINED' ? '#4CAF50' : '#F44336',
-                        }}
-                      />
-                    </Tooltip>
-                  )}
+              <Track align="center" gap={8}>
+                {props.cell.getValue().name && (
+                  <Tooltip content={fromUpperSnakeCase(props.cell.getValue().status)}>
+                    <div
+                      style={{
+                        width: '8px',
+                        height: '8px',
+                        borderRadius: '50%',
+                        backgroundColor: props.cell.getValue().status === 'TRAINED' ? '#4CAF50' : '#F44336',
+                        cursor: 'pointer',
+                      }}
+                    />
+                  </Tooltip>
+                )}
+                <Button
+                  style={{
+                    textDecoration: props.row.original.state === ServiceState.Ready ? undefined : 'none',
+                    boxShadow: 'none',
+                  }}
+                  appearance="text"
+                  onClick={() => {
+                    useServiceListStore.getState().setSelectedService(props.row.original);
+                    if (props.row.original.state === ServiceState.Ready) {
+                      showIntentConnectionModal();
+                    }
+                  }}
+                >
                   <label style={{ color: 'black' }}>{props.cell.getValue().name}</label>
-                </Track>
-              </Button>
+                </Button>
+              </Track>
             ) : (
               <Button
                 appearance="text"
