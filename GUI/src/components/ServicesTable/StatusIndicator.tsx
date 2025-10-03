@@ -7,7 +7,7 @@ interface StatusIndicatorProps {
 }
 
 const StatusIndicator = ({ status, size = 8 }: StatusIndicatorProps) => {
-  const backgroundColor = status === 'TRAINED' ? '#4CAF50' : '#F44336';
+  const backgroundColor = status === 'TRAINED' ? 'var(--veera-color-sea-green-10)' : 'var(--veera-color-jasper-10)';
 
   return (
     <Tooltip content={fromUpperSnakeCase(status)}>

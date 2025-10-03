@@ -43,21 +43,21 @@ describe('StatusIndicator', () => {
     render(<StatusIndicator status="TRAINED" />);
 
     const circle = screen.getByTestId('tooltip').querySelector('div');
-    expect(circle).toHaveStyle({ backgroundColor: '#4CAF50' });
+    expect(circle).toHaveStyle({ backgroundColor: 'var(--veera-color-sea-green-10)' });
   });
 
   it('should show red color for non-TRAINED status', () => {
     render(<StatusIndicator status="PENDING" />);
 
     const circle = screen.getByTestId('tooltip').querySelector('div');
-    expect(circle).toHaveStyle({ backgroundColor: '#F44336' });
+    expect(circle).toHaveStyle({ backgroundColor: 'var(--veera-color-jasper-10)' });
   });
 
   it('should show red color for NOT_TRAINED status', () => {
     render(<StatusIndicator status="NOT_TRAINED" />);
 
     const circle = screen.getByTestId('tooltip').querySelector('div');
-    expect(circle).toHaveStyle({ backgroundColor: '#F44336' });
+    expect(circle).toHaveStyle({ backgroundColor: 'var(--veera-color-jasper-10)' });
   });
 
   it('should have correct styling', () => {
