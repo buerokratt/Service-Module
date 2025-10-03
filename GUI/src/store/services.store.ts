@@ -18,11 +18,9 @@ import { create } from 'zustand';
 import useToastStore from './toasts.store';
 import api from '../services/api-dev';
 
-const mapServicesWithLinkedIntent = (
-  services: any[],
-  triggers: Pick<Trigger, 'intent' | 'service' | 'created'>[],
-  intents: Pick<Intent, 'intent' | 'status'>[],
-) => {
+const mapServicesWithLinkedIntent = (response: ServicesListResponse) => {
+  const [services, triggers, intents] = response;
+
   return (
     services.map?.((item) => ({
       id: item.id,
@@ -130,11 +128,7 @@ const useServiceListStore = create<ServiceStoreState>((set, get, store) => ({
       sorting: sort,
     });
 
-    const services = mapServicesWithLinkedIntent(
-      result.data.response[0],
-      result.data.response[1],
-      result.data.response[2],
-    );
+    const services = mapServicesWithLinkedIntent(result.data.response);
 
     set({
       notCommonServices: services,
@@ -151,11 +145,7 @@ const useServiceListStore = create<ServiceStoreState>((set, get, store) => ({
       sorting: sort,
     });
 
-    const services = mapServicesWithLinkedIntent(
-      result.data.response[0],
-      result.data.response[1],
-      result.data.response[2],
-    );
+    const services = mapServicesWithLinkedIntent(result.data.response);
 
     set({
       commonServices: services,
