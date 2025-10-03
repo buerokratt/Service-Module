@@ -113,7 +113,7 @@ export const getColumns = ({
                   }
                 }}
               >
-                <label style={{ paddingLeft: '15px', color: 'black' }}>{props.cell.getValue()}</label>
+                <label style={{ paddingLeft: '15px', color: 'black' }}>{props.cell.getValue().name}</label>
               </Button>
             ) : (
               <Button
@@ -143,7 +143,7 @@ export const getColumns = ({
           onClick={() => {
             useServiceListStore.getState().setSelectedService(props.row.original);
             const state = props.row.original.state;
-            if (state === ServiceState.Ready && props.row.original.linkedIntent != '') {
+            if (state === ServiceState.Ready && props.row.original.linkedIntent.name !== '') {
               checkIntentConnection();
               showReadyPopup();
             }

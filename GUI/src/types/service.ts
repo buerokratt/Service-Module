@@ -24,6 +24,6 @@ export interface Service {
     }
   >;
   readonly serviceId: string;
-  readonly linkedIntent: string;
+  readonly linkedIntent: { name: string; status: string };
   readonly totalPages: number;
 }

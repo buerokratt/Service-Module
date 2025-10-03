@@ -104,6 +104,7 @@ const useServiceListStore = create<ServiceStoreState>((set, get, store) => ({
     });
 
     const triggers = result.data.response[1];
+    const intents = result.data.response[2];
     const services =
       result.data.response[0].map?.((item: any) => ({
         id: item.id,
@@ -116,7 +117,11 @@ const useServiceListStore = create<ServiceStoreState>((set, get, store) => ({
         serviceId: item.serviceId,
         usedCount: 0,
         totalPages: item.totalPages,
-        linkedIntent: triggers.find((e) => e.service === item.serviceId)?.intent ?? '',
+        linkedIntent: {
+          name: triggers.find((e) => e.service === item.serviceId)?.intent ?? '',
+          status:
+            intents.find((e) => e.intent === triggers.find((e) => e.service === item.serviceId)?.intent)?.status ?? '',
+        },
         endpoints: [],
       })) ?? [];
 
@@ -136,6 +141,8 @@ const useServiceListStore = create<ServiceStoreState>((set, get, store) => ({
     });
 
     const triggers = result.data.response[1];
+    const intents = result.data.response[2];
+
     const services =
       result.data.response[0].map?.((item) => ({
         id: item.id,
@@ -147,7 +154,11 @@ const useServiceListStore = create<ServiceStoreState>((set, get, store) => ({
         serviceId: item.serviceId,
         totalPages: item.totalPages,
         usedCount: 0,
-        linkedIntent: triggers.find((e) => e.service === item.serviceId)?.intent ?? '',
+        linkedIntent: {
+          name: triggers.find((e) => e.service === item.serviceId)?.intent ?? '',
+          status:
+            intents.find((e) => e.intent === triggers.find((e) => e.service === item.serviceId)?.intent)?.status ?? '',
+        },
         endpoints: [],
       })) ?? [];
 
