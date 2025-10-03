@@ -11,7 +11,8 @@ import useServiceListStore from 'store/services.store';
 import useStore from 'store/store';
 import useToastStore from 'store/toasts.store';
 import { Service, ServiceState } from 'types';
-import { fromUpperSnakeCase } from 'utils/string-util';
+
+import StatusIndicator from './StatusIndicator';
 
 interface GetColumnsConfig {
   isCommon: boolean;
@@ -100,19 +101,7 @@ export const getColumns = ({
           <Track justify="start">
             {props.cell.getValue() ? (
               <Track align="center" gap={8}>
-                {props.cell.getValue().name && (
-                  <Tooltip content={fromUpperSnakeCase(props.cell.getValue().status)}>
-                    <div
-                      style={{
-                        width: '8px',
-                        height: '8px',
-                        borderRadius: '50%',
-                        backgroundColor: props.cell.getValue().status === 'TRAINED' ? '#4CAF50' : '#F44336',
-                        cursor: 'pointer',
-                      }}
-                    />
-                  </Tooltip>
-                )}
+                {props.cell.getValue().name && <StatusIndicator status={props.cell.getValue().status} />}
                 <Button
                   style={{
                     textDecoration: props.row.original.state === ServiceState.Ready ? undefined : 'none',
