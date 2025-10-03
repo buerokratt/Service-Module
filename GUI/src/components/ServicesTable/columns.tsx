@@ -89,44 +89,48 @@ export const getColumns = ({
         size: 320,
       },
     }),
+    // todo this here
     columnHelper.accessor('linkedIntent', {
       header: i18n.t('overview.service.linkedIntent') ?? '',
       meta: {
         size: 200,
       },
-      cell: (props) => (
-        <Track justify="start">
-          {props.cell.getValue() ? (
-            <Button
-              style={{
-                textDecoration: props.row.original.state === ServiceState.Ready ? undefined : 'none',
-                boxShadow: 'none',
-              }}
-              appearance="text"
-              onClick={() => {
-                useServiceListStore.getState().setSelectedService(props.row.original);
-                if (props.row.original.state === ServiceState.Ready) {
+      cell: (props) => {
+        // console.log('igor', props.row.original);
+        return (
+          <Track justify="start">
+            {props.cell.getValue() ? (
+              <Button
+                style={{
+                  textDecoration: props.row.original.state === ServiceState.Ready ? undefined : 'none',
+                  boxShadow: 'none',
+                }}
+                appearance="text"
+                onClick={() => {
+                  useServiceListStore.getState().setSelectedService(props.row.original);
+                  if (props.row.original.state === ServiceState.Ready) {
+                    showIntentConnectionModal();
+                  }
+                }}
+              >
+                <label style={{ paddingLeft: '15px', color: 'black' }}>{props.cell.getValue()}</label>
+              </Button>
+            ) : (
+              <Button
+                appearance="text"
+                onClick={() => {
+                  useServiceListStore.getState().setSelectedService(props.row.original);
                   showIntentConnectionModal();
-                }
-              }}
-            >
-              <label style={{ paddingLeft: '15px', color: 'black' }}>{props.cell.getValue()}</label>
-            </Button>
-          ) : (
-            <Button
-              appearance="text"
-              onClick={() => {
-                useServiceListStore.getState().setSelectedService(props.row.original);
-                showIntentConnectionModal();
-              }}
-              disabled={props.row.original.state === ServiceState.Draft}
-            >
-              <Icon icon={<MdOutlineArrowForward color="rgba(0, 0, 0, 0.54)" />} />
-              {i18n.t('overview.popup.connectToIntent')}
-            </Button>
-          )}
-        </Track>
-      ),
+                }}
+                disabled={props.row.original.state === ServiceState.Draft}
+              >
+                <Icon icon={<MdOutlineArrowForward color="rgba(0, 0, 0, 0.54)" />} />
+                {i18n.t('overview.popup.connectToIntent')}
+              </Button>
+            )}
+          </Track>
+        );
+      },
     }),
     columnHelper.accessor('state', {
       header: i18n.t('overview.service.state') ?? '',

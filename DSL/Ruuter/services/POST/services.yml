@@ -42,8 +42,21 @@ get_approved_triggers:
 assign_training_result:
   assign:
     triggers: ${triggers_res.response.body}
+    intents: ${triggers_res.response.body.map(trigger => trigger.intent)}
+
+get_intent_status:
+  call: http.post
+  args:
+    url: "[#SERVICE_TRAINING_RESQL]/get_intents_by_names"
+    body:
+      intents: ${intents}
+  result: intents_res
+
+assign_intents_result:
+  assign:
+    intent_statuses: ${intents_res.response.body}
 
 return_ok:
   status: 200
-  return: ${[services, triggers]}
+  return: ${[services, triggers, intent_statuses]}
   next: end

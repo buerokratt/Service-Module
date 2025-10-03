@@ -87,29 +87,30 @@ const useServiceListStore = create<ServiceStoreState>((set, get, store) => ({
   loadServicesList: async (pagination, sorting) => {
     const order = sorting[0]?.desc ? 'desc' : 'asc';
     const sort = sorting.length === 0 ? 'name asc' : sorting[0]?.id + ' ' + order;
-    const result = await api.post(getServicesList(), {
+    const result = await api.post<{ response: [Service[], Trigger[], Intent[]] }>(getServicesList(), {
       page: pagination.pageIndex + 1,
       page_size: pagination.pageSize,
       sorting: sort,
     });
+
+    console.log('IGOR', result.data.response);
+
     const triggers = result.data.response[1];
     const services =
-      result.data.response[0].map?.(
-        (item: any) =>
-          ({
-            id: item.id,
-            name: item.name,
-            description: item.description,
-            slot: item.slot,
-            state: item.state,
-            type: item.type,
-            isCommon: item.iscommon,
-            serviceId: item.serviceId,
-            usedCount: 0,
-            totalPages: item.totalPages,
-            linkedIntent: triggers.find((e: Trigger) => e.service === item.serviceId)?.intent ?? '',
-          }) as Service,
-      ) ?? [];
+      result.data.response[0].map?.((item: any) => ({
+        id: item.id,
+        name: item.name,
+        description: item.description,
+        slot: item.slot,
+        state: item.state,
+        type: item.type,
+        isCommon: item.iscommon,
+        serviceId: item.serviceId,
+        usedCount: 0,
+        totalPages: item.totalPages,
+        linkedIntent: triggers.find((e) => e.service === item.serviceId)?.intent ?? '',
+        endpoints: [],
+      })) ?? [];
 
     set({
       notCommonServices: services,
@@ -118,28 +119,26 @@ const useServiceListStore = create<ServiceStoreState>((set, get, store) => ({
   loadCommonServicesList: async (pagination, sorting) => {
     const order = sorting[0]?.desc ? 'desc' : 'asc';
     const sort = sorting.length === 0 ? 'id asc' : sorting[0]?.id + ' ' + order;
-    const result = await api.post(getCommonServicesList(), {
+    const result = await api.post<{ response: [Service[], Trigger[]] }>(getCommonServicesList(), {
       page: pagination.pageIndex + 1,
       page_size: pagination.pageSize,
       sorting: sort,
     });
     const triggers = result.data.response[1];
     const services =
-      result.data.response[0].map?.(
-        (item: any) =>
-          ({
-            id: item.id,
-            name: item.name,
-            description: item.description,
-            state: item.state,
-            type: item.type,
-            isCommon: item.iscommon,
-            serviceId: item.serviceId,
-            totalPages: item.totalPages,
-            usedCount: 0,
-            linkedIntent: triggers.find((e: Trigger) => e.service === item.serviceId)?.intent ?? '',
-          }) as Service,
-      ) ?? [];
+      result.data.response[0].map?.((item: any) => ({
+        id: item.id,
+        name: item.name,
+        description: item.description,
+        state: item.state,
+        type: item.type,
+        isCommon: item.iscommon,
+        serviceId: item.serviceId,
+        totalPages: item.totalPages,
+        usedCount: 0,
+        linkedIntent: triggers.find((e) => e.service === item.serviceId)?.intent ?? '',
+        endpoints: [],
+      })) ?? [];
 
     set({
       commonServices: services,
