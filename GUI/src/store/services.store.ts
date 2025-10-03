@@ -18,6 +18,33 @@ import { create } from 'zustand';
 import useToastStore from './toasts.store';
 import api from '../services/api-dev';
 
+const mapServicesWithLinkedIntent = (
+  services: any[],
+  triggers: Pick<Trigger, 'intent' | 'service' | 'created'>[],
+  intents: Pick<Intent, 'intent' | 'status'>[],
+) => {
+  return (
+    services.map?.((item) => ({
+      id: item.id,
+      name: item.name,
+      description: item.description,
+      slot: item.slot,
+      state: item.state,
+      type: item.type,
+      isCommon: item.iscommon,
+      serviceId: item.serviceId,
+      usedCount: 0,
+      totalPages: item.totalPages,
+      linkedIntent: {
+        name: triggers.find((e) => e.service === item.serviceId)?.intent ?? '',
+        status:
+          intents.find((e) => e.intent === triggers.find((e) => e.service === item.serviceId)?.intent)?.status ?? '',
+      },
+      endpoints: [],
+    })) ?? []
+  );
+};
+
 type ServicesListResponse = [
   (Pick<Service, 'id' | 'name' | 'description' | 'state' | 'type' | 'serviceId' | 'slot' | 'totalPages'> & {
     iscommon: boolean;
@@ -103,27 +130,11 @@ const useServiceListStore = create<ServiceStoreState>((set, get, store) => ({
       sorting: sort,
     });
 
-    const triggers = result.data.response[1];
-    const intents = result.data.response[2];
-    const services =
-      result.data.response[0].map?.((item: any) => ({
-        id: item.id,
-        name: item.name,
-        description: item.description,
-        slot: item.slot,
-        state: item.state,
-        type: item.type,
-        isCommon: item.iscommon,
-        serviceId: item.serviceId,
-        usedCount: 0,
-        totalPages: item.totalPages,
-        linkedIntent: {
-          name: triggers.find((e) => e.service === item.serviceId)?.intent ?? '',
-          status:
-            intents.find((e) => e.intent === triggers.find((e) => e.service === item.serviceId)?.intent)?.status ?? '',
-        },
-        endpoints: [],
-      })) ?? [];
+    const services = mapServicesWithLinkedIntent(
+      result.data.response[0],
+      result.data.response[1],
+      result.data.response[2],
+    );
 
     set({
       notCommonServices: services,
@@ -140,27 +151,11 @@ const useServiceListStore = create<ServiceStoreState>((set, get, store) => ({
       sorting: sort,
     });
 
-    const triggers = result.data.response[1];
-    const intents = result.data.response[2];
-
-    const services =
-      result.data.response[0].map?.((item) => ({
-        id: item.id,
-        name: item.name,
-        description: item.description,
-        state: item.state,
-        type: item.type,
-        isCommon: item.iscommon,
-        serviceId: item.serviceId,
-        totalPages: item.totalPages,
-        usedCount: 0,
-        linkedIntent: {
-          name: triggers.find((e) => e.service === item.serviceId)?.intent ?? '',
-          status:
-            intents.find((e) => e.intent === triggers.find((e) => e.service === item.serviceId)?.intent)?.status ?? '',
-        },
-        endpoints: [],
-      })) ?? [];
+    const services = mapServicesWithLinkedIntent(
+      result.data.response[0],
+      result.data.response[1],
+      result.data.response[2],
+    );
 
     set({
       commonServices: services,
