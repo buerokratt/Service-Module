@@ -13,15 +13,6 @@ vi.mock('components/Tooltip', () => ({
   ),
 }));
 
-// Mock the string utility
-vi.mock('utils/string-util', () => ({
-  fromUpperSnakeCase: (str: string) =>
-    str
-      .toLowerCase()
-      .replace('_', ' ')
-      .replace(/\b\w/g, (l) => l.toUpperCase()),
-}));
-
 describe('StatusIndicator', () => {
   it('should render with default size', () => {
     render(<StatusIndicator status="TRAINED" />);
