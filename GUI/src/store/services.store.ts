@@ -18,11 +18,11 @@ import { create } from 'zustand';
 import useToastStore from './toasts.store';
 import api from '../services/api-dev';
 
-const mapServicesWithLinkedIntent = (response: ServicesListResponse) => {
+export const mapServicesWithLinkedIntent = (response: ServicesListResponse) => {
   const [services, triggers, intents] = response;
 
   return (
-    services.map?.((item) => ({
+    services?.map?.((item) => ({
       id: item.id,
       name: item.name,
       description: item.description,
@@ -43,7 +43,7 @@ const mapServicesWithLinkedIntent = (response: ServicesListResponse) => {
   );
 };
 
-type ServicesListResponse = [
+export type ServicesListResponse = [
   (Pick<Service, 'id' | 'name' | 'description' | 'state' | 'type' | 'serviceId' | 'slot' | 'totalPages'> & {
     iscommon: boolean;
   })[],
