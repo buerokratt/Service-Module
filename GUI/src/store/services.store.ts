@@ -18,6 +18,14 @@ import { create } from 'zustand';
 import useToastStore from './toasts.store';
 import api from '../services/api-dev';
 
+type ServicesListResponse = [
+  (Pick<Service, 'id' | 'name' | 'description' | 'state' | 'type' | 'serviceId' | 'slot' | 'totalPages'> & {
+    iscommon: boolean;
+  })[],
+  Pick<Trigger, 'intent' | 'service' | 'created'>[],
+  Pick<Intent, 'intent' | 'status'>[],
+];
+
 interface ServiceStoreState {
   services: Service[];
   commonServices: Service[];
@@ -87,13 +95,13 @@ const useServiceListStore = create<ServiceStoreState>((set, get, store) => ({
   loadServicesList: async (pagination, sorting) => {
     const order = sorting[0]?.desc ? 'desc' : 'asc';
     const sort = sorting.length === 0 ? 'name asc' : sorting[0]?.id + ' ' + order;
-    const result = await api.post<{ response: [Service[], Trigger[], Intent[]] }>(getServicesList(), {
+    const result = await api.post<{
+      response: ServicesListResponse;
+    }>(getServicesList(), {
       page: pagination.pageIndex + 1,
       page_size: pagination.pageSize,
       sorting: sort,
     });
-
-    console.log('IGOR', result.data.response);
 
     const triggers = result.data.response[1];
     const services =
@@ -119,14 +127,17 @@ const useServiceListStore = create<ServiceStoreState>((set, get, store) => ({
   loadCommonServicesList: async (pagination, sorting) => {
     const order = sorting[0]?.desc ? 'desc' : 'asc';
     const sort = sorting.length === 0 ? 'id asc' : sorting[0]?.id + ' ' + order;
-    const result = await api.post<{ response: [Service[], Trigger[]] }>(getCommonServicesList(), {
+    const result = await api.post<{
+      response: ServicesListResponse;
+    }>(getCommonServicesList(), {
       page: pagination.pageIndex + 1,
       page_size: pagination.pageSize,
       sorting: sort,
     });
+
     const triggers = result.data.response[1];
     const services =
-      result.data.response[0].map?.((item: any) => ({
+      result.data.response[0].map?.((item) => ({
         id: item.id,
         name: item.name,
         description: item.description,

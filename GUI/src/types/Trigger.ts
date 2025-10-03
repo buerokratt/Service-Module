@@ -7,4 +7,5 @@ export interface Trigger {
   requestedAt: string;
   status: string;
   readonly totalPages: number;
+  readonly created: string;
 }
