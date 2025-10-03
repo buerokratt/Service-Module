@@ -96,7 +96,7 @@ export const getColumns = ({
         size: 200,
       },
       cell: (props) => {
-        // console.log('igor', props.row.original);
+        console.log('igor', props.row.original);
         return (
           <Track justify="start">
             {props.cell.getValue() ? (
@@ -113,7 +113,19 @@ export const getColumns = ({
                   }
                 }}
               >
-                <label style={{ paddingLeft: '15px', color: 'black' }}>{props.cell.getValue().name}</label>
+                <Track align="center" gap={8}>
+                  {props.cell.getValue().name && (
+                    <div
+                      style={{
+                        width: '8px',
+                        height: '8px',
+                        borderRadius: '50%',
+                        backgroundColor: props.cell.getValue().status === 'TRAINED' ? '#4CAF50' : '#F44336',
+                      }}
+                    />
+                  )}
+                  <label style={{ color: 'black' }}>{props.cell.getValue().name}</label>
+                </Track>
               </Button>
             ) : (
               <Button

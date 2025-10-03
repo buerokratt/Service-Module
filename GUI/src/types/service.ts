@@ -24,6 +24,11 @@ export interface Service {
     }
   >;
   readonly serviceId: string;
-  readonly linkedIntent: { name: string; status: string };
+  readonly linkedIntent: LinkedIntent;
   readonly totalPages: number;
+}
+
+interface LinkedIntent {
+  name: string;
+  status: 'TRAINED' | 'NOT_TRAINED' | 'DELETED';
 }
