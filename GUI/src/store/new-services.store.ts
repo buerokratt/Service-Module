@@ -810,7 +810,7 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
       })
       .catch((error) => {
         useToastStore.getState().error({
-          title: error.message || t('newService.endpoint.error')
+          title: error.message ?? t('newService.endpoint.error'),
         });
       });
   },

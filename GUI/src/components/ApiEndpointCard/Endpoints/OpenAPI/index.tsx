@@ -289,11 +289,7 @@ const EndpointOpenAPI: React.FC<EndpointOpenAPIProps> = ({
           <>
             <Track justify="between" gap={16}>
               <p>{selectedEndpoint?.description}</p>
-              <Button
-                onClick={handleJsonRequestClick}
-              >
-                {t('newService.test')}
-              </Button>
+              <Button onClick={handleJsonRequestClick}>{t('newService.test')}</Button>
             </Track>
             <RequestVariables
               key={key}

@@ -114,11 +114,7 @@ const EndpointCustom: React.FC<EndpointCustomProps> = ({
               placeholder={t('newService.endpoint.insert') ?? ''}
             />
           </Track>
-          <Button
-            onClick={handleJsonRequestClick}
-          >
-            {t('newService.test')}
-          </Button>
+          <Button onClick={handleJsonRequestClick}>{t('newService.test')}</Button>
         </Track>
       </div>
       <RequestVariables
