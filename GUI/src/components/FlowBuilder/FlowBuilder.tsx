@@ -1,11 +1,11 @@
-import { Background, Controls, Edge, MiniMap, Node, Panel, ReactFlow, useReactFlow } from '@xyflow/react';
+import {Background, ColorMode, Controls, Edge, MiniMap, Node, Panel, ReactFlow, useReactFlow} from '@xyflow/react';
 import { Button, Modal, Track } from 'components';
 import Chat from 'components/chat/chat';
 import edgeTypes from 'components/Flow/EdgeTypes';
 import nodeTypes from 'components/Flow/NodeTypes';
 import useLayout from 'hooks/flow/useLayout';
 import { useOnNodesDelete } from 'hooks/flow/useOnNodeDelete';
-import { FC, useCallback } from 'react';
+import {ChangeEventHandler, FC, useCallback, useState} from 'react';
 import '@xyflow/react/dist/style.css';
 import { useTranslation } from 'react-i18next';
 import useServiceStore from 'store/new-services.store';
@@ -20,6 +20,7 @@ type FlowBuilderProps = {
 const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
   useLayout();
   const { getNodes, getEdges, setNodes, setEdges, getNode } = useReactFlow();
+  const [colorMode, setColorMode] = useState<ColorMode>('light');
   const setReactFlowInstance = useServiceStore((state) => state.setReactFlowInstance);
   const { t } = useTranslation();
   const {
@@ -68,6 +69,10 @@ const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
     },
     [getEdges, getNodes, setEdges, setHasUnsavedChanges, setNodes],
   );
+
+    const onChange: ChangeEventHandler<HTMLSelectElement> = (evt) => {
+        setColorMode(evt.target.value as ColorMode);
+    };
 
   const isValidConnection = useCallback((connection: any) => {
     return connection.source !== connection.target;
@@ -135,6 +140,7 @@ const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
         }}
         fitView
         fitViewOptions={{ padding: 5 }}
+        colorMode={colorMode}
         isValidConnection={isValidConnection}
         defaultEdgeOptions={{ type: 'step', deletable: false }}
       >
@@ -144,6 +150,17 @@ const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
         <Controls orientation="horizontal" showInteractive={false} />
         <Panel position="top-left">
           <ImportExportControls />
+        </Panel>
+        <Panel position="top-right">
+            <select
+                className="xy-theme__select"
+                onChange={onChange}
+                data-testid="colormode-select"
+            >
+                <option value="dark">dark</option>
+                <option value="light">light</option>
+                <option value="system">system</option>
+             </select>
         </Panel>
       </ReactFlow>
       {isDeleteConnectionsModalVisible && (
