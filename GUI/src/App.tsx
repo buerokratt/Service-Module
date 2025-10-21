@@ -31,68 +31,68 @@ const App: React.FC = () => {
     enabled: import.meta.env.REACT_APP_LOCAL !== 'true',
   });
 
-  useEffect(() => {
-    const delay = 1000;
+  // useEffect(() => {
+  //   const delay = 1000;
 
-    const timeOutId = setTimeout(() => {
-      initializeSession();
-    }, delay);
+  //   const timeOutId = setTimeout(() => {
+  //     initializeSession();
+  //   }, delay);
 
-    return () => clearTimeout(timeOutId);
-  }, []);
+  //   return () => clearTimeout(timeOutId);
+  // }, []);
 
 
-  const initializeSession = () => {
-    let tabId = sessionStorage.getItem(CHAT_SESSIONS.SESSION_ID_KEY);
-    if (!tabId) {
-      tabId = generateUEID();
-      sessionStorage.setItem(CHAT_SESSIONS.SESSION_ID_KEY, tabId);
-    }
+  // const initializeSession = () => {
+  //   let tabId = sessionStorage.getItem(CHAT_SESSIONS.SESSION_ID_KEY);
+  //   if (!tabId) {
+  //     tabId = generateUEID();
+  //     sessionStorage.setItem(CHAT_SESSIONS.SESSION_ID_KEY, tabId);
+  //   }
 
-    let currentState = getCurrentSessionState();
+  //   let currentState = getCurrentSessionState();
 
-    if (!currentState.ids.includes(tabId)) {
-      currentState.ids.push(tabId);
-      currentState.count = currentState.ids.length;
-      localStorage.setItem(
-          CHAT_SESSIONS.SESSION_STATE_KEY,
-          JSON.stringify(currentState)
-      );
-    }
+  //   if (!currentState.ids.includes(tabId)) {
+  //     currentState.ids.push(tabId);
+  //     currentState.count = currentState.ids.length;
+  //     localStorage.setItem(
+  //         CHAT_SESSIONS.SESSION_STATE_KEY,
+  //         JSON.stringify(currentState)
+  //     );
+  //   }
 
-    const handleTabClose = () => {
-      const currentAppState = JSON.parse(
-          localStorage.getItem(CHAT_SESSIONS.SESSION_STATE_KEY) as string
-      ) || { ids: [], count: 0 };
+  //   const handleTabClose = () => {
+  //     const currentAppState = JSON.parse(
+  //         localStorage.getItem(CHAT_SESSIONS.SESSION_STATE_KEY) as string
+  //     ) || { ids: [], count: 0 };
 
-      const updatedIds = currentAppState.ids.filter(
-          (id: string) => id !== tabId
-      );
-      const updatedState = {
-        ids: updatedIds,
-        count: updatedIds.length,
-      };
+  //     const updatedIds = currentAppState.ids.filter(
+  //         (id: string) => id !== tabId
+  //     );
+  //     const updatedState = {
+  //       ids: updatedIds,
+  //       count: updatedIds.length,
+  //     };
 
-      localStorage.setItem(
-          CHAT_SESSIONS.SESSION_STATE_KEY,
-          JSON.stringify(updatedState)
-      );
-    };
+  //     localStorage.setItem(
+  //         CHAT_SESSIONS.SESSION_STATE_KEY,
+  //         JSON.stringify(updatedState)
+  //     );
+  //   };
 
-    window.addEventListener("beforeunload", handleTabClose);
+  //   window.addEventListener("beforeunload", handleTabClose);
 
-    return () => {
-      window.removeEventListener("beforeunload", handleTabClose);
-    };
-  };
+  //   return () => {
+  //     window.removeEventListener("beforeunload", handleTabClose);
+  //   };
+  // };
 
-  const getCurrentSessionState = () => {
-    return (
-        JSON.parse(
-            localStorage.getItem(CHAT_SESSIONS.SESSION_STATE_KEY) as string
-        ) || { ids: [], count: 0 }
-    );
-  };
+  // const getCurrentSessionState = () => {
+  //   return (
+  //       JSON.parse(
+  //           localStorage.getItem(CHAT_SESSIONS.SESSION_STATE_KEY) as string
+  //       ) || { ids: [], count: 0 }
+  //   );
+  // };
 
   return (
     <BrowserRouter basename={import.meta.env.BASE_URL}>
