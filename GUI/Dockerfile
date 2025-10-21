@@ -4,7 +4,7 @@ COPY ./package.json ./
 ENV PORT=3006
 
 FROM image AS build
-RUN npm ci --legacy-peer-deps --ignore-scripts
+RUN npm i --legacy-peer-deps --ignore-scripts
 COPY . .
 RUN ./node_modules/.bin/vite build
 VOLUME /app
