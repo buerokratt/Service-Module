@@ -13,13 +13,13 @@ const ARRAY_INDEX_PATTERN = /\[\d+\]$/;
 const getArrayIndex = (value: string): number => {
   const base = templateToString(value);
   const index = ARRAY_INDEX_PATTERN.exec(base);
-  return index ? parseInt(index[0].slice(1, -1)) : 0;
+  return index ? Number.parseInt(index[0].slice(1, -1)) : 0;
 };
 
 const updateArrayIndex = (value: string, index?: number): string => {
   let base = templateToString(value);
   base = base.replace(ARRAY_INDEX_PATTERN, '');
-  return stringToTemplate(index !== undefined ? `${base}[${index}]` : base);
+  return stringToTemplate(index === undefined ? base : `${base}[${index}]`);
 };
 
 interface DragInputProps {
@@ -56,7 +56,9 @@ const DragInput = ({ onChange, element, id }: DragInputProps): ReactNode => {
           {isArray(element.data) ? (
             <div className={styles.array}>
               {text}
-              {!all ? (
+              {all ? (
+                <></>
+              ) : (
                 <FormInput
                   name={element.value}
                   type="number"
@@ -72,8 +74,6 @@ const DragInput = ({ onChange, element, id }: DragInputProps): ReactNode => {
                   }}
                   className={styles.arrayIndex}
                 />
-              ) : (
-                <></>
               )}
               <div className={styles.arrayAll}>
                 <input
