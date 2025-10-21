@@ -29,7 +29,7 @@ interface DragInputProps {
 }
 
 const DragInput = ({ onChange, element, id }: DragInputProps): ReactNode => {
-  const [all, setAll] = useState(false);
+  const [all, setAll] = useState(element?.isAll ?? false);
   const [arrayIndex, setArrayIndex] = useState(0);
   const [text, setText] = useState(element?.key ?? '');
   const [placeholder, setPlaceholder] = useState(t('serviceFlow.popup.dragElementHere'));
@@ -82,7 +82,7 @@ const DragInput = ({ onChange, element, id }: DragInputProps): ReactNode => {
                   checked={all}
                   onChange={(e) => {
                     setAll(e.target.checked);
-                    onChange({ ...element, value: updateArrayIndex(element.value) });
+                    onChange({ ...element, value: updateArrayIndex(element.value), isAll: e.target.checked });
                   }}
                 />
                 <label htmlFor={`${id}-all`}>{t('serviceFlow.popup.all')}</label>
