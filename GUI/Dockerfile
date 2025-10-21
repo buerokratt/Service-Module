@@ -1,6 +1,6 @@
 FROM node:22.18.0-alpine AS image
 WORKDIR /app
-COPY ./package.json ./package-lock.json ./
+COPY ./package.json ./
 ENV PORT=3006
 
 FROM image AS build
