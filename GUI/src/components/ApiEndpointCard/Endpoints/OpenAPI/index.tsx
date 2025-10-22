@@ -223,7 +223,7 @@ const EndpointOpenAPI: React.FC<EndpointOpenAPIProps> = ({
 
   const checkNestedVariables = (variable: EndpointVariableData, data: RequestVariablesRowData[]) => {
     const variableData = variable.type === 'schema' ? variable.schemaData : variable.arrayData;
-    if (variableData instanceof Array) {
+    if (Array.isArray(variableData)) {
       variableData.forEach((variableData) => {
         const updatedVariable = data.find((updated) => updated.endpointVariableId === variableData.id);
         variableData[isLive ? 'value' : 'testValue'] = updatedVariable?.value;

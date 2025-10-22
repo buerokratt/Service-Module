@@ -688,7 +688,7 @@ const getNestedPreDefinedRawVariables = (data: { [key: string]: any }, result: s
 
 const getNestedPreDefinedEndpointVariables = (variable: EndpointVariableData, result: string[]) => {
   const variableData = variable.type === 'schema' ? variable.schemaData : variable.arrayData;
-  if (variableData instanceof Array) {
+  if (Array.isArray(variableData)) {
     variableData.forEach((v) => {
       if (['schema', 'array'].includes(v.type)) getNestedPreDefinedEndpointVariables(v, result);
 
