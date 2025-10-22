@@ -222,6 +222,30 @@ async function saveService(
     .catch(onError);
 }
 
+const validateMCQ = (node: NodeDataProps | undefined) => {
+  if (!node?.multiChoiceQuestion?.question || node.multiChoiceQuestion.question === '')
+    return i18next.t('toast.missing-mcq-question');
+  if (!node?.multiChoiceQuestion?.buttons || node.multiChoiceQuestion.buttons.length === 0)
+    return i18next.t('toast.missing-mcq-options');
+  return null;
+};
+
+const validateDynamicChoices = (node: NodeDataProps | undefined) => {
+  if (!node?.dynamicChoices?.list || node.dynamicChoices.list === '')
+    return i18next.t('toast.missing-dynamic-choices-list');
+  if (!node?.dynamicChoices?.serviceName || node.dynamicChoices.serviceName === '')
+    return i18next.t('toast.missing-dynamic-choices-service-name');
+  if (!node?.dynamicChoices?.key || node.dynamicChoices.key === '')
+    return i18next.t('toast.missing-dynamic-choices-key');
+  return null;
+};
+
+const validateCondition = (node: NodeDataProps | undefined) => {
+  const invalidRulesExist = hasInvalidRules(node?.rules?.children ?? []);
+  const isInvalid = node?.rules?.children === undefined || invalidRulesExist || node?.rules?.children.length === 0;
+  return isInvalid ? (i18next.t('toast.missing-condition-rules') ?? 'Error') : null;
+};
+
 function getYamlContent(
   nodes: Node<NodeDataProps>[],
   edges: Edge[],
@@ -260,42 +284,13 @@ function getYamlContent(
           }
           break;
         case StepType.MultiChoiceQuestion:
-          if (
-            followingNode?.multiChoiceQuestion?.question === undefined ||
-            followingNode?.multiChoiceQuestion.question === ''
-          ) {
-            error = i18next.t('toast.missing-mcq-question');
-            break;
-          }
-          if (!followingNode?.multiChoiceQuestion?.buttons || followingNode?.multiChoiceQuestion.buttons.length === 0) {
-            error = i18next.t('toast.missing-mcq-options');
-          }
+          error = validateMCQ(followingNode);
           break;
         case StepType.DynamicChoices:
-          if (followingNode?.dynamicChoices?.list === undefined || followingNode?.dynamicChoices.list === '') {
-            error = i18next.t('toast.missing-dynamic-choices-list');
-            break;
-          }
-          if (
-            followingNode?.dynamicChoices?.serviceName === undefined ||
-            followingNode?.dynamicChoices.serviceName === ''
-          ) {
-            error = i18next.t('toast.missing-dynamic-choices-service-name');
-            break;
-          }
-          if (followingNode?.dynamicChoices?.key === undefined || followingNode?.dynamicChoices.key === '') {
-            error = i18next.t('toast.missing-dynamic-choices-key');
-          }
+          error = validateDynamicChoices(followingNode);
           break;
         case StepType.Condition: {
-          const invalidRulesExist = hasInvalidRules(followingNode?.rules?.children ?? []);
-          const isInvalid =
-            followingNode?.rules?.children === undefined ||
-            invalidRulesExist ||
-            followingNode?.rules?.children.length === 0;
-          if (isInvalid) {
-            throw new Error(i18next.t('toast.missing-condition-rules') ?? 'Error');
-          }
+          error = validateCondition(followingNode);
           break;
         }
         case StepType.Input:
