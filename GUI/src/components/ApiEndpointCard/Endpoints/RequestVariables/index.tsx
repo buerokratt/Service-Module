@@ -366,7 +366,8 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
       </Track>
       {Object.keys(rowsData).map((tab) => (
         <Tabs.Content className="endpoint-tab-group__tab-content" value={tab} key={tab}>
-          {(requestTab.showRawData || endpoint.definitions[0][requestTab.tab]?.isRowSelected) && requestTab.tab === 'body' ? (
+          {(requestTab.showRawData || endpoint.definitions[0][requestTab.tab]?.isRowSelected) &&
+          requestTab.tab === 'body' ? (
             buildRawDataView()
           ) : (
             <>
