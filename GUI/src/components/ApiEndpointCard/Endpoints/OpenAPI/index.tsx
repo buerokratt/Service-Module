@@ -194,18 +194,21 @@ const EndpointOpenAPI: React.FC<EndpointOpenAPIProps> = ({
             ? {
                 variables: body,
                 rawData: {},
+                isRowSelected: false,
               }
             : undefined,
           headers: headers
             ? {
                 variables: headers,
                 rawData: {},
+                isRowSelected: false,
               }
             : undefined,
           params: params
             ? {
                 variables: params,
                 rawData: {},
+                isRowSelected: false,
               }
             : undefined,
           response,

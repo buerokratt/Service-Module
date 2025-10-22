@@ -253,11 +253,13 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
       endpoint.definitions[0].body = {
         variables: variables,
         rawData: {},
+        isRowSelected: false,
       };
     } else if (requestTab.tab === 'headers') {
       endpoint.definitions[0].headers = {
         variables: variables,
         rawData: {},
+        isRowSelected: false,
       };
     }
   };
@@ -290,6 +292,7 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
                 try {
                   const content = prevRawData[requestTab.tab] ?? '';
                   prevRawData[requestTab.tab] = JSON.stringify(JSON.parse(content), null, 4);
+                  updateEndpointRawData(prevRawData, endpoint);
                 } catch (e: any) {
                   setJsonError(`Unable to format JSON. ${e.message}`);
                 }
@@ -306,10 +309,10 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
           name={`${requestTab.tab}-raw-data`}
           label={''}
           defaultValue={tabRawData[requestTab.tab]}
-          onBlur={() => updateEndpointRawData(tabRawData, endpoint)}
           onChange={(event) => {
             setJsonError(undefined);
             tabRawData[requestTab.tab] = event.target.value;
+            updateEndpointRawData(tabRawData, endpoint);
           }}
         />
       </>
@@ -339,18 +342,21 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
             );
           })}
         </Tabs.List>
-        {!disableRawData && (
+        {!disableRawData && requestTab.tab === 'body' && (
           <Track style={{ paddingRight: 16 }} gap={8}>
             <SwitchBox
               style={{ width: 'fit-content' }}
               label={''}
               name={'raw-data'}
-              checked={requestTab.showRawData}
+              checked={endpoint.definitions[0][requestTab.tab]?.isRowSelected ?? requestTab.showRawData}
               onCheckedChange={(checked) => {
                 setRequestTab((rt) => {
                   rt.showRawData = checked;
                   return rt;
                 });
+                if (endpoint.definitions[0][requestTab.tab]) {
+                  endpoint.definitions[0][requestTab.tab]!.isRowSelected = checked;
+                }
                 setKey(key + 1);
               }}
             />
@@ -360,7 +366,7 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
       </Track>
       {Object.keys(rowsData).map((tab) => (
         <Tabs.Content className="endpoint-tab-group__tab-content" value={tab} key={tab}>
-          {requestTab.showRawData ? (
+          {(requestTab.showRawData || endpoint.definitions[0][requestTab.tab]?.isRowSelected) && requestTab.tab === 'body' ? (
             buildRawDataView()
           ) : (
             <>

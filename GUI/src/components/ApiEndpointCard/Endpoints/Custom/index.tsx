@@ -44,14 +44,17 @@ const EndpointCustom: React.FC<EndpointCustomProps> = ({
       body: {
         variables: [],
         rawData: {},
+        isRowSelected: false,
       },
       headers: {
         variables: [],
         rawData: {},
+        isRowSelected: false,
       },
       params: {
         variables: [],
         rawData: {},
+        isRowSelected: false,
       },
     });
   }
@@ -107,6 +110,7 @@ const EndpointCustom: React.FC<EndpointCustomProps> = ({
                 endpoint.definitions[0].params = {
                   variables: parameters,
                   rawData: {},
+                  isRowSelected: false,
                 };
                 refereshEndpoint();
               }}
