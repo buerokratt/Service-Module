@@ -128,7 +128,7 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
   const getInitialTabsRawData = (): RequestVariablesTabsRawData => {
     return tabs.reduce((tabsRawData, tab) => {
       const endpointData = endpoint.definitions[0];
-      if (!endpointData || !endpointData[tab]) return tabsRawData;
+      if (!endpointData?.[tab]) return tabsRawData;
       return { ...tabsRawData, [tab]: endpointData[tab]?.rawData[isLive ? 'value' : 'testValue'] ?? '' };
     }, {});
   };
