@@ -11,7 +11,14 @@ import { StepType } from 'types';
 import { Assign } from 'types/assign';
 import { EndpointData, EndpointVariableData } from 'types/endpoint';
 import { NodeDataProps } from 'types/service-flow';
-import { getLastDigits, isNumericString, removeTrailingUnderscores, removeWrapperQuotes, stringToArray, toSnakeCase } from 'utils/string-util';
+import {
+  getLastDigits,
+  isNumericString,
+  removeTrailingUnderscores,
+  removeWrapperQuotes,
+  stringToArray,
+  toSnakeCase,
+} from 'utils/string-util';
 
 import api from '../services/api-dev';
 

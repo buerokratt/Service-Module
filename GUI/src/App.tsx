@@ -1,15 +1,15 @@
 import { useQuery } from '@tanstack/react-query';
 import UnsavedChangesDialog from 'handlers/unsavedChangesDialog';
 import { UnsavedChangesHandler } from 'handlers/unsavedChangesHandler';
-import React, {useEffect} from 'react';
+import React, { useEffect } from 'react';
 import { BrowserRouter } from 'react-router-dom';
 
 import { ToastProvider } from './components/Toast/ToastProvider';
 import RootComponent from './RootComponent';
 import useStore from './store/store';
 import { UserInfo } from './types/userInfo';
-import {CHAT_SESSIONS} from "./constants/consts";
-import {generateUEID} from "./utils/generateUEID";
+import { CHAT_SESSIONS } from './constants/consts';
+import { generateUEID } from './utils/generateUEID';
 
 const App: React.FC = () => {
   useQuery<{
@@ -41,7 +41,6 @@ const App: React.FC = () => {
     return () => clearTimeout(timeOutId);
   }, []);
 
-
   const initializeSession = () => {
     let tabId = sessionStorage.getItem(CHAT_SESSIONS.SESSION_ID_KEY);
     if (!tabId) {
@@ -54,44 +53,33 @@ const App: React.FC = () => {
     if (!currentState.ids.includes(tabId)) {
       currentState.ids.push(tabId);
       currentState.count = currentState.ids.length;
-      localStorage.setItem(
-          CHAT_SESSIONS.SESSION_STATE_KEY,
-          JSON.stringify(currentState)
-      );
+      localStorage.setItem(CHAT_SESSIONS.SESSION_STATE_KEY, JSON.stringify(currentState));
     }
 
     const handleTabClose = () => {
-      const currentAppState = JSON.parse(
-          localStorage.getItem(CHAT_SESSIONS.SESSION_STATE_KEY) as string
-      ) || { ids: [], count: 0 };
+      const currentAppState = JSON.parse(localStorage.getItem(CHAT_SESSIONS.SESSION_STATE_KEY) as string) || {
+        ids: [],
+        count: 0,
+      };
 
-      const updatedIds = currentAppState.ids.filter(
-          (id: string) => id !== tabId
-      );
+      const updatedIds = currentAppState.ids.filter((id: string) => id !== tabId);
       const updatedState = {
         ids: updatedIds,
         count: updatedIds.length,
       };
 
-      localStorage.setItem(
-          CHAT_SESSIONS.SESSION_STATE_KEY,
-          JSON.stringify(updatedState)
-      );
+      localStorage.setItem(CHAT_SESSIONS.SESSION_STATE_KEY, JSON.stringify(updatedState));
     };
 
-    window.addEventListener("beforeunload", handleTabClose);
+    window.addEventListener('beforeunload', handleTabClose);
 
     return () => {
-      window.removeEventListener("beforeunload", handleTabClose);
+      window.removeEventListener('beforeunload', handleTabClose);
     };
   };
 
   const getCurrentSessionState = () => {
-    return (
-        JSON.parse(
-            localStorage.getItem(CHAT_SESSIONS.SESSION_STATE_KEY) as string
-        ) || { ids: [], count: 0 }
-    );
+    return JSON.parse(localStorage.getItem(CHAT_SESSIONS.SESSION_STATE_KEY) as string) || { ids: [], count: 0 };
   };
 
   return (

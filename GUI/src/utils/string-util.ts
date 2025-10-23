@@ -129,7 +129,7 @@ export function removeNestedTemplates(str: string): string {
 export function isNumericString(str: string): boolean {
   if (typeof str !== 'string') return false;
   if (str.trim() === '') return false;
-  
+
   const num = Number(str);
   return !Number.isNaN(num) && Number.isFinite(num);
 }
