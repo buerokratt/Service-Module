@@ -125,3 +125,22 @@ export function removeNestedTemplates(str: string): string {
 
   return str;
 }
+
+export function isNumericString(str: string): boolean {
+  if (typeof str !== 'string') return false;
+  if (str.trim() === '') return false;
+  
+  const num = Number(str);
+  return !Number.isNaN(num) && Number.isFinite(num);
+}
+
+export function removeWrapperQuotes(str: string): string {
+  if (typeof str !== 'string') return str;
+
+  let start = 0;
+  let end = str.length - 1;
+  while (start <= end && str[start] === '"') start++;
+  while (end >= start && str[end] === '"') end--;
+
+  return str.substring(start, end + 1);
+}
