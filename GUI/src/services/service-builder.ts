@@ -294,7 +294,7 @@ function getYamlContent(
             invalidRulesExist ||
             followingNode?.rules?.children.length === 0;
           if (isInvalid) {
-            throw new Error(i18next.t('toast.missing-condition-rules') ?? 'Error');
+            error = i18next.t('toast.missing-condition-rules');
           }
           break;
         }
