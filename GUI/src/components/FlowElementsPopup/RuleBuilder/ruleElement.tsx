@@ -2,6 +2,7 @@ import { DragInput, FormInput, FormSelect, Icon, Tooltip, Track } from 'componen
 import React from 'react';
 import { MdDeleteOutline, MdEdit } from 'react-icons/md';
 import { Assign } from 'types';
+import { getDragData } from 'utils/component-util';
 
 import { Rule } from './types';
 import { t } from 'i18next';
@@ -17,6 +18,16 @@ interface RuleElementProps {
 const RuleElement: React.FC<RuleElementProps> = ({ rule, onRemove, onChange }) => {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     change(e.target.name, e.target.value);
+  };
+
+  const handleFieldDrop = (e: React.DragEvent<HTMLInputElement>) => {
+    const data = getDragData(e);
+    onChange({ ...rule, field: data.value });
+  };
+
+  const handleValueDrop = (e: React.DragEvent<HTMLInputElement>) => {
+    const data = getDragData(e);
+    onChange({ ...rule, value: data.value });
   };
 
   const handleSelectionChange = (e: { label: string; value: string } | null) => {
@@ -72,7 +83,7 @@ const RuleElement: React.FC<RuleElementProps> = ({ rule, onRemove, onChange }) =
           />
         )}
         {rule.isFieldManual && (
-          <FormInput value={rule.field} name="field" onChange={handleChange} label="" hideLabel />
+          <FormInput value={rule.field} name="field" onChange={handleChange} onDrop={handleFieldDrop} label="" hideLabel />
         )}
         <Tooltip content={t('serviceFlow.popup.assignManualEdit')} onButtonClick={toggleFieldMode}>
           <div className="small-assign-button assign-blue">
@@ -96,7 +107,7 @@ const RuleElement: React.FC<RuleElementProps> = ({ rule, onRemove, onChange }) =
           />
         )}
         {rule.isValueManual && (
-          <FormInput value={rule.value} name="value" onChange={handleChange} label="" hideLabel />
+          <FormInput value={rule.value} name="value" onChange={handleChange} onDrop={handleValueDrop} label="" hideLabel />
         )}
         <Tooltip
           content={t('serviceFlow.popup.assignManualEdit')}
