@@ -146,7 +146,6 @@
     },
     "service": {
       "name": "Nimetus",
-      "usedCount": "Kasutamise arv",
       "linkedIntent": "Ühendatud teema",
       "state": "Olek",
       "states": {

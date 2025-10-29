@@ -105,7 +105,6 @@ const useServiceListStore = create<ServiceStoreState>((set, get, store) => ({
             type: item.type,
             isCommon: item.iscommon,
             serviceId: item.serviceId,
-            usedCount: 0,
             totalPages: item.totalPages,
             linkedIntent: triggers.find((e: Trigger) => e.service === item.serviceId)?.intent ?? '',
           }) as Service,
@@ -136,7 +135,6 @@ const useServiceListStore = create<ServiceStoreState>((set, get, store) => ({
             isCommon: item.iscommon,
             serviceId: item.serviceId,
             totalPages: item.totalPages,
-            usedCount: 0,
             linkedIntent: triggers.find((e: Trigger) => e.service === item.serviceId)?.intent ?? '',
           }) as Service,
       ) ?? [];

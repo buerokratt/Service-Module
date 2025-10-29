@@ -146,7 +146,6 @@
     },
     "service": {
       "name": "Name",
-      "usedCount": "Times service has been triggered",
       "state": "State",
       "linkedIntent": "Linked Intent",
       "states": {
