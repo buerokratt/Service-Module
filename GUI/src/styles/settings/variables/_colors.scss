@@ -167,6 +167,21 @@ $veera-colors: (
   extra-light: #f9f9f9
 );
 
+:root {
+  --dark-bg-main: #1f2937;
+  --dark-bg-secondary: #273549;
+  --dark-bg-light: #374151;
+  --dark-bg-extra-light: #4b5563;
+  --dark-bg-highlight: #6b7280;
+
+  --dark-text-highlight: #f9fafb ;
+  --dark-text-primary: #f3f4f6;
+  --dark-text-secondary: #e5e7eb;
+  --dark-text-label: #d1d5db;
+  --dark-text-disabled: #9ca3af;
+  --dark-text-border: #6b7280;
+}
+
 // CSS variables
 :root {
   @each $name, $color in $veera-colors {
