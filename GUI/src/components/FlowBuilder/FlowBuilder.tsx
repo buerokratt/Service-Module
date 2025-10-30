@@ -1,5 +1,5 @@
 import {Background, ColorMode, Controls, Edge, MiniMap, Node, Panel, ReactFlow, useReactFlow} from '@xyflow/react';
-import { Button, Modal, Track } from 'components';
+import {Button, Modal, ThemeToggle, Track} from 'components';
 import Chat from 'components/chat/chat';
 import edgeTypes from 'components/Flow/EdgeTypes';
 import nodeTypes from 'components/Flow/NodeTypes';
@@ -11,6 +11,7 @@ import { useTranslation } from 'react-i18next';
 import useServiceStore from 'store/new-services.store';
 import { StepType } from 'types';
 import ImportExportControls from 'components/Flow/Controls/ImportExportControls';
+import {useThemeSyncWithFlow} from "../../hooks/useThemeSyncWithFlow";
 
 type FlowBuilderProps = {
   nodes: Node[];
@@ -23,6 +24,9 @@ const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
   const [colorMode, setColorMode] = useState<ColorMode>('light');
   const setReactFlowInstance = useServiceStore((state) => state.setReactFlowInstance);
   const { t } = useTranslation();
+
+  useThemeSyncWithFlow();
+
   const {
     onNodesDelete,
     onEdgesDelete,
@@ -152,15 +156,7 @@ const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
           <ImportExportControls />
         </Panel>
         <Panel position="top-right">
-            <select
-                className="xy-theme__select"
-                onChange={onChange}
-                data-testid="colormode-select"
-            >
-                <option value="dark">dark</option>
-                <option value="light">light</option>
-                <option value="system">system</option>
-             </select>
+            <ThemeToggle onChange={onChange} />
         </Panel>
       </ReactFlow>
       {isDeleteConnectionsModalVisible && (
