@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { FaMoon, FaSun } from "react-icons/fa";
-import './TheToggle.scss';
+import './ThemeToggle.scss';
 
 export default function ThemeToggle({ onChange }) {
     const [theme, setTheme] = useState(() => {

@@ -1,12 +1,8 @@
 :root[data-theme="light"] {
-  --bg-color: #f3f4f6;
-  --text-color: #111827;
   --panel-bg: #e5e7eb;
 }
 
 :root[data-theme="dark"] {
-  --bg-color: #1f2937;
-  --text-color: #f3f4f6;
   --panel-bg: #374151;
 }
 
@@ -40,7 +36,6 @@
     background: #4b5563;
     box-shadow: 0 0 6px rgba(96, 165, 250, 0.6);
   }
-
 
   .toggle-btn {
     flex: 1;
