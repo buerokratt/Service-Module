@@ -1,13 +1,6 @@
-export type BaseAnchor =
-  | 'startOfDay'
-  | 'startOfMonth'
-  | 'startOfYear'
-  | 'endOfDay'
-  | 'endOfMonth'
-  | 'endOfYear'
-  | 'now';
+export type BaseDate = 'startOfDay' | 'startOfMonth' | 'startOfYear' | 'endOfDay' | 'endOfMonth' | 'endOfYear' | 'now';
 
-export const baseOptionsConfig: Array<{ value: BaseAnchor; baseDate: string }> = [
+export const baseOptionsConfig: Array<{ value: BaseDate; baseDate: string }> = [
   { value: 'now', baseDate: 'new Date()' },
   {
     value: 'startOfDay',
@@ -36,7 +29,7 @@ export const baseOptionsConfig: Array<{ value: BaseAnchor; baseDate: string }> =
 ];
 
 export const generateDateCode = (
-  base: BaseAnchor,
+  base: BaseDate,
   days: string,
   months: string,
   years: string,

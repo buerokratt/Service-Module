@@ -7,12 +7,13 @@ import { t } from 'i18next';
 import { CSSProperties, FC, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Assign } from 'types';
-import { type BaseAnchor, baseOptionsConfig, generateDateCode } from 'utils/date-code-util';
 import { getTypeColor } from 'utils/object-util';
 import { stringToTemplate } from 'utils/string-util';
 import { v4 } from 'uuid';
 
-const getBaseOptions = (): { label: string; value: BaseAnchor }[] =>
+import { type BaseDate, baseOptionsConfig, generateDateCode } from './date-time-utils';
+
+const getBaseOptions = (): { label: string; value: BaseDate }[] =>
   baseOptionsConfig.map((option) => ({
     label: String(t(`serviceFlow.previousVariables.dates.${option.value}`)),
     value: option.value,
@@ -25,7 +26,7 @@ interface DateTimeBuilderProps {
 
 const DateTimeBuilder: FC<DateTimeBuilderProps> = ({ border, popupBodyCss }) => {
   const { t } = useTranslation();
-  const [base, setBase] = useState<BaseAnchor>('now');
+  const [base, setBase] = useState<BaseDate>('now');
   const [days, setDays] = useState<string>('0');
   const [months, setMonths] = useState<string>('0');
   const [years, setYears] = useState<string>('0');
@@ -72,7 +73,7 @@ const DateTimeBuilder: FC<DateTimeBuilderProps> = ({ border, popupBodyCss }) => 
             style={{ fontSize: '14px' }}
             onSelectionChange={(selection) => {
               if (selection) {
-                setBase(selection.value as BaseAnchor);
+                setBase(selection.value as BaseDate);
               }
             }}
           />
