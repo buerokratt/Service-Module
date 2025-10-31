@@ -142,6 +142,7 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
         popupBodyCss={popupBodyCss}
         border={border}
       />
+      {/* todo remove later */}
       <VariableSection
         title={t('serviceFlow.previousVariables.dates.title')}
         variables={[...datesVariables]}

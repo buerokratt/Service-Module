@@ -41,6 +41,7 @@ const DateTimeBuilder: FC<DateTimeBuilderProps> = ({ border, popupBodyCss }) => 
       }}
     >
       <label htmlFor="json" style={{ marginBottom: '10px', textTransform: 'capitalize', cursor: 'auto' }}>
+        {/* todo rename */}
         {t('serviceFlow.previousVariables.dates.title')}
       </label>
 
