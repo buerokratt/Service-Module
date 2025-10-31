@@ -30,19 +30,21 @@ export const baseOptionsConfig: Array<{ value: BaseDate; baseDate: string }> = [
 
 export const generateDateCode = (
   base: BaseDate,
-  days: string,
-  months: string,
-  years: string,
-  isTimePrecisionEnabled: boolean,
-  time: string,
+  options?: {
+    days?: string;
+    months?: string;
+    years?: string;
+    isTimePrecisionEnabled?: boolean;
+    time?: string;
+  },
 ): string => {
   // Get base date initialization from config
   const baseDate = baseOptionsConfig.find((option) => option.value === base)?.baseDate || 'new Date()';
 
   // Parse offsets
-  const daysNum = parseInt(days) || 0;
-  const monthsNum = parseInt(months) || 0;
-  const yearsNum = parseInt(years) || 0;
+  const daysNum = parseInt(options?.days ?? '0');
+  const monthsNum = parseInt(options?.months ?? '0');
+  const yearsNum = parseInt(options?.years ?? '0');
 
   // Build operations using IIFE to avoid nested new Date() calls
   const operations: string[] = [];
@@ -57,8 +59,8 @@ export const generateDateCode = (
   if (yearsNum !== 0) {
     operations.push(`d.setFullYear(d.getFullYear() + ${yearsNum})`);
   }
-  if (isTimePrecisionEnabled && time) {
-    const timeParts = time.split(':');
+  if (options?.isTimePrecisionEnabled && options?.time) {
+    const timeParts = options.time.split(':');
     if (timeParts.length >= 2) {
       const hours = timeParts[0] || '0';
       const minutes = timeParts[1] || '0';

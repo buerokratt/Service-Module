@@ -34,7 +34,14 @@ const DateTimeBuilder: FC<DateTimeBuilderProps> = ({ border, popupBodyCss }) => 
   const [time, setTime] = useState<string>('21:00:00.000');
 
   const dateCode = useMemo(
-    () => generateDateCode(base, days, months, years, isTimePrecisionEnabled, time),
+    () =>
+      generateDateCode(base, {
+        days,
+        months,
+        years,
+        isTimePrecisionEnabled,
+        time,
+      }),
     [base, days, months, years, isTimePrecisionEnabled, time],
   );
 
