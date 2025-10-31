@@ -370,9 +370,9 @@
         "now": "Now",
         "today": "Today",
         "offset": "Offset",
-        "addDays": "Add days",
-        "addMonths": "Add months",
-        "addYears": "Add years",
+        "addDays": "Days",
+        "addMonths": "Months",
+        "addYears": "Years",
         "timePrecision": "Time precision",
         "setTime": "Set time",
         "timeFormat": "Time format (HH:mm:ss.SSSZ)"

@@ -374,9 +374,9 @@
         "now": "Nüüd",
         "today": "Täna",
         "offset": "Nihutus",
-        "addDays": "Lisa päevi",
-        "addMonths": "Lisa kuud",
-        "addYears": "Lisa aastaid",
+        "addDays": "Päevad",
+        "addMonths": "Kuud",
+        "addYears": "Aastad",
         "timePrecision": "Aja täpsus",
         "setTime": "Määra aeg",
         "timeFormat": "Aja vorming (HH:mm:ss.SSSZ)"
