@@ -1,13 +1,14 @@
 import { useQuery } from '@tanstack/react-query';
 import UnsavedChangesDialog from 'handlers/unsavedChangesDialog';
 import { UnsavedChangesHandler } from 'handlers/unsavedChangesHandler';
-import React from 'react';
+import React, {useEffect} from 'react';
 import { BrowserRouter } from 'react-router-dom';
 
 import { ToastProvider } from './components/Toast/ToastProvider';
 import RootComponent from './RootComponent';
 import useStore from './store/store';
 import { UserInfo } from './types/userInfo';
+import useTabCloseEffect from "./hooks/useTabCloseEffects";
 
 const App: React.FC = () => {
   useQuery<{
@@ -28,6 +29,8 @@ const App: React.FC = () => {
     },
     enabled: import.meta.env.REACT_APP_LOCAL !== 'true',
   });
+
+  useTabCloseEffect();
 
   return (
     <BrowserRouter basename={import.meta.env.BASE_URL}>
