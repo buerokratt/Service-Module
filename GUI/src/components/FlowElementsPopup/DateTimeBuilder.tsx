@@ -18,7 +18,7 @@ const DateTimeBuilder: FC<DateTimeBuilderProps> = ({ border }) => {
   const [addMonths, setAddMonths] = useState<string>('0');
   const [addYears, setAddYears] = useState<string>('0');
   const [isTimePrecisionEnabled, setIsTimePrecisionEnabled] = useState<boolean>(false);
-  const [timeFormat, setTimeFormat] = useState<string>('00:00:00.000Z');
+  const [timeFormat, setTimeFormat] = useState<string>('00:00:00.000');
 
   const popupBodyCss: CSSProperties = {
     padding: 16,
@@ -114,7 +114,7 @@ const DateTimeBuilder: FC<DateTimeBuilderProps> = ({ border }) => {
               type="text"
               value={timeFormat}
               onChange={(e) => setTimeFormat(e.target.value)}
-              placeholder="HH:mm:ss.SSSZ"
+              placeholder="HH:mm:ss.SSS"
             />
           )}
         </Track>
