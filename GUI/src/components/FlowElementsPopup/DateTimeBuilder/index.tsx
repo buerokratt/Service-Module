@@ -3,21 +3,12 @@ import FormInput from 'components/FormElements/FormInput';
 import FormSelect from 'components/FormElements/FormSelect';
 import OutputElementBox from 'components/OutputElementBox';
 import Track from 'components/Track';
-import { t } from 'i18next';
 import { CSSProperties, FC, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Assign } from 'types';
 import { getTypeColor } from 'utils/object-util';
-import { stringToTemplate } from 'utils/string-util';
-import { v4 } from 'uuid';
 
-import { type BaseDate, baseOptionsConfig, generateDateCode } from './date-time-utils';
-
-const getBaseOptions = (): { label: string; value: BaseDate }[] =>
-  baseOptionsConfig.map((option) => ({
-    label: String(t(`serviceFlow.previousVariables.dates.${option.value}`)),
-    value: option.value,
-  }));
+import { type BaseDate, createDateTimeDragData, generateDateCode, getBaseOptions } from './date-time-utils';
 
 interface DateTimeBuilderProps {
   border: string;
@@ -45,15 +36,7 @@ const DateTimeBuilder: FC<DateTimeBuilderProps> = ({ border, popupBodyCss }) => 
     [base, days, months, years, isTimePrecisionEnabled, time],
   );
 
-  const dragData: Assign = useMemo(
-    () => ({
-      id: v4(),
-      key: 'dateTime',
-      value: stringToTemplate(dateCode),
-      data: dateCode,
-    }),
-    [dateCode],
-  );
+  const dragData: Assign = useMemo(() => createDateTimeDragData(dateCode), [dateCode]);
 
   return (
     <Track

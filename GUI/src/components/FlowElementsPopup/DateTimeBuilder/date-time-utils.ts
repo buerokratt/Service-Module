@@ -1,3 +1,8 @@
+import { t } from 'i18next';
+import { Assign } from 'types';
+import { stringToTemplate } from 'utils/string-util';
+import { v4 } from 'uuid';
+
 export type BaseDate = 'startOfDay' | 'startOfMonth' | 'startOfYear' | 'endOfDay' | 'endOfMonth' | 'endOfYear' | 'now';
 
 export const baseOptionsConfig: Array<{ value: BaseDate; baseDate: string }> = [
@@ -78,3 +83,16 @@ export const generateDateCode = (
   const opsString = operations.join('; ');
   return `(function() { const d = ${baseDate}; ${opsString}; return d.toISOString(); })()`;
 };
+
+export const getBaseOptions = (): { label: string; value: BaseDate }[] =>
+  baseOptionsConfig.map((option) => ({
+    label: String(t(`serviceFlow.previousVariables.dates.${option.value}`)),
+    value: option.value,
+  }));
+
+export const createDateTimeDragData = (dateCode: string): Assign => ({
+  id: v4(),
+  key: 'dateTime',
+  value: stringToTemplate(dateCode),
+  data: dateCode,
+});
