@@ -113,8 +113,6 @@ const DateTimeBuilder: FC<DateTimeBuilderProps> = ({ border, popupBodyCss }) => 
     [dateCode],
   );
 
-  const typeColor = getTypeColor(dateCode);
-
   return (
     <Track
       direction="vertical"
@@ -202,7 +200,7 @@ const DateTimeBuilder: FC<DateTimeBuilderProps> = ({ border, popupBodyCss }) => 
 
         <Track direction="vertical" align="stretch" gap={8}>
           <label style={{ fontSize: '14px', fontWeight: 500 }}>Output</label>
-          <OutputElementBox dragData={dragData} borderColor={typeColor.color} style={{ cursor: 'grab' }}>
+          <OutputElementBox dragData={dragData} borderColor={getTypeColor(dateCode).color} style={{ cursor: 'grab' }}>
             {t('serviceFlow.previousVariables.dates.title')}
           </OutputElementBox>
         </Track>
