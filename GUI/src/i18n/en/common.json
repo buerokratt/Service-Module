@@ -370,12 +370,12 @@
         "now": "Now",
         "today": "Today",
         "offset": "Offset",
-        "addDays": "Days",
-        "addMonths": "Months",
-        "addYears": "Years",
+        "days": "Days",
+        "months": "Months",
+        "years": "Years",
         "timePrecision": "Time precision",
         "setTime": "Set time",
-        "timeFormat": "Time"
+        "time": "Time"
       },
       "noName": "<No name>",
       "environmentVariables": {

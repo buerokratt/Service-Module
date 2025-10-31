@@ -71,21 +71,21 @@ const DateTimeBuilder: FC<DateTimeBuilderProps> = ({ border }) => {
           <label style={{ fontSize: '14px', fontWeight: 500 }}>{t('serviceFlow.previousVariables.dates.offset')}</label>
           <Track direction="vertical" align="stretch" gap={8}>
             <FormInput
-              label={String(t('serviceFlow.previousVariables.dates.addDays'))}
+              label={String(t('serviceFlow.previousVariables.dates.days'))}
               name="addDays"
               type="number"
               value={addDays}
               onChange={(e) => setAddDays(e.target.value)}
             />
             <FormInput
-              label={String(t('serviceFlow.previousVariables.dates.addMonths'))}
+              label={String(t('serviceFlow.previousVariables.dates.months'))}
               name="addMonths"
               type="number"
               value={addMonths}
               onChange={(e) => setAddMonths(e.target.value)}
             />
             <FormInput
-              label={String(t('serviceFlow.previousVariables.dates.addYears'))}
+              label={String(t('serviceFlow.previousVariables.dates.years'))}
               name="addYears"
               type="number"
               value={addYears}
@@ -111,7 +111,7 @@ const DateTimeBuilder: FC<DateTimeBuilderProps> = ({ border }) => {
           />
           {isTimePrecisionEnabled && (
             <FormInput
-              label={String(t('serviceFlow.previousVariables.dates.timeFormat'))}
+              label={String(t('serviceFlow.previousVariables.dates.time'))}
               name="timeFormat"
               type="text"
               value={timeFormat}

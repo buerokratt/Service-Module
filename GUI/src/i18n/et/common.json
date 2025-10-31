@@ -374,12 +374,12 @@
         "now": "Nüüd",
         "today": "Täna",
         "offset": "Nihutus",
-        "addDays": "Päevad",
-        "addMonths": "Kuud",
-        "addYears": "Aastad",
+        "days": "Päevad",
+        "months": "Kuud",
+        "years": "Aastad",
         "timePrecision": "Aja täpsus",
         "setTime": "Määra aeg",
-        "timeFormat": "Aeg"
+        "time": "Aeg"
       },
       "helpers": {
         "title": "Tööriistad",
