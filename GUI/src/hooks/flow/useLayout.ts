@@ -108,7 +108,7 @@ function useLayout() {
   const edgeCount = useStore(edgeCountSelector);
   const { getNodes, getNode, setNodes, setEdges, getEdges, fitView } = useReactFlow();
   const autoView = useServiceStore((state) => state.autoView);
-  
+
   const runLayout = useCallback(() => {
     const nodes = getNodes();
     const edges = getEdges();

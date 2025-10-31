@@ -14,10 +14,7 @@ const Tooltip: FC<PropsWithChildren<TooltipProps>> = ({ content, children, onBut
       <RadixTooltip.Provider delayDuration={100}>
         <RadixTooltip.Root>
           <RadixTooltip.Trigger asChild>
-            <button
-              style={{ display: 'inline-flex' }}
-              onClick={onButtonClick}
-            >
+            <button style={{ display: 'inline-flex' }} onClick={onButtonClick}>
               {children}
             </button>
           </RadixTooltip.Trigger>
