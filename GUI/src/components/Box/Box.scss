@@ -45,3 +45,35 @@
     border-color: get-color(black-coral-3);
   }
 }
+
+[data-theme='dark'] .box {
+  &--default {
+    background-color: get-color(black-coral-12);
+    border-color: get-color(black-coral-11);
+  }
+
+  &--blue {
+    background-color: get-color(sapphire-blue-12);
+    border-color: get-color(sapphire-blue-11);
+  }
+
+  &--yellow {
+    background-color: get-color(dark-tangerine-12);
+    border-color: get-color(dark-tangerine-11);
+  }
+
+  &--green {
+    background-color: get-color(sea-green-12);
+    border-color: get-color(sea-green-11);
+  }
+
+  &--red {
+    background-color: get-color(jasper-12);
+    border-color: get-color(jasper-11);
+  }
+
+  &--gray {
+    background-color: get-color(black-coral-12);
+    border-color: get-color(black-coral-11);
+  }
+}

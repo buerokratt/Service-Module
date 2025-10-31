@@ -2,6 +2,7 @@
 @import 'src/styles/tools/color';
 @import 'src/styles/settings/variables/other';
 @import 'src/styles/settings/variables/typography';
+@import 'src/styles/settings/variables/_colors';
 
 .variable-required {
   align-items: center;
@@ -37,6 +38,33 @@
       background-color: get-color(white);
       border-color: get-color(black-coral-2);
       color: get-color(sapphire-blue-10);
+    }
+  }
+
+  &__tab-content {
+    background-color: get-color(white);
+  }
+}
+
+[data-theme='dark'] .endpoint-tab-group {
+  background-color: var(--dark-bg-secondary);
+  border: 1px solid var(--dark-text-border);
+
+  &__list {
+    border-bottom: 1px solid var(--dark-text-disabled);
+  }
+
+  &__tab-btn {
+    color: var(--dark-text-disabled);
+
+    &.active {
+      background-color: var(--dark-bg-light);
+      border-color: get-color(black-coral-2);
+      color: get-color(sapphire-blue-4);
+    }
+
+    &:hover {
+      background-color: var(--dark-bg-highlight);
     }
   }
 
