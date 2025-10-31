@@ -55,11 +55,11 @@ interface DateTimeBuilderProps {
 const DateTimeBuilder: FC<DateTimeBuilderProps> = ({ border, popupBodyCss }) => {
   const { t } = useTranslation();
   const [base, setBase] = useState<Base>('now');
-  const [addDays, setAddDays] = useState<string>('0');
-  const [addMonths, setAddMonths] = useState<string>('0');
-  const [addYears, setAddYears] = useState<string>('0');
+  const [days, setDays] = useState<string>('0');
+  const [months, setMonths] = useState<string>('0');
+  const [years, setYears] = useState<string>('0');
   const [isTimePrecisionEnabled, setIsTimePrecisionEnabled] = useState<boolean>(false);
-  const [timeFormat, setTimeFormat] = useState<string>('21:00:00.000');
+  const [time, setTime] = useState<string>('21:00:00.000');
 
   const baseOptions = getBaseOptions();
 
@@ -68,9 +68,9 @@ const DateTimeBuilder: FC<DateTimeBuilderProps> = ({ border, popupBodyCss }) => 
     const dateInit = baseOptionsConfig.find((option) => option.value === base)?.dateInit || 'new Date()';
 
     // Parse offsets
-    const daysNum = parseInt(addDays) || 0;
-    const monthsNum = parseInt(addMonths) || 0;
-    const yearsNum = parseInt(addYears) || 0;
+    const daysNum = parseInt(days) || 0;
+    const monthsNum = parseInt(months) || 0;
+    const yearsNum = parseInt(years) || 0;
 
     // Build operations using IIFE to avoid nested new Date() calls
     const operations: string[] = [];
@@ -85,8 +85,8 @@ const DateTimeBuilder: FC<DateTimeBuilderProps> = ({ border, popupBodyCss }) => 
     if (yearsNum !== 0) {
       operations.push(`d.setFullYear(d.getFullYear() + ${yearsNum})`);
     }
-    if (isTimePrecisionEnabled && timeFormat) {
-      const timeParts = timeFormat.split(':');
+    if (isTimePrecisionEnabled && time) {
+      const timeParts = time.split(':');
       if (timeParts.length >= 2) {
         const hours = timeParts[0] || '0';
         const minutes = timeParts[1] || '0';
@@ -103,7 +103,7 @@ const DateTimeBuilder: FC<DateTimeBuilderProps> = ({ border, popupBodyCss }) => 
 
     const opsString = operations.join('; ');
     return `(function() { const d = ${dateInit}; ${opsString}; return d.toISOString(); })()`;
-  }, [base, addDays, addMonths, addYears, isTimePrecisionEnabled, timeFormat]);
+  }, [base, days, months, years, isTimePrecisionEnabled, time]);
 
   const dragData: Assign = useMemo(
     () => ({
@@ -153,24 +153,24 @@ const DateTimeBuilder: FC<DateTimeBuilderProps> = ({ border, popupBodyCss }) => 
           <Track direction="vertical" align="stretch" gap={8}>
             <FormInput
               label={String(t('serviceFlow.previousVariables.dates.days'))}
-              name="addDays"
+              name="days"
               type="number"
-              value={addDays}
-              onChange={(e) => setAddDays(e.target.value)}
+              value={days}
+              onChange={(e) => setDays(e.target.value)}
             />
             <FormInput
               label={String(t('serviceFlow.previousVariables.dates.months'))}
-              name="addMonths"
+              name="months"
               type="number"
-              value={addMonths}
-              onChange={(e) => setAddMonths(e.target.value)}
+              value={months}
+              onChange={(e) => setMonths(e.target.value)}
             />
             <FormInput
               label={String(t('serviceFlow.previousVariables.dates.years'))}
-              name="addYears"
+              name="years"
               type="number"
-              value={addYears}
-              onChange={(e) => setAddYears(e.target.value)}
+              value={years}
+              onChange={(e) => setYears(e.target.value)}
             />
           </Track>
         </Track>
@@ -195,8 +195,8 @@ const DateTimeBuilder: FC<DateTimeBuilderProps> = ({ border, popupBodyCss }) => 
               label={String(t('serviceFlow.previousVariables.dates.time'))}
               name="timeFormat"
               type="text"
-              value={timeFormat}
-              onChange={(e) => setTimeFormat(e.target.value)}
+              value={time}
+              onChange={(e) => setTime(e.target.value)}
               placeholder="HH:mm:ss.SSS"
             />
           )}
