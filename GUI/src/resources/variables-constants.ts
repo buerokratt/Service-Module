@@ -1,5 +1,5 @@
 import { Assign } from 'types';
-import { DATE_CONSTANTS, HELPERS_CONSTANTS } from 'utils/constants';
+import { HELPERS_CONSTANTS } from 'utils/constants';
 import { stringToTemplate } from 'utils/string-util';
 import { v4 } from 'uuid';
 
@@ -16,20 +16,7 @@ const createTemplate = (
   tooltip,
 });
 
-const datesTrPath = 'serviceFlow.previousVariables.dateAndTime';
 const helpersTrPath = 'serviceFlow.previousVariables.helpers';
-
-export const datesVariables: Assign[] = [
-  createTemplate(v4(), `${datesTrPath}.currentDate`, DATE_CONSTANTS.TODAY),
-  createTemplate(v4(), `${datesTrPath}.currentTime`, DATE_CONSTANTS.CURRENT_TIME),
-  createTemplate(v4(), `${datesTrPath}.currentDateAndTime`, DATE_CONSTANTS.NOW),
-  createTemplate(v4(), `${datesTrPath}.yesterday`, DATE_CONSTANTS.YESTERDAY),
-  createTemplate(v4(), `${datesTrPath}.tomorrow`, DATE_CONSTANTS.TOMORROW),
-  createTemplate(v4(), `${datesTrPath}.customDateTime`, DATE_CONSTANTS.CUSTOM),
-  createTemplate(v4(), `${datesTrPath}.yearMonthDayFormat`, DATE_CONSTANTS.TODAY),
-  createTemplate(v4(), `${datesTrPath}.dayMonthYearFormat`, DATE_CONSTANTS.DMY),
-  createTemplate(v4(), `${datesTrPath}.customFormat`, DATE_CONSTANTS.CUSTOM_FORMAT),
-];
 
 export const helperVariables: Assign[] = [
   createTemplate(v4(), `${helpersTrPath}.map`, HELPERS_CONSTANTS.MAP),

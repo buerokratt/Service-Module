@@ -2,7 +2,7 @@ import { Edge, Node } from '@xyflow/react';
 import OutputElementBox from 'components/OutputElementBox';
 import React, { CSSProperties, FC, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { datesVariables, environmentVariables, helperVariables } from 'resources/variables-constants';
+import { environmentVariables, helperVariables } from 'resources/variables-constants';
 import { StepType } from 'types';
 import { EndpointResponseVariable } from 'types/endpoint/endpoint-response-variables';
 import { NodeDataProps } from 'types/service-flow';
@@ -137,16 +137,6 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
       <VariableSection
         title={t('serviceFlow.previousVariables.environmentVariables.title')}
         variables={[...environmentVariables]}
-        assignedObjectTree={assignedObjectTree}
-        setAssignedObjectTree={setAssignedObjectTree}
-        popupBodyCss={popupBodyCss}
-        border={border}
-      />
-      {/* todo remove later */}
-      {/* todo also remove all realted code */}
-      <VariableSection
-        title={t('serviceFlow.previousVariables.dateAndTime.title')}
-        variables={[...datesVariables]}
         assignedObjectTree={assignedObjectTree}
         setAssignedObjectTree={setAssignedObjectTree}
         popupBodyCss={popupBodyCss}

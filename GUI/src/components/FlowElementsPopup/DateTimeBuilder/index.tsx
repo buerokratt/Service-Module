@@ -150,7 +150,7 @@ const DateTimeBuilder: FC<DateTimeBuilderProps> = ({ border, popupBodyCss }) => 
         </Track>
 
         <Track direction="vertical" align="stretch" style={{ flex: '0 0 50%', maxWidth: '50%' }}>
-          {/* todo Right side for future options */}
+          {/* todo Right side for Format Control */}
         </Track>
       </Track>
     </Track>
