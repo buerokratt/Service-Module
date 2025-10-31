@@ -375,7 +375,7 @@
         "addYears": "Years",
         "timePrecision": "Time precision",
         "setTime": "Set time",
-        "timeFormat": "Time format (HH:mm:ss.SSSZ)"
+        "timeFormat": "Time"
       },
       "noName": "<No name>",
       "environmentVariables": {

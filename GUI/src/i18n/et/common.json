@@ -379,7 +379,7 @@
         "addYears": "Aastad",
         "timePrecision": "Aja täpsus",
         "setTime": "Määra aeg",
-        "timeFormat": "Aja vorming (HH:mm:ss.SSSZ)"
+        "timeFormat": "Aeg"
       },
       "helpers": {
         "title": "Tööriistad",

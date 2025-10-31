@@ -97,9 +97,13 @@ const DateTimeBuilder: FC<DateTimeBuilderProps> = ({ border }) => {
         </Track>
 
         <Track direction="vertical" align="stretch" gap={8}>
+          <label style={{ fontSize: '14px', fontWeight: 500 }}>
+            {t('serviceFlow.previousVariables.dates.timePrecision')}
+          </label>
           <FormCheckbox
-            label={String(t('serviceFlow.previousVariables.dates.timePrecision'))}
+            label=""
             name="timePrecision"
+            hideLabel
             item={{
               label: String(t('serviceFlow.previousVariables.dates.setTime')),
               value: 'setTime',
