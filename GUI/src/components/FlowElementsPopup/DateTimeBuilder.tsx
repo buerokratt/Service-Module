@@ -7,11 +7,12 @@ import { useTranslation } from 'react-i18next';
 
 interface DateTimeBuilderProps {
   border: string;
+  popupBodyCss: CSSProperties;
 }
 
 type Base = 'startOfDay' | 'startOfMonth' | 'startOfYear' | 'endOfDay' | 'endOfMonth' | 'endOfYear' | 'now';
 
-const DateTimeBuilder: FC<DateTimeBuilderProps> = ({ border }) => {
+const DateTimeBuilder: FC<DateTimeBuilderProps> = ({ border, popupBodyCss }) => {
   const { t } = useTranslation();
   const [base, setBase] = useState<Base>('now');
   const [addDays, setAddDays] = useState<string>('0');
@@ -19,12 +20,6 @@ const DateTimeBuilder: FC<DateTimeBuilderProps> = ({ border }) => {
   const [addYears, setAddYears] = useState<string>('0');
   const [isTimePrecisionEnabled, setIsTimePrecisionEnabled] = useState<boolean>(false);
   const [timeFormat, setTimeFormat] = useState<string>('00:00:00.000');
-
-  const popupBodyCss: CSSProperties = {
-    padding: 16,
-    backgroundColor: '#F9F9F9',
-    width: '100%',
-  };
 
   const baseOptions = [
     { label: String(t('serviceFlow.previousVariables.dates.now')), value: 'now' },

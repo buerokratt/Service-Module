@@ -142,7 +142,7 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
         popupBodyCss={popupBodyCss}
         border={border}
       />
-      <DateTimeBuilder border={border} />
+      <DateTimeBuilder border={border} popupBodyCss={popupBodyCss} />
       <VariableSection
         title={t('serviceFlow.previousVariables.helpers.title')}
         variables={[...helperVariablesWithTooltips]}
