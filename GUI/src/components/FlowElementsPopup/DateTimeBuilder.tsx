@@ -41,10 +41,6 @@ const baseOptionsConfig: Array<{ value: Base; dateInit: string }> = [
   },
 ];
 
-const baseDateInitMap: Record<Base, string> = Object.fromEntries(
-  baseOptionsConfig.map((opt) => [opt.value, opt.dateInit]),
-) as Record<Base, string>;
-
 const getBaseOptions = (): { label: string; value: Base }[] =>
   baseOptionsConfig.map((option) => ({
     label: String(t(`serviceFlow.previousVariables.dates.${option.value}`)),
@@ -68,8 +64,8 @@ const DateTimeBuilder: FC<DateTimeBuilderProps> = ({ border, popupBodyCss }) => 
   const baseOptions = getBaseOptions();
 
   const dateCode = useMemo(() => {
-    // Get base date initialization from map
-    const dateInit = baseDateInitMap[base];
+    // Get base date initialization from config
+    const dateInit = baseOptionsConfig.find((option) => option.value === base)?.dateInit || 'new Date()';
 
     // Parse offsets
     const daysNum = parseInt(addDays) || 0;
