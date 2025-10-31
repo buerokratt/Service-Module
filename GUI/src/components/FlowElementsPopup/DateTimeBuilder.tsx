@@ -20,7 +20,6 @@ const DateTimeBuilder: FC<DateTimeBuilderProps> = ({ border }) => {
   const [isTimePrecisionEnabled, setIsTimePrecisionEnabled] = useState<boolean>(false);
   const [timeFormat, setTimeFormat] = useState<string>('00:00:00.000Z');
 
-  // todo maybe move elsewhere
   const popupBodyCss: CSSProperties = {
     padding: 16,
     backgroundColor: '#F9F9F9',
@@ -50,29 +49,35 @@ const DateTimeBuilder: FC<DateTimeBuilderProps> = ({ border }) => {
         {t('serviceFlow.previousVariables.dates.title')}
       </label>
 
-      <Track direction="vertical" align="left" gap={16}>
-        <FormSelect
-          label={t('serviceFlow.previousVariables.dates.baseAnchor')}
-          name="baseAnchor"
-          options={baseAnchorOptions}
-          defaultValue={baseAnchor}
-          onSelectionChange={(selection) => {
-            if (selection) {
-              setBaseAnchor(selection.value as BaseAnchorType);
-            }
-          }}
-        />
+      <Track direction="vertical" align="stretch" gap={16}>
+        <Track direction="vertical" align="stretch" gap={8}>
+          <label style={{ fontSize: '14px', fontWeight: 500 }}>
+            {t('serviceFlow.previousVariables.dates.baseAnchor')}
+          </label>
+          <FormSelect
+            label=""
+            name="baseAnchor"
+            hideLabel
+            options={baseAnchorOptions}
+            defaultValue={baseAnchor}
+            style={{ fontSize: '14px' }}
+            onSelectionChange={(selection) => {
+              if (selection) {
+                setBaseAnchor(selection.value as BaseAnchorType);
+              }
+            }}
+          />
+        </Track>
 
-        <Track direction="vertical" align="left" gap={8}>
+        <Track direction="vertical" align="stretch" gap={8}>
           <label style={{ fontSize: '14px', fontWeight: 500 }}>{t('serviceFlow.previousVariables.dates.offset')}</label>
-          <Track direction="horizontal" gap={8} align="left">
+          <Track direction="vertical" align="stretch" gap={8}>
             <FormInput
               label={String(t('serviceFlow.previousVariables.dates.addDays'))}
               name="addDays"
               type="number"
               value={addDays}
               onChange={(e) => setAddDays(e.target.value)}
-              style={{ width: '120px' }}
             />
             <FormInput
               label={String(t('serviceFlow.previousVariables.dates.addMonths'))}
@@ -80,7 +85,6 @@ const DateTimeBuilder: FC<DateTimeBuilderProps> = ({ border }) => {
               type="number"
               value={addMonths}
               onChange={(e) => setAddMonths(e.target.value)}
-              style={{ width: '120px' }}
             />
             <FormInput
               label={String(t('serviceFlow.previousVariables.dates.addYears'))}
@@ -88,12 +92,11 @@ const DateTimeBuilder: FC<DateTimeBuilderProps> = ({ border }) => {
               type="number"
               value={addYears}
               onChange={(e) => setAddYears(e.target.value)}
-              style={{ width: '120px' }}
             />
           </Track>
         </Track>
 
-        <Track direction="vertical" align="left" gap={8}>
+        <Track direction="vertical" align="stretch" gap={8}>
           <FormCheckbox
             label={String(t('serviceFlow.previousVariables.dates.timePrecision'))}
             name="timePrecision"
