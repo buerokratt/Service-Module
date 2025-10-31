@@ -9,11 +9,11 @@ interface DateTimeBuilderProps {
   border: string;
 }
 
-type BaseAnchorType = 'startOfDay' | 'startOfMonth' | 'startOfYear' | 'endOfDay' | 'endOfMonth' | 'endOfYear' | 'now';
+type Base = 'startOfDay' | 'startOfMonth' | 'startOfYear' | 'endOfDay' | 'endOfMonth' | 'endOfYear' | 'now';
 
 const DateTimeBuilder: FC<DateTimeBuilderProps> = ({ border }) => {
   const { t } = useTranslation();
-  const [baseAnchor, setBaseAnchor] = useState<BaseAnchorType>('now');
+  const [base, setBase] = useState<Base>('now');
   const [addDays, setAddDays] = useState<string>('0');
   const [addMonths, setAddMonths] = useState<string>('0');
   const [addYears, setAddYears] = useState<string>('0');
@@ -26,14 +26,14 @@ const DateTimeBuilder: FC<DateTimeBuilderProps> = ({ border }) => {
     width: '100%',
   };
 
-  const baseAnchorOptions = [
+  const baseOptions = [
+    { label: String(t('serviceFlow.previousVariables.dates.now')), value: 'now' },
     { label: String(t('serviceFlow.previousVariables.dates.startOfDay')), value: 'startOfDay' },
     { label: String(t('serviceFlow.previousVariables.dates.startOfMonth')), value: 'startOfMonth' },
     { label: String(t('serviceFlow.previousVariables.dates.startOfYear')), value: 'startOfYear' },
     { label: String(t('serviceFlow.previousVariables.dates.endOfDay')), value: 'endOfDay' },
     { label: String(t('serviceFlow.previousVariables.dates.endOfMonth')), value: 'endOfMonth' },
     { label: String(t('serviceFlow.previousVariables.dates.endOfYear')), value: 'endOfYear' },
-    { label: String(t('serviceFlow.previousVariables.dates.now')), value: 'now' },
   ];
 
   return (
@@ -51,19 +51,17 @@ const DateTimeBuilder: FC<DateTimeBuilderProps> = ({ border }) => {
 
       <Track direction="vertical" align="stretch" gap={16}>
         <Track direction="vertical" align="stretch" gap={8}>
-          <label style={{ fontSize: '14px', fontWeight: 500 }}>
-            {t('serviceFlow.previousVariables.dates.baseAnchor')}
-          </label>
+          <label style={{ fontSize: '14px', fontWeight: 500 }}>{t('serviceFlow.previousVariables.dates.base')}</label>
           <FormSelect
             label=""
-            name="baseAnchor"
+            name="base"
             hideLabel
-            options={baseAnchorOptions}
-            defaultValue={baseAnchor}
+            options={baseOptions}
+            defaultValue={base}
             style={{ fontSize: '14px' }}
             onSelectionChange={(selection) => {
               if (selection) {
-                setBaseAnchor(selection.value as BaseAnchorType);
+                setBase(selection.value as Base);
               }
             }}
           />

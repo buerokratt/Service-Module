@@ -360,7 +360,7 @@
         "yearMonthDayFormat": "Year Month Day format",
         "dayMonthYearFormat": "Day Month Year format",
         "customFormat": "Custom format",
-        "baseAnchor": "Base",
+        "base": "Base",
         "startOfDay": "Start of day",
         "startOfMonth": "Start of month",
         "startOfYear": "Start of year",

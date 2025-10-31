@@ -364,7 +364,7 @@
         "yearMonthDayFormat": "Aasta Kuu Päeva formaat",
         "dayMonthYearFormat": "Päev Kuu Aasta formaat",
         "customFormat": "Kohandatud vorming",
-        "baseAnchor": "Põhi",
+        "base": "Põhi",
         "startOfDay": "Päeva algus",
         "startOfMonth": "Kuu algus",
         "startOfYear": "Aasta algus",
