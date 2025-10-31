@@ -2,6 +2,7 @@ import { Edge, Node, ReactFlowState, useReactFlow, useStore } from '@xyflow/reac
 import { stratify, tree } from 'd3-hierarchy';
 import { timer } from 'd3-timer';
 import { useCallback, useEffect, useRef } from 'react';
+import useServiceStore from 'store/services.store';
 import { StepType } from 'types';
 
 const layout = tree<Node>()
@@ -106,7 +107,8 @@ function useLayout() {
   const nodeCount = useStore(nodeCountSelector);
   const edgeCount = useStore(edgeCountSelector);
   const { getNodes, getNode, setNodes, setEdges, getEdges, fitView } = useReactFlow();
-
+  const autoView = useServiceStore((state) => state.autoView);
+  
   const runLayout = useCallback(() => {
     const nodes = getNodes();
     const edges = getEdges();
@@ -151,7 +153,7 @@ function useLayout() {
 
         t.stop();
 
-        if (!initial.current) {
+        if (!initial.current && autoView) {
           fitView({ duration: 200, padding: 3 });
         }
         initial.current = false;
@@ -161,7 +163,7 @@ function useLayout() {
     return () => {
       t.stop();
     };
-  }, [getEdges, getNodes, getNode, setNodes, fitView, setEdges]);
+  }, [getEdges, getNodes, getNode, setNodes, fitView, setEdges, autoView]);
 
   useEffect(() => {
     runLayout();

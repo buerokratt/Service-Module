@@ -399,6 +399,7 @@
     "allElements": "Üldelemendid",
     "serviceInfo": "Teenuse teave",
     "parseError": "Teenuse genereerimine ebaõnnestus! Fail ei ole kas JSON, seda on muudetud või see on vigane",
+    "autoFocus": "Automaatvaade: SEES/VÄLJAS",
     "apiElements": {
       "title": "API elemendid",
       "delete": "Kustuta",

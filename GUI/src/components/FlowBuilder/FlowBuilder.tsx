@@ -1,5 +1,5 @@
 import { Background, Controls, Edge, MiniMap, Node, Panel, ReactFlow, useReactFlow } from '@xyflow/react';
-import { Button, Modal, Track } from 'components';
+import { Button, Icon, Modal, Switch, Tooltip, Track } from 'components';
 import Chat from 'components/chat/chat';
 import edgeTypes from 'components/Flow/EdgeTypes';
 import nodeTypes from 'components/Flow/NodeTypes';
@@ -8,9 +8,11 @@ import { useOnNodesDelete } from 'hooks/flow/useOnNodeDelete';
 import { FC, useCallback } from 'react';
 import '@xyflow/react/dist/style.css';
 import { useTranslation } from 'react-i18next';
-import useServiceStore from 'store/new-services.store';
+import useNewServiceStore from 'store/new-services.store';
+import useServiceStore from 'store/services.store';
 import { StepType } from 'types';
 import ImportExportControls from 'components/Flow/Controls/ImportExportControls';
+import { MdCenterFocusStrong, MdOutlineCenterFocusStrong } from 'react-icons/md';
 
 type FlowBuilderProps = {
   nodes: Node[];
@@ -20,7 +22,7 @@ type FlowBuilderProps = {
 const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
   useLayout();
   const { getNodes, getEdges, setNodes, setEdges, getNode } = useReactFlow();
-  const setReactFlowInstance = useServiceStore((state) => state.setReactFlowInstance);
+  const setReactFlowInstance = useNewServiceStore((state) => state.setReactFlowInstance);
   const { t } = useTranslation();
   const {
     onNodesDelete,
@@ -33,7 +35,9 @@ const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
     setDeletedNodes,
     setNodeToDelete,
   } = useOnNodesDelete();
-  const { setHasUnsavedChanges } = useServiceStore();
+  const { setHasUnsavedChanges } = useNewServiceStore();
+  const autoView = useServiceStore((state) => state.autoView);
+  const toggleAutoView = useServiceStore((state) => state.toggleAutoView);
 
   const onConnect = useCallback(
     ({ source, target }: any) => {
@@ -111,8 +115,8 @@ const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
       <ReactFlow
         nodes={nodes}
         edges={edges}
-        onNodesChange={useServiceStore.getState().onNodesChange}
-        onEdgesChange={useServiceStore.getState().onEdgesChange}
+        onNodesChange={useNewServiceStore.getState().onNodesChange}
+        onEdgesChange={useNewServiceStore.getState().onEdgesChange}
         snapToGrid
         proOptions={{ hideAttribution: true }}
         panOnScroll
@@ -120,7 +124,7 @@ const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
         edgeTypes={edgeTypes}
         onInit={(instance) => {
           setReactFlowInstance(instance);
-          useServiceStore.getState().loadEndpointsResponseVariables();
+          useNewServiceStore.getState().loadEndpointsResponseVariables();
         }}
         nodesDraggable={false}
         onConnect={onConnect}
@@ -141,9 +145,23 @@ const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
         <Chat />
         <MiniMap />
         <Background color="#D2D3D8" gap={16} lineWidth={9} />
-        <Controls orientation="horizontal" showInteractive={false} />
         <Panel position="top-left">
           <ImportExportControls />
+        </Panel>
+        <Panel position="bottom-left">
+          <Track gap={10} direction="horizontal" align="center" style={{ paddingLeft: '110px', paddingBottom: '7px' }}>
+            <Controls orientation="horizontal" showInteractive={false} style={{ marginBottom: '12px' }} />
+            <Tooltip content={t('serviceFlow.autoFocus')}>
+              <span>
+                <Switch
+                  checked={autoView}
+                  onCheckedChange={toggleAutoView}
+                  onLabel={<Icon icon={<MdCenterFocusStrong fontSize={30} />} size="medium" />}
+                  offLabel={<Icon icon={<MdOutlineCenterFocusStrong fontSize={30} />} size="medium" />}
+                />
+              </span>
+            </Tooltip>
+          </Track>
         </Panel>
       </ReactFlow>
       {isDeleteConnectionsModalVisible && (
