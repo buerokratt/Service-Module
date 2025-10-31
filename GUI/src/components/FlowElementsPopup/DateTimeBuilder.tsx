@@ -3,6 +3,7 @@ import FormInput from 'components/FormElements/FormInput';
 import FormSelect from 'components/FormElements/FormSelect';
 import OutputElementBox from 'components/OutputElementBox';
 import Track from 'components/Track';
+import { t } from 'i18next';
 import { CSSProperties, FC, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Assign } from 'types';
@@ -22,6 +23,16 @@ const baseDateInitMap: Record<Base, string> = {
   endOfYear: 'new Date(new Date(new Date().getFullYear(), 11, 31).setHours(23, 59, 59, 999))',
 };
 
+const getBaseOptions = (): { label: string; value: Base }[] => [
+  { label: String(t('serviceFlow.previousVariables.dates.now')), value: 'now' },
+  { label: String(t('serviceFlow.previousVariables.dates.startOfDay')), value: 'startOfDay' },
+  { label: String(t('serviceFlow.previousVariables.dates.startOfMonth')), value: 'startOfMonth' },
+  { label: String(t('serviceFlow.previousVariables.dates.startOfYear')), value: 'startOfYear' },
+  { label: String(t('serviceFlow.previousVariables.dates.endOfDay')), value: 'endOfDay' },
+  { label: String(t('serviceFlow.previousVariables.dates.endOfMonth')), value: 'endOfMonth' },
+  { label: String(t('serviceFlow.previousVariables.dates.endOfYear')), value: 'endOfYear' },
+];
+
 interface DateTimeBuilderProps {
   border: string;
   popupBodyCss: CSSProperties;
@@ -36,15 +47,7 @@ const DateTimeBuilder: FC<DateTimeBuilderProps> = ({ border, popupBodyCss }) => 
   const [isTimePrecisionEnabled, setIsTimePrecisionEnabled] = useState<boolean>(false);
   const [timeFormat, setTimeFormat] = useState<string>('21:00:00.000');
 
-  const baseOptions: { label: string; value: Base }[] = [
-    { label: String(t('serviceFlow.previousVariables.dates.now')), value: 'now' },
-    { label: String(t('serviceFlow.previousVariables.dates.startOfDay')), value: 'startOfDay' },
-    { label: String(t('serviceFlow.previousVariables.dates.startOfMonth')), value: 'startOfMonth' },
-    { label: String(t('serviceFlow.previousVariables.dates.startOfYear')), value: 'startOfYear' },
-    { label: String(t('serviceFlow.previousVariables.dates.endOfDay')), value: 'endOfDay' },
-    { label: String(t('serviceFlow.previousVariables.dates.endOfMonth')), value: 'endOfMonth' },
-    { label: String(t('serviceFlow.previousVariables.dates.endOfYear')), value: 'endOfYear' },
-  ];
+  const baseOptions = getBaseOptions();
 
   const dateCode = useMemo(() => {
     // Get base date initialization from map
