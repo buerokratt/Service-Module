@@ -11,37 +11,37 @@ import { getTypeColor } from 'utils/object-util';
 import { stringToTemplate } from 'utils/string-util';
 import { v4 } from 'uuid';
 
-type Base = 'startOfDay' | 'startOfMonth' | 'startOfYear' | 'endOfDay' | 'endOfMonth' | 'endOfYear' | 'now';
+type BaseAnchor = 'startOfDay' | 'startOfMonth' | 'startOfYear' | 'endOfDay' | 'endOfMonth' | 'endOfYear' | 'now';
 
-const baseOptionsConfig: Array<{ value: Base; dateInit: string }> = [
-  { value: 'now', dateInit: 'new Date()' },
+const baseOptionsConfig: Array<{ value: BaseAnchor; baseDate: string }> = [
+  { value: 'now', baseDate: 'new Date()' },
   {
     value: 'startOfDay',
-    dateInit: 'new Date(new Date().setHours(0, 0, 0, 0))',
+    baseDate: 'new Date(new Date().setHours(0, 0, 0, 0))',
   },
   {
     value: 'startOfMonth',
-    dateInit: 'new Date(new Date(new Date().setDate(1)).setHours(0, 0, 0, 0))',
+    baseDate: 'new Date(new Date(new Date().setDate(1)).setHours(0, 0, 0, 0))',
   },
   {
     value: 'startOfYear',
-    dateInit: 'new Date(new Date(new Date().setMonth(0, 1)).setHours(0, 0, 0, 0))',
+    baseDate: 'new Date(new Date(new Date().setMonth(0, 1)).setHours(0, 0, 0, 0))',
   },
   {
     value: 'endOfDay',
-    dateInit: 'new Date(new Date().setHours(23, 59, 59, 999))',
+    baseDate: 'new Date(new Date().setHours(23, 59, 59, 999))',
   },
   {
     value: 'endOfMonth',
-    dateInit: 'new Date(new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).setHours(23, 59, 59, 999))',
+    baseDate: 'new Date(new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).setHours(23, 59, 59, 999))',
   },
   {
     value: 'endOfYear',
-    dateInit: 'new Date(new Date(new Date().getFullYear(), 11, 31).setHours(23, 59, 59, 999))',
+    baseDate: 'new Date(new Date(new Date().getFullYear(), 11, 31).setHours(23, 59, 59, 999))',
   },
 ];
 
-const getBaseOptions = (): { label: string; value: Base }[] =>
+const getBaseOptions = (): { label: string; value: BaseAnchor }[] =>
   baseOptionsConfig.map((option) => ({
     label: String(t(`serviceFlow.previousVariables.dates.${option.value}`)),
     value: option.value,
@@ -54,18 +54,16 @@ interface DateTimeBuilderProps {
 
 const DateTimeBuilder: FC<DateTimeBuilderProps> = ({ border, popupBodyCss }) => {
   const { t } = useTranslation();
-  const [base, setBase] = useState<Base>('now');
+  const [base, setBase] = useState<BaseAnchor>('now');
   const [days, setDays] = useState<string>('0');
   const [months, setMonths] = useState<string>('0');
   const [years, setYears] = useState<string>('0');
   const [isTimePrecisionEnabled, setIsTimePrecisionEnabled] = useState<boolean>(false);
   const [time, setTime] = useState<string>('21:00:00.000');
 
-  const baseOptions = getBaseOptions();
-
   const dateCode = useMemo(() => {
     // Get base date initialization from config
-    const dateInit = baseOptionsConfig.find((option) => option.value === base)?.dateInit || 'new Date()';
+    const baseDate = baseOptionsConfig.find((option) => option.value === base)?.baseDate || 'new Date()';
 
     // Parse offsets
     const daysNum = parseInt(days) || 0;
@@ -98,11 +96,11 @@ const DateTimeBuilder: FC<DateTimeBuilderProps> = ({ border, popupBodyCss }) => 
 
     // Build IIFE expression
     if (operations.length === 0) {
-      return `${dateInit}.toISOString()`;
+      return `${baseDate}.toISOString()`;
     }
 
     const opsString = operations.join('; ');
-    return `(function() { const d = ${dateInit}; ${opsString}; return d.toISOString(); })()`;
+    return `(function() { const d = ${baseDate}; ${opsString}; return d.toISOString(); })()`;
   }, [base, days, months, years, isTimePrecisionEnabled, time]);
 
   const dragData: Assign = useMemo(
@@ -137,12 +135,12 @@ const DateTimeBuilder: FC<DateTimeBuilderProps> = ({ border, popupBodyCss }) => 
             label=""
             name="base"
             hideLabel
-            options={baseOptions}
+            options={getBaseOptions()}
             defaultValue={base}
             style={{ fontSize: '14px' }}
             onSelectionChange={(selection) => {
               if (selection) {
-                setBase(selection.value as Base);
+                setBase(selection.value as BaseAnchor);
               }
             }}
           />
