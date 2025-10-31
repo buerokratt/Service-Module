@@ -51,8 +51,8 @@ const DateTimeBuilder: FC<DateTimeBuilderProps> = ({ border, popupBodyCss }) => 
         {t('serviceFlow.previousVariables.dates.title')}
       </label>
 
-      <Track direction="vertical" align="stretch" gap={16}>
-        <Track direction="vertical" align="stretch" gap={8}>
+      <Track direction="horizontal" align="stretch" gap={16} style={{ width: '100%' }}>
+        <Track direction="vertical" align="stretch" gap={16} style={{ flex: '0 0 50%', maxWidth: '50%' }}>
           <label style={{ fontSize: '14px', fontWeight: 500 }}>{t('serviceFlow.previousVariables.dates.base')}</label>
           <FormSelect
             label=""
@@ -60,16 +60,14 @@ const DateTimeBuilder: FC<DateTimeBuilderProps> = ({ border, popupBodyCss }) => 
             hideLabel
             options={getBaseOptions()}
             defaultValue={base}
-            style={{ fontSize: '14px' }}
+            style={{ fontSize: '14px', width: '100%', maxWidth: '100%' }}
             onSelectionChange={(selection) => {
               if (selection) {
                 setBase(selection.value as BaseDate);
               }
             }}
           />
-        </Track>
 
-        <Track direction="vertical" align="stretch" gap={8}>
           <label style={{ fontSize: '14px', fontWeight: 500 }}>{t('serviceFlow.previousVariables.dates.offset')}</label>
           <Track direction="vertical" align="stretch" gap={8}>
             <FormInput
@@ -78,6 +76,7 @@ const DateTimeBuilder: FC<DateTimeBuilderProps> = ({ border, popupBodyCss }) => 
               type="number"
               value={days}
               onChange={(e) => setDays(e.target.value)}
+              style={{ width: '100%', maxWidth: '100%' }}
             />
             <FormInput
               label={String(t('serviceFlow.previousVariables.dates.months'))}
@@ -85,6 +84,7 @@ const DateTimeBuilder: FC<DateTimeBuilderProps> = ({ border, popupBodyCss }) => 
               type="number"
               value={months}
               onChange={(e) => setMonths(e.target.value)}
+              style={{ width: '100%', maxWidth: '100%' }}
             />
             <FormInput
               label={String(t('serviceFlow.previousVariables.dates.years'))}
@@ -92,11 +92,10 @@ const DateTimeBuilder: FC<DateTimeBuilderProps> = ({ border, popupBodyCss }) => 
               type="number"
               value={years}
               onChange={(e) => setYears(e.target.value)}
+              style={{ width: '100%', maxWidth: '100%' }}
             />
           </Track>
-        </Track>
 
-        <Track direction="vertical" align="stretch" gap={8}>
           <label style={{ fontSize: '14px', fontWeight: 500 }}>
             {t('serviceFlow.previousVariables.dates.timePrecision')}
           </label>
@@ -119,15 +118,22 @@ const DateTimeBuilder: FC<DateTimeBuilderProps> = ({ border, popupBodyCss }) => 
               value={time}
               onChange={(e) => setTime(e.target.value)}
               placeholder="HH:mm:ss.SSS"
+              style={{ width: '100%', maxWidth: '100%' }}
             />
           )}
-        </Track>
 
-        <Track direction="vertical" align="stretch" gap={8}>
           <label style={{ fontSize: '14px', fontWeight: 500 }}>Output</label>
-          <OutputElementBox dragData={dragData} borderColor={getTypeColor(dateCode).color} style={{ cursor: 'grab' }}>
+          <OutputElementBox
+            dragData={dragData}
+            borderColor={getTypeColor(dateCode).color}
+            style={{ cursor: 'grab', width: 'fit-content', maxWidth: '100%' }}
+          >
             {t('serviceFlow.previousVariables.dates.title')}
           </OutputElementBox>
+        </Track>
+
+        <Track direction="vertical" align="stretch" style={{ flex: '0 0 50%', maxWidth: '50%' }}>
+          {/* Right side for future options */}
         </Track>
       </Track>
     </Track>
