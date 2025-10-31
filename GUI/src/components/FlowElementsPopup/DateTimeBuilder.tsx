@@ -13,25 +13,43 @@ import { v4 } from 'uuid';
 
 type Base = 'startOfDay' | 'startOfMonth' | 'startOfYear' | 'endOfDay' | 'endOfMonth' | 'endOfYear' | 'now';
 
-const baseDateInitMap: Record<Base, string> = {
-  now: 'new Date()',
-  startOfDay: 'new Date(new Date().setHours(0, 0, 0, 0))',
-  startOfMonth: 'new Date(new Date(new Date().setDate(1)).setHours(0, 0, 0, 0))',
-  startOfYear: 'new Date(new Date(new Date().setMonth(0, 1)).setHours(0, 0, 0, 0))',
-  endOfDay: 'new Date(new Date().setHours(23, 59, 59, 999))',
-  endOfMonth: 'new Date(new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).setHours(23, 59, 59, 999))',
-  endOfYear: 'new Date(new Date(new Date().getFullYear(), 11, 31).setHours(23, 59, 59, 999))',
-};
-
-const getBaseOptions = (): { label: string; value: Base }[] => [
-  { label: String(t('serviceFlow.previousVariables.dates.now')), value: 'now' },
-  { label: String(t('serviceFlow.previousVariables.dates.startOfDay')), value: 'startOfDay' },
-  { label: String(t('serviceFlow.previousVariables.dates.startOfMonth')), value: 'startOfMonth' },
-  { label: String(t('serviceFlow.previousVariables.dates.startOfYear')), value: 'startOfYear' },
-  { label: String(t('serviceFlow.previousVariables.dates.endOfDay')), value: 'endOfDay' },
-  { label: String(t('serviceFlow.previousVariables.dates.endOfMonth')), value: 'endOfMonth' },
-  { label: String(t('serviceFlow.previousVariables.dates.endOfYear')), value: 'endOfYear' },
+const baseOptionsConfig: Array<{ value: Base; dateInit: string }> = [
+  { value: 'now', dateInit: 'new Date()' },
+  {
+    value: 'startOfDay',
+    dateInit: 'new Date(new Date().setHours(0, 0, 0, 0))',
+  },
+  {
+    value: 'startOfMonth',
+    dateInit: 'new Date(new Date(new Date().setDate(1)).setHours(0, 0, 0, 0))',
+  },
+  {
+    value: 'startOfYear',
+    dateInit: 'new Date(new Date(new Date().setMonth(0, 1)).setHours(0, 0, 0, 0))',
+  },
+  {
+    value: 'endOfDay',
+    dateInit: 'new Date(new Date().setHours(23, 59, 59, 999))',
+  },
+  {
+    value: 'endOfMonth',
+    dateInit: 'new Date(new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).setHours(23, 59, 59, 999))',
+  },
+  {
+    value: 'endOfYear',
+    dateInit: 'new Date(new Date(new Date().getFullYear(), 11, 31).setHours(23, 59, 59, 999))',
+  },
 ];
+
+const baseDateInitMap: Record<Base, string> = Object.fromEntries(
+  baseOptionsConfig.map((opt) => [opt.value, opt.dateInit]),
+) as Record<Base, string>;
+
+const getBaseOptions = (): { label: string; value: Base }[] =>
+  baseOptionsConfig.map((option) => ({
+    label: String(t(`serviceFlow.previousVariables.dates.${option.value}`)),
+    value: option.value,
+  }));
 
 interface DateTimeBuilderProps {
   border: string;
