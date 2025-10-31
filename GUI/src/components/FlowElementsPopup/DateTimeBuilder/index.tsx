@@ -45,8 +45,8 @@ const DateTimeBuilder: FC<DateTimeBuilderProps> = ({ border, popupBodyCss }) => 
       // which only creates date manipulation code from controlled inputs, never user-provided strings
       // Using Function constructor is necessary to execute the generated date code for preview
       // eslint-disable-next-line sonarjs/code-eval
-      const result = new Function(`return ${dateCode}`)();
-      return typeof result === 'string' ? result : String(result);
+      const result = new Function(`return ${dateCode}`)() as string;
+      return result;
     } catch {
       return 'Error evaluating date';
     }
