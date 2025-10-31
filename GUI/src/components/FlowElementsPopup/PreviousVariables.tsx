@@ -2,7 +2,7 @@ import { Edge, Node } from '@xyflow/react';
 import OutputElementBox from 'components/OutputElementBox';
 import React, { CSSProperties, FC, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { datesVariables, environmentVariables, helperVariables } from 'resources/variables-constants';
+import { environmentVariables, helperVariables } from 'resources/variables-constants';
 import { StepType } from 'types';
 import { EndpointResponseVariable } from 'types/endpoint/endpoint-response-variables';
 import { NodeDataProps } from 'types/service-flow';
@@ -11,6 +11,7 @@ import { getTypeColor, isObject } from 'utils/object-util';
 import { stringToTemplate, templateToString } from 'utils/string-util';
 import { v4 } from 'uuid';
 
+import DateTimeBuilder from './DateTimeBuilder';
 import { ObjectTree } from './ObjectTree';
 import useServiceStore from '../../store/new-services.store';
 import { Assign } from '../../types/assign';
@@ -133,7 +134,6 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
           isAssignSection={true}
         />
       )}
-
       <VariableSection
         title={t('serviceFlow.previousVariables.environmentVariables.title')}
         variables={[...environmentVariables]}
@@ -142,16 +142,7 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
         popupBodyCss={popupBodyCss}
         border={border}
       />
-
-      <VariableSection
-        title={t('serviceFlow.previousVariables.dates.title')}
-        variables={[...datesVariables]}
-        assignedObjectTree={assignedObjectTree}
-        setAssignedObjectTree={setAssignedObjectTree}
-        popupBodyCss={popupBodyCss}
-        border={border}
-      />
-
+      <DateTimeBuilder border={border} />
       <VariableSection
         title={t('serviceFlow.previousVariables.helpers.title')}
         variables={[...helperVariablesWithTooltips]}
@@ -160,7 +151,6 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
         popupBodyCss={popupBodyCss}
         border={border}
       />
-
       {isObject(assignedObjectTree?.data) && (
         <ObjectTree
           data={assignedObjectTree.data}
@@ -168,7 +158,6 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
           style={{ borderBottom: border, borderTop: border }}
         />
       )}
-
       {endpoints.map((endpoint) => (
         <Track key={v4()} direction="vertical" align="left" style={{ ...popupBodyCss, borderBottom: border }}>
           <label
@@ -222,7 +211,6 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
           </Track>
         </Track>
       ))}
-
       {isObject(endpointsObjectTree?.data) && (
         <ObjectTree data={endpointsObjectTree.data} path={endpointsObjectTree.path} />
       )}
