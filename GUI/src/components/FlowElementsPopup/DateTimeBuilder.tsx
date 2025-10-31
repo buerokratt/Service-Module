@@ -37,40 +37,40 @@ const DateTimeBuilder: FC<DateTimeBuilderProps> = ({ border, popupBodyCss }) => 
   ];
 
   const dateCode = useMemo(() => {
-    let code = 'new Date()';
-
-    // Apply base anchor modifications
+    // Build base date initialization
+    let dateInit = 'new Date()';
     if (base === 'startOfDay') {
-      code = 'new Date(new Date().setHours(0, 0, 0, 0))';
+      dateInit = 'new Date(new Date().setHours(0, 0, 0, 0))';
     } else if (base === 'startOfMonth') {
-      code = 'new Date(new Date(new Date().setDate(1)).setHours(0, 0, 0, 0))';
+      dateInit = 'new Date(new Date(new Date().setDate(1)).setHours(0, 0, 0, 0))';
     } else if (base === 'startOfYear') {
-      code = 'new Date(new Date(new Date().setMonth(0, 1)).setHours(0, 0, 0, 0))';
+      dateInit = 'new Date(new Date(new Date().setMonth(0, 1)).setHours(0, 0, 0, 0))';
     } else if (base === 'endOfDay') {
-      code = 'new Date(new Date().setHours(23, 59, 59, 999))';
+      dateInit = 'new Date(new Date().setHours(23, 59, 59, 999))';
     } else if (base === 'endOfMonth') {
-      code = 'new Date(new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).setHours(23, 59, 59, 999))';
+      dateInit = 'new Date(new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).setHours(23, 59, 59, 999))';
     } else if (base === 'endOfYear') {
-      code = 'new Date(new Date(new Date().getFullYear(), 11, 31).setHours(23, 59, 59, 999))';
+      dateInit = 'new Date(new Date(new Date().getFullYear(), 11, 31).setHours(23, 59, 59, 999))';
     }
 
-    // Apply offsets
+    // Parse offsets
     const daysNum = parseInt(addDays) || 0;
     const monthsNum = parseInt(addMonths) || 0;
     const yearsNum = parseInt(addYears) || 0;
 
+    // Build operations using IIFE to avoid nested new Date() calls
+    const operations: string[] = [];
+
     if (daysNum !== 0) {
       const milliseconds = daysNum * 86400000;
-      code = `new Date(${code}.getTime() + ${milliseconds})`;
+      operations.push(`d = new Date(d.getTime() + ${milliseconds})`);
     }
     if (monthsNum !== 0) {
-      code = `new Date(new Date(${code}).setMonth(new Date(${code}).getMonth() + ${monthsNum}))`;
+      operations.push(`d.setMonth(d.getMonth() + ${monthsNum})`);
     }
     if (yearsNum !== 0) {
-      code = `new Date(new Date(${code}).setFullYear(new Date(${code}).getFullYear() + ${yearsNum}))`;
+      operations.push(`d.setFullYear(d.getFullYear() + ${yearsNum})`);
     }
-
-    // Apply time precision if enabled
     if (isTimePrecisionEnabled && timeFormat) {
       const timeParts = timeFormat.split(':');
       if (timeParts.length >= 2) {
@@ -78,12 +78,17 @@ const DateTimeBuilder: FC<DateTimeBuilderProps> = ({ border, popupBodyCss }) => 
         const minutes = timeParts[1] || '0';
         const secondsPart = timeParts[2]?.split('.')[0] || '0';
         const milliseconds = timeParts[2]?.split('.')[1] || '0';
-        code = `new Date(new Date(${code}).setHours(${hours}, ${minutes}, ${secondsPart}, ${milliseconds}))`;
+        operations.push(`d.setHours(${hours}, ${minutes}, ${secondsPart}, ${milliseconds})`);
       }
     }
 
-    // Return ISO string
-    return `${code}.toISOString()`;
+    // Build IIFE expression
+    if (operations.length === 0) {
+      return `${dateInit}.toISOString()`;
+    }
+
+    const opsString = operations.join('; ');
+    return `(function() { const d = ${dateInit}; ${opsString}; return d.toISOString(); })()`;
   }, [base, addDays, addMonths, addYears, isTimePrecisionEnabled, timeFormat]);
 
   const dragData: Assign = useMemo(
