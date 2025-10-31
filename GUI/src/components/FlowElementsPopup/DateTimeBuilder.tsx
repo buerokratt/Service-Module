@@ -10,12 +10,22 @@ import { getTypeColor } from 'utils/object-util';
 import { stringToTemplate } from 'utils/string-util';
 import { v4 } from 'uuid';
 
+type Base = 'startOfDay' | 'startOfMonth' | 'startOfYear' | 'endOfDay' | 'endOfMonth' | 'endOfYear' | 'now';
+
+const baseDateInitMap: Record<Base, string> = {
+  now: 'new Date()',
+  startOfDay: 'new Date(new Date().setHours(0, 0, 0, 0))',
+  startOfMonth: 'new Date(new Date(new Date().setDate(1)).setHours(0, 0, 0, 0))',
+  startOfYear: 'new Date(new Date(new Date().setMonth(0, 1)).setHours(0, 0, 0, 0))',
+  endOfDay: 'new Date(new Date().setHours(23, 59, 59, 999))',
+  endOfMonth: 'new Date(new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).setHours(23, 59, 59, 999))',
+  endOfYear: 'new Date(new Date(new Date().getFullYear(), 11, 31).setHours(23, 59, 59, 999))',
+};
+
 interface DateTimeBuilderProps {
   border: string;
   popupBodyCss: CSSProperties;
 }
-
-type Base = 'startOfDay' | 'startOfMonth' | 'startOfYear' | 'endOfDay' | 'endOfMonth' | 'endOfYear' | 'now';
 
 const DateTimeBuilder: FC<DateTimeBuilderProps> = ({ border, popupBodyCss }) => {
   const { t } = useTranslation();
@@ -26,7 +36,7 @@ const DateTimeBuilder: FC<DateTimeBuilderProps> = ({ border, popupBodyCss }) => 
   const [isTimePrecisionEnabled, setIsTimePrecisionEnabled] = useState<boolean>(false);
   const [timeFormat, setTimeFormat] = useState<string>('21:00:00.000');
 
-  const baseOptions = [
+  const baseOptions: { label: string; value: Base }[] = [
     { label: String(t('serviceFlow.previousVariables.dates.now')), value: 'now' },
     { label: String(t('serviceFlow.previousVariables.dates.startOfDay')), value: 'startOfDay' },
     { label: String(t('serviceFlow.previousVariables.dates.startOfMonth')), value: 'startOfMonth' },
@@ -37,21 +47,8 @@ const DateTimeBuilder: FC<DateTimeBuilderProps> = ({ border, popupBodyCss }) => 
   ];
 
   const dateCode = useMemo(() => {
-    // Build base date initialization
-    let dateInit = 'new Date()';
-    if (base === 'startOfDay') {
-      dateInit = 'new Date(new Date().setHours(0, 0, 0, 0))';
-    } else if (base === 'startOfMonth') {
-      dateInit = 'new Date(new Date(new Date().setDate(1)).setHours(0, 0, 0, 0))';
-    } else if (base === 'startOfYear') {
-      dateInit = 'new Date(new Date(new Date().setMonth(0, 1)).setHours(0, 0, 0, 0))';
-    } else if (base === 'endOfDay') {
-      dateInit = 'new Date(new Date().setHours(23, 59, 59, 999))';
-    } else if (base === 'endOfMonth') {
-      dateInit = 'new Date(new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).setHours(23, 59, 59, 999))';
-    } else if (base === 'endOfYear') {
-      dateInit = 'new Date(new Date(new Date().getFullYear(), 11, 31).setHours(23, 59, 59, 999))';
-    }
+    // Get base date initialization from map
+    const dateInit = baseDateInitMap[base];
 
     // Parse offsets
     const daysNum = parseInt(addDays) || 0;
