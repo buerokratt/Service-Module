@@ -353,8 +353,8 @@
       "environmentVariables": {
         "title": "Keskkonnamuutujad"
       },
-      "dates": {
-        "title": "Kuupäevad",
+      "dateAndTime": {
+        "title": "Kuupäev ja kellaaeg",
         "currentDate": "Praegune kuupäev",
         "currentTime": "Praegune aeg",
         "currentDateAndTime": "Praegune kuupäev ja kellaaeg",

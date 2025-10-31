@@ -16,7 +16,7 @@ const createTemplate = (
   tooltip,
 });
 
-const datesTrPath = 'serviceFlow.previousVariables.dates';
+const datesTrPath = 'serviceFlow.previousVariables.dateAndTime';
 const helpersTrPath = 'serviceFlow.previousVariables.helpers';
 
 export const datesVariables: Assign[] = [

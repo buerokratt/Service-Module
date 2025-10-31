@@ -47,13 +47,15 @@ const DateTimeBuilder: FC<DateTimeBuilderProps> = ({ border, popupBodyCss }) => 
         borderBottom: border,
       }}
     >
-      <label htmlFor="json" style={{ marginBottom: '10px', textTransform: 'capitalize', cursor: 'auto' }}>
-        {t('serviceFlow.previousVariables.dates.title')}
+      <label htmlFor="json" style={{ marginBottom: '10px' }}>
+        {t('serviceFlow.previousVariables.dateAndTime.title')}
       </label>
 
       <Track direction="horizontal" align="stretch" gap={16} style={{ width: '100%' }}>
         <Track direction="vertical" align="stretch" gap={16} style={{ flex: '0 0 50%', maxWidth: '50%' }}>
-          <label style={{ fontSize: '14px', fontWeight: 500 }}>{t('serviceFlow.previousVariables.dates.base')}</label>
+          <label style={{ fontSize: '14px', fontWeight: 500 }}>
+            {t('serviceFlow.previousVariables.dateAndTime.base')}
+          </label>
           <FormSelect
             label=""
             name="base"
@@ -68,10 +70,12 @@ const DateTimeBuilder: FC<DateTimeBuilderProps> = ({ border, popupBodyCss }) => 
             }}
           />
 
-          <label style={{ fontSize: '14px', fontWeight: 500 }}>{t('serviceFlow.previousVariables.dates.offset')}</label>
+          <label style={{ fontSize: '14px', fontWeight: 500 }}>
+            {t('serviceFlow.previousVariables.dateAndTime.offset')}
+          </label>
           <Track direction="vertical" align="stretch" gap={8}>
             <FormInput
-              label={String(t('serviceFlow.previousVariables.dates.days'))}
+              label={String(t('serviceFlow.previousVariables.dateAndTime.days'))}
               name="days"
               type="number"
               value={days}
@@ -79,7 +83,7 @@ const DateTimeBuilder: FC<DateTimeBuilderProps> = ({ border, popupBodyCss }) => 
               style={{ width: '100%', maxWidth: '100%' }}
             />
             <FormInput
-              label={String(t('serviceFlow.previousVariables.dates.months'))}
+              label={String(t('serviceFlow.previousVariables.dateAndTime.months'))}
               name="months"
               type="number"
               value={months}
@@ -87,7 +91,7 @@ const DateTimeBuilder: FC<DateTimeBuilderProps> = ({ border, popupBodyCss }) => 
               style={{ width: '100%', maxWidth: '100%' }}
             />
             <FormInput
-              label={String(t('serviceFlow.previousVariables.dates.years'))}
+              label={String(t('serviceFlow.previousVariables.dateAndTime.years'))}
               name="years"
               type="number"
               value={years}
@@ -97,14 +101,14 @@ const DateTimeBuilder: FC<DateTimeBuilderProps> = ({ border, popupBodyCss }) => 
           </Track>
 
           <label style={{ fontSize: '14px', fontWeight: 500 }}>
-            {t('serviceFlow.previousVariables.dates.timePrecision')}
+            {t('serviceFlow.previousVariables.dateAndTime.timePrecision')}
           </label>
           <FormCheckbox
             label=""
             name="timePrecision"
             hideLabel
             item={{
-              label: String(t('serviceFlow.previousVariables.dates.setTime')),
+              label: String(t('serviceFlow.previousVariables.dateAndTime.setTime')),
               value: 'setTime',
             }}
             checked={isTimePrecisionEnabled}
@@ -112,7 +116,7 @@ const DateTimeBuilder: FC<DateTimeBuilderProps> = ({ border, popupBodyCss }) => 
           />
           {isTimePrecisionEnabled && (
             <FormInput
-              label={String(t('serviceFlow.previousVariables.dates.time'))}
+              label={String(t('serviceFlow.previousVariables.dateAndTime.time'))}
               name="timeFormat"
               type="text"
               value={time}
@@ -128,7 +132,7 @@ const DateTimeBuilder: FC<DateTimeBuilderProps> = ({ border, popupBodyCss }) => 
             borderColor={getTypeColor(dateCode).color}
             style={{ cursor: 'grab', width: 'fit-content', maxWidth: '100%' }}
           >
-            {t('serviceFlow.previousVariables.dates.title')}
+            {t('serviceFlow.previousVariables.dateAndTime.title')}
           </OutputElementBox>
         </Track>
 

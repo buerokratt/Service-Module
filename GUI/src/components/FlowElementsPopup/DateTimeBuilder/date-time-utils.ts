@@ -86,7 +86,7 @@ export const generateDateCode = (
 
 export const getBaseOptions = (): { label: string; value: BaseDate }[] =>
   baseOptionsConfig.map((option) => ({
-    label: String(t(`serviceFlow.previousVariables.dates.${option.value}`)),
+    label: String(t(`serviceFlow.previousVariables.dateAndTime.${option.value}`)),
     value: option.value,
   }));
 

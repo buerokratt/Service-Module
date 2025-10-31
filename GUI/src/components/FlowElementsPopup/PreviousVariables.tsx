@@ -145,7 +145,7 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
       {/* todo remove later */}
       {/* todo also remove all realted code */}
       <VariableSection
-        title={t('serviceFlow.previousVariables.dates.title')}
+        title={t('serviceFlow.previousVariables.dateAndTime.title')}
         variables={[...datesVariables]}
         assignedObjectTree={assignedObjectTree}
         setAssignedObjectTree={setAssignedObjectTree}

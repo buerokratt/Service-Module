@@ -349,8 +349,8 @@
     },
     "previousVariables": {
       "assignElements": "Assign Elements",
-      "dates": {
-        "title": "Dates",
+      "dateAndTime": {
+        "title": "Date and time",
         "currentDate": "Current date",
         "currentTime": "Current time",
         "currentDateAndTime": "Current date & time",
