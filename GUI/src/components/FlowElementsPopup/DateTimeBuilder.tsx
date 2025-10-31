@@ -9,15 +9,7 @@ interface DateTimeBuilderProps {
   border: string;
 }
 
-type BaseAnchorType =
-  | 'startOfDay'
-  | 'startOfMonth'
-  | 'startOfYear'
-  | 'endOfDay'
-  | 'endOfMonth'
-  | 'endOfYear'
-  | 'now'
-  | 'today';
+type BaseAnchorType = 'startOfDay' | 'startOfMonth' | 'startOfYear' | 'endOfDay' | 'endOfMonth' | 'endOfYear' | 'now';
 
 const DateTimeBuilder: FC<DateTimeBuilderProps> = ({ border }) => {
   const { t } = useTranslation();
@@ -28,6 +20,7 @@ const DateTimeBuilder: FC<DateTimeBuilderProps> = ({ border }) => {
   const [isTimePrecisionEnabled, setIsTimePrecisionEnabled] = useState<boolean>(false);
   const [timeFormat, setTimeFormat] = useState<string>('00:00:00.000Z');
 
+  // todo maybe move elsewhere
   const popupBodyCss: CSSProperties = {
     padding: 16,
     backgroundColor: '#F9F9F9',
@@ -42,7 +35,6 @@ const DateTimeBuilder: FC<DateTimeBuilderProps> = ({ border }) => {
     { label: String(t('serviceFlow.previousVariables.dates.endOfMonth')), value: 'endOfMonth' },
     { label: String(t('serviceFlow.previousVariables.dates.endOfYear')), value: 'endOfYear' },
     { label: String(t('serviceFlow.previousVariables.dates.now')), value: 'now' },
-    { label: String(t('serviceFlow.previousVariables.dates.today')), value: 'today' },
   ];
 
   return (
