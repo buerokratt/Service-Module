@@ -11,7 +11,7 @@ type AssignContentProps = {
   readonly node: Node<NodeDataProps>;
 };
 
-const AssignContent: FC<AssignContentProps> = ({ node}) => {
+const AssignContent: FC<AssignContentProps> = ({ node }) => {
   const nodes = useServiceStore((state) => state.nodes);
   const currentNodeElements = nodes.findLast((n) => n.id === node.id)?.data?.assignElements ?? [];
 
