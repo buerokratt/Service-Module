@@ -55,7 +55,7 @@ const DragInput = ({ onChange, element, id }: DragInputProps): ReactNode => {
         <OutputElementBox borderColor={getTypeColor(element?.data).color} className={styles.element}>
           {isArray(element.data) ? (
             <div className={styles.array}>
-              {text}
+              <span className={styles.dragText}>{text}</span>
               {!all ? (
                 <FormInput
                   name={element.value}
@@ -89,7 +89,7 @@ const DragInput = ({ onChange, element, id }: DragInputProps): ReactNode => {
               </div>
             </div>
           ) : (
-            text
+            <span className={styles.dragText}>{text}</span>
           )}
         </OutputElementBox>
       </Tooltip>
