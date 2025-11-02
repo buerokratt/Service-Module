@@ -4,14 +4,16 @@ import { EndpointData } from 'types/endpoint';
 
 import Track from '../Track';
 import PreviousVariables from './PreviousVariables';
+import { Node } from '@xyflow/react';
+import { NodeDataProps } from 'types/service-flow';
 
 type ApiContentProps = {
-  readonly nodeId: string;
+  readonly node: Node<NodeDataProps>;
   readonly endpoint: EndpointData | undefined;
   readonly onEndpointChange?: (endpoint: EndpointData) => void;
 };
 
-const ApiContent: FC<ApiContentProps> = ({ nodeId, endpoint, onEndpointChange }) => {
+const ApiContent: FC<ApiContentProps> = ({ node, endpoint, onEndpointChange }) => {
   const endpointCopy = useMemo(() => {
     return endpoint ? JSON.parse(JSON.stringify(endpoint)) : undefined;
   }, [endpoint]);
@@ -34,7 +36,7 @@ const ApiContent: FC<ApiContentProps> = ({ nodeId, endpoint, onEndpointChange })
           }}
         />
       )}
-      <PreviousVariables nodeId={nodeId} />
+      <PreviousVariables node={node} />
     </Track>
   );
 };

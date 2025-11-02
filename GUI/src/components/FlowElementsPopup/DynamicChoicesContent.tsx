@@ -7,9 +7,11 @@ import { DynamicChoices } from 'types/dynamic-choices';
 import Track from '../Track';
 import AssignElement from './AssignBuilder/AssignElement';
 import PreviousVariables from './PreviousVariables';
+import { Node } from '@xyflow/react';
+import { NodeDataProps } from 'types/service-flow';
 
 type DynamicChoicesContentProps = {
-  readonly nodeId: string;
+  readonly node: Node<NodeDataProps>;
   readonly dynamicChoices?: DynamicChoices;
   readonly onDynamicChoicesChange?: (dynamicChoices: DynamicChoices) => void;
 };
@@ -42,7 +44,7 @@ const fields: Array<{
 ];
 
 const DynamicChoicesContent: FC<DynamicChoicesContentProps> = ({
-  nodeId,
+  node,
   dynamicChoices = {
     list: '',
     serviceName: '',
@@ -87,7 +89,7 @@ const DynamicChoicesContent: FC<DynamicChoicesContentProps> = ({
           </Track>
         ))}
       </Track>
-      <PreviousVariables nodeId={nodeId} />
+      <PreviousVariables node={node} />
     </Track>
   );
 };

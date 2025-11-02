@@ -447,7 +447,7 @@ const FlowElementsPopup: React.FC = () => {
             {stepType === StepType.Textfield && (
               <TextfieldContent
                 defaultMessage={node.data.message ?? textfieldMessage ?? undefined}
-                nodeId={node.id}
+                node={node}
                 onChange={(message, placeholders) => {
                   setTextfieldMessage(message);
                   setTextfieldMessagePlaceholders(placeholders);
@@ -486,18 +486,18 @@ const FlowElementsPopup: React.FC = () => {
             )}
             {stepType === StepType.FinishingStepEnd && <EndConversationContent />}
             {stepType === StepType.RasaRules && <RasaRulesContent />}
-            {stepType === StepType.Assign && <AssignContent nodeId={node.id} />}
-            {stepType === StepType.Condition && <ConditionContent nodeId={node.id} />}
+            {stepType === StepType.Assign && <AssignContent node={node} />}
+            {stepType === StepType.Condition && <ConditionContent node={node} />}
             {stepType === StepType.DynamicChoices && (
               <DynamicChoicesContent
-                nodeId={node.id}
+                node={node}
                 dynamicChoices={dynamicChoices}
                 onDynamicChoicesChange={setDynamicChoices}
               />
             )}
             {stepType === StepType.UserDefined && (
               <ApiContent
-                nodeId={node.id}
+                node={node}
                 endpoint={node.data.endpoint}
                 onEndpointChange={(endpoint) => {
                   if (!endpoint) return;

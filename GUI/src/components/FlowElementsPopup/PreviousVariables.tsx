@@ -18,14 +18,14 @@ import Tooltip from '../Tooltip';
 import Track from '../Track';
 
 type PreviousVariablesProps = {
-  readonly nodeId: string;
+  readonly node: Node<NodeDataProps>;
 };
 
 // Unique key for predefined elements, used below to identify it
 // All other assign element keys are UUIDs
 const predefinedInputKeys = ['-1', '-2'];
 
-const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
+const PreviousVariables: FC<PreviousVariablesProps> = ({ node }) => {
   const { t } = useTranslation();
   let endpointsVariables = useServiceStore((state) => state.endpointsResponseVariables);
   const nodes = useServiceStore((state) => state.nodes);
@@ -47,7 +47,7 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
   });
 
   useEffect(() => {
-    const currentNodeIndex = nodes.findIndex((node) => node.id === nodeId);
+    const currentNodeIndex = nodes.findIndex((n) => n.id === node.id);
     const currentNode = nodes[currentNodeIndex];
 
     let startIndex = nodes.findLastIndex(
@@ -133,98 +133,101 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
           isAssignSection={true}
         />
       )}
+      {node.data.stepType === StepType.Assign && (
+        <>
+          <VariableSection
+            title={t('serviceFlow.previousVariables.environmentVariables.title')}
+            variables={[...environmentVariables]}
+            assignedObjectTree={assignedObjectTree}
+            setAssignedObjectTree={setAssignedObjectTree}
+            popupBodyCss={popupBodyCss}
+            border={border}
+          />
 
-      <VariableSection
-        title={t('serviceFlow.previousVariables.environmentVariables.title')}
-        variables={[...environmentVariables]}
-        assignedObjectTree={assignedObjectTree}
-        setAssignedObjectTree={setAssignedObjectTree}
-        popupBodyCss={popupBodyCss}
-        border={border}
-      />
+          <VariableSection
+            title={t('serviceFlow.previousVariables.dates.title')}
+            variables={[...datesVariables]}
+            assignedObjectTree={assignedObjectTree}
+            setAssignedObjectTree={setAssignedObjectTree}
+            popupBodyCss={popupBodyCss}
+            border={border}
+          />
 
-      <VariableSection
-        title={t('serviceFlow.previousVariables.dates.title')}
-        variables={[...datesVariables]}
-        assignedObjectTree={assignedObjectTree}
-        setAssignedObjectTree={setAssignedObjectTree}
-        popupBodyCss={popupBodyCss}
-        border={border}
-      />
+          <VariableSection
+            title={t('serviceFlow.previousVariables.helpers.title')}
+            variables={[...helperVariablesWithTooltips]}
+            assignedObjectTree={assignedObjectTree}
+            setAssignedObjectTree={setAssignedObjectTree}
+            popupBodyCss={popupBodyCss}
+            border={border}
+          />
 
-      <VariableSection
-        title={t('serviceFlow.previousVariables.helpers.title')}
-        variables={[...helperVariablesWithTooltips]}
-        assignedObjectTree={assignedObjectTree}
-        setAssignedObjectTree={setAssignedObjectTree}
-        popupBodyCss={popupBodyCss}
-        border={border}
-      />
+          {isObject(assignedObjectTree?.data) && (
+            <ObjectTree
+              data={assignedObjectTree.data}
+              path={templateToString(assignedObjectTree.path)}
+              style={{ borderBottom: border, borderTop: border }}
+            />
+          )}
 
-      {isObject(assignedObjectTree?.data) && (
-        <ObjectTree
-          data={assignedObjectTree.data}
-          path={templateToString(assignedObjectTree.path)}
-          style={{ borderBottom: border, borderTop: border }}
-        />
-      )}
+          {endpoints.map((endpoint) => (
+            <Track key={v4()} direction="vertical" align="left" style={{ ...popupBodyCss, borderBottom: border }}>
+              <label
+                htmlFor="json"
+                style={{ marginBottom: '10px', textTransform: 'capitalize', cursor: 'auto' }}
+              >{`${endpoint.name}`}</label>
+              <Track
+                direction="horizontal"
+                gap={4}
+                justify="start"
+                isMultiline
+                style={{ maxHeight: '30vh', overflow: 'auto' }}
+              >
+                {endpoint.chips.map((chip) => {
+                  const typeColor = getTypeColor(chip.data);
+                  const dragData: Assign = {
+                    id: v4(),
+                    key: chip.name,
+                    value: stringToTemplate(chip.value),
+                    data: chip.data,
+                  };
 
-      {endpoints.map((endpoint) => (
-        <Track key={v4()} direction="vertical" align="left" style={{ ...popupBodyCss, borderBottom: border }}>
-          <label
-            htmlFor="json"
-            style={{ marginBottom: '10px', textTransform: 'capitalize', cursor: 'auto' }}
-          >{`${endpoint.name}`}</label>
-          <Track
-            direction="horizontal"
-            gap={4}
-            justify="start"
-            isMultiline
-            style={{ maxHeight: '30vh', overflow: 'auto' }}
-          >
-            {endpoint.chips.map((chip) => {
-              const typeColor = getTypeColor(chip.data);
-              const dragData: Assign = {
-                id: v4(),
-                key: chip.name,
-                value: stringToTemplate(chip.value),
-                data: chip.data,
-              };
+                  return isObject(chip.data) ? (
+                    <Tooltip content={`${JSON.stringify(chip.data)} : ${typeColor.type}`} key={dragData.id}>
+                      <OutputElementBox
+                        dragData={dragData}
+                        style={{ cursor: 'pointer' }}
+                        borderColor={typeColor.color}
+                        onClick={() => {
+                          setEndpointsObjectTree(
+                            endpointsObjectTree?.path === chip.value
+                              ? null
+                              : {
+                                  data: chip.data,
+                                  path: chip.value,
+                                },
+                          );
+                        }}
+                      >
+                        {endpointsObjectTree?.path === chip.value ? chip.name + ' ▲' : chip.name + ' ▼'}
+                      </OutputElementBox>
+                    </Tooltip>
+                  ) : (
+                    <Tooltip content={`${chip.data} : ${typeColor.type}`} key={dragData.id}>
+                      <OutputElementBox borderColor={typeColor.color} dragData={dragData}>
+                        {chip.name}
+                      </OutputElementBox>
+                    </Tooltip>
+                  );
+                })}
+              </Track>
+            </Track>
+          ))}
 
-              return isObject(chip.data) ? (
-                <Tooltip content={`${JSON.stringify(chip.data)} : ${typeColor.type}`} key={dragData.id}>
-                  <OutputElementBox
-                    dragData={dragData}
-                    style={{ cursor: 'pointer' }}
-                    borderColor={typeColor.color}
-                    onClick={() => {
-                      setEndpointsObjectTree(
-                        endpointsObjectTree?.path === chip.value
-                          ? null
-                          : {
-                              data: chip.data,
-                              path: chip.value,
-                            },
-                      );
-                    }}
-                  >
-                    {endpointsObjectTree?.path === chip.value ? chip.name + ' ▲' : chip.name + ' ▼'}
-                  </OutputElementBox>
-                </Tooltip>
-              ) : (
-                <Tooltip content={`${chip.data} : ${typeColor.type}`} key={dragData.id}>
-                  <OutputElementBox borderColor={typeColor.color} dragData={dragData}>
-                    {chip.name}
-                  </OutputElementBox>
-                </Tooltip>
-              );
-            })}
-          </Track>
-        </Track>
-      ))}
-
-      {isObject(endpointsObjectTree?.data) && (
-        <ObjectTree data={endpointsObjectTree.data} path={endpointsObjectTree.path} />
+          {isObject(endpointsObjectTree?.data) && (
+            <ObjectTree data={endpointsObjectTree.data} path={endpointsObjectTree.path} />
+          )}
+        </>
       )}
     </Track>
   );
