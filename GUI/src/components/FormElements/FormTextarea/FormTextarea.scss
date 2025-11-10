@@ -2,6 +2,7 @@
 @import 'src/styles/tools/color';
 @import 'src/styles/settings/variables/other';
 @import 'src/styles/settings/variables/typography';
+@import 'src/styles/settings/variables/_colors';
 
 .textarea {
   $self: &;
@@ -95,6 +96,17 @@
   &--maxlength-shown {
     textarea {
       padding-right: 70px;
+    }
+  }
+}
+
+[data-theme="dark"] .textarea {
+  textarea {
+    background-color: var(--dark-bg-highlight);
+
+    &:focus {
+      outline: none;
+      border:2px solid get-color(sapphire-blue-9);
     }
   }
 }

@@ -2,6 +2,7 @@
 @import 'src/styles/tools/color';
 @import 'src/styles/settings/variables/other';
 @import 'src/styles/settings/variables/typography';
+@import 'src/styles/settings/variables/_colors';
 
 .input {
   $self: &;
@@ -84,6 +85,17 @@
   &--error {
     input {
       border-color: get-color(jasper-10);
+    }
+  }
+}
+
+[data-theme="dark"] .input {
+  input {
+    background-color: var(--dark-bg-highlight);
+
+    &:focus {
+      outline: none;
+      border:2px solid get-color(sapphire-blue-9);
     }
   }
 }
