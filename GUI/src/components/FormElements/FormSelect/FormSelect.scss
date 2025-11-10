@@ -2,6 +2,7 @@
 @import 'src/styles/tools/color';
 @import 'src/styles/settings/variables/other';
 @import 'src/styles/settings/variables/typography';
+@import 'src/styles/settings/variables/_colors';
 
 .select {
   $self: &;
@@ -104,6 +105,67 @@
     &:focus {
       background-color: get-color(black-coral-0);
       color: get-color(black-coral-20);
+    }
+  }
+}
+
+[data-theme="dark"] .select {
+  $self: &;
+
+  &__trigger {
+    appearance: none;
+    background-color: var(--dark-bg-highlight);
+    border: 1px solid var(--dark-text-border);
+    color: var(--dark-text-secondary);
+    cursor: pointer;
+
+    &--disabled {
+      background-color: #f0f0f2;
+      pointer-events: none;
+    }
+
+    &[aria-expanded='true'] {
+      border-color: get-color(sapphire-blue-10);
+      background-color: var(--dark-bg-extra-light);
+
+      + #{$self}__menu {
+        display: block;
+      }
+
+      .icon {
+        transform: rotate(180deg);
+      }
+    }
+  }
+
+  &__menu {
+    background-color: var(--dark-bg-extra-light);
+    color: var(--dark-text-label);
+  }
+
+  &__option {
+    cursor: pointer;
+
+    &--selected {
+      background-color: get-color(sapphire-blue-12);
+      color: var(--dark-text-label);
+    }
+
+    &[aria-selected='true'] {
+      background-color: get-color(sapphire-blue-12);
+      color: var(--dark-text-label);
+
+      &:hover,
+      &:focus {
+        background-color: get-color(sapphire-blue-12);
+        color: var(--dark-text-label);
+      }
+    }
+
+    &:hover,
+    &:focus {
+      background-color: var(--dark-bg-highlight);
+      color: var(--dark-text-label);
     }
   }
 }
