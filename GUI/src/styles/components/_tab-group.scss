@@ -2,6 +2,7 @@
 @import 'src/styles/tools/color';
 @import 'src/styles/settings/variables/other';
 @import 'src/styles/settings/variables/typography';
+@import 'src/styles/settings/variables/_colors';
 
 .tab-group {
   &__list {
@@ -31,5 +32,22 @@
     padding: get-spacing('haapsalu');
     border: 1px solid get-color(black-coral-2);
     border-radius: 4px;
+  }
+}
+
+[data-theme='dark'] .tab-group {
+  &__tab-btn {
+    &.active {
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-bottom: none;
+      color: var(--dark-text-secondary);
+      background-color: var(--dark-bg-main);
+    }
+  }
+
+  &__tab-content {
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
+    background-color: var(--dark-bg-main);
   }
 }
