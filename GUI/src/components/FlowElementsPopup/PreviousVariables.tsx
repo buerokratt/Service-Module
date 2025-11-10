@@ -16,6 +16,8 @@ import useServiceStore from '../../store/new-services.store';
 import { Assign } from '../../types/assign';
 import Tooltip from '../Tooltip';
 import Track from '../Track';
+import '../../styles/settings/variables/_colors.scss'
+import {useTheme} from "../../utils/useTheme";
 
 type PreviousVariablesProps = {
   readonly nodeId: string;
@@ -27,6 +29,7 @@ const predefinedInputKeys = ['-1', '-2'];
 
 const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
   const { t } = useTranslation();
+  const theme = useTheme();
   let endpointsVariables = useServiceStore((state) => state.endpointsResponseVariables);
   const nodes = useServiceStore((state) => state.nodes);
   const edges = useServiceStore((state) => state.edges);
@@ -114,7 +117,7 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
 
   const popupBodyCss: CSSProperties = {
     padding: 16,
-    backgroundColor: '#F9F9F9',
+    backgroundColor: theme === 'dark' ? 'var(--dark-bg-main)' : '#F9F9F9',
     width: '100%',
   };
 

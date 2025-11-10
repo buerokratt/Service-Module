@@ -2,6 +2,7 @@
 @import 'src/styles/tools/color';
 @import 'src/styles/settings/variables/other';
 @import 'src/styles/settings/variables/typography';
+@import 'src/styles/settings/variables/_colors';
 
 .toast {
   padding: 16px;
@@ -69,5 +70,27 @@
   &--warning {
     border-color: get-color(dark-tangerine-10);
     background-color: get-color(dark-tangerine-1);
+  }
+}
+
+[data-theme="dark"] .toast {
+  &--success {
+    border-color: get-color(sea-green-11);
+    background-color: var(--dark-bg-secondary);
+  }
+
+  &--info {
+    border-color: get-color(sapphire-blue-11);
+    background-color: var(--dark-bg-secondary);
+  }
+
+  &--error {
+    border-color: get-color(jasper-12);
+    background-color: var(--dark-bg-secondary);
+  }
+
+  &--warning {
+    border-color: get-color(dark-tangerine-11);
+    background-color: var(--dark-bg-secondary);
   }
 }

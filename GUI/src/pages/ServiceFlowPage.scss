@@ -2,6 +2,7 @@
 @import 'src/styles/tools/color';
 @import 'src/styles/settings/variables/other';
 @import 'src/styles/settings/variables/typography';
+@import 'src/styles/settings/variables/_colors';
 
 .graph {
   flex: 1;
@@ -160,4 +161,67 @@
 
 .edge-button:hover {
   box-shadow: 1px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+[data-theme='dark'] .react-flow {
+  &__node {
+    color: var(--dark-text-secondary);
+
+    &.selected {
+      &.step {
+        border: 1px solid get-color(sapphire-blue-2);
+      }
+    }
+
+    &.start,
+    &.end {
+      color: get-color(white);
+    }
+
+    &.placeholder {
+      background-color: get-color(extra-light);
+      border: dashed 1px get-color(black-coral-10);
+
+      p {
+        color: get-color(black-coral-6);
+      }
+
+      &:hover {
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      }
+    }
+
+    &.end {
+      background-color: get-color(jasper-12);
+    }
+
+    &.step {
+      background-color: get-color(sapphire-blue-12);
+      border: 1px solid get-color(sapphire-blue-11);
+    }
+
+    &.rule {
+      background-color: get-color(black-coral-12);
+      border: 1px solid get-color(black-coral-11);
+    }
+
+    &.finishing-step {
+      background-color: get-color(jasper-12);
+      border: 1px solid get-color(jasper-11);
+    }
+
+    &.dynamic-choices {
+      background-color: get-color(purple-12);
+      border: 1px solid get-color(purple-11);
+    }
+
+    &.selected {
+      border: dashed 1px get-color(black-coral-10);
+    }
+  }
+
+  &__edge-path {
+    stroke: get-color(black-coral-10);
+    stroke-width: 1.5px;
+  }
 }
