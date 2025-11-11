@@ -47,7 +47,6 @@ const DateSettings: FC = () => {
           type="number"
           value={days}
           onChange={(e) => setDays(e.target.value)}
-          style={{ width: '100%', maxWidth: '100%' }}
         />
         <FormInput
           label={String(t('serviceFlow.previousVariables.dateAndTime.months'))}
@@ -55,7 +54,6 @@ const DateSettings: FC = () => {
           type="number"
           value={months}
           onChange={(e) => setMonths(e.target.value)}
-          style={{ width: '100%', maxWidth: '100%' }}
         />
         <FormInput
           label={String(t('serviceFlow.previousVariables.dateAndTime.years'))}
@@ -63,33 +61,37 @@ const DateSettings: FC = () => {
           type="number"
           value={years}
           onChange={(e) => setYears(e.target.value)}
-          style={{ width: '100%', maxWidth: '100%' }}
         />
       </Track>
 
       <label style={{ fontSize: '14px', fontWeight: 500 }}>{t('serviceFlow.previousVariables.dateAndTime.time')}</label>
-      <FormCheckbox
-        label=""
-        name="timePrecision"
-        hideLabel
-        item={{
-          label: String(t('serviceFlow.previousVariables.dateAndTime.setTime')),
-          value: 'setTime',
-        }}
-        checked={isTimePrecisionEnabled}
-        onChange={() => setIsTimePrecisionEnabled(!isTimePrecisionEnabled)}
-      />
-      {isTimePrecisionEnabled && (
-        <FormInput
-          label={String(t('serviceFlow.previousVariables.dateAndTime.time'))}
-          name="timeFormat"
-          type="text"
-          value={time}
-          onChange={(e) => setTime(e.target.value)}
-          placeholder="HH:mm:ss.SSS"
-          style={{ width: '100%', maxWidth: '100%' }}
+      <Track direction="horizontal" align="center" gap={8} style={{ width: '100%', height: '33px' }}>
+        <FormCheckbox
+          label=""
+          name="timePrecision"
+          hideLabel
+          item={{
+            label: String(t('serviceFlow.previousVariables.dateAndTime.setTime')),
+            value: 'setTime',
+          }}
+          checked={isTimePrecisionEnabled}
+          onChange={() => setIsTimePrecisionEnabled(!isTimePrecisionEnabled)}
         />
-      )}
+        {isTimePrecisionEnabled ? (
+          <FormInput
+            label=""
+            name="timeFormat"
+            hideLabel
+            type="text"
+            value={time}
+            onChange={(e) => setTime(e.target.value)}
+            placeholder="HH:mm:ss.SSS"
+            style={{ width: '156px', marginLeft: '6px' }}
+          />
+        ) : (
+          <div style={{ flex: 1 }} />
+        )}
+      </Track>
     </Track>
   );
 };
