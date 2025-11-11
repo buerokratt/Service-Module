@@ -3,7 +3,7 @@ import { Assign } from 'types';
 
 import { BaseDate, DatePart, FormatOptions, FormatType, Separator } from './date-time-utils';
 
-export interface DateTimeBuilderState {
+interface DateTimeBuilderState {
   base: BaseDate;
   days: string;
   months: string;
