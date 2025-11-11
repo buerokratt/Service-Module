@@ -154,3 +154,21 @@ export const createDateTimeDragData = (dateCode: string): Assign => ({
   value: stringToTemplate(dateCode),
   data: dateCode,
 });
+
+export const updateDateOrder = (
+  currentOrder: [DatePart, DatePart, DatePart],
+  index: number,
+  newValue: DatePart,
+): [DatePart, DatePart, DatePart] => {
+  const newOrder: [DatePart, DatePart, DatePart] = [...currentOrder] as [DatePart, DatePart, DatePart];
+  const currentValue = currentOrder[index];
+
+  // If the new value is already in another position, swap them
+  const existingIndex = currentOrder.findIndex((val: DatePart) => val === newValue);
+  if (existingIndex !== -1 && existingIndex !== index) {
+    newOrder[existingIndex] = currentValue;
+  }
+
+  newOrder[index] = newValue;
+  return newOrder;
+};

@@ -3,40 +3,17 @@ import Track from 'components/Track';
 import { FC } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { type DatePart, type FormatType, type Separator } from './date-time-utils';
+import { type DatePart, type FormatType, type Separator, updateDateOrder } from './date-time-utils';
+import { useDateTimeBuilderContext } from './useDateTimeBuilderContext';
 
-interface FormatSettingsProps {
-  formatType: FormatType;
-  dateOrder: [DatePart, DatePart, DatePart];
-  separator: Separator;
-  onFormatTypeChange: (value: FormatType) => void;
-  onDateOrderChange: (value: [DatePart, DatePart, DatePart]) => void;
-  onSeparatorChange: (value: Separator) => void;
-}
-
-const FormatSettings: FC<FormatSettingsProps> = ({
-  formatType,
-  dateOrder,
-  separator,
-  onFormatTypeChange,
-  onDateOrderChange,
-  onSeparatorChange,
-}) => {
+const FormatSettings: FC = () => {
   const { t } = useTranslation();
-
-  const handleDateOrderChange = (index: number, newValue: DatePart) => {
-    const newOrder: [DatePart, DatePart, DatePart] = [...dateOrder];
-    const currentValue = dateOrder[index];
-
-    // If the new value is already in another position, swap them
-    const existingIndex = dateOrder.findIndex((val) => val === newValue);
-    if (existingIndex !== -1 && existingIndex !== index) {
-      newOrder[existingIndex] = currentValue;
-    }
-
-    newOrder[index] = newValue;
-    onDateOrderChange(newOrder);
-  };
+  const {
+    state: { formatType, dateOrder, separator },
+    setFormatType,
+    setDateOrder,
+    setSeparator,
+  } = useDateTimeBuilderContext();
 
   return (
     <Track direction="vertical" align="stretch" gap={16} style={{ flex: '0 0 50%', maxWidth: '50%' }}>
@@ -58,7 +35,7 @@ const FormatSettings: FC<FormatSettingsProps> = ({
         style={{ fontSize: '14px', width: '100%', maxWidth: '100%' }}
         onSelectionChange={(selection) => {
           if (selection) {
-            onFormatTypeChange(selection.value as FormatType);
+            setFormatType(selection.value as FormatType);
           }
         }}
       />
@@ -80,7 +57,8 @@ const FormatSettings: FC<FormatSettingsProps> = ({
                 style={{ fontSize: '14px', width: '100%', maxWidth: '100%' }}
                 onSelectionChange={(selection) => {
                   if (selection) {
-                    handleDateOrderChange(index, selection.value as DatePart);
+                    const newOrder = updateDateOrder(dateOrder, index, selection.value as DatePart);
+                    setDateOrder(newOrder);
                   }
                 }}
               />
@@ -103,7 +81,7 @@ const FormatSettings: FC<FormatSettingsProps> = ({
             style={{ fontSize: '14px', width: '100%', maxWidth: '100%' }}
             onSelectionChange={(selection) => {
               if (selection) {
-                onSeparatorChange(selection.value as Separator);
+                setSeparator(selection.value as Separator);
               }
             }}
           />

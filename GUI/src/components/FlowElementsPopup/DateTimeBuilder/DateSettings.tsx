@@ -6,37 +6,19 @@ import { FC } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { type BaseDate, getBaseOptions } from './date-time-utils';
+import { useDateTimeBuilderContext } from './useDateTimeBuilderContext';
 
-interface DateSettingsProps {
-  base: BaseDate;
-  days: string;
-  months: string;
-  years: string;
-  isTimePrecisionEnabled: boolean;
-  time: string;
-  onBaseChange: (value: BaseDate) => void;
-  onDaysChange: (value: string) => void;
-  onMonthsChange: (value: string) => void;
-  onYearsChange: (value: string) => void;
-  onTimePrecisionToggle: () => void;
-  onTimeChange: (value: string) => void;
-}
-
-const DateSettings: FC<DateSettingsProps> = ({
-  base,
-  days,
-  months,
-  years,
-  isTimePrecisionEnabled,
-  time,
-  onBaseChange,
-  onDaysChange,
-  onMonthsChange,
-  onYearsChange,
-  onTimePrecisionToggle,
-  onTimeChange,
-}) => {
+const DateSettings: FC = () => {
   const { t } = useTranslation();
+  const {
+    state: { base, days, months, years, isTimePrecisionEnabled, time },
+    setBase,
+    setDays,
+    setMonths,
+    setYears,
+    setIsTimePrecisionEnabled,
+    setTime,
+  } = useDateTimeBuilderContext();
 
   return (
     <Track direction="vertical" align="stretch" gap={16} style={{ flex: '0 0 50%', maxWidth: '50%' }}>
@@ -50,7 +32,7 @@ const DateSettings: FC<DateSettingsProps> = ({
         style={{ fontSize: '14px', width: '100%', maxWidth: '100%' }}
         onSelectionChange={(selection) => {
           if (selection) {
-            onBaseChange(selection.value as BaseDate);
+            setBase(selection.value as BaseDate);
           }
         }}
       />
@@ -64,7 +46,7 @@ const DateSettings: FC<DateSettingsProps> = ({
           name="days"
           type="number"
           value={days}
-          onChange={(e) => onDaysChange(e.target.value)}
+          onChange={(e) => setDays(e.target.value)}
           style={{ width: '100%', maxWidth: '100%' }}
         />
         <FormInput
@@ -72,7 +54,7 @@ const DateSettings: FC<DateSettingsProps> = ({
           name="months"
           type="number"
           value={months}
-          onChange={(e) => onMonthsChange(e.target.value)}
+          onChange={(e) => setMonths(e.target.value)}
           style={{ width: '100%', maxWidth: '100%' }}
         />
         <FormInput
@@ -80,7 +62,7 @@ const DateSettings: FC<DateSettingsProps> = ({
           name="years"
           type="number"
           value={years}
-          onChange={(e) => onYearsChange(e.target.value)}
+          onChange={(e) => setYears(e.target.value)}
           style={{ width: '100%', maxWidth: '100%' }}
         />
       </Track>
@@ -95,7 +77,7 @@ const DateSettings: FC<DateSettingsProps> = ({
           value: 'setTime',
         }}
         checked={isTimePrecisionEnabled}
-        onChange={onTimePrecisionToggle}
+        onChange={() => setIsTimePrecisionEnabled(!isTimePrecisionEnabled)}
       />
       {isTimePrecisionEnabled && (
         <FormInput
@@ -103,7 +85,7 @@ const DateSettings: FC<DateSettingsProps> = ({
           name="timeFormat"
           type="text"
           value={time}
-          onChange={(e) => onTimeChange(e.target.value)}
+          onChange={(e) => setTime(e.target.value)}
           placeholder="HH:mm:ss.SSS"
           style={{ width: '100%', maxWidth: '100%' }}
         />
