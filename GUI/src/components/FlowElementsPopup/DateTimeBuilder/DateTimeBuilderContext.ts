@@ -3,14 +3,6 @@ import { Assign } from 'types';
 
 import { BaseDate, DatePart, FormatOptions, FormatType, Separator } from './date-time-utils';
 
-export const useDateTimeBuilderContext = (): DateTimeBuilderContextValue => {
-  const context = useContext(DateTimeBuilderContext);
-  if (!context) {
-    throw new Error('useDateTimeBuilderContext must be used within DateTimeBuilderProvider');
-  }
-  return context;
-};
-
 export interface DateTimeBuilderState {
   base: BaseDate;
   days: string;
@@ -45,3 +37,11 @@ export interface DateTimeBuilderContextValue {
 }
 
 export const DateTimeBuilderContext = createContext<DateTimeBuilderContextValue | null>(null);
+
+export const useDateTimeBuilderContext = (): DateTimeBuilderContextValue => {
+  const context = useContext(DateTimeBuilderContext);
+  if (!context) {
+    throw new Error('useDateTimeBuilderContext must be used within DateTimeBuilderProvider');
+  }
+  return context;
+};
