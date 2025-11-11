@@ -92,6 +92,7 @@
 [data-theme="dark"] .input {
   input {
     background-color: var(--dark-bg-highlight);
+    color: var(--dark-text-primary);
 
     &:focus {
       outline: none;

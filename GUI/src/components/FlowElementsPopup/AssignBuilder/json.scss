@@ -1,0 +1,73 @@
+@import 'src/styles/settings/variables/_colors';
+
+[data-theme="dark"] {
+  .jsoneditor,
+  .jsoneditor-menu {
+    background: var(--dark-bg-secondary) !important;
+    color: var(--dark-text-secondary) !important;
+    border-color: var(--dark-bg-extra-light) !important;
+  }
+
+  .jsoneditor-tree {
+    background: var(--dark-bg-highlight) !important;
+    color: var(--dark-text-secondary) !important;
+  }
+
+  .jsoneditor-navigation-bar {
+    background: var(--dark-bg-light) !important;
+    color: var(--dark-text-label) !important;
+  }
+
+  .jsoneditor-readonly {
+    color: var(--dark-text-secondary) !important;
+  }
+
+  .jsoneditor-highlight {
+    background-color: var(--dark-bg-secondary) !important;
+  }
+
+  .jsoneditor-field {
+    background-color: var(--dark-bg-extra-light) !important;
+    color: var(--dark-text-secondary) !important;
+
+     &:focus {
+       background-color: var(--dark-bg-extra-light) !important;
+       border-color: var(--dark-text-disabled) !important;
+     }
+
+    &:hover {
+      background-color: var(--dark-bg-highlight) !important;
+      border-color: var(--dark-text-disabled) !important;
+    }
+  }
+
+  .jsoneditor-value {
+    background-color: var(--dark-bg-extra-light) !important;
+    color: var(--dark-text-secondary) !important;
+
+    &:focus {
+      background-color: var(--dark-bg-extra-light) !important;
+      border-color: var(--dark-text-disabled) !important;
+    }
+
+    &:hover {
+      background-color: var(--dark-bg-highlight) !important;
+      border-color: var(--dark-text-disabled) !important;
+    }
+  }
+
+  .jsoneditor-frame {
+    background-color: var(--dark-bg-highlight) !important;
+    color: var(--dark-text-disabled) !important;
+
+    input {
+      background-color: var(--dark-bg-highlight) !important;
+      color: var(--dark-text-disabled) !important;
+    }
+  }
+
+  .jsoneditor-undo,
+  .jsoneditor-redo {
+    color: var(--dark-text-disabled) !important;
+  }
+}

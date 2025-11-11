@@ -2,6 +2,7 @@
 @import 'src/styles/tools/color';
 @import 'src/styles/settings/variables/other';
 @import 'src/styles/settings/variables/typography';
+@import 'src/styles/settings/variables/_colors';
 
 .dropdown {
   background-color: white;
@@ -47,4 +48,17 @@
 [data-theme="dark"] .dropdown {
   border: 1px solid rgba(255, 255, 255, 0.1);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
+  background-color: var(--dark-bg-secondary);
+  border-bottom: 1px solid var(--dark-bg-extra-light) !important;
+  color: var(--dark-text-primary);
+
+  &__header {
+    color: var(--dark-text-secondary);
+    background-color: var(--dark-bg-main);
+    border-bottom: 1px solid var(--dark-bg-extra-light);
+
+    span {
+      color: var(--dark-text-secondary);
+    }
+  }
 }

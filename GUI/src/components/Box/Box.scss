@@ -2,6 +2,7 @@
 @import 'src/styles/tools/color';
 @import 'src/styles/settings/variables/other';
 @import 'src/styles/settings/variables/typography';
+@import 'src/styles/settings/variables/_colors';
 
 .box {
   padding: get-spacing(paldiski);
@@ -47,6 +48,8 @@
 }
 
 [data-theme='dark'] .box {
+  color: var(--dark-text-label);
+
   &--default {
     background-color: get-color(black-coral-12);
     border-color: get-color(black-coral-11);

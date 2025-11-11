@@ -3,6 +3,7 @@
 @import 'src/styles/settings/variables/other';
 @import 'src/styles/settings/variables/typography';
 @import 'src/styles/settings/mixins';
+@import 'src/styles/settings/variables/_colors';
 
 .yellow-tag {
   padding: 0 0.3rem;
@@ -193,4 +194,50 @@ li:not(:has(> div > div)) .object-tree-chip {
   background-color: get-color(sapphire-blue-10) !important;
   height: 36px !important;
   cursor: default !important;
+}
+
+[data-theme="dark"] .assign-blue, .rule-blue {
+  background: get-color(sapphire-blue-12);
+  color: var(--dark-text-secondary);
+  border: 1px solid get-color(sapphire-blue-10);
+
+  &:hover {
+    background: get-color(sapphire-blue-11);
+  }
+}
+
+[data-theme="dark"] .assign-red, .rule-red {
+  background: get-color(jasper-12);
+  border: 1px solid get-color(jasper-10);
+  color: var(--dark-text-secondary);
+
+  &:hover {
+    background: get-color(jasper-11);
+  }
+}
+
+[data-theme="dark"] .rule-action-container {
+  background-color: var(--dark-bg-light);
+  border: 1px solid var(--dark-bg-light);
+}
+
+[data-theme="dark"] .rule-green {
+  background: get-color(sea-green-12);
+  border: 1px solid get-color(sea-green-10);
+  color: var(--dark-text-secondary);
+
+  &:hover {
+    background: get-color(sea-green-11);
+  }
+}
+
+
+[data-theme="dark"] .rule-gray {
+  background-color: var(--dark-bg-highlight);
+  border: 1px solid  var(--dark-bg-highlight);
+  color: var(--dark-text-secondary);
+
+  &:hover {
+    background-color: var(--dark-bg-extra-light);
+  }
 }

@@ -225,3 +225,13 @@
     stroke-width: 1.5px;
   }
 }
+
+[data-theme='dark'] .edge-button {
+  background-color: var(--dark-bg-main);
+  color: var(--dark-text-label);
+  border: var(--dark-text-label) 0.5px solid;
+
+  &:hover {
+    background-color: var(--dark-bg-secondary);
+  }
+}
