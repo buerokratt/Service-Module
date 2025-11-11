@@ -182,7 +182,6 @@ const DateTimeBuilder: FC<DateTimeBuilderProps> = ({ border, popupBodyCss }) => 
               { label: String(t('serviceFlow.previousVariables.dateAndTime.timestamp')), value: 'timestamp' },
               { label: String(t('serviceFlow.previousVariables.dateAndTime.timestampMs')), value: 'timestampMs' },
               { label: String(t('serviceFlow.previousVariables.dateAndTime.yearOnly')), value: 'yearOnly' },
-              { label: String(t('serviceFlow.previousVariables.dateAndTime.custom')), value: 'custom' },
             ]}
             defaultValue={formatType}
             style={{ fontSize: '14px', width: '100%', maxWidth: '100%' }}

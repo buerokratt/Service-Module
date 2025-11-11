@@ -41,7 +41,7 @@ export const getBaseOptions = (): { label: string; value: BaseDate }[] =>
 
 export type DatePart = 'YYYY' | 'MM' | 'DD';
 export type Separator = '.' | '/' | '-';
-export type FormatType = 'dateOnly' | 'timestamp' | 'timestampMs' | 'yearOnly' | 'custom';
+export type FormatType = 'dateOnly' | 'timestamp' | 'timestampMs' | 'yearOnly';
 
 export interface FormatOptions {
   type: FormatType;
@@ -89,9 +89,6 @@ const generateDateFormatCode = (formatOptions: FormatOptions, dateVarName = 'd')
       const milliseconds = `String(${dateVarName}.getMilliseconds()).padStart(3, '0')`;
       return `[${getDatePartCode(part1, dateVarName)}, ${getDatePartCode(part2, dateVarName)}, ${getDatePartCode(part3, dateVarName)}].join('${separator}') + 'T' + ${hours} + ':' + ${minutes} + ':' + ${seconds} + '.' + ${milliseconds} + 'Z'`;
     }
-    case 'custom':
-      // Custom format is same as dateOnly - just date parts with separator
-      return generateDateOnlyCode(formatOptions, dateVarName);
   }
 };
 
