@@ -1,5 +1,6 @@
 import Track from 'components/Track';
 import { CSSProperties, FC } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import DateSettings from './DateSettings';
 import { DateTimeBuilderProvider } from './DateTimeBuilderProvider';
@@ -12,6 +13,7 @@ interface DateTimeBuilderProps {
 }
 
 const DateTimeBuilderContent: FC<{ border: string; popupBodyCss: CSSProperties }> = ({ border, popupBodyCss }) => {
+  const { t } = useTranslation();
   const paddingValue = typeof popupBodyCss.padding === 'number' ? popupBodyCss.padding : 16;
 
   return (
@@ -25,6 +27,7 @@ const DateTimeBuilderContent: FC<{ border: string; popupBodyCss: CSSProperties }
         paddingRight: popupBodyCss.paddingRight ?? paddingValue,
       }}
     >
+      <label>{t('serviceFlow.previousVariables.dateAndTime.title')}</label>
       <DateTimePreview />
       <Track direction="horizontal" align="stretch" gap={16} style={{ width: '100%' }}>
         <DateSettings />

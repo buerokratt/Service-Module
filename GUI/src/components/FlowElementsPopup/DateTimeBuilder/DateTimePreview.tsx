@@ -10,22 +10,12 @@ const DateTimePreview: FC = () => {
   const { dragData, evaluatedDate, borderColor } = useDateTimeBuilderContext();
 
   return (
-    <>
-      <label htmlFor="json" style={{ marginBottom: '10px' }}>
+    <Track direction="horizontal" align="center" gap={8} style={{ width: '100%', flexWrap: 'wrap' }}>
+      <OutputElementBox dragData={dragData} borderColor={borderColor} style={{ cursor: 'grab', width: 'fit-content' }}>
         {t('serviceFlow.previousVariables.dateAndTime.title')}
-      </label>
-
-      <Track direction="horizontal" align="center" gap={8} style={{ width: '100%', flexWrap: 'wrap' }}>
-        <OutputElementBox
-          dragData={dragData}
-          borderColor={borderColor}
-          style={{ cursor: 'grab', width: 'fit-content' }}
-        >
-          {t('serviceFlow.previousVariables.dateAndTime.title')}
-        </OutputElementBox>
-        <span style={{ fontSize: '12px', color: '#666', fontFamily: 'monospace' }}>{evaluatedDate}</span>
-      </Track>
-    </>
+      </OutputElementBox>
+      <span style={{ fontSize: '12px', color: '#666', fontFamily: 'monospace' }}>{evaluatedDate}</span>
+    </Track>
   );
 };
 
