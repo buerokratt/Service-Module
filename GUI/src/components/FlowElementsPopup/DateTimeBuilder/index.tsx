@@ -12,13 +12,17 @@ interface DateTimeBuilderProps {
 }
 
 const DateTimeBuilderContent: FC<{ border: string; popupBodyCss: CSSProperties }> = ({ border, popupBodyCss }) => {
+  const paddingValue = typeof popupBodyCss.padding === 'number' ? popupBodyCss.padding : 16;
+
   return (
     <Track
       direction="vertical"
       align="left"
+      gap={16}
       style={{
         ...popupBodyCss,
         borderBottom: border,
+        paddingRight: popupBodyCss.paddingRight ?? paddingValue,
       }}
     >
       <DateTimePreview />
