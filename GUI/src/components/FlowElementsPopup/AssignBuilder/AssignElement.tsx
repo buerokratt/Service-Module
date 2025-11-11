@@ -41,7 +41,7 @@ const AssignElement: React.FC<AssignElementProps> = ({
 }) => {
   const slots = element.slots ?? [];
   const [isSecondSlotOpen, setIsSecondSlotOpen] = useState(!!slots[1]);
-  const [isEditingManually, setIsEditingManually] = useState(manualEdit || (element.value && !slots.length));
+  const [isEditingManually, setIsEditingManually] = useState(manualEdit === true || element.isValueManual === true);
   const [isObjectEditorOpen, setIsObjectEditorOpen] = useState(element.isObject ?? false);
 
   const changeKey = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -77,15 +77,15 @@ const AssignElement: React.FC<AssignElementProps> = ({
     onChange({ ...element, value, slots: [slots[0], data] });
   };
 
-  const enableManualEdit = () => {
-    setIsEditingManually(true);
-    onChange({ ...element, slots: undefined });
+  const toggleManualEdit = () => {
+    const newMode = !element.isValueManual
+    setIsEditingManually(newMode);
+    onChange({ ...element, slots: undefined, isValueManual: newMode });
   };
 
   const toggleObjectEditor = () => {
     if (isObjectEditorOpen) {
       setIsObjectEditorOpen(!isObjectEditorOpen);
-      setIsEditingManually(true);
     } else {
       // New empty element
       if (element.value === '') {
@@ -163,13 +163,13 @@ const AssignElement: React.FC<AssignElementProps> = ({
                 </Track>
               )}
 
-              {!isEditingManually ? (
-                <Tooltip content={t('serviceFlow.popup.assignManualEdit')} onButtonClick={enableManualEdit}>
-                  <div className="small-assign-button assign-blue">
+              {manualEdit ? null : (
+                <Tooltip content={t('serviceFlow.popup.assignManualEdit')} onButtonClick={toggleManualEdit}>
+                  <div className={`small-assign-button assign-${isEditingManually ? 'red' : 'blue'}`}>
                     <Icon icon={<MdEdit />} />
                   </div>
                 </Tooltip>
-              ) : null}
+              )}
             </>
           )}
 
