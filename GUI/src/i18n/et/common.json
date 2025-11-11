@@ -377,8 +377,7 @@
         "yearOnly": "Ainult aasta",
         "custom": "Kohandatud",
         "dateOrder": "Kuupäeva järjekord",
-        "separator": "Eraldaja",
-        "output": "Väljund"
+        "separator": "Eraldaja"
       },
       "helpers": {
         "title": "Tööriistad",

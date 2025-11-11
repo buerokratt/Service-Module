@@ -373,8 +373,7 @@
         "yearOnly": "Year only",
         "custom": "Custom",
         "dateOrder": "Date order",
-        "separator": "Separator",
-        "output": "Output"
+        "separator": "Separator"
       },
       "noName": "<No name>",
       "environmentVariables": {

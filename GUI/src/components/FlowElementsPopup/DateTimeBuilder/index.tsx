@@ -39,12 +39,7 @@ const DateTimeBuilder: FC<DateTimeBuilderProps> = ({ border, popupBodyCss }) => 
   const formatOptions: FormatOptions = useMemo(
     () => ({
       type: formatType,
-      ...(formatType === 'dateOnly' ||
-      formatType === 'custom' ||
-      formatType === 'timestamp' ||
-      formatType === 'timestampMs'
-        ? { dateOrder, separator }
-        : {}),
+      ...(formatType !== 'yearOnly' ? { dateOrder, separator } : {}),
     }),
     [formatType, dateOrder, separator],
   );
@@ -171,10 +166,6 @@ const DateTimeBuilder: FC<DateTimeBuilderProps> = ({ border, popupBodyCss }) => 
               style={{ width: '100%', maxWidth: '100%' }}
             />
           )}
-
-          <label style={{ fontSize: '14px', fontWeight: 500 }}>
-            {t('serviceFlow.previousVariables.dateAndTime.output')}
-          </label>
         </Track>
 
         <Track direction="vertical" align="stretch" gap={16} style={{ flex: '0 0 50%', maxWidth: '50%' }}>
@@ -202,10 +193,7 @@ const DateTimeBuilder: FC<DateTimeBuilderProps> = ({ border, popupBodyCss }) => 
             }}
           />
 
-          {(formatType === 'dateOnly' ||
-            formatType === 'custom' ||
-            formatType === 'timestamp' ||
-            formatType === 'timestampMs') && (
+          {formatType !== 'yearOnly' && (
             <>
               <label style={{ fontSize: '14px', fontWeight: 500 }}>
                 {t('serviceFlow.previousVariables.dateAndTime.dateOrder')}
