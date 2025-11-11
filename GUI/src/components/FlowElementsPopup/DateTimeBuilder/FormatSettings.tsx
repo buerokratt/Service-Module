@@ -16,7 +16,7 @@ const FormatSettings: FC = () => {
   } = useDateTimeBuilderContext();
 
   return (
-    <Track direction="vertical" align="stretch" gap={16} style={{ flex: '0 0 50%', maxWidth: '50%' }}>
+    <Track direction="vertical" align="stretch" gap={16} style={{ flex: '0 1 50%', maxWidth: '50%' }}>
       <label style={{ fontSize: '14px', fontWeight: 500 }}>
         {t('serviceFlow.previousVariables.dateAndTime.format')}
       </label>
