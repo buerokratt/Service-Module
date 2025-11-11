@@ -145,7 +145,7 @@ export const generateDateCode = (
   }
 
   const opsString = operations.join('; ');
-  return `(function() { const d = ${baseDate}; ${opsString}; return ${formatCode}; })()`;
+  return `(function() { let d = ${baseDate}; ${opsString}; return ${formatCode}; })()`;
 };
 
 export const createDateTimeDragData = (dateCode: string): Assign => ({
