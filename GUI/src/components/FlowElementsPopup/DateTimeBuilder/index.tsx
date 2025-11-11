@@ -111,7 +111,7 @@ const DateTimeBuilder: FC<DateTimeBuilderProps> = ({ border, popupBodyCss }) => 
           </Track>
 
           <label style={{ fontSize: '14px', fontWeight: 500 }}>
-            {t('serviceFlow.previousVariables.dateAndTime.timePrecision')}
+            {t('serviceFlow.previousVariables.dateAndTime.time')}
           </label>
           <FormCheckbox
             label=""
