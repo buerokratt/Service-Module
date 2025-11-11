@@ -8,7 +8,16 @@ import { useTranslation } from 'react-i18next';
 import { Assign } from 'types';
 import { getTypeColor } from 'utils/object-util';
 
-import { type BaseDate, createDateTimeDragData, generateDateCode, getBaseOptions } from './date-time-utils';
+import {
+  type BaseDate,
+  createDateTimeDragData,
+  type DatePart,
+  type FormatOptions,
+  type FormatType,
+  generateDateCode,
+  getBaseOptions,
+  type Separator,
+} from './date-time-utils';
 
 interface DateTimeBuilderProps {
   border: string;
@@ -23,6 +32,22 @@ const DateTimeBuilder: FC<DateTimeBuilderProps> = ({ border, popupBodyCss }) => 
   const [years, setYears] = useState<string>('0');
   const [isTimePrecisionEnabled, setIsTimePrecisionEnabled] = useState<boolean>(false);
   const [time, setTime] = useState<string>('21:00:00.000');
+  const [formatType, setFormatType] = useState<FormatType>('dateOnly');
+  const [dateOrder, setDateOrder] = useState<[DatePart, DatePart, DatePart]>(['YYYY', 'MM', 'DD']);
+  const [separator, setSeparator] = useState<Separator>('-');
+
+  const formatOptions: FormatOptions = useMemo(
+    () => ({
+      type: formatType,
+      ...(formatType === 'dateOnly' ||
+      formatType === 'custom' ||
+      formatType === 'timestamp' ||
+      formatType === 'timestampMs'
+        ? { dateOrder, separator }
+        : {}),
+    }),
+    [formatType, dateOrder, separator],
+  );
 
   const dateCode = useMemo(
     () =>
@@ -32,8 +57,9 @@ const DateTimeBuilder: FC<DateTimeBuilderProps> = ({ border, popupBodyCss }) => 
         years,
         isTimePrecisionEnabled,
         time,
+        format: formatOptions,
       }),
-    [base, days, months, years, isTimePrecisionEnabled, time],
+    [base, days, months, years, isTimePrecisionEnabled, time, formatOptions],
   );
 
   const dragData: Assign = useMemo(() => createDateTimeDragData(dateCode), [dateCode]);
@@ -56,7 +82,6 @@ const DateTimeBuilder: FC<DateTimeBuilderProps> = ({ border, popupBodyCss }) => 
         borderBottom: border,
       }}
     >
-      {/* todo check margins everywhere */}
       <label htmlFor="json" style={{ marginBottom: '10px' }}>
         {t('serviceFlow.previousVariables.dateAndTime.title')}
       </label>
@@ -147,11 +172,101 @@ const DateTimeBuilder: FC<DateTimeBuilderProps> = ({ border, popupBodyCss }) => 
             />
           )}
 
-          <label style={{ fontSize: '14px', fontWeight: 500 }}>Output</label>
+          <label style={{ fontSize: '14px', fontWeight: 500 }}>
+            {t('serviceFlow.previousVariables.dateAndTime.output')}
+          </label>
         </Track>
 
-        <Track direction="vertical" align="stretch" style={{ flex: '0 0 50%', maxWidth: '50%' }}>
-          {/* todo Right side for Format Control */}
+        <Track direction="vertical" align="stretch" gap={16} style={{ flex: '0 0 50%', maxWidth: '50%' }}>
+          <label style={{ fontSize: '14px', fontWeight: 500 }}>
+            {t('serviceFlow.previousVariables.dateAndTime.format')}
+          </label>
+
+          <FormSelect
+            label=""
+            name="formatType"
+            hideLabel
+            options={[
+              { label: String(t('serviceFlow.previousVariables.dateAndTime.dateOnly')), value: 'dateOnly' },
+              { label: String(t('serviceFlow.previousVariables.dateAndTime.timestamp')), value: 'timestamp' },
+              { label: String(t('serviceFlow.previousVariables.dateAndTime.timestampMs')), value: 'timestampMs' },
+              { label: String(t('serviceFlow.previousVariables.dateAndTime.yearOnly')), value: 'yearOnly' },
+              { label: String(t('serviceFlow.previousVariables.dateAndTime.custom')), value: 'custom' },
+            ]}
+            defaultValue={formatType}
+            style={{ fontSize: '14px', width: '100%', maxWidth: '100%' }}
+            onSelectionChange={(selection) => {
+              if (selection) {
+                setFormatType(selection.value as FormatType);
+              }
+            }}
+          />
+
+          {(formatType === 'dateOnly' ||
+            formatType === 'custom' ||
+            formatType === 'timestamp' ||
+            formatType === 'timestampMs') && (
+            <>
+              <label style={{ fontSize: '14px', fontWeight: 500 }}>
+                {t('serviceFlow.previousVariables.dateAndTime.dateOrder')}
+              </label>
+              <Track direction="horizontal" align="stretch" gap={8}>
+                {[0, 1, 2].map((index) => {
+                  const handleDateOrderChange = (newValue: DatePart) => {
+                    const newOrder: [DatePart, DatePart, DatePart] = [...dateOrder];
+                    const currentValue = dateOrder[index];
+
+                    // If the new value is already in another position, swap them
+                    const existingIndex = dateOrder.findIndex((val) => val === newValue);
+                    if (existingIndex !== -1 && existingIndex !== index) {
+                      newOrder[existingIndex] = currentValue;
+                    }
+
+                    newOrder[index] = newValue;
+                    setDateOrder(newOrder);
+                  };
+
+                  return (
+                    <FormSelect
+                      key={index}
+                      label=""
+                      name={`dateOrder${index + 1}`}
+                      hideLabel
+                      options={['YYYY', 'MM', 'DD'].map((part) => ({ label: part, value: part }))}
+                      defaultValue={dateOrder[index]}
+                      style={{ fontSize: '14px', width: '100%', maxWidth: '100%' }}
+                      onSelectionChange={(selection) => {
+                        if (selection) {
+                          handleDateOrderChange(selection.value as DatePart);
+                        }
+                      }}
+                    />
+                  );
+                })}
+              </Track>
+
+              <label style={{ fontSize: '14px', fontWeight: 500 }}>
+                {t('serviceFlow.previousVariables.dateAndTime.separator')}
+              </label>
+              <FormSelect
+                label=""
+                name="separator"
+                hideLabel
+                options={[
+                  { label: '.', value: '.' },
+                  { label: '/', value: '/' },
+                  { label: '-', value: '-' },
+                ]}
+                defaultValue={separator}
+                style={{ fontSize: '14px', width: '100%', maxWidth: '100%' }}
+                onSelectionChange={(selection) => {
+                  if (selection) {
+                    setSeparator(selection.value as Separator);
+                  }
+                }}
+              />
+            </>
+          )}
         </Track>
       </Track>
     </Track>

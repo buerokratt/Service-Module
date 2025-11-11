@@ -365,7 +365,16 @@
         "months": "Months",
         "years": "Years",
         "setTime": "Set time",
-        "time": "Time"
+        "time": "Time",
+        "format": "Format",
+        "dateOnly": "Date only",
+        "timestamp": "Timestamp",
+        "timestampMs": "Timestamp (ms)",
+        "yearOnly": "Year only",
+        "custom": "Custom",
+        "dateOrder": "Date order",
+        "separator": "Separator",
+        "output": "Output"
       },
       "noName": "<No name>",
       "environmentVariables": {

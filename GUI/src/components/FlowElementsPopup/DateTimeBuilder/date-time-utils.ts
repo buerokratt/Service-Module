@@ -33,6 +33,68 @@ export const baseOptionsConfig: Array<{ value: BaseDate; baseDate: string }> = [
   },
 ];
 
+export const getBaseOptions = (): { label: string; value: BaseDate }[] =>
+  baseOptionsConfig.map((option) => ({
+    label: String(t(`serviceFlow.previousVariables.dateAndTime.${option.value}`)),
+    value: option.value,
+  }));
+
+export type DatePart = 'YYYY' | 'MM' | 'DD';
+export type Separator = '.' | '/' | '-';
+export type FormatType = 'dateOnly' | 'timestamp' | 'timestampMs' | 'yearOnly' | 'custom';
+
+export interface FormatOptions {
+  type: FormatType;
+  dateOrder?: [DatePart, DatePart, DatePart];
+  separator?: Separator;
+}
+
+const getDatePartCode = (part: DatePart, dateVarName = 'd'): string => {
+  switch (part) {
+    case 'YYYY':
+      return `${dateVarName}.getFullYear()`;
+    case 'MM':
+      return `String(${dateVarName}.getMonth() + 1).padStart(2, '0')`;
+    case 'DD':
+      return `String(${dateVarName}.getDate()).padStart(2, '0')`;
+  }
+};
+
+const generateDateOnlyCode = (formatOptions: FormatOptions, dateVarName = 'd'): string => {
+  const separator = formatOptions.separator || '-';
+  const [part1, part2, part3] = formatOptions.dateOrder || ['YYYY', 'MM', 'DD'];
+  return `[${getDatePartCode(part1, dateVarName)}, ${getDatePartCode(part2, dateVarName)}, ${getDatePartCode(part3, dateVarName)}].join('${separator}')`;
+};
+
+const generateDateFormatCode = (formatOptions: FormatOptions, dateVarName = 'd'): string => {
+  switch (formatOptions.type) {
+    case 'yearOnly':
+      return `${dateVarName}.getFullYear().toString()`;
+    case 'dateOnly':
+      return generateDateOnlyCode(formatOptions, dateVarName);
+    case 'timestamp': {
+      const separator = formatOptions.separator || '-';
+      const [part1, part2, part3] = formatOptions.dateOrder || ['YYYY', 'MM', 'DD'];
+      const hours = `String(${dateVarName}.getHours()).padStart(2, '0')`;
+      const minutes = `String(${dateVarName}.getMinutes()).padStart(2, '0')`;
+      const seconds = `String(${dateVarName}.getSeconds()).padStart(2, '0')`;
+      return `[${getDatePartCode(part1, dateVarName)}, ${getDatePartCode(part2, dateVarName)}, ${getDatePartCode(part3, dateVarName)}].join('${separator}') + 'T' + ${hours} + ':' + ${minutes} + ':' + ${seconds} + 'Z'`;
+    }
+    case 'timestampMs': {
+      const separator = formatOptions.separator || '-';
+      const [part1, part2, part3] = formatOptions.dateOrder || ['YYYY', 'MM', 'DD'];
+      const hours = `String(${dateVarName}.getHours()).padStart(2, '0')`;
+      const minutes = `String(${dateVarName}.getMinutes()).padStart(2, '0')`;
+      const seconds = `String(${dateVarName}.getSeconds()).padStart(2, '0')`;
+      const milliseconds = `String(${dateVarName}.getMilliseconds()).padStart(3, '0')`;
+      return `[${getDatePartCode(part1, dateVarName)}, ${getDatePartCode(part2, dateVarName)}, ${getDatePartCode(part3, dateVarName)}].join('${separator}') + 'T' + ${hours} + ':' + ${minutes} + ':' + ${seconds} + '.' + ${milliseconds} + 'Z'`;
+    }
+    case 'custom':
+      // Custom format is same as dateOnly - just date parts with separator
+      return generateDateOnlyCode(formatOptions, dateVarName);
+  }
+};
+
 export const generateDateCode = (
   base: BaseDate,
   options?: {
@@ -41,6 +103,7 @@ export const generateDateCode = (
     years?: string;
     isTimePrecisionEnabled?: boolean;
     time?: string;
+    format?: FormatOptions;
   },
 ): string => {
   // Get base date initialization from config
@@ -75,20 +138,18 @@ export const generateDateCode = (
     }
   }
 
+  // Get format code
+  const formatOptions = options?.format || { type: 'dateOnly', dateOrder: ['YYYY', 'MM', 'DD'], separator: '-' };
+  const formatCode = generateDateFormatCode(formatOptions);
+
   // Build IIFE expression
   if (operations.length === 0) {
-    return `${baseDate}.toISOString()`;
+    return `(function() { const d = ${baseDate}; return ${formatCode}; })()`;
   }
 
   const opsString = operations.join('; ');
-  return `(function() { const d = ${baseDate}; ${opsString}; return d.toISOString(); })()`;
+  return `(function() { const d = ${baseDate}; ${opsString}; return ${formatCode}; })()`;
 };
-
-export const getBaseOptions = (): { label: string; value: BaseDate }[] =>
-  baseOptionsConfig.map((option) => ({
-    label: String(t(`serviceFlow.previousVariables.dateAndTime.${option.value}`)),
-    value: option.value,
-  }));
 
 export const createDateTimeDragData = (dateCode: string): Assign => ({
   id: v4(),

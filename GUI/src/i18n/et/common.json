@@ -369,7 +369,16 @@
         "months": "Kuud",
         "years": "Aastad",
         "setTime": "Määra aeg",
-        "time": "Aeg"
+        "time": "Aeg",
+        "format": "Vorming",
+        "dateOnly": "Ainult kuupäev",
+        "timestamp": "Ajatempel",
+        "timestampMs": "Ajatempel (ms)",
+        "yearOnly": "Ainult aasta",
+        "custom": "Kohandatud",
+        "dateOrder": "Kuupäeva järjekord",
+        "separator": "Eraldaja",
+        "output": "Väljund"
       },
       "helpers": {
         "title": "Tööriistad",
