@@ -5,6 +5,16 @@ import { v4 } from 'uuid';
 
 export type BaseDate = 'startOfDay' | 'startOfMonth' | 'startOfYear' | 'endOfDay' | 'endOfMonth' | 'endOfYear' | 'now';
 
+export type DatePart = 'YYYY' | 'MM' | 'DD';
+export type Separator = '.' | '/' | '-';
+export type FormatType = 'dateOnly' | 'timestamp' | 'timestampMs' | 'yearOnly';
+
+export interface FormatOptions {
+  type: FormatType;
+  dateOrder?: [DatePart, DatePart, DatePart];
+  separator?: Separator;
+}
+
 export const baseOptionsConfig: Array<{ value: BaseDate; baseDate: string }> = [
   { value: 'now', baseDate: 'new Date()' },
   {
@@ -38,16 +48,6 @@ export const getBaseOptions = (): { label: string; value: BaseDate }[] =>
     label: String(t(`serviceFlow.previousVariables.dateAndTime.${option.value}`)),
     value: option.value,
   }));
-
-export type DatePart = 'YYYY' | 'MM' | 'DD';
-export type Separator = '.' | '/' | '-';
-export type FormatType = 'dateOnly' | 'timestamp' | 'timestampMs' | 'yearOnly';
-
-export interface FormatOptions {
-  type: FormatType;
-  dateOrder?: [DatePart, DatePart, DatePart];
-  separator?: Separator;
-}
 
 const getDatePartCode = (part: DatePart, dateVarName = 'd'): string => {
   switch (part) {
