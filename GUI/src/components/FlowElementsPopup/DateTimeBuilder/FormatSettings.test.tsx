@@ -49,14 +49,56 @@ describe('FormatSettings', () => {
     expect(screen.getByText('serviceFlow.previousVariables.dateAndTime.separator')).toBeInTheDocument();
   });
 
-  it('should hide date order and separator when format type is yearOnly', () => {
+  it('should render format type selector', () => {
     render(
       <DateTimeBuilderProvider>
         <FormatSettings />
       </DateTimeBuilderProvider>,
     );
 
-    // Initially visible
+    // Format type selector should be present (find by name attribute)
+    const allComboboxes = screen.getAllByRole('combobox');
+    const formatTypeSelector = allComboboxes.find((cb) => cb.getAttribute('name') === 'formatType');
+    expect(formatTypeSelector).toBeInTheDocument();
+    // Default is dateOnly
+    expect(screen.getByText('serviceFlow.previousVariables.dateAndTime.dateOnly')).toBeInTheDocument();
+  });
+
+  it('should render date order selectors', () => {
+    render(
+      <DateTimeBuilderProvider>
+        <FormatSettings />
+      </DateTimeBuilderProvider>,
+    );
+
+    // Should have 3 date order selectors (for YYYY, MM, DD)
+    const dateOrderSelectors = screen
+      .getAllByRole('combobox')
+      .filter((element) => element.getAttribute('name')?.startsWith('dateOrder'));
+    expect(dateOrderSelectors).toHaveLength(3);
+  });
+
+  it('should render separator selector', () => {
+    render(
+      <DateTimeBuilderProvider>
+        <FormatSettings />
+      </DateTimeBuilderProvider>,
+    );
+
+    // Find separator selector by name attribute
+    const allComboboxes = screen.getAllByRole('combobox');
+    const separator = allComboboxes.find((cb) => cb.getAttribute('name') === 'separator');
+    expect(separator).toBeInTheDocument();
+  });
+
+  it('should show date order and separator when format type is not yearOnly', () => {
+    render(
+      <DateTimeBuilderProvider>
+        <FormatSettings />
+      </DateTimeBuilderProvider>,
+    );
+
+    // Default formatType is 'dateOnly', so date order and separator should be visible
     expect(screen.getByText('serviceFlow.previousVariables.dateAndTime.dateOrder')).toBeInTheDocument();
     expect(screen.getByText('serviceFlow.previousVariables.dateAndTime.separator')).toBeInTheDocument();
   });
