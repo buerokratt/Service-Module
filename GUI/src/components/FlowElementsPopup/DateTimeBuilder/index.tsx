@@ -1,6 +1,3 @@
-import FormCheckbox from 'components/FormElements/FormCheckbox';
-import FormInput from 'components/FormElements/FormInput';
-import FormSelect from 'components/FormElements/FormSelect';
 import OutputElementBox from 'components/OutputElementBox';
 import Track from 'components/Track';
 import { CSSProperties, FC, useMemo, useState } from 'react';
@@ -15,9 +12,10 @@ import {
   type FormatOptions,
   type FormatType,
   generateDateCode,
-  getBaseOptions,
   type Separator,
 } from './date-time-utils';
+import DateSettings from './DateSettings';
+import FormatSettings from './FormatSettings';
 
 interface DateTimeBuilderProps {
   border: string;
@@ -93,168 +91,29 @@ const DateTimeBuilder: FC<DateTimeBuilderProps> = ({ border, popupBodyCss }) => 
       </Track>
 
       <Track direction="horizontal" align="stretch" gap={16} style={{ width: '100%' }}>
-        <Track direction="vertical" align="stretch" gap={16} style={{ flex: '0 0 50%', maxWidth: '50%' }}>
-          <label style={{ fontSize: '14px', fontWeight: 500 }}>
-            {t('serviceFlow.previousVariables.dateAndTime.base')}
-          </label>
-          <FormSelect
-            label=""
-            name="base"
-            hideLabel
-            options={getBaseOptions()}
-            defaultValue={base}
-            style={{ fontSize: '14px', width: '100%', maxWidth: '100%' }}
-            onSelectionChange={(selection) => {
-              if (selection) {
-                setBase(selection.value as BaseDate);
-              }
-            }}
-          />
+        <DateSettings
+          base={base}
+          days={days}
+          months={months}
+          years={years}
+          isTimePrecisionEnabled={isTimePrecisionEnabled}
+          time={time}
+          onBaseChange={setBase}
+          onDaysChange={setDays}
+          onMonthsChange={setMonths}
+          onYearsChange={setYears}
+          onTimePrecisionToggle={() => setIsTimePrecisionEnabled(!isTimePrecisionEnabled)}
+          onTimeChange={setTime}
+        />
 
-          <label style={{ fontSize: '14px', fontWeight: 500 }}>
-            {t('serviceFlow.previousVariables.dateAndTime.offset')}
-          </label>
-          <Track direction="vertical" align="stretch" gap={8}>
-            <FormInput
-              label={String(t('serviceFlow.previousVariables.dateAndTime.days'))}
-              name="days"
-              type="number"
-              value={days}
-              onChange={(e) => setDays(e.target.value)}
-              style={{ width: '100%', maxWidth: '100%' }}
-            />
-            <FormInput
-              label={String(t('serviceFlow.previousVariables.dateAndTime.months'))}
-              name="months"
-              type="number"
-              value={months}
-              onChange={(e) => setMonths(e.target.value)}
-              style={{ width: '100%', maxWidth: '100%' }}
-            />
-            <FormInput
-              label={String(t('serviceFlow.previousVariables.dateAndTime.years'))}
-              name="years"
-              type="number"
-              value={years}
-              onChange={(e) => setYears(e.target.value)}
-              style={{ width: '100%', maxWidth: '100%' }}
-            />
-          </Track>
-
-          <label style={{ fontSize: '14px', fontWeight: 500 }}>
-            {t('serviceFlow.previousVariables.dateAndTime.time')}
-          </label>
-          <FormCheckbox
-            label=""
-            name="timePrecision"
-            hideLabel
-            item={{
-              label: String(t('serviceFlow.previousVariables.dateAndTime.setTime')),
-              value: 'setTime',
-            }}
-            checked={isTimePrecisionEnabled}
-            onChange={() => setIsTimePrecisionEnabled(!isTimePrecisionEnabled)}
-          />
-          {isTimePrecisionEnabled && (
-            <FormInput
-              label={String(t('serviceFlow.previousVariables.dateAndTime.time'))}
-              name="timeFormat"
-              type="text"
-              value={time}
-              onChange={(e) => setTime(e.target.value)}
-              placeholder="HH:mm:ss.SSS"
-              style={{ width: '100%', maxWidth: '100%' }}
-            />
-          )}
-        </Track>
-
-        <Track direction="vertical" align="stretch" gap={16} style={{ flex: '0 0 50%', maxWidth: '50%' }}>
-          <label style={{ fontSize: '14px', fontWeight: 500 }}>
-            {t('serviceFlow.previousVariables.dateAndTime.format')}
-          </label>
-
-          <FormSelect
-            label=""
-            name="formatType"
-            hideLabel
-            options={[
-              { label: String(t('serviceFlow.previousVariables.dateAndTime.dateOnly')), value: 'dateOnly' },
-              { label: String(t('serviceFlow.previousVariables.dateAndTime.timestamp')), value: 'timestamp' },
-              { label: String(t('serviceFlow.previousVariables.dateAndTime.timestampMs')), value: 'timestampMs' },
-              { label: String(t('serviceFlow.previousVariables.dateAndTime.yearOnly')), value: 'yearOnly' },
-            ]}
-            defaultValue={formatType}
-            style={{ fontSize: '14px', width: '100%', maxWidth: '100%' }}
-            onSelectionChange={(selection) => {
-              if (selection) {
-                setFormatType(selection.value as FormatType);
-              }
-            }}
-          />
-
-          {formatType !== 'yearOnly' && (
-            <>
-              <label style={{ fontSize: '14px', fontWeight: 500 }}>
-                {t('serviceFlow.previousVariables.dateAndTime.dateOrder')}
-              </label>
-              <Track direction="horizontal" align="stretch" gap={8}>
-                {[0, 1, 2].map((index) => {
-                  const handleDateOrderChange = (newValue: DatePart) => {
-                    const newOrder: [DatePart, DatePart, DatePart] = [...dateOrder];
-                    const currentValue = dateOrder[index];
-
-                    // If the new value is already in another position, swap them
-                    const existingIndex = dateOrder.findIndex((val) => val === newValue);
-                    if (existingIndex !== -1 && existingIndex !== index) {
-                      newOrder[existingIndex] = currentValue;
-                    }
-
-                    newOrder[index] = newValue;
-                    setDateOrder(newOrder);
-                  };
-
-                  return (
-                    <FormSelect
-                      key={index}
-                      label=""
-                      name={`dateOrder${index + 1}`}
-                      hideLabel
-                      options={['YYYY', 'MM', 'DD'].map((part) => ({ label: part, value: part }))}
-                      defaultValue={dateOrder[index]}
-                      style={{ fontSize: '14px', width: '100%', maxWidth: '100%' }}
-                      onSelectionChange={(selection) => {
-                        if (selection) {
-                          handleDateOrderChange(selection.value as DatePart);
-                        }
-                      }}
-                    />
-                  );
-                })}
-              </Track>
-
-              <label style={{ fontSize: '14px', fontWeight: 500 }}>
-                {t('serviceFlow.previousVariables.dateAndTime.separator')}
-              </label>
-              <FormSelect
-                label=""
-                name="separator"
-                hideLabel
-                options={[
-                  { label: '.', value: '.' },
-                  { label: '/', value: '/' },
-                  { label: '-', value: '-' },
-                ]}
-                defaultValue={separator}
-                style={{ fontSize: '14px', width: '100%', maxWidth: '100%' }}
-                onSelectionChange={(selection) => {
-                  if (selection) {
-                    setSeparator(selection.value as Separator);
-                  }
-                }}
-              />
-            </>
-          )}
-        </Track>
+        <FormatSettings
+          formatType={formatType}
+          dateOrder={dateOrder}
+          separator={separator}
+          onFormatTypeChange={setFormatType}
+          onDateOrderChange={setDateOrder}
+          onSeparatorChange={setSeparator}
+        />
       </Track>
     </Track>
   );
