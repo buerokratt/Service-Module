@@ -4,7 +4,7 @@ import { FC } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { type DatePart, type FormatType, type Separator, updateDateOrder } from './date-time-utils';
-import { useDateTimeBuilderContext } from './useDateTimeBuilderContext';
+import { useDateTimeBuilderContext } from './DateTimeBuilderContext';
 
 const FormatSettings: FC = () => {
   const { t } = useTranslation();

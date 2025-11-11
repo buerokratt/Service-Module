@@ -1,7 +1,15 @@
-import { createContext } from 'react';
+import { createContext, useContext } from 'react';
 import { Assign } from 'types';
 
-import { type BaseDate, type DatePart, type FormatOptions, type FormatType, type Separator } from './date-time-utils';
+import { BaseDate, DatePart, FormatOptions, FormatType, Separator } from './date-time-utils';
+
+export const useDateTimeBuilderContext = (): DateTimeBuilderContextValue => {
+  const context = useContext(DateTimeBuilderContext);
+  if (!context) {
+    throw new Error('useDateTimeBuilderContext must be used within DateTimeBuilderProvider');
+  }
+  return context;
+};
 
 export interface DateTimeBuilderState {
   base: BaseDate;

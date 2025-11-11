@@ -6,7 +6,7 @@ import { FC } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { type BaseDate, getBaseOptions } from './date-time-utils';
-import { useDateTimeBuilderContext } from './useDateTimeBuilderContext';
+import { useDateTimeBuilderContext } from './DateTimeBuilderContext';
 
 const DateSettings: FC = () => {
   const { t } = useTranslation();

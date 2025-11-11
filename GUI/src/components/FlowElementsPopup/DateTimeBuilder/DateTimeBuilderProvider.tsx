@@ -11,7 +11,7 @@ import {
   generateDateCode,
   type Separator,
 } from './date-time-utils';
-import { DateTimeBuilderContext, type DateTimeBuilderContextValue } from './DateTimeBuilderContext';
+import { DateTimeBuilderContext, DateTimeBuilderContextValue } from './DateTimeBuilderContext';
 
 interface DateTimeBuilderProviderProps extends PropsWithChildren {}
 

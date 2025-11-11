@@ -3,7 +3,7 @@ import Track from 'components/Track';
 import { FC } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { useDateTimeBuilderContext } from './useDateTimeBuilderContext';
+import { useDateTimeBuilderContext } from './DateTimeBuilderContext';
 
 const DateTimePreview: FC = () => {
   const { t } = useTranslation();
