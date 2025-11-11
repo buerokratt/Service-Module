@@ -56,9 +56,21 @@ const DateTimeBuilder: FC<DateTimeBuilderProps> = ({ border, popupBodyCss }) => 
         borderBottom: border,
       }}
     >
+      {/* todo check margins everywhere */}
       <label htmlFor="json" style={{ marginBottom: '10px' }}>
         {t('serviceFlow.previousVariables.dateAndTime.title')}
       </label>
+
+      <Track direction="horizontal" align="center" gap={8} style={{ width: '100%', flexWrap: 'wrap' }}>
+        <OutputElementBox
+          dragData={dragData}
+          borderColor={getTypeColor(dateCode).color}
+          style={{ cursor: 'grab', width: 'fit-content' }}
+        >
+          {t('serviceFlow.previousVariables.dateAndTime.title')}
+        </OutputElementBox>
+        <span style={{ fontSize: '12px', color: '#666', fontFamily: 'monospace' }}>{evaluatedDate}</span>
+      </Track>
 
       <Track direction="horizontal" align="stretch" gap={16} style={{ width: '100%' }}>
         <Track direction="vertical" align="stretch" gap={16} style={{ flex: '0 0 50%', maxWidth: '50%' }}>
@@ -136,16 +148,6 @@ const DateTimeBuilder: FC<DateTimeBuilderProps> = ({ border, popupBodyCss }) => 
           )}
 
           <label style={{ fontSize: '14px', fontWeight: 500 }}>Output</label>
-          <Track direction="horizontal" align="center" gap={8} style={{ width: '100%', flexWrap: 'wrap' }}>
-            <OutputElementBox
-              dragData={dragData}
-              borderColor={getTypeColor(dateCode).color}
-              style={{ cursor: 'grab', width: 'fit-content' }}
-            >
-              {t('serviceFlow.previousVariables.dateAndTime.title')}
-            </OutputElementBox>
-            <span style={{ fontSize: '12px', color: '#666', fontFamily: 'monospace' }}>{evaluatedDate}</span>
-          </Track>
         </Track>
 
         <Track direction="vertical" align="stretch" style={{ flex: '0 0 50%', maxWidth: '50%' }}>
