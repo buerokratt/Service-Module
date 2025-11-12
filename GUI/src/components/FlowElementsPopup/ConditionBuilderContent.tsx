@@ -29,7 +29,12 @@ const ConditionBuilderContent: React.FC = () => {
         <span>{t('serviceFlow.popup.yesNoQuestion')}</span>
       </Track>
       {isYesNoQuestion && <YesNoPopupContent />}
-      {!isYesNoQuestion && <RuleBuilder onChange={useServiceStore.getState().changeRulesNode} seedGroup={rules} />}
+      {!isYesNoQuestion && (
+        <RuleBuilder
+          onChange={(group) => useServiceStore.getState().changeRulesNode(group.children)}
+          seedGroup={rules}
+        />
+      )}
     </Track>
   );
 };

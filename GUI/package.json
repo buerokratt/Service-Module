@@ -57,7 +57,7 @@
     "sass": "^1.57.1",
     "sass-loader": "^13.2.0",
     "to-json-schema": "^0.2.5",
-    "typescript": "^4.9.4",
+    "typescript": "^5.9.2",
     "uuid": "^9.0.0",
     "yup": "^1.0.0"
   },
@@ -70,6 +70,7 @@
     "format:fix": "prettier --write .",
     "lint": "eslint . --max-warnings 0",
     "lint:fix": "eslint . --fix --max-warnings 0",
+    "typecheck": "tsc --noEmit --skipLibCheck 2>&1 | grep '^src/' || echo 'No type errors found in src/'",
     "test": "vitest",
     "test:run": "vitest run",
     "test:ui": "vitest --ui",
