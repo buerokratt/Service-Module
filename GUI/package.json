@@ -70,7 +70,6 @@
     "format:fix": "prettier --write .",
     "lint": "eslint . --max-warnings 0",
     "lint:fix": "eslint . --fix --max-warnings 0",
-    "typecheck": "tsc --noEmit --skipLibCheck 2>&1 | grep '^src/' || echo 'No type errors found in src/'",
     "test": "vitest",
     "test:run": "vitest run",
     "test:ui": "vitest --ui",
