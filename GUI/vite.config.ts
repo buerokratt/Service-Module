@@ -25,7 +25,7 @@ export default ({ mode }: { mode: string }) => {
       },
       host: true,
       strictPort: true,
-      port: parseInt(process.env.REACT_APP_APP_PORT),
+      port: parseInt(process.env.REACT_APP_APP_PORT ?? '3006'),
       headers: {
         ...(process.env.REACT_APP_CSP && {
           'Content-Security-Policy': process.env.REACT_APP_CSP,
