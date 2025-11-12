@@ -23,7 +23,7 @@ const Layout: FC<PropsWithChildren<LayoutProps>> = ({ disableMenu, customHeader,
           <Header
             toastContext={{ open: useToastStore.getState().open }}
             user={useStore.getState().userInfo}
-            setUserDomains={() => {}}
+            setUserDomains={useStore.getState().setUserDomains}
           />
         )}
         <main className="layout__main">{children ?? <Outlet />}</main>
