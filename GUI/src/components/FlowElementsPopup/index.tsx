@@ -35,6 +35,7 @@ import TextfieldTestContent from './TextfieldTestContent';
 import { servicesRequestsExplain } from '../../resources/api-constants';
 import api from '../../services/api-dev';
 import { StepType } from '../../types';
+import { getInitialGroup } from './RuleBuilder/types';
 import './styles.scss';
 
 const FlowElementsPopup: React.FC = () => {
@@ -85,7 +86,11 @@ const FlowElementsPopup: React.FC = () => {
   );
 
   useEffect(() => {
-    if (node) node.data.rules = rules;
+    if (node) {
+      node.data.rules = node.data.rules
+        ? { ...node.data.rules, children: rules }
+        : { ...getInitialGroup(), children: rules };
+    }
   }, [node, rules]);
 
   useEffect(() => {
@@ -129,7 +134,7 @@ const FlowElementsPopup: React.FC = () => {
       case StepType.Input:
       case StepType.Condition:
         if (node.data?.rules) {
-          useServiceStore.getState().changeRulesNode(node.data.rules);
+          useServiceStore.getState().changeRulesNode(node.data.rules.children);
         }
         break;
 
@@ -198,7 +203,9 @@ const FlowElementsPopup: React.FC = () => {
     };
 
     if (stepType === StepType.Input || stepType === StepType.Condition) {
-      updatedNode.data.rules = rules;
+      updatedNode.data.rules = updatedNode.data.rules
+        ? { ...updatedNode.data.rules, children: rules }
+        : { ...getInitialGroup(), children: rules };
     }
 
     if (stepType === StepType.MultiChoiceQuestion) {
