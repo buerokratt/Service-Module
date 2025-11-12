@@ -1,5 +1,12 @@
+@import 'src/styles/settings/variables/_colors';
+
 .ql-toolbar {
   border-radius: 4px 4px 0 0;
+  color: white !important;
+  background-color: var(--dark-bg-extra-light);
+}
+.ql-toolbar .ql-stroke {
+  stroke: var(--dark-text-label) !important;
 }
 
 .ql-container {
@@ -14,4 +21,9 @@
 
 .ql-editor {
   min-height: 144px;
+}
+
+.ql-snow.ql-toolbar {
+  .ql-stroke { stroke: var(--dark-text-label) !important; }
+  .ql-fill { fill: var(--dark-text-label) !important; }
 }
