@@ -11,6 +11,7 @@ import { useTranslation } from 'react-i18next';
 import useServiceStore from 'store/new-services.store';
 import { StepType } from 'types';
 import ImportExportControls from 'components/Flow/Controls/ImportExportControls';
+import './FlowBuilder.scss';
 
 type FlowBuilderProps = {
   nodes: Node[];
@@ -139,10 +140,14 @@ const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
         defaultEdgeOptions={{ type: 'step', deletable: false }}
       >
         <Chat />
-        <MiniMap />
+        <div className={'controls-adjustment'}>
+            <MiniMap />
+        </div>
         <Background color="#D2D3D8" gap={16} lineWidth={9} />
-        <Controls orientation="horizontal" showInteractive={false} />
-        <Panel position="top-left">
+        <div className={'controls-adjustment zoom-position'}>
+            <Controls orientation="horizontal" showInteractive={false} />
+        </div>
+        <Panel position="top-left" style={{ marginTop: '75}px'}}>
           <ImportExportControls />
         </Panel>
       </ReactFlow>

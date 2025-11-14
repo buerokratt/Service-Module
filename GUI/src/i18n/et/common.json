@@ -277,6 +277,7 @@
     "chooseMemorySlots": "Vali mälukohad"
   },
   "serviceFlow": {
+    "serviceConfiguration": "Teenuse seaded",
     "element": {
       "taraAuthentication": "TARA autentimine",
       "textfield": "Sõnum kliendile",

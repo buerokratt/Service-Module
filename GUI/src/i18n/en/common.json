@@ -277,6 +277,7 @@
     "chooseMemorySlots": "Choose memory slots"
   },
   "serviceFlow": {
+    "serviceConfiguration": "Service Configuration",
     "element": {
       "taraAuthentication": "Tara authorization",
       "textfield": "Send message to client",

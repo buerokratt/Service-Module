@@ -35,8 +35,11 @@ const NewServiceHeader: FC<NewServiceHeaderProps> = ({ activeStep, backOnClick, 
     <>
       <header className="header" style={{ paddingLeft: 24 }}>
         <Track justify="between" gap={16}>
-          <Button appearance="text" style={{ textDecoration: 'none', boxShadow: 'none' }} onClick={backOnClick}>
-            <h1 style={{ whiteSpace: 'nowrap', color: 'black' }}>{`< ${t('menu.backToServiceListing')}`}</h1>
+          <Button appearance="primary" onClick={backOnClick}>
+              <Icon icon={<TiArrowLeft size={20} />}/>{t('menu.backToServiceListing')}
+          </Button>
+          <Button appearance="primary" onClick={() => setShowServiceConfig(true)}>
+              {t('serviceFlow.serviceConfiguration')}<Icon icon={<FaGear size={18} />} size="medium" />
           </Button>
           <HeaderStepCounter activeStep={activeStep} />
           <Button
