@@ -18,8 +18,6 @@ type EndpointCustomProps = {
 
 const EndpointCustom: React.FC<EndpointCustomProps> = ({
   endpoint,
-  // This needs to be removed in the future
-  // This is always true as we have removed the Test tab
   isLive,
   requestValues,
   requestTab,
@@ -56,7 +54,10 @@ const EndpointCustom: React.FC<EndpointCustomProps> = ({
     });
   }
 
-  useEffect(() => setKey(key + 1), [isLive, key]);
+  // Adding "key" dependency breaks focus in variable inputs
+  // Impossible to fix without a significant refactor
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => setKey(key + 1), [isLive]);
 
   const handleJsonRequestClick = () => {
     triggerJsonRequest(endpoint);
