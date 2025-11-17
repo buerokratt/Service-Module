@@ -55,7 +55,7 @@ const EndpointCustom: React.FC<EndpointCustomProps> = ({
   }
 
   // Adding "key" dependency breaks focus in variable inputs
-  // Impossible to fix without a significant refactor
+  // Likely impossible to fix without a significant refactor
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => setKey(key + 1), [isLive]);
 
