@@ -741,6 +741,7 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
             dynamicChoices: updatedNode.data.dynamicChoices,
             endpoint: updatedNode.data.endpoint,
             label: updatedNode.data.label,
+            testingPassed: updatedNode.data.testingPassed,
           },
         };
       }),
