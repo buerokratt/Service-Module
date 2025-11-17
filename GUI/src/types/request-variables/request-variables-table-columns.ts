@@ -1,3 +1,5 @@
+import { RequestOperator } from 'types/endpoint/request-operator';
+
 export type RequestVariablesTableColumns = {
   id: string;
   isNameEditable: boolean;
@@ -9,4 +11,5 @@ export type RequestVariablesTableColumns = {
   type?: string;
   value?: string;
   variable?: string;
+  operator?: RequestOperator;
 };

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="256" height="256" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Horizontal flow layout icon (centered)">
+  <!-- Background rounded square -->
+  <rect x="16" y="16" width="224" height="224" rx="28" ry="28" fill="#005AA3"/>
+
+  <!-- Left node (centered vertically) -->
+  <rect x="36" y="112" width="60" height="32" rx="6" ry="6" fill="#FFFFFF"/>
+
+  <!-- Horizontal stem to split (ends at split bar left edge) -->
+  <rect x="96" y="124" width="28" height="8" fill="#FFFFFF"/>
+
+  <!-- Vertical split bar (centered on x=128) -->
+  <rect x="124" y="86" width="8" height="84" fill="#FFFFFF"/>
+
+  <!-- Horizontal connectors from split bar corners to node corners -->
+  <!-- From top-right corner of split bar (x=132,y=96) to top-left corner of top-right node (x=160,y=96) -->
+  <rect x="132" y="86" width="28" height="8" fill="#FFFFFF"/>
+  <!-- From bottom-right corner of split bar (x=132,y=160) to top-left corner of bottom-right node (x=160,y=160) -->
+  <rect x="132" y="162" width="28" height="8" fill="#FFFFFF"/>
+
+  <!-- Top right node -->
+  <rect x="160" y="74" width="60" height="32" rx="6" ry="6" fill="#FFFFFF"/>
+
+  <!-- Bottom right node -->
+  <rect x="160" y="150" width="60" height="32" rx="6" ry="6" fill="#FFFFFF"/>
+</svg>

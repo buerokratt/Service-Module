@@ -603,17 +603,18 @@ function handleEndpointStep(
   const bodyVariables = endpointDefinition?.body?.variables;
   const headersVariables = endpointDefinition?.headers?.variables;
   const methodType = endpointDefinition?.methodType?.toLowerCase();
+  const hasNonEqualOperator = paramsVariables?.some((param: any) => param.operator && param.operator !== '=');
 
   const stepConfig: any = {
     call: `http.${methodType ?? 'post'}`,
     args: {
-      url: endpointDefinition?.url?.split('?')[0] ?? '',
+      url: hasNonEqualOperator ? (endpointDefinition?.url ?? '') : (endpointDefinition?.url?.split('?')[0] ?? ''),
     },
     result: `${parentNode.data.endpoint?.name.replaceAll(' ', '_')}_res`,
     next: childNode ? toSnakeCase(childNode.data.label ?? 'format_messages') : 'format_messages',
   };
 
-  if (Array.isArray(paramsVariables) && paramsVariables.length > 0) {
+  if (Array.isArray(paramsVariables) && paramsVariables.length > 0 && !hasNonEqualOperator) {
     stepConfig.args.query = paramsVariables.reduce((acc: any, e: any) => {
       acc[e.name] = e.value;
       return acc;

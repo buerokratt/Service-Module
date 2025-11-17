@@ -5,7 +5,7 @@ import i18n from 'i18n';
 import { Dispatch, SetStateAction } from 'react';
 import { MdDeleteOutline } from 'react-icons/md';
 import { RequestTab } from 'types';
-import { PreDefinedEndpointEnvVariables } from 'types/endpoint';
+import { EndpointTab, PreDefinedEndpointEnvVariables } from 'types/endpoint';
 import {
   RequestVariablesRowData,
   RequestVariablesTableColumns,
@@ -14,22 +14,32 @@ import {
 
 import ValueCell from './ValueCell';
 import VariableCell from './VariableCell';
+import OperatorCell from './OperatorCell';
+import { FieldType } from 'types/endpoint/field-type';
 
 interface GetColumnsConfig {
   rowsData: RequestVariablesTabsRowsData;
   updateParams: (isValue: boolean, rowId: string, value: string) => void;
+  updateOperator: (rowId: string, operator: string) => void;
   requestTab: RequestTab;
   deleteVariable: (rowData: RequestVariablesRowData) => void;
   setRowsData: Dispatch<SetStateAction<RequestVariablesTabsRowsData>>;
   requestValues: PreDefinedEndpointEnvVariables;
   isLive: boolean;
-  updateRowField: (id: string, field: 'variable' | 'value', value: string) => void;
+  updateRowField: (id: string, field: FieldType, value: string) => void;
   getTabsRowsData: () => RequestVariablesTabsRowsData;
 }
+
+const getSortValue = (rowData: RequestVariablesRowData | undefined, type: FieldType): string => {
+  if (!rowData) return '';
+
+  return rowData[type] ?? '';
+};
 
 export const getColumns = ({
   rowsData,
   updateParams,
+  updateOperator,
   requestTab,
   deleteVariable,
   setRowsData,
@@ -41,18 +51,19 @@ export const getColumns = ({
   const sortRows = (
     rowA: Row<RequestVariablesTableColumns>,
     rowB: Row<RequestVariablesTableColumns>,
-    type: 'variable' | 'value',
+    type: FieldType,
   ): number => {
     if (!rowsData[requestTab.tab]) return 1;
     const valueA = rowsData[requestTab.tab]!.find((row) => row.id === rowA.id);
     const valueB = rowsData[requestTab.tab]!.find((row) => row.id === rowB.id);
-    if (type === 'variable') {
-      return (valueA?.variable ?? '') < (valueB?.variable ?? '') ? 1 : -1;
-    }
-    return (valueA?.value ?? '') < (valueB?.value ?? '') ? 1 : -1;
+
+    const aValue = getSortValue(valueA, type);
+    const bValue = getSortValue(valueB, type);
+
+    return (aValue ?? '') < (bValue ?? '') ? 1 : -1;
   };
 
-  return [
+  const columns: any = [
     columnHelper.accessor('variable', {
       header: i18n.t('newService.endpoint.variable') ?? '',
       meta: {
@@ -74,6 +85,36 @@ export const getColumns = ({
         />
       ),
     }),
+  ];
+
+  if (requestTab.tab === EndpointTab.Params) {
+    columns.push(
+      columnHelper.accessor('operator', {
+        header: i18n.t('newService.endpoint.operator') ?? 'Operator',
+        meta: {
+          size: '15%',
+        },
+        sortingFn: (rowA: Row<RequestVariablesTableColumns>, rowB: Row<RequestVariablesTableColumns>) => {
+          return sortRows(rowA, rowB, 'operator');
+        },
+        cell: (props) => (
+          <OperatorCell
+            row={props.row}
+            operator={rowsData[requestTab.tab]!.find((r) => r.id === props.row.id)?.operator ?? '='}
+            updateRowOperator={(id, operator) => {
+              updateRowField(id, 'operator', operator);
+            }}
+            onOperatorChange={(rowId, operator) => {
+              updateOperator(rowId, operator);
+            }}
+            currentTab={requestTab.tab}
+          />
+        ),
+      }),
+    );
+  }
+
+  columns.push(
     columnHelper.accessor('value', {
       header: i18n.t('newService.endpoint.value') ?? '',
       meta: {
@@ -97,6 +138,9 @@ export const getColumns = ({
     }),
     columnHelper.display({
       id: 'delete',
+      meta: {
+        size: '10%',
+      },
       cell: (props) => {
         return (
           <Track justify="center" style={{ paddingRight: 8 }}>
@@ -120,5 +164,7 @@ export const getColumns = ({
         );
       },
     }),
-  ];
+  );
+
+  return columns;
 };

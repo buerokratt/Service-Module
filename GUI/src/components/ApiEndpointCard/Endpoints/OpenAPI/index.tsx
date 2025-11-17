@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import api from 'services/api';
 import { v4 as uuid } from 'uuid';
 
 import { Button, FormInput, FormSelect, RequestVariables, Track } from '../../..';
 import { getOpenApiSpec } from '../../../../resources/api-constants';
-import api from '../../../../services/api-dev';
+import useServiceStore from '../../../../store/new-services.store';
 import { Option, RequestTab } from '../../../../types';
 import { ApiSpecProperty } from '../../../../types/api-spec-property';
 import {
@@ -37,9 +38,17 @@ const EndpointOpenAPI: React.FC<EndpointOpenAPIProps> = ({
   );
   const [openApiEndpoints, setOpenApiEndpoints] = useState<EndpointDefinition[]>(endpoint.definitions ?? []);
   const [key, setKey] = useState<number>(0);
+  const { triggerJsonRequest } = useServiceStore();
   const { t } = useTranslation();
 
   useEffect(() => setKey(key + 1), [isLive, key]);
+
+  const handleJsonRequestClick = () => {
+    if (selectedEndpoint) {
+      const endpointData = { ...endpoint, definitions: [selectedEndpoint] };
+      triggerJsonRequest(endpointData);
+    }
+  };
 
   const getEndpointSchema = (
     apiSpec: ApiSpecProperty,
@@ -156,7 +165,7 @@ const EndpointOpenAPI: React.FC<EndpointOpenAPIProps> = ({
   const fetchOpenApiSpecMock = async () => {
     const result = await api.post<{ response: ApiSpecProperty }>(getOpenApiSpec(), { url: openApiUrl });
     const apiSpec = result.data.response;
-    const url = new URL(openApiUrl).origin + apiSpec.basePath;
+    const url = new URL(openApiUrl).origin + (apiSpec.basePath ?? '');
     const paths: EndpointDefinition[] = [];
 
     Object.entries(apiSpec.paths).forEach(([path, endpointData]) => {
@@ -271,7 +280,10 @@ const EndpointOpenAPI: React.FC<EndpointOpenAPIProps> = ({
       {selectedEndpoint &&
         (selectedEndpoint?.supported ? (
           <>
-            <p>{selectedEndpoint?.description}</p>
+            <Track justify="between" gap={16}>
+              <p>{selectedEndpoint?.description}</p>
+              <Button onClick={handleJsonRequestClick}>{t('newService.test')}</Button>
+            </Track>
             <RequestVariables
               key={key}
               disableRawData

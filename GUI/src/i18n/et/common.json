@@ -123,6 +123,8 @@
       "popupNotifications": "Pop-up märguanded",
       "newUnansweredChat": "Uus vastamata vestlus",
       "newForwardedChat": "Uus suunatud vestlus",
+      "newForwardedChatTitle": "Suunatud vestlus",
+      "newForwardedChatMessage": "Sulle suunati uus vestlus!",
       "newValidationMessage": "Uus teade kinnitamiseks",
       "useAutocorrect": "Teksti autokorrektor",
       "required": "Nõutud",
@@ -144,7 +146,6 @@
     },
     "service": {
       "name": "Nimetus",
-      "usedCount": "Kasutamise arv",
       "linkedIntent": "Ühendatud teema",
       "state": "Olek",
       "states": {
@@ -228,6 +229,7 @@
       "url": "API otspunkti URL",
       "value": "Väärtus",
       "variable": "Muutuja",
+      "operator": "Operaator",
       "unsupported": "Vabandust, praegu toetame ainult GET ja POST päringud",
       "insertName": "Sisesta otspunkti nimetus...",
       "type": "Otspunkti tüüp",
@@ -346,17 +348,31 @@
       "environmentVariables": {
         "title": "Keskkonnamuutujad"
       },
-      "dates": {
-        "title": "Kuupäevad",
-        "currentDate": "Praegune kuupäev",
-        "currentTime": "Praegune aeg",
-        "currentDateAndTime": "Praegune kuupäev ja kellaaeg",
-        "yesterday": "Eile",
-        "tomorrow": "Homme",
-        "customDateTime": "Kohandatud kuupäev ja kellaaeg",
-        "yearMonthDayFormat": "Aasta Kuu Päeva formaat",
-        "dayMonthYearFormat": "Päev Kuu Aasta formaat",
-        "customFormat": "Kohandatud vorming"
+      "dateAndTime": {
+        "title": "Kuupäev ja kellaaeg",
+        "base": "Põhi",
+        "startOfDay": "Päeva algus",
+        "startOfMonth": "Kuu algus",
+        "startOfYear": "Aasta algus",
+        "endOfDay": "Päeva lõpp",
+        "endOfMonth": "Kuu lõpp",
+        "endOfYear": "Aasta lõpp",
+        "now": "Nüüd",
+        "today": "Täna",
+        "offset": "Nihutus",
+        "days": "Päevad",
+        "months": "Kuud",
+        "years": "Aastad",
+        "setTime": "Määra aeg",
+        "time": "Aeg",
+        "format": "Vorming",
+        "dateOnly": "Ainult kuupäev",
+        "timestamp": "Ajatempel",
+        "timestampMs": "Ajatempel (ms)",
+        "yearOnly": "Ainult aasta",
+        "custom": "Kohandatud",
+        "dateOrder": "Kuupäeva järjekord",
+        "separator": "Eraldaja"
       },
       "helpers": {
         "title": "Tööriistad",
@@ -392,6 +408,7 @@
     "allElements": "Üldelemendid",
     "serviceInfo": "Teenuse teave",
     "parseError": "Teenuse genereerimine ebaõnnestus! Fail ei ole kas JSON, seda on muudetud või see on vigane",
+    "orientationTooltip": "Vahetage voolu suunda",
     "apiElements": {
       "title": "API elemendid",
       "delete": "Kustuta",

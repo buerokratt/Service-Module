@@ -40,9 +40,8 @@ import './styles.scss';
 const FlowElementsPopup: React.FC = () => {
   const { t } = useTranslation();
   const [selectedTab, setSelectedTab] = useState<string | null>(null);
-  const [isJsonRequestVisible, setIsJsonRequestVisible] = useState(false);
   const [isSaveEnabled, setIsSaveEnabled] = useState(true);
-  const [jsonRequestContent, setJsonRequestContent] = useState<any>(null);
+  const { isJsonRequestVisible, jsonRequestContent, setJsonRequestVisible, setJsonRequestContent } = useServiceStore();
   const node = useServiceStore((state) => state.selectedNode);
   const selectedService = useServiceListStore((state) => state.selectedService);
   const instance = useServiceStore.getState().reactFlowInstance;
@@ -159,7 +158,7 @@ const FlowElementsPopup: React.FC = () => {
 
   const onClose = () => {
     setSelectedTab(null);
-    setIsJsonRequestVisible(false);
+    setJsonRequestVisible(false);
     setJsonRequestContent(null);
     setTextfieldMessage(null);
     setWebpageName(null);
@@ -194,6 +193,7 @@ const FlowElementsPopup: React.FC = () => {
         },
         dynamicChoices: dynamicChoices,
         endpoint: nodeEndpoint ?? node.data?.endpoint,
+        testingPassed: undefined,
       },
     };
 
@@ -260,7 +260,7 @@ const FlowElementsPopup: React.FC = () => {
 
   const handleJsonRequestClick = async () => {
     if (isJsonRequestVisible) {
-      setIsJsonRequestVisible(false);
+      setJsonRequestVisible(false);
       return;
     }
 
@@ -281,20 +281,22 @@ const FlowElementsPopup: React.FC = () => {
         ],
       });
       setJsonRequestContent(response.data.response);
-      setIsJsonRequestVisible(true);
+      setJsonRequestVisible(true);
     } catch (error) {
       console.error('Error: ', error);
     }
   };
 
   function extractMapValues(element: any) {
-    if (element.rawData && element.rawData.length > 0) {
-      return element.rawData.value; //  element.rawData.testValue
+    if (element?.rawData && element?.rawData?.length > 0) {
+      return element.rawData.value;
     }
 
     let result: any = {};
-    for (const entry of element.variables) {
-      result = { ...result, [entry.name]: entry.value };
+    if (element?.variables) {
+      for (const entry of element.variables) {
+        result = { ...result, [entry.name]: entry.value };
+      }
     }
     return result;
   }
