@@ -1,8 +1,10 @@
 import * as Tabs from '@radix-ui/react-tabs';
 import { PaginationState, SortingState } from '@tanstack/react-table';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { ReactElement, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import useServiceStore from 'store/new-services.store';
+import { FieldType } from 'types/endpoint/field-type';
+import { RequestOperator } from 'types/endpoint/request-operator';
 
 import { getColumns } from './columns';
 import { Button, FormTextarea, SwitchBox, Track } from '../../..';
@@ -19,8 +21,6 @@ import {
   RequestVariablesTabsRowsData,
 } from '../../../../types/request-variables';
 import DataTable from '../../../DataTable';
-import { RequestOperator } from 'types/endpoint/request-operator';
-import { FieldType } from 'types/endpoint/field-type';
 
 type RequestVariablesProps = {
   disableRawData?: boolean;
@@ -119,14 +119,19 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
     return rowIdx;
   };
 
+  const [rowsData, setRowsData] = useState<RequestVariablesTabsRowsData>(getTabsRowsData());
+
   useEffect(() => {
     setRequestTab((rt) => {
       const availableTabs = Object.keys(rowsData);
       rt.tab = availableTabs.includes(rt.tab) ? rt.tab : (availableTabs[0] as EndpointTab);
       return rt;
     });
-    setKey(key + 1);
-  }, []);
+    setKey((key) => key + 1);
+    // Adding rowsData dependency breaks focus on typing in variable inputs
+    // Impossible to fix without a significant refactor
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [setRequestTab]);
 
   const getInitialTabsRawData = (): RequestVariablesTabsRawData => {
     return tabs.reduce((tabsRawData, tab) => {
@@ -135,7 +140,6 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
       return { ...tabsRawData, [tab]: endpointData[tab]?.rawData[isLive ? 'value' : 'testValue'] ?? '' };
     }, {});
   };
-  const [rowsData, setRowsData] = useState<RequestVariablesTabsRowsData>(getTabsRowsData());
   const [tabRawData, setTabRawData] = useState<RequestVariablesTabsRawData>(getInitialTabsRawData());
 
   const getTabTriggerClasses = (tab: EndpointTab) =>
@@ -316,10 +320,13 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
         isLive,
         getTabsRowsData,
       }),
+    // Adding missing dependencies breaks focus on typing in variable inputs
+    // Impossible to fix without a significant refactor
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [deletedVariable, requestTab.tab],
   );
 
-  const buildRawDataView = (): JSX.Element => {
+  const buildRawDataView = (): ReactElement => {
     return (
       <>
         <Track justify="between" style={{ padding: '8px 0 8px 0' }}>
@@ -344,7 +351,6 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
         </Track>
         <FormTextarea
           key={`${requestTab.tab}-raw-data`}
-          name={`${requestTab.tab}-raw-data`}
           label={''}
           defaultValue={tabRawData[requestTab.tab]}
           onBlur={() => updateEndpointRawData(tabRawData, endpoint)}

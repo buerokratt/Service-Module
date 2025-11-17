@@ -1,4 +1,4 @@
-import { useTranslation } from 'react-i18next';
+import { t } from 'i18next';
 
 export enum HELPERS_CONSTANTS {
   MAP = 'YOUR_LIST.map((item: any) => item.value)',
@@ -14,7 +14,6 @@ export enum HELPERS_CONSTANTS {
 }
 
 export const getHelperTooltips = () => {
-  const { t } = useTranslation();
   const helpersPath = 'serviceFlow.previousVariables.helpers.tooltip';
 
   const createTooltip = (key: string, replacements: Record<string, string> = {}) => {

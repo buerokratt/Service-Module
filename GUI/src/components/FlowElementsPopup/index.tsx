@@ -1,5 +1,6 @@
 import * as Tabs from '@radix-ui/react-tabs';
-import React, { useEffect, useState } from 'react';
+import { Edge, getConnectedEdges, getIncomers, getOutgoers, Node } from '@xyflow/react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { useTranslation } from 'react-i18next';
@@ -15,30 +16,26 @@ import { isTemplate, removeTrailingUnderscores, stringToTemplate, templateToStri
 
 import { Button, Track } from '..';
 import Popup from '../Popup';
+import ApiContent from './ApiContent';
+import AssignContent from './AssignContent';
 import ConditionBuilderContent from './ConditionBuilderContent';
+import ConditionContent from './ConditionContent';
 import DefaultMessageContent from './DefaultMessageContent';
+import DynamicChoicesContent from './DynamicChoicesContent';
 import EndConversationContent from './EndConversationContent';
 import FileGenerateContent from './FileGenerateContent';
 import FileSignContent from './FileSignContent';
 import JsonRequestContent from './JsonRequestContent';
+import MultiChoiceQuestionContent from './MultiChoiceQuestionContent';
 import OpenWebPageContent from './OpenWebPageContent';
 import OpenWebPageTestContent from './OpenWebPageTestContent';
 import RasaRulesContent from './RasaRulesContent';
 import TextfieldContent from './TextfieldContent';
 import TextfieldTestContent from './TextfieldTestContent';
 import { servicesRequestsExplain } from '../../resources/api-constants';
-import { StepType } from '../../types';
-
-import './styles.scss';
-import ConditionContent from './ConditionContent';
-import AssignContent from './AssignContent';
-import ApiContent from './ApiContent';
-import MultiChoiceQuestionContent from './MultiChoiceQuestionContent';
-
-import { Edge, getConnectedEdges, getIncomers, getOutgoers, Node } from '@xyflow/react';
-
 import api from '../../services/api-dev';
-import DynamicChoicesContent from './DynamicChoicesContent';
+import { StepType } from '../../types';
+import './styles.scss';
 
 const FlowElementsPopup: React.FC = () => {
   const { t } = useTranslation();
@@ -49,44 +46,50 @@ const FlowElementsPopup: React.FC = () => {
   const selectedService = useServiceListStore((state) => state.selectedService);
   const instance = useServiceStore.getState().reactFlowInstance;
 
-  const isUserDefinedNode = node?.data?.stepType === 'user-defined';
+  const isUserDefinedNode = node?.data?.stepType === StepType.UserDefined;
 
   const serviceName = useServiceStore((state) => removeTrailingUnderscores(state.serviceNameDashed()));
   const rules = useServiceStore((state) => state.rules);
   const assignElements = useServiceStore((state) => state.assignElements);
   const endpointsVariables = useServiceStore((state) => state.endpointsResponseVariables);
 
-  const defaultMultiChoiceQuestionButtons = [
-    {
-      id: '1',
-      title: 'Jah',
-      payload: `#service, /${selectedService?.type ?? 'POST'}/services/active/${serviceName}_mcq_${
-        node?.data.label[node?.data.label.length - 1]
-      }_0`,
-    },
-    {
-      id: '2',
-      title: 'Ei',
-      payload: `#service, /${selectedService?.type ?? 'POST'}/services/active/${serviceName}_mcq_${
-        node?.data.label[node?.data.label.length - 1]
-      }_1`,
-    },
-  ];
+  const defaultMultiChoiceQuestionButtons = useMemo(
+    () => [
+      {
+        id: '1',
+        title: 'Jah',
+        payload: `#service, /${selectedService?.type ?? 'POST'}/services/active/${serviceName}_mcq_${
+          node?.data.label[node?.data.label.length - 1]
+        }_0`,
+      },
+      {
+        id: '2',
+        title: 'Ei',
+        payload: `#service, /${selectedService?.type ?? 'POST'}/services/active/${serviceName}_mcq_${
+          node?.data.label[node?.data.label.length - 1]
+        }_1`,
+      },
+    ],
+    [selectedService?.type, serviceName, node?.data.label],
+  );
 
-  const defaultDynamicChoices: DynamicChoices = {
-    list: '',
-    serviceName: '',
-    key: '',
-    payloadKeys: '',
-  };
+  const defaultDynamicChoices: DynamicChoices = useMemo(
+    () => ({
+      list: '',
+      serviceName: '',
+      key: '',
+      payloadKeys: '',
+    }),
+    [],
+  );
 
   useEffect(() => {
     if (node) node.data.rules = rules;
-  }, [rules]);
+  }, [node, rules]);
 
   useEffect(() => {
     if (node) node.data.assignElements = assignElements;
-  }, [assignElements]);
+  }, [assignElements, node]);
 
   // StepType.Textfield
   const [textfieldMessage, setTextfieldMessage] = useState<string | null>(null);
@@ -147,7 +150,7 @@ const FlowElementsPopup: React.FC = () => {
       default:
         break;
     }
-  }, [stepType]);
+  }, [defaultDynamicChoices, defaultMultiChoiceQuestionButtons, node, stepType]);
 
   if (!node) return <></>;
 

@@ -2,14 +2,14 @@ import * as Dialog from '@radix-ui/react-dialog';
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 import Icon from 'components/Icon';
 import Track from 'components/Track';
-import { FC, PropsWithChildren } from 'react';
+import { FC, PropsWithChildren, ReactNode } from 'react';
 import { MdOutlineClose } from 'react-icons/md';
 import './Dropdown.scss';
 
 type DropdownProps = PropsWithChildren<{
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
-  trigger: React.ReactNode;
+  trigger: ReactNode;
   title?: string;
   onClose?: () => void;
   centered?: boolean;

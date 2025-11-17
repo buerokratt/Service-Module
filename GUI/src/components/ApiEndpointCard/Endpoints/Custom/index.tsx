@@ -1,12 +1,12 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import useServiceStore from 'store/new-services.store';
+import { RequestOperator } from 'types/endpoint/request-operator';
 import { v4 as uuid } from 'uuid';
 
 import { Button, FormInput, FormSelect, RequestVariables, Track } from '../../..';
 import { RequestTab } from '../../../../types';
 import { EndpointData, EndpointVariableData, PreDefinedEndpointEnvVariables } from '../../../../types/endpoint';
-import { RequestOperator } from 'types/endpoint/request-operator';
 
 type EndpointCustomProps = {
   endpoint: EndpointData;
@@ -54,6 +54,9 @@ const EndpointCustom: React.FC<EndpointCustomProps> = ({
     });
   }
 
+  // Adding "key" dependency breaks focus in variable inputs
+  // Likely impossible to fix without a significant refactor
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => setKey(key + 1), [isLive]);
 
   const handleJsonRequestClick = () => {
@@ -157,7 +160,7 @@ const EndpointCustom: React.FC<EndpointCustomProps> = ({
 
 function parseURL(url: string) {
   try {
-    const [_, queryString = ''] = url.split('?');
+    const queryString = url.split('?')[1] ?? '';
     const params: Record<string, any> = {};
     const operators: Record<string, string> = {};
 

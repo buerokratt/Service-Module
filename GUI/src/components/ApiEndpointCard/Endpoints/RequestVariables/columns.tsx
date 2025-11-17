@@ -2,19 +2,20 @@ import { Button, Icon, Track } from '@buerokratt-ria/header/src/components';
 import { createColumnHelper, Row } from '@tanstack/react-table';
 import Tooltip from 'components/Tooltip';
 import i18n from 'i18n';
+import { Dispatch, SetStateAction } from 'react';
 import { MdDeleteOutline } from 'react-icons/md';
 import { RequestTab } from 'types';
 import { EndpointTab, PreDefinedEndpointEnvVariables } from 'types/endpoint';
+import { FieldType } from 'types/endpoint/field-type';
 import {
   RequestVariablesRowData,
   RequestVariablesTableColumns,
   RequestVariablesTabsRowsData,
 } from 'types/request-variables';
 
+import OperatorCell from './OperatorCell';
 import ValueCell from './ValueCell';
 import VariableCell from './VariableCell';
-import OperatorCell from './OperatorCell';
-import { FieldType } from 'types/endpoint/field-type';
 
 interface GetColumnsConfig {
   rowsData: RequestVariablesTabsRowsData;
@@ -22,7 +23,7 @@ interface GetColumnsConfig {
   updateOperator: (rowId: string, operator: string) => void;
   requestTab: RequestTab;
   deleteVariable: (rowData: RequestVariablesRowData) => void;
-  setRowsData: React.Dispatch<React.SetStateAction<RequestVariablesTabsRowsData>>;
+  setRowsData: Dispatch<SetStateAction<RequestVariablesTabsRowsData>>;
   requestValues: PreDefinedEndpointEnvVariables;
   isLive: boolean;
   updateRowField: (id: string, field: FieldType, value: string) => void;

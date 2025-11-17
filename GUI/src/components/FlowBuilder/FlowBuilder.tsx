@@ -1,6 +1,7 @@
 import { Background, Controls, Edge, MiniMap, Node, Panel, ReactFlow, useReactFlow } from '@xyflow/react';
 import { Button, Modal, Tooltip, Track } from 'components';
 import Chat from 'components/chat/chat';
+import ImportExportControls from 'components/Flow/Controls/ImportExportControls';
 import edgeTypes from 'components/Flow/EdgeTypes';
 import nodeTypes from 'components/Flow/NodeTypes';
 import useLayout from 'hooks/flow/useLayout';
@@ -11,7 +12,7 @@ import { useTranslation } from 'react-i18next';
 import useNewServiceStore from 'store/new-services.store';
 import useServiceStore from 'store/services.store';
 import { StepType } from 'types';
-import ImportExportControls from 'components/Flow/Controls/ImportExportControls';
+
 import HorizontalFlow from '../../static/icons/horizontal_flow.svg';
 import VerticalFlow from '../../static/icons/vertical_flow.svg';
 
