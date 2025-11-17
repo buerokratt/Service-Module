@@ -160,6 +160,7 @@ function CustomEdge({
       <EdgeLabelRenderer>
         <Dropdown
           open={dropdownOpen}
+          centered={true}
           onOpenChange={setDropdownOpen}
           onClose={() => setDropdownOpen(false)}
           title={t('serviceFlow.elements').toString()}

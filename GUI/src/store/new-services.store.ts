@@ -11,7 +11,7 @@ import {
 } from '@xyflow/react';
 import { AxiosResponse } from 'axios';
 import { GroupOrRule } from 'components/FlowElementsPopup/RuleBuilder/types';
-import i18next from 'i18next';
+import i18next, { t } from 'i18next';
 import {
   getCommonEndpoints,
   getEndpointValidation,
@@ -31,6 +31,7 @@ import { EndpointResponseVariable } from 'types/endpoint/endpoint-response-varia
 import { EndpointType } from 'types/endpoint/endpoint-type';
 import { RequestVariablesTabsRawData, RequestVariablesTabsRowsData } from 'types/request-variables';
 import { initialEdges, initialNodes, NodeDataProps } from 'types/service-flow';
+import { generateJsonRequest } from 'utils/json-request-utils';
 import { v4 as uuid } from 'uuid';
 import { create } from 'zustand';
 
@@ -119,8 +120,11 @@ export interface ServiceStoreState {
   enableTestButton: () => void;
   handlePopupSave: (updatedNode: Node<NodeDataProps>) => void;
   testUrl: (endpoint: EndpointData, onError: () => void, onSuccess: () => void) => Promise<void>;
-
-  // remove the following funtions and refactor the code to use more specific functions later
+  isJsonRequestVisible: boolean;
+  jsonRequestContent: any;
+  setJsonRequestVisible: (visible: boolean) => void;
+  setJsonRequestContent: (content: any) => void;
+  triggerJsonRequest: (endpoint: EndpointData) => void;
   setEndpoints: (callback: (prev: EndpointData[]) => EndpointData[]) => void;
   reactFlowInstance: ReactFlowInstance | null;
   setReactFlowInstance: (reactFlowInstance: ReactFlowInstance | null) => void;
@@ -746,6 +750,7 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
             dynamicChoices: updatedNode.data.dynamicChoices,
             endpoint: updatedNode.data.endpoint,
             label: updatedNode.data.label,
+            testingPassed: updatedNode.data.testingPassed,
           },
         };
       }),
@@ -796,6 +801,24 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
   },
   cancelNavigation: () => {
     set({ nextLocation: null });
+  },
+  isJsonRequestVisible: false,
+  jsonRequestContent: null,
+  setJsonRequestVisible: (visible: boolean) => set({ isJsonRequestVisible: visible }),
+  setJsonRequestContent: (content: any) => set({ jsonRequestContent: content }),
+  triggerJsonRequest: (endpoint: EndpointData) => {
+    generateJsonRequest(endpoint.definitions[0])
+      .then((content) => {
+        set({ jsonRequestContent: content, isJsonRequestVisible: true });
+        useToastStore.getState().success({
+          title: t('newService.endpoint.success'),
+        });
+      })
+      .catch((error) => {
+        useToastStore.getState().error({
+          title: error.message ?? t('newService.endpoint.error'),
+        });
+      });
   },
 }));
 

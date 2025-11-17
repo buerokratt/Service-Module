@@ -26,12 +26,15 @@ const AddEndpointModal: React.FC<AddEndpointModalProps> = ({ onClose, onUpdatePr
   const [endpointNameExists, setEndpointNameExists] = useState(false);
   const [isCommonEndpoint, setIsCommonEndpoint] = useState(false);
   const [isCreatingEndpoint, setIsCreatingEndpoint] = useState(false);
+  const { setJsonRequestVisible, setJsonRequestContent } = useServiceStore();
 
   const handleClose = () => {
     setEndpoint({ endpointId: uuid(), name: '', definitions: [], isNew: true });
     setEndpointName('');
     setIsCommonEndpoint(false);
     setIsCreatingEndpoint(false);
+    setJsonRequestVisible(false);
+    setJsonRequestContent(null);
     onClose();
   };
 

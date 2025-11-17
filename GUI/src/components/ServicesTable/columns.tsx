@@ -79,12 +79,6 @@ export const getColumns = ({
         </Track>
       ),
     }),
-    columnHelper.accessor('usedCount', {
-      header: i18n.t('overview.service.usedCount') ?? '',
-      meta: {
-        size: 320,
-      },
-    }),
     columnHelper.accessor('linkedIntent', {
       header: i18n.t('overview.service.linkedIntent') ?? '',
       meta: {

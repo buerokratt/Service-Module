@@ -10,7 +10,6 @@ export type EndpointDefinitionJson = {
 export interface Service {
   readonly id: number;
   readonly name: string;
-  usedCount: number;
   readonly state: ServiceState;
   readonly type: 'GET' | 'POST';
   readonly isCommon: boolean;

@@ -66,24 +66,24 @@ const App: React.FC = () => {
         localStorage.setItem(CHAT_SESSIONS.SESSION_STATE_KEY, JSON.stringify(currentState));
       }
 
-      const handleTabCloseWithId = () => handleTabClose(tabId);
-      window.addEventListener('beforeunload', handleTabCloseWithId);
+      const boundHandleTabClose = () => handleTabClose(tabId);
+      window.addEventListener('beforeunload', boundHandleTabClose);
 
       return () => {
-        window.removeEventListener('beforeunload', handleTabCloseWithId);
+        window.removeEventListener('beforeunload', boundHandleTabClose);
       };
     };
 
     const delay = 1000;
-    let eventListenerCleanup: (() => void) | undefined;
+    let cleanupSession: (() => void) | undefined;
 
     const timeOutId = setTimeout(() => {
-      eventListenerCleanup = initializeSession();
+      cleanupSession = initializeSession();
     }, delay);
 
     return () => {
       clearTimeout(timeOutId);
-      eventListenerCleanup?.();
+      cleanupSession?.();
     };
   }, []);
 
