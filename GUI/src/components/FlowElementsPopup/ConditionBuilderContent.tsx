@@ -5,6 +5,7 @@ import useServiceStore from 'store/new-services.store';
 import { Track } from '..';
 import { SwitchBox } from '../FormElements';
 import RuleBuilder from './RuleBuilder';
+import { Group } from './RuleBuilder/types';
 import YesNoPopupContent from './YesNoPopupContent';
 
 import './styles.scss';
@@ -31,7 +32,7 @@ const ConditionBuilderContent: React.FC = () => {
       {isYesNoQuestion && <YesNoPopupContent />}
       {!isYesNoQuestion && (
         <RuleBuilder
-          onChange={(group) => useServiceStore.getState().changeRulesNode(group.children)}
+          onChange={(group: Group) => useServiceStore.getState().changeRulesNode(group.children)}
           seedGroup={rules}
         />
       )}
