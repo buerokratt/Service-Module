@@ -234,6 +234,7 @@
       "url": "API endpoint URL",
       "value": "Value",
       "variable": "Variable",
+      "operator": "Operator",
       "unsupported": "Sorry, we currently only support GET and POST requests.",
       "insertName": "Insert endpoint name...",
       "type": "Endpoint type",
@@ -398,6 +399,7 @@
     "allElements": "All elements",
     "serviceInfo": "Service info",
     "parseError": "Service generation failed! Either not JSON, the file has been modified or is corrupt",
+    "orientationTooltip": "Toggle flow orientation",
     "apiElements": {
       "title": "API elements",
       "delete": "Delete",
