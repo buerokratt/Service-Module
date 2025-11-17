@@ -6,7 +6,7 @@ import Track from 'components/Track';
 import React, { FC, useEffect } from 'react';
 import { MdDeleteOutline, MdOutlineEdit, MdOutlineRemoveRedEye } from 'react-icons/md';
 import { NodeDataProps } from 'types/service-flow';
-
+import useServiceStore from 'store/services.store';
 import StepNode from './StepNode';
 
 type CustomNodeProps = {
@@ -15,16 +15,25 @@ type CustomNodeProps = {
 
 const CustomNode: FC<NodeProps & CustomNodeProps> = (props) => {
   const { data, isConnectable, id } = props;
+  const orientation = useServiceStore((state) => state.orientation);
   const shouldOffsetHandles = data.childrenCount > 1;
 
   const updateNodeInternals = useUpdateNodeInternals();
 
   useEffect(() => {
     updateNodeInternals(id);
-  }, [data.childrenCount, id, updateNodeInternals]);
+  }, [data.childrenCount, id, updateNodeInternals, orientation]);
 
   const isFinishingStep = () => {
     return data.type === 'finishing-step';
+  };
+
+  const getTargetPosition = () => {
+    return orientation === 'horizontal' ? Position.Left : Position.Top;
+  };
+
+  const getSourcePosition = () => {
+    return orientation === 'horizontal' ? Position.Right : Position.Bottom;
   };
 
   const bottomHandles = (): React.JSX.Element => {
@@ -35,7 +44,7 @@ const CustomNode: FC<NodeProps & CustomNodeProps> = (props) => {
             key={`handle-${id}-${i}`}
             id={`handle-${id}-${i}`}
             type="source"
-            position={Position.Bottom}
+            position={getSourcePosition()}
             isConnectable={isConnectable}
             style={
               shouldOffsetHandles
@@ -54,7 +63,7 @@ const CustomNode: FC<NodeProps & CustomNodeProps> = (props) => {
 
   return (
     <>
-      <Handle type="target" position={Position.Top} isConnectable={isConnectable} />
+      <Handle type="target" position={getTargetPosition()} isConnectable={isConnectable} />
       <StepNode data={data} />
       {data.stepType !== 'rule' && (
         <Track style={{ position: 'fixed', top: 8, right: 8 }}>

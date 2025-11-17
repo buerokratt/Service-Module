@@ -56,6 +56,13 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    padding-top: 5px;
+
+    &[data-orientation='horizontal'] {
+      padding-left: 5px;
+    }
+
+    &[data-orientation='vertical'] {
+      padding-top: 5px;
+    }
   }
 }
