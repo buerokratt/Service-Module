@@ -56,7 +56,7 @@ const ApiEndpoint: FC<ApiEndpointProps> = ({ step, onClick }) => {
     return step.data ? JSON.parse(JSON.stringify(step.data)) : undefined;
   }, [step.data]);
 
-  const { deleteEndpoint: deleteEndpointFromStore } = useServiceStore();
+  const { deleteEndpoint: deleteEndpointFromStore, setJsonRequestVisible, setJsonRequestContent } = useServiceStore();
 
   const deleteSelectedEndpoint = async (endpoint: EndpointData | undefined) => {
     if (!endpoint) {
@@ -125,6 +125,8 @@ const ApiEndpoint: FC<ApiEndpointProps> = ({ step, onClick }) => {
           onClose={() => {
             useServiceStore.getState().editEndpoint(originalEndpoint);
             setShowEditModal(false);
+            setJsonRequestVisible(false);
+            setJsonRequestContent(null);
           }}
         >
           <Track isMultiline gap={16} direction="vertical" align="stretch">
@@ -141,6 +143,8 @@ const ApiEndpoint: FC<ApiEndpointProps> = ({ step, onClick }) => {
                 onClick={(e) => {
                   useServiceStore.getState().editEndpoint(originalEndpoint);
                   setShowEditModal(false);
+                  setJsonRequestVisible(false);
+                  setJsonRequestContent(null);
                   e.stopPropagation();
                 }}
               >
@@ -158,6 +162,8 @@ const ApiEndpoint: FC<ApiEndpointProps> = ({ step, onClick }) => {
                     [stepData],
                     () => {
                       setShowEditModal(false);
+                      setJsonRequestVisible(false);
+                      setJsonRequestContent(null);
                       e.stopPropagation();
                       useServiceStore.getState().editEndpoint(stepData);
                       setIsEditing(false);
