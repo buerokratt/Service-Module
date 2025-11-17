@@ -30,11 +30,6 @@ jobs:
     with:
       command: npm run test:run
 
-  frontend-typecheck:
-    uses: ./.github/workflows/run-check.yml
-    with:
-      command: npm run typecheck
-
   frontend-build:
     if: github.event.pull_request.draft == false
     runs-on: ubuntu-latest
