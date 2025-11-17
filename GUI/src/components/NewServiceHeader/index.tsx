@@ -12,6 +12,12 @@ import { removeTrailingUnderscores } from 'utils/string-util';
 import { Button, HeaderStepCounter, Modal, Track } from '..';
 import api from '../../services/api-dev';
 import useServiceListStore from '../../store/services.store';
+import SettingsModal from "../ServiceConfigurationForm";
+import Dialog from "../Dialog";
+import Icon from "../Icon";
+import {FaGear} from "react-icons/fa6";
+import {TiArrowLeft} from "react-icons/ti";
+import "./NewServiceHeader.scss";
 
 type NewServiceHeaderProps = {
   activeStep: number;
@@ -35,13 +41,15 @@ const NewServiceHeader: FC<NewServiceHeaderProps> = ({ activeStep, backOnClick, 
     <>
       <header className="header" style={{ paddingLeft: 24 }}>
         <Track justify="between" gap={16}>
-          <Button appearance="primary" onClick={backOnClick}>
+          <Button appearance="primary" className={"icon_button"} onClick={backOnClick}>
               <Icon icon={<TiArrowLeft size={20} />}/>{t('menu.backToServiceListing')}
           </Button>
-          <Button appearance="primary" onClick={() => setShowServiceConfig(true)}>
+          <Button appearance="primary"  className={"icon_button"} onClick={() => setShowServiceConfig(true)}>
               {t('serviceFlow.serviceConfiguration')}<Icon icon={<FaGear size={18} />} size="medium" />
           </Button>
-          <HeaderStepCounter activeStep={activeStep} />
+          <div className="naming">
+            {name ?? '...'}
+          </div>
           <Button
             appearance={isDeleting ? 'loading' : 'error'}
             disabled={
