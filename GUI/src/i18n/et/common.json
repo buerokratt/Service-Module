@@ -235,6 +235,7 @@
       "url": "API otspunkti URL",
       "value": "Väärtus",
       "variable": "Muutuja",
+      "operator": "Operaator",
       "unsupported": "Vabandust, praegu toetame ainult GET ja POST päringud",
       "insertName": "Sisesta otspunkti nimetus...",
       "type": "Otspunkti tüüp",
