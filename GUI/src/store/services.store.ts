@@ -155,7 +155,7 @@ const useServiceListStore = create<ServiceStoreState>()(
           commonServices: services,
         });
       },
-      deleteService: async (id) => {
+      deleteService: (id) => {
         const services = get().services.filter((e: Service) => e.serviceId !== id);
         set({
           commonServices: services.filter((e: Service) => e.isCommon === true),
@@ -207,7 +207,7 @@ const useServiceListStore = create<ServiceStoreState>()(
         if (!selectedService) return;
 
         try {
-          const res = await api.post(changeIntentConnection(), {
+          const res = await api.post<{ response: Trigger }>(changeIntentConnection(), {
             serviceId: selectedService.serviceId,
           });
           if (res.data.response) {
@@ -220,7 +220,7 @@ const useServiceListStore = create<ServiceStoreState>()(
           onNotConnected();
         }
       },
-      deleteSelectedService: async (onEnd, successMessage, errorMessage, pagination, sorting) => {
+      deleteSelectedService: async (onEnd, successMessage, errorMessage) => {
         const selectedService = get().selectedService;
         if (!selectedService) return;
 
@@ -264,7 +264,7 @@ const useServiceListStore = create<ServiceStoreState>()(
         try {
           const order = sorting[0]?.desc ? 'desc' : 'asc';
           const sort = sorting.length === 0 ? 'requestedAt desc' : sorting[0]?.id + ' ' + order;
-          const requests = await api.post(getConnectionRequests(), {
+          const requests = await api.post<{ response: Trigger[] }>(getConnectionRequests(), {
             page: pagination.pageIndex + 1,
             page_size: pagination.pageSize,
             sorting: sort,
@@ -280,7 +280,7 @@ const useServiceListStore = create<ServiceStoreState>()(
         try {
           const order = sorting[0]?.desc ? 'desc' : 'asc';
           const sort = sorting.length === 0 ? 'intent asc' : sorting[0]?.id + ' ' + order;
-          const requests = await api.post(getAvailableIntents(), {
+          const requests = await api.post<{ response: Intent[] }>(getAvailableIntents(), {
             page: pagination.pageIndex + 1,
             page_size: pagination.pageSize,
             sorting: sort,
