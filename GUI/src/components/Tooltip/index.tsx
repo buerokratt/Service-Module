@@ -1,5 +1,5 @@
 import * as RadixTooltip from '@radix-ui/react-tooltip';
-import React, { FC, PropsWithChildren, ReactNode, useState, cloneElement, isValidElement } from 'react';
+import React, { cloneElement, FC, isValidElement, PropsWithChildren, ReactNode, useState } from 'react';
 
 import './Tooltip.scss';
 

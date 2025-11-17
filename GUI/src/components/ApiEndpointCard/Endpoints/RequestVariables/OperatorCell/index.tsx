@@ -1,9 +1,9 @@
-import React from 'react';
 import { Row } from '@tanstack/react-table';
 import { FormSelect } from 'components/FormElements';
+import React from 'react';
 import { EndpointTab } from 'types/endpoint';
-import { RequestVariablesTableColumns } from 'types/request-variables';
 import { RequestOperator } from 'types/endpoint/request-operator';
+import { RequestVariablesTableColumns } from 'types/request-variables';
 
 type OperatorCellProps = {
   row: Row<RequestVariablesTableColumns>;

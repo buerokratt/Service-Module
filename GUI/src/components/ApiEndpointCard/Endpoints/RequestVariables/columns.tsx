@@ -6,16 +6,16 @@ import { Dispatch, SetStateAction } from 'react';
 import { MdDeleteOutline } from 'react-icons/md';
 import { RequestTab } from 'types';
 import { EndpointTab, PreDefinedEndpointEnvVariables } from 'types/endpoint';
+import { FieldType } from 'types/endpoint/field-type';
 import {
   RequestVariablesRowData,
   RequestVariablesTableColumns,
   RequestVariablesTabsRowsData,
 } from 'types/request-variables';
 
+import OperatorCell from './OperatorCell';
 import ValueCell from './ValueCell';
 import VariableCell from './VariableCell';
-import OperatorCell from './OperatorCell';
-import { FieldType } from 'types/endpoint/field-type';
 
 interface GetColumnsConfig {
   rowsData: RequestVariablesTabsRowsData;

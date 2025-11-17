@@ -5,8 +5,9 @@ import Icon from 'components/Icon';
 import Track from 'components/Track';
 import React, { FC, useEffect } from 'react';
 import { MdDeleteOutline, MdOutlineEdit, MdOutlineRemoveRedEye } from 'react-icons/md';
-import { NodeDataProps } from 'types/service-flow';
 import useServiceStore from 'store/services.store';
+import { NodeDataProps } from 'types/service-flow';
+
 import StepNode from './StepNode';
 
 type CustomNodeProps = {

@@ -160,7 +160,7 @@ const EndpointCustom: React.FC<EndpointCustomProps> = ({
 
 function parseURL(url: string) {
   try {
-    const [_, queryString = ''] = url.split('?');
+    const queryString = url.split('?')[1] ?? '';
     const params: Record<string, any> = {};
     const operators: Record<string, string> = {};
 

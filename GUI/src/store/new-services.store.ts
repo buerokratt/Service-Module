@@ -31,13 +31,13 @@ import { EndpointResponseVariable } from 'types/endpoint/endpoint-response-varia
 import { EndpointType } from 'types/endpoint/endpoint-type';
 import { RequestVariablesTabsRawData, RequestVariablesTabsRowsData } from 'types/request-variables';
 import { initialEdges, initialNodes, NodeDataProps } from 'types/service-flow';
+import { generateJsonRequest } from 'utils/json-request-utils';
 import { v4 as uuid } from 'uuid';
 import { create } from 'zustand';
 
 import useTestServiceStore from './test-services.store';
 import useToastStore from './toasts.store';
 import api from '../services/api-dev';
-import { generateJsonRequest } from 'utils/json-request-utils';
 
 export interface ServiceStoreState {
   endpoints: EndpointData[];
