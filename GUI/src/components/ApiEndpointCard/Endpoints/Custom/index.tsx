@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MdErrorOutline } from 'react-icons/md';
 import useServiceStore from 'store/new-services.store';
@@ -19,6 +19,8 @@ type EndpointCustomProps = {
 
 const EndpointCustom: React.FC<EndpointCustomProps> = ({
   endpoint,
+  // This needs to be removed in the future
+  // This is always true as we have removed the Test tab
   isLive,
   requestValues,
   requestTab,
@@ -55,8 +57,6 @@ const EndpointCustom: React.FC<EndpointCustomProps> = ({
       },
     });
   }
-
-  useEffect(() => setKey(key + 1), [isLive]);
 
   const refereshEndpoint = () => {
     setEndpoints((endpoint) => endpoint);

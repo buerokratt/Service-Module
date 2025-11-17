@@ -175,10 +175,7 @@
     "popup": {
       "delete": "Are you sure you want to delete this service? This action cannot be undone.",
       "setActive": "Are you sure you want to activate this service?",
-      "setReady": "Are you sure you want to mark this service as ready?",
       "setDraft": "Are you sure you want to mark this service as draft?",
-      "setInactive": "Are you sure you want to deactivate this service?",
-      "setState": "Update state",
       "checking": "Checking if service is connected to an intent",
       "setToDraft": "Set to draft",
       "connectToIntent": "Connect to intent",
@@ -194,8 +191,6 @@
       "noIntentsAvailable": "No intents available to be connected",
       "noSlotsAvailable": "No slots available",
       "connectionQuestion": "Are you sure you want to connect to this intent?",
-      "activate": "Activate",
-      "deactivate": "Deactivate",
       "createNewIntent": "Create new intent",
       "deleteNodeConnections": "Would you like to also delete all the logic paths connected to this node or leave them hanging?"
     }

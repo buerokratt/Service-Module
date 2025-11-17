@@ -11,7 +11,6 @@ const DefaultMessageContent: FC<{ message: string }> = ({ message }) => {
     <Track direction="vertical" align="left" style={{ width: '100%', padding: 16 }}>
       <label htmlFor="messageToClient">{t('serviceFlow.popup.clientSeesMessage')}</label>
       <FormTextarea
-        name={'messageToClient'}
         label={''}
         defaultValue={message}
         style={{

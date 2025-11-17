@@ -41,7 +41,7 @@ const AddEndpointModal: React.FC<AddEndpointModalProps> = ({ onClose, onUpdatePr
     passedEndpoint.isCommon = isCommonEndpoint;
     setIsCreatingEndpoint(true);
 
-    saveEndpoints(
+    void saveEndpoints(
       [passedEndpoint],
       () => {
         useServiceStore.getState().addEndpoint(passedEndpoint);
@@ -66,7 +66,6 @@ const AddEndpointModal: React.FC<AddEndpointModalProps> = ({ onClose, onUpdatePr
       <Track isMultiline gap={16} direction="vertical" align="stretch">
         <ApiEndpointCard
           endpoint={endpoint}
-          isDeletable={false}
           onNameExists={setEndpointNameExists}
           onNameChange={setEndpointName}
           onCommonChange={setIsCommonEndpoint}
