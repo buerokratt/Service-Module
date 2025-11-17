@@ -6,7 +6,7 @@ import svgr from 'vite-plugin-svgr';
 import tsconfigPaths from 'vite-tsconfig-paths';
 
 // https://vitejs.dev/config/
-export default ({ mode }) => {
+export default ({ mode }: { mode: string }) => {
   process.env = Object.assign(process.env, loadEnv(mode, process.cwd(), ''));
 
   return defineConfig({
@@ -25,7 +25,7 @@ export default ({ mode }) => {
       },
       host: true,
       strictPort: true,
-      port: parseInt(process.env.REACT_APP_APP_PORT),
+      port: parseInt(process.env.REACT_APP_APP_PORT ?? '3006'),
       headers: {
         ...(process.env.REACT_APP_CSP && {
           'Content-Security-Policy': process.env.REACT_APP_CSP,
