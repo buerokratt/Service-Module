@@ -117,6 +117,7 @@ const useServiceListStore = create<ServiceStoreState>()(
             totalPages: item.totalPages,
             linkedIntent: triggers.find((e: Trigger) => e.service === item.serviceId)?.intent ?? '',
             endpoints: [],
+            // TODO: remove comment later, only for testing Sonar
           })) ?? [];
 
         set({
