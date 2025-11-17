@@ -1,6 +1,5 @@
 import { FC } from 'react';
 import useServiceStore from 'store/new-services.store';
-import { Assign } from 'types';
 
 import Track from '../Track';
 import AssignBuilder from './AssignBuilder';
@@ -12,7 +11,7 @@ type AssignContentProps = {
 
 const AssignContent: FC<AssignContentProps> = ({ nodeId }) => {
   const nodes = useServiceStore((state) => state.nodes);
-  const currentNodeElements = (nodes.findLast((node) => node.id === nodeId)?.data?.assignElements as Assign[]) ?? [];
+  const currentNodeElements = nodes.findLast((node) => node.id === nodeId)?.data?.assignElements ?? [];
 
   return (
     <Track direction="vertical" align="stretch">

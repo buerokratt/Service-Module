@@ -76,7 +76,7 @@ const DynamicChoicesContent: FC<DynamicChoicesContentProps> = ({
               element={{
                 id: field.key,
                 key: field.label,
-                value: dynamicChoices[field.key] ?? '',
+                value: dynamicChoices[field.key],
                 tooltip: field.tooltip,
               }}
               onChange={(element) => handleChange(field.key, element.value)}
