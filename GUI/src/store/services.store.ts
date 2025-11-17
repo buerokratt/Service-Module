@@ -104,22 +104,20 @@ const useServiceListStore = create<ServiceStoreState>()(
         });
         const triggers = result.data.response[1];
         const services =
-          result.data.response[0].map?.(
-            (item: any) =>
-              ({
-                id: item.id,
-                name: item.name,
-                description: item.description,
-                slot: item.slot,
-                state: item.state,
-                type: item.type,
-                isCommon: item.iscommon,
-                serviceId: item.serviceId,
-                usedCount: 0,
-                totalPages: item.totalPages,
-                linkedIntent: triggers.find((e: Trigger) => e.service === item.serviceId)?.intent ?? '',
-              }) as Service,
-          ) ?? [];
+          result.data.response[0].map?.((item: any) => ({
+            id: item.id,
+            name: item.name,
+            description: item.description,
+            slot: item.slot,
+            state: item.state,
+            type: item.type,
+            isCommon: item.iscommon,
+            serviceId: item.serviceId,
+            usedCount: 0,
+            totalPages: item.totalPages,
+            linkedIntent: triggers.find((e: Trigger) => e.service === item.serviceId)?.intent ?? '',
+            endpoints: [],
+          })) ?? [];
 
         set({
           notCommonServices: services,
@@ -135,21 +133,20 @@ const useServiceListStore = create<ServiceStoreState>()(
         });
         const triggers = result.data.response[1];
         const services =
-          result.data.response[0].map?.(
-            (item: any) =>
-              ({
-                id: item.id,
-                name: item.name,
-                description: item.description,
-                state: item.state,
-                type: item.type,
-                isCommon: item.iscommon,
-                serviceId: item.serviceId,
-                totalPages: item.totalPages,
-                usedCount: 0,
-                linkedIntent: triggers.find((e: Trigger) => e.service === item.serviceId)?.intent ?? '',
-              }) as Service,
-          ) ?? [];
+          result.data.response[0].map?.((item: any) => ({
+            id: item.id,
+            name: item.name,
+            description: item.description,
+            state: item.state,
+            type: item.type,
+            isCommon: item.iscommon,
+            serviceId: item.serviceId,
+            totalPages: item.totalPages,
+            usedCount: 0,
+            linkedIntent: triggers.find((e: Trigger) => e.service === item.serviceId)?.intent ?? '',
+            endpoints: [],
+            slot: '',
+          })) ?? [];
 
         set({
           commonServices: services,
