@@ -1,5 +1,5 @@
-import api from '../services/api-dev';
 import { servicesRequestsExplain } from '../resources/api-constants';
+import api from '../services/api-dev';
 import { EndpointDefinition } from '../types/endpoint';
 
 export const extractMapValues = (element: any) => {
