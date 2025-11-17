@@ -1,4 +1,4 @@
-import { t } from 'i18next';
+import { useTranslation } from 'react-i18next';
 
 export enum DATE_CONSTANTS {
   TODAY = "new Date().toISOString().split('T')[0]",
@@ -25,6 +25,7 @@ export enum HELPERS_CONSTANTS {
 }
 
 export const getHelperTooltips = () => {
+  const { t } = useTranslation();
   const helpersPath = 'serviceFlow.previousVariables.helpers.tooltip';
 
   const createTooltip = (key: string, replacements: Record<string, string> = {}) => {

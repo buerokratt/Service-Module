@@ -1,9 +1,9 @@
-import { CSSProperties, PropsWithChildren } from 'react';
+import { PropsWithChildren } from 'react';
 
 import styles from './FormError.module.scss';
 
 interface FormErrorProps {
-  style?: CSSProperties;
+  style?: React.CSSProperties;
 }
 
 const FormError = ({ children, style }: PropsWithChildren<FormErrorProps>) => {

@@ -1,4 +1,3 @@
-import ConnectionRequestsPage from 'pages/ConnectionRequestsPage';
 import React from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
 
@@ -11,6 +10,7 @@ import ServiceSettingPage from './pages/ServiceSettingPage';
 import { ROUTES } from './resources/routes-constants';
 
 import './styles/main.scss';
+import ConnectionRequestsPage from 'pages/ConnectionRequestsPage';
 
 const RootComponent: React.FC = () => {
   return (

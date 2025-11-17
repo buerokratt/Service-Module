@@ -24,7 +24,7 @@ interface ServiceStoreState {
   notCommonServices: Service[];
   loadServicesList: (pagination: PaginationState, sorting: SortingState) => Promise<void>;
   loadCommonServicesList: (pagination: PaginationState, sorting: SortingState) => Promise<void>;
-  deleteService: (id: string) => void;
+  deleteService: (id: string) => Promise<void>;
   selectedService: Service | undefined;
   setSelectedService: (service: Service) => void;
   changeServiceState: (
@@ -80,7 +80,7 @@ interface ServiceStoreState {
   ) => Promise<void>;
 }
 
-const useServiceListStore = create<ServiceStoreState>((set, get) => ({
+const useServiceListStore = create<ServiceStoreState>((set, get, store) => ({
   services: [],
   commonServices: [],
   notCommonServices: [],
@@ -145,7 +145,7 @@ const useServiceListStore = create<ServiceStoreState>((set, get) => ({
       commonServices: services,
     });
   },
-  deleteService: (id) => {
+  deleteService: async (id) => {
     const services = get().services.filter((e: Service) => e.serviceId !== id);
     set({
       commonServices: services.filter((e: Service) => e.isCommon === true),
@@ -197,7 +197,7 @@ const useServiceListStore = create<ServiceStoreState>((set, get) => ({
     if (!selectedService) return;
 
     try {
-      const res = await api.post<{ response: Trigger }>(changeIntentConnection(), {
+      const res = await api.post(changeIntentConnection(), {
         serviceId: selectedService.serviceId,
       });
       if (res.data.response) {
@@ -210,7 +210,7 @@ const useServiceListStore = create<ServiceStoreState>((set, get) => ({
       onNotConnected();
     }
   },
-  deleteSelectedService: async (onEnd, successMessage, errorMessage) => {
+  deleteSelectedService: async (onEnd, successMessage, errorMessage, pagination, sorting) => {
     const selectedService = get().selectedService;
     if (!selectedService) return;
 
@@ -254,7 +254,7 @@ const useServiceListStore = create<ServiceStoreState>((set, get) => ({
     try {
       const order = sorting[0]?.desc ? 'desc' : 'asc';
       const sort = sorting.length === 0 ? 'requestedAt desc' : sorting[0]?.id + ' ' + order;
-      const requests = await api.post<{ response: Trigger[] }>(getConnectionRequests(), {
+      const requests = await api.post(getConnectionRequests(), {
         page: pagination.pageIndex + 1,
         page_size: pagination.pageSize,
         sorting: sort,
@@ -270,7 +270,7 @@ const useServiceListStore = create<ServiceStoreState>((set, get) => ({
     try {
       const order = sorting[0]?.desc ? 'desc' : 'asc';
       const sort = sorting.length === 0 ? 'intent asc' : sorting[0]?.id + ' ' + order;
-      const requests = await api.post<{ response: Intent[] }>(getAvailableIntents(), {
+      const requests = await api.post(getAvailableIntents(), {
         page: pagination.pageIndex + 1,
         page_size: pagination.pageSize,
         sorting: sort,

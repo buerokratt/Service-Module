@@ -1,6 +1,6 @@
 import clsx from 'clsx';
-import { useMultipleSelection, useSelect, UseSelectGetToggleButtonPropsOptions } from 'downshift';
-import { FC, SelectHTMLAttributes, useEffect, useId } from 'react';
+import { useMultipleSelection, useSelect } from 'downshift';
+import React, { FC, SelectHTMLAttributes, useEffect, useId } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MdArrowDropDown } from 'react-icons/md';
 
@@ -74,11 +74,11 @@ const FormSelectMultiple: FC<FormSelectMultipleProps> = ({
 
   useEffect(() => {
     if (onSelectionChange) onSelectionChange(selectedItems);
-  }, [onSelectionChange, selectedItems]);
+  }, [selectedItems]);
 
   useEffect(() => {
     setSelectedItems(options.filter((o) => defaultValue?.includes(String(o.value))));
-  }, [defaultValue, options, setSelectedItems]);
+  }, []);
 
   const selectClasses = clsx('select', disabled && 'select--disabled');
 
@@ -92,12 +92,7 @@ const FormSelectMultiple: FC<FormSelectMultipleProps> = ({
         </label>
       )}
       <div className="select__wrapper">
-        <div
-          className="select__trigger"
-          {...getToggleButtonProps(
-            getDropdownProps({ preventKeyAction: isOpen }) as UseSelectGetToggleButtonPropsOptions,
-          )}
-        >
+        <div className="select__trigger" {...getToggleButtonProps(getDropdownProps({ preventKeyAction: isOpen }))}>
           {selectedItems.map((i) => i.label).join(', ') || placeholderValue}
           <Icon label="Dropdown icon" size="medium" icon={<MdArrowDropDown color="#5D6071" />} />
         </div>

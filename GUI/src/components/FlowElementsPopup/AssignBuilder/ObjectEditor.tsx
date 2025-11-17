@@ -123,7 +123,7 @@ const ObjectEditor: React.FC<ObjectEditorProps> = ({ onChange, data }) => {
 
     try {
       const dragData = getDragData(e);
-      if (jsonEditorRef.current) {
+      if (dragData && jsonEditorRef.current) {
         // Extract just the value from the drag data
         const valueToReplace = dragData.value;
 

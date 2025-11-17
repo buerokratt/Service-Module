@@ -1,4 +1,4 @@
-import { Dispatch, FC, SetStateAction } from 'react';
+import { FC } from 'react';
 import { useTranslation } from 'react-i18next';
 import { KeyPath } from 'react-json-tree';
 import { getKeyPathString } from 'utils/object-util';
@@ -12,15 +12,15 @@ interface ObjectTreeValueProps {
   rawValue: unknown;
   keyPath: KeyPath;
   roundedValues: Map<string, number>;
-  setRoundedValues: Dispatch<SetStateAction<Map<string, number>>>;
+  setRoundedValues: React.Dispatch<React.SetStateAction<Map<string, number>>>;
 }
 
 export const ObjectTreeValue: FC<ObjectTreeValueProps> = ({ rawValue, keyPath, roundedValues, setRoundedValues }) => {
   const { t } = useTranslation();
-  const key = getKeyPathString(keyPath) as string;
+  const key = getKeyPathString(keyPath);
 
   const toggleRounding = (keyPath: KeyPath, value: number, roundValue = true) => {
-    const key = getKeyPathString(keyPath) as string;
+    const key = getKeyPathString(keyPath);
 
     setRoundedValues((prev) => {
       const newMap = new Map(prev);

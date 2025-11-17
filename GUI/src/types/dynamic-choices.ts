@@ -1,6 +1,6 @@
 export type DynamicChoices = {
   list: string;
-  serviceName: string | undefined;
-  key: string | undefined;
+  serviceName: string;
+  key: string;
   payloadKeys: string;
 };

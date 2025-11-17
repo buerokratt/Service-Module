@@ -1,10 +1,9 @@
 import { t } from 'i18next';
-import { CSSProperties, FC, useRef, useState } from 'react';
-import ReactQuill from 'react-quill';
-import { removeNestedTemplates } from 'utils/string-util';
-
 import { FormRichText, Track } from '..';
+import { CSSProperties, FC, useRef, useState } from 'react';
 import PreviousVariables from './PreviousVariables';
+import { removeNestedTemplates } from 'utils/string-util';
+import ReactQuill from 'react-quill';
 
 type TextfieldContentProps = {
   readonly defaultMessage?: string;

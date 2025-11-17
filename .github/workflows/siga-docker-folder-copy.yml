@@ -1,0 +1,43 @@
+name: Copy Folder
+
+on:
+  push:
+    branches:
+      - dev
+    paths:
+      - '.github/workflows/siga-docker-folder-copy.yml'
+
+
+
+jobs:
+  copy-folder:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v2
+
+    - name: Set Up Folder Structure and Copy
+      run: |
+        FOLDER_PATH=docker-siga
+        SOURCE_REPO=buerokratt/open-eid-SiGa
+        SOURCE_FOLDER=docker
+
+        git clone --branch=develop "https://github.com/$SOURCE_REPO.git" source-repo
+
+        TARGET_DIRECTORY="$FOLDER_PATH"
+        mkdir -p "$TARGET_DIRECTORY"
+
+        cp -R "source-repo/$SOURCE_FOLDER/." "$TARGET_DIRECTORY"
+
+    - name: Clean Up Cloned Repository
+      run: |
+        rm -rf source-repo
+
+    - name: Commit and Push Changes
+      run: |
+        git config --global user.email "actions@github.com"
+        git config --global user.name "GitHub Actions"
+        git add docker-siga
+        git diff-index --quiet HEAD || git commit -m "Copy contents and update folder structure using GitHub Actions"
+        git push

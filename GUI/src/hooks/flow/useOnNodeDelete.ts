@@ -131,7 +131,7 @@ export const useOnNodesDelete = () => {
 
   const setDeletedNodes = useCallback((nodes: Node[] | null) => setNodeToDelete(nodes?.[0] ?? null), []);
 
-  const onDeleteConfirmed = useCallback(() => {
+  const onDeleteConfirmed = useCallback(async () => {
     if (!nodeToDelete) return;
 
     const nodes = getNodes();
@@ -224,7 +224,7 @@ export const useOnNodesDelete = () => {
           setEdges((eds) => [...eds, ghostEdge]);
         }
       },
-      [getNode, setNodes, setEdges],
+      [getNodes, getEdges, setEdges, setNodes, hasConnectedNodes],
     ),
     isDeleteConnectionsModalVisible,
     setIsDeleteConnectionsModalVisible,

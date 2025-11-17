@@ -5,11 +5,11 @@ import { initReactI18next } from 'react-i18next';
 import commonEN from './en/common.json';
 import commonET from './et/common.json';
 
-void i18n
+i18n
   .use(LanguageDetector)
   .use(initReactI18next)
   .init({
-    debug: import.meta.env.DEV,
+    debug: process.env.NODE_ENV === 'development',
     fallbackLng: 'et',
     supportedLngs: ['et', 'en'],
     resources: {

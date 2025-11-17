@@ -1,5 +1,4 @@
 import { Edge, MarkerType, Node, NodeChange, NodeDimensionChange, XYPosition } from '@xyflow/react';
-import { MutableRefObject, RefObject } from 'react';
 import useServiceStore from 'store/new-services.store';
 import { ConditionRuleType, StepType } from 'types';
 import { EDGE_LENGTH, GRID_UNIT } from 'types/service-flow';
@@ -236,6 +235,7 @@ export const updateFlowInputRules = (
     );
     // Add new edges to connect new rules and placeholders
     newRules.forEach((rule, i) => {
+      if (rule === null) return;
       const oldEdgeAfterNewRule = prevEdges.find((edge) => edge.source === rule);
       const nodeAfterNewRule = updatedNodes.find((node) => node.id === oldEdgeAfterNewRule?.target);
       newEdges.push(
@@ -283,8 +283,8 @@ const buildRuleEdges = ({
 export const onFlowNodeDragStop = (
   event: any,
   draggedNode: Node,
-  reactFlowWrapper: RefObject<HTMLDivElement>,
-  startDragNode: MutableRefObject<Node | undefined>,
+  reactFlowWrapper: React.RefObject<HTMLDivElement>,
+  startDragNode: React.MutableRefObject<Node | undefined>,
 ) => {
   // Dragging existing node onto placeholder
 

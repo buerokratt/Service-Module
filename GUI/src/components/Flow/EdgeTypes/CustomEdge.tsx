@@ -101,7 +101,7 @@ function CustomEdge({
       }
     });
     setAllElements(elements);
-  }, [stepPreferences, t]);
+  }, [stepPreferences]);
 
   useEffect(() => {
     const steps = mapEndpointsToSteps();
@@ -141,14 +141,14 @@ function CustomEdge({
   );
 
   function updateStepPreference(steps: Step[]) {
-    void api.post(userStepPreferences(), {
+    api.post(userStepPreferences(), {
       steps: steps.map((e) => e.type),
       endpoints: getEndpointIds(apiElements),
     });
   }
 
   function updateEndpointPreference(endpointIds: string[]) {
-    void api.post(userStepPreferences(), {
+    api.post(userStepPreferences(), {
       steps: stepPreferences,
       endpoints: endpointIds,
     });
@@ -215,7 +215,7 @@ function CustomEdge({
                 defaultOpen={true}
                 title={t('serviceFlow.apiElements.title')}
                 contentStyle={contentStyle}
-                onAddClick={() => {
+                onAddClick={async () => {
                   if (!idParam) {
                     useToastStore.getState().error({
                       title: t('newService.toast.serviceNotFound'),
@@ -234,8 +234,9 @@ function CustomEdge({
                           key={step.id}
                           step={step}
                           onClick={(step) => {
-                            onEdgeAdd(step);
-                            useServiceStore.getState().loadEndpointsResponseVariables();
+                            onEdgeAdd(step).then(() => {
+                              useServiceStore.getState().loadEndpointsResponseVariables();
+                            });
                             setDropdownOpen(false);
                             setHasUnsavedChanges(true);
                           }}

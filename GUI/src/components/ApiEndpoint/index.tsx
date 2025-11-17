@@ -53,7 +53,7 @@ const ApiEndpoint: FC<ApiEndpointProps> = ({ step, onClick }) => {
   const [endpointName, setEndpointName] = useState<string>(step.data?.name ?? '');
   const [isCommonEndpoint, setIsCommonEndpoint] = useState<boolean>(step.data?.isCommon ?? false);
   const originalEndpoint = useMemo(() => {
-    return step.data ? (JSON.parse(JSON.stringify(step.data)) as EndpointData) : undefined;
+    return step.data ? JSON.parse(JSON.stringify(step.data)) : undefined;
   }, [step.data]);
 
   const { deleteEndpoint: deleteEndpointFromStore } = useServiceStore();
@@ -100,7 +100,7 @@ const ApiEndpoint: FC<ApiEndpointProps> = ({ step, onClick }) => {
               appearance={isDeleting ? 'loading' : 'error'}
               onClick={() => {
                 setIsDeleting(true);
-                void deleteSelectedEndpoint(step.data);
+                deleteSelectedEndpoint(step.data);
               }}
             >
               {t('serviceFlow.apiElements.delete')}
@@ -130,6 +130,7 @@ const ApiEndpoint: FC<ApiEndpointProps> = ({ step, onClick }) => {
           <Track isMultiline gap={16} direction="vertical" align="stretch">
             <ApiEndpointCard
               endpoint={step?.data}
+              isDeletable={false}
               onNameExists={setEndpointNameExists}
               onNameChange={setEndpointName}
               onCommonChange={setIsCommonEndpoint}
@@ -153,7 +154,7 @@ const ApiEndpoint: FC<ApiEndpointProps> = ({ step, onClick }) => {
                   stepData.name = endpointName;
                   stepData.isCommon = isCommonEndpoint;
                   setIsEditing(true);
-                  void saveEndpoints(
+                  saveEndpoints(
                     [stepData],
                     () => {
                       setShowEditModal(false);

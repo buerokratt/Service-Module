@@ -6,7 +6,7 @@ import { getNodeLabel } from 'utils/flow-utils';
 function useEdgeAdd(id: string) {
   const { setEdges, setNodes, getNodes, getNode, getEdge } = useReactFlow();
 
-  const handleEdgeClick = (step: Step) => {
+  const handleEdgeClick = async (step: Step) => {
     const edge = getEdge(id);
     if (!edge) return;
 
@@ -33,15 +33,11 @@ function useEdgeAdd(id: string) {
         endpoint: step.data,
         setClickedNode: useServiceStore.getState().setClickedNode,
       },
-      className: (() => {
-        if ([StepType.FinishingStepEnd, StepType.FinishingStepRedirect].includes(stepType)) {
-          return 'finishing-step';
-        }
-        if ([StepType.DynamicChoices].includes(stepType)) {
-          return 'dynamic-choices';
-        }
-        return 'step';
-      })(),
+      className: [StepType.FinishingStepEnd, StepType.FinishingStepRedirect].includes(stepType)
+        ? 'finishing-step'
+        : [StepType.DynamicChoices].includes(stepType)
+          ? 'dynamic-choices'
+          : 'step',
       type: 'custom',
     };
 
@@ -75,7 +71,7 @@ function useEdgeAdd(id: string) {
 
     if (stepType === StepType.MultiChoiceQuestion || stepType === StepType.Condition || stepType === StepType.Input) {
       const labels = stepType === StepType.MultiChoiceQuestion ? ['Jah', 'Ei'] : ['Success', 'Failure'];
-      ghostNodes = labels.slice(1).map((_) => ({
+      ghostNodes = labels.slice(1).map((_, i) => ({
         id: crypto.randomUUID(),
         type: 'ghost',
         position: {

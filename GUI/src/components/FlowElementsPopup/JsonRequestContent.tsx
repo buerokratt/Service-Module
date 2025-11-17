@@ -17,6 +17,7 @@ const JsonRequestContent: FC<JsonRequestContentProps> = ({ isVisible, jsonConten
     <Track direction="vertical" align="left" style={{ width: '100%', padding: 16 }}>
       <label htmlFor="json">JSON</label>
       <FormTextarea
+        name="json"
         label="JSON"
         placeholder={t('serviceFlow.popup.jsonRequestPlaceholder')!}
         hideLabel={true}

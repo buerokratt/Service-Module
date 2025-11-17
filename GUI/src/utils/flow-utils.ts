@@ -10,15 +10,15 @@ interface ValidationResult {
 }
 
 export const getNodeLabel = (step: Step, nodes: Node[]) => {
-  const baseLabel = step.label.split(' - ').pop() ?? '';
+  const baseLabel = step.label.split(' - ').pop();
   const existingNumbers = nodes
-    .filter((node) => node.data.stepType === step.type)
-    .map((node) => node.data.label as string)
+    .filter((node: any) => node.data.stepType === step.type)
+    .map((node: any) => node.data.label)
     .filter((label) => label.startsWith(baseLabel))
     .map((label) => {
       const parts = label.split(' - ');
       if (parts.length > 1) {
-        const num = parseInt(parts[parts.length - 1]);
+        const num = parseInt(parts[parts.length - 1] as string);
         return isNaN(num) ? 0 : num;
       }
       return 0;

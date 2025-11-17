@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 import { useSelect } from 'downshift';
-import { FC, SelectHTMLAttributes, useEffect, useId, useState } from 'react';
+import React, { FC, SelectHTMLAttributes, useEffect, useId, useState } from 'react';
 import { MdArrowDropDown } from 'react-icons/md';
 
 import { Icon } from '../../../components';
@@ -18,6 +18,7 @@ type FormSelectProps = SelectHTMLAttributes<HTMLSelectElement> & {
   }[];
   onSelectionChange?: (selection: { label: string; value: string } | null) => void;
   isOpen?: boolean;
+  isMenuAbsolute?: boolean;
   menuPosition?: 'absolute' | 'relative';
 };
 
@@ -34,6 +35,7 @@ const FormSelect: FC<FormSelectProps> = ({
   defaultValue,
   onSelectionChange,
   isOpen: isMenuOpen = false,
+  isMenuAbsolute = true,
   menuPosition = 'absolute',
   ...rest
 }) => {
