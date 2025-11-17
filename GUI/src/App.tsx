@@ -13,10 +13,10 @@ import {generateUEID} from "./utils/generateUEID";
 
 const App: React.FC = () => {
   useQuery<{
-    data: UserInfo;
+    data: { custom_jwt_userinfo: UserInfo };
   }>({
     queryKey: ['userinfo', 'prod'],
-    onSuccess: (res) => {
+    onSuccess: (res: any) => {
       return useStore.getState().setUserInfo(res.data);
     },
     enabled: import.meta.env.REACT_APP_LOCAL === 'true',

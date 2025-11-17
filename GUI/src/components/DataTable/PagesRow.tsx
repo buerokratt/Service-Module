@@ -28,7 +28,7 @@ const PagesRow: React.FC<PagesRowProps> = ({ table, setPageIndex, pagesShown = 7
     }
 
     return pages;
-  }, [pagesShown, table]);
+  }, [pagesShown]);
 
   return (
     <nav role="navigation" aria-label={t('global.paginationNavigation') || ''}>

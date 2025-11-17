@@ -1,11 +1,12 @@
 import clsx from 'clsx';
-import { ChangeEvent, forwardRef, useId, useState } from 'react';
+import React, { ChangeEvent, forwardRef, useId, useState } from 'react';
 import TextareaAutosize, { TextareaAutosizeProps } from 'react-textarea-autosize';
 
 import './FormTextarea.scss';
 
 type TextareaProps = TextareaAutosizeProps & {
   label: string;
+  name: string;
   hideLabel?: boolean;
   showMaxLength?: boolean;
 };
@@ -14,6 +15,7 @@ const FormTextarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
   (
     {
       label,
+      name,
       maxLength = 2000,
       minRows = 3,
       maxRows = 3,

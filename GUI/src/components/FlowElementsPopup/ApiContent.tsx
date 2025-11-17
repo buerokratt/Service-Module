@@ -13,7 +13,7 @@ type ApiContentProps = {
 
 const ApiContent: FC<ApiContentProps> = ({ nodeId, endpoint, onEndpointChange }) => {
   const endpointCopy = useMemo(() => {
-    return endpoint ? (JSON.parse(JSON.stringify(endpoint)) as EndpointData) : undefined;
+    return endpoint ? JSON.parse(JSON.stringify(endpoint)) : undefined;
   }, [endpoint]);
 
   useEffect(() => {
@@ -27,6 +27,7 @@ const ApiContent: FC<ApiContentProps> = ({ nodeId, endpoint, onEndpointChange })
       {endpointCopy && (
         <ApiEndpointCard
           endpoint={endpointCopy}
+          isDeletable={false}
           showCommonSwitch={false}
           onNameChange={(name) => {
             endpointCopy.name = name;

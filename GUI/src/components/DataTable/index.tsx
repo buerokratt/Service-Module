@@ -48,6 +48,12 @@ type DataTableProps = {
   meta?: TableMeta<any>;
 };
 
+type ColumnMeta = {
+  meta: {
+    size: number | string;
+  };
+};
+
 declare module '@tanstack/table-core' {
   interface FilterFns {
     fuzzy: FilterFn<unknown>;
@@ -64,8 +70,10 @@ declare module '@tanstack/react-table' {
   }
 }
 
+type CustomColumnDef = ColumnDef<any> & ColumnMeta;
+
 const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
-  const itemRank = rankItem(row.getValue(columnId), value as string);
+  const itemRank = rankItem(row.getValue(columnId), value);
   addMeta({
     itemRank,
   });

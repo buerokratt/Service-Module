@@ -1,5 +1,5 @@
 import React from 'react';
-import { Assign, Step } from 'types';
+import { Step } from 'types';
 
 export const ASSIGN_DRAG_TYPE = 'text/plain';
 
@@ -10,11 +10,10 @@ export const onDragStart = (event: React.DragEvent<HTMLDivElement>, step: Step) 
   event.dataTransfer.effectAllowed = 'move';
 };
 
-export const getDragData = (event: React.DragEvent<HTMLDivElement>): Assign => {
+export const getDragData = (event: React.DragEvent<HTMLDivElement>) => {
   event.preventDefault();
 
-  // This should never happen
-  if (!event.dataTransfer.getData(ASSIGN_DRAG_TYPE)) console.error('getDragData: No drag data found');
+  if (!event.dataTransfer.getData(ASSIGN_DRAG_TYPE)) return;
 
   return JSON.parse(event.dataTransfer.getData(ASSIGN_DRAG_TYPE));
 };

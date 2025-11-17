@@ -1,11 +1,11 @@
-import { FC, Ref } from 'react';
+import { FC } from 'react';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import './FormRichText.scss';
 
 type FormRichTextProps = {
   readonly defaultValue?: string;
-  quill?: Ref<ReactQuill>;
+  quill?: React.Ref<ReactQuill>;
   onChange(value: string | null): void;
 };
 

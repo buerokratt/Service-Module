@@ -19,7 +19,7 @@ const ServiceSettingPage: React.FC = () => {
       .get(getServiceSettings())
       .then((x) => {
         const settings = x.data.filter((x: any) => x.name === 'maxInputTry');
-        const maxInputTry = Number(settings[0].value);
+        const maxInputTry = settings[0].value;
         setInitValue(maxInputTry);
         setTryCount(maxInputTry);
       })
@@ -29,10 +29,10 @@ const ServiceSettingPage: React.FC = () => {
           message: t('global.errorMessage'),
         });
       });
-  }, [t]);
+  }, []);
 
   const handleSave = async (value: number) => {
-    await api
+    api
       .post(saveServiceSettings(), {
         name: 'maxInputTry',
         value: value,
@@ -78,8 +78,4 @@ const ServiceSettingPage: React.FC = () => {
   );
 };
 
-const AuthorizedServiceSettingPage = withAuthorization(ServiceSettingPage, [
-  ROLES.ROLE_ADMINISTRATOR,
-  ROLES.ROLE_SERVICE_MANAGER,
-]);
-export default AuthorizedServiceSettingPage;
+export default withAuthorization(ServiceSettingPage, [ROLES.ROLE_ADMINISTRATOR, ROLES.ROLE_SERVICE_MANAGER]);

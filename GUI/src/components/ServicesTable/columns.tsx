@@ -17,8 +17,10 @@ interface GetColumnsConfig {
   navigate: NavigateFunction;
   checkIntentConnection: () => void;
   hideDeletePopup: () => void;
+  showStatePopup: (text: string) => void;
   showReadyPopup: () => void;
   showIntentConnectionModal: () => void;
+  editService: () => void;
 }
 
 export const getColumns = ({
@@ -26,8 +28,10 @@ export const getColumns = ({
   navigate,
   checkIntentConnection,
   hideDeletePopup,
+  showStatePopup,
   showReadyPopup,
   showIntentConnectionModal,
+  editService,
 }: GetColumnsConfig) => {
   const columnHelper = createColumnHelper<Service>();
   const userInfo = useStore.getState().userInfo;
@@ -60,7 +64,7 @@ export const getColumns = ({
                 <Button
                   appearance="text"
                   onClick={() => {
-                    void navigator.clipboard.writeText(props.row.original.description ?? '');
+                    navigator.clipboard.writeText(props.row.original.description ?? '');
                     useToastStore.getState().success({
                       title: i18n.t('overview.descriptionCopiedSuccessfully'),
                     });
@@ -208,4 +212,10 @@ const getLabelType = (serviceState: ServiceState) => {
     default:
       return 'info';
   }
+};
+
+const getStatePopupContent = (state: ServiceState) => {
+  if (state === ServiceState.Draft) return i18n.t('overview.popup.setReady');
+  if (state === ServiceState.Active) return i18n.t('overview.popup.setInactive');
+  return i18n.t('overview.popup.setActive');
 };

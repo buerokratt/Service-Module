@@ -13,6 +13,7 @@ import {
   EndpointVariableData,
   PreDefinedEndpointEnvVariables,
 } from '../../../../types/endpoint';
+import { RequestVariablesRowData } from '../../../../types/request-variables';
 
 type EndpointOpenAPIProps = {
   endpoint: EndpointData;
@@ -24,8 +25,6 @@ type EndpointOpenAPIProps = {
 
 const EndpointOpenAPI: React.FC<EndpointOpenAPIProps> = ({
   endpoint,
-  // This needs to be removed in the future
-  // This is always true as we have removed the Test tab
   isLive,
   requestValues,
   requestTab,
@@ -39,7 +38,7 @@ const EndpointOpenAPI: React.FC<EndpointOpenAPIProps> = ({
   const [key, setKey] = useState<number>(0);
   const { t } = useTranslation();
 
-  useEffect(() => setKey(key + 1), [isLive, key]);
+  useEffect(() => setKey(key + 1), [isLive]);
 
   const getEndpointSchema = (
     apiSpec: ApiSpecProperty,
@@ -116,10 +115,6 @@ const EndpointOpenAPI: React.FC<EndpointOpenAPIProps> = ({
       result.push(variableData);
     });
     if (!schema.required) return result;
-    // The types are ambiguous here
-    // Required can a record of strings (here) or a boolean (in getParams)
-    // This might be a bug, impossible to resolve without refactoring this old component
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     Object.values(schema?.required).forEach((name) => {
       result.forEach((variable) => {
         if (variable.name !== name) return;
@@ -154,13 +149,13 @@ const EndpointOpenAPI: React.FC<EndpointOpenAPIProps> = ({
   };
 
   const fetchOpenApiSpecMock = async () => {
-    const result = await api.post<{ response: ApiSpecProperty }>(getOpenApiSpec(), { url: openApiUrl });
+    const result = await api.post(getOpenApiSpec(), { url: openApiUrl });
     const apiSpec = result.data.response;
     const url = new URL(openApiUrl).origin + apiSpec.basePath;
     const paths: EndpointDefinition[] = [];
 
     Object.entries(apiSpec.paths).forEach(([path, endpointData]) => {
-      Object.entries(endpointData).forEach(([method, data]) => {
+      Object.entries(endpointData as ApiSpecProperty).forEach(([method, data]: [string, ApiSpecProperty]) => {
         const endpointUrl = url + path;
         const label = `${method.toUpperCase()} ${path}`;
         if (!['get', 'post'].includes(method.toLowerCase())) {
@@ -223,6 +218,19 @@ const EndpointOpenAPI: React.FC<EndpointOpenAPIProps> = ({
     setKey(key + 1);
   };
 
+  const checkNestedVariables = (variable: EndpointVariableData, data: RequestVariablesRowData[]) => {
+    const variableData = variable.type === 'schema' ? variable.schemaData : variable.arrayData;
+    if (variableData instanceof Array) {
+      variableData.forEach((variableData) => {
+        const updatedVariable = data.find((updated) => updated.endpointVariableId === variableData.id);
+        variableData[isLive ? 'value' : 'testValue'] = updatedVariable?.value;
+        if (['schema', 'array'].includes(variableData.type)) {
+          checkNestedVariables(variableData, data);
+        }
+      });
+    }
+  };
+
   const onSelectEndpoint = (selection: Option | null) => {
     const newSelectedEndpoint = openApiEndpoints.find((openApiEndpoint) => openApiEndpoint.label === selection?.label);
     setSelectedEndpoint(newSelectedEndpoint);
@@ -246,7 +254,7 @@ const EndpointOpenAPI: React.FC<EndpointOpenAPIProps> = ({
           />
           <Button
             onClick={() => {
-              void fetchOpenApiSpecMock();
+              fetchOpenApiSpecMock();
             }}
           >
             {t('newService.endpoint.ask')}

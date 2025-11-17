@@ -21,9 +21,15 @@ const BotMessage = ({ message }: ChatMessageProps) => {
   const { t } = useTranslation();
 
   const renderConent = useCallback(() => {
+    if (message.payload)
+      return (
+        <a className={styles.link} href={message.payload}>
+          {message.message}
+        </a>
+      );
     if (message.message.startsWith('<p>')) return message.message.replace('<p>', '').replace('</p>', '');
     return t(message.message);
-  }, [message.message, t]);
+  }, [message]);
 
   return (
     <motion.div animate={leftAnimation.animate} initial={leftAnimation.initial} transition={leftAnimation.transition}>
