@@ -162,15 +162,15 @@ const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
         <Panel position="top-left">
           <ImportExportControls />
         </Panel>
-          <Panel position="top-right">
+          <Panel position="top-right" style={{ paddingRight: '90px'}}>
               <ThemeToggle onChange={onChange} />
           </Panel>
         <Panel position="top-right">
           <Tooltip content={t('serviceFlow.orientationTooltip')}>
-            <Button onClick={toggleOrientation} size="s" style={{ backgroundColor: '#005aa3' }}>
+            <Button onClick={toggleOrientation} size="s" style={{ backgroundColor: '#005aa3', height: '36px' }}>
               <img
                 src={orientation === 'horizontal' ? HorizontalFlow : VerticalFlow}
-                width={35}
+                width={32}
                 className="logo"
                 loading="eager"
                 alt="orientation toggle"
