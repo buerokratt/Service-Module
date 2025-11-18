@@ -209,6 +209,26 @@
     "test": "Test URL",
     "isCommon": "Common Service",
     "slot": "Slot",
+    "serviceName": {
+      "title": "Name",
+      "placeholder": "Title is mandatory",
+      "tooltip": "Service name displayed to users and in system"
+    },
+    "serviceDescription": {
+      "title": "Description",
+      "placeholder": "Describe what the service does...",
+      "tooltip": "Short description of the service’s purpose or function. Recommended: clear and concise."
+    },
+    "examples": {
+      "title": "Examples",
+      "placeholder": "Add examples of what the user could ask to start the service",
+      "tooltip": "Enter sample user questions that trigger this service (e.g., ‘When is Midsummer festival?’)"
+    },
+    "keywords": {
+      "title": "Keywords",
+      "placeholder": "Add essential service keywords (e.g. ‘holiday’, ‘year’)",
+      "tooltip": "Enter key terms used by AI to recognize intent. Keywords should reflect input concepts (e.g. ‘holiday’, ‘year’)."
+    },
     "endpoint": {
       "add": "+ Add API endpoint",
       "addTestEnv": "+ Add test environment",
@@ -272,6 +292,7 @@
     "chooseMemorySlots": "Choose memory slots"
   },
   "serviceFlow": {
+    "serviceConfiguration": "Service Configuration",
     "element": {
       "taraAuthentication": "Tara authorization",
       "textfield": "Send message to client",

@@ -15,6 +15,7 @@ import { StepType } from 'types';
 
 import HorizontalFlow from '../../static/icons/horizontal_flow.svg';
 import VerticalFlow from '../../static/icons/vertical_flow.svg';
+import './FlowBuilder.scss';
 
 type FlowBuilderProps = {
   nodes: Node[];
@@ -146,10 +147,14 @@ const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
         defaultEdgeOptions={{ type: 'step', deletable: false }}
       >
         <Chat />
-        <MiniMap />
+        <div className={'controls-adjustment'}>
+            <MiniMap />
+        </div>
         <Background color="#D2D3D8" gap={16} lineWidth={9} />
-        <Controls orientation="horizontal" showInteractive={false} />
-        <Panel position="top-left">
+        <div className={'controls-adjustment zoom-position'}>
+            <Controls orientation="horizontal" showInteractive={false} />
+        </div>
+        <Panel position="top-left" style={{ marginTop: '75}px'}}>
           <ImportExportControls />
         </Panel>
         <Panel position="top-right">
