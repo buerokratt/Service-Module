@@ -90,6 +90,10 @@
 }
 
 [data-theme="dark"] .input {
+  &__label {
+    color: var(--dark-text-primary);
+  }
+
   input {
     background-color: var(--dark-bg-highlight);
     color: var(--dark-text-primary);

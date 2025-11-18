@@ -74,6 +74,16 @@
 }
 
 [data-theme="dark"] .toast {
+  color: var(--dark-text-secondary);
+
+  &__close {
+    color: var(--dark-text-secondary)
+  }
+
+  &__list {
+    background-color: var(--dark-bg-extra-light);
+  }
+
   &--success {
     border-color: get-color(sea-green-11);
     background-color: var(--dark-bg-secondary);

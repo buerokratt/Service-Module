@@ -46,6 +46,14 @@
   }
 }
 
+.default_label {
+  color: black;
+}
+
+[data-theme='dark'] .default_label {
+  color: var(--dark-text-secondary);
+}
+
 [data-theme='dark'] .endpoint-tab-group {
   background-color: var(--dark-bg-secondary);
   border: 1px solid var(--dark-text-border);

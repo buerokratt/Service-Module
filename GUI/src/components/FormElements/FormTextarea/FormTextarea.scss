@@ -101,8 +101,11 @@
 }
 
 [data-theme="dark"] .textarea {
+  background-color: var(--dark-bg-light) !important;
+
   textarea {
-    background-color: var(--dark-bg-highlight);
+    background-color: var(--dark-bg-extra-light) !important;
+    color: var(--dark-text-secondary);
 
     &:focus {
       outline: none;
