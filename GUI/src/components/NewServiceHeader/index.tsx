@@ -1,9 +1,10 @@
 import { t } from 'i18next';
-import React, {FC, useState} from 'react';
-import useServiceStore from 'store/new-services.store';
+import { FC, useState } from 'react';
+import '@buerokratt-ria/header/src/Header.scss';
 import { useNavigate, useParams } from 'react-router-dom';
 import { deleteService } from 'resources/api-constants';
 import { ROUTES } from 'resources/routes-constants';
+import useServiceStore from 'store/new-services.store';
 import useToastStore from 'store/toasts.store';
 import { ServiceState } from 'types';
 import { removeTrailingUnderscores } from 'utils/string-util';

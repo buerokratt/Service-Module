@@ -1,8 +1,10 @@
 import * as Tabs from '@radix-ui/react-tabs';
 import { PaginationState, SortingState } from '@tanstack/react-table';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { ReactElement, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import useServiceStore from 'store/new-services.store';
+import { FieldType } from 'types/endpoint/field-type';
+import { RequestOperator } from 'types/endpoint/request-operator';
 
 import { getColumns } from './columns';
 import { Button, FormTextarea, SwitchBox, Track } from '../../..';
@@ -61,6 +63,7 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
       required: data.required ?? false,
       variable: data.name,
       value,
+      operator: data.operator ?? '=',
       isNameEditable: data.type === 'custom',
       type: data.type,
       description: data.description,
@@ -116,14 +119,19 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
     return rowIdx;
   };
 
+  const [rowsData, setRowsData] = useState<RequestVariablesTabsRowsData>(getTabsRowsData());
+
   useEffect(() => {
     setRequestTab((rt) => {
       const availableTabs = Object.keys(rowsData);
       rt.tab = availableTabs.includes(rt.tab) ? rt.tab : (availableTabs[0] as EndpointTab);
       return rt;
     });
-    setKey(key + 1);
-  }, []);
+    setKey((key) => key + 1);
+    // Adding rowsData dependency breaks focus on typing in variable inputs
+    // Impossible to fix without a significant refactor
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [setRequestTab]);
 
   const getInitialTabsRawData = (): RequestVariablesTabsRawData => {
     return tabs.reduce((tabsRawData, tab) => {
@@ -132,7 +140,6 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
       return { ...tabsRawData, [tab]: endpointData[tab]?.rawData[isLive ? 'value' : 'testValue'] ?? '' };
     }, {});
   };
-  const [rowsData, setRowsData] = useState<RequestVariablesTabsRowsData>(getTabsRowsData());
   const [tabRawData, setTabRawData] = useState<RequestVariablesTabsRawData>(getInitialTabsRawData());
 
   const getTabTriggerClasses = (tab: EndpointTab) =>
@@ -152,34 +159,70 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
     return [...nonEmptyRows, emptyRow ? { ...baseEmptyRow, ...emptyRow } : baseEmptyRow];
   };
 
-  const updateRowField = (id: string, field: 'variable' | 'value', newValue: string) => {
+  const updateRowField = (id: string, field: FieldType, newValue: string) => {
     setRowsData((prevRowsData) => {
       const newRowsData = { ...prevRowsData };
       newRowsData[requestTab.tab] = [...(newRowsData[requestTab.tab] || [])];
 
       newRowsData[requestTab.tab]!.forEach((row) => {
         if (row.id !== id) return;
-        row[field] = newValue;
+        if (field === 'operator') {
+          row[field] = newValue as RequestOperator;
+        } else {
+          row[field] = newValue;
+        }
       });
 
       if (endpoint.type === 'custom') {
         newRowsData[requestTab.tab] = maintainSingleEmptyRow(newRowsData[requestTab.tab] || []);
       }
       updateEndpointData(newRowsData, endpoint);
-      if (requestTab.tab === 'params')
+
+      if (requestTab.tab === 'params') {
         onParametersChange(
           newRowsData[requestTab.tab]
-            ?.filter((row) => row.value && row.variable)
+            ?.filter((row) => row.variable)
             .map((row) => ({
               id: row.endpointVariableId ?? row.id,
               name: row.variable!,
               type: row.type ?? 'custom',
               required: row.required ?? false,
               value: row.value!,
+              operator: row.operator as RequestOperator,
             })) ?? [],
         );
+      }
       return newRowsData;
     });
+  };
+
+  const updateOperator = (rowId: string, operator: string) => {
+    if (!rowsData[requestTab.tab] || requestTab.tab !== EndpointTab.Params) return;
+
+    const newData = rowsData[requestTab.tab]!.map((row) => {
+      if (row.id !== rowId) return row;
+      row.operator = operator as RequestOperator;
+      return row;
+    });
+
+    const variables: EndpointVariableData[] = [];
+    newData.forEach((row) => {
+      if (!row.variable) return;
+
+      const newVariable: EndpointVariableData = {
+        id: row.endpointVariableId ?? row.id,
+        name: row.variable ?? '',
+        type: row.type ?? 'custom',
+        required: row.required ?? false,
+        value: row.value,
+        operator: requestTab.tab === EndpointTab.Params ? (row.operator as RequestOperator) || '=' : undefined,
+      };
+      variables.push(newVariable);
+    });
+
+    if (requestTab.tab === 'params') {
+      onParametersChange(variables);
+    }
   };
 
   const checkNestedVariables = (rowVariableId: string, variable: EndpointVariableData) => {
@@ -239,10 +282,11 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
 
       const newVariable: EndpointVariableData = {
         id: row.endpointVariableId ?? row.id,
-        name: row.variable,
+        name: row.variable ?? '',
         type: row.type ?? 'custom',
         required: row.required ?? false,
         value: row.value,
+        operator: requestTab.tab === EndpointTab.Params ? (row.operator as RequestOperator) || '=' : undefined,
       };
       variables.push(newVariable);
     });
@@ -271,14 +315,18 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
         deleteVariable,
         setRowsData,
         updateRowField,
+        updateOperator,
         requestValues,
         isLive,
         getTabsRowsData,
       }),
-    [deletedVariable],
+    // Adding missing dependencies breaks focus on typing in variable inputs
+    // Impossible to fix without a significant refactor
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [deletedVariable, requestTab.tab],
   );
 
-  const buildRawDataView = (): JSX.Element => {
+  const buildRawDataView = (): ReactElement => {
     return (
       <>
         <Track justify="between" style={{ padding: '8px 0 8px 0' }}>
@@ -303,7 +351,6 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
         </Track>
         <FormTextarea
           key={`${requestTab.tab}-raw-data`}
-          name={`${requestTab.tab}-raw-data`}
           label={''}
           defaultValue={tabRawData[requestTab.tab]}
           onBlur={() => updateEndpointRawData(tabRawData, endpoint)}
@@ -372,6 +419,7 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
                 setSorting={setSorting}
                 pagination={pagination}
                 sorting={sorting}
+                withScrollWrapper={false}
               />
               <hr style={{ margin: 0, borderTop: '1px solid #D2D3D8' }} />
             </>

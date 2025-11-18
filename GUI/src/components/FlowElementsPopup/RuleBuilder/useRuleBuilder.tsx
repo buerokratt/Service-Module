@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { getInitialGroup, getInitialRule, Group, GroupOrRule, GroupType, Rule } from './types';
 
@@ -6,19 +6,43 @@ interface UseRuleBuilderProps {
   group?: Group;
   root?: boolean;
   onChange: (group: Group) => void;
-  seedGroup?: any;
+  seedGroup?: Group | GroupOrRule[];
 }
 
 export const useRuleBuilder = (config: UseRuleBuilderProps) => {
-  const elementsInitialValue = config.root ? (config.seedGroup?.children ?? []) : config.group!.children;
-  const seedGroup =
-    config.seedGroup?.length > 0 || config.seedGroup?.children?.length ? config.seedGroup : getInitialGroup();
-  const groupInfoInitialValue = config.root ? seedGroup : config.group!;
+  const getSeedGroupChildren = (seedGroup: Group | GroupOrRule[] | undefined): GroupOrRule[] => {
+    if (!seedGroup) return [];
+    if (Array.isArray(seedGroup)) return seedGroup;
+    return seedGroup.children;
+  };
+
+  const elementsInitialValue = config.root ? getSeedGroupChildren(config.seedGroup) : config.group!.children;
+
+  const isSeedGroupValid = (seedGroup: Group | GroupOrRule[] | undefined): boolean => {
+    if (!seedGroup) return false;
+    if (Array.isArray(seedGroup)) return seedGroup.length > 0;
+    return seedGroup.children?.length > 0;
+  };
+
+  const seedGroup = isSeedGroupValid(config.seedGroup) ? config.seedGroup : getInitialGroup();
+
+  const getGroupInfoInitialValue = (): Group => {
+    if (config.root) {
+      return Array.isArray(seedGroup) ? getInitialGroup() : seedGroup || getInitialGroup();
+    }
+    return config.group!;
+  };
+
   const [elements, setElements] = useState<GroupOrRule[]>(elementsInitialValue);
-  const [groupInfo, setGroupInfo] = useState<Group>(groupInfoInitialValue);
+  const [groupInfo, setGroupInfo] = useState<Group>(getGroupInfoInitialValue());
+
+  // Use ref to store the latest onChange function to avoid dependency issues
+  // Without this, component crashes completely OR we violate the rules of hooks below
+  const onChangeRef = useRef(config.onChange);
+  onChangeRef.current = config.onChange;
 
   useEffect(() => {
-    config.onChange({
+    onChangeRef.current({
       ...groupInfo,
       children: elements,
     });
@@ -52,7 +76,7 @@ export const useRuleBuilder = (config: UseRuleBuilderProps) => {
 
   const changeRule = (rule: Rule) => setElementById(rule.id, rule);
 
-  const onSubGroupChange = (parentId: string) => (rule: any) => setElementById(parentId, rule);
+  const onSubGroupChange = (parentId: string) => (rule: GroupOrRule) => setElementById(parentId, rule);
 
   const setElementById = (id: string, element: GroupOrRule) => {
     const newElements = elements.map((x) => (x.id === id ? { ...element } : x));

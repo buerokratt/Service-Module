@@ -11,7 +11,7 @@ import {
 } from '@xyflow/react';
 import { AxiosResponse } from 'axios';
 import { GroupOrRule } from 'components/FlowElementsPopup/RuleBuilder/types';
-import i18next from 'i18next';
+import i18next, { t } from 'i18next';
 import {
   getCommonEndpoints,
   getEndpointValidation,
@@ -31,6 +31,7 @@ import { EndpointResponseVariable } from 'types/endpoint/endpoint-response-varia
 import { EndpointType } from 'types/endpoint/endpoint-type';
 import { RequestVariablesTabsRawData, RequestVariablesTabsRowsData } from 'types/request-variables';
 import { initialEdges, initialNodes, NodeDataProps } from 'types/service-flow';
+import { generateJsonRequest } from 'utils/json-request-utils';
 import { v4 as uuid } from 'uuid';
 import { create } from 'zustand';
 
@@ -46,6 +47,7 @@ export interface ServiceStoreState {
   slot: string;
   isCommon: boolean;
   edges: Edge[];
+  // In the future, this needs to use a common interface with NodeDataProps and not Node
   nodes: Node[];
   isNewService: boolean;
   serviceState?: ServiceState;
@@ -108,8 +110,8 @@ export interface ServiceStoreState {
   resetSelectedNode: () => void;
   handleNodeEdit: (selectedNodeId: string) => void;
   onDelete: (id: string) => void;
-  clickedNode: any;
-  setClickedNode: (clickedNode: any) => void;
+  clickedNode: string | null;
+  setClickedNode: (clickedNode: string | null) => void;
   onNodesChange: (changes: NodeChange[]) => void;
   onEdgesChange: (changes: EdgeChange[]) => void;
   onNodeAdded: (node: Node) => void;
@@ -118,8 +120,11 @@ export interface ServiceStoreState {
   enableTestButton: () => void;
   handlePopupSave: (updatedNode: Node<NodeDataProps>) => void;
   testUrl: (endpoint: EndpointData, onError: () => void, onSuccess: () => void) => Promise<void>;
-
-  // remove the following funtions and refactor the code to use more specific functions later
+  isJsonRequestVisible: boolean;
+  jsonRequestContent: any;
+  setJsonRequestVisible: (visible: boolean) => void;
+  setJsonRequestContent: (content: any) => void;
+  triggerJsonRequest: (endpoint: EndpointData) => void;
   setEndpoints: (callback: (prev: EndpointData[]) => EndpointData[]) => void;
   reactFlowInstance: ReactFlowInstance | null;
   setReactFlowInstance: (reactFlowInstance: ReactFlowInstance | null) => void;
@@ -132,7 +137,7 @@ export interface ServiceStoreState {
   handleProgrammaticNavigation: (to: string) => boolean;
 }
 
-const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
+const useServiceStore = create<ServiceStoreState>((set, get) => ({
   endpoints: [],
   name: '',
   slot: '',
@@ -151,17 +156,22 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
   endpointsResponseVariables: [],
   setIsYesNoQuestion: (value: boolean) => set({ isYesNoQuestion: value }),
   changeAssignNode: (assignElements) => {
+    // In the future, NodeDataProps and not any (or Node) should be used here as well
     const { nodes } = get();
     const elementsMap = new Map(
-      nodes
-        .filter((node) => node.data.stepType === StepType.Assign)
-        .flatMap((node) => node.data?.assignElements ?? [])
-        .map((element) => [element.id, element]),
+      (
+        nodes
+          .filter((node) => node.data.stepType === StepType.Assign)
+          .flatMap((node) => node.data?.assignElements ?? []) as Assign[]
+      ).map((element) => [element.id, element]),
     );
 
-    assignElements.forEach(
-      (updated) => elementsMap.get(updated.id) && Object.assign(elementsMap.get(updated.id), updated),
-    );
+    assignElements.forEach((updated) => {
+      const existing = elementsMap.get(updated.id);
+      if (existing) {
+        Object.assign(existing, updated);
+      }
+    });
 
     const hasChangedSlot = (slot: any, elementsMap: Map<any, any>): boolean => {
       const ref = elementsMap.get(slot.id);
@@ -176,7 +186,7 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
       }
 
       if (slot.slots) {
-        checkSlots(slot.slots, elementsMap);
+        checkSlots(slot.slots as any[], elementsMap);
       }
 
       return changed;
@@ -187,7 +197,7 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
     };
 
     const processElement = (element: any, elementsMap: Map<any, any>): boolean => {
-      const slotsChanged = element.slots && checkSlots(element.slots, elementsMap);
+      const slotsChanged = element.slots && checkSlots(element.slots as any[], elementsMap);
 
       if (element.slots?.length) {
         element.value = element.slots[0].value;
@@ -275,13 +285,13 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
         })),
       );
 
-      const response = await api.post(servicesRequestsExplain(), {
+      const response = await api.post<{ response: Record<string, unknown>[] }>(servicesRequestsExplain(), {
         requests: requests,
       });
 
       const variables: EndpointResponseVariable[] = [];
 
-      response.data.response.forEach((res: any, i: number) => {
+      response.data.response.forEach((res, i) => {
         const endpoint = endpointsFromNodes[i];
         const chips: Chip[] = [];
 
@@ -648,7 +658,7 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
     try {
       await onServiceSave(ServiceState.Ready);
     } catch (e: any) {
-      return Promise.reject(new Error(i18next.t('toast.cannot-save-flow') ?? e?.message ?? 'Error'));
+      return Promise.reject(new Error(i18next.t('toast.cannot-save-flow') ?? (e?.message as string) ?? 'Error'));
     }
 
     if (isNewService) {
@@ -684,24 +694,23 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
     get().setEdges((eds) => applyEdgeChanges(changes, eds));
   },
 
-  onNodeAdded: (node: Node) => {
-    const cleanupGhostNodes = () => {
+  onNodeAdded: () => {
+    const cleanupGhostNodes = async () => {
       const instance = get().reactFlowInstance;
       if (!instance) return;
 
       const nodes = instance.getNodes() ?? [];
       const edges = instance.getEdges() ?? [];
 
-      nodes
-        .filter((n) => n.type === 'ghost')
-        .forEach((ghostNode) => {
-          const incomers = getIncomers(ghostNode, nodes, edges);
-          const outgoers = getOutgoers(ghostNode, nodes, edges);
+      const ghostNodes = nodes.filter((n) => n.type === 'ghost');
+      for (const ghostNode of ghostNodes) {
+        const incomers = getIncomers(ghostNode, nodes, edges);
+        const outgoers = getOutgoers(ghostNode, nodes, edges);
 
-          if (incomers.length === 0 && outgoers.length === 0) {
-            instance.deleteElements({ nodes: [ghostNode] });
-          }
-        });
+        if (incomers.length === 0 && outgoers.length === 0) {
+          await instance.deleteElements({ nodes: [ghostNode] });
+        }
+      }
     };
 
     requestAnimationFrame(cleanupGhostNodes);
@@ -741,6 +750,7 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
             dynamicChoices: updatedNode.data.dynamicChoices,
             endpoint: updatedNode.data.endpoint,
             label: updatedNode.data.label,
+            testingPassed: updatedNode.data.testingPassed,
           },
         };
       }),
@@ -791,6 +801,24 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
   },
   cancelNavigation: () => {
     set({ nextLocation: null });
+  },
+  isJsonRequestVisible: false,
+  jsonRequestContent: null,
+  setJsonRequestVisible: (visible: boolean) => set({ isJsonRequestVisible: visible }),
+  setJsonRequestContent: (content: any) => set({ jsonRequestContent: content }),
+  triggerJsonRequest: (endpoint: EndpointData) => {
+    generateJsonRequest(endpoint.definitions[0])
+      .then((content) => {
+        set({ jsonRequestContent: content, isJsonRequestVisible: true });
+        useToastStore.getState().success({
+          title: t('newService.endpoint.success'),
+        });
+      })
+      .catch((error) => {
+        useToastStore.getState().error({
+          title: error.message ?? t('newService.endpoint.error'),
+        });
+      });
   },
 }));
 

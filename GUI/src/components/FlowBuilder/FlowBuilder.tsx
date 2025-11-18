@@ -1,6 +1,7 @@
-import {Background, ColorMode, Controls, Edge, MiniMap, Node, Panel, ReactFlow, useReactFlow} from '@xyflow/react';
-import {Button, Modal, ThemeToggle, Track} from 'components';
+import { Background,ColorMode, Controls, Edge, MiniMap, Node, Panel, ReactFlow, useReactFlow } from '@xyflow/react';
+import { Button, Modal, Tooltip, Track, ThemeToggle } from 'components';
 import Chat from 'components/chat/chat';
+import ImportExportControls from 'components/Flow/Controls/ImportExportControls';
 import edgeTypes from 'components/Flow/EdgeTypes';
 import nodeTypes from 'components/Flow/NodeTypes';
 import useLayout from 'hooks/flow/useLayout';
@@ -8,9 +9,12 @@ import { useOnNodesDelete } from 'hooks/flow/useOnNodeDelete';
 import {ChangeEventHandler, FC, useCallback, useState} from 'react';
 import '@xyflow/react/dist/style.css';
 import { useTranslation } from 'react-i18next';
-import useServiceStore from 'store/new-services.store';
+import useNewServiceStore from 'store/new-services.store';
+import useServiceStore from 'store/services.store';
 import { StepType } from 'types';
-import ImportExportControls from 'components/Flow/Controls/ImportExportControls';
+
+import HorizontalFlow from '../../static/icons/horizontal_flow.svg';
+import VerticalFlow from '../../static/icons/vertical_flow.svg';
 import {useThemeSyncWithFlow} from "../../hooks/useThemeSyncWithFlow";
 
 type FlowBuilderProps = {
@@ -22,7 +26,7 @@ const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
   useLayout();
   const { getNodes, getEdges, setNodes, setEdges, getNode } = useReactFlow();
   const [colorMode, setColorMode] = useState<ColorMode>('light');
-  const setReactFlowInstance = useServiceStore((state) => state.setReactFlowInstance);
+  const setReactFlowInstance = useNewServiceStore((state) => state.setReactFlowInstance);
   const { t } = useTranslation();
 
   useThemeSyncWithFlow();
@@ -38,7 +42,10 @@ const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
     setDeletedNodes,
     setNodeToDelete,
   } = useOnNodesDelete();
-  const { setHasUnsavedChanges } = useServiceStore();
+  const { setHasUnsavedChanges } = useNewServiceStore();
+  const orientation = useServiceStore((state) => state.orientation);
+  const toggleOrientation = useServiceStore((state) => state.toggleOrientation);
+  useLayout(orientation);
 
   const onConnect = useCallback(
     ({ source, target }: any) => {
@@ -120,8 +127,8 @@ const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
       <ReactFlow
         nodes={nodes}
         edges={edges}
-        onNodesChange={useServiceStore.getState().onNodesChange}
-        onEdgesChange={useServiceStore.getState().onEdgesChange}
+        onNodesChange={useNewServiceStore.getState().onNodesChange}
+        onEdgesChange={useNewServiceStore.getState().onEdgesChange}
         snapToGrid
         proOptions={{ hideAttribution: true }}
         panOnScroll
@@ -129,7 +136,7 @@ const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
         edgeTypes={edgeTypes}
         onInit={(instance) => {
           setReactFlowInstance(instance);
-          useServiceStore.getState().loadEndpointsResponseVariables();
+          useNewServiceStore.getState().loadEndpointsResponseVariables();
         }}
         nodesDraggable={false}
         onConnect={onConnect}
@@ -155,8 +162,21 @@ const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
         <Panel position="top-left">
           <ImportExportControls />
         </Panel>
+          <Panel position="top-right">
+              <ThemeToggle onChange={onChange} />
+          </Panel>
         <Panel position="top-right">
-            <ThemeToggle onChange={onChange} />
+          <Tooltip content={t('serviceFlow.orientationTooltip')}>
+            <Button onClick={toggleOrientation} size="s" style={{ backgroundColor: '#005aa3' }}>
+              <img
+                src={orientation === 'horizontal' ? HorizontalFlow : VerticalFlow}
+                width={35}
+                className="logo"
+                loading="eager"
+                alt="orientation toggle"
+              />
+            </Button>
+          </Tooltip>
         </Panel>
       </ReactFlow>
       {isDeleteConnectionsModalVisible && (
