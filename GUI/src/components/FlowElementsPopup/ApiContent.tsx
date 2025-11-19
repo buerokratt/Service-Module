@@ -1,11 +1,11 @@
+import { Node } from '@xyflow/react';
 import ApiEndpointCard from 'components/ApiEndpointCard';
 import { FC, useEffect, useMemo } from 'react';
 import { EndpointData } from 'types/endpoint';
+import { NodeDataProps } from 'types/service-flow';
 
 import Track from '../Track';
 import PreviousVariables from './PreviousVariables';
-import { Node } from '@xyflow/react';
-import { NodeDataProps } from 'types/service-flow';
 
 type ApiContentProps = {
   readonly node: Node<NodeDataProps>;
@@ -15,7 +15,7 @@ type ApiContentProps = {
 
 const ApiContent: FC<ApiContentProps> = ({ node, endpoint, onEndpointChange }) => {
   const endpointCopy = useMemo(() => {
-    return endpoint ? JSON.parse(JSON.stringify(endpoint)) : undefined;
+    return endpoint ? (JSON.parse(JSON.stringify(endpoint)) as EndpointData) : undefined;
   }, [endpoint]);
 
   useEffect(() => {
@@ -29,7 +29,6 @@ const ApiContent: FC<ApiContentProps> = ({ node, endpoint, onEndpointChange }) =
       {endpointCopy && (
         <ApiEndpointCard
           endpoint={endpointCopy}
-          isDeletable={false}
           showCommonSwitch={false}
           onNameChange={(name) => {
             endpointCopy.name = name;

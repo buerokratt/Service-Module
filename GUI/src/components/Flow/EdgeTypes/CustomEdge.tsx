@@ -101,7 +101,7 @@ function CustomEdge({
       }
     });
     setAllElements(elements);
-  }, [stepPreferences]);
+  }, [stepPreferences, t]);
 
   useEffect(() => {
     const steps = mapEndpointsToSteps();
@@ -141,14 +141,14 @@ function CustomEdge({
   );
 
   function updateStepPreference(steps: Step[]) {
-    api.post(userStepPreferences(), {
+    void api.post(userStepPreferences(), {
       steps: steps.map((e) => e.type),
       endpoints: getEndpointIds(apiElements),
     });
   }
 
   function updateEndpointPreference(endpointIds: string[]) {
-    api.post(userStepPreferences(), {
+    void api.post(userStepPreferences(), {
       steps: stepPreferences,
       endpoints: endpointIds,
     });
@@ -160,6 +160,7 @@ function CustomEdge({
       <EdgeLabelRenderer>
         <Dropdown
           open={dropdownOpen}
+          centered={true}
           onOpenChange={setDropdownOpen}
           onClose={() => setDropdownOpen(false)}
           title={t('serviceFlow.elements').toString()}
@@ -215,7 +216,7 @@ function CustomEdge({
                 defaultOpen={true}
                 title={t('serviceFlow.apiElements.title')}
                 contentStyle={contentStyle}
-                onAddClick={async () => {
+                onAddClick={() => {
                   if (!idParam) {
                     useToastStore.getState().error({
                       title: t('newService.toast.serviceNotFound'),
@@ -234,9 +235,8 @@ function CustomEdge({
                           key={step.id}
                           step={step}
                           onClick={(step) => {
-                            onEdgeAdd(step).then(() => {
-                              useServiceStore.getState().loadEndpointsResponseVariables();
-                            });
+                            onEdgeAdd(step);
+                            useServiceStore.getState().loadEndpointsResponseVariables();
                             setDropdownOpen(false);
                             setHasUnsavedChanges(true);
                           }}

@@ -1,11 +1,12 @@
+import { Node } from '@xyflow/react';
 import { t } from 'i18next';
-import { FormRichText, Track } from '..';
 import { CSSProperties, FC, useRef, useState } from 'react';
-import PreviousVariables from './PreviousVariables';
-import { removeNestedTemplates } from 'utils/string-util';
 import ReactQuill from 'react-quill';
 import { NodeDataProps } from 'types/service-flow';
-import { Node } from '@xyflow/react';
+import { removeNestedTemplates } from 'utils/string-util';
+
+import { FormRichText, Track } from '..';
+import PreviousVariables from './PreviousVariables';
 
 type TextfieldContentProps = {
   readonly defaultMessage?: string;

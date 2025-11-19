@@ -1,11 +1,11 @@
+import { Node } from '@xyflow/react';
 import { FC } from 'react';
 import useServiceStore from 'store/new-services.store';
+import { NodeDataProps } from 'types/service-flow';
 
 import Track from '../Track';
 import PreviousVariables from './PreviousVariables';
 import RuleBuilder from './RuleBuilder';
-import { Node } from '@xyflow/react';
-import { NodeDataProps } from 'types/service-flow';
 
 type ConditionContentProps = {
   readonly node: Node<NodeDataProps>;

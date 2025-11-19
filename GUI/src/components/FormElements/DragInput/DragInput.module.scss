@@ -48,6 +48,14 @@
   height: 27px !important;
 }
 
+.dragText {
+  white-space: nowrap;
+  min-width: 40px;
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .dragHover {
   border: 1px solid get-color(sea-green-10) !important;
 }
