@@ -7,7 +7,6 @@ import VariableCell from './ApiEndpointCard/Endpoints/RequestVariables/VariableC
 import Box from './Box';
 import Button from './Button';
 import Card from './Card';
-import ThemeToggle from './ThemeToggle';
 import CheckBadge from './CheckBadge';
 import Collapsible from './Collapsible';
 import DataTable from './DataTable';
@@ -40,6 +39,7 @@ import OutputElementBox from './OutputElementBox';
 import Popover from './Popover';
 import Section from './Section';
 import StepElement from './StepElement';
+import ThemeToggle from './ThemeToggle';
 import Toast from './Toast';
 import Tooltip from './Tooltip';
 import Track from './Track';

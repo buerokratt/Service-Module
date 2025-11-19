@@ -1,5 +1,6 @@
-import { useEffect } from 'react';
 import { useReactFlow } from '@xyflow/react';
+import { useEffect } from 'react';
+
 import { useTheme } from '../utils/useTheme';
 
 export function useThemeSyncWithFlow() {
