@@ -4,7 +4,7 @@ import { MdDeleteOutline } from 'react-icons/md';
 
 import { Rule } from './types';
 
-export const conditionOptions = ['==', '===', '!=', '!==', '>', '<', '>=', '<='].map((x) => ({ label: x, value: x }));
+const conditionOptions = ['==', '===', '!=', '!==', '>', '<', '>=', '<='].map((x) => ({ label: x, value: x }));
 
 interface RuleElementProps {
   rule: Rule;

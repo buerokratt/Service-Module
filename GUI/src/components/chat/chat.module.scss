@@ -1,9 +1,12 @@
+@import 'src/styles/settings/variables/_colors';
+@import 'src/styles/tools/color';
+
 .chatWrapper {
   z-index: 99;
   position: fixed;
   margin: 1em;
   right: 250px;
-  bottom: 0;
+  bottom: 95px;
   width: 650px;
   height: 500px;
 }
@@ -281,7 +284,7 @@
 
 .profile {
   position: fixed;
-  bottom: 0;
+  bottom: 95px;
   right: 250px;
 
   display: flex;
@@ -300,5 +303,81 @@
     bottom: 0;
     right: 0;
     z-index: 20;
+  }
+}
+
+[data-theme='dark'] .profile {
+  background-color: get-color(sapphire-blue-12);
+  color: var(--dark-bg-extra-light);
+}
+
+[data-theme='dark'] .keypad {
+  background-color: get-color(sapphire-blue-12);
+  color: var(--dark-bg-extra-light);
+
+  .input {
+    color: var(--dark-text-secondary);
+    background-color: var(--dark-bg-extra-light);
+  }
+}
+
+[data-theme='dark'] .header {
+  color: var(--dark-bg-extra-light);
+  background-color: get-color(sapphire-blue-12);
+}
+
+[data-theme='dark'] .chatContent {
+  background-color: var(--dark-bg-light);
+}
+
+[data-theme='dark'] .keypadContainer {
+  background-color: var(--dark-bg-light);
+}
+
+[data-theme='dark'] .chat {
+  background-color: var(--dark-bg-light);
+}
+
+[data-theme='dark'] .message {
+  color: var(--dark-text-secondary);
+
+  &.client {
+    .content {
+      background-color: #764ca0;
+    }
+  }
+
+  &.admin {
+    .main {
+      .content {
+        background-color: get-color(sapphire-blue-12);
+      }
+    }
+  }
+}
+
+[data-theme='dark'] .system {
+  &.success {
+    color: get-color(sea-green-11);
+    background: get-color(sea-green-6);
+  }
+
+  &.error {
+    color: get-color(jasper-11);
+    background: get-color(jasper-6);
+  }
+
+  &.info {
+    color: get-color(sapphire-blue-11);
+    background: get-color(sapphire-blue-6);
+  }
+
+  &.normal {
+    background: #0001;
+  }
+
+  .link {
+    text-decoration: underline;
+    padding-left: 0.1em;
   }
 }
