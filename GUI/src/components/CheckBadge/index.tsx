@@ -1,9 +1,11 @@
 import { FC } from 'react';
+
 import { AiFillCheckCircle } from 'react-icons/ai';
+
 import '../../styles/settings/variables/_colors.scss';
+import { useTheme } from '../../utils/useTheme';
 import Icon from '../Icon';
 import './CheckBadge.scss';
-import { useTheme } from '../../utils/useTheme';
 
 const CheckBadge: FC = () => {
   const theme = useTheme();
