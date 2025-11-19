@@ -456,7 +456,8 @@
     "nodesCut": "{{count}} node{{s}} cut",
     "copyNodes": "Copy selected nodes",
     "pasteNodes": "Paste nodes",
-    "cutNodes": "Cut selected nodes"
+    "cutNodes": "Cut selected nodes",
+    "lasso": "Lasso"
   },
   "logs": {
     "service": "Service",

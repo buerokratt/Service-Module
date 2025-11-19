@@ -122,7 +122,6 @@
       }
     }
 
-    // Common hover effect mixin for node types
     @mixin node-hover-effect($hover-border-color) {
       &:hover:not(.selected) {
         border: 1px solid $hover-border-color;

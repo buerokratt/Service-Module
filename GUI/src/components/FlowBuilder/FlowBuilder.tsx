@@ -3,8 +3,10 @@ import { Button, Modal, ThemeToggle, Tooltip, Track } from 'components';
 import Chat from 'components/chat/chat';
 import CopyPasteControls from 'components/Flow/Controls/CopyPasteControls';
 import ImportExportControls from 'components/Flow/Controls/ImportExportControls';
+import LassoSelectionControls from 'components/Flow/Controls/LassoSelectionControls';
 import UndoRedoControls from 'components/Flow/Controls/UndoRedoControls';
 import edgeTypes from 'components/Flow/EdgeTypes';
+import { Lasso } from 'components/Flow/LassoSelection/Lasso';
 import nodeTypes from 'components/Flow/NodeTypes';
 import useLayout from 'hooks/flow/useLayout';
 import { useOnNodesDelete } from 'hooks/flow/useOnNodeDelete';
@@ -14,6 +16,7 @@ import { useTranslation } from 'react-i18next';
 import useNewServiceStore from 'store/new-services.store';
 import useServiceStore from 'store/services.store';
 import { StepType } from 'types';
+import '../Flow/LassoSelection/Lasso.css';
 
 import { useThemeSyncWithFlow } from '../../hooks/useThemeSyncWithFlow';
 import HorizontalFlow from '../../static/icons/horizontal_flow.svg';
@@ -44,6 +47,7 @@ const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
     setDeletedNodes,
     setNodeToDelete,
   } = useOnNodesDelete();
+  const [isLassoActive, setIsLassoActive] = useState(false);
   const { saveToHistory, historyIndex, setFlowSelectedNodes, setHasUnsavedChanges } = useNewServiceStore();
   const orientation = useServiceStore((state) => state.orientation);
   const toggleOrientation = useServiceStore((state) => state.toggleOrientation);
@@ -85,6 +89,8 @@ const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
     },
     [getEdges, getNodes, setEdges, setHasUnsavedChanges, setNodes, saveToHistory],
   );
+
+  const zIndexStyle = { zIndex: 20 };
 
   const onChange: ChangeEventHandler<HTMLSelectElement> = (evt) => {
     setColorMode(evt.target.value as ColorMode);
@@ -135,6 +141,10 @@ const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
     [getNode, hasConnectedNodes, setDeletedNodes, setIsDeleteConnectionsModalVisible],
   );
 
+  const handleToggleLasso = useCallback(() => {
+    setIsLassoActive((prev) => !prev);
+  }, []);
+
   useEffect(() => {
     runLayout();
   }, [historyIndex, runLayout]);
@@ -176,20 +186,21 @@ const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
         defaultEdgeOptions={{ type: 'step', deletable: false }}
       >
         <Chat />
-        <MiniMap />
+        <MiniMap style={zIndexStyle} />
         <Background color="#D2D3D8" gap={16} lineWidth={9} />
-        <Controls orientation="horizontal" showInteractive={false} />
-        <Panel position="top-left">
+        <Controls orientation="horizontal" showInteractive={false} style={zIndexStyle} />
+        {isLassoActive && <Lasso />}
+        <Panel position="top-left" style={zIndexStyle}>
           <Track gap={10} direction="vertical" align="left">
             <ImportExportControls />
             <CopyPasteControls onNodesDelete={onNodesDelete} />
             <UndoRedoControls />
           </Track>
         </Panel>
-        <Panel position="top-right" style={{ paddingRight: '90px' }}>
+        <Controls orientation="horizontal" showInteractive={false} />
+        <Panel position="top-right" style={{ zIndex: 20, paddingRight: '90px' }}>
+          <LassoSelectionControls isLassoActive={isLassoActive} onToggleLasso={handleToggleLasso} />
           <ThemeToggle onChange={onChange} />
-        </Panel>
-        <Panel position="top-right">
           <Tooltip content={t('serviceFlow.orientationTooltip')}>
             <Button onClick={toggleOrientation} size="s" style={{ backgroundColor: '#005aa3', height: '36px' }}>
               <img
