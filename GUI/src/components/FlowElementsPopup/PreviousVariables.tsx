@@ -17,8 +17,8 @@ import useServiceStore from '../../store/new-services.store';
 import { Assign } from '../../types/assign';
 import Tooltip from '../Tooltip';
 import Track from '../Track';
-import '../../styles/settings/variables/_colors.scss'
-import {useTheme} from "../../utils/useTheme";
+import '../../styles/settings/variables/_colors.scss';
+import { useTheme } from '../../utils/useTheme';
 
 type PreviousVariablesProps = {
   readonly nodeId: string;

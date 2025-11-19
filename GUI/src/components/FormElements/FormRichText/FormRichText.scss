@@ -24,6 +24,10 @@
 }
 
 .ql-snow.ql-toolbar {
-  .ql-stroke { stroke: var(--dark-text-label) !important; }
-  .ql-fill { fill: var(--dark-text-label) !important; }
+  .ql-stroke {
+    stroke: var(--dark-text-label) !important;
+  }
+  .ql-fill {
+    fill: var(--dark-text-label) !important;
+  }
 }

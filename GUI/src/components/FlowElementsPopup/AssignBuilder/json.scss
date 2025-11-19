@@ -1,6 +1,6 @@
 @import 'src/styles/settings/variables/_colors';
 
-[data-theme="dark"] {
+[data-theme='dark'] {
   .jsoneditor,
   .jsoneditor-menu {
     background: var(--dark-bg-secondary) !important;
@@ -30,10 +30,10 @@
     background-color: var(--dark-bg-extra-light) !important;
     color: var(--dark-text-secondary) !important;
 
-     &:focus {
-       background-color: var(--dark-bg-extra-light) !important;
-       border-color: var(--dark-text-disabled) !important;
-     }
+    &:focus {
+      background-color: var(--dark-bg-extra-light) !important;
+      border-color: var(--dark-text-disabled) !important;
+    }
 
     &:hover {
       background-color: var(--dark-bg-highlight) !important;

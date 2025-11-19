@@ -1,4 +1,4 @@
-import { Background,ColorMode, Controls, Edge, MiniMap, Node, Panel, ReactFlow, useReactFlow } from '@xyflow/react';
+import { Background, ColorMode, Controls, Edge, MiniMap, Node, Panel, ReactFlow, useReactFlow } from '@xyflow/react';
 import { Button, Modal, Tooltip, Track, ThemeToggle } from 'components';
 import Chat from 'components/chat/chat';
 import ImportExportControls from 'components/Flow/Controls/ImportExportControls';
@@ -6,7 +6,7 @@ import edgeTypes from 'components/Flow/EdgeTypes';
 import nodeTypes from 'components/Flow/NodeTypes';
 import useLayout from 'hooks/flow/useLayout';
 import { useOnNodesDelete } from 'hooks/flow/useOnNodeDelete';
-import {ChangeEventHandler, FC, useCallback, useState} from 'react';
+import { ChangeEventHandler, FC, useCallback, useState } from 'react';
 import '@xyflow/react/dist/style.css';
 import { useTranslation } from 'react-i18next';
 import useNewServiceStore from 'store/new-services.store';
@@ -15,7 +15,7 @@ import { StepType } from 'types';
 
 import HorizontalFlow from '../../static/icons/horizontal_flow.svg';
 import VerticalFlow from '../../static/icons/vertical_flow.svg';
-import {useThemeSyncWithFlow} from "../../hooks/useThemeSyncWithFlow";
+import { useThemeSyncWithFlow } from '../../hooks/useThemeSyncWithFlow';
 
 type FlowBuilderProps = {
   nodes: Node[];
@@ -81,9 +81,9 @@ const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
     [getEdges, getNodes, setEdges, setHasUnsavedChanges, setNodes],
   );
 
-    const onChange: ChangeEventHandler<HTMLSelectElement> = (evt) => {
-        setColorMode(evt.target.value as ColorMode);
-    };
+  const onChange: ChangeEventHandler<HTMLSelectElement> = (evt) => {
+    setColorMode(evt.target.value as ColorMode);
+  };
 
   const isValidConnection = useCallback((connection: any) => {
     return connection.source !== connection.target;
@@ -162,9 +162,9 @@ const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
         <Panel position="top-left">
           <ImportExportControls />
         </Panel>
-          <Panel position="top-right" style={{ paddingRight: '90px'}}>
-              <ThemeToggle onChange={onChange} />
-          </Panel>
+        <Panel position="top-right" style={{ paddingRight: '90px' }}>
+          <ThemeToggle onChange={onChange} />
+        </Panel>
         <Panel position="top-right">
           <Tooltip content={t('serviceFlow.orientationTooltip')}>
             <Button onClick={toggleOrientation} size="s" style={{ backgroundColor: '#005aa3', height: '36px' }}>

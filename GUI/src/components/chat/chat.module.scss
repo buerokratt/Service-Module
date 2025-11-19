@@ -306,12 +306,12 @@
   }
 }
 
-[data-theme="dark"] .profile {
+[data-theme='dark'] .profile {
   background-color: get-color(sapphire-blue-12);
   color: var(--dark-bg-extra-light);
 }
 
-[data-theme="dark"] .keypad {
+[data-theme='dark'] .keypad {
   background-color: get-color(sapphire-blue-12);
   color: var(--dark-bg-extra-light);
 
@@ -321,24 +321,24 @@
   }
 }
 
-[data-theme="dark"] .header {
+[data-theme='dark'] .header {
   color: var(--dark-bg-extra-light);
   background-color: get-color(sapphire-blue-12);
 }
 
-[data-theme="dark"] .chatContent {
+[data-theme='dark'] .chatContent {
   background-color: var(--dark-bg-light);
 }
 
-[data-theme="dark"] .keypadContainer {
+[data-theme='dark'] .keypadContainer {
   background-color: var(--dark-bg-light);
 }
 
-[data-theme="dark"] .chat {
+[data-theme='dark'] .chat {
   background-color: var(--dark-bg-light);
 }
 
-[data-theme="dark"] .message {
+[data-theme='dark'] .message {
   color: var(--dark-text-secondary);
 
   &.client {
@@ -356,8 +356,7 @@
   }
 }
 
-
-[data-theme="dark"] .system {
+[data-theme='dark'] .system {
   &.success {
     color: get-color(sea-green-11);
     background: get-color(sea-green-6);

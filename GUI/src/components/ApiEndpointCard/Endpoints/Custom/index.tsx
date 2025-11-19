@@ -7,7 +7,7 @@ import { v4 as uuid } from 'uuid';
 import { Button, FormInput, FormSelect, RequestVariables, Track } from '../../..';
 import { RequestTab } from '../../../../types';
 import { EndpointData, EndpointVariableData, PreDefinedEndpointEnvVariables } from '../../../../types/endpoint';
-import {useTheme} from "../../../../utils/useTheme";
+import { useTheme } from '../../../../utils/useTheme';
 
 type EndpointCustomProps = {
   endpoint: EndpointData;
@@ -73,7 +73,9 @@ const EndpointCustom: React.FC<EndpointCustomProps> = ({
   return (
     <Track direction="vertical" align="stretch" gap={16}>
       <div>
-        <label htmlFor="endpointUrl" style={{ color: `${theme === 'dark' ? 'white' : 'black'}`}}>{t('newService.endpoint.url')}</label>
+        <label htmlFor="endpointUrl" style={{ color: `${theme === 'dark' ? 'white' : 'black'}` }}>
+          {t('newService.endpoint.url')}
+        </label>
         <Track gap={8}>
           <Track style={{ width: '100%' }}>
             <div style={{ width: 108 }}>

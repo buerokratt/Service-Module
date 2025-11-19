@@ -7,7 +7,7 @@ import VariableCell from './ApiEndpointCard/Endpoints/RequestVariables/VariableC
 import Box from './Box';
 import Button from './Button';
 import Card from './Card';
-import ThemeToggle from "./ThemeToggle";
+import ThemeToggle from './ThemeToggle';
 import CheckBadge from './CheckBadge';
 import Collapsible from './Collapsible';
 import DataTable from './DataTable';
@@ -87,5 +87,5 @@ export {
   ValueCell,
   StepElement,
   Dropdown,
-  ThemeToggle
+  ThemeToggle,
 };

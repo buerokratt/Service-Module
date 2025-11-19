@@ -67,7 +67,9 @@ const ApiEndpointCard: FC<EndpointCardProps> = ({
           <Tabs.Content className="tab-group__tab-content" value={env} key={env}>
             <Track direction="vertical" align="stretch" gap={16}>
               <Track isMultiline>
-                <label htmlFor="service-type" className={"default_label"}>{t('newService.uses')}</label>
+                <label htmlFor="service-type" className={'default_label'}>
+                  {t('newService.uses')}
+                </label>
                 <FormSelect
                   name="service-type"
                   label=""
@@ -85,7 +87,9 @@ const ApiEndpointCard: FC<EndpointCardProps> = ({
               </Track>
               {option && (
                 <div>
-                  <label htmlFor="endpointName" className={"default_label"}>{t('newService.endpoint.name')}</label>
+                  <label htmlFor="endpointName" className={'default_label'}>
+                    {t('newService.endpoint.name')}
+                  </label>
                   <FormInput
                     name="endpointName"
                     label=""
@@ -135,7 +139,9 @@ const ApiEndpointCard: FC<EndpointCardProps> = ({
               )}
               {showCommonSwitch && option?.value && (
                 <Track gap={16}>
-                  <label htmlFor="isCommon" className={"default_label"}>{t('newService.endpoint.publicEndpoint')}</label>
+                  <label htmlFor="isCommon" className={'default_label'}>
+                    {t('newService.endpoint.publicEndpoint')}
+                  </label>
                   <Switch
                     name="isCommon"
                     label=""
