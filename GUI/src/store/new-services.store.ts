@@ -720,8 +720,8 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
   onEdgesChange: (changes: EdgeChange[]) => {
     get().setEdges((eds) => applyEdgeChanges(changes, eds));
   },
-  onNodeAdded: (node: Node) => {
-    const cleanupGhostNodes = () => {
+  onNodeAdded: (_: Node) => {
+    const cleanupGhostNodes = async () => {
       const instance = get().reactFlowInstance;
       if (!instance) return;
 

@@ -3,6 +3,7 @@ import { Button, Modal, ThemeToggle, Tooltip, Track } from 'components';
 import Chat from 'components/chat/chat';
 import CopyPasteControls from 'components/Flow/Controls/CopyPasteControls';
 import ImportExportControls from 'components/Flow/Controls/ImportExportControls';
+import UndoRedoControls from 'components/Flow/Controls/UndoRedoControls';
 import edgeTypes from 'components/Flow/EdgeTypes';
 import nodeTypes from 'components/Flow/NodeTypes';
 import useLayout from 'hooks/flow/useLayout';
@@ -13,7 +14,7 @@ import { useTranslation } from 'react-i18next';
 import useNewServiceStore from 'store/new-services.store';
 import useServiceStore from 'store/services.store';
 import { StepType } from 'types';
-import UndoRedoControls from 'components/Flow/Controls/UndoRedoControls';
+
 import { useThemeSyncWithFlow } from '../../hooks/useThemeSyncWithFlow';
 import HorizontalFlow from '../../static/icons/horizontal_flow.svg';
 import VerticalFlow from '../../static/icons/vertical_flow.svg';
@@ -136,7 +137,7 @@ const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
 
   useEffect(() => {
     runLayout();
-  }, [historyIndex]);
+  }, [historyIndex, runLayout]);
 
   return (
     <>

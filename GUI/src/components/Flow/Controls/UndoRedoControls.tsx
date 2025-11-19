@@ -1,8 +1,8 @@
 import { Button, Icon, Track } from 'components';
-import { useTranslation } from 'react-i18next';
 import { FC, useCallback, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
+import { MdRedo, MdUndo } from 'react-icons/md';
 import useServiceStore from 'store/new-services.store';
-import { MdUndo, MdRedo } from 'react-icons/md';
 
 const UndoRedoControls: FC = () => {
   const { t } = useTranslation();
