@@ -11,7 +11,7 @@ declare global {
 }
 
 const useTabCloseEffect = () => {
-  if (import.meta.env.REACT_APP_LOCAL?.toLowerCase() === 'true') return;
+  const isLocal = import.meta.env.REACT_APP_LOCAL?.toLowerCase() === 'true';
   const baseUrl = import.meta.env.REACT_APP_NOTIFICATION_NODE_URL;
   const logoutPath = '/add-to-logout-queue';
   const cancelLogoutPath = '/remove-from-logout-queue';
@@ -49,13 +49,19 @@ const useTabCloseEffect = () => {
   };
 
   useEffect(() => {
-    setTimeout(() => {
+    if (isLocal) return;
+
+    const timeout = setTimeout(() => {
       return makeCall('cancel');
     }, 2500);
-  }, []);
+
+    return () => clearTimeout(timeout);
+  }, [isLocal]);
 
   useEffect(() => {
+    if (isLocal) return;
     if (window.__chatSessionInitialized__) return;
+
     window.__chatSessionInitialized__ = true;
 
     const tabId = sessionStorage.getItem(CHAT_SESSIONS.SESSION_ID_KEY) || generateUEID();
@@ -87,7 +93,9 @@ const useTabCloseEffect = () => {
     };
 
     window.addEventListener('beforeunload', handleTabClose);
-  }, []);
+
+    return () => window.removeEventListener('beforeunload', handleTabClose);
+  }, [isLocal]);
 };
 
 export default useTabCloseEffect;
