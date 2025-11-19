@@ -235,19 +235,6 @@ const EndpointOpenAPI: React.FC<EndpointOpenAPIProps> = ({
     setKey(key + 1);
   };
 
-  const checkNestedVariables = (variable: EndpointVariableData, data: RequestVariablesRowData[]) => {
-    const variableData = variable.type === 'schema' ? variable.schemaData : variable.arrayData;
-    if (Array.isArray(variableData)) {
-      variableData.forEach((variableData) => {
-        const updatedVariable = data.find((updated) => updated.endpointVariableId === variableData.id);
-        variableData[isLive ? 'value' : 'testValue'] = updatedVariable?.value;
-        if (['schema', 'array'].includes(variableData.type)) {
-          checkNestedVariables(variableData, data);
-        }
-      });
-    }
-  };
-
   const onSelectEndpoint = (selection: Option | null) => {
     const newSelectedEndpoint = openApiEndpoints.find((openApiEndpoint) => openApiEndpoint.label === selection?.label);
     setSelectedEndpoint(newSelectedEndpoint);
