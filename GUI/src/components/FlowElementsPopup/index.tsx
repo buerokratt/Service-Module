@@ -1,5 +1,6 @@
 import * as Tabs from '@radix-ui/react-tabs';
-import React, { useEffect, useState } from 'react';
+import { Edge, getConnectedEdges, getIncomers, getOutgoers, Node } from '@xyflow/react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { useTranslation } from 'react-i18next';
@@ -15,79 +16,85 @@ import { isTemplate, removeTrailingUnderscores, stringToTemplate, templateToStri
 
 import { Button, Track } from '..';
 import Popup from '../Popup';
+import ApiContent from './ApiContent';
+import AssignContent from './AssignContent';
 import ConditionBuilderContent from './ConditionBuilderContent';
+import ConditionContent from './ConditionContent';
 import DefaultMessageContent from './DefaultMessageContent';
+import DynamicChoicesContent from './DynamicChoicesContent';
 import EndConversationContent from './EndConversationContent';
 import FileGenerateContent from './FileGenerateContent';
 import FileSignContent from './FileSignContent';
 import JsonRequestContent from './JsonRequestContent';
+import MultiChoiceQuestionContent from './MultiChoiceQuestionContent';
 import OpenWebPageContent from './OpenWebPageContent';
 import OpenWebPageTestContent from './OpenWebPageTestContent';
 import RasaRulesContent from './RasaRulesContent';
 import TextfieldContent from './TextfieldContent';
 import TextfieldTestContent from './TextfieldTestContent';
 import { servicesRequestsExplain } from '../../resources/api-constants';
-import { StepType } from '../../types';
-
-import './styles.scss';
-import ConditionContent from './ConditionContent';
-import AssignContent from './AssignContent';
-import ApiContent from './ApiContent';
-import MultiChoiceQuestionContent from './MultiChoiceQuestionContent';
-
-import { Edge, getConnectedEdges, getIncomers, getOutgoers, Node } from '@xyflow/react';
-
 import api from '../../services/api-dev';
-import DynamicChoicesContent from './DynamicChoicesContent';
+import { StepType } from '../../types';
+import { getInitialGroup } from './RuleBuilder/types';
+import './styles.scss';
 
 const FlowElementsPopup: React.FC = () => {
   const { t } = useTranslation();
   const [selectedTab, setSelectedTab] = useState<string | null>(null);
-  const [isJsonRequestVisible, setIsJsonRequestVisible] = useState(false);
   const [isSaveEnabled, setIsSaveEnabled] = useState(true);
-  const [jsonRequestContent, setJsonRequestContent] = useState<any>(null);
+  const { isJsonRequestVisible, jsonRequestContent, setJsonRequestVisible, setJsonRequestContent } = useServiceStore();
   const node = useServiceStore((state) => state.selectedNode);
   const selectedService = useServiceListStore((state) => state.selectedService);
   const instance = useServiceStore.getState().reactFlowInstance;
 
-  const isUserDefinedNode = node?.data?.stepType === 'user-defined';
+  const isUserDefinedNode = node?.data?.stepType === StepType.UserDefined;
 
   const serviceName = useServiceStore((state) => removeTrailingUnderscores(state.serviceNameDashed()));
   const rules = useServiceStore((state) => state.rules);
   const assignElements = useServiceStore((state) => state.assignElements);
   const endpointsVariables = useServiceStore((state) => state.endpointsResponseVariables);
 
-  const defaultMultiChoiceQuestionButtons = [
-    {
-      id: '1',
-      title: 'Jah',
-      payload: `#service, /${selectedService?.type ?? 'POST'}/services/active/${serviceName}_mcq_${
-        node?.data.label[node?.data.label.length - 1]
-      }_0`,
-    },
-    {
-      id: '2',
-      title: 'Ei',
-      payload: `#service, /${selectedService?.type ?? 'POST'}/services/active/${serviceName}_mcq_${
-        node?.data.label[node?.data.label.length - 1]
-      }_1`,
-    },
-  ];
+  const defaultMultiChoiceQuestionButtons = useMemo(
+    () => [
+      {
+        id: '1',
+        title: 'Jah',
+        payload: `#service, /${selectedService?.type ?? 'POST'}/services/active/${serviceName}_mcq_${
+          node?.data.label[node?.data.label.length - 1]
+        }_0`,
+      },
+      {
+        id: '2',
+        title: 'Ei',
+        payload: `#service, /${selectedService?.type ?? 'POST'}/services/active/${serviceName}_mcq_${
+          node?.data.label[node?.data.label.length - 1]
+        }_1`,
+      },
+    ],
+    [selectedService?.type, serviceName, node?.data.label],
+  );
 
-  const defaultDynamicChoices: DynamicChoices = {
-    list: '',
-    serviceName: '',
-    key: '',
-    payloadKeys: '',
-  };
+  const defaultDynamicChoices: DynamicChoices = useMemo(
+    () => ({
+      list: '',
+      serviceName: '',
+      key: '',
+      payloadKeys: '',
+    }),
+    [],
+  );
 
   useEffect(() => {
-    if (node) node.data.rules = rules;
-  }, [rules]);
+    if (node) {
+      node.data.rules = node.data.rules
+        ? { ...node.data.rules, children: rules }
+        : { ...getInitialGroup(), children: rules };
+    }
+  }, [node, rules]);
 
   useEffect(() => {
     if (node) node.data.assignElements = assignElements;
-  }, [assignElements]);
+  }, [assignElements, node]);
 
   // StepType.Textfield
   const [textfieldMessage, setTextfieldMessage] = useState<string | null>(null);
@@ -126,7 +133,7 @@ const FlowElementsPopup: React.FC = () => {
       case StepType.Input:
       case StepType.Condition:
         if (node.data?.rules) {
-          useServiceStore.getState().changeRulesNode(node.data.rules);
+          useServiceStore.getState().changeRulesNode(node.data.rules.children);
         }
         break;
 
@@ -148,7 +155,7 @@ const FlowElementsPopup: React.FC = () => {
       default:
         break;
     }
-  }, [stepType]);
+  }, [defaultDynamicChoices, defaultMultiChoiceQuestionButtons, node, stepType]);
 
   if (!node) return <></>;
 
@@ -156,7 +163,7 @@ const FlowElementsPopup: React.FC = () => {
 
   const onClose = () => {
     setSelectedTab(null);
-    setIsJsonRequestVisible(false);
+    setJsonRequestVisible(false);
     setJsonRequestContent(null);
     setTextfieldMessage(null);
     setWebpageName(null);
@@ -191,11 +198,14 @@ const FlowElementsPopup: React.FC = () => {
         },
         dynamicChoices: dynamicChoices,
         endpoint: nodeEndpoint ?? node.data?.endpoint,
+        testingPassed: undefined,
       },
     };
 
     if (stepType === StepType.Input || stepType === StepType.Condition) {
-      updatedNode.data.rules = rules;
+      updatedNode.data.rules = updatedNode.data.rules
+        ? { ...updatedNode.data.rules, children: rules }
+        : { ...getInitialGroup(), children: rules };
     }
 
     if (stepType === StepType.MultiChoiceQuestion) {
@@ -257,7 +267,7 @@ const FlowElementsPopup: React.FC = () => {
 
   const handleJsonRequestClick = async () => {
     if (isJsonRequestVisible) {
-      setIsJsonRequestVisible(false);
+      setJsonRequestVisible(false);
       return;
     }
 
@@ -278,20 +288,22 @@ const FlowElementsPopup: React.FC = () => {
         ],
       });
       setJsonRequestContent(response.data.response);
-      setIsJsonRequestVisible(true);
+      setJsonRequestVisible(true);
     } catch (error) {
       console.error('Error: ', error);
     }
   };
 
   function extractMapValues(element: any) {
-    if (element.rawData && element.rawData.length > 0) {
-      return element.rawData.value; //  element.rawData.testValue
+    if (element?.rawData && element?.rawData?.length > 0) {
+      return element.rawData.value;
     }
 
     let result: any = {};
-    for (const entry of element.variables) {
-      result = { ...result, [entry.name]: entry.value };
+    if (element?.variables) {
+      for (const entry of element.variables) {
+        result = { ...result, [entry.name]: entry.value };
+      }
     }
     return result;
   }
@@ -447,7 +459,7 @@ const FlowElementsPopup: React.FC = () => {
             {stepType === StepType.Textfield && (
               <TextfieldContent
                 defaultMessage={node.data.message ?? textfieldMessage ?? undefined}
-                nodeId={node.id}
+                node={node}
                 onChange={(message, placeholders) => {
                   setTextfieldMessage(message);
                   setTextfieldMessagePlaceholders(placeholders);
@@ -486,18 +498,18 @@ const FlowElementsPopup: React.FC = () => {
             )}
             {stepType === StepType.FinishingStepEnd && <EndConversationContent />}
             {stepType === StepType.RasaRules && <RasaRulesContent />}
-            {stepType === StepType.Assign && <AssignContent nodeId={node.id} />}
-            {stepType === StepType.Condition && <ConditionContent nodeId={node.id} />}
+            {stepType === StepType.Assign && <AssignContent node={node} />}
+            {stepType === StepType.Condition && <ConditionContent node={node} />}
             {stepType === StepType.DynamicChoices && (
               <DynamicChoicesContent
-                nodeId={node.id}
+                node={node}
                 dynamicChoices={dynamicChoices}
                 onDynamicChoicesChange={setDynamicChoices}
               />
             )}
             {stepType === StepType.UserDefined && (
               <ApiContent
-                nodeId={node.id}
+                node={node}
                 endpoint={node.data.endpoint}
                 onEndpointChange={(endpoint) => {
                   if (!endpoint) return;

@@ -78,35 +78,85 @@ const AssignElement: React.FC<AssignElementProps> = ({
   };
 
   const toggleManualEdit = () => {
-    const newMode = !element.isValueManual
+    const newMode = !element.isValueManual;
     setIsEditingManually(newMode);
     onChange({ ...element, slots: undefined, isValueManual: newMode });
   };
 
-  const toggleObjectEditor = () => {
-    if (isObjectEditorOpen) {
-      setIsObjectEditorOpen(!isObjectEditorOpen);
-    } else {
-      // New empty element
-      if (element.value === '') {
-        setIsObjectEditorOpen(!isObjectEditorOpen);
-        return;
-      }
+  const canOpenObjectEditor = () => {
+    if (element.value === '') return true;
 
-      if (!isTemplate(element.value)) {
-        showInvalidObjectError();
-        return;
-      }
+    if (!isTemplate(element.value)) {
+      showInvalidObjectError();
+      return false;
+    }
 
-      try {
-        JSON.parse(templateToString(element.value));
-        setIsObjectEditorOpen(!isObjectEditorOpen);
-      } catch (error) {
-        console.log('Error parsing input', error);
-        showInvalidObjectError();
-      }
+    try {
+      JSON.parse(templateToString(element.value));
+      return true;
+    } catch (error) {
+      console.log('Error parsing input', error);
+      showInvalidObjectError();
+      return false;
     }
   };
+
+  const toggleObjectEditor = () => {
+    if (isObjectEditorOpen) {
+      setIsObjectEditorOpen(false);
+      return;
+    }
+
+    if (canOpenObjectEditor()) {
+      setIsObjectEditorOpen(true);
+    }
+  };
+
+  const canShowSecondSlotToggle = Boolean(slots[0] && isObject(slots[0].data) && !isArray(slots[0].data));
+
+  const renderManualValueInput = () => (
+    <FormInput
+      value={element.value}
+      name="value"
+      onChange={changeValue}
+      label=""
+      style={valueStyle}
+      hideLabel
+      onDrop={changeManualInputValue}
+    />
+  );
+
+  const renderSecondSlotToggle = () =>
+    canShowSecondSlotToggle ? (
+      <Tooltip
+        content={t(isSecondSlotOpen ? 'serviceFlow.popup.removeValueAssignment' : 'serviceFlow.popup.assignAsValue')}
+        onButtonClick={() => {
+          setIsSecondSlotOpen(!isSecondSlotOpen);
+          if (!isSecondSlotOpen) resetSecondSlot();
+        }}
+      >
+        <div className={`small-assign-button ${isSecondSlotOpen ? 'assign-red' : 'assign-blue'}`}>
+          <Icon icon={<MdMoveDown />} />
+        </div>
+      </Tooltip>
+    ) : null;
+
+  const renderDragInputs = () => (
+    <Track gap={3} isFlex>
+      <DragInput id={element.id} element={slots[0]} onChange={changeFirstSlot} />
+      {renderSecondSlotToggle()}
+      {isSecondSlotOpen ? <DragInput id={element.id} element={slots[1]} onChange={changeSecondSlot} /> : null}
+    </Track>
+  );
+
+  const renderManualToggle = () =>
+    manualEdit ? null : (
+      <Tooltip content={t('serviceFlow.popup.assignManualEdit')} onButtonClick={toggleManualEdit}>
+        <div className={`small-assign-button assign-${isEditingManually ? 'red' : 'blue'}`}>
+          <Icon icon={<MdEdit />} />
+        </div>
+      </Tooltip>
+    );
 
   return (
     <>
@@ -125,51 +175,8 @@ const AssignElement: React.FC<AssignElementProps> = ({
         <Track style={{ flex: '1 0 75%', justifyContent: 'flex-end' }} gap={5}>
           {!isObjectEditorOpen && (
             <>
-              {isEditingManually ? (
-                <FormInput
-                  value={element.value}
-                  name="value"
-                  onChange={changeValue}
-                  label=""
-                  style={valueStyle}
-                  hideLabel
-                  onDrop={changeManualInputValue}
-                />
-              ) : (
-                <Track gap={3} isFlex>
-                  <DragInput id={element.id} element={slots[0]} onChange={changeFirstSlot} />
-
-                  {slots.length && isObject(slots[0].data) && !isArray(slots[0].data) ? (
-                    <Tooltip
-                      content={t(
-                        isSecondSlotOpen
-                          ? 'serviceFlow.popup.removeValueAssignment'
-                          : 'serviceFlow.popup.assignAsValue',
-                      )}
-                      onButtonClick={() => {
-                        setIsSecondSlotOpen(!isSecondSlotOpen);
-                        if (!isSecondSlotOpen) resetSecondSlot();
-                      }}
-                    >
-                      <div className={`small-assign-button ${isSecondSlotOpen ? 'assign-red' : 'assign-blue'}`}>
-                        <Icon icon={<MdMoveDown />} />
-                      </div>
-                    </Tooltip>
-                  ) : null}
-
-                  {isSecondSlotOpen ? (
-                    <DragInput id={element.id} element={slots[1]} onChange={changeSecondSlot} />
-                  ) : null}
-                </Track>
-              )}
-
-              {manualEdit ? null : (
-                <Tooltip content={t('serviceFlow.popup.assignManualEdit')} onButtonClick={toggleManualEdit}>
-                  <div className={`small-assign-button assign-${isEditingManually ? 'red' : 'blue'}`}>
-                    <Icon icon={<MdEdit />} />
-                  </div>
-                </Tooltip>
-              )}
+              {isEditingManually ? renderManualValueInput() : renderDragInputs()}
+              {renderManualToggle()}
             </>
           )}
 

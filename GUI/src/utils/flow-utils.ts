@@ -10,15 +10,15 @@ interface ValidationResult {
 }
 
 export const getNodeLabel = (step: Step, nodes: Node[]) => {
-  const baseLabel = step.label.split(' - ').pop();
+  const baseLabel = step.label.split(' - ').pop() ?? '';
   const existingNumbers = nodes
-    .filter((node: any) => node.data.stepType === step.type)
-    .map((node: any) => node.data.label)
+    .filter((node) => node.data.stepType === step.type)
+    .map((node) => node.data.label as string)
     .filter((label) => label.startsWith(baseLabel))
     .map((label) => {
       const parts = label.split(' - ');
       if (parts.length > 1) {
-        const num = parseInt(parts[parts.length - 1] as string);
+        const num = parseInt(parts[parts.length - 1]);
         return isNaN(num) ? 0 : num;
       }
       return 0;
@@ -27,6 +27,39 @@ export const getNodeLabel = (step: Step, nodes: Node[]) => {
 
   let nextNumber = 1;
   for (const num of existingNumbers) {
+    if (num === nextNumber) {
+      nextNumber++;
+    } else if (num > nextNumber) {
+      break;
+    }
+  }
+
+  return `${baseLabel} - ${nextNumber}`;
+};
+
+export const generateUniqueId = () => {
+  return crypto.randomUUID();
+};
+
+export const generateUniqueLabel = (originalLabel: string, existingNodes: Node[]): string => {
+  const parts = originalLabel.split(' - ');
+  const baseLabel = parts.length > 1 ? parts.slice(0, -1).join(' - ') : originalLabel;
+
+  const existingLabels = existingNodes
+    .map((node: any) => node.data?.label)
+    .filter((label) => label?.startsWith(baseLabel))
+    .map((label) => {
+      const labelParts = label.split(' - ');
+      if (labelParts.length > 1) {
+        const num = parseInt(labelParts[labelParts.length - 1] as string);
+        return isNaN(num) ? 0 : num;
+      }
+      return 0;
+    })
+    .sort((a, b) => a - b);
+
+  let nextNumber = 1;
+  for (const num of existingLabels) {
     if (num === nextNumber) {
       nextNumber++;
     } else if (num > nextNumber) {

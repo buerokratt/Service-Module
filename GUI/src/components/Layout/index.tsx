@@ -20,7 +20,11 @@ const Layout: FC<PropsWithChildren<LayoutProps>> = ({ disableMenu, customHeader,
       {!disableMenu && <MainNavigation countConf={menuCountConf} />}
       <div className="layout__wrapper">
         {customHeader ?? (
-          <Header toastContext={{ open: useToastStore.getState().open }} user={useStore.getState().userInfo} setUserDomains={useStore.getState().setUserDomains}/>
+          <Header
+            toastContext={{ open: useToastStore.getState().open }}
+            user={useStore.getState().userInfo}
+            setUserDomains={useStore.getState().setUserDomains}
+          />
         )}
         <main className="layout__main">{children ?? <Outlet />}</main>
       </div>

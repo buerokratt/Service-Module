@@ -58,7 +58,7 @@ const FaultyServicesPage: React.FC = () => {
       order = sorting[0].desc ? 'desc' : 'asc';
     }
     api
-      .get(getFaultyServices(pagination.pageIndex + 1, pagination.pageSize, sort, order))
+      .get<[FaultyService[], number]>(getFaultyServices(pagination.pageIndex + 1, pagination.pageSize, sort, order))
       .then((res) => {
         setData(res.data[0]);
         setPageCount(Math.ceil(res.data[1] / pagination.pageSize));
@@ -68,7 +68,7 @@ const FaultyServicesPage: React.FC = () => {
 
   useEffect(() => {
     loadFaultyServices(pagination, sorting);
-  }, []);
+  }, [pagination, sorting]);
 
   return (
     <>
@@ -200,7 +200,7 @@ const getColumns = (setViewFaultyServiceLog: (data: FaultyService) => void) => {
     columnHelper.accessor('timestamp', {
       header: i18n.t('logs.failedTime') ?? '',
       cell: (props) => <span>{format(new Date(parseInt(props.getValue() ?? '0')), 'dd-MM-yyyy HH:mm:ss')}</span>,
-      filterFn: (row: Row<FaultyService>, _, filterValue) => {
+      filterFn: (row: Row<FaultyService>, _, filterValue: string) => {
         return format(new Date(parseInt(row.original.timestamp ?? '0')), 'dd-MM-yyyy HH:mm:ss')
           .toLowerCase()
           .includes(filterValue.toLowerCase());
@@ -223,4 +223,8 @@ const getColumns = (setViewFaultyServiceLog: (data: FaultyService) => void) => {
   ];
 };
 
-export default withAuthorization(FaultyServicesPage, [ROLES.ROLE_ADMINISTRATOR, ROLES.ROLE_SERVICE_MANAGER]);
+const AuthorizedFaultyServicesPage = withAuthorization(FaultyServicesPage, [
+  ROLES.ROLE_ADMINISTRATOR,
+  ROLES.ROLE_SERVICE_MANAGER,
+]);
+export default AuthorizedFaultyServicesPage;

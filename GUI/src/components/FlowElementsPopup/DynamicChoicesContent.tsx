@@ -1,15 +1,17 @@
+import { Node } from '@xyflow/react';
 import Tooltip from 'components/Tooltip';
 import { t } from 'i18next';
 import { FC } from 'react';
 import { MdOutlineInfo } from 'react-icons/md';
 import { DynamicChoices } from 'types/dynamic-choices';
+import { NodeDataProps } from 'types/service-flow';
 
 import Track from '../Track';
 import AssignElement from './AssignBuilder/AssignElement';
 import PreviousVariables from './PreviousVariables';
 
 type DynamicChoicesContentProps = {
-  readonly nodeId: string;
+  readonly node: Node<NodeDataProps>;
   readonly dynamicChoices?: DynamicChoices;
   readonly onDynamicChoicesChange?: (dynamicChoices: DynamicChoices) => void;
 };
@@ -42,7 +44,7 @@ const fields: Array<{
 ];
 
 const DynamicChoicesContent: FC<DynamicChoicesContentProps> = ({
-  nodeId,
+  node,
   dynamicChoices = {
     list: '',
     serviceName: '',
@@ -76,7 +78,7 @@ const DynamicChoicesContent: FC<DynamicChoicesContentProps> = ({
               element={{
                 id: field.key,
                 key: field.label,
-                value: dynamicChoices[field.key],
+                value: dynamicChoices[field.key] ?? '',
                 tooltip: field.tooltip,
               }}
               onChange={(element) => handleChange(field.key, element.value)}
@@ -87,7 +89,7 @@ const DynamicChoicesContent: FC<DynamicChoicesContentProps> = ({
           </Track>
         ))}
       </Track>
-      <PreviousVariables nodeId={nodeId} />
+      <PreviousVariables node={node} />
     </Track>
   );
 };

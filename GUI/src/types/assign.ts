@@ -7,4 +7,5 @@ export interface Assign {
   slots?: [Assign] | [Assign, Assign];
   tooltip?: string;
   isObject?: boolean;
+  isAll?: boolean;
 }
