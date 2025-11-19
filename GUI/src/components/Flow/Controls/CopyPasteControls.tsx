@@ -18,7 +18,7 @@ interface CopyPasteControlsProps {
 }
 
 const CopyPasteControls: FC<CopyPasteControlsProps> = ({ onNodesDelete }) => {
-  const { getNodes, getEdges, setNodes, setEdges, getViewport } = useReactFlow();
+  const { getNodes, getEdges, setNodes, setEdges } = useReactFlow();
   const { t } = useTranslation();
   const { setHasUnsavedChanges } = useServiceStore();
   const [hasClipboardData, setHasClipboardData] = useState<boolean>(false);
@@ -29,7 +29,7 @@ const CopyPasteControls: FC<CopyPasteControlsProps> = ({ onNodesDelete }) => {
     return navigator.clipboard && typeof navigator.clipboard.writeText === 'function';
   };
 
-  const checkClipboardPermissions = async () => {
+  const checkClipboardPermissions = useCallback(async () => {
     if (!isClipboardSupported()) return false;
 
     try {
@@ -39,7 +39,7 @@ const CopyPasteControls: FC<CopyPasteControlsProps> = ({ onNodesDelete }) => {
       console.warn('Clipboard permissions query not supported:', error);
       return true;
     }
-  };
+  }, []);
 
   const [fallbackClipboardData, setFallbackClipboardData] = useState<ClipboardData | null>(null);
 
@@ -93,7 +93,7 @@ const CopyPasteControls: FC<CopyPasteControlsProps> = ({ onNodesDelete }) => {
         }
       }
     },
-    [selectedNodes, getNodes, getEdges],
+    [selectedNodes, getEdges, checkClipboardPermissions, t],
   );
 
   const pasteNodes = useCallback(async () => {
@@ -136,10 +136,12 @@ const CopyPasteControls: FC<CopyPasteControlsProps> = ({ onNodesDelete }) => {
 
       const allExistingNodes = [...currentNodes];
       processedLabels.forEach((label) => {
-        allExistingNodes.push({
+        const virtualNode: Node = {
           id: 'virtual',
           data: { label },
-        } as any);
+          position: { x: 0, y: 0 },
+        };
+        allExistingNodes.push(virtualNode);
       });
 
       const uniqueLabel = generateUniqueLabel(node.data.label as string, allExistingNodes);
@@ -211,7 +213,8 @@ const CopyPasteControls: FC<CopyPasteControlsProps> = ({ onNodesDelete }) => {
         (edge) => edge.source === node.id && edge.label === button.title,
       );
       if (!hasExistingBranch) {
-        createGhostBranch(node, newId, button.title, index);
+        const buttonTitle: string = typeof button.title === 'string' ? button.title : String(button.title ?? '');
+        createGhostBranch(node, newId, buttonTitle, index);
       }
     };
 
@@ -297,7 +300,7 @@ const CopyPasteControls: FC<CopyPasteControlsProps> = ({ onNodesDelete }) => {
     useToastStore
       .getState()
       .success({ title: t('serviceFlow.nodesPasted', { count: newNodes.length, s: newNodes.length > 1 ? 's' : '' }) });
-  }, [fallbackClipboardData, getNodes, getEdges, getViewport, setNodes, setEdges, setHasUnsavedChanges]);
+  }, [fallbackClipboardData, getNodes, setNodes, setEdges, setHasUnsavedChanges, t]);
 
   const cutNodes = useCallback(async () => {
     if (selectedNodes.length === 0) {
@@ -309,7 +312,9 @@ const CopyPasteControls: FC<CopyPasteControlsProps> = ({ onNodesDelete }) => {
     if (onNodesDelete) {
       onNodesDelete(selectedNodes);
     } else {
-      reactFlowInstance?.deleteElements({ nodes: selectedNodes });
+      reactFlowInstance?.deleteElements({ nodes: selectedNodes }).catch((error) => {
+        console.error('Failed to delete elements:', error);
+      });
     }
 
     setHasUnsavedChanges(true);
@@ -317,7 +322,7 @@ const CopyPasteControls: FC<CopyPasteControlsProps> = ({ onNodesDelete }) => {
     useToastStore.getState().success({
       title: t('serviceFlow.nodesCut', { count: selectedNodes.length, s: selectedNodes.length > 1 ? 's' : '' }),
     });
-  }, [selectedNodes, copyNodes, onNodesDelete, getNodes, getEdges, setNodes, setEdges, setHasUnsavedChanges]);
+  }, [selectedNodes, copyNodes, onNodesDelete, reactFlowInstance, setHasUnsavedChanges, t]);
 
   useEffect(() => {
     const handleKeyDown = async (event: KeyboardEvent) => {

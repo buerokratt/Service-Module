@@ -75,7 +75,7 @@ function useEdgeAdd(id: string) {
 
     if (stepType === StepType.MultiChoiceQuestion || stepType === StepType.Condition || stepType === StepType.Input) {
       const labels = stepType === StepType.MultiChoiceQuestion ? ['Jah', 'Ei'] : ['Success', 'Failure'];
-      ghostNodes = labels.slice(1).map((_, i) => ({
+      ghostNodes = labels.slice(1).map((_) => ({
         id: generateUniqueId(),
         type: 'ghost',
         position: {
