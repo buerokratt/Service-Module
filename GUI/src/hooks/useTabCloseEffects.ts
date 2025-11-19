@@ -28,19 +28,19 @@ const useTabCloseEffect = () => {
     return JSON.parse(localStorage.getItem(CHAT_SESSIONS.SESSION_STATE_KEY) as string) || { ids: [], count: 0 };
   };
 
-  const makeCall = (decision: 'add' | 'cancel') => {
+  const makeCall = (baseUrl: string, decision: 'add' | 'cancel') => {
+    const logoutPath = '/add-to-logout-queue';
+    const cancelLogoutPath = '/remove-from-logout-queue';
+
     try {
       const supportsBeacon = !!navigator.sendBeacon;
-
-      const currenntPath = decision === 'add' ? logoutPath : cancelLogoutPath;
+      const path = decision === 'add' ? logoutPath : cancelLogoutPath;
 
       if (supportsBeacon) {
-        const blob = new Blob([], {
-          type: 'application/x-www-form-urlencoded',
-        });
-        navigator.sendBeacon(baseUrl + currenntPath, blob);
+        const blob = new Blob([], { type: 'application/x-www-form-urlencoded' });
+        navigator.sendBeacon(baseUrl + path, blob);
       } else {
-        return notificationApiDev.post(currenntPath);
+        return notificationApiDev.post(path);
       }
     } catch (err) {
       console.warn('Beacon failed, falling back to logout mutation', err);
@@ -52,11 +52,11 @@ const useTabCloseEffect = () => {
     if (isLocal) return;
 
     const timeout = setTimeout(() => {
-      return makeCall('cancel');
+      return makeCall(baseUrl, 'cancel');
     }, 2500);
 
     return () => clearTimeout(timeout);
-  }, [isLocal, makeCall]);
+  }, [isLocal, baseUrl]);
 
   useEffect(() => {
     if (isLocal) return;
@@ -88,14 +88,14 @@ const useTabCloseEffect = () => {
       const lastInitial = currentAppState.count <= 1;
 
       if (lastInitial && isLastSession()) {
-        return makeCall('add');
+        return makeCall(baseUrl, 'add');
       }
     };
 
     window.addEventListener('beforeunload', handleTabClose);
 
     return () => window.removeEventListener('beforeunload', handleTabClose);
-  }, [isLocal, makeCall]);
+  }, [isLocal, baseUrl]);
 };
 
 export default useTabCloseEffect;
