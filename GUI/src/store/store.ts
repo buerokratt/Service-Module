@@ -21,7 +21,7 @@ interface StoreState {
   setUserDomains: (domains: string[]) => void;
 }
 
-const useStore = create<StoreState>((set, get, store) => ({
+const useStore = create<StoreState>((set, get) => ({
   userInfo: null,
   userId: '',
   activeChats: [],

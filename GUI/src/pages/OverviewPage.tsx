@@ -31,4 +31,5 @@ const OverviewPage: React.FC = () => {
   );
 };
 
-export default withAuthorization(OverviewPage, [ROLES.ROLE_ADMINISTRATOR, ROLES.ROLE_SERVICE_MANAGER]);
+const AuthorizedOverviewPage = withAuthorization(OverviewPage, [ROLES.ROLE_ADMINISTRATOR, ROLES.ROLE_SERVICE_MANAGER]);
+export default AuthorizedOverviewPage;

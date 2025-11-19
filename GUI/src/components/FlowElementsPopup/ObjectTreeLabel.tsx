@@ -72,7 +72,7 @@ export const ObjectTreeLabel: FC<ObjectTreeLabelProps> = ({ keyPath, nodeType, p
   const typeColor = getTypeColor(parseNodeType(nodeType));
 
   const buildValueString = (keyPath: KeyPath) => {
-    const base = buildKeyPathString(getKeyPathString(keyPath), pathArray);
+    const base = buildKeyPathString(getKeyPathString(keyPath) as string, pathArray);
     return stringToTemplate(roundedValues.has(key) ? buildRoundedValueString(base) : base);
   };
 
