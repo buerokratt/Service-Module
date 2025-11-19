@@ -61,7 +61,10 @@
     "edit": "Edit",
     "import": "Import",
     "export": "Export",
-    "proceed": "Proceed"
+    "proceed": "Proceed",
+    "copy": "Copy",
+    "paste": "Paste",
+    "cut": "Cut"
   },
   "menu": {
     "overview": "Overview",
@@ -443,7 +446,15 @@
       "setup": "Setup",
       "test": "Test"
     },
-    "rule": "Rule"
+    "rule": "Rule",
+    "noNodesSelected": "No nodes selected",
+    "nothingToPaste": "Nothing to paste",
+    "nodesCopied": "{{count}} node{{s}} copied",
+    "nodesPasted": "{{count}} node{{s}} pasted",
+    "nodesCut": "{{count}} node{{s}} cut",
+    "copyNodes": "Copy selected nodes",
+    "pasteNodes": "Paste nodes",
+    "cutNodes": "Cut selected nodes"
   },
   "logs": {
     "service": "Service",

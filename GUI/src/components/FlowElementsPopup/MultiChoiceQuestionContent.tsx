@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { MdCheck, MdDeleteOutline, MdEdit } from 'react-icons/md';
 import useServiceStore from 'store/new-services.store';
 import useServiceListStore from 'store/services.store';
+import { generateUniqueId } from 'utils/flow-utils';
 import { removeTrailingUnderscores } from 'utils/string-util';
 import { v4 } from 'uuid';
 
@@ -72,7 +73,7 @@ const MultiChoiceQuestionContent: FC<MultiChoiceQuestionContentProps> = ({
     const newButtons = [
       ...buttons,
       {
-        id: crypto.randomUUID(),
+        id: generateUniqueId(),
         title: '',
         payload: `#service, /${selectedService?.type ?? 'POST'}/services/active/${serviceName}_mcq_${
           node?.data.label[node?.data.label.length - 1]

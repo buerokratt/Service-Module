@@ -1,6 +1,7 @@
 import { Background, ColorMode, Controls, Edge, MiniMap, Node, Panel, ReactFlow, useReactFlow } from '@xyflow/react';
 import { Button, Modal, ThemeToggle, Tooltip, Track } from 'components';
 import Chat from 'components/chat/chat';
+import CopyPasteControls from 'components/Flow/Controls/CopyPasteControls';
 import ImportExportControls from 'components/Flow/Controls/ImportExportControls';
 import edgeTypes from 'components/Flow/EdgeTypes';
 import nodeTypes from 'components/Flow/NodeTypes';
@@ -42,7 +43,7 @@ const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
     setDeletedNodes,
     setNodeToDelete,
   } = useOnNodesDelete();
-  const { setHasUnsavedChanges } = useNewServiceStore();
+  const { setFlowSelectedNodes, setHasUnsavedChanges } = useNewServiceStore();
   const orientation = useServiceStore((state) => state.orientation);
   const toggleOrientation = useServiceStore((state) => state.toggleOrientation);
   useLayout(orientation);
@@ -88,6 +89,14 @@ const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
   const isValidConnection = useCallback((connection: any) => {
     return connection.source !== connection.target;
   }, []);
+
+  const onSelectionChange = useCallback(
+    ({ nodes: selectedNodes }: { nodes: Node[] }) => {
+      setFlowSelectedNodes(selectedNodes);
+      setHasUnsavedChanges(true);
+    },
+    [setFlowSelectedNodes, setHasUnsavedChanges],
+  );
 
   const onBeforeDelete = useCallback(
     ({ nodes: nodesToDelete, edges: edgesToDelete }: { nodes: Node[]; edges: Edge[] }) => {
@@ -139,6 +148,7 @@ const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
           useNewServiceStore.getState().loadEndpointsResponseVariables();
         }}
         nodesDraggable={false}
+        onSelectionChange={onSelectionChange}
         onConnect={onConnect}
         onEdgesDelete={(edges) => {
           onEdgesDelete(edges);
@@ -160,7 +170,10 @@ const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
         <Background color="#D2D3D8" gap={16} lineWidth={9} />
         <Controls orientation="horizontal" showInteractive={false} />
         <Panel position="top-left">
-          <ImportExportControls />
+          <Track gap={10} direction="vertical" align="left">
+            <ImportExportControls />
+            <CopyPasteControls onNodesDelete={onNodesDelete} />
+          </Track>
         </Panel>
         <Panel position="top-right" style={{ paddingRight: '90px' }}>
           <ThemeToggle onChange={onChange} />

@@ -61,7 +61,10 @@
     "edit": "Muuda",
     "import": "Impordi",
     "export": "Ekspordi",
-    "proceed": "Jätka"
+    "proceed": "Jätka",
+    "copy": "Kopeeri",
+    "paste": "Kleebi",
+    "cut": "Lõika"
   },
   "menu": {
     "overview": "Ülevaade",
@@ -444,7 +447,15 @@
       "setup": "Seadistamine",
       "test": "Testimine"
     },
-    "rule": "Reegel"
+    "rule": "Reegel",
+    "noNodesSelected": "Ühtegi sõlme pole valitud",
+    "nothingToPaste": "Pole midagi kleepida",
+    "nodesCopied": "{{count}} sõlme kopeeritud",
+    "nodesPasted": "{{count}} sõlme kleepitud",
+    "nodesCut": "{{count}} sõlme lõigatud",
+    "copyNodes": "Kopeeri valitud sõlmed",
+    "pasteNodes": "Kleebi sõlmed",
+    "cutNodes": "Lõika valitud sõlmed"
   },
   "logs": {
     "service": "Teenus",
