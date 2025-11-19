@@ -1,5 +1,5 @@
 import { Background, ColorMode, Controls, Edge, MiniMap, Node, Panel, ReactFlow, useReactFlow } from '@xyflow/react';
-import { Button, Modal, ThemeToggle, Tooltip, Track } from 'components';
+import { Button, Icon, Modal, Switch, ThemeToggle, Tooltip, Track } from 'components';
 import Chat from 'components/chat/chat';
 import CopyPasteControls from 'components/Flow/Controls/CopyPasteControls';
 import ImportExportControls from 'components/Flow/Controls/ImportExportControls';
@@ -13,6 +13,7 @@ import { useOnNodesDelete } from 'hooks/flow/useOnNodeDelete';
 import { ChangeEventHandler, FC, useCallback, useEffect, useState } from 'react';
 import '@xyflow/react/dist/style.css';
 import { useTranslation } from 'react-i18next';
+import { MdCenterFocusStrong, MdOutlineCenterFocusStrong } from 'react-icons/md';
 import useNewServiceStore from 'store/new-services.store';
 import useServiceStore from 'store/services.store';
 import { StepType } from 'types';
@@ -30,8 +31,8 @@ type FlowBuilderProps = {
 const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
   useLayout();
   const { getNodes, getEdges, setNodes, setEdges, getNode } = useReactFlow();
-  const [colorMode, setColorMode] = useState<ColorMode>('light');
   const setReactFlowInstance = useNewServiceStore((state) => state.setReactFlowInstance);
+  const [colorMode, setColorMode] = useState<ColorMode>('light');
   const { t } = useTranslation();
 
   useThemeSyncWithFlow();
@@ -52,6 +53,8 @@ const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
   const orientation = useServiceStore((state) => state.orientation);
   const toggleOrientation = useServiceStore((state) => state.toggleOrientation);
   useLayout(orientation);
+  const autoView = useServiceStore((state) => state.autoView);
+  const toggleAutoView = useServiceStore((state) => state.toggleAutoView);
 
   const { runLayout } = useLayout();
 
@@ -212,6 +215,21 @@ const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
               />
             </Button>
           </Tooltip>
+        </Panel>
+        <Panel position="bottom-left">
+          <Track gap={10} direction="horizontal" align="center" style={{ paddingLeft: '110px', paddingBottom: '7px' }}>
+            <Controls orientation="horizontal" showInteractive={false} style={{ marginBottom: '12px' }} />
+            <Tooltip content={t('serviceFlow.autoFocus')}>
+              <span>
+                <Switch
+                  checked={autoView}
+                  onCheckedChange={toggleAutoView}
+                  onLabel={<Icon icon={<MdCenterFocusStrong fontSize={30} />} size="medium" />}
+                  offLabel={<Icon icon={<MdOutlineCenterFocusStrong fontSize={30} />} size="medium" />}
+                />
+              </span>
+            </Tooltip>
+          </Track>
         </Panel>
       </ReactFlow>
       {isDeleteConnectionsModalVisible && (

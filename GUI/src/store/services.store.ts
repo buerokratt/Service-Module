@@ -25,6 +25,8 @@ interface ServiceStoreState {
   notCommonServices: Service[];
   orientation: 'horizontal' | 'vertical';
   toggleOrientation: () => void;
+  autoView: boolean;
+  toggleAutoView: () => void;
   loadServicesList: (pagination: PaginationState, sorting: SortingState) => Promise<void>;
   loadCommonServicesList: (pagination: PaginationState, sorting: SortingState) => Promise<void>;
   deleteService: (id: string) => void;
@@ -90,6 +92,11 @@ const useServiceListStore = create<ServiceStoreState>()(
       commonServices: [],
       notCommonServices: [],
       orientation: 'vertical',
+      autoView: false,
+      toggleAutoView: () =>
+        set((state) => ({
+          autoView: !state.autoView,
+        })),
       toggleOrientation: () =>
         set((state) => ({
           orientation: state.orientation === 'horizontal' ? 'vertical' : 'horizontal',
@@ -118,7 +125,6 @@ const useServiceListStore = create<ServiceStoreState>()(
             linkedIntent: triggers.find((e: Trigger) => e.service === item.serviceId)?.intent ?? '',
             endpoints: [],
           })) ?? [];
-
         set({
           notCommonServices: services,
         });
@@ -326,8 +332,8 @@ const useServiceListStore = create<ServiceStoreState>()(
       },
     }),
     {
-      name: 'flow-orientation',
-      partialize: (state) => ({ orientation: state.orientation }),
+      name: 'state-configs',
+      partialize: (state) => ({ orientation: state.orientation, autoView: state.autoView }),
     },
   ),
 );

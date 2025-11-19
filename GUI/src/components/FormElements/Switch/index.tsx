@@ -6,9 +6,9 @@ import { useTranslation } from 'react-i18next';
 import './Switch.scss';
 
 type SwitchProps = Partial<ControllerRenderProps> & {
-  onLabel?: string;
-  offLabel?: string;
-  label: string;
+  onLabel?: string | React.ReactNode;
+  offLabel?: string | React.ReactNode;
+  label?: string;
   checked?: boolean;
   hideLabel?: boolean;
   onCheckedChange?: (checked: boolean) => void;

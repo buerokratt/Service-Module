@@ -39,7 +39,7 @@ const Tooltip: FC<PropsWithChildren<TooltipProps>> = ({ content, children, onBut
 
   return (
     <RadixTooltip.Provider delayDuration={100}>
-      <RadixTooltip.Root open={open} onOpenChange={setOpen}>
+      <RadixTooltip.Root>
         <RadixTooltip.Trigger asChild>
           {cloneElement(children, {
             onClick: (e: React.MouseEvent) => {

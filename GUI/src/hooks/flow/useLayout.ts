@@ -2,6 +2,7 @@ import { Edge, Node, ReactFlowState, useReactFlow, useStore } from '@xyflow/reac
 import { stratify, tree } from 'd3-hierarchy';
 import { timer } from 'd3-timer';
 import { useCallback, useEffect, useRef } from 'react';
+import useServiceStore from 'store/services.store';
 import { StepType } from 'types';
 
 const options = { duration: 300 };
@@ -36,13 +37,13 @@ function layoutNodes(nodes: Node[], edges: Edge[], orientation: 'horizontal' | '
       position: { x: 0, y: 0 },
     });
 
-    rootNodes.forEach((root) => {
+    for (const root of rootNodes) {
       filteredEdges.push({
         id: `virtual-edge-${root.id}`,
         source: virtualRootId,
         target: root.id,
       });
-    });
+    }
   }
 
   try {
@@ -106,6 +107,7 @@ function useLayout(orientation: 'horizontal' | 'vertical' = 'horizontal') {
   const nodeCount = useStore(nodeCountSelector);
   const edgeCount = useStore(edgeCountSelector);
   const { getNodes, getNode, setNodes, getEdges, fitView } = useReactFlow();
+  const autoView = useServiceStore((state) => state.autoView);
 
   const runLayout = useCallback(() => {
     const nodes = getNodes();
@@ -151,7 +153,7 @@ function useLayout(orientation: 'horizontal' | 'vertical' = 'horizontal') {
 
         t.stop();
 
-        if (!initial.current) {
+        if (!initial.current && autoView) {
           await fitView({ duration: 200, padding: 3 });
         }
         initial.current = false;
@@ -161,7 +163,7 @@ function useLayout(orientation: 'horizontal' | 'vertical' = 'horizontal') {
     return () => {
       t.stop();
     };
-  }, [getEdges, getNodes, getNode, setNodes, fitView, orientation]);
+  }, [getEdges, getNodes, getNode, setNodes, fitView, orientation, autoView]);
 
   useEffect(() => {
     runLayout();

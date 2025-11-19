@@ -44,6 +44,7 @@ export const fromSnakeCase = (value: string) => {
         return word.toLowerCase();
       }
     });
+
     return `${displayWords.join(' ')} - ${number}`;
   } else {
     // Handle regular snake case conversion
