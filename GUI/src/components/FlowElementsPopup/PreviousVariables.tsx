@@ -108,9 +108,6 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ nodeId }) => {
         id: predefinedInputKeys[1],
         key: 'Empty Content Type',
         value: stringToTemplate(''),
-        // Can only be a string array, see trigger-service.yaml in Buerokratt-Chatbot
-        // Value is not known at this point, so passing a dummy to correctly infer type
-        data: [],
       },
     ];
 
