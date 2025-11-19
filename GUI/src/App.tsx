@@ -1,10 +1,11 @@
 import { useQuery } from '@tanstack/react-query';
 import UnsavedChangesDialog from 'handlers/unsavedChangesDialog';
 import { UnsavedChangesHandler } from 'handlers/unsavedChangesHandler';
-import React, {useEffect} from 'react';
+import React, { useEffect } from 'react';
 import { BrowserRouter } from 'react-router-dom';
 
 import { ToastProvider } from './components/Toast/ToastProvider';
+import { CHAT_SESSIONS } from './constants/consts';
 import RootComponent from './RootComponent';
 import useStore from './store/store';
 import { UserInfo } from './types/userInfo';
@@ -12,10 +13,10 @@ import useTabCloseEffect from "./hooks/useTabCloseEffects";
 
 const App: React.FC = () => {
   useQuery<{
-    data: { custom_jwt_userinfo: UserInfo };
+    data: UserInfo;
   }>({
     queryKey: ['userinfo', 'prod'],
-    onSuccess: (res: any) => {
+    onSuccess: (res) => {
       return useStore.getState().setUserInfo(res.data);
     },
     enabled: import.meta.env.REACT_APP_LOCAL === 'true',

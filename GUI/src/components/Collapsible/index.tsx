@@ -1,11 +1,11 @@
 import * as RadixCollapsible from '@radix-ui/react-collapsible';
 import { CSSProperties, FC, PropsWithChildren, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { MdAdd, MdOutlineAddBox, MdOutlineIndeterminateCheckBox } from 'react-icons/md';
 
 import { Icon, Track } from '../';
 
 import './Collapsible.scss';
-import { useTranslation } from 'react-i18next';
 
 type CollapsibleProps = {
   title: string;
@@ -37,15 +37,9 @@ const Collapsible: FC<PropsWithChildren<CollapsibleProps>> = ({
         }
       }}
     >
-      <RadixCollapsible.Trigger style={{ cursor: 'pointer' }} asChild className="collapsible__trigger">
+      <RadixCollapsible.Trigger asChild className="collapsible__trigger">
         <Track justify="between">
-          <button
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '4px',
-            }}
-          >
+          <button className="collapsible__button">
             <Icon icon={open ? <MdOutlineIndeterminateCheckBox /> : <MdOutlineAddBox />} size="medium" />
             <h3 className="h6">{title}</h3>
           </button>

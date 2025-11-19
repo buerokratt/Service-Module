@@ -46,12 +46,7 @@ type DataTableProps = {
   disableHead?: boolean;
   pagesCount?: number;
   meta?: TableMeta<any>;
-};
-
-type ColumnMeta = {
-  meta: {
-    size: number | string;
-  };
+  withScrollWrapper?: boolean;
 };
 
 declare module '@tanstack/table-core' {
@@ -70,10 +65,8 @@ declare module '@tanstack/react-table' {
   }
 }
 
-type CustomColumnDef = ColumnDef<any> & ColumnMeta;
-
 const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
-  const itemRank = rankItem(row.getValue(columnId), value);
+  const itemRank = rankItem(row.getValue(columnId), value as string);
   addMeta({
     itemRank,
   });
@@ -100,6 +93,7 @@ const DataTable: FC<DataTableProps> = ({
   disableHead,
   pagesCount,
   meta,
+  withScrollWrapper = true,
 }) => {
   const id = useId();
   const { t } = useTranslation();
@@ -148,7 +142,7 @@ const DataTable: FC<DataTableProps> = ({
   });
 
   return (
-    <div className="data-table__scrollWrapper">
+    <div className={`data-table${withScrollWrapper ? '__scrollWrapper' : ''}`}>
       <table className="data-table">
         {!disableHead && (
           <thead>

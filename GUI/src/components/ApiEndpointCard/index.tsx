@@ -1,15 +1,12 @@
 import * as Tabs from '@radix-ui/react-tabs';
 import { FC, useMemo, useState } from 'react';
-
-import { EndpointCustom, EndpointOpenAPI, FormInput, FormSelect, Switch, Track } from '..';
-
 import { useTranslation } from 'react-i18next';
-
 import './ApiEndpointCard.scss';
 import useServiceStore from 'store/new-services.store';
 import { EndpointType } from 'types/endpoint/endpoint-type';
 import { removeTrailingUnderscores } from 'utils/string-util';
 
+import { EndpointCustom, EndpointOpenAPI, FormInput, FormSelect, Switch, Track } from '..';
 import { RequestTab } from '../../types';
 import { EndpointData, EndpointEnv, EndpointTab } from '../../types/endpoint';
 import { Option } from '../../types/option';
@@ -26,7 +23,6 @@ type EndpointCardProps = {
 
 const ApiEndpointCard: FC<EndpointCardProps> = ({
   endpoint,
-  isDeletable = true,
   isNameDisabled = false,
   showCommonSwitch = true,
   onNameExists,
@@ -48,7 +44,7 @@ const ApiEndpointCard: FC<EndpointCardProps> = ({
 
   const getTabTriggerClasses = (tab: EndpointEnv) => `tab-group__tab-btn ${selectedTab === tab ? 'active' : ''}`;
 
-  const requestValues = useMemo(() => getAvailableRequestValues(endpoint), []);
+  const requestValues = useMemo(() => getAvailableRequestValues(endpoint), [endpoint, getAvailableRequestValues]);
 
   return (
     <Tabs.Root
@@ -71,7 +67,9 @@ const ApiEndpointCard: FC<EndpointCardProps> = ({
           <Tabs.Content className="tab-group__tab-content" value={env} key={env}>
             <Track direction="vertical" align="stretch" gap={16}>
               <Track isMultiline>
-                <label htmlFor="service-type">{t('newService.uses')}</label>
+                <label htmlFor="service-type" className={'default_label'}>
+                  {t('newService.uses')}
+                </label>
                 <FormSelect
                   name="service-type"
                   label=""
@@ -89,7 +87,9 @@ const ApiEndpointCard: FC<EndpointCardProps> = ({
               </Track>
               {option && (
                 <div>
-                  <label htmlFor="endpointName">{t('newService.endpoint.name')}</label>
+                  <label htmlFor="endpointName" className={'default_label'}>
+                    {t('newService.endpoint.name')}
+                  </label>
                   <FormInput
                     name="endpointName"
                     label=""
@@ -139,7 +139,9 @@ const ApiEndpointCard: FC<EndpointCardProps> = ({
               )}
               {showCommonSwitch && option?.value && (
                 <Track gap={16}>
-                  <label htmlFor="isCommon">{t('newService.endpoint.publicEndpoint')}</label>
+                  <label htmlFor="isCommon" className={'default_label'}>
+                    {t('newService.endpoint.publicEndpoint')}
+                  </label>
                   <Switch
                     name="isCommon"
                     label=""

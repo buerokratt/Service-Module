@@ -25,7 +25,7 @@ interface ToastState {
   error: (toast: ToastMessage) => void;
 }
 
-const useToastStore = create<ToastState>((set, get, store) => ({
+const useToastStore = create<ToastState>((set, get) => ({
   toasts: [],
   open: (toast: ToastType) => {
     const newToast = { id: uuid(), ...toast };
