@@ -5,10 +5,10 @@ import React from 'react';
 import { BrowserRouter } from 'react-router-dom';
 
 import { ToastProvider } from './components/Toast/ToastProvider';
+import useTabCloseEffect from './hooks/useTabCloseEffects';
 import RootComponent from './RootComponent';
 import useStore from './store/store';
 import { UserInfo } from './types/userInfo';
-import useTabCloseEffect from './hooks/useTabCloseEffects';
 
 const App: React.FC = () => {
   useQuery<{

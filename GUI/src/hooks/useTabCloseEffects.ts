@@ -1,7 +1,8 @@
 import { useEffect } from 'react';
+
 import { CHAT_SESSIONS } from '../constants/consts';
-import { generateUEID } from '../utils/generateUEID';
 import notificationApiDev from '../services/notificationApi';
+import { generateUEID } from '../utils/generateUEID';
 
 declare global {
   interface Window {
