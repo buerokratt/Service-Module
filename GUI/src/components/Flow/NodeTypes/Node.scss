@@ -2,6 +2,7 @@
 @import 'src/styles/tools/color';
 @import 'src/styles/settings/variables/other';
 @import 'src/styles/settings/variables/typography';
+@import 'src/styles/settings/variables/_colors';
 
 .react-flow__node {
   .icon {
@@ -56,6 +57,19 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    padding-top: 5px;
+
+    &[data-orientation='horizontal'] {
+      padding-left: 5px;
+    }
+
+    &[data-orientation='vertical'] {
+      padding-top: 5px;
+    }
+  }
+}
+
+[data-theme='dark'] .react-flow__node {
+  .icon {
+    color: var(--dark-text-label);
   }
 }

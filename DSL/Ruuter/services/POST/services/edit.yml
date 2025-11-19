@@ -14,6 +14,9 @@ declaration:
       - field: description
         type: string
         description: "Body field 'description'"
+      - field: isCommon
+        type: boolean
+        description: "Body field 'isCommon'"  
       - field: slot
         type: string
         description: "Slot input"
@@ -46,6 +49,7 @@ extract_request_data:
     id: ${incoming.params.id}
     name: ${incoming.body.name}
     description: ${incoming.body.description}
+    isCommon: ${incoming.body.isCommon}
     slot: ${incoming.body.slot}
     type: ${incoming.body.type}
     content: ${incoming.body.content}
@@ -209,6 +213,7 @@ service_edit:
       id: ${id}
       name: ${name}
       description: ${description}
+      is_common: ${isCommon ?? false}
       slot: ${slot}
       structure: ${new_structure}
       state: ${state ?? 'draft'}

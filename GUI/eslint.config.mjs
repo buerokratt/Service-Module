@@ -95,11 +95,13 @@ export default [
       'sonarjs/assertions-in-tests': 'off',
       // Causes issues and forces to use unknown instead of more specific types
       'sonarjs/function-return-type': 'off',
+      // This rules causes false positives for object parameters with NAMED properties
+      'sonarjs/no-selector-parameter': 'off',
     },
   },
 
   // Global ignores
   {
-    ignores: ['eslint.config.mjs', 'dist', 'build', 'node_modules', 'vitest.config.ts'],
+    ignores: ['eslint.config.mjs', 'dist', 'build', 'node_modules', 'vitest.config.ts', 'vite.config.ts', 'coverage'],
   },
 ];

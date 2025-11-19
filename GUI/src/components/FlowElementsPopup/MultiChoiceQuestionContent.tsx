@@ -1,3 +1,4 @@
+import FormError from 'components/FormElements/FormError';
 import { FC, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MdCheck, MdDeleteOutline, MdEdit } from 'react-icons/md';
@@ -15,7 +16,7 @@ import './styles.scss';
 import FormError from 'components/FormElements/FormError';
 import { generateUniqueId } from 'utils/flow-utils';
 
-const maxButtons = parseInt(process.env.REACT_APP_MULTI_CHOICE_QUESTION_MAX_BUTTONS ?? '4');
+const maxButtons = parseInt((import.meta.env.REACT_APP_MULTI_CHOICE_QUESTION_MAX_BUTTONS as string) ?? '4');
 
 export interface MultiChoiceQuestionContentProps {
   question: string;
@@ -88,7 +89,6 @@ const MultiChoiceQuestionContent: FC<MultiChoiceQuestionContentProps> = ({
     <Track direction="vertical" align="stretch" style={{ width: '100%', padding: 16 }}>
       <div>
         <FormTextarea
-          name="multiChoiceQuestion-question"
           label=""
           placeholder={t('serviceFlow.multiChoiceQuestion.questionPlaceholder')!}
           value={question}

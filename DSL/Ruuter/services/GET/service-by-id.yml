@@ -7,6 +7,10 @@ declaration:
   returns: json
   namespace: service
   allowlist:
+    header:
+      - field: cookie
+        type: string
+        description: "Cookie field"
     params:
       - field: id
         type: string

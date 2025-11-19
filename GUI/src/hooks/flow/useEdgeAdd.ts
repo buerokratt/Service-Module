@@ -6,7 +6,7 @@ import { generateUniqueId, getNodeLabel } from 'utils/flow-utils';
 function useEdgeAdd(id: string) {
   const { setEdges, setNodes, getNodes, getNode, getEdge } = useReactFlow();
 
-  const handleEdgeClick = async (step: Step) => {
+  const handleEdgeClick = (step: Step) => {
     const edge = getEdge(id);
     if (!edge) return;
 

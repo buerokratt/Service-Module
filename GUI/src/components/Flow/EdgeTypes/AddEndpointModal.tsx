@@ -26,12 +26,15 @@ const AddEndpointModal: React.FC<AddEndpointModalProps> = ({ onClose, onUpdatePr
   const [endpointNameExists, setEndpointNameExists] = useState(false);
   const [isCommonEndpoint, setIsCommonEndpoint] = useState(false);
   const [isCreatingEndpoint, setIsCreatingEndpoint] = useState(false);
+  const { setJsonRequestVisible, setJsonRequestContent } = useServiceStore();
 
   const handleClose = () => {
     setEndpoint({ endpointId: uuid(), name: '', definitions: [], isNew: true });
     setEndpointName('');
     setIsCommonEndpoint(false);
     setIsCreatingEndpoint(false);
+    setJsonRequestVisible(false);
+    setJsonRequestContent(null);
     onClose();
   };
 
@@ -41,7 +44,7 @@ const AddEndpointModal: React.FC<AddEndpointModalProps> = ({ onClose, onUpdatePr
     passedEndpoint.isCommon = isCommonEndpoint;
     setIsCreatingEndpoint(true);
 
-    saveEndpoints(
+    void saveEndpoints(
       [passedEndpoint],
       () => {
         useServiceStore.getState().addEndpoint(passedEndpoint);
@@ -66,7 +69,6 @@ const AddEndpointModal: React.FC<AddEndpointModalProps> = ({ onClose, onUpdatePr
       <Track isMultiline gap={16} direction="vertical" align="stretch">
         <ApiEndpointCard
           endpoint={endpoint}
-          isDeletable={false}
           onNameExists={setEndpointNameExists}
           onNameChange={setEndpointName}
           onCommonChange={setIsCommonEndpoint}

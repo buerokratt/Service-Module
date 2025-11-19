@@ -2,6 +2,7 @@ import JSONEditor from 'jsoneditor';
 import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import 'jsoneditor/dist/jsoneditor.css';
+import './json.scss';
 import { getDragData } from 'utils/component-util';
 import { searchForProperty, searchForValue, updateValueAtPath } from 'utils/object-util';
 import { stringToTemplate } from 'utils/string-util';
@@ -123,7 +124,7 @@ const ObjectEditor: React.FC<ObjectEditorProps> = ({ onChange, data }) => {
 
     try {
       const dragData = getDragData(e);
-      if (dragData && jsonEditorRef.current) {
+      if (jsonEditorRef.current) {
         // Extract just the value from the drag data
         const valueToReplace = dragData.value;
 
