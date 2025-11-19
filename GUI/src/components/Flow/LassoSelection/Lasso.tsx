@@ -1,5 +1,5 @@
-import { useRef, type PointerEvent, useEffect } from 'react';
 import { useReactFlow, useStore } from '@xyflow/react';
+import { type PointerEvent, useCallback, useEffect, useRef } from 'react';
 import { getSvgPathFromStroke } from 'utils/lasso-utils';
 
 type Point = [number, number];
@@ -126,13 +126,12 @@ export function Lasso() {
     ctx.current.stroke(path);
 
     const polygonArea = getPolygonArea(closedPolygon);
+    const lastPoint = points.current.at(-1);
     const hasMinimumDrag =
       startPoint.current &&
+      lastPoint &&
       points.current.length > 1 &&
-      Math.hypot(
-        points.current[points.current.length - 1][0] - startPoint.current[0],
-        points.current[points.current.length - 1][1] - startPoint.current[1],
-      ) >= 10;
+      Math.hypot(lastPoint[0] - startPoint.current[0], lastPoint[1] - startPoint.current[1]) >= 10;
 
     const nodesToSelect = new Set<string>();
     if (polygonArea >= 200 && hasMinimumDrag && points.current.length >= 3) {
@@ -164,7 +163,10 @@ export function Lasso() {
     startPoint.current = null;
   };
 
-  const clearSelection = () => setNodes((nodes) => nodes.map((node) => ({ ...node, selected: false })));
+  const clearSelection = useCallback(
+    () => setNodes((nodes) => nodes.map((node) => ({ ...node, selected: false }))),
+    [setNodes],
+  );
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -173,7 +175,7 @@ export function Lasso() {
 
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [setNodes]);
+  }, [clearSelection]);
 
   return (
     <canvas

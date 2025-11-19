@@ -1,6 +1,6 @@
 import { Button, Icon, Track } from 'components';
-import { useTranslation } from 'react-i18next';
 import { FC, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { MdDraw } from 'react-icons/md';
 
 interface LassoSelectionControlsProps {
@@ -22,7 +22,7 @@ const LassoSelectionControls: FC<LassoSelectionControlsProps> = ({ isLassoActive
     return () => {
       document.removeEventListener('keydown', handleKeyDown);
     };
-  }, []);
+  }, [onToggleLasso]);
 
   return (
     <Track style={{ gap: 8 }} align="center" justify="start">
