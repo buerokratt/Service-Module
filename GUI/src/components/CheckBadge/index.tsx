@@ -1,5 +1,4 @@
 import { FC } from 'react';
-
 import { AiFillCheckCircle } from 'react-icons/ai';
 
 import '../../styles/settings/variables/_colors.scss';
