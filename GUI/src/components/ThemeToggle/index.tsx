@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { SetStateAction, useEffect, useState } from 'react';
 import { FaMoon, FaSun } from 'react-icons/fa';
 import './ThemeToggle.scss';
 
@@ -13,7 +13,7 @@ export default function ThemeToggle({ onChange }) {
     if (onChange) onChange({ target: { value: theme } });
   }, [theme, onChange]);
 
-  const toggleTheme = (newTheme) => setTheme(newTheme);
+  const toggleTheme = (newTheme: SetStateAction<string>) => setTheme(newTheme);
 
   return (
     <div className={`theme-toggle ${theme}`}>
