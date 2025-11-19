@@ -41,7 +41,7 @@ const AssignElement: React.FC<AssignElementProps> = ({
 }) => {
   const slots = element.slots ?? [];
   const [isSecondSlotOpen, setIsSecondSlotOpen] = useState(!!slots[1]);
-  const [isEditingManually, setIsEditingManually] = useState(manualEdit || (element.value && !slots.length));
+  const [isEditingManually, setIsEditingManually] = useState(manualEdit === true || element.isValueManual === true);
   const [isObjectEditorOpen, setIsObjectEditorOpen] = useState(element.isObject ?? false);
 
   const changeKey = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -77,36 +77,86 @@ const AssignElement: React.FC<AssignElementProps> = ({
     onChange({ ...element, value, slots: [slots[0], data] });
   };
 
-  const enableManualEdit = () => {
-    setIsEditingManually(true);
-    onChange({ ...element, slots: undefined });
+  const toggleManualEdit = () => {
+    const newMode = !element.isValueManual;
+    setIsEditingManually(newMode);
+    onChange({ ...element, slots: undefined, isValueManual: newMode });
+  };
+
+  const canOpenObjectEditor = () => {
+    if (element.value === '') return true;
+
+    if (!isTemplate(element.value)) {
+      showInvalidObjectError();
+      return false;
+    }
+
+    try {
+      JSON.parse(templateToString(element.value));
+      return true;
+    } catch (error) {
+      console.log('Error parsing input', error);
+      showInvalidObjectError();
+      return false;
+    }
   };
 
   const toggleObjectEditor = () => {
     if (isObjectEditorOpen) {
-      setIsObjectEditorOpen(!isObjectEditorOpen);
-      setIsEditingManually(true);
-    } else {
-      // New empty element
-      if (element.value === '') {
-        setIsObjectEditorOpen(!isObjectEditorOpen);
-        return;
-      }
+      setIsObjectEditorOpen(false);
+      return;
+    }
 
-      if (!isTemplate(element.value)) {
-        showInvalidObjectError();
-        return;
-      }
-
-      try {
-        JSON.parse(templateToString(element.value));
-        setIsObjectEditorOpen(!isObjectEditorOpen);
-      } catch (error) {
-        console.log('Error parsing input', error);
-        showInvalidObjectError();
-      }
+    if (canOpenObjectEditor()) {
+      setIsObjectEditorOpen(true);
     }
   };
+
+  const canShowSecondSlotToggle = Boolean(slots[0] && isObject(slots[0].data) && !isArray(slots[0].data));
+
+  const renderManualValueInput = () => (
+    <FormInput
+      value={element.value}
+      name="value"
+      onChange={changeValue}
+      label=""
+      style={valueStyle}
+      hideLabel
+      onDrop={changeManualInputValue}
+    />
+  );
+
+  const renderSecondSlotToggle = () =>
+    canShowSecondSlotToggle ? (
+      <Tooltip
+        content={t(isSecondSlotOpen ? 'serviceFlow.popup.removeValueAssignment' : 'serviceFlow.popup.assignAsValue')}
+        onButtonClick={() => {
+          setIsSecondSlotOpen(!isSecondSlotOpen);
+          if (!isSecondSlotOpen) resetSecondSlot();
+        }}
+      >
+        <div className={`small-assign-button ${isSecondSlotOpen ? 'assign-red' : 'assign-blue'}`}>
+          <Icon icon={<MdMoveDown />} />
+        </div>
+      </Tooltip>
+    ) : null;
+
+  const renderDragInputs = () => (
+    <Track gap={3} isFlex>
+      <DragInput id={element.id} element={slots[0]} onChange={changeFirstSlot} />
+      {renderSecondSlotToggle()}
+      {isSecondSlotOpen ? <DragInput id={element.id} element={slots[1]} onChange={changeSecondSlot} /> : null}
+    </Track>
+  );
+
+  const renderManualToggle = () =>
+    manualEdit ? null : (
+      <Tooltip content={t('serviceFlow.popup.assignManualEdit')} onButtonClick={toggleManualEdit}>
+        <div className={`small-assign-button assign-${isEditingManually ? 'red' : 'blue'}`}>
+          <Icon icon={<MdEdit />} />
+        </div>
+      </Tooltip>
+    );
 
   return (
     <>
@@ -125,51 +175,8 @@ const AssignElement: React.FC<AssignElementProps> = ({
         <Track style={{ flex: '1 0 75%', justifyContent: 'flex-end' }} gap={5}>
           {!isObjectEditorOpen && (
             <>
-              {isEditingManually ? (
-                <FormInput
-                  value={element.value}
-                  name="value"
-                  onChange={changeValue}
-                  label=""
-                  style={valueStyle}
-                  hideLabel
-                  onDrop={changeManualInputValue}
-                />
-              ) : (
-                <Track gap={3} isFlex>
-                  <DragInput id={element.id} element={slots[0]} onChange={changeFirstSlot} />
-
-                  {slots.length && isObject(slots[0].data) && !isArray(slots[0].data) ? (
-                    <Tooltip
-                      content={t(
-                        isSecondSlotOpen
-                          ? 'serviceFlow.popup.removeValueAssignment'
-                          : 'serviceFlow.popup.assignAsValue',
-                      )}
-                      onButtonClick={() => {
-                        setIsSecondSlotOpen(!isSecondSlotOpen);
-                        if (!isSecondSlotOpen) resetSecondSlot();
-                      }}
-                    >
-                      <div className={`small-assign-button ${isSecondSlotOpen ? 'assign-red' : 'assign-blue'}`}>
-                        <Icon icon={<MdMoveDown />} />
-                      </div>
-                    </Tooltip>
-                  ) : null}
-
-                  {isSecondSlotOpen ? (
-                    <DragInput id={element.id} element={slots[1]} onChange={changeSecondSlot} />
-                  ) : null}
-                </Track>
-              )}
-
-              {!isEditingManually ? (
-                <Tooltip content={t('serviceFlow.popup.assignManualEdit')} onButtonClick={enableManualEdit}>
-                  <div className="small-assign-button assign-blue">
-                    <Icon icon={<MdEdit />} />
-                  </div>
-                </Tooltip>
-              ) : null}
+              {isEditingManually ? renderManualValueInput() : renderDragInputs()}
+              {renderManualToggle()}
             </>
           )}
 
