@@ -11,7 +11,14 @@ import { StepType } from 'types';
 import { Assign } from 'types/assign';
 import { EndpointData } from 'types/endpoint';
 import { NodeDataProps } from 'types/service-flow';
-import { getLastDigits, removeTrailingUnderscores, stringToArray, toSnakeCase } from 'utils/string-util';
+import {
+  getLastDigits,
+  isNumericString,
+  removeTrailingUnderscores,
+  removeWrapperQuotes,
+  stringToArray,
+  toSnakeCase,
+} from 'utils/string-util';
 
 import api from '../services/api-dev';
 
@@ -100,9 +107,9 @@ const buildConditionString = (group: any): string => {
         return `(${buildConditionString(child)})`;
       } else {
         const rule = child;
-        return `${rule.field.replaceAll('${', '').replaceAll('}', '')} ${rule.operator} ${rule.value
-          .replaceAll('${', '')
-          .replaceAll('}', '')}`;
+        const absoluteValue = removeWrapperQuotes(rule.value.replaceAll('${', '').replaceAll('}', ''));
+        const value = isNumericString(absoluteValue) ? absoluteValue : `"${absoluteValue}"`;
+        return `${rule.field.replaceAll('${', '').replaceAll('}', '')} ${rule.operator} ${value}`;
       }
     });
 
@@ -113,9 +120,9 @@ const buildConditionString = (group: any): string => {
     }
   } else {
     const rule = group as Rule;
-    return `${rule.field.replaceAll('${', '').replaceAll('}', '')} ${rule.operator} ${rule.value
-      .replaceAll('${', '')
-      .replaceAll('}', '')}`;
+    const absoluteValue = removeWrapperQuotes(rule.value.replaceAll('${', '').replaceAll('}', ''));
+    const value = isNumericString(absoluteValue) ? absoluteValue : `"${absoluteValue}"`;
+    return `${rule.field.replaceAll('${', '').replaceAll('}', '')} ${rule.operator} ${value}`;
   }
 };
 
@@ -346,9 +353,9 @@ function getYamlContent(
       const [parentNodeId, childNodeId] = r.split(',');
       const parentNode = nodes.findLast((node) => node.id === parentNodeId) as Node<NodeDataProps> | undefined;
       if (
-        !parentNode ||
+        !parentNode?.type ||
         parentNode.type !== 'custom' ||
-        [StepType.Rule, StepType.RuleDefinition].includes(parentNode.data.stepType)
+        [StepType.Rule, StepType.RuleDefinition].includes(parentNode.data?.stepType)
       ) {
         return;
       }
