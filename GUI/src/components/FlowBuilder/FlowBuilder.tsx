@@ -1,18 +1,19 @@
-import { Background, Controls, Edge, MiniMap, Node, Panel, ReactFlow, useReactFlow } from '@xyflow/react';
-import { Button, Modal, Tooltip, Track } from 'components';
+import { Background, ColorMode, Controls, Edge, MiniMap, Node, Panel, ReactFlow, useReactFlow } from '@xyflow/react';
+import { Button, Modal, ThemeToggle, Tooltip, Track } from 'components';
 import Chat from 'components/chat/chat';
 import ImportExportControls from 'components/Flow/Controls/ImportExportControls';
 import edgeTypes from 'components/Flow/EdgeTypes';
 import nodeTypes from 'components/Flow/NodeTypes';
 import useLayout from 'hooks/flow/useLayout';
 import { useOnNodesDelete } from 'hooks/flow/useOnNodeDelete';
-import { FC, useCallback } from 'react';
+import { ChangeEventHandler, FC, useCallback, useState } from 'react';
 import '@xyflow/react/dist/style.css';
 import { useTranslation } from 'react-i18next';
 import useNewServiceStore from 'store/new-services.store';
 import useServiceStore from 'store/services.store';
 import { StepType } from 'types';
 
+import { useThemeSyncWithFlow } from '../../hooks/useThemeSyncWithFlow';
 import HorizontalFlow from '../../static/icons/horizontal_flow.svg';
 import VerticalFlow from '../../static/icons/vertical_flow.svg';
 
@@ -24,8 +25,12 @@ type FlowBuilderProps = {
 const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
   useLayout();
   const { getNodes, getEdges, setNodes, setEdges, getNode } = useReactFlow();
+  const [colorMode, setColorMode] = useState<ColorMode>('light');
   const setReactFlowInstance = useNewServiceStore((state) => state.setReactFlowInstance);
   const { t } = useTranslation();
+
+  useThemeSyncWithFlow();
+
   const {
     onNodesDelete,
     onEdgesDelete,
@@ -75,6 +80,10 @@ const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
     },
     [getEdges, getNodes, setEdges, setHasUnsavedChanges, setNodes],
   );
+
+  const onChange: ChangeEventHandler<HTMLSelectElement> = (evt) => {
+    setColorMode(evt.target.value as ColorMode);
+  };
 
   const isValidConnection = useCallback((connection: any) => {
     return connection.source !== connection.target;
@@ -142,6 +151,7 @@ const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
         }}
         fitView
         fitViewOptions={{ padding: 5 }}
+        colorMode={colorMode}
         isValidConnection={isValidConnection}
         defaultEdgeOptions={{ type: 'step', deletable: false }}
       >
@@ -152,12 +162,15 @@ const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
         <Panel position="top-left">
           <ImportExportControls />
         </Panel>
+        <Panel position="top-right" style={{ paddingRight: '90px' }}>
+          <ThemeToggle onChange={onChange} />
+        </Panel>
         <Panel position="top-right">
           <Tooltip content={t('serviceFlow.orientationTooltip')}>
-            <Button onClick={toggleOrientation} size="s" style={{ backgroundColor: '#005aa3' }}>
+            <Button onClick={toggleOrientation} size="s" style={{ backgroundColor: '#005aa3', height: '36px' }}>
               <img
                 src={orientation === 'horizontal' ? HorizontalFlow : VerticalFlow}
-                width={35}
+                width={32}
                 className="logo"
                 loading="eager"
                 alt="orientation toggle"

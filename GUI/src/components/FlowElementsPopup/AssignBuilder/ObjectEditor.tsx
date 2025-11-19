@@ -2,6 +2,7 @@ import JSONEditor from 'jsoneditor';
 import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import 'jsoneditor/dist/jsoneditor.css';
+import './json.scss';
 import { getDragData } from 'utils/component-util';
 import { searchForProperty, searchForValue, updateValueAtPath } from 'utils/object-util';
 import { stringToTemplate } from 'utils/string-util';

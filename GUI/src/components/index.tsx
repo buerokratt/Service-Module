@@ -39,6 +39,7 @@ import OutputElementBox from './OutputElementBox';
 import Popover from './Popover';
 import Section from './Section';
 import StepElement from './StepElement';
+import ThemeToggle from './ThemeToggle';
 import Toast from './Toast';
 import Tooltip from './Tooltip';
 import Track from './Track';
@@ -86,4 +87,5 @@ export {
   ValueCell,
   StepElement,
   Dropdown,
+  ThemeToggle,
 };

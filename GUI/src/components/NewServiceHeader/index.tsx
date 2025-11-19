@@ -12,6 +12,7 @@ import { removeTrailingUnderscores } from 'utils/string-util';
 import { Button, HeaderStepCounter, Modal, Track } from '..';
 import api from '../../services/api-dev';
 import useServiceListStore from '../../store/services.store';
+import './NewServiceHeader.scss';
 
 type NewServiceHeaderProps = {
   activeStep: number;
@@ -33,10 +34,10 @@ const NewServiceHeader: FC<NewServiceHeaderProps> = ({ activeStep, backOnClick, 
 
   return (
     <>
-      <header className="header" style={{ paddingLeft: 24 }}>
+      <header className="header">
         <Track justify="between" gap={16}>
           <Button appearance="text" style={{ textDecoration: 'none', boxShadow: 'none' }} onClick={backOnClick}>
-            <h1 style={{ whiteSpace: 'nowrap', color: 'black' }}>{`< ${t('menu.backToServiceListing')}`}</h1>
+            <h1>{`< ${t('menu.backToServiceListing')}`}</h1>
           </Button>
           <HeaderStepCounter activeStep={activeStep} />
           <Button
