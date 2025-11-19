@@ -234,7 +234,7 @@ li:not(:has(> div > div)) .object-tree-chip {
 
 [data-theme="dark"] .rule-gray {
   background-color: var(--dark-bg-highlight);
-  border: 1px solid  var(--dark-bg-highlight);
+  border: 1px solid var(--dark-bg-highlight);
   color: var(--dark-text-secondary);
 
   &:hover {

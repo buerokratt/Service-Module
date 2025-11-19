@@ -100,7 +100,7 @@
   }
 }
 
-[data-theme="dark"] .textarea {
+[data-theme='dark'] .textarea {
   background-color: var(--dark-bg-light) !important;
 
   textarea {
@@ -109,7 +109,7 @@
 
     &:focus {
       outline: none;
-      border:2px solid get-color(sapphire-blue-9);
+      border: 2px solid get-color(sapphire-blue-9);
     }
   }
 }

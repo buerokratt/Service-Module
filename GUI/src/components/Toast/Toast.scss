@@ -73,11 +73,11 @@
   }
 }
 
-[data-theme="dark"] .toast {
+[data-theme='dark'] .toast {
   color: var(--dark-text-secondary);
 
   &__close {
-    color: var(--dark-text-secondary)
+    color: var(--dark-text-secondary);
   }
 
   &__list {
