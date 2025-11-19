@@ -1,8 +1,10 @@
+import FormError from 'components/FormElements/FormError';
 import { FC, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MdCheck, MdDeleteOutline, MdEdit } from 'react-icons/md';
 import useServiceStore from 'store/new-services.store';
 import useServiceListStore from 'store/services.store';
+import { generateUniqueId } from 'utils/flow-utils';
 import { removeTrailingUnderscores } from 'utils/string-util';
 import { v4 } from 'uuid';
 
@@ -12,9 +14,8 @@ import Icon from '../Icon';
 import Track from '../Track';
 
 import './styles.scss';
-import FormError from 'components/FormElements/FormError';
 
-const maxButtons = parseInt(process.env.REACT_APP_MULTI_CHOICE_QUESTION_MAX_BUTTONS ?? '4');
+const maxButtons = parseInt((import.meta.env.REACT_APP_MULTI_CHOICE_QUESTION_MAX_BUTTONS as string) ?? '4');
 
 export interface MultiChoiceQuestionContentProps {
   question: string;
@@ -72,7 +73,7 @@ const MultiChoiceQuestionContent: FC<MultiChoiceQuestionContentProps> = ({
     const newButtons = [
       ...buttons,
       {
-        id: crypto.randomUUID(),
+        id: generateUniqueId(),
         title: '',
         payload: `#service, /${selectedService?.type ?? 'POST'}/services/active/${serviceName}_mcq_${
           node?.data.label[node?.data.label.length - 1]
@@ -87,7 +88,6 @@ const MultiChoiceQuestionContent: FC<MultiChoiceQuestionContentProps> = ({
     <Track direction="vertical" align="stretch" style={{ width: '100%', padding: 16 }}>
       <div>
         <FormTextarea
-          name="multiChoiceQuestion-question"
           label=""
           placeholder={t('serviceFlow.multiChoiceQuestion.questionPlaceholder')!}
           value={question}

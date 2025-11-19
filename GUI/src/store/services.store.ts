@@ -23,11 +23,13 @@ interface ServiceStoreState {
   services: Service[];
   commonServices: Service[];
   notCommonServices: Service[];
+  orientation: 'horizontal' | 'vertical';
+  toggleOrientation: () => void;
   autoView: boolean;
   toggleAutoView: () => void;
   loadServicesList: (pagination: PaginationState, sorting: SortingState) => Promise<void>;
   loadCommonServicesList: (pagination: PaginationState, sorting: SortingState) => Promise<void>;
-  deleteService: (id: string) => Promise<void>;
+  deleteService: (id: string) => void;
   selectedService: Service | undefined;
   setSelectedService: (service: Service) => void;
   changeServiceState: (
@@ -89,10 +91,15 @@ const useServiceListStore = create<ServiceStoreState>()(
       services: [],
       commonServices: [],
       notCommonServices: [],
+      orientation: 'vertical',
       autoView: false,
       toggleAutoView: () =>
         set((state) => ({
           autoView: !state.autoView,
+        })),
+      toggleOrientation: () =>
+        set((state) => ({
+          orientation: state.orientation === 'horizontal' ? 'vertical' : 'horizontal',
         })),
       loadServicesList: async (pagination, sorting) => {
         const order = sorting[0]?.desc ? 'desc' : 'asc';
@@ -104,23 +111,20 @@ const useServiceListStore = create<ServiceStoreState>()(
         });
         const triggers = result.data.response[1];
         const services =
-          result.data.response[0].map?.(
-            (item: any) =>
-              ({
-                id: item.id,
-                name: item.name,
-                description: item.description,
-                slot: item.slot,
-                state: item.state,
-                type: item.type,
-                isCommon: item.iscommon,
-                serviceId: item.serviceId,
-                usedCount: 0,
-                totalPages: item.totalPages,
-                linkedIntent: triggers.find((e: Trigger) => e.service === item.serviceId)?.intent ?? '',
-              }) as Service,
-          ) ?? [];
-
+          result.data.response[0].map?.((item: any) => ({
+            id: item.id,
+            name: item.name,
+            description: item.description,
+            slot: item.slot,
+            state: item.state,
+            type: item.type,
+            isCommon: item.iscommon,
+            serviceId: item.serviceId,
+            usedCount: 0,
+            totalPages: item.totalPages,
+            linkedIntent: triggers.find((e: Trigger) => e.service === item.serviceId)?.intent ?? '',
+            endpoints: [],
+          })) ?? [];
         set({
           notCommonServices: services,
         });
@@ -135,27 +139,26 @@ const useServiceListStore = create<ServiceStoreState>()(
         });
         const triggers = result.data.response[1];
         const services =
-          result.data.response[0].map?.(
-            (item: any) =>
-              ({
-                id: item.id,
-                name: item.name,
-                description: item.description,
-                state: item.state,
-                type: item.type,
-                isCommon: item.iscommon,
-                serviceId: item.serviceId,
-                totalPages: item.totalPages,
-                usedCount: 0,
-                linkedIntent: triggers.find((e: Trigger) => e.service === item.serviceId)?.intent ?? '',
-              }) as Service,
-          ) ?? [];
+          result.data.response[0].map?.((item: any) => ({
+            id: item.id,
+            name: item.name,
+            description: item.description,
+            state: item.state,
+            type: item.type,
+            isCommon: item.iscommon,
+            serviceId: item.serviceId,
+            totalPages: item.totalPages,
+            usedCount: 0,
+            linkedIntent: triggers.find((e: Trigger) => e.service === item.serviceId)?.intent ?? '',
+            endpoints: [],
+            slot: '',
+          })) ?? [];
 
         set({
           commonServices: services,
         });
       },
-      deleteService: async (id) => {
+      deleteService: (id) => {
         const services = get().services.filter((e: Service) => e.serviceId !== id);
         set({
           commonServices: services.filter((e: Service) => e.isCommon === true),
@@ -207,7 +210,7 @@ const useServiceListStore = create<ServiceStoreState>()(
         if (!selectedService) return;
 
         try {
-          const res = await api.post(changeIntentConnection(), {
+          const res = await api.post<{ response: Trigger }>(changeIntentConnection(), {
             serviceId: selectedService.serviceId,
           });
           if (res.data.response) {
@@ -220,7 +223,7 @@ const useServiceListStore = create<ServiceStoreState>()(
           onNotConnected();
         }
       },
-      deleteSelectedService: async (onEnd, successMessage, errorMessage, pagination, sorting) => {
+      deleteSelectedService: async (onEnd, successMessage, errorMessage) => {
         const selectedService = get().selectedService;
         if (!selectedService) return;
 
@@ -264,7 +267,7 @@ const useServiceListStore = create<ServiceStoreState>()(
         try {
           const order = sorting[0]?.desc ? 'desc' : 'asc';
           const sort = sorting.length === 0 ? 'requestedAt desc' : sorting[0]?.id + ' ' + order;
-          const requests = await api.post(getConnectionRequests(), {
+          const requests = await api.post<{ response: Trigger[] }>(getConnectionRequests(), {
             page: pagination.pageIndex + 1,
             page_size: pagination.pageSize,
             sorting: sort,
@@ -280,7 +283,7 @@ const useServiceListStore = create<ServiceStoreState>()(
         try {
           const order = sorting[0]?.desc ? 'desc' : 'asc';
           const sort = sorting.length === 0 ? 'intent asc' : sorting[0]?.id + ' ' + order;
-          const requests = await api.post(getAvailableIntents(), {
+          const requests = await api.post<{ response: Intent[] }>(getAvailableIntents(), {
             page: pagination.pageIndex + 1,
             page_size: pagination.pageSize,
             sorting: sort,
@@ -329,8 +332,8 @@ const useServiceListStore = create<ServiceStoreState>()(
       },
     }),
     {
-      name: 'auto-view',
-      partialize: (state) => ({ autoView: state.autoView }),
+      name: 'state-configs',
+      partialize: (state) => ({ orientation: state.orientation, autoView: state.autoView }),
     },
   ),
 );

@@ -1,5 +1,5 @@
 import * as RadixTooltip from '@radix-ui/react-tooltip';
-import React, { FC, PropsWithChildren, ReactNode, cloneElement, isValidElement } from 'react';
+import React, { cloneElement, FC, isValidElement, PropsWithChildren, ReactNode, useState } from 'react';
 
 import './Tooltip.scss';
 
@@ -9,12 +9,20 @@ type TooltipProps = {
 };
 
 const Tooltip: FC<PropsWithChildren<TooltipProps>> = ({ content, children, onButtonClick }) => {
+  const [open, setOpen] = useState(false);
+
   if (!isValidElement(children)) {
     return (
       <RadixTooltip.Provider delayDuration={100}>
-        <RadixTooltip.Root>
+        <RadixTooltip.Root open={open} onOpenChange={setOpen}>
           <RadixTooltip.Trigger asChild>
-            <button style={{ display: 'inline-flex' }} onClick={onButtonClick}>
+            <button
+              style={{ display: 'inline-flex' }}
+              onClick={() => {
+                setOpen(true);
+                onButtonClick?.();
+              }}
+            >
               {children}
             </button>
           </RadixTooltip.Trigger>
@@ -35,6 +43,7 @@ const Tooltip: FC<PropsWithChildren<TooltipProps>> = ({ content, children, onBut
         <RadixTooltip.Trigger asChild>
           {cloneElement(children, {
             onClick: (e: React.MouseEvent) => {
+              setOpen(true);
               onButtonClick?.();
               if (children.props.onClick) {
                 children.props.onClick(e);

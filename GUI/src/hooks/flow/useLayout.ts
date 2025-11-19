@@ -5,16 +5,16 @@ import { useCallback, useEffect, useRef } from 'react';
 import useServiceStore from 'store/services.store';
 import { StepType } from 'types';
 
-const layout = tree<Node>()
-  .nodeSize([400, 180])
-  .separation(() => 1);
-
 const options = { duration: 300 };
 
-function layoutNodes(nodes: Node[], edges: Edge[]): Node[] {
+function layoutNodes(nodes: Node[], edges: Edge[], orientation: 'horizontal' | 'vertical' = 'horizontal'): Node[] {
   if (nodes.length === 0) {
     return [];
   }
+
+  const layout = tree<Node>()
+    .nodeSize(orientation === 'vertical' ? [400, 180] : [400, 500])
+    .separation(() => 1);
 
   const nodesCopy = [...nodes];
   const edgesCopy = [...edges];
@@ -37,13 +37,13 @@ function layoutNodes(nodes: Node[], edges: Edge[]): Node[] {
       position: { x: 0, y: 0 },
     });
 
-    rootNodes.forEach((root) => {
+    for (const root of rootNodes) {
       filteredEdges.push({
         id: `virtual-edge-${root.id}`,
         source: virtualRootId,
         target: root.id,
       });
-    });
+    }
   }
 
   try {
@@ -63,7 +63,7 @@ function layoutNodes(nodes: Node[], edges: Edge[]): Node[] {
 
     let resultNodes = root
       .descendants()
-      .map((d) => ({ ...d.data, position: { x: d.x, y: d.y } }))
+      .map((d) => ({ ...d.data, position: orientation === 'vertical' ? { x: d.x, y: d.y } : { x: d.y, y: d.x } }))
       .filter((node) => node.id !== 'virtual-root');
 
     for (const node of multiParentNodes) {
@@ -101,29 +101,29 @@ function layoutNodes(nodes: Node[], edges: Edge[]): Node[] {
 const nodeCountSelector = (state: ReactFlowState) => state.nodeLookup.size;
 const edgeCountSelector = (state: ReactFlowState) => state.edgeLookup.size;
 
-function useLayout() {
+function useLayout(orientation: 'horizontal' | 'vertical' = 'horizontal') {
   const initial = useRef(true);
 
   const nodeCount = useStore(nodeCountSelector);
   const edgeCount = useStore(edgeCountSelector);
-  const { getNodes, getNode, setNodes, setEdges, getEdges, fitView } = useReactFlow();
+  const { getNodes, getNode, setNodes, getEdges, fitView } = useReactFlow();
   const autoView = useServiceStore((state) => state.autoView);
 
   const runLayout = useCallback(() => {
     const nodes = getNodes();
     const edges = getEdges();
 
-    const targetNodes = layoutNodes(nodes, edges);
+    const targetNodes = layoutNodes(nodes, edges, orientation);
     const transitions = targetNodes.map((node) => {
       return {
         id: node.id,
         from: getNode(node.id)?.position ?? node.position,
-        to: node.type === 'starts' ? { x: 140, y: 0 } : node.position,
+        to: node.type === 'start' ? { x: 140, y: 0 } : node.position,
         node,
       };
     });
 
-    const t = timer((elapsed: number) => {
+    const t = timer(async (elapsed: number) => {
       const s = elapsed / options.duration;
 
       const currNodes = transitions.map(({ node, from, to }) => {
@@ -154,7 +154,7 @@ function useLayout() {
         t.stop();
 
         if (!initial.current && autoView) {
-          fitView({ duration: 200, padding: 3 });
+         await fitView({ duration: 200, padding: 3 });
         }
         initial.current = false;
       }
@@ -163,7 +163,7 @@ function useLayout() {
     return () => {
       t.stop();
     };
-  }, [getEdges, getNodes, getNode, setNodes, fitView, setEdges, autoView]);
+  }, [getEdges, getNodes, getNode, setNodes, fitView, orientation, autoView]);
 
   useEffect(() => {
     runLayout();
