@@ -1,6 +1,7 @@
 import { Background, ColorMode, Controls, Edge, MiniMap, Node, Panel, ReactFlow, useReactFlow } from '@xyflow/react';
 import { Button, Modal, ThemeToggle, Tooltip, Track } from 'components';
 import Chat from 'components/chat/chat';
+import CopyPasteControls from 'components/Flow/Controls/CopyPasteControls';
 import ImportExportControls from 'components/Flow/Controls/ImportExportControls';
 import edgeTypes from 'components/Flow/EdgeTypes';
 import nodeTypes from 'components/Flow/NodeTypes';
@@ -12,7 +13,6 @@ import { useTranslation } from 'react-i18next';
 import useNewServiceStore from 'store/new-services.store';
 import useServiceStore from 'store/services.store';
 import { StepType } from 'types';
-import CopyPasteControls from 'components/Flow/Controls/CopyPasteControls';
 
 import { useThemeSyncWithFlow } from '../../hooks/useThemeSyncWithFlow';
 import HorizontalFlow from '../../static/icons/horizontal_flow.svg';

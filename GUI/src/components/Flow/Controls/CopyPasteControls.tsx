@@ -1,12 +1,12 @@
-import { useReactFlow, Node, Edge } from '@xyflow/react';
+import { Edge, Node, useReactFlow } from '@xyflow/react';
 import { Button, Icon, Track } from 'components';
-import { useTranslation } from 'react-i18next';
 import { FC, useCallback, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { MdContentCopy, MdContentCut, MdContentPaste } from 'react-icons/md';
 import useServiceStore from 'store/new-services.store';
-import { MdContentCopy, MdContentPaste, MdContentCut } from 'react-icons/md';
 import useToastStore from 'store/toasts.store';
-import { generateUniqueId, generateUniqueLabel } from 'utils/flow-utils';
 import { StepType } from 'types';
+import { generateUniqueId, generateUniqueLabel } from 'utils/flow-utils';
 
 interface ClipboardData {
   nodes: Node[];

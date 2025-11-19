@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { MdCheck, MdDeleteOutline, MdEdit } from 'react-icons/md';
 import useServiceStore from 'store/new-services.store';
 import useServiceListStore from 'store/services.store';
+import { generateUniqueId } from 'utils/flow-utils';
 import { removeTrailingUnderscores } from 'utils/string-util';
 import { v4 } from 'uuid';
 
@@ -13,8 +14,6 @@ import Icon from '../Icon';
 import Track from '../Track';
 
 import './styles.scss';
-import FormError from 'components/FormElements/FormError';
-import { generateUniqueId } from 'utils/flow-utils';
 
 const maxButtons = parseInt((import.meta.env.REACT_APP_MULTI_CHOICE_QUESTION_MAX_BUTTONS as string) ?? '4');
 

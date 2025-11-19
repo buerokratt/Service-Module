@@ -1,13 +1,13 @@
 import { Edge, Node } from '@xyflow/react';
 import { Group } from 'components/FlowElementsPopup/RuleBuilder/types';
 import { Dispatch, SetStateAction } from 'react';
+import { generateUniqueId } from 'utils/flow-utils';
 
 import { Assign } from './assign';
 import { DynamicChoices } from './dynamic-choices';
 import { EndpointData } from './endpoint';
 import { MultiChoiceQuestion } from './multi-choice-question';
 import { StepType } from './step-type.enum';
-import { generateUniqueId } from 'utils/flow-utils';
 
 export const GRID_UNIT = 16;
 export const EDGE_LENGTH = 5 * GRID_UNIT;
