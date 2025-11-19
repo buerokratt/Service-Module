@@ -13,8 +13,6 @@ declare global {
 const useTabCloseEffect = () => {
   const isLocal = import.meta.env.REACT_APP_LOCAL?.toLowerCase() === 'true';
   const baseUrl = import.meta.env.REACT_APP_NOTIFICATION_NODE_URL;
-  const logoutPath = '/add-to-logout-queue';
-  const cancelLogoutPath = '/remove-from-logout-queue';
 
   const isLastSession = (): boolean => {
     const currentState = JSON.parse(localStorage.getItem(CHAT_SESSIONS.SESSION_STATE_KEY) as string) || {
