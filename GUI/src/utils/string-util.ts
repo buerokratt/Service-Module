@@ -61,7 +61,7 @@ export const getLastDigits = (value: string) => {
       break;
     }
   }
-  return lastDigits ? parseInt(lastDigits, 10) : 1;
+  return lastDigits ? Number.parseInt(lastDigits, 10) : 1;
 };
 
 export const removeTrailingUnderscores = (value: string) => {

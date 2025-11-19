@@ -353,9 +353,9 @@ function getYamlContent(
       const [parentNodeId, childNodeId] = r.split(',');
       const parentNode = nodes.findLast((node) => node.id === parentNodeId) as Node<NodeDataProps> | undefined;
       if (
-        !parentNode ||
+        !parentNode?.type ||
         parentNode.type !== 'custom' ||
-        [StepType.Rule, StepType.RuleDefinition].includes(parentNode.data.stepType)
+        [StepType.Rule, StepType.RuleDefinition].includes(parentNode.data?.stepType)
       ) {
         return;
       }
