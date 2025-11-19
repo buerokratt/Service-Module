@@ -9,7 +9,7 @@ import useServiceStore from 'store/new-services.store';
 import useToastStore from 'store/toasts.store';
 import { StepType } from 'types';
 import { Assign } from 'types/assign';
-import { EndpointData, EndpointVariableData } from 'types/endpoint';
+import { EndpointData } from 'types/endpoint';
 import { NodeDataProps } from 'types/service-flow';
 import { getLastDigits, removeTrailingUnderscores, stringToArray, toSnakeCase } from 'utils/string-util';
 
@@ -56,7 +56,7 @@ async function createEndpointAndUpdateState(endpoint: EndpointData): Promise<any
 interface SaveFlowConfig {
   name: string;
   edges: Edge[];
-  nodes: Node[];
+  nodes: Node<NodeDataProps>[];
   onSuccess: (e: any) => void;
   onError: (e: any) => void;
   description: string;
@@ -222,6 +222,20 @@ async function saveService(
     .catch(onError);
 }
 
+const validateMCQ = (node: NodeDataProps | undefined) => {
+  if (!node?.multiChoiceQuestion?.question || node.multiChoiceQuestion.question === '')
+    return i18next.t('toast.missing-mcq-question');
+  if (!node?.multiChoiceQuestion?.buttons || node.multiChoiceQuestion.buttons.length === 0)
+    return i18next.t('toast.missing-mcq-options');
+  return null;
+};
+
+export const validateCondition = (node: NodeDataProps | undefined) => {
+  const invalidRulesExist = hasInvalidRules(node?.rules?.children ?? []);
+  const isInvalid = node?.rules?.children === undefined || invalidRulesExist || node?.rules?.children.length === 0;
+  return isInvalid ? (i18next.t('toast.missing-condition-rules') ?? 'Error') : null;
+};
+
 function getYamlContent(
   nodes: Node<NodeDataProps>[],
   edges: Edge[],
@@ -236,68 +250,30 @@ function getYamlContent(
 
     outgoingEdges.forEach((edge) => {
       const followingNode = nodes.find((n) => n.id === edge.target)?.data;
-      let error;
+      let error: string | null = null;
 
       switch (followingNode?.stepType) {
         case StepType.Textfield:
-          if (followingNode?.message === undefined) {
-            error = i18next.t('toast.missing-textfield-message');
-          }
+          error = validateTextField(followingNode);
           break;
         case StepType.OpenWebpage:
-          if (followingNode?.link === undefined || followingNode?.linkText === undefined) {
-            error = i18next.t('toast.missing-website');
-          }
+          error = validateOpenWebpage(followingNode);
           break;
         case StepType.FileGenerate:
-          if (followingNode?.fileName === undefined || followingNode?.fileContent === undefined) {
-            error = i18next.t('toast.missing-file-generation');
-          }
+          error = validateFileGenerate(followingNode);
           break;
         case StepType.Assign:
-          if (followingNode?.assignElements === undefined || followingNode?.assignElements?.length === 0) {
-            error = i18next.t('toast.missing-assign-elements');
-          }
+          error = validateAssign(followingNode);
           break;
         case StepType.MultiChoiceQuestion:
-          if (
-            followingNode?.multiChoiceQuestion?.question === undefined ||
-            followingNode?.multiChoiceQuestion.question === ''
-          ) {
-            error = i18next.t('toast.missing-mcq-question');
-            break;
-          }
-          if (!followingNode?.multiChoiceQuestion?.buttons || followingNode?.multiChoiceQuestion.buttons.length === 0) {
-            error = i18next.t('toast.missing-mcq-options');
-          }
+          error = validateMCQ(followingNode);
           break;
         case StepType.DynamicChoices:
-          if (followingNode?.dynamicChoices?.list === undefined || followingNode?.dynamicChoices.list === '') {
-            error = i18next.t('toast.missing-dynamic-choices-list');
-            break;
-          }
-          if (
-            followingNode?.dynamicChoices?.serviceName === undefined ||
-            followingNode?.dynamicChoices.serviceName === ''
-          ) {
-            error = i18next.t('toast.missing-dynamic-choices-service-name');
-            break;
-          }
-          if (followingNode?.dynamicChoices?.key === undefined || followingNode?.dynamicChoices.key === '') {
-            error = i18next.t('toast.missing-dynamic-choices-key');
-          }
+          error = validateDynamicChoices(followingNode);
           break;
-        case StepType.Condition: {
-          const invalidRulesExist = hasInvalidRules(followingNode?.rules?.children ?? []);
-          const isInvalid =
-            followingNode?.rules?.children === undefined ||
-            invalidRulesExist ||
-            followingNode?.rules?.children.length === 0;
-          if (isInvalid) {
-            throw new Error(i18next.t('toast.missing-condition-rules') ?? 'Error');
-          }
+        case StepType.Condition:
+          error = validateCondition(followingNode);
           break;
-        }
         case StepType.Input:
           if (followingNode?.type === 'placeholder' && !allRelations.includes(node.id)) {
             allRelations.push(node.id);
@@ -415,7 +391,7 @@ function getYamlContent(
     });
   } catch (e: any) {
     if (showError) {
-      throw new Error(i18next.t('toast.cannot-save-flow') ?? e?.message ?? 'Error');
+      throw new Error(i18next.t('toast.cannot-save-flow') ?? (e?.message as string) ?? 'Error');
     }
   }
 
@@ -450,8 +426,63 @@ function getYamlContent(
   return Object.fromEntries(finishedFlow.entries());
 }
 
-function getBranchNodes(nodes: Node[], edges: Edge[], startNode: Node): Node[] {
-  const branchNodes: Node[] = [startNode];
+export const validateTextField = (nodeData: NodeDataProps): string | null => {
+  if (nodeData?.message === undefined) {
+    return i18next.t('toast.missing-textfield-message');
+  }
+  return null;
+};
+
+export const validateOpenWebpage = (nodeData: NodeDataProps): string | null => {
+  if (nodeData?.link === undefined || nodeData?.linkText === undefined) {
+    return i18next.t('toast.missing-website');
+  }
+  return null;
+};
+
+export const validateFileGenerate = (nodeData: NodeDataProps): string | null => {
+  if (nodeData?.fileName === undefined || nodeData?.fileContent === undefined) {
+    return i18next.t('toast.missing-file-generation');
+  }
+  return null;
+};
+
+export const validateAssign = (nodeData: NodeDataProps): string | null => {
+  if (nodeData?.assignElements === undefined || nodeData?.assignElements?.length === 0) {
+    return i18next.t('toast.missing-assign-elements');
+  }
+  return null;
+};
+
+export const validateMultiChoiceQuestion = (nodeData: NodeDataProps): string | null => {
+  if (nodeData?.multiChoiceQuestion?.question === undefined || nodeData?.multiChoiceQuestion.question === '') {
+    return i18next.t('toast.missing-mcq-question');
+  }
+  if (!nodeData?.multiChoiceQuestion?.buttons || nodeData?.multiChoiceQuestion.buttons.length === 0) {
+    return i18next.t('toast.missing-mcq-options');
+  }
+  return null;
+};
+
+export const validateDynamicChoices = (nodeData: NodeDataProps): string | null => {
+  if (nodeData?.dynamicChoices?.list === undefined || nodeData?.dynamicChoices.list === '') {
+    return i18next.t('toast.missing-dynamic-choices-list');
+  }
+  if (nodeData?.dynamicChoices?.serviceName === undefined || nodeData?.dynamicChoices.serviceName === '') {
+    return i18next.t('toast.missing-dynamic-choices-service-name');
+  }
+  if (nodeData?.dynamicChoices?.key === undefined || nodeData?.dynamicChoices.key === '') {
+    return i18next.t('toast.missing-dynamic-choices-key');
+  }
+  return null;
+};
+
+function getBranchNodes(
+  nodes: Node<NodeDataProps>[],
+  edges: Edge[],
+  startNode: Node<NodeDataProps>,
+): Node<NodeDataProps>[] {
+  const branchNodes: Node<NodeDataProps>[] = [startNode];
   const visited = new Set<string>([startNode.id]);
   const queue: string[] = [startNode.id];
 
@@ -558,7 +589,7 @@ function handleAssignStep(
   }
 
   finishedFlow.set(parentStepName, {
-    assign: parentNode.data.assignElements.reduce((acc: any, e: any) => {
+    assign: parentNode.data.assignElements?.reduce((acc: Record<string, any>, e: Assign) => {
       acc[e.key] = e.value;
       return acc;
     }, {}),
@@ -575,26 +606,36 @@ function handleEndpointStep(
   const endpointDefinition = parentNode.data.endpoint?.definitions[0];
   const paramsVariables = endpointDefinition?.params?.variables;
   const bodyVariables = endpointDefinition?.body?.variables;
+  const isRawBodySelected = endpointDefinition?.body?.isRowSelected ?? false;
+  const rawBody = endpointDefinition?.body?.rawData ?? {};
   const headersVariables = endpointDefinition?.headers?.variables;
   const methodType = endpointDefinition?.methodType?.toLowerCase();
+  const hasNonEqualOperator = paramsVariables?.some((param: any) => param.operator && param.operator !== '=');
 
   const stepConfig: any = {
     call: `http.${methodType ?? 'post'}`,
     args: {
-      url: endpointDefinition?.url?.split('?')[0] ?? '',
+      url: hasNonEqualOperator ? (endpointDefinition?.url ?? '') : (endpointDefinition?.url?.split('?')[0] ?? ''),
     },
     result: `${parentNode.data.endpoint?.name.replaceAll(' ', '_')}_res`,
     next: childNode ? toSnakeCase(childNode.data.label ?? 'format_messages') : 'format_messages',
   };
 
-  if (Array.isArray(paramsVariables) && paramsVariables.length > 0) {
+  if (Array.isArray(paramsVariables) && paramsVariables.length > 0 && !hasNonEqualOperator) {
     stepConfig.args.query = paramsVariables.reduce((acc: any, e: any) => {
       acc[e.name] = e.value;
       return acc;
     }, {});
   }
 
-  if (Array.isArray(bodyVariables) && bodyVariables.length > 0) {
+  if (isRawBodySelected) {
+    try {
+      const rawJson = JSON.parse(rawBody?.value ?? '');
+      stepConfig.args.body = rawJson;
+    } catch (e: any) {
+      console.log(`Unable to save JSON to Yaml. ${e.message}`);
+    }
+  } else if (Array.isArray(bodyVariables) && bodyVariables.length > 0) {
     stepConfig.args.body = bodyVariables.reduce((acc: any, e: any) => {
       acc[e.name] = e.value;
       return acc;
@@ -658,41 +699,6 @@ function handleDynamicChoices(
     next: childNode ? toSnakeCase(childNode.data.label ?? 'format_messages') : 'format_messages',
   });
 }
-
-const getMapEntry = (value: string) => {
-  const secrets = useServiceStore.getState().secrets;
-
-  const parts = value.replace('{{', '').replace('}}', '').split('.');
-  const key = value.replace('{{', '"').replace('}}', '"');
-  if ([...(secrets?.prod ?? []), ...(secrets?.test ?? [])].includes(value)) {
-    return `[${key}, secrets.response.body.${parts.join('.')}]`;
-  }
-  if (!value.includes('ClientInput')) parts.splice(1, 0, 'response', 'body');
-  return `[${key}, ${parts.join('.')}]`;
-};
-
-const getNestedPreDefinedRawVariables = (data: { [key: string]: any }, result: string[]) => {
-  Object.keys(data).forEach((k) => {
-    if (typeof data[k] === 'object') {
-      return getNestedPreDefinedRawVariables(data[k], result);
-    }
-    if (typeof data[k] === 'string' && data[k].startsWith('{{')) {
-      result.push(getMapEntry(data[k]));
-    }
-  });
-};
-
-const getNestedPreDefinedEndpointVariables = (variable: EndpointVariableData, result: string[]) => {
-  const variableData = variable.type === 'schema' ? variable.schemaData : variable.arrayData;
-  if (variableData instanceof Array) {
-    variableData.forEach((v) => {
-      if (['schema', 'array'].includes(v.type)) getNestedPreDefinedEndpointVariables(v, result);
-
-      if (v.value?.startsWith('{{')) result.push(getMapEntry(v.value));
-      if (v.testValue?.startsWith('{{')) result.push(getMapEntry(v.testValue));
-    });
-  }
-};
 
 const getTemplate = (node: Node, stepName: string, nextStep?: string) => {
   const data = getTemplateDataFromNode(node);
@@ -773,7 +779,7 @@ export const saveFlowClick = async (status: 'draft' | 'ready' = 'ready', showErr
   const isCommon = useServiceStore.getState().isCommon;
   const isNewService = useServiceStore.getState().isNewService;
   const edges = useServiceStore.getState().edges;
-  const nodes = useServiceStore.getState().nodes;
+  const nodes = useServiceStore.getState().nodes as Node<NodeDataProps>[];
 
   await saveFlow({
     name: !name

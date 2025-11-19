@@ -21,7 +21,6 @@ import {
   FormAutocomplete,
   FormCheckbox,
   FormCheckboxes,
-  FormDatepicker,
   FormInput,
   FormRichText,
   FormSelect,
@@ -40,6 +39,7 @@ import OutputElementBox from './OutputElementBox';
 import Popover from './Popover';
 import Section from './Section';
 import StepElement from './StepElement';
+import ThemeToggle from './ThemeToggle';
 import Toast from './Toast';
 import Tooltip from './Tooltip';
 import Track from './Track';
@@ -61,7 +61,6 @@ export {
   FormAutocomplete,
   FormCheckbox,
   FormCheckboxes,
-  FormDatepicker,
   FormInput,
   FormSelect,
   FormTextarea,
@@ -88,4 +87,5 @@ export {
   ValueCell,
   StepElement,
   Dropdown,
+  ThemeToggle,
 };
