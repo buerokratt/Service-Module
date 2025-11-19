@@ -2,6 +2,7 @@
 @import 'src/styles/tools/color';
 @import 'src/styles/settings/variables/other';
 @import 'src/styles/settings/variables/typography';
+@import 'src/styles/settings/variables/_colors';
 
 .popup {
   background-color: get-color(white);
@@ -51,5 +52,26 @@
 
   &__footer {
     border-top: 1px solid get-color(black-coral-2);
+  }
+}
+
+[data-theme='dark'] .popup {
+  background-color: var(--dark-bg-main);
+  color: var(--dark-text-primary);
+  border: 0.5px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
+
+  &__close {
+    color: var(--dark-text-primary);
+  }
+
+  &__header {
+    background-color: var(--dark-bg-main);
+    color: var(--dark-text-primary);
+  }
+
+  &_body {
+    background-color: var(--dark-bg-main);
+    color: var(--dark-text-primary);
   }
 }
