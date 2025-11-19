@@ -56,7 +56,7 @@ const useTabCloseEffect = () => {
     }, 2500);
 
     return () => clearTimeout(timeout);
-  }, [isLocal]);
+  }, [isLocal, makeCall]);
 
   useEffect(() => {
     if (isLocal) return;
@@ -95,7 +95,7 @@ const useTabCloseEffect = () => {
     window.addEventListener('beforeunload', handleTabClose);
 
     return () => window.removeEventListener('beforeunload', handleTabClose);
-  }, [isLocal]);
+  }, [isLocal, makeCall]);
 };
 
 export default useTabCloseEffect;
