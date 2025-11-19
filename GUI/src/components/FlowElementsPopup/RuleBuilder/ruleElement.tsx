@@ -1,13 +1,13 @@
 import { DragInput, FormInput, FormSelect, Icon, Tooltip, Track } from 'components';
+import { t } from 'i18next';
 import React from 'react';
 import { MdDeleteOutline, MdEdit } from 'react-icons/md';
 import { Assign } from 'types';
 import { getDragData } from 'utils/component-util';
 
 import { Rule } from './types';
-import { t } from 'i18next';
 
-export const conditionOptions = ['==', '===', '!=', '!==', '>', '<', '>=', '<='].map((x) => ({ label: x, value: x }));
+const conditionOptions = ['==', '===', '!=', '!==', '>', '<', '>=', '<='].map((x) => ({ label: x, value: x }));
 
 interface RuleElementProps {
   rule: Rule;
@@ -39,36 +39,36 @@ const RuleElement: React.FC<RuleElementProps> = ({ rule, onRemove, onChange }) =
   };
 
   const handleFieldDragChange = (dragElement: Assign) => {
-    onChange({ 
-      ...rule, 
+    onChange({
+      ...rule,
       fieldDragElement: dragElement,
       field: dragElement.value,
-      isFieldManual: false 
+      isFieldManual: false,
     });
   };
 
   const handleValueDragChange = (dragElement: Assign) => {
-    onChange({ 
-      ...rule, 
+    onChange({
+      ...rule,
       valueDragElement: dragElement,
       value: dragElement.value,
-      isValueManual: false 
+      isValueManual: false,
     });
   };
 
   const toggleFieldMode = () => {
     const newMode = !rule.isFieldManual;
-    onChange({ 
-      ...rule, 
-      isFieldManual: newMode
+    onChange({
+      ...rule,
+      isFieldManual: newMode,
     });
   };
 
   const toggleValueMode = () => {
     const newMode = !rule.isValueManual;
-    onChange({ 
-      ...rule, 
-      isValueManual: newMode
+    onChange({
+      ...rule,
+      isValueManual: newMode,
     });
   };
 
@@ -76,14 +76,17 @@ const RuleElement: React.FC<RuleElementProps> = ({ rule, onRemove, onChange }) =
     <Track gap={16} isFlex>
       <Track gap={16} isFlex>
         {!rule.isFieldManual && (
-          <DragInput 
-            id={`field-${rule.id}`} 
-            element={rule.fieldDragElement} 
-            onChange={handleFieldDragChange} 
-          />
+          <DragInput id={`field-${rule.id}`} element={rule.fieldDragElement} onChange={handleFieldDragChange} />
         )}
         {rule.isFieldManual && (
-          <FormInput value={rule.field} name="field" onChange={handleChange} onDrop={handleFieldDrop} label="" hideLabel />
+          <FormInput
+            value={rule.field}
+            name="field"
+            onChange={handleChange}
+            onDrop={handleFieldDrop}
+            label=""
+            hideLabel
+          />
         )}
         <Tooltip content={t('serviceFlow.popup.assignManualEdit')} onButtonClick={toggleFieldMode}>
           <div className="small-assign-button assign-blue">
@@ -100,19 +103,19 @@ const RuleElement: React.FC<RuleElementProps> = ({ rule, onRemove, onChange }) =
           hideLabel
         />
         {!rule.isValueManual && (
-          <DragInput 
-            id={`value-${rule.id}`} 
-            element={rule.valueDragElement} 
-            onChange={handleValueDragChange} 
-          />
+          <DragInput id={`value-${rule.id}`} element={rule.valueDragElement} onChange={handleValueDragChange} />
         )}
         {rule.isValueManual && (
-          <FormInput value={rule.value} name="value" onChange={handleChange} onDrop={handleValueDrop} label="" hideLabel />
+          <FormInput
+            value={rule.value}
+            name="value"
+            onChange={handleChange}
+            onDrop={handleValueDrop}
+            label=""
+            hideLabel
+          />
         )}
-        <Tooltip
-          content={t('serviceFlow.popup.assignManualEdit')}
-          onButtonClick={toggleValueMode}
-        >
+        <Tooltip content={t('serviceFlow.popup.assignManualEdit')} onButtonClick={toggleValueMode}>
           <div className="small-assign-button assign-blue">
             <Icon icon={<MdEdit />} />
           </div>

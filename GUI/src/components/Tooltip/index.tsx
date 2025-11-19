@@ -1,5 +1,5 @@
 import * as RadixTooltip from '@radix-ui/react-tooltip';
-import { FC, PropsWithChildren, ReactNode, useState } from 'react';
+import React, { cloneElement, FC, isValidElement, PropsWithChildren, ReactNode, useState } from 'react';
 
 import './Tooltip.scss';
 
@@ -10,19 +10,46 @@ type TooltipProps = {
 
 const Tooltip: FC<PropsWithChildren<TooltipProps>> = ({ content, children, onButtonClick }) => {
   const [open, setOpen] = useState(false);
+
+  if (!isValidElement(children)) {
+    return (
+      <RadixTooltip.Provider delayDuration={100}>
+        <RadixTooltip.Root open={open} onOpenChange={setOpen}>
+          <RadixTooltip.Trigger asChild>
+            <button
+              style={{ display: 'inline-flex' }}
+              onClick={() => {
+                setOpen(true);
+                onButtonClick?.();
+              }}
+            >
+              {children}
+            </button>
+          </RadixTooltip.Trigger>
+          <RadixTooltip.Portal>
+            <RadixTooltip.Content className="tooltip">
+              {content}
+              <RadixTooltip.Arrow className="tooltip__arrow" />
+            </RadixTooltip.Content>
+          </RadixTooltip.Portal>
+        </RadixTooltip.Root>
+      </RadixTooltip.Provider>
+    );
+  }
+
   return (
     <RadixTooltip.Provider delayDuration={100}>
       <RadixTooltip.Root open={open} onOpenChange={setOpen}>
         <RadixTooltip.Trigger asChild>
-          <button
-            style={{ display: 'inline-flex' }}
-            onClick={() => {
+          {cloneElement(children, {
+            onClick: (e: React.MouseEvent) => {
               setOpen(true);
               onButtonClick?.();
-            }}
-          >
-            {children}
-          </button>
+              if (children.props.onClick) {
+                children.props.onClick(e);
+              }
+            },
+          })}
         </RadixTooltip.Trigger>
         <RadixTooltip.Portal>
           <RadixTooltip.Content className="tooltip">

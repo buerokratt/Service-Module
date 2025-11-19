@@ -51,6 +51,7 @@ vi.mock('utils/string-util', () => ({
 
 vi.mock('utils/flow-utils', () => ({
   validateStep: vi.fn(),
+  generateUniqueId: vi.fn(() => 'mock-unique-id'),
 }));
 
 describe('translateErrorPayload', () => {

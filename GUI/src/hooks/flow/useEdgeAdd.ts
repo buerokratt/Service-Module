@@ -1,12 +1,12 @@
 import { Edge, Node, useReactFlow } from '@xyflow/react';
 import useServiceStore from 'store/new-services.store';
 import { Step, StepType } from 'types';
-import { getNodeLabel } from 'utils/flow-utils';
+import { generateUniqueId, getNodeLabel } from 'utils/flow-utils';
 
 function useEdgeAdd(id: string) {
   const { setEdges, setNodes, getNodes, getNode, getEdge } = useReactFlow();
 
-  const handleEdgeClick = async (step: Step) => {
+  const handleEdgeClick = (step: Step) => {
     const edge = getEdge(id);
     if (!edge) return;
 
@@ -16,7 +16,7 @@ function useEdgeAdd(id: string) {
     const nodeLabel = getNodeLabel(step, getNodes());
     const stepType: StepType = step.type;
 
-    const newNodeId = crypto.randomUUID();
+    const newNodeId = generateUniqueId();
 
     const insertNode = {
       id: newNodeId,
@@ -33,11 +33,15 @@ function useEdgeAdd(id: string) {
         endpoint: step.data,
         setClickedNode: useServiceStore.getState().setClickedNode,
       },
-      className: [StepType.FinishingStepEnd, StepType.FinishingStepRedirect].includes(stepType)
-        ? 'finishing-step'
-        : [StepType.DynamicChoices].includes(stepType)
-          ? 'dynamic-choices'
-          : 'step',
+      className: (() => {
+        if ([StepType.FinishingStepEnd, StepType.FinishingStepRedirect].includes(stepType)) {
+          return 'finishing-step';
+        }
+        if ([StepType.DynamicChoices].includes(stepType)) {
+          return 'dynamic-choices';
+        }
+        return 'step';
+      })(),
       type: 'custom',
     };
 
@@ -71,8 +75,8 @@ function useEdgeAdd(id: string) {
 
     if (stepType === StepType.MultiChoiceQuestion || stepType === StepType.Condition || stepType === StepType.Input) {
       const labels = stepType === StepType.MultiChoiceQuestion ? ['Jah', 'Ei'] : ['Success', 'Failure'];
-      ghostNodes = labels.slice(1).map((_, i) => ({
-        id: crypto.randomUUID(),
+      ghostNodes = labels.slice(1).map((_) => ({
+        id: generateUniqueId(),
         type: 'ghost',
         position: {
           x: targetNode.position.x,
@@ -117,6 +121,10 @@ function useEdgeAdd(id: string) {
 
       return newNodes;
     });
+
+    setTimeout(() => {
+      useServiceStore.getState().saveToHistory();
+    }, 0);
   };
   return handleEdgeClick;
 }

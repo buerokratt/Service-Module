@@ -1,3 +1,5 @@
+@import 'src/styles/settings/variables/_colors';
+
 .vertical-tabs {
   display: flex;
   border-radius: 4px;
@@ -92,5 +94,40 @@
     padding: 16px 16px 4px;
     color: get-color(black-coral-20);
     border-bottom: 1px solid get-color(black-coral-2);
+  }
+}
+
+[data-theme='dark'] .vertical-tabs {
+  border: 1px solid get-color(black-coral-2);
+  background-color: get-color(white);
+
+  &__column {
+    background-color: var(--dark-bg-secondary);
+  }
+
+  &__body {
+    background-color: var(--dark-bg-light);
+  }
+
+  &__content-header {
+    border-bottom: 1px solid var(--dark-bg-highlight);
+  }
+
+  &__content-footer {
+    border-top: 1px solid var(--dark-bg-highlight);
+  }
+
+  &__trigger {
+    color: var(--dark-text-label);
+
+    &[aria-selected='true'] {
+      color: get-color(sapphire-blue-4);
+      background-color: var(--dark-bg-light);
+    }
+  }
+
+  &__group-header {
+    color: get-color(black-coral-20);
+    border-bottom: 1px solid var(--dark-bg-highlight);
   }
 }

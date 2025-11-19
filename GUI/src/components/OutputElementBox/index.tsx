@@ -44,9 +44,9 @@ const OutputElementBox: FC<OutputElementBoxProps> = ({
     event.dataTransfer.setData(
       ASSIGN_DRAG_TYPE,
       // Need to check for StepType.Assign here since ReactQuill does not support custom onDrop events
-      node?.data.stepType === StepType.Assign || 
-      node?.data.stepType === StepType.DynamicChoices || 
-      node?.data.stepType === StepType.Condition
+      node?.data.stepType === StepType.Assign ||
+        node?.data.stepType === StepType.DynamicChoices ||
+        node?.data.stepType === StepType.Condition
         ? JSON.stringify(dragData)
         : dragValue,
     );
