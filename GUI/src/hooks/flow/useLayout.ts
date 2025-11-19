@@ -154,7 +154,7 @@ function useLayout(orientation: 'horizontal' | 'vertical' = 'horizontal') {
         t.stop();
 
         if (!initial.current && autoView) {
-         await fitView({ duration: 200, padding: 3 });
+          await fitView({ duration: 200, padding: 3 });
         }
         initial.current = false;
       }
