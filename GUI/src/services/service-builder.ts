@@ -230,7 +230,7 @@ const validateMCQ = (node: NodeDataProps | undefined) => {
   return null;
 };
 
-const validateCondition = (node: NodeDataProps | undefined) => {
+export const validateCondition = (node: NodeDataProps | undefined) => {
   const invalidRulesExist = hasInvalidRules(node?.rules?.children ?? []);
   const isInvalid = node?.rules?.children === undefined || invalidRulesExist || node?.rules?.children.length === 0;
   return isInvalid ? (i18next.t('toast.missing-condition-rules') ?? 'Error') : null;
