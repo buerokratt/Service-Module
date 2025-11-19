@@ -64,7 +64,9 @@
     "proceed": "Proceed",
     "copy": "Copy",
     "paste": "Paste",
-    "cut": "Cut"
+    "cut": "Cut",
+    "undo": "Undo",
+    "redo": "Redo"
   },
   "menu": {
     "overview": "Overview",

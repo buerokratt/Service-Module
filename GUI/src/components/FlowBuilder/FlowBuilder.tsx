@@ -3,11 +3,12 @@ import { Button, Modal, ThemeToggle, Tooltip, Track } from 'components';
 import Chat from 'components/chat/chat';
 import CopyPasteControls from 'components/Flow/Controls/CopyPasteControls';
 import ImportExportControls from 'components/Flow/Controls/ImportExportControls';
+import UndoRedoControls from 'components/Flow/Controls/UndoRedoControls';
 import edgeTypes from 'components/Flow/EdgeTypes';
 import nodeTypes from 'components/Flow/NodeTypes';
 import useLayout from 'hooks/flow/useLayout';
 import { useOnNodesDelete } from 'hooks/flow/useOnNodeDelete';
-import { ChangeEventHandler, FC, useCallback, useState } from 'react';
+import { ChangeEventHandler, FC, useCallback, useEffect, useState } from 'react';
 import '@xyflow/react/dist/style.css';
 import { useTranslation } from 'react-i18next';
 import useNewServiceStore from 'store/new-services.store';
@@ -43,10 +44,12 @@ const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
     setDeletedNodes,
     setNodeToDelete,
   } = useOnNodesDelete();
-  const { setFlowSelectedNodes, setHasUnsavedChanges } = useNewServiceStore();
+  const { saveToHistory, historyIndex, setFlowSelectedNodes, setHasUnsavedChanges } = useNewServiceStore();
   const orientation = useServiceStore((state) => state.orientation);
   const toggleOrientation = useServiceStore((state) => state.toggleOrientation);
   useLayout(orientation);
+
+  const { runLayout } = useLayout();
 
   const onConnect = useCallback(
     ({ source, target }: any) => {
@@ -78,8 +81,9 @@ const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
         },
       ]);
       setHasUnsavedChanges(true);
+      saveToHistory();
     },
-    [getEdges, getNodes, setEdges, setHasUnsavedChanges, setNodes],
+    [getEdges, getNodes, setEdges, setHasUnsavedChanges, setNodes, saveToHistory],
   );
 
   const onChange: ChangeEventHandler<HTMLSelectElement> = (evt) => {
@@ -131,6 +135,10 @@ const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
     [getNode, hasConnectedNodes, setDeletedNodes, setIsDeleteConnectionsModalVisible],
   );
 
+  useEffect(() => {
+    runLayout();
+  }, [historyIndex, runLayout]);
+
   return (
     <>
       <ReactFlow
@@ -153,11 +161,13 @@ const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
         onEdgesDelete={(edges) => {
           onEdgesDelete(edges);
           setHasUnsavedChanges(true);
+          saveToHistory();
         }}
         onBeforeDelete={onBeforeDelete}
         onNodesDelete={(nodes) => {
           onNodesDelete(nodes);
           setHasUnsavedChanges(true);
+          saveToHistory();
         }}
         fitView
         fitViewOptions={{ padding: 5 }}
@@ -173,6 +183,7 @@ const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
           <Track gap={10} direction="vertical" align="left">
             <ImportExportControls />
             <CopyPasteControls onNodesDelete={onNodesDelete} />
+            <UndoRedoControls />
           </Track>
         </Panel>
         <Panel position="top-right" style={{ paddingRight: '90px' }}>

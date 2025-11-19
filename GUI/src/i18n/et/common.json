@@ -64,7 +64,9 @@
     "proceed": "Jätka",
     "copy": "Kopeeri",
     "paste": "Kleebi",
-    "cut": "Lõika"
+    "cut": "Lõika",
+    "undo": "Võta tagasi",
+    "redo": "Taasta"
   },
   "menu": {
     "overview": "Ülevaade",
