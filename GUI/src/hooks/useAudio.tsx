@@ -22,7 +22,7 @@ export const useAudio = (audiosrc: string) => {
     return () => {
       howl.unload();
     };
-  }, []);
+  }, [audiosrc]);
 
   return [audio] as const;
 };

@@ -1,7 +1,7 @@
 import { createColumnHelper, PaginationState, SortingState } from '@tanstack/react-table';
 import { Button, DataTable, Dialog, FormInput, Icon, Modal, Track } from 'components';
 import i18n from 'i18n';
-import { FC, useEffect, useMemo, useState } from 'react';
+import { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MdOutlineArrowForward } from 'react-icons/md';
 import { Link } from 'react-router-dom';
@@ -35,22 +35,25 @@ const ConnectServiceToIntentModel: FC<ConnectServiceToIntentModelProps> = ({
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
   const [isConnecting, setIsConnecting] = useState(false);
 
-  const loadAvailableIntents = (pagination: PaginationState, sorting: SortingState, search: string) => {
-    useServiceStore
-      .getState()
-      .loadAvailableIntentsList(
-        (requests: Intent[]) => setIntents(requests),
-        t('overview.service.toast.failed.availableIntents'),
-        pagination,
-        sorting,
-        search,
-      );
-  };
+  const loadAvailableIntents = useCallback(
+    (pagination: PaginationState, sorting: SortingState, search: string) => {
+      void useServiceStore
+        .getState()
+        .loadAvailableIntentsList(
+          (requests: Intent[]) => setIntents(requests),
+          t('overview.service.toast.failed.availableIntents'),
+          pagination,
+          sorting,
+          search,
+        );
+    },
+    [t],
+  );
 
   useEffect(() => {
     const intialPagination = { pageIndex: 0, pageSize: 10 };
     loadAvailableIntents(filter ? intialPagination : pagination, sorting, filter);
-  }, [filter]);
+  }, [filter, loadAvailableIntents, pagination, sorting]);
 
   const intentColumns = useMemo(
     () =>
