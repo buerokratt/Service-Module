@@ -15,17 +15,22 @@ interface ChatMessageProps {
   message: TestingMessage;
 }
 
-const UserMessage = ({ message }: ChatMessageProps) => (
-  <motion.div animate={rightAnimation.animate} initial={rightAnimation.initial} transition={rightAnimation.transition}>
-    <div className={classNames(styles.message, styles.client)}>
-      <div className={styles.icon}>
-        <img src={PersonIcon} alt="Person icon" />
+const UserMessage = ({ message }: ChatMessageProps) =>
+  message.message && (
+    <motion.div
+      animate={rightAnimation.animate}
+      initial={rightAnimation.initial}
+      transition={rightAnimation.transition}
+    >
+      <div className={classNames(styles.message, styles.client)}>
+        <div className={styles.icon}>
+          <img src={PersonIcon} alt="Person icon" />
+        </div>
+        <div className={styles.content}>
+          <span>{message.message}</span>
+        </div>
       </div>
-      <div className={styles.content}>
-        <span>{message.message}</span>
-      </div>
-    </div>
-  </motion.div>
-);
+    </motion.div>
+  );
 
 export default UserMessage;

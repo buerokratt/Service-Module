@@ -37,7 +37,7 @@ const Toast: FC<ToastProps> = ({ toast }) => {
         <Icon icon={toastIcons[toast.type]} />
         {toast.title}
       </RadixToast.Title>
-      <RadixToast.Description className="toast__content">{toast.message}</RadixToast.Description>
+      {toast.message && <RadixToast.Description className="toast__content">{toast.message}</RadixToast.Description>}
       <RadixToast.Close onClick={close} className="toast__close">
         <Icon icon={<MdOutlineClose />} size="medium" />
       </RadixToast.Close>

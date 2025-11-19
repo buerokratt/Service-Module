@@ -2,7 +2,7 @@ import { createColumnHelper, PaginationState, SortingState } from '@tanstack/rea
 import { Card, DataTable, Icon } from 'components';
 import { format } from 'date-fns';
 import withAuthorization, { ROLES } from 'hoc/with-authorization';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { AiFillCheckCircle, AiFillCloseCircle } from 'react-icons/ai';
 import useServiceStore from 'store/services.store';
@@ -17,34 +17,40 @@ const ConnectionRequestsPage: React.FC = () => {
   });
   const [sorting, setSorting] = useState<SortingState>([]);
 
-  const loadConnectionRequests = (pagination: PaginationState, sorting: SortingState) => {
-    useServiceStore
-      .getState()
-      .loadRequestsList(
-        (requests: Trigger[]) => setTriggers(requests),
-        t('connectionRequests.toast.failed.requests'),
-        pagination,
-        sorting,
-      );
-  };
+  const loadConnectionRequests = useCallback(
+    (pagination: PaginationState, sorting: SortingState) => {
+      void useServiceStore
+        .getState()
+        .loadRequestsList(
+          (requests: Trigger[]) => setTriggers(requests),
+          t('connectionRequests.toast.failed.requests'),
+          pagination,
+          sorting,
+        );
+    },
+    [t],
+  );
 
   useEffect(() => {
     loadConnectionRequests(pagination, sorting);
-  }, []);
+  }, [loadConnectionRequests, pagination, sorting]);
 
-  const respondToConnectionRequest = (status: boolean, request: Trigger) => {
-    useServiceStore
-      .getState()
-      .respondToConnectionRequest(
-        () => loadConnectionRequests(pagination, sorting),
-        t('connectionRequests.approvedConnection'),
-        t('connectionRequests.declinedConnection'),
-        status,
-        request,
-      );
-  };
+  const respondToConnectionRequest = useCallback(
+    async (status: boolean, request: Trigger) => {
+      await useServiceStore
+        .getState()
+        .respondToConnectionRequest(
+          () => loadConnectionRequests(pagination, sorting),
+          t('connectionRequests.approvedConnection'),
+          t('connectionRequests.declinedConnection'),
+          status,
+          request,
+        );
+    },
+    [loadConnectionRequests, pagination, sorting, t],
+  );
 
-  const appRequestColumns = useMemo(() => getColumns(respondToConnectionRequest), []);
+  const appRequestColumns = useMemo(() => getColumns(respondToConnectionRequest), [respondToConnectionRequest]);
 
   if (!triggers) return <span>Loading ...</span>;
 
@@ -139,4 +145,8 @@ const getColumns = (respondToConnectionRequest: (result: boolean, tigger: Trigge
   ];
 };
 
-export default withAuthorization(ConnectionRequestsPage, [ROLES.ROLE_ADMINISTRATOR, ROLES.ROLE_SERVICE_MANAGER]);
+const AuthorizedConnectionRequestsPage = withAuthorization(ConnectionRequestsPage, [
+  ROLES.ROLE_ADMINISTRATOR,
+  ROLES.ROLE_SERVICE_MANAGER,
+]);
+export default AuthorizedConnectionRequestsPage;

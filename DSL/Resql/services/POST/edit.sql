@@ -6,7 +6,7 @@ SELECT
   ruuter_type,
   :state::service_state,
   service_id,
-  is_common,
+  COALESCE(:is_common, false) AS is_common,
   :structure::json
 FROM services
 WHERE service_id = :id

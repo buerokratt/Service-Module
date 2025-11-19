@@ -1,13 +1,18 @@
 import { useReactFlow } from '@xyflow/react';
 import { Button, Icon, Modal, Track } from 'components';
-import { useTranslation } from 'react-i18next';
-import { FC, useRef, useCallback, useState } from 'react';
-import useServiceStore from 'store/new-services.store';
-import { AiOutlineExport, AiOutlineImport } from 'react-icons/ai';
-import useToastStore from 'store/toasts.store';
 import { format } from 'date-fns';
-import { removeTrailingUnderscores } from 'utils/string-util';
+import { ChangeEvent, FC, useCallback, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { AiOutlineExport, AiOutlineImport } from 'react-icons/ai';
 import { updateFlowInputRules } from 'services/flow-builder';
+import useServiceStore from 'store/new-services.store';
+import useToastStore from 'store/toasts.store';
+import { removeTrailingUnderscores } from 'utils/string-util';
+
+interface FlowData {
+  nodes: any[];
+  edges: any[];
+}
 
 const ImportExportControls: FC = () => {
   const { getNodes, getEdges, setNodes, setEdges } = useReactFlow();
@@ -16,7 +21,7 @@ const ImportExportControls: FC = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const serviceName = useServiceStore((state) => removeTrailingUnderscores(state.serviceNameDashed()));
   const [isConfirmImportModalVisible, setIsConfirmImportModalVisible] = useState(false);
-  const [importedFlowData, setImportedFlowData] = useState<{ nodes: any[]; edges: any[] } | null>(null);
+  const [importedFlowData, setImportedFlowData] = useState<FlowData | null>(null);
 
   const handleExport = useCallback(async () => {
     try {
@@ -54,42 +59,8 @@ const ImportExportControls: FC = () => {
     }
   }, [getNodes, getEdges, serviceName, t]);
 
-  const handleImport = useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>) => {
-      const file = event.target.files?.[0];
-      if (!file) return;
-
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        try {
-          const content = e.target?.result as string;
-          const flowData = JSON.parse(content);
-          const currentNodes = getNodes().filter((node) => node.type !== 'ghost');
-
-          if (currentNodes.length === 1 && currentNodes[0].type === 'start') {
-            applyImportedFlow(flowData);
-          } else {
-            setImportedFlowData(flowData);
-            setIsConfirmImportModalVisible(true);
-          }
-        } catch (error) {
-          console.error('Error parsing flow file:', error);
-          useToastStore
-            .getState()
-            .error({ title: t('global.notificationError'), message: t('serviceFlow.parseError') });
-        }
-      };
-      reader.readAsText(file);
-
-      if (fileInputRef.current) {
-        fileInputRef.current.value = '';
-      }
-    },
-    [getNodes, setNodes, setEdges, setHasUnsavedChanges, t],
-  );
-
   const applyImportedFlow = useCallback(
-    (flowData: { nodes: any[]; edges: any[] }) => {
+    (flowData: FlowData) => {
       if (isValidFlowData(flowData)) {
         const nodes = flowData.nodes.map((node: any) => {
           if (node.type !== 'custom') return node;
@@ -112,6 +83,40 @@ const ImportExportControls: FC = () => {
     [setNodes, setEdges, setHasUnsavedChanges, t],
   );
 
+  const handleImport = useCallback(
+    (event: ChangeEvent<HTMLInputElement>) => {
+      const file = event.target.files?.[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const content = e.target?.result as string;
+          const flowData = JSON.parse(content) as FlowData;
+          const currentNodes = getNodes().filter((node) => node.type !== 'ghost');
+
+          if (currentNodes.length === 1 && currentNodes[0].type === 'start') {
+            applyImportedFlow(flowData);
+          } else {
+            setImportedFlowData(flowData);
+            setIsConfirmImportModalVisible(true);
+          }
+        } catch (error) {
+          console.error('Error parsing flow file:', error);
+          useToastStore
+            .getState()
+            .error({ title: t('global.notificationError'), message: t('serviceFlow.parseError') });
+        }
+      };
+      reader.readAsText(file);
+
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    },
+    [getNodes, applyImportedFlow, t],
+  );
+
   const handleConfirmImport = useCallback(() => {
     if (importedFlowData) {
       applyImportedFlow(importedFlowData);
@@ -125,7 +130,7 @@ const ImportExportControls: FC = () => {
     setImportedFlowData(null);
   }, []);
 
-  const isValidFlowData = (data: any): data is { nodes: any[]; edges: any[] } => {
+  const isValidFlowData = (data: any): data is FlowData => {
     return (
       data &&
       Array.isArray(data.nodes) &&

@@ -61,7 +61,12 @@
     "edit": "Edit",
     "import": "Import",
     "export": "Export",
-    "proceed": "Proceed"
+    "proceed": "Proceed",
+    "copy": "Copy",
+    "paste": "Paste",
+    "cut": "Cut",
+    "undo": "Undo",
+    "redo": "Redo"
   },
   "menu": {
     "overview": "Overview",
@@ -146,7 +151,6 @@
     },
     "service": {
       "name": "Name",
-      "usedCount": "Times service has been triggered",
       "state": "State",
       "linkedIntent": "Linked Intent",
       "states": {
@@ -175,10 +179,7 @@
     "popup": {
       "delete": "Are you sure you want to delete this service? This action cannot be undone.",
       "setActive": "Are you sure you want to activate this service?",
-      "setReady": "Are you sure you want to mark this service as ready?",
       "setDraft": "Are you sure you want to mark this service as draft?",
-      "setInactive": "Are you sure you want to deactivate this service?",
-      "setState": "Update state",
       "checking": "Checking if service is connected to an intent",
       "setToDraft": "Set to draft",
       "connectToIntent": "Connect to intent",
@@ -194,8 +195,6 @@
       "noIntentsAvailable": "No intents available to be connected",
       "noSlotsAvailable": "No slots available",
       "connectionQuestion": "Are you sure you want to connect to this intent?",
-      "activate": "Activate",
-      "deactivate": "Deactivate",
       "createNewIntent": "Create new intent",
       "deleteNodeConnections": "Would you like to also delete all the logic paths connected to this node or leave them hanging?"
     }
@@ -235,6 +234,7 @@
       "url": "API endpoint URL",
       "value": "Value",
       "variable": "Variable",
+      "operator": "Operator",
       "unsupported": "Sorry, we currently only support GET and POST requests.",
       "insertName": "Insert endpoint name...",
       "type": "Endpoint type",
@@ -349,17 +349,31 @@
     },
     "previousVariables": {
       "assignElements": "Assign Elements",
-      "dates": {
-        "title": "Dates",
-        "currentDate": "Current date",
-        "currentTime": "Current time",
-        "currentDateAndTime": "Current date & time",
-        "yesterday": "Yesterday",
-        "tomorrow": "Tomorrow",
-        "customDateTime": "Custom date & time",
-        "yearMonthDayFormat": "Year Month Day format",
-        "dayMonthYearFormat": "Day Month Year format",
-        "customFormat": "Custom format"
+      "dateAndTime": {
+        "title": "Date and time",
+        "base": "Base",
+        "startOfDay": "Start of day",
+        "startOfMonth": "Start of month",
+        "startOfYear": "Start of year",
+        "endOfDay": "End of day",
+        "endOfMonth": "End of month",
+        "endOfYear": "End of year",
+        "now": "Now",
+        "today": "Today",
+        "offset": "Offset",
+        "days": "Days",
+        "months": "Months",
+        "years": "Years",
+        "setTime": "Set time",
+        "time": "Time",
+        "format": "Format",
+        "dateOnly": "Date only",
+        "timestamp": "Timestamp",
+        "timestampMs": "Timestamp (ms)",
+        "yearOnly": "Year only",
+        "custom": "Custom",
+        "dateOrder": "Date order",
+        "separator": "Separator"
       },
       "noName": "<No name>",
       "environmentVariables": {
@@ -399,6 +413,8 @@
     "allElements": "All elements",
     "serviceInfo": "Service info",
     "parseError": "Service generation failed! Either not JSON, the file has been modified or is corrupt",
+    "orientationTooltip": "Toggle flow orientation",
+    "autoFocus": "Auto-View: ON/OFF",
     "apiElements": {
       "title": "API elements",
       "delete": "Delete",
@@ -433,7 +449,16 @@
       "setup": "Setup",
       "test": "Test"
     },
-    "rule": "Rule"
+    "rule": "Rule",
+    "noNodesSelected": "No nodes selected",
+    "nothingToPaste": "Nothing to paste",
+    "nodesCopied": "{{count}} node{{s}} copied",
+    "nodesPasted": "{{count}} node{{s}} pasted",
+    "nodesCut": "{{count}} node{{s}} cut",
+    "copyNodes": "Copy selected nodes",
+    "pasteNodes": "Paste nodes",
+    "cutNodes": "Cut selected nodes",
+    "lasso": "Lasso"
   },
   "logs": {
     "service": "Service",
