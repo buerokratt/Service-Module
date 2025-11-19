@@ -1,5 +1,5 @@
 import { Background, ColorMode, Controls, Edge, MiniMap, Node, Panel, ReactFlow, useReactFlow } from '@xyflow/react';
-import { Button, Modal, Tooltip, Track, ThemeToggle } from 'components';
+import { Button, Modal, ThemeToggle, Tooltip, Track } from 'components';
 import Chat from 'components/chat/chat';
 import ImportExportControls from 'components/Flow/Controls/ImportExportControls';
 import edgeTypes from 'components/Flow/EdgeTypes';
@@ -13,9 +13,9 @@ import useNewServiceStore from 'store/new-services.store';
 import useServiceStore from 'store/services.store';
 import { StepType } from 'types';
 
+import { useThemeSyncWithFlow } from '../../hooks/useThemeSyncWithFlow';
 import HorizontalFlow from '../../static/icons/horizontal_flow.svg';
 import VerticalFlow from '../../static/icons/vertical_flow.svg';
-import { useThemeSyncWithFlow } from '../../hooks/useThemeSyncWithFlow';
 
 type FlowBuilderProps = {
   nodes: Node[];
