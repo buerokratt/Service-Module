@@ -14,9 +14,12 @@ declaration:
       - field: description
         type: string
         description: "Body field 'description'"
-      - field: slot
-        type: string
-        description: "Slot input"
+      - field: keywords
+        type: object
+        description: "Body field 'Keywords'"
+      - field: examples
+        type: object
+        description: "Body field 'Examples'"
       - field: isCommon
         type: boolean
         description: "Body field 'isCommon'"
@@ -49,7 +52,8 @@ extract_request_data:
   assign:
     name: ${incoming.body.name}
     description: ${incoming.body.description}
-    slot: ${incoming.body.slot}
+    keywords: ${incoming.body.keywords}
+    examples: ${incoming.body.examples}
     type: ${incoming.body.type.toUpperCase()}
     content: ${incoming.body.content}
     serviceId: ${incoming.body.serviceId}
@@ -86,7 +90,9 @@ service_add:
     body:
       name: ${name}
       description: ${description}
-      slot: ${slot}
+      slot: ${""}
+      keywords: ${keywords}
+      examples: ${examples}
       ruuter_type: ${type}
       service_id: ${serviceId}
       is_common: ${isCommon}
