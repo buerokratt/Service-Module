@@ -61,6 +61,8 @@ interface SaveFlowConfig {
   onError: (e: any) => void;
   description: string;
   slot: string;
+  examples: string[];
+  entities: string[];
   isCommon: boolean;
   serviceId: string;
   isNewService: boolean;
@@ -127,6 +129,8 @@ export const saveFlow = async ({
   onError,
   description,
   slot,
+  examples,
+  entities,
   isCommon,
   serviceId,
   isNewService,
@@ -150,7 +154,18 @@ export const saveFlow = async ({
 
     await saveService(
       yamlContent,
-      { name, serviceId, description, slot, isCommon, nodes, edges, isNewService } as SaveFlowConfig,
+      {
+        name,
+        serviceId,
+        description,
+        slot,
+        examples,
+        entities,
+        isCommon,
+        nodes,
+        edges,
+        isNewService,
+      } as SaveFlowConfig,
       true,
       status,
       onSuccess,
@@ -174,7 +189,18 @@ export const saveFlow = async ({
 
         await saveService(
           getYamlContent(branchNodes, branchEdges, serviceName, description, showError),
-          { name: serviceName, serviceId, description, slot, isCommon, nodes, edges, isNewService } as SaveFlowConfig,
+          {
+            name: serviceName,
+            serviceId,
+            description,
+            slot,
+            examples,
+            entities,
+            isCommon,
+            nodes,
+            edges,
+            isNewService,
+          } as SaveFlowConfig,
           false,
           status,
         );
@@ -193,7 +219,7 @@ async function saveService(
   onSuccess?: (e: any) => void,
   onError?: (e: any) => void,
 ) {
-  const { isNewService, serviceId, name, description, slot, isCommon, edges, nodes } = config;
+  const { isNewService, serviceId, name, description, slot, examples, entities, isCommon, edges, nodes } = config;
   if (updateServiceDb) {
     useServiceStore.getState().changeServiceName(removeTrailingUnderscores(name));
   }
@@ -205,6 +231,8 @@ async function saveService(
         serviceId,
         description,
         slot,
+        examples,
+        entities,
         type: 'POST',
         content: content,
         isCommon,
@@ -762,6 +790,8 @@ export const saveFlowClick = async (status: 'draft' | 'ready' = 'ready', showErr
   const serviceId = useServiceStore.getState().serviceId;
   const description = useServiceStore.getState().description;
   const slot = useServiceStore.getState().slot;
+  const examples = useServiceStore.getState().examples;
+  const entities = useServiceStore.getState().entities;
   const isCommon = useServiceStore.getState().isCommon;
   const isNewService = useServiceStore.getState().isNewService;
   const edges = useServiceStore.getState().edges;
@@ -791,6 +821,8 @@ export const saveFlowClick = async (status: 'draft' | 'ready' = 'ready', showErr
     },
     description,
     slot,
+    examples,
+    entities,
     isCommon,
     serviceId,
     isNewService,

@@ -45,8 +45,8 @@ export interface ServiceStoreState {
   serviceId: string;
   description: string;
   slot: string;
-  examples: string[],
-  keywords: string[],
+  examples: string[];
+  entities: string[];
   isCommon: boolean;
   edges: Edge[];
   // In the future, this needs to use a common interface with NodeDataProps and not Node
@@ -81,7 +81,7 @@ export interface ServiceStoreState {
   setDescription: (description: string) => void;
   setSlot: (slot: string) => void;
   setExamples: (examples: string[]) => void;
-  setKeywords: (keywords: string[]) => void;
+  setEntities: (entities: string[]) => void;
   setStepPreferences: (stepPreferences: string[]) => void;
   loadEndpointsResponseVariables: () => void;
   setSecrets: (newSecrets: PreDefinedEndpointEnvVariables) => void;
@@ -146,7 +146,7 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
   name: '',
   slot: '',
   examples: [],
-  keywords: [],
+  entities: [],
   serviceId: uuid(),
   description: '',
   edges: initialEdges,
@@ -341,7 +341,7 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
   setDescription: (description: string) => set({ description }),
   setSlot: (slot: string) => set({ slot }),
   setExamples: (examples: string[]) => set({ examples: examples }),
-  setKeywords: (keywords: string[]) => set({ keywords: keywords }),
+  setEntities: (entities: string[]) => set({ entities: entities }),
   setStepPreferences: (stepPreferences: string[]) => set({ stepPreferences }),
   isCommon: false,
   setIsCommon: (isCommon: boolean) => set({ isCommon }),

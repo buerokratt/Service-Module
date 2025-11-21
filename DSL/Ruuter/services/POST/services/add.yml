@@ -7,6 +7,10 @@ declaration:
   returns: json
   namespace: service
   allowlist:
+    header:
+      - field: cookie
+        type: string
+        description: "Cookie field"
     body:
       - field: content
         type: string
@@ -14,9 +18,9 @@ declaration:
       - field: description
         type: string
         description: "Body field 'description'"
-      - field: keywords
+      - field: entities
         type: object
-        description: "Body field 'Keywords'"
+        description: "Body field 'Entities'"
       - field: examples
         type: object
         description: "Body field 'Examples'"
@@ -52,7 +56,8 @@ extract_request_data:
   assign:
     name: ${incoming.body.name}
     description: ${incoming.body.description}
-    keywords: ${incoming.body.keywords}
+    slot: ${""}
+    entities: ${incoming.body.entities}
     examples: ${incoming.body.examples}
     type: ${incoming.body.type.toUpperCase()}
     content: ${incoming.body.content}
@@ -91,7 +96,7 @@ service_add:
       name: ${name}
       description: ${description}
       slot: ${""}
-      keywords: ${keywords}
+      entities: ${entities}
       examples: ${examples}
       ruuter_type: ${type}
       service_id: ${serviceId}
@@ -122,7 +127,32 @@ check_for_type:
   switch:
     - condition: ${type === 'GET'}
       next: add_get_dsl
-  next: add_post_dsl
+  next: generateServiceJson
+
+generateServiceJson:
+  call: http.post
+  args:
+    url: "[#SERVICE_DMAPPER_HBS]/service_declaration"
+    headers:
+      type: 'json'
+    body:
+      name: ${name}
+      description: ${description}
+      examples: ${examples}
+  result: serviceJson
+
+checkV4:
+  log: ${serviceJson.response.body}
+
+createJsonService:
+  call: http.post
+  args:
+    url: "[#SERVICE_DMAPPER]/file-manager/create"
+    body:
+      file_path: "[#RUUTER_SERVICES_POST_PATH]/draft/${name}_.json"
+      content: ${JSON.stringify(serviceJson.response.body)}
+  result: savedJson
+  next: add_get_dsl
 
 add_get_dsl:
   call: http.post
