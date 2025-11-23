@@ -29,7 +29,6 @@ type FlowBuilderProps = {
 };
 
 const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
-  useLayout();
   const { getNodes, getEdges, setNodes, setEdges, getNode } = useReactFlow();
   const setReactFlowInstance = useNewServiceStore((state) => state.setReactFlowInstance);
   const [colorMode, setColorMode] = useState<ColorMode>('light');
@@ -56,7 +55,7 @@ const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
   const autoView = useServiceStore((state) => state.autoView);
   const toggleAutoView = useServiceStore((state) => state.toggleAutoView);
 
-  const { runLayout } = useLayout();
+  const { runLayout } = useLayout(orientation);
 
   const onConnect = useCallback(
     ({ source, target }: any) => {
@@ -191,7 +190,6 @@ const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
         <Chat />
         <MiniMap style={zIndexStyle} />
         <Background color="#D2D3D8" gap={16} lineWidth={9} />
-        <Controls orientation="horizontal" showInteractive={false} style={zIndexStyle} />
         {isLassoActive && <Lasso />}
         <Panel position="top-left" style={zIndexStyle}>
           <Track gap={10} direction="vertical" align="left">
@@ -200,21 +198,22 @@ const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
             <UndoRedoControls />
           </Track>
         </Panel>
-        <Controls orientation="horizontal" showInteractive={false} />
-        <Panel position="top-right" style={{ zIndex: 20, paddingRight: '90px' }}>
-          <LassoSelectionControls isLassoActive={isLassoActive} onToggleLasso={handleToggleLasso} />
-          <ThemeToggle onChange={onChange} />
-          <Tooltip content={t('serviceFlow.orientationTooltip')}>
-            <Button onClick={toggleOrientation} size="s" style={{ backgroundColor: '#005aa3', height: '36px' }}>
-              <img
-                src={orientation === 'horizontal' ? HorizontalFlow : VerticalFlow}
-                width={32}
-                className="logo"
-                loading="eager"
-                alt="orientation toggle"
-              />
-            </Button>
-          </Tooltip>
+        <Panel position="top-right" style={{ zIndex: 20, marginRight: '30px' }}>
+          <Track gap={10} direction="vertical" align="right">
+            <LassoSelectionControls isLassoActive={isLassoActive} onToggleLasso={handleToggleLasso} />
+            <ThemeToggle onChange={onChange} />
+            <Tooltip content={t('serviceFlow.orientationTooltip')}>
+              <Button onClick={toggleOrientation} size="s" style={{ backgroundColor: '#005aa3', height: '36px' }}>
+                <img
+                  src={orientation === 'horizontal' ? HorizontalFlow : VerticalFlow}
+                  width={32}
+                  className="logo"
+                  loading="eager"
+                  alt="orientation toggle"
+                />
+              </Button>
+            </Tooltip>
+          </Track>
         </Panel>
         <Panel position="bottom-left">
           <Track gap={10} direction="horizontal" align="center" style={{ paddingLeft: '110px', paddingBottom: '7px' }}>
