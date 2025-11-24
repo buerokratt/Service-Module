@@ -1,11 +1,11 @@
-import { CSSProperties, DragEvent, forwardRef, ReactNode } from 'react';
+import { CSSProperties, DragEvent, forwardRef, HTMLAttributes, ReactNode } from 'react';
 import useServiceStore from 'store/new-services.store';
 import { Assign, StepType } from 'types';
 import { ASSIGN_DRAG_TYPE } from 'utils/component-util';
 
 import Box from '../Box';
 
-type OutputElementBoxProps = {
+type OutputElementBoxProps = Omit<HTMLAttributes<HTMLDivElement>, 'color'> & {
   readonly children: ReactNode;
   readonly borderColor?: string;
   readonly dragData?: Assign;
@@ -16,7 +16,7 @@ type OutputElementBoxProps = {
 };
 
 const OutputElementBox = forwardRef<HTMLDivElement, OutputElementBoxProps>(
-  ({ borderColor, dragData, onClick, style, className, children, isAssignElement = false }, ref) => {
+  ({ borderColor, dragData, onClick, style, className, children, isAssignElement = false, ...rest }, ref) => {
     const node = useServiceStore((state) => state.selectedNode);
     const mergedStyle: CSSProperties = {
       borderRadius: 46,
@@ -54,6 +54,7 @@ const OutputElementBox = forwardRef<HTMLDivElement, OutputElementBoxProps>(
         draggable={!!dragData}
         onDragStart={handleDragStart}
         style={mergedStyle}
+        {...rest}
       >
         {children}
       </Box>
