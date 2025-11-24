@@ -465,6 +465,8 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
         isCommon: serviceResponse.data.isCommon,
         description: serviceResponse.data.description,
         slot: serviceResponse.data.slot,
+        examples: serviceResponse.data.examples,
+        entities: serviceResponse.data.entities,
         edges,
         nodes,
         endpoints,

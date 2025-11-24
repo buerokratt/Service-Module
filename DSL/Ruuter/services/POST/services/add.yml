@@ -95,7 +95,7 @@ service_add:
     body:
       name: ${name}
       description: ${description}
-      slot: ${""}
+      slot: ${slot}
       entities: ${entities}
       examples: ${examples}
       ruuter_type: ${type}
@@ -127,7 +127,7 @@ check_for_type:
   switch:
     - condition: ${type === 'GET'}
       next: add_get_dsl
-  next: generateServiceJson
+  next: add_post_dsl
 
 generateServiceJson:
   call: http.post
@@ -139,20 +139,18 @@ generateServiceJson:
       name: ${name}
       description: ${description}
       examples: ${examples}
+      entities: ${entities}
   result: serviceJson
-
-checkV4:
-  log: ${serviceJson.response.body}
 
 createJsonService:
   call: http.post
   args:
     url: "[#SERVICE_DMAPPER]/file-manager/create"
     body:
-      file_path: "[#RUUTER_SERVICES_POST_PATH]/draft/${name}_.json"
+      file_path: "[#RUUTER_SERVICES_JSON_PATH]/${name}_.json"
       content: ${JSON.stringify(serviceJson.response.body)}
   result: savedJson
-  next: add_get_dsl
+  next: check_result
 
 add_get_dsl:
   call: http.post
@@ -162,7 +160,7 @@ add_get_dsl:
       file_path: "[#RUUTER_SERVICES_GET_PATH]/draft/${name}.tmp"
       content: ${ymlResult.response.body.yaml}
   result: results
-  next: check_result
+  next: generateServiceJson
 
 add_post_dsl:
   call: http.post
@@ -172,7 +170,7 @@ add_post_dsl:
       file_path: "[#RUUTER_SERVICES_POST_PATH]/draft/${name}.tmp"
       content: ${ymlResult.response.body.yaml}
   result: results
-  next: check_result
+  next: generateServiceJson
 
 check_result:
   switch:
