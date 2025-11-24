@@ -41,7 +41,7 @@ const EndpointOpenAPI: React.FC<EndpointOpenAPIProps> = ({
   const { triggerJsonRequest } = useServiceStore();
   const { t } = useTranslation();
 
-  useEffect(() => setKey(key + 1), [isLive, key]);
+  useEffect(() => setKey(key + 1), [isLive]);
 
   const handleJsonRequestClick = () => {
     if (selectedEndpoint) {
