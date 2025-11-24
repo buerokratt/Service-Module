@@ -27,7 +27,6 @@ const DateTimeBuilderContent: FC<{ border: string; popupBodyCss: CSSProperties }
         paddingRight: popupBodyCss.paddingRight ?? paddingValue,
       }}
     >
-      <label>{t('serviceFlow.previousVariables.dateAndTime.title')}</label>
       <DateTimePreview />
       <Track direction="horizontal" align="stretch" gap={16} style={{ width: '100%' }}>
         <DateSettings />
