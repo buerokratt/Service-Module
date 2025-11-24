@@ -53,7 +53,6 @@ const FlowElementsPopup: React.FC = () => {
   const rules = useServiceStore((state) => state.rules);
   const assignElements = useServiceStore((state) => state.assignElements);
   const endpointsVariables = useServiceStore((state) => state.endpointsResponseVariables);
-  const [hasAssignElementsInitialized, setHasAssignElementsInitialized] = useState(false);
   const stepType = node?.data.stepType;
 
   const defaultMultiChoiceQuestionButtons = useMemo(
@@ -93,16 +92,6 @@ const FlowElementsPopup: React.FC = () => {
         : { ...getInitialGroup(), children: rules };
     }
   }, [node, rules]);
-
-  useEffect(() => {
-    setHasAssignElementsInitialized(false);
-  }, [node?.id]);
-
-  useEffect(() => {
-    if (!node || stepType !== StepType.Assign) return;
-    if (!hasAssignElementsInitialized) return;
-    node.data.assignElements = assignElements;
-  }, [assignElements, node, stepType, hasAssignElementsInitialized]);
 
   // StepType.Textfield
   const [textfieldMessage, setTextfieldMessage] = useState<string | null>(null);
@@ -149,7 +138,6 @@ const FlowElementsPopup: React.FC = () => {
         } else {
           useServiceStore.getState().changeAssignNode([]);
         }
-        setHasAssignElementsInitialized(true);
         break;
 
       case StepType.MultiChoiceQuestion:

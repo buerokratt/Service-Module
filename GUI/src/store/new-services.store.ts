@@ -146,6 +146,31 @@ export interface ServiceStoreState {
   canRedo: () => boolean;
 }
 
+const deepCloneValue = (value: unknown): unknown => {
+  if (Array.isArray(value)) {
+    return value.map(deepCloneValue);
+  }
+
+  if (value && typeof value === 'object') {
+    return Object.entries(value as Record<string, unknown>).reduce<Record<string, unknown>>((acc, [key, val]) => {
+      acc[key] = deepCloneValue(val);
+      return acc;
+    }, {});
+  }
+
+  return value;
+};
+
+const cloneAssignElement = (element: Assign): Assign => {
+  const clonedSlots = element.slots ? (element.slots as Assign[]).map(cloneAssignElement) : undefined;
+
+  return {
+    ...element,
+    slots: clonedSlots as Assign['slots'],
+    data: deepCloneValue(element.data),
+  };
+};
+
 const useServiceStore = create<ServiceStoreState>((set, get) => ({
   endpoints: [],
   name: '',
@@ -168,73 +193,8 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
   historyIndex: 0,
   setIsYesNoQuestion: (value: boolean) => set({ isYesNoQuestion: value }),
   changeAssignNode: (assignElements) => {
-    // In the future, NodeDataProps and not any (or Node) should be used here as well
-    const { nodes } = get();
-    const elementsMap = new Map(
-      (
-        nodes
-          .filter((node) => node.data.stepType === StepType.Assign)
-          .flatMap((node) => node.data?.assignElements ?? []) as Assign[]
-      ).map((element) => [element.id, element]),
-    );
-
-    assignElements.forEach((updated) => {
-      const existing = elementsMap.get(updated.id);
-      if (existing) {
-        Object.assign(existing, updated);
-      }
-    });
-
-    const hasChangedSlot = (slot: any, elementsMap: Map<any, any>): boolean => {
-      const ref = elementsMap.get(slot.id);
-      if (!ref) return false;
-
-      const valueChanged = slot.value !== ref.value;
-      const slotsChanged = JSON.stringify(slot.slots) !== JSON.stringify(ref.slots);
-      const changed = valueChanged || slotsChanged;
-
-      if (changed) {
-        Object.assign(slot, { ...ref, id: slot.id, key: slot.key });
-      }
-
-      if (slot.slots) {
-        checkSlots(slot.slots as any[], elementsMap);
-      }
-
-      return changed;
-    };
-
-    const checkSlots = (slots: any[], elementsMap: Map<any, any>): boolean => {
-      return slots.some((slot) => hasChangedSlot(slot, elementsMap));
-    };
-
-    const processElement = (element: any, elementsMap: Map<any, any>): boolean => {
-      const slotsChanged = element.slots && checkSlots(element.slots as any[], elementsMap);
-
-      if (element.slots?.length) {
-        element.value = element.slots[0].value;
-      }
-
-      return slotsChanged;
-    };
-
-    const hasChangedElements = (node: any, elementsMap: Map<any, any>): boolean => {
-      return node.data.assignElements?.some((element: any) => processElement(element, elementsMap)) ?? false;
-    };
-
-    const getAssignNodes = (nodes: any[]): any[] => {
-      return nodes.filter((node) => node.data.stepType === StepType.Assign);
-    };
-
-    const updateRefs = (): boolean => {
-      const assignNodes = getAssignNodes(nodes);
-      return assignNodes.some((node) => hasChangedElements(node, elementsMap));
-    };
-
-    while (updateRefs()) {
-      /* logic to do while refs are being updated */
-    }
-    set({ assignElements });
+    const clonedElements = assignElements.map(cloneAssignElement);
+    set({ assignElements: clonedElements });
   },
   changeRulesNode: (rules) => set({ rules }),
   disableTestButton: () =>
