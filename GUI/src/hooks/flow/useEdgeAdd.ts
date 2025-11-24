@@ -1,7 +1,7 @@
 import { Edge, Node, useReactFlow } from '@xyflow/react';
 import useServiceStore from 'store/new-services.store';
 import { Step, StepType } from 'types';
-import { getNodeLabel } from 'utils/flow-utils';
+import { generateUniqueId, getNodeLabel } from 'utils/flow-utils';
 
 function useEdgeAdd(id: string) {
   const { setEdges, setNodes, getNodes, getNode, getEdge } = useReactFlow();
@@ -16,7 +16,7 @@ function useEdgeAdd(id: string) {
     const nodeLabel = getNodeLabel(step, getNodes());
     const stepType: StepType = step.type;
 
-    const newNodeId = crypto.randomUUID();
+    const newNodeId = generateUniqueId();
 
     const insertNode = {
       id: newNodeId,
@@ -76,7 +76,7 @@ function useEdgeAdd(id: string) {
     if (stepType === StepType.MultiChoiceQuestion || stepType === StepType.Condition || stepType === StepType.Input) {
       const labels = stepType === StepType.MultiChoiceQuestion ? ['Jah', 'Ei'] : ['Success', 'Failure'];
       ghostNodes = labels.slice(1).map((_) => ({
-        id: crypto.randomUUID(),
+        id: generateUniqueId(),
         type: 'ghost',
         position: {
           x: targetNode.position.x,
@@ -121,6 +121,10 @@ function useEdgeAdd(id: string) {
 
       return newNodes;
     });
+
+    setTimeout(() => {
+      useServiceStore.getState().saveToHistory();
+    }, 0);
   };
   return handleEdgeClick;
 }

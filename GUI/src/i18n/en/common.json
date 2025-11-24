@@ -61,7 +61,12 @@
     "edit": "Edit",
     "import": "Import",
     "export": "Export",
-    "proceed": "Proceed"
+    "proceed": "Proceed",
+    "copy": "Copy",
+    "paste": "Paste",
+    "cut": "Cut",
+    "undo": "Undo",
+    "redo": "Redo"
   },
   "menu": {
     "overview": "Overview",
@@ -430,6 +435,7 @@
     "serviceInfo": "Service info",
     "parseError": "Service generation failed! Either not JSON, the file has been modified or is corrupt",
     "orientationTooltip": "Toggle flow orientation",
+    "autoFocus": "Auto-View: ON/OFF",
     "apiElements": {
       "title": "API elements",
       "delete": "Delete",
@@ -464,7 +470,16 @@
       "setup": "Setup",
       "test": "Test"
     },
-    "rule": "Rule"
+    "rule": "Rule",
+    "noNodesSelected": "No nodes selected",
+    "nothingToPaste": "Nothing to paste",
+    "nodesCopied": "{{count}} node{{s}} copied",
+    "nodesPasted": "{{count}} node{{s}} pasted",
+    "nodesCut": "{{count}} node{{s}} cut",
+    "copyNodes": "Copy selected nodes",
+    "pasteNodes": "Paste nodes",
+    "cutNodes": "Cut selected nodes",
+    "lasso": "Lasso"
   },
   "logs": {
     "service": "Service",

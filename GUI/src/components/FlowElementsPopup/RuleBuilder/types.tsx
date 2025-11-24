@@ -1,3 +1,4 @@
+import { Assign } from 'types';
 import { v4 as uuidv4 } from 'uuid';
 
 export interface RuleGroupBuilderProps {
@@ -12,6 +13,10 @@ export interface Rule {
   field: string;
   operator: string;
   value: string;
+  fieldDragElement?: Assign;
+  valueDragElement?: Assign;
+  isFieldManual?: boolean;
+  isValueManual?: boolean;
 }
 
 export type GroupType = 'and' | 'or';
@@ -33,6 +38,10 @@ export const getInitialRule = () => {
     field: '',
     operator: '',
     value: '',
+    fieldDragElement: undefined,
+    valueDragElement: undefined,
+    isFieldManual: false,
+    isValueManual: false,
   };
 };
 

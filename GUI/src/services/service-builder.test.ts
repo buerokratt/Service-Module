@@ -253,19 +253,19 @@ describe('Validation Functions', () => {
       expect(() => validateCondition(nodeData as NodeDataProps)).not.toThrow();
     });
 
-    it('should throw error when rules children are undefined', () => {
+    it('should return error when rules children are undefined', () => {
       const nodeData = { rules: { children: undefined } };
-      expect(() => validateCondition(nodeData as unknown as NodeDataProps)).toThrow('toast.missing-condition-rules');
+      expect(validateCondition(nodeData as unknown as NodeDataProps)).toBe('toast.missing-condition-rules');
     });
 
-    it('should throw error when rules children are empty', () => {
+    it('should return error when rules children are empty', () => {
       const nodeData = { rules: { children: [] } };
-      expect(() => validateCondition(nodeData as unknown as NodeDataProps)).toThrow('toast.missing-condition-rules');
+      expect(validateCondition(nodeData as unknown as NodeDataProps)).toBe('toast.missing-condition-rules');
     });
 
-    it('should throw error when rules are undefined', () => {
+    it('should return error when rules are undefined', () => {
       const nodeData = { rules: undefined };
-      expect(() => validateCondition(nodeData as unknown as NodeDataProps)).toThrow('toast.missing-condition-rules');
+      expect(validateCondition(nodeData as unknown as NodeDataProps)).toBe('toast.missing-condition-rules');
     });
   });
 });

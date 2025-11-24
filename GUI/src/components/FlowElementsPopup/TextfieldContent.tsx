@@ -1,6 +1,8 @@
+import { Node } from '@xyflow/react';
 import { t } from 'i18next';
 import { CSSProperties, FC, useRef, useState } from 'react';
 import ReactQuill from 'react-quill';
+import { NodeDataProps } from 'types/service-flow';
 import { removeNestedTemplates } from 'utils/string-util';
 
 import { FormRichText, Track } from '..';
@@ -8,11 +10,11 @@ import PreviousVariables from './PreviousVariables';
 
 type TextfieldContentProps = {
   readonly defaultMessage?: string;
-  readonly nodeId: string;
+  readonly node: Node<NodeDataProps>;
   readonly onChange?: (message: string | null, placeholders: { [key: string]: string }) => void;
 };
 
-const TextfieldContent: FC<TextfieldContentProps> = ({ defaultMessage, onChange, nodeId }) => {
+const TextfieldContent: FC<TextfieldContentProps> = ({ defaultMessage, onChange, node }) => {
   const [editorValue, setEditorValue] = useState<string | null>(defaultMessage || null);
   const quillRef = useRef<ReactQuill>(null);
 
@@ -54,7 +56,7 @@ const TextfieldContent: FC<TextfieldContentProps> = ({ defaultMessage, onChange,
         </label>
         <FormRichText quill={quillRef} onChange={handleEditorChange} defaultValue={editorValue ?? ''} />
       </Track>
-      <PreviousVariables nodeId={nodeId} />
+      <PreviousVariables node={node} />
     </>
   );
 };

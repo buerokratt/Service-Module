@@ -1,6 +1,7 @@
 import { Edge, getConnectedEdges, getIncomers, getOutgoers, Node, useReactFlow } from '@xyflow/react';
 import { useCallback, useState } from 'react';
 import { StepType } from 'types';
+import { generateUniqueId } from 'utils/flow-utils';
 
 const getRemainingEdges = (allEdges: Edge[], edgesToRemove: Edge[]): Edge[] =>
   allEdges.filter((edge) => !edgesToRemove.includes(edge));
@@ -27,8 +28,7 @@ const processDeletedNodes = (
   edges: Edge[],
   deletedNodes: Node[],
   nodes: Node[],
-  setNodes: (nodes: Node[]) => void,
-): Edge[] => {
+): { updatedNodes: Node[]; updatedEdges: Edge[] } => {
   let updatedNodes = [...nodes];
   let updatedEdges = [...edges];
 
@@ -50,7 +50,7 @@ const processDeletedNodes = (
 
       incomers.forEach((incomer) => {
         const ghostNode: Node = {
-          id: crypto.randomUUID(),
+          id: generateUniqueId(),
           type: 'ghost',
           position: {
             x: node.position.x,
@@ -79,7 +79,7 @@ const processDeletedNodes = (
     } else {
       if (outgoers.length === 0 || outgoers.length > 1) {
         const ghostNode: Node = {
-          id: crypto.randomUUID(),
+          id: generateUniqueId(),
           type: 'ghost',
           position: { x: node.position.x, y: node.position.y },
           data: { type: 'ghost' },
@@ -105,8 +105,7 @@ const processDeletedNodes = (
       getOutgoers(node, updatedNodes, updatedEdges).length > 0,
   );
 
-  setNodes(updatedNodes);
-  return updatedEdges;
+  return { updatedNodes, updatedEdges };
 };
 
 function getDirectlyConnectedNodes(nodeId: string, nodes: Node[], edges: Edge[], withGhost: boolean = true): Node[] {
@@ -157,14 +156,18 @@ export const useOnNodesDelete = () => {
     const descendantNodes = nodes.filter((node) => uniqueDescendantIds.includes(node.id));
     const nodesToDelete = [nodeToDelete, ...descendantNodes];
 
-    setEdges(processDeletedNodes(getEdges(), nodesToDelete, getNodes(), setNodes));
+    const { updatedNodes, updatedEdges } = processDeletedNodes(getEdges(), nodesToDelete, getNodes());
+    setNodes(updatedNodes);
+    setEdges(updatedEdges);
     setIsDeleteConnectionsModalVisible(false);
     setNodeToDelete(null);
   }, [nodeToDelete, getNodes, getEdges, setEdges, setNodes]);
 
   const onKeepItConfirmed = useCallback(() => {
     if (!nodeToDelete) return;
-    setEdges(processDeletedNodes(getEdges(), [nodeToDelete], getNodes(), setNodes));
+    const { updatedNodes, updatedEdges } = processDeletedNodes(getEdges(), [nodeToDelete], getNodes());
+    setNodes(updatedNodes);
+    setEdges(updatedEdges);
     setIsDeleteConnectionsModalVisible(false);
     setNodeToDelete(null);
   }, [nodeToDelete, getNodes, getEdges, setEdges, setNodes]);
@@ -192,7 +195,18 @@ export const useOnNodesDelete = () => {
           console.error(error);
         }
 
-        setEdges(deleted.reduce((acc: Edge[], node: Node) => processDeletedNodes(acc, [node], nodes, setNodes), edges));
+        const { updatedNodes, updatedEdges } = deleted.reduce(
+          (acc: { updatedNodes: Node[]; updatedEdges: Edge[] }, node: Node) => {
+            const result = processDeletedNodes(acc.updatedEdges, [node], acc.updatedNodes);
+            return {
+              updatedNodes: result.updatedNodes,
+              updatedEdges: result.updatedEdges,
+            };
+          },
+          { updatedNodes: nodes, updatedEdges: edges },
+        );
+        setNodes(updatedNodes);
+        setEdges(updatedEdges);
       },
       [getNodes, getEdges, setEdges, setNodes, hasConnectedNodes],
     ),
@@ -201,7 +215,7 @@ export const useOnNodesDelete = () => {
         const parentNode = getNode(deleted[0].source);
         if (parentNode) {
           const ghostNode: Node = {
-            id: crypto.randomUUID(),
+            id: generateUniqueId(),
             type: 'ghost',
             position: { x: parentNode.position.x + 50, y: parentNode.position.y + 50 },
             data: { type: 'ghost' },

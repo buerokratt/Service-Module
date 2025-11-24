@@ -11,7 +11,14 @@ import { StepType } from 'types';
 import { Assign } from 'types/assign';
 import { EndpointData } from 'types/endpoint';
 import { NodeDataProps } from 'types/service-flow';
-import { getLastDigits, removeTrailingUnderscores, stringToArray, toSnakeCase } from 'utils/string-util';
+import {
+  getLastDigits,
+  isNumericString,
+  removeTrailingUnderscores,
+  removeWrapperQuotes,
+  stringToArray,
+  toSnakeCase,
+} from 'utils/string-util';
 
 import api from '../services/api-dev';
 
@@ -102,9 +109,9 @@ const buildConditionString = (group: any): string => {
         return `(${buildConditionString(child)})`;
       } else {
         const rule = child;
-        return `${rule.field.replaceAll('${', '').replaceAll('}', '')} ${rule.operator} ${rule.value
-          .replaceAll('${', '')
-          .replaceAll('}', '')}`;
+        const absoluteValue = removeWrapperQuotes(rule.value.replaceAll('${', '').replaceAll('}', ''));
+        const value = isNumericString(absoluteValue) ? absoluteValue : `"${absoluteValue}"`;
+        return `${rule.field.replaceAll('${', '').replaceAll('}', '')} ${rule.operator} ${value}`;
       }
     });
 
@@ -115,9 +122,9 @@ const buildConditionString = (group: any): string => {
     }
   } else {
     const rule = group as Rule;
-    return `${rule.field.replaceAll('${', '').replaceAll('}', '')} ${rule.operator} ${rule.value
-      .replaceAll('${', '')
-      .replaceAll('}', '')}`;
+    const absoluteValue = removeWrapperQuotes(rule.value.replaceAll('${', '').replaceAll('}', ''));
+    const value = isNumericString(absoluteValue) ? absoluteValue : `"${absoluteValue}"`;
+    return `${rule.field.replaceAll('${', '').replaceAll('}', '')} ${rule.operator} ${value}`;
   }
 };
 
@@ -250,6 +257,20 @@ async function saveService(
     .catch(onError);
 }
 
+const validateMCQ = (node: NodeDataProps | undefined) => {
+  if (!node?.multiChoiceQuestion?.question || node.multiChoiceQuestion.question === '')
+    return i18next.t('toast.missing-mcq-question');
+  if (!node?.multiChoiceQuestion?.buttons || node.multiChoiceQuestion.buttons.length === 0)
+    return i18next.t('toast.missing-mcq-options');
+  return null;
+};
+
+export const validateCondition = (node: NodeDataProps | undefined) => {
+  const invalidRulesExist = hasInvalidRules(node?.rules?.children ?? []);
+  const isInvalid = node?.rules?.children === undefined || invalidRulesExist || node?.rules?.children.length === 0;
+  return isInvalid ? (i18next.t('toast.missing-condition-rules') ?? 'Error') : null;
+};
+
 function getYamlContent(
   nodes: Node<NodeDataProps>[],
   edges: Edge[],
@@ -280,13 +301,13 @@ function getYamlContent(
           error = validateAssign(followingNode);
           break;
         case StepType.MultiChoiceQuestion:
-          error = validateMultiChoiceQuestion(followingNode);
+          error = validateMCQ(followingNode);
           break;
         case StepType.DynamicChoices:
           error = validateDynamicChoices(followingNode);
           break;
         case StepType.Condition:
-          validateCondition(followingNode);
+          error = validateCondition(followingNode);
           break;
         case StepType.Input:
           if (followingNode?.type === 'placeholder' && !allRelations.includes(node.id)) {
@@ -360,9 +381,9 @@ function getYamlContent(
       const [parentNodeId, childNodeId] = r.split(',');
       const parentNode = nodes.findLast((node) => node.id === parentNodeId) as Node<NodeDataProps> | undefined;
       if (
-        !parentNode ||
+        !parentNode?.type ||
         parentNode.type !== 'custom' ||
-        [StepType.Rule, StepType.RuleDefinition].includes(parentNode.data.stepType)
+        [StepType.Rule, StepType.RuleDefinition].includes(parentNode.data?.stepType)
       ) {
         return;
       }
@@ -489,15 +510,6 @@ export const validateDynamicChoices = (nodeData: NodeDataProps): string | null =
     return i18next.t('toast.missing-dynamic-choices-key');
   }
   return null;
-};
-
-export const validateCondition = (nodeData: NodeDataProps): void => {
-  const invalidRulesExist = hasInvalidRules(nodeData?.rules?.children ?? []);
-  const isInvalid =
-    nodeData?.rules?.children === undefined || invalidRulesExist || nodeData?.rules?.children.length === 0;
-  if (isInvalid) {
-    throw new Error(i18next.t('toast.missing-condition-rules') ?? 'Error');
-  }
 };
 
 function getBranchNodes(
@@ -629,6 +641,8 @@ function handleEndpointStep(
   const endpointDefinition = parentNode.data.endpoint?.definitions[0];
   const paramsVariables = endpointDefinition?.params?.variables;
   const bodyVariables = endpointDefinition?.body?.variables;
+  const isRawBodySelected = endpointDefinition?.body?.isRowSelected ?? false;
+  const rawBody = endpointDefinition?.body?.rawData ?? {};
   const headersVariables = endpointDefinition?.headers?.variables;
   const methodType = endpointDefinition?.methodType?.toLowerCase();
   const hasNonEqualOperator = paramsVariables?.some((param: any) => param.operator && param.operator !== '=');
@@ -649,7 +663,14 @@ function handleEndpointStep(
     }, {});
   }
 
-  if (Array.isArray(bodyVariables) && bodyVariables.length > 0) {
+  if (isRawBodySelected) {
+    try {
+      const rawJson = JSON.parse(rawBody?.value ?? '');
+      stepConfig.args.body = rawJson;
+    } catch (e: any) {
+      console.log(`Unable to save JSON to Yaml. ${e.message}`);
+    }
+  } else if (Array.isArray(bodyVariables) && bodyVariables.length > 0) {
     stepConfig.args.body = bodyVariables.reduce((acc: any, e: any) => {
       acc[e.name] = e.value;
       return acc;

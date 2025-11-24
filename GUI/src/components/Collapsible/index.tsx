@@ -37,15 +37,9 @@ const Collapsible: FC<PropsWithChildren<CollapsibleProps>> = ({
         }
       }}
     >
-      <RadixCollapsible.Trigger style={{ cursor: 'pointer' }} asChild className="collapsible__trigger">
+      <RadixCollapsible.Trigger asChild className="collapsible__trigger">
         <Track justify="between">
-          <button
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '4px',
-            }}
-          >
+          <button className="collapsible__button">
             <Icon icon={open ? <MdOutlineIndeterminateCheckBox /> : <MdOutlineAddBox />} size="medium" />
             <h3 className="h6">{title}</h3>
           </button>

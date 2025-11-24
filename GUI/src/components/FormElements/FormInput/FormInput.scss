@@ -2,6 +2,7 @@
 @import 'src/styles/tools/color';
 @import 'src/styles/settings/variables/other';
 @import 'src/styles/settings/variables/typography';
+@import 'src/styles/settings/variables/_colors';
 
 .input {
   $self: &;
@@ -99,4 +100,20 @@
 .input-error::placeholder {
   color: red !important;
   font-style: italic !important;
+}
+
+[data-theme='dark'] .input {
+  &__label {
+    color: var(--dark-text-primary);
+  }
+
+  input {
+    background-color: var(--dark-bg-highlight);
+    color: var(--dark-text-primary);
+
+    &:focus {
+      outline: none;
+      border: 2px solid get-color(sapphire-blue-9);
+    }
+  }
 }

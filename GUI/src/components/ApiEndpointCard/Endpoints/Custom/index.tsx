@@ -7,6 +7,7 @@ import { v4 as uuid } from 'uuid';
 import { Button, FormInput, FormSelect, RequestVariables, Track } from '../../..';
 import { RequestTab } from '../../../../types';
 import { EndpointData, EndpointVariableData, PreDefinedEndpointEnvVariables } from '../../../../types/endpoint';
+import { useTheme } from '../../../../utils/useTheme';
 
 type EndpointCustomProps = {
   endpoint: EndpointData;
@@ -42,14 +43,17 @@ const EndpointCustom: React.FC<EndpointCustomProps> = ({
       body: {
         variables: [],
         rawData: {},
+        isRowSelected: false,
       },
       headers: {
         variables: [],
         rawData: {},
+        isRowSelected: false,
       },
       params: {
         variables: [],
         rawData: {},
+        isRowSelected: false,
       },
     });
   }
@@ -58,6 +62,7 @@ const EndpointCustom: React.FC<EndpointCustomProps> = ({
   // Likely impossible to fix without a significant refactor
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => setKey(key + 1), [isLive]);
+  const theme = useTheme();
 
   const handleJsonRequestClick = () => {
     triggerJsonRequest(endpoint);
@@ -71,7 +76,9 @@ const EndpointCustom: React.FC<EndpointCustomProps> = ({
   return (
     <Track direction="vertical" align="stretch" gap={16}>
       <div>
-        <label htmlFor="endpointUrl">{t('newService.endpoint.url')}</label>
+        <label htmlFor="endpointUrl" style={{ color: `${theme === 'dark' ? 'white' : 'black'}` }}>
+          {t('newService.endpoint.url')}
+        </label>
         <Track gap={8}>
           <Track style={{ width: '100%' }}>
             <div style={{ width: 108 }}>
@@ -114,6 +121,7 @@ const EndpointCustom: React.FC<EndpointCustomProps> = ({
                 endpoint.definitions[0].params = {
                   variables: parameters,
                   rawData: {},
+                  isRowSelected: false,
                 };
                 refereshEndpoint();
               }}

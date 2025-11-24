@@ -1,6 +1,7 @@
 import { Edge, Node } from '@xyflow/react';
 import { Group } from 'components/FlowElementsPopup/RuleBuilder/types';
 import { Dispatch, SetStateAction } from 'react';
+import { generateUniqueId } from 'utils/flow-utils';
 
 import { Assign } from './assign';
 import { DynamicChoices } from './dynamic-choices';
@@ -10,8 +11,8 @@ import { StepType } from './step-type.enum';
 
 export const GRID_UNIT = 16;
 export const EDGE_LENGTH = 5 * GRID_UNIT;
-const startNodeId = crypto.randomUUID();
-const ghostNodeId = crypto.randomUUID();
+const startNodeId = generateUniqueId();
+const ghostNodeId = generateUniqueId();
 
 export type NodeDataProps = {
   label: string;

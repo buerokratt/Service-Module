@@ -51,6 +51,7 @@ export interface ServiceStoreState {
   edges: Edge[];
   // In the future, this needs to use a common interface with NodeDataProps and not Node
   nodes: Node[];
+  flowSelectedNodes: Node[];
   isNewService: boolean;
   serviceState?: ServiceState;
   assignElements: Assign[];
@@ -67,6 +68,7 @@ export interface ServiceStoreState {
   // In the future, this needs to use a common interface with NodeDataProps and not Node
   setNodes: (nodes: Node[] | ((prev: Node[]) => Node[])) => void;
   setEdges: (edges: Edge[] | ((prev: Edge[]) => Edge[])) => void;
+  setFlowSelectedNodes: (nodes: Node[]) => void;
   vaildServiceInfo: () => boolean;
   setIsCommon: (isCommon: boolean) => void;
   secrets: PreDefinedEndpointEnvVariables;
@@ -139,6 +141,13 @@ export interface ServiceStoreState {
   cancelNavigation: () => void;
   handleNavigationAttempt: (to: string) => boolean;
   handleProgrammaticNavigation: (to: string) => boolean;
+  history: { nodes: Node[]; edges: Edge[] }[];
+  historyIndex: number;
+  saveToHistory: () => void;
+  undo: () => void;
+  redo: () => void;
+  canUndo: () => boolean;
+  canRedo: () => boolean;
 }
 
 const useServiceStore = create<ServiceStoreState>((set, get) => ({
@@ -151,6 +160,7 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
   description: '',
   edges: initialEdges,
   nodes: initialNodes,
+  flowSelectedNodes: [],
   isNewService: true,
   serviceState: undefined,
   isTestButtonVisible: false,
@@ -160,6 +170,8 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
   isYesNoQuestion: false,
   stepPreferences: [],
   endpointsResponseVariables: [],
+  history: [{ nodes: initialNodes, edges: initialEdges }],
+  historyIndex: 0,
   setIsYesNoQuestion: (value: boolean) => set({ isYesNoQuestion: value }),
   changeAssignNode: (assignElements) => {
     // In the future, NodeDataProps and not any (or Node) should be used here as well
@@ -266,6 +278,7 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
       set({ edges });
     }
   },
+  setFlowSelectedNodes: (nodes: Node[]) => set({ flowSelectedNodes: nodes }),
   secrets: { prod: [], test: [] },
   availableVariables: { prod: [], test: [] },
   loadEndpointsResponseVariables: async () => {
@@ -416,6 +429,8 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
       isTestButtonVisible: false,
       selectedNode: null,
       serviceState: undefined,
+      history: [{ nodes: initialNodes, edges: initialEdges }],
+      historyIndex: 0,
     });
     useTestServiceStore.getState().reset();
   },
@@ -459,6 +474,11 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
         return node;
       });
 
+      const initialHistoryState = {
+        nodes: JSON.parse(JSON.stringify(nodes)),
+        edges: JSON.parse(JSON.stringify(edges)),
+      };
+
       set({
         serviceId: id,
         name: serviceResponse.data.name,
@@ -472,6 +492,13 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
         endpoints,
         isNewService: false,
         serviceState: serviceResponse.data.state,
+        history: [initialHistoryState],
+        historyIndex: 0,
+      });
+    } else {
+      set({
+        history: [{ nodes: initialNodes, edges: initialEdges }],
+        historyIndex: 0,
       });
     }
 
@@ -703,8 +730,7 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
   onEdgesChange: (changes: EdgeChange[]) => {
     get().setEdges((eds) => applyEdgeChanges(changes, eds));
   },
-
-  onNodeAdded: () => {
+  onNodeAdded: (_: Node) => {
     const cleanupGhostNodes = async () => {
       const instance = get().reactFlowInstance;
       if (!instance) return;
@@ -765,6 +791,8 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
         };
       }),
     );
+
+    get().saveToHistory();
   },
   testUrl: async (endpoint, onError, onSuccess) => {
     try {
@@ -830,6 +858,60 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
         });
       });
   },
+  saveToHistory: () => {
+    const { nodes, edges, history, historyIndex } = get();
+
+    const currentState = {
+      nodes: JSON.parse(JSON.stringify(nodes)),
+      edges: JSON.parse(JSON.stringify(edges)),
+    };
+
+    const lastState = history[historyIndex];
+
+    const statesAreEqual =
+      lastState &&
+      JSON.stringify(lastState.nodes) === JSON.stringify(currentState.nodes) &&
+      JSON.stringify(lastState.edges) === JSON.stringify(currentState.edges);
+
+    if (statesAreEqual) {
+      return;
+    }
+
+    history.push(currentState);
+
+    set({
+      history,
+      historyIndex: historyIndex + 1,
+      hasUnsavedChanges: true,
+    });
+  },
+  undo: () => {
+    const { history, historyIndex } = get();
+    if (historyIndex > 0) {
+      const previousState = history[historyIndex - 1];
+      set({
+        nodes: JSON.parse(JSON.stringify(previousState.nodes)),
+        edges: JSON.parse(JSON.stringify(previousState.edges)),
+        historyIndex: historyIndex - 1,
+        hasUnsavedChanges: true,
+      });
+    }
+  },
+
+  redo: () => {
+    const { history, historyIndex } = get();
+    if (historyIndex < history.length - 1) {
+      const nextState = history[historyIndex + 1];
+      set({
+        nodes: JSON.parse(JSON.stringify(nextState.nodes)),
+        edges: JSON.parse(JSON.stringify(nextState.edges)),
+        historyIndex: historyIndex + 1,
+        hasUnsavedChanges: true,
+      });
+    }
+  },
+  canUndo: () => get().historyIndex > 0,
+  canRedo: () => get().historyIndex < get().history.length - 1,
 }));
 
 function extractMapValues(element: any) {

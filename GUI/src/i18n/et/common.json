@@ -61,7 +61,12 @@
     "edit": "Muuda",
     "import": "Impordi",
     "export": "Ekspordi",
-    "proceed": "Jätka"
+    "proceed": "Jätka",
+    "copy": "Kopeeri",
+    "paste": "Kleebi",
+    "cut": "Lõika",
+    "undo": "Võta tagasi",
+    "redo": "Taasta"
   },
   "menu": {
     "overview": "Ülevaade",
@@ -430,6 +435,7 @@
     "serviceInfo": "Teenuse teave",
     "parseError": "Teenuse genereerimine ebaõnnestus! Fail ei ole kas JSON, seda on muudetud või see on vigane",
     "orientationTooltip": "Vahetage voolu suunda",
+    "autoFocus": "Automaatvaade: SEES/VÄLJAS",
     "apiElements": {
       "title": "API elemendid",
       "delete": "Kustuta",
@@ -465,7 +471,16 @@
       "setup": "Seadistamine",
       "test": "Testimine"
     },
-    "rule": "Reegel"
+    "rule": "Reegel",
+    "noNodesSelected": "Ühtegi sõlme pole valitud",
+    "nothingToPaste": "Pole midagi kleepida",
+    "nodesCopied": "{{count}} sõlme kopeeritud",
+    "nodesPasted": "{{count}} sõlme kleepitud",
+    "nodesCut": "{{count}} sõlme lõigatud",
+    "copyNodes": "Kopeeri valitud sõlmed",
+    "pasteNodes": "Kleebi sõlmed",
+    "cutNodes": "Lõika valitud sõlmed",
+    "lasso": "Lohistus"
   },
   "logs": {
     "service": "Teenus",
