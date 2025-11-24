@@ -1,6 +1,5 @@
 import Track from 'components/Track';
 import { CSSProperties, FC } from 'react';
-import { useTranslation } from 'react-i18next';
 
 import DateSettings from './DateSettings';
 import { DateTimeBuilderProvider } from './DateTimeBuilderProvider';
@@ -13,7 +12,6 @@ interface DateTimeBuilderProps {
 }
 
 const DateTimeBuilderContent: FC<{ border: string; popupBodyCss: CSSProperties }> = ({ border, popupBodyCss }) => {
-  const { t } = useTranslation();
   const paddingValue = typeof popupBodyCss.padding === 'number' ? popupBodyCss.padding : 16;
 
   return (

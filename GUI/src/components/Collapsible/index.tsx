@@ -1,8 +1,8 @@
 import * as RadixCollapsible from '@radix-ui/react-collapsible';
 import { CSSProperties, FC, PropsWithChildren, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { MdAdd, MdOutlineAddBox, MdOutlineIndeterminateCheckBox } from 'react-icons/md';
 import { CgChevronDown, CgChevronUp } from 'react-icons/cg';
+import { MdAdd, MdOutlineAddBox, MdOutlineIndeterminateCheckBox } from 'react-icons/md';
 
 import { Icon, Track } from '../';
 

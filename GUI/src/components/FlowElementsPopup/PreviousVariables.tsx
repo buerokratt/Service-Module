@@ -1,4 +1,5 @@
 import { Edge, Node } from '@xyflow/react';
+import Collapsible from 'components/Collapsible';
 import OutputElementBox from 'components/OutputElementBox';
 import { CSSProperties, FC, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -18,8 +19,8 @@ import { Assign } from '../../types/assign';
 import { useTheme } from '../../utils/useTheme';
 import Tooltip from '../Tooltip';
 import Track from '../Track';
+
 import '../../styles/settings/variables/_colors.scss';
-import Collapsible from 'components/Collapsible';
 
 type PreviousVariablesProps = {
   readonly node: Node<NodeDataProps>;
