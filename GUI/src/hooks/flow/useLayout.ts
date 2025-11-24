@@ -92,8 +92,7 @@ function layoutNodes(nodes: Node[], edges: Edge[], orientation: 'horizontal' | '
     }
 
     return resultNodes;
-  } catch (error) {
-    console.error('Error in hierarchy layout:', error);
+  } catch {
     return nodes;
   }
 }

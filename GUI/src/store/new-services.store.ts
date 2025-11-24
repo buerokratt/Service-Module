@@ -777,6 +777,7 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
             endpoint: updatedNode.data.endpoint,
             label: updatedNode.data.label,
             testingPassed: updatedNode.data.testingPassed,
+            assignElements: updatedNode.data.assignElements ?? prevNode.data.assignElements,
           },
         };
       }),
