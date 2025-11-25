@@ -1,6 +1,7 @@
 @import 'src/styles/tools/spacing';
 @import 'src/styles/tools/color';
 @import 'src/styles/settings/variables/other';
+@import 'src/styles/settings/variables/_colors';
 @import 'src/styles/settings/variables/typography';
 
 .card {
@@ -70,4 +71,9 @@
     bottom: 0;
     background-color: get-color(white);
   }
+}
+
+[data-theme='dark'] .card {
+  color: var(--dark-text-secondary);
+  background-color: var(--dark-bg-secondary);
 }

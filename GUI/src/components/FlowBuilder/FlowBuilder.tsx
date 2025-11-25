@@ -13,6 +13,7 @@ import { useOnNodesDelete } from 'hooks/flow/useOnNodeDelete';
 import { ChangeEventHandler, FC, useCallback, useEffect, useState } from 'react';
 import '@xyflow/react/dist/style.css';
 import { useTranslation } from 'react-i18next';
+import { MdCenterFocusStrong, MdOutlineCenterFocusStrong } from 'react-icons/md';
 import useNewServiceStore from 'store/new-services.store';
 import useServiceStore from 'store/services.store';
 import { StepType } from 'types';
@@ -23,14 +24,13 @@ import { useThemeSyncWithFlow } from '../../hooks/useThemeSyncWithFlow';
 import HorizontalFlow from '../../static/icons/horizontal_flow.svg';
 import VerticalFlow from '../../static/icons/vertical_flow.svg';
 
-import { MdCenterFocusStrong, MdOutlineCenterFocusStrong } from 'react-icons/md';
-
 type FlowBuilderProps = {
   nodes: Node[];
   edges: Edge[];
 };
 
 const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
+  useLayout();
   const { getNodes, getEdges, setNodes, setEdges, getNode } = useReactFlow();
   const setReactFlowInstance = useNewServiceStore((state) => state.setReactFlowInstance);
   const [colorMode, setColorMode] = useState<ColorMode>('light');
@@ -57,7 +57,7 @@ const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
   const autoView = useServiceStore((state) => state.autoView);
   const toggleAutoView = useServiceStore((state) => state.toggleAutoView);
 
-  const { runLayout } = useLayout(orientation);
+  const { runLayout } = useLayout();
 
   const onConnect = useCallback(
     ({ source, target }: any) => {

@@ -15,6 +15,8 @@ export interface Service {
   readonly isCommon: boolean;
   readonly description?: string;
   readonly slot: string;
+  readonly examples: string[];
+  readonly entities: string[];
   readonly structure?: { value: string };
   readonly endpoints: Array<
     Pick<EndpointData, 'endpointId' | 'name' | 'type' | 'fileName' | 'isCommon'> & {
