@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next';
 import { LuMinus, LuPlus } from 'react-icons/lu';
 
 import { FormInput, Icon } from '../index';
-
 import './DynamicList.scss';
 import { InfoTooltip } from '../InfoTooltip';
 

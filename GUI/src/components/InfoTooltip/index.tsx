@@ -1,8 +1,8 @@
-import React from 'react';
 import { Tooltip } from 'components';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
-
 import { AiOutlineInfoCircle } from 'react-icons/ai';
+
 import Icon from '../Icon';
 
 interface TooltipProps {
