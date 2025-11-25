@@ -45,3 +45,8 @@
     color: var(--dark-text-primary);
   }
 }
+
+[data-theme="dark"] .naming {
+  background-color: var(--dark-bg-extra-light);
+  color: var(--dark-text-label)
+}
