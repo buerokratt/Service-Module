@@ -190,7 +190,7 @@ const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
         defaultEdgeOptions={{ type: 'step', deletable: false }}
       >
         <Chat />
-        <MiniMap style={{ left: '0', position: 'absolute', right: 'unset', marginBottom: '3px' }} />
+        <MiniMap className={'minimap'} />
         <Background color="#D2D3D8" gap={16} lineWidth={9} />
         {isLassoActive && <Lasso />}
         <Panel position="top-left" style={zIndexStyle}>
@@ -218,13 +218,14 @@ const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
           </Track>
         </Panel>
         <Panel position="bottom-left">
-          <Track gap={10} direction="horizontal" align="center" style={{ paddingLeft: '110px', paddingBottom: '7px' }}>
+          <Track gap={10} direction="horizontal" align="center" style={{}}>
             <Controls
               orientation="horizontal"
               showInteractive={false}
-              style={{ marginBottom: '148px', marginLeft: '0' }}
+              style={{ marginLeft: '0' }}
+              className={'zoom-controls'}
             />
-            <div style={{ left: '90px', position: 'absolute', marginBottom: '307px' }}>
+            <div className={'center-controls'}>
               <Tooltip content={t('serviceFlow.autoFocus')}>
                 <span>
                   <Switch

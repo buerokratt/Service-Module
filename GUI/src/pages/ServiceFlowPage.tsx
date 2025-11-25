@@ -90,7 +90,7 @@ const ServiceFlowPage: FC = () => {
           <FlowElementsPopup />
           <div style={{ position: 'relative', width: '100%', height: '100%' }}>
             <ReactFlowProvider>
-              <div style={{ width: '100%', height: '100%' }}>
+              <div style={{ width: '100%', height: '99%' }}>
                 <FlowBuilder nodes={nodes} edges={edges} />
               </div>
             </ReactFlowProvider>
