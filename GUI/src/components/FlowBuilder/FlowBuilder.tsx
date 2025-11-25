@@ -13,15 +13,17 @@ import { useOnNodesDelete } from 'hooks/flow/useOnNodeDelete';
 import { ChangeEventHandler, FC, useCallback, useEffect, useState } from 'react';
 import '@xyflow/react/dist/style.css';
 import { useTranslation } from 'react-i18next';
-import { MdCenterFocusStrong, MdOutlineCenterFocusStrong } from 'react-icons/md';
 import useNewServiceStore from 'store/new-services.store';
 import useServiceStore from 'store/services.store';
 import { StepType } from 'types';
 import '../Flow/LassoSelection/Lasso.css';
+import './FlowBuilder.scss';
 
 import { useThemeSyncWithFlow } from '../../hooks/useThemeSyncWithFlow';
 import HorizontalFlow from '../../static/icons/horizontal_flow.svg';
 import VerticalFlow from '../../static/icons/vertical_flow.svg';
+
+import { MdCenterFocusStrong, MdOutlineCenterFocusStrong } from 'react-icons/md';
 
 type FlowBuilderProps = {
   nodes: Node[];
@@ -188,7 +190,7 @@ const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
         defaultEdgeOptions={{ type: 'step', deletable: false }}
       >
         <Chat />
-        <MiniMap style={zIndexStyle} />
+        <MiniMap style={{ left: '0', position: 'absolute', right: 'unset', marginBottom: '3px' }} />
         <Background color="#D2D3D8" gap={16} lineWidth={9} />
         {isLassoActive && <Lasso />}
         <Panel position="top-left" style={zIndexStyle}>
@@ -217,17 +219,23 @@ const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
         </Panel>
         <Panel position="bottom-left">
           <Track gap={10} direction="horizontal" align="center" style={{ paddingLeft: '110px', paddingBottom: '7px' }}>
-            <Controls orientation="horizontal" showInteractive={false} style={{ marginBottom: '12px' }} />
-            <Tooltip content={t('serviceFlow.autoFocus')}>
-              <span>
-                <Switch
-                  checked={autoView}
-                  onCheckedChange={toggleAutoView}
-                  onLabel={<Icon icon={<MdCenterFocusStrong fontSize={30} />} size="medium" />}
-                  offLabel={<Icon icon={<MdOutlineCenterFocusStrong fontSize={30} />} size="medium" />}
-                />
-              </span>
-            </Tooltip>
+            <Controls
+              orientation="horizontal"
+              showInteractive={false}
+              style={{ marginBottom: '148px', marginLeft: '0' }}
+            />
+            <div style={{ left: '90px', position: 'absolute', marginBottom: '307px' }}>
+              <Tooltip content={t('serviceFlow.autoFocus')}>
+                <span>
+                  <Switch
+                    checked={autoView}
+                    onCheckedChange={toggleAutoView}
+                    onLabel={<Icon icon={<MdCenterFocusStrong fontSize={30} />} size="medium" />}
+                    offLabel={<Icon icon={<MdOutlineCenterFocusStrong fontSize={30} />} size="medium" />}
+                  />
+                </span>
+              </Tooltip>
+            </div>
           </Track>
         </Panel>
       </ReactFlow>
