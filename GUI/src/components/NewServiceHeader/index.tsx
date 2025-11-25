@@ -6,6 +6,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import '@buerokratt-ria/header/src/Header.scss';
 import { deleteService } from 'resources/api-constants';
 import { ROUTES } from 'resources/routes-constants';
+import useServiceStore from 'store/new-services.store';
 import useToastStore from 'store/toasts.store';
 import { ServiceState } from 'types';
 import { removeTrailingUnderscores } from 'utils/string-util';
@@ -16,7 +17,7 @@ import useServiceListStore from '../../store/services.store';
 import Dialog from '../Dialog';
 import Icon from '../Icon';
 import SettingsModal from '../ServiceConfigurationForm';
-import useServiceStore from 'store/new-services.store';
+
 import './NewServiceHeader.scss';
 
 type NewServiceHeaderProps = {
