@@ -92,8 +92,7 @@ function layoutNodes(nodes: Node[], edges: Edge[], orientation: 'horizontal' | '
     }
 
     return resultNodes;
-  } catch (error) {
-    console.error('Error in hierarchy layout:', error);
+  } catch {
     return nodes;
   }
 }
@@ -101,7 +100,7 @@ function layoutNodes(nodes: Node[], edges: Edge[], orientation: 'horizontal' | '
 const nodeCountSelector = (state: ReactFlowState) => state.nodeLookup.size;
 const edgeCountSelector = (state: ReactFlowState) => state.edgeLookup.size;
 
-function useLayout(orientation: 'horizontal' | 'vertical' = 'horizontal') {
+function useLayout(orientation: 'horizontal' | 'vertical' = 'vertical') {
   const initial = useRef(true);
 
   const nodeCount = useStore(nodeCountSelector);

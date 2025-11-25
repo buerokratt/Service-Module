@@ -1,4 +1,5 @@
 import { Edge, Node } from '@xyflow/react';
+import Collapsible from 'components/Collapsible';
 import OutputElementBox from 'components/OutputElementBox';
 import { CSSProperties, FC, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -18,6 +19,7 @@ import { Assign } from '../../types/assign';
 import { useTheme } from '../../utils/useTheme';
 import Tooltip from '../Tooltip';
 import Track from '../Track';
+
 import '../../styles/settings/variables/_colors.scss';
 
 type PreviousVariablesProps = {
@@ -148,7 +150,16 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ node }) => {
             popupBodyCss={popupBodyCss}
             border={border}
           />
-          <DateTimeBuilder border={border} popupBodyCss={popupBodyCss} />
+          <Collapsible
+            title={t('serviceFlow.previousVariables.dateAndTime.title')}
+            appearance="normal"
+            defaultOpen={false}
+            contentStyle={{ padding: '0px' }}
+            headerDivider={false}
+            style={{ borderRadius: '0px', borderBottom: '1px solid #d2d3d8', borderTop: '0px' }}
+          >
+            <DateTimeBuilder border={border} popupBodyCss={popupBodyCss} />
+          </Collapsible>
           <VariableSection
             title={t('serviceFlow.previousVariables.helpers.title')}
             variables={[...helperVariablesWithTooltips]}

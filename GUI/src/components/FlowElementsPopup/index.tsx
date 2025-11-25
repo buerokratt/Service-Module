@@ -53,6 +53,7 @@ const FlowElementsPopup: React.FC = () => {
   const rules = useServiceStore((state) => state.rules);
   const assignElements = useServiceStore((state) => state.assignElements);
   const endpointsVariables = useServiceStore((state) => state.endpointsResponseVariables);
+  const stepType = node?.data.stepType;
 
   const defaultMultiChoiceQuestionButtons = useMemo(
     () => [
@@ -92,10 +93,6 @@ const FlowElementsPopup: React.FC = () => {
     }
   }, [node, rules]);
 
-  useEffect(() => {
-    if (node) node.data.assignElements = assignElements;
-  }, [assignElements, node]);
-
   // StepType.Textfield
   const [textfieldMessage, setTextfieldMessage] = useState<string | null>(null);
   const [textfieldMessagePlaceholders, setTextfieldMessagePlaceholders] = useState<{ [key: string]: string }>({});
@@ -122,8 +119,6 @@ const FlowElementsPopup: React.FC = () => {
   const [title, setTitle] = useState(node?.data.label ?? '');
   const [titleError, setTitleError] = useState<string | undefined>(undefined);
 
-  const stepType = node?.data.stepType;
-
   useEffect(() => {
     if (!node) return;
 
@@ -140,6 +135,8 @@ const FlowElementsPopup: React.FC = () => {
       case StepType.Assign:
         if (node.data?.assignElements) {
           useServiceStore.getState().changeAssignNode(node.data.assignElements);
+        } else {
+          useServiceStore.getState().changeAssignNode([]);
         }
         break;
 

@@ -89,7 +89,7 @@ const RuleElement: React.FC<RuleElementProps> = ({ rule, onRemove, onChange }) =
           />
         )}
         <Tooltip content={t('serviceFlow.popup.assignManualEdit')} onButtonClick={toggleFieldMode}>
-          <div className="small-assign-button assign-blue">
+          <div className={`small-assign-button assign-${rule.isFieldManual ? 'red' : 'blue'}`}>
             <Icon icon={<MdEdit />} />
           </div>
         </Tooltip>
@@ -116,7 +116,7 @@ const RuleElement: React.FC<RuleElementProps> = ({ rule, onRemove, onChange }) =
           />
         )}
         <Tooltip content={t('serviceFlow.popup.assignManualEdit')} onButtonClick={toggleValueMode}>
-          <div className="small-assign-button assign-blue">
+          <div className={`small-assign-button assign-${rule.isValueManual ? 'red' : 'blue'}`}>
             <Icon icon={<MdEdit />} />
           </div>
         </Tooltip>
