@@ -15,7 +15,7 @@ type InputProps = InputHTMLAttributes<HTMLInputElement> & {
 };
 
 const FieldInput = forwardRef<HTMLInputElement, InputProps>(
-  ({ label, name, disabled, hideLabel, colorInput,showExclamation,highlightPlaceholder , ...rest }, ref) => {
+  ({ label, name, disabled, hideLabel, colorInput, showExclamation, highlightPlaceholder, ...rest }, ref) => {
     const id = useId();
 
     const inputClasses = clsx('input', disabled && 'input--disabled');
@@ -29,7 +29,7 @@ const FieldInput = forwardRef<HTMLInputElement, InputProps>(
         )}
         <div className="input__wrapper">
           <input
-            className={`${inputClasses} ${highlightPlaceholder ? "input-error" : ""}`}
+            className={`${inputClasses} ${highlightPlaceholder ? 'input-error' : ''}`}
             name={name}
             id={id}
             ref={ref}
@@ -37,7 +37,7 @@ const FieldInput = forwardRef<HTMLInputElement, InputProps>(
             pattern={colorInput ? '^#([a-fA-F0-9]{3}){1,2}$' : undefined}
             {...rest}
           />
-          {showExclamation && (<span className="input-icon">!</span>)}
+          {showExclamation && <span className="input-icon">!</span>}
           {colorInput && <Icon icon={<MdOutlinePalette fontSize={20} color="rgba(0,0,0,0.54)" />} />}
         </div>
       </div>
@@ -48,4 +48,3 @@ const FieldInput = forwardRef<HTMLInputElement, InputProps>(
 FieldInput.displayName = 'fieldInput';
 
 export default FieldInput;
-

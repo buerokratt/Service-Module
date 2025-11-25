@@ -1,5 +1,5 @@
 import * as RadixSwitch from '@radix-ui/react-switch';
-import React, {forwardRef, ReactNode, useId} from 'react';
+import React, { forwardRef, ReactNode, useId } from 'react';
 import { ControllerRenderProps } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
