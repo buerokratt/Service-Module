@@ -1,5 +1,7 @@
 import { t } from 'i18next';
 import React, { FC, useState } from 'react';
+import { FaGear } from 'react-icons/fa6';
+import { TiArrowLeft } from 'react-icons/ti';
 import { useNavigate, useParams } from 'react-router-dom';
 import '@buerokratt-ria/header/src/Header.scss';
 import { deleteService } from 'resources/api-constants';
@@ -7,15 +9,13 @@ import { ROUTES } from 'resources/routes-constants';
 import useToastStore from 'store/toasts.store';
 import { ServiceState } from 'types';
 import { removeTrailingUnderscores } from 'utils/string-util';
-import { Button, Modal, Track } from '..';
 
+import { Button, Modal, Track } from '..';
 import api from '../../services/api-dev';
 import useServiceListStore from '../../store/services.store';
-import SettingsModal from '../ServiceConfigurationForm';
 import Dialog from '../Dialog';
 import Icon from '../Icon';
-import { FaGear } from 'react-icons/fa6';
-import { TiArrowLeft } from 'react-icons/ti';
+import SettingsModal from '../ServiceConfigurationForm';
 import useServiceStore from 'store/new-services.store';
 import './NewServiceHeader.scss';
 
