@@ -71,7 +71,7 @@ const ServiceFlowPage: FC = () => {
               navigate(ROUTES.replaceWithId(ROUTES.EDITSERVICE_ROUTE, serviceId));
             }
           } else {
-            useServiceStore.getState().loadService(id);
+            await useServiceStore.getState().loadService(id);
           }
         }}
       />

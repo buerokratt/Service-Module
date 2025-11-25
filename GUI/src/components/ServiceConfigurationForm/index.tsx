@@ -10,7 +10,7 @@ type SettingsModalProps = {
   id?: string;
 };
 
-const SettingsModal: FC<SettingsModalProps> = ({ id }: SettingsModalProps) => {
+const SettingsModal: FC<SettingsModalProps> = () => {
   const { t } = useTranslation();
 
   const name = useServiceStore((state) => state.serviceNameDashed());

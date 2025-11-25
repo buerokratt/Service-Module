@@ -34,7 +34,7 @@ const showEmptyNameError = () => {
   });
 };
 
-const NewServiceHeader: FC<NewServiceHeaderProps> = ({ activeStep, backOnClick, continueOnClick, saveOnClick }) => {
+const NewServiceHeader: FC<NewServiceHeaderProps> = ({ backOnClick, continueOnClick, saveOnClick }) => {
   const name = removeTrailingUnderscores(useServiceStore((state) => state.serviceNameDashed()));
   const serviceState = useServiceStore((state) => state.serviceState);
   const selectedService = useServiceListStore((state) => state.selectedService);
