@@ -13,6 +13,15 @@ const LassoSelectionControls: FC<LassoSelectionControlsProps> = ({ isLassoActive
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      const target = e.target as HTMLElement;
+      const isEditable =
+        target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement || target.isContentEditable;
+      const isDialogOpen =
+        target.closest('[role="dialog"], [role="alertdialog"]') ||
+        document.querySelector('[role="dialog"]:not([aria-hidden="true"])');
+
+      if (isEditable || isDialogOpen) return;
+
       if (e.key === 'l' || e.key === 'L') {
         e.preventDefault();
         onToggleLasso();
