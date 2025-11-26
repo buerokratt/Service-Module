@@ -15,9 +15,7 @@ const Chat = (): React.JSX.Element => {
 
   if (!state) return <></>;
 
-  return !opened ? (
-    <Profile />
-  ) : (
+  return opened ? (
     <div className={styles.chatWrapper}>
       <motion.div className={styles.chat} animate={{ y: 0 }} style={{ y: 400 }}>
         <ChatHeader />
@@ -25,6 +23,8 @@ const Chat = (): React.JSX.Element => {
         <ChatInput />
       </motion.div>
     </div>
+  ) : (
+    <Profile />
   );
 };
 

@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import api from 'services/api';
 import { v4 as uuid } from 'uuid';
 
 import { Button, FormInput, FormSelect, RequestVariables, Track } from '../../..';
 import { getOpenApiSpec } from '../../../../resources/api-constants';
-import api from '../../../../services/api-dev';
+import useServiceStore from '../../../../store/new-services.store';
 import { Option, RequestTab } from '../../../../types';
 import { ApiSpecProperty } from '../../../../types/api-spec-property';
 import {
@@ -13,7 +14,6 @@ import {
   EndpointVariableData,
   PreDefinedEndpointEnvVariables,
 } from '../../../../types/endpoint';
-import { RequestVariablesRowData } from '../../../../types/request-variables';
 
 type EndpointOpenAPIProps = {
   endpoint: EndpointData;
@@ -25,6 +25,8 @@ type EndpointOpenAPIProps = {
 
 const EndpointOpenAPI: React.FC<EndpointOpenAPIProps> = ({
   endpoint,
+  // This needs to be removed in the future
+  // This is always true as we have removed the Test tab
   isLive,
   requestValues,
   requestTab,
@@ -36,9 +38,17 @@ const EndpointOpenAPI: React.FC<EndpointOpenAPIProps> = ({
   );
   const [openApiEndpoints, setOpenApiEndpoints] = useState<EndpointDefinition[]>(endpoint.definitions ?? []);
   const [key, setKey] = useState<number>(0);
+  const { triggerJsonRequest } = useServiceStore();
   const { t } = useTranslation();
 
-  useEffect(() => setKey(key + 1), [isLive]);
+  useEffect(() => setKey((prevKey) => prevKey + 1), [isLive]);
+
+  const handleJsonRequestClick = () => {
+    if (selectedEndpoint) {
+      const endpointData = { ...endpoint, definitions: [selectedEndpoint] };
+      triggerJsonRequest(endpointData);
+    }
+  };
 
   const getEndpointSchema = (
     apiSpec: ApiSpecProperty,
@@ -115,6 +125,10 @@ const EndpointOpenAPI: React.FC<EndpointOpenAPIProps> = ({
       result.push(variableData);
     });
     if (!schema.required) return result;
+    // The types are ambiguous here
+    // Required can a record of strings (here) or a boolean (in getParams)
+    // This might be a bug, impossible to resolve without refactoring this old component
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     Object.values(schema?.required).forEach((name) => {
       result.forEach((variable) => {
         if (variable.name !== name) return;
@@ -149,13 +163,13 @@ const EndpointOpenAPI: React.FC<EndpointOpenAPIProps> = ({
   };
 
   const fetchOpenApiSpecMock = async () => {
-    const result = await api.post(getOpenApiSpec(), { url: openApiUrl });
+    const result = await api.post<{ response: ApiSpecProperty }>(getOpenApiSpec(), { url: openApiUrl });
     const apiSpec = result.data.response;
-    const url = new URL(openApiUrl).origin + apiSpec.basePath;
+    const url = new URL(openApiUrl).origin + (apiSpec.basePath ?? '');
     const paths: EndpointDefinition[] = [];
 
     Object.entries(apiSpec.paths).forEach(([path, endpointData]) => {
-      Object.entries(endpointData as ApiSpecProperty).forEach(([method, data]: [string, ApiSpecProperty]) => {
+      Object.entries(endpointData).forEach(([method, data]) => {
         const endpointUrl = url + path;
         const label = `${method.toUpperCase()} ${path}`;
         if (!['get', 'post'].includes(method.toLowerCase())) {
@@ -194,18 +208,21 @@ const EndpointOpenAPI: React.FC<EndpointOpenAPIProps> = ({
             ? {
                 variables: body,
                 rawData: {},
+                isRowSelected: false,
               }
             : undefined,
           headers: headers
             ? {
                 variables: headers,
                 rawData: {},
+                isRowSelected: false,
               }
             : undefined,
           params: params
             ? {
                 variables: params,
                 rawData: {},
+                isRowSelected: false,
               }
             : undefined,
           response,
@@ -216,19 +233,6 @@ const EndpointOpenAPI: React.FC<EndpointOpenAPIProps> = ({
     endpoint.definitions = paths;
     endpoint.definitions[0].openApiUrl = openApiUrl;
     setKey(key + 1);
-  };
-
-  const checkNestedVariables = (variable: EndpointVariableData, data: RequestVariablesRowData[]) => {
-    const variableData = variable.type === 'schema' ? variable.schemaData : variable.arrayData;
-    if (variableData instanceof Array) {
-      variableData.forEach((variableData) => {
-        const updatedVariable = data.find((updated) => updated.endpointVariableId === variableData.id);
-        variableData[isLive ? 'value' : 'testValue'] = updatedVariable?.value;
-        if (['schema', 'array'].includes(variableData.type)) {
-          checkNestedVariables(variableData, data);
-        }
-      });
-    }
   };
 
   const onSelectEndpoint = (selection: Option | null) => {
@@ -254,7 +258,7 @@ const EndpointOpenAPI: React.FC<EndpointOpenAPIProps> = ({
           />
           <Button
             onClick={() => {
-              fetchOpenApiSpecMock();
+              void fetchOpenApiSpecMock();
             }}
           >
             {t('newService.endpoint.ask')}
@@ -279,7 +283,10 @@ const EndpointOpenAPI: React.FC<EndpointOpenAPIProps> = ({
       {selectedEndpoint &&
         (selectedEndpoint?.supported ? (
           <>
-            <p>{selectedEndpoint?.description}</p>
+            <Track justify="between" gap={16}>
+              <p>{selectedEndpoint?.description}</p>
+              <Button onClick={handleJsonRequestClick}>{t('newService.test')}</Button>
+            </Track>
             <RequestVariables
               key={key}
               disableRawData

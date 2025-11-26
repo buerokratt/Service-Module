@@ -2,6 +2,7 @@
 @import 'src/styles/tools/color';
 @import 'src/styles/settings/variables/other';
 @import 'src/styles/settings/variables/typography';
+@import 'src/styles/settings/variables/_colors';
 
 .graph {
   flex: 1;
@@ -52,10 +53,26 @@
     line-height: $veera-line-height-500;
     max-width: 350px;
     width: 100%;
+    min-height: 65px;
+    align-content: center;
 
     &.selected {
+      border: dashed 1px get-color(black-coral-1);
+
+      &.end {
+        border: 1px solid get-color(jasper-15);
+      }
       &.step {
-        border: 1px solid get-color(sapphire-blue-2);
+        border: 1px solid get-color(sapphire-blue-7);
+      }
+      &.rule {
+        border: 1px solid get-color(black-coral-8);
+      }
+      &.finishing-step {
+        border: 1px solid get-color(jasper-8);
+      }
+      &.dynamic-choices {
+        border: 1px solid get-color(purple-8);
       }
     }
 
@@ -76,6 +93,7 @@
 
     &.start,
     &.end {
+      width: auto;
       display: flex;
       padding: 0.05rem;
       justify-content: center;
@@ -104,32 +122,41 @@
       }
     }
 
+    @mixin node-hover-effect($hover-border-color) {
+      &:hover:not(.selected) {
+        border: 1px solid $hover-border-color;
+        box-shadow: 0 0px 5px rgba(0, 0, 0, 0.08);
+      }
+    }
+
     &.end {
       background-color: get-color(jasper-10);
+      border: 1px solid get-color(jasper-10);
+      @include node-hover-effect(get-color(jasper-11));
     }
 
     &.step {
       background-color: get-color(sapphire-blue-0);
-      border: 1px solid get-color(sapphire-blue-2);
+      border: 1px solid get-color(sapphire-blue-3);
+      @include node-hover-effect(get-color(sapphire-blue-4));
     }
 
     &.rule {
       background-color: get-color(black-coral-1);
       border: 1px solid get-color(black-coral-3);
+      @include node-hover-effect(get-color(black-coral-4));
     }
 
     &.finishing-step {
       background-color: get-color(jasper-1);
       border: 1px solid get-color(jasper-3);
+      @include node-hover-effect(get-color(jasper-4));
     }
 
     &.dynamic-choices {
       background-color: get-color(purple-1);
       border: 1px solid get-color(purple-3);
-    }
-
-    &.selected {
-      border: dashed 1px get-color(black-coral-1);
+      @include node-hover-effect(get-color(purple-4));
     }
   }
 
@@ -160,4 +187,77 @@
 
 .edge-button:hover {
   box-shadow: 1px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+[data-theme='dark'] .react-flow {
+  &__node {
+    color: var(--dark-text-secondary);
+
+    &.selected {
+      &.step {
+        border: 1px solid get-color(sapphire-blue-2);
+      }
+    }
+
+    &.start,
+    &.end {
+      color: get-color(white);
+    }
+
+    &.placeholder {
+      background-color: get-color(extra-light);
+      border: dashed 1px get-color(black-coral-10);
+
+      p {
+        color: get-color(black-coral-6);
+      }
+
+      &:hover {
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      }
+    }
+
+    &.end {
+      background-color: get-color(jasper-12);
+    }
+
+    &.step {
+      background-color: get-color(sapphire-blue-12);
+      border: 1px solid get-color(sapphire-blue-11);
+    }
+
+    &.rule {
+      background-color: get-color(black-coral-12);
+      border: 1px solid get-color(black-coral-11);
+    }
+
+    &.finishing-step {
+      background-color: get-color(jasper-12);
+      border: 1px solid get-color(jasper-11);
+    }
+
+    &.dynamic-choices {
+      background-color: get-color(purple-12);
+      border: 1px solid get-color(purple-11);
+    }
+
+    &.selected {
+      border: dashed 1px get-color(black-coral-10);
+    }
+  }
+
+  &__edge-path {
+    stroke: get-color(black-coral-10);
+    stroke-width: 1.5px;
+  }
+}
+
+[data-theme='dark'] .edge-button {
+  background-color: var(--dark-bg-main);
+  color: var(--dark-text-label);
+  border: var(--dark-text-label) 0.5px solid;
+
+  &:hover {
+    background-color: var(--dark-bg-secondary);
+  }
 }

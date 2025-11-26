@@ -5,16 +5,17 @@ import React from 'react';
 import { BrowserRouter } from 'react-router-dom';
 
 import { ToastProvider } from './components/Toast/ToastProvider';
+import useTabCloseEffect from './hooks/useTabCloseEffects';
 import RootComponent from './RootComponent';
 import useStore from './store/store';
 import { UserInfo } from './types/userInfo';
 
 const App: React.FC = () => {
   useQuery<{
-    data: { custom_jwt_userinfo: UserInfo };
+    data: UserInfo;
   }>({
     queryKey: ['userinfo', 'prod'],
-    onSuccess: (res: any) => {
+    onSuccess: (res) => {
       return useStore.getState().setUserInfo(res.data);
     },
     enabled: import.meta.env.REACT_APP_LOCAL === 'true',
@@ -28,6 +29,8 @@ const App: React.FC = () => {
     },
     enabled: import.meta.env.REACT_APP_LOCAL !== 'true',
   });
+
+  useTabCloseEffect();
 
   return (
     <BrowserRouter basename={import.meta.env.BASE_URL}>
