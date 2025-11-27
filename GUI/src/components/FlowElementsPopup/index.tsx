@@ -191,10 +191,13 @@ const FlowElementsPopup: React.FC = () => {
         fileName: fileName ?? node.data?.fileName,
         fileContent: fileContent ?? node.data?.fileContent,
         signOption: signOption ?? node.data?.signOption,
-        multiChoiceQuestion: node.data.stepType === StepType.MultiChoiceQuestion ? {
-          question: multiChoiceQuestionQuestion,
-          buttons: multiChoiceQuestionButtons,
-        } : undefined,
+        multiChoiceQuestion:
+          node.data.stepType === StepType.MultiChoiceQuestion
+            ? {
+                question: multiChoiceQuestionQuestion,
+                buttons: multiChoiceQuestionButtons,
+              }
+            : undefined,
         dynamicChoices: node.data.stepType === StepType.DynamicChoices ? dynamicChoices : undefined,
         endpoint: nodeEndpoint ?? node.data?.endpoint,
         testingPassed: undefined,
