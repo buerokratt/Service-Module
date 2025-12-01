@@ -1,15 +1,22 @@
-import { t } from "i18next";
-import { FormRichText, OutputElementBox, Track } from "..";
-import { CSSProperties, FC } from "react";
-import useServiceStore from "store/new-services.store";
+import { Node } from '@xyflow/react';
+import { t } from 'i18next';
+import { CSSProperties, FC, useRef, useState } from 'react';
+import ReactQuill from 'react-quill';
+import { NodeDataProps } from 'types/service-flow';
+import { removeNestedTemplates } from 'utils/string-util';
+
+import { FormRichText, Track } from '..';
+import PreviousVariables from './PreviousVariables';
 
 type TextfieldContentProps = {
   readonly defaultMessage?: string;
+  readonly node: Node<NodeDataProps>;
   readonly onChange?: (message: string | null, placeholders: { [key: string]: string }) => void;
 };
 
-const TextfieldContent: FC<TextfieldContentProps> = ({ defaultMessage, onChange }) => {
-  const variables = useServiceStore(state => state.getFlatVariables());
+const TextfieldContent: FC<TextfieldContentProps> = ({ defaultMessage, onChange, node }) => {
+  const [editorValue, setEditorValue] = useState<string | null>(defaultMessage || null);
+  const quillRef = useRef<ReactQuill>(null);
 
   const popupBodyCss: CSSProperties = {
     padding: 16,
@@ -23,31 +30,33 @@ const TextfieldContent: FC<TextfieldContentProps> = ({ defaultMessage, onChange 
     const placeholders: { [key: string]: string } = {};
     let match;
 
-    while ((match = pattern.exec(text))) placeholders[match[0]] = "";
+    while ((match = pattern.exec(text))) placeholders[match[0]] = '';
     return placeholders;
+  };
+
+  const handleEditorChange = (value: string | null) => {
+    if (!onChange) return;
+
+    const formattedValue = removeNestedTemplates(value ?? '');
+    if (value !== formattedValue && quillRef.current) {
+      const editor = quillRef.current.getEditor();
+      editor.setText(formattedValue.replaceAll(/<\/?p>/g, '') || '');
+    }
+
+    const placeholders = findMessagePlaceholders(formattedValue);
+    onChange(formattedValue, placeholders);
+    setEditorValue(formattedValue);
   };
 
   return (
     <>
-      <Track direction="vertical" align="left" style={{ width: "100%", ...popupBodyCss }}>
-        <label htmlFor="message">{t("serviceFlow.popup.messageLabel")}</label>
-        <FormRichText
-          onChange={(value) => {
-            if (!onChange) return;
-            const placeholders = findMessagePlaceholders(value);
-            onChange(value, placeholders);
-          }}
-          defaultValue={defaultMessage}
-        ></FormRichText>
+      <Track direction="vertical" align="left" style={{ width: '100%', ...popupBodyCss }}>
+        <label htmlFor="message" style={{ marginBottom: '10px' }}>
+          {t('serviceFlow.popup.messageLabel')}
+        </label>
+        <FormRichText quill={quillRef} onChange={handleEditorChange} defaultValue={editorValue ?? ''} />
       </Track>
-      <Track direction="vertical" align="left" style={{ width: "100%", ...popupBodyCss, backgroundColor: "#F9F9F9" }}>
-        <label htmlFor="json">{t("serviceFlow.popup.availableOutputElementsLabel")}</label>
-        <Track direction="horizontal" gap={4} justify="start" isMultiline style={{ maxHeight: "30vh", overflow: "auto" }}>
-          {variables.map((element, i) => (
-            <OutputElementBox key={`${element}-${i}`} text={element}></OutputElementBox>
-          ))}
-        </Track>
-      </Track>
+      <PreviousVariables node={node} />
     </>
   );
 };

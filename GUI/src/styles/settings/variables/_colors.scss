@@ -115,6 +115,29 @@ $veera-colors: (
   sapphire-blue-19: #00111e,
   sapphire-blue-20: #00090f,
 
+  // Purple
+  purple-0: #f2e7f9,
+  purple-1: #e5d0f3,
+  purple-2: #d8b9ed,
+  purple-3: #cba2e7,
+  purple-4: #be8be1,
+  purple-5: #b374db,
+  purple-6: #a65dd5,
+  purple-7: #9946cf,
+  purple-8: #8c2fd0,
+  purple-9: #7f18ca,
+  purple-10: #7201c4,
+  purple-11: #6a00b8,
+  purple-12: #6200a9,
+  purple-13: #5a009b,
+  purple-14: #52008d,
+  purple-15: #4a007f,
+  purple-16: #420071,
+  purple-17: #3a0063,
+  purple-18: #320055,
+  purple-19: #2a0047,
+  purple-20: #220039,
+
   // Sea green
   sea-green-0: #ecf4ef,
   sea-green-1: #d9e9df,
@@ -143,6 +166,21 @@ $veera-colors: (
   black: #000000,
   extra-light: #f9f9f9
 );
+
+:root {
+  --dark-bg-main: #1f2937;
+  --dark-bg-secondary: #273549;
+  --dark-bg-light: #374151;
+  --dark-bg-extra-light: #4b5563;
+  --dark-bg-highlight: #6b7280;
+
+  --dark-text-highlight: #f9fafb;
+  --dark-text-primary: #f3f4f6;
+  --dark-text-secondary: #e5e7eb;
+  --dark-text-label: #d1d5db;
+  --dark-text-disabled: #9ca3af;
+  --dark-text-border: #6b7280;
+}
 
 // CSS variables
 :root {

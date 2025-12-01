@@ -1,35 +1,35 @@
 import React, {
-  MdOutlineForum,
+  MdMiscellaneousServices,
   MdOutlineAdb,
   MdOutlineEqualizer,
-  MdSettings,
+  MdOutlineForum,
   MdOutlineMonitorWeight,
-  MdMiscellaneousServices,
-} from "react-icons/md";
+  MdSettings,
+} from 'react-icons/md';
 
 export const menuIcons = [
   {
-    id: "conversations",
+    id: 'conversations',
     icon: <MdOutlineForum />,
   },
   {
-    id: "training",
+    id: 'training',
     icon: <MdOutlineAdb />,
   },
   {
-    id: "analytics",
+    id: 'analytics',
     icon: <MdOutlineEqualizer />,
   },
   {
-    id: "services",
+    id: 'services',
     icon: <MdMiscellaneousServices />,
   },
   {
-    id: "settings",
+    id: 'settings',
     icon: <MdSettings />,
   },
   {
-    id: "monitoring",
+    id: 'monitoring',
     icon: <MdOutlineMonitorWeight />,
   },
 ];

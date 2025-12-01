@@ -1,0 +1,69 @@
+@import 'src/styles/tools/spacing';
+@import 'src/styles/tools/color';
+@import 'src/styles/settings/variables/other';
+@import 'src/styles/settings/variables/typography';
+@import 'src/styles/settings/mixins';
+
+.element {
+  cursor: default !important;
+}
+
+.array {
+  display: flex;
+  // Breaks in Firefox if not explicitly set
+  height: 20px;
+
+  .arrayIndex {
+    height: 5px;
+    margin-left: 4px;
+    padding: 8px 0;
+    text-align: center;
+    width: 50px;
+  }
+
+  .arrayAll {
+    @include veera-checkbox;
+
+    display: flex;
+
+    input[type='checkbox'] {
+      + label {
+        display: inline;
+        padding-left: 25px;
+
+        &::before {
+          background-color: get-color(white);
+          top: 2px;
+        }
+      }
+    }
+  }
+}
+
+.dragInput {
+  background: transparent !important;
+  border: 1px dashed !important;
+  font-style: italic;
+  cursor: default;
+  height: 27px !important;
+}
+
+.dragText {
+  white-space: nowrap;
+  min-width: 40px;
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dragHover {
+  border: 1px solid get-color(sea-green-10) !important;
+}
+
+.dragHoverDisabled {
+  border: 1px solid get-color(jasper-10) !important;
+
+  &::placeholder {
+    color: get-color(jasper-10) !important;
+  }
+}

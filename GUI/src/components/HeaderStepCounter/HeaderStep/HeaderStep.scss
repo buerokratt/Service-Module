@@ -1,4 +1,4 @@
-@import "src/styles/tools/color";
+@import 'src/styles/tools/color';
 
 .header-step {
   background-color: white;
@@ -11,10 +11,15 @@
 }
 
 .active-step {
-  background-color: get-color(black-coral-10);
+  background-color: get-color(sapphire-blue-10);
   border-radius: 4px 0 0 4px;
+}
 
-  &__name {
-    color: white;
-  }
+.in-active-step {
+  background-color: get-color(black-coral-3);
+  border-radius: 4px 0 0 4px;
+}
+
+.step-name {
+  color: white;
 }

@@ -1,13 +1,14 @@
-import { EndpointType } from "./endpoint-type";
+import { EndpointDefinition } from './endpoint-definition';
+import { EndpointType } from './endpoint-type';
 
 export type EndpointData = {
-  id: string;
+  endpointId: string;
   name: string;
-  type?: string;
+  fileName?: string;
+  type?: EndpointType;
   isCommon?: boolean;
-  openApiUrl?: string;
-  testEnvUrl?: string;
+  isNew?: boolean;
   hasTestEnv?: boolean;
   serviceId?: string;
-  definedEndpoints: EndpointType[];
+  definitions: EndpointDefinition[];
 };

@@ -1,7 +1,8 @@
-@import "src/styles/tools/spacing";
-@import "src/styles/tools/color";
-@import "src/styles/settings/variables/other";
-@import "src/styles/settings/variables/typography";
+@import 'src/styles/tools/spacing';
+@import 'src/styles/tools/color';
+@import 'src/styles/settings/variables/other';
+@import 'src/styles/settings/variables/typography';
+@import 'src/styles/settings/variables/_colors';
 
 .graph {
   flex: 1;
@@ -50,9 +51,30 @@
     color: get-color(black);
     font-size: $veera-font-size-100;
     line-height: $veera-line-height-500;
-    min-width: 400px;
-    max-width: 354px;
+    max-width: 350px;
     width: 100%;
+    min-height: 65px;
+    align-content: center;
+
+    &.selected {
+      border: dashed 1px get-color(black-coral-1);
+
+      &.end {
+        border: 1px solid get-color(jasper-15);
+      }
+      &.step {
+        border: 1px solid get-color(sapphire-blue-7);
+      }
+      &.rule {
+        border: 1px solid get-color(black-coral-8);
+      }
+      &.finishing-step {
+        border: 1px solid get-color(jasper-8);
+      }
+      &.dynamic-choices {
+        border: 1px solid get-color(purple-8);
+      }
+    }
 
     &-default {
       width: 320px;
@@ -71,16 +93,115 @@
 
     &.start,
     &.end {
+      width: auto;
       display: flex;
-      align-items: center;
+      padding: 0.05rem;
       justify-content: center;
-      width: 64px;
-      height: 64px;
-      border-radius: 50%;
-      font-size: 20px;
       color: get-color(white);
-      border: 0;
-      min-width: revert;
+    }
+
+    &.placeholder {
+      background-color: get-color(extra-light);
+      border: dashed 1px get-color(black-coral-10);
+      min-width: 140px;
+      max-width: 354px;
+      padding-left: 0;
+      padding-right: 0;
+      padding-top: 0;
+      padding-bottom: 0;
+      width: 140px;
+      height: 35px;
+      cursor: pointer;
+
+      p {
+        color: get-color(black-coral-6);
+      }
+
+      &:hover {
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      }
+    }
+
+    @mixin node-hover-effect($hover-border-color) {
+      &:hover:not(.selected) {
+        border: 1px solid $hover-border-color;
+        box-shadow: 0 0px 5px rgba(0, 0, 0, 0.08);
+      }
+    }
+
+    &.end {
+      background-color: get-color(jasper-10);
+      border: 1px solid get-color(jasper-10);
+      @include node-hover-effect(get-color(jasper-11));
+    }
+
+    &.step {
+      background-color: get-color(sapphire-blue-0);
+      border: 1px solid get-color(sapphire-blue-3);
+      @include node-hover-effect(get-color(sapphire-blue-4));
+    }
+
+    &.rule {
+      background-color: get-color(black-coral-1);
+      border: 1px solid get-color(black-coral-3);
+      @include node-hover-effect(get-color(black-coral-4));
+    }
+
+    &.finishing-step {
+      background-color: get-color(jasper-1);
+      border: 1px solid get-color(jasper-3);
+      @include node-hover-effect(get-color(jasper-4));
+    }
+
+    &.dynamic-choices {
+      background-color: get-color(purple-1);
+      border: 1px solid get-color(purple-3);
+      @include node-hover-effect(get-color(purple-4));
+    }
+  }
+
+  &__edge-path {
+    stroke: get-color(black-coral-10);
+    stroke-width: 1.5px;
+  }
+}
+
+.edge-button {
+  pointer-events: all;
+  cursor: pointer;
+  position: absolute;
+  background: white;
+  color: #777;
+  border-radius: 4px;
+  min-width: 80px;
+  min-height: 25px;
+  max-width: 200px;
+  max-height: 25px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-align: center;
+  border: #777 0.5px solid;
+  padding: 0.2rem 0.5rem;
+}
+
+.edge-button:hover {
+  box-shadow: 1px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+[data-theme='dark'] .react-flow {
+  &__node {
+    color: var(--dark-text-secondary);
+
+    &.selected {
+      &.step {
+        border: 1px solid get-color(sapphire-blue-2);
+      }
+    }
+
+    &.start,
+    &.end {
+      color: get-color(white);
     }
 
     &.placeholder {
@@ -90,46 +211,53 @@
       p {
         color: get-color(black-coral-6);
       }
-    }
 
-    &.start {
-      background-color: get-color(sea-green-10);
+      &:hover {
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      }
     }
 
     &.end {
-      background-color: get-color(jasper-10);
+      background-color: get-color(jasper-12);
     }
 
     &.step {
-      background-color: get-color(sapphire-blue-0);
-      border: 1px solid get-color(sapphire-blue-2);
+      background-color: get-color(sapphire-blue-12);
+      border: 1px solid get-color(sapphire-blue-11);
     }
 
     &.rule {
-      background-color: get-color(black-coral-1);
-      border: 1px solid get-color(black-coral-3);
+      background-color: get-color(black-coral-12);
+      border: 1px solid get-color(black-coral-11);
     }
 
     &.finishing-step {
-      background-color: get-color(jasper-1);
-      border: 1px solid get-color(jasper-3);
+      background-color: get-color(jasper-12);
+      border: 1px solid get-color(jasper-11);
+    }
+
+    &.dynamic-choices {
+      background-color: get-color(purple-12);
+      border: 1px solid get-color(purple-11);
     }
 
     &.selected {
-      border: dashed 1px get-color(black-coral-1);
+      border: dashed 1px get-color(black-coral-10);
     }
   }
 
   &__edge-path {
     stroke: get-color(black-coral-10);
-    stroke-width: 2px;
+    stroke-width: 1.5px;
   }
+}
 
-  &__arrowhead {
-    polyline {
-      stroke: get-color(black-coral-10);
-      fill: get-color(black-coral-10);
-      stroke-linejoin: bevel;
-    }
+[data-theme='dark'] .edge-button {
+  background-color: var(--dark-bg-main);
+  color: var(--dark-text-label);
+  border: var(--dark-text-label) 0.5px solid;
+
+  &:hover {
+    background-color: var(--dark-bg-secondary);
   }
 }

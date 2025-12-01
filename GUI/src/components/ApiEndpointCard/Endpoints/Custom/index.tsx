@@ -1,12 +1,13 @@
-import React, { useEffect, useRef, useState } from "react";
-import { useTranslation } from "react-i18next";
-import { MdErrorOutline } from "react-icons/md";
-import { v4 as uuid } from "uuid";
-import { Button, FormInput, FormSelect, Icon, RequestVariables, Track } from "../../..";
-import { RequestTab } from "../../../../types";
-import { EndpointData, EndpointVariableData, PreDefinedEndpointEnvVariables } from "../../../../types/endpoint";
-import useServiceStore from "store/new-services.store";
-import useToastStore from "store/toasts.store";
+import React, { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import useServiceStore from 'store/new-services.store';
+import { RequestOperator } from 'types/endpoint/request-operator';
+import { v4 as uuid } from 'uuid';
+
+import { Button, FormInput, FormSelect, RequestVariables, Track } from '../../..';
+import { RequestTab } from '../../../../types';
+import { EndpointData, EndpointVariableData, PreDefinedEndpointEnvVariables } from '../../../../types/endpoint';
+import { useTheme } from '../../../../utils/useTheme';
 
 type EndpointCustomProps = {
   endpoint: EndpointData;
@@ -24,38 +25,48 @@ const EndpointCustom: React.FC<EndpointCustomProps> = ({
   setRequestTab,
 }) => {
   const { t } = useTranslation();
-  const [urlError, setUrlError] = useState<string>();
   const [key, setKey] = useState<number>(0);
-  const { setEndpoints, testUrl } = useServiceStore();
+  const { setEndpoints, triggerJsonRequest } = useServiceStore();
   const ref = useRef<HTMLInputElement>(null);
 
   // initial endpoint data
-  if (endpoint.definedEndpoints.length === 0) {
-    endpoint.definedEndpoints.push({
+  if (endpoint.definitions.length === 0) {
+    endpoint.definitions.push({
       id: uuid(),
-      label: "",
-      methodType: "GET",
-      type: "custom",
-      dataType: "custom",
-      path: "",
+      label: '',
+      methodType: 'GET',
+      type: 'custom',
+      dataType: 'custom',
+      path: '',
       supported: true,
       isSelected: true,
       body: {
         variables: [],
         rawData: {},
+        isRowSelected: false,
       },
       headers: {
         variables: [],
         rawData: {},
+        isRowSelected: false,
       },
       params: {
         variables: [],
         rawData: {},
+        isRowSelected: false,
       },
     });
   }
 
+  // Adding "key" dependency breaks focus in variable inputs
+  // Likely impossible to fix without a significant refactor
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => setKey(key + 1), [isLive]);
+  const theme = useTheme();
+
+  const handleJsonRequestClick = () => {
+    triggerJsonRequest(endpoint);
+  };
 
   const refereshEndpoint = () => {
     setEndpoints((endpoint) => endpoint);
@@ -65,103 +76,89 @@ const EndpointCustom: React.FC<EndpointCustomProps> = ({
   return (
     <Track direction="vertical" align="stretch" gap={16}>
       <div>
-        <label htmlFor="endpointUrl">{t("newService.endpoint.url")}</label>
+        <label htmlFor="endpointUrl" style={{ color: `${theme === 'dark' ? 'white' : 'black'}` }}>
+          {t('newService.endpoint.url')}
+        </label>
         <Track gap={8}>
-          <Track style={{ width: "100%" }}>
+          <Track style={{ width: '100%' }}>
             <div style={{ width: 108 }}>
               <FormSelect
-                name={"request-type"}
-                label={""}
-                style={{ borderRadius: "4px 0 0 4px", borderRight: 0 }}
+                name={'request-type'}
+                label={''}
+                style={{ borderRadius: '4px 0 0 4px', borderRight: 0, fontSize: '15px' }}
                 options={[
-                  { label: "GET", value: "GET" },
-                  { label: "POST", value: "POST" },
+                  { label: 'GET', value: 'GET' },
+                  { label: 'POST', value: 'POST' },
                 ]}
                 onSelectionChange={(selection) => {
-                  endpoint.definedEndpoints[0].methodType = selection?.value ?? "GET";
+                  endpoint.definitions[0].methodType = selection?.value ?? 'GET';
                 }}
-                defaultValue={endpoint.definedEndpoints[0]?.methodType ?? "GET"}
+                defaultValue={endpoint.definitions[0]?.methodType ?? 'GET'}
               />
             </div>
             <FormInput
               ref={ref}
-              style={{ borderRadius: "0 4px 4px 0" }}
+              style={{ borderRadius: '0 4px 4px 0' }}
               name="endpointUrl"
               label=""
-              defaultValue={endpoint.definedEndpoints[0].url ?? ""}
-              value={endpoint.definedEndpoints[0].url ?? ""}
+              defaultValue={endpoint.definitions[0]?.url ?? ''}
               onChange={(event) => {
                 const parsedUrl = parseURL(event.target.value);
-                endpoint.definedEndpoints[0].url = parsedUrl.url;
+                endpoint.definitions[0].url = parsedUrl.url;
+
                 const parameters: EndpointVariableData[] = [];
                 Object.keys(parsedUrl.params).forEach((key) => {
                   parameters.push({
                     id: uuid(),
                     name: key,
-                    type: "custom",
+                    type: 'custom',
                     required: false,
                     value: parsedUrl.params[key],
+                    operator: (parsedUrl.operators[key] as RequestOperator) || '=',
                   });
                 });
 
-                endpoint.definedEndpoints[0].params = {
+                endpoint.definitions[0].params = {
                   variables: parameters,
                   rawData: {},
+                  isRowSelected: false,
                 };
                 refereshEndpoint();
               }}
-              placeholder={t("newService.endpoint.insert") ?? ""}
+              placeholder={t('newService.endpoint.insert') ?? ''}
             />
           </Track>
-          <Button
-            onClick={() =>
-              testUrl(
-                endpoint,
-                () => setUrlError(t("newService.endpoint.error") ?? undefined),
-                () => {
-                  setUrlError(undefined);
-                  useToastStore.getState().success({
-                    title: t("newService.endpoint.success"),
-                  });
-                }
-              )
-            }
-          >
-            {t("newService.test")}
-          </Button>
+          <Button onClick={handleJsonRequestClick}>{t('newService.test')}</Button>
         </Track>
       </div>
-      {urlError && (
-        <div className={"toast toast--error"} style={{ padding: "8px 16px 8px 16px" }}>
-          <div className="toast__title">
-            <Icon icon={<MdErrorOutline />} />
-            {urlError}
-          </div>
-        </div>
-      )}
       <RequestVariables
         key={key}
         requestValues={requestValues}
         isLive={isLive}
-        endpointData={endpoint.definedEndpoints[0]}
+        endpoint={endpoint}
         requestTab={requestTab}
         setRequestTab={setRequestTab}
-        parentEndpointId={endpoint.id}
+        parentEndpointId={endpoint.endpointId}
         onParametersChange={(parameters) => {
-          const url = new URL(endpoint.definedEndpoints[0].url ?? "");
-          url.searchParams.forEach((_, key) => {
-            url.searchParams.delete(key);
-          });
-          parameters.forEach((param: EndpointVariableData) => {
-            url.searchParams.set(param.name, param.value ?? "");
-          });
-          endpoint.definedEndpoints[0].params = {
+          const url = new URL(endpoint.definitions[0].url ?? '');
+          const baseUrl = `${url.origin}${url.pathname}`;
+
+          const queryString = parameters
+            .filter((param) => param.value && param.name)
+            .map((param) => {
+              const operator = param.operator ? param.operator : '=';
+              return `${param.name}${operator}${encodeURIComponent(param.value ?? '')}`;
+            })
+            .join('&');
+
+          endpoint.definitions[0].url = queryString ? `${baseUrl}?${queryString}` : baseUrl;
+          endpoint.definitions[0].params = {
             variables: parameters,
             rawData: {},
           };
-          endpoint.definedEndpoints[0].url = url.href ?? "";
+
           if (ref?.current) {
-            ref.current.value = url.href ?? "";
+            ref.current.value = endpoint.definitions[0].url;
           }
         }}
       />
@@ -171,19 +168,38 @@ const EndpointCustom: React.FC<EndpointCustomProps> = ({
 
 function parseURL(url: string) {
   try {
-    const parsedURL = new URL(url);
-    const params: { [key: string]: any } = Object.fromEntries(parsedURL.searchParams);
+    const queryString = url.split('?')[1] ?? '';
+    const params: Record<string, any> = {};
+    const operators: Record<string, string> = {};
 
-    return {
-      url: parsedURL.href,
-      params,
-    };
+    queryString
+      .split('&')
+      .filter(Boolean)
+      .forEach((segment) => {
+        const { index, token } = findOperators(segment);
+        const name = decodeURIComponent(index !== -1 ? segment.slice(0, index) : segment);
+        const value = decodeURIComponent(index !== -1 ? segment.slice(index + token.length) : '');
+        const operator = index !== -1 ? token : '=';
+        if (name) {
+          params[name] = value;
+          operators[name] = operator;
+        }
+      });
+
+    return { url, params, operators };
   } catch (e) {
-    return {
-      url,
-      params: {},
-    };
+    console.error('Invalid URL format:', e);
+    return { url, params: {}, operators: {} };
   }
+}
+
+function findOperators(segment: string): { index: number; token: string } {
+  const operatorTokens = ['>=', '<=', '>', '<', '='];
+  let found = operatorTokens
+    .map((token) => ({ token, idx: segment.indexOf(token) }))
+    .filter(({ idx }) => idx !== -1)
+    .sort((a, b) => a.idx - b.idx || b.token.length - a.token.length)[0];
+  return found ? { index: found.idx, token: found.token } : { index: -1, token: '' };
 }
 
 export default EndpointCustom;

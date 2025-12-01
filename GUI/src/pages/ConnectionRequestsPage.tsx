@@ -1,12 +1,12 @@
-import React, { useEffect, useMemo, useState } from "react";
-import { useTranslation } from "react-i18next";
-import { PaginationState, SortingState, createColumnHelper } from "@tanstack/react-table";
-import { format } from "date-fns";
-import { AiFillCheckCircle, AiFillCloseCircle } from "react-icons/ai";
-import { Card, DataTable, Icon } from "components";
-import { Trigger } from "types/Trigger";
-import useServiceStore from "store/services.store";
-import withAuthorization, { ROLES } from "hoc/with-authorization";
+import { createColumnHelper, PaginationState, SortingState } from '@tanstack/react-table';
+import { Card, DataTable, Icon } from 'components';
+import { format } from 'date-fns';
+import withAuthorization, { ROLES } from 'hoc/with-authorization';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { AiFillCheckCircle, AiFillCloseCircle } from 'react-icons/ai';
+import useServiceStore from 'store/services.store';
+import { Trigger } from 'types/Trigger';
 
 const ConnectionRequestsPage: React.FC = () => {
   const { t } = useTranslation();
@@ -17,40 +17,46 @@ const ConnectionRequestsPage: React.FC = () => {
   });
   const [sorting, setSorting] = useState<SortingState>([]);
 
-  const loadConnectionRequests = (pagination: PaginationState, sorting: SortingState) => {
-    useServiceStore
-      .getState()
-      .loadRequestsList(
-        (requests: Trigger[]) => setTriggers(requests),
-        t("connectionRequests.toast.failed.requests"),
-        pagination,
-        sorting
-      );
-  };
+  const loadConnectionRequests = useCallback(
+    (pagination: PaginationState, sorting: SortingState) => {
+      void useServiceStore
+        .getState()
+        .loadRequestsList(
+          (requests: Trigger[]) => setTriggers(requests),
+          t('connectionRequests.toast.failed.requests'),
+          pagination,
+          sorting,
+        );
+    },
+    [t],
+  );
 
   useEffect(() => {
     loadConnectionRequests(pagination, sorting);
-  }, []);
+  }, [loadConnectionRequests, pagination, sorting]);
 
-  const respondToConnectionRequest = (status: boolean, request: Trigger) => {
-    useServiceStore
-      .getState()
-      .respondToConnectionRequest(
-        () => loadConnectionRequests(pagination, sorting),
-        t("connectionRequests.approvedConnection"),
-        t("connectionRequests.declinedConnection"),
-        status,
-        request
-      );
-  };
+  const respondToConnectionRequest = useCallback(
+    async (status: boolean, request: Trigger) => {
+      await useServiceStore
+        .getState()
+        .respondToConnectionRequest(
+          () => loadConnectionRequests(pagination, sorting),
+          t('connectionRequests.approvedConnection'),
+          t('connectionRequests.declinedConnection'),
+          status,
+          request,
+        );
+    },
+    [loadConnectionRequests, pagination, sorting, t],
+  );
 
-  const appRequestColumns = useMemo(() => getColumns(respondToConnectionRequest), []);
+  const appRequestColumns = useMemo(() => getColumns(respondToConnectionRequest), [respondToConnectionRequest]);
 
   if (!triggers) return <span>Loading ...</span>;
 
   return (
     <>
-      <h1>{t("connectionRequests.title")}</h1>
+      <h1>{t('connectionRequests.title')}</h1>
       <Card>
         <DataTable
           data={triggers}
@@ -79,20 +85,20 @@ const getColumns = (respondToConnectionRequest: (result: boolean, tigger: Trigge
   const appRequestColumnHelper = createColumnHelper<Trigger>();
 
   return [
-    appRequestColumnHelper.accessor("intent", {
-      header: "Intent",
+    appRequestColumnHelper.accessor('intent', {
+      header: 'Intent',
       cell: (uniqueIdentifier) => uniqueIdentifier.getValue(),
     }),
-    appRequestColumnHelper.accessor("serviceName", {
-      header: "Service",
+    appRequestColumnHelper.accessor('serviceName', {
+      header: 'Service',
       cell: (uniqueIdentifier) => uniqueIdentifier.getValue(),
     }),
-    appRequestColumnHelper.accessor("requestedAt", {
-      header: "Requested At",
-      cell: (props) => <span>{format(new Date(props.getValue()), "dd-MM-yyyy HH:mm:ss")}</span>,
+    appRequestColumnHelper.accessor('requestedAt', {
+      header: 'Requested At',
+      cell: (props) => <span>{format(new Date(props.getValue()), 'dd-MM-yyyy HH:mm:ss')}</span>,
     }),
     appRequestColumnHelper.display({
-      header: "",
+      header: '',
       cell: (props) => (
         <Icon
           icon={
@@ -105,13 +111,13 @@ const getColumns = (respondToConnectionRequest: (result: boolean, tigger: Trigge
           size="medium"
         />
       ),
-      id: "approve",
+      id: 'approve',
       meta: {
-        size: "1%",
+        size: '1%',
       },
     }),
     appRequestColumnHelper.display({
-      header: "",
+      header: '',
       cell: (props) => (
         <Icon
           icon={
@@ -124,19 +130,23 @@ const getColumns = (respondToConnectionRequest: (result: boolean, tigger: Trigge
           size="medium"
         />
       ),
-      id: "reject",
+      id: 'reject',
       meta: {
-        size: "1%",
+        size: '1%',
       },
     }),
     appRequestColumnHelper.display({
-      header: "",
-      id: "space",
+      header: '',
+      id: 'space',
       meta: {
-        size: "1%",
+        size: '1%',
       },
     }),
   ];
 };
 
-export default withAuthorization(ConnectionRequestsPage, [ROLES.ROLE_ADMINISTRATOR, ROLES.ROLE_SERVICE_MANAGER]);
+const AuthorizedConnectionRequestsPage = withAuthorization(ConnectionRequestsPage, [
+  ROLES.ROLE_ADMINISTRATOR,
+  ROLES.ROLE_SERVICE_MANAGER,
+]);
+export default AuthorizedConnectionRequestsPage;

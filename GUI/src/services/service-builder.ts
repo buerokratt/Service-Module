@@ -1,885 +1,855 @@
-import axios from "axios";
-import i18next from 'i18next';
-import { Edge, Node } from "reactflow";
+import { Edge, Node } from '@xyflow/react';
+import { AxiosError } from 'axios';
+import { Group, Rule } from 'components/FlowElementsPopup/RuleBuilder/types';
+import { format } from 'date-fns';
+import i18next, { t } from 'i18next';
+import { NodeHtmlMarkdown } from 'node-html-markdown';
+import { createEndpoint, createNewService, editService, updateEndpoint } from 'resources/api-constants';
+import useServiceStore from 'store/new-services.store';
+import useToastStore from 'store/toasts.store';
+import { StepType } from 'types';
+import { Assign } from 'types/assign';
+import { EndpointData } from 'types/endpoint';
+import { NodeDataProps } from 'types/service-flow';
 import {
-  createNewService,
-  editService,
-  updateServiceEndpoints,
-  jsonToYml,
-  testService,
-} from "resources/api-constants";
-import useServiceStore from "store/new-services.store";
-import useToastStore from "store/toasts.store";
-import { RawData, Step, StepType } from "types";
-import { EndpointData, EndpointEnv, EndpointType, EndpointVariableData } from "types/endpoint";
+  getLastDigits,
+  isNumericString,
+  removeTrailingUnderscores,
+  removeWrapperQuotes,
+  stringToArray,
+  toSnakeCase,
+} from 'utils/string-util';
 
-// refactor this file later
+import api from '../services/api-dev';
 
-const getEndpointVariables = (
-  key: string,
-  data?: {
-    variables: EndpointVariableData[];
-    rawData: RawData;
-  }
-): { [key: string]: any } => {
-  if (!data) return {};
-  const result: { [key: string]: any } = {};
-  data.variables.forEach((v) => {
-    if (["schema", "array"].includes(v.type)) {
-      if (v.type === "array" && v.arrayType !== "schema") {
-        if (v.value) result[v.name] = `\${[info.response.body.${key}["${v.name}"]]}`;
-        return;
-      }
-      const nestedResult: string[] = [];
-      getNestedVariables(v, key, v.name, nestedResult);
-      result[v.name] = `\${new Map([${nestedResult}])}`;
-      return;
-    }
-    if (v.value) result[v.name] = `\${info.response.body.${key}["${v.name}"]}`;
-  });
-  if (Object.keys(result).length === 0) {
-    try {
-      [data.rawData.value, data.rawData.testValue].forEach((rawData) => {
-        if (!rawData) return;
-        const parsedData = JSON.parse(rawData);
-        Object.keys(parsedData).forEach((k) => {
-          if (typeof parsedData[k] === "object") {
-            const nestedResult: string[] = [];
-            getNestedRawData(parsedData[k], key, k, nestedResult);
-            result[k] = `\${new Map([${nestedResult}])}`;
-            return;
-          }
-          result[k] = `\${info.response.body.${key}["${k}"]}`;
-        });
-      });
-    } catch (e) {
-      console.log(e);
-    }
-  }
-  return result;
-};
-
-const getNestedVariables = (variable: EndpointVariableData, key: string, path: string, result: string[]) => {
-  const variableData = variable.type === "schema" ? variable.schemaData : variable.arrayData;
-  if (variableData instanceof Array) {
-    variableData.forEach((v) => {
-      if (["schema", "array"].includes(v.type)) {
-        getNestedVariables(v, key, `${path}.${v.name}`, result);
-        return;
-      }
-      result.push(`["${path}.${v.name}", info.response.body.${key}["${path}.${v.name}"]]`);
-    });
-  }
-};
-
-const getNestedRawData = (data: { [key: string]: any }, key: string, path: string, result: string[]) => {
-  Object.keys(data).forEach((k) => {
-    if (typeof data[k] === "object") {
-      getNestedRawData(data[k], key, `${path}.${k}`, result);
-      return;
-    }
-    result.push(`["${path}.${k}", info.response.body.${key}["${path}.${k}"]]`);
-  });
-};
-
-// Since we currently cannot mark variables as sensitive from GUI, we set all as sensitive
-const saveEndpointInfo = async (
-  selectedEndpoint: EndpointType,
-  env: EndpointEnv,
-  endpointName: string,
-  endpoint: EndpointData,
-) => {
-  await saveEndpointConfig(selectedEndpoint, env, endpointName, endpoint);
-
-  const steps = new Map();
-  steps.set("get-configs", {
-    call: "http.post",
-    args: {
-      url: `${process.env.REACT_APP_API_URL}/services/endpoints/configs/${endpoint.isCommon ? "common/" : ""
-        }${endpointName}-${env === EndpointEnv.Live ? "prod" : "test"}-configs`,
-      body: {
-        params: "${incoming.body.params}",
-        headers: "${incoming.body.headers}",
-        body: "${incoming.body.body}",
-      },
-    },
-    result: "configs",
-  });
-  steps.set("return_value", {
-    wrapper: false,
-    return: "${configs.response.body}",
-  });
-  const result = Object.fromEntries(steps.entries());
-
-  await axios
-    .post(
-      jsonToYml(),
-      { result },
-      {
-        params: {
-          location: `/Ruuter/POST/services/endpoints/info/${endpoint.isCommon ? "common/" : ""}${endpointName}-${env === EndpointEnv.Live ? "prod" : "test"
-            }-info.yml`,
-        },
-      }
-    )
-    .then(console.log)
-    .catch(console.log)
-};
-
-const saveEndpointConfig = async (
-  endpoint: EndpointType,
-  env: EndpointEnv,
-  endpointName: string,
-  data: EndpointData,
-) => {
-  const headers = rawDataIfVariablesMissing(
-    endpoint,
-    "headers",
-    env,
-    assignEndpointVariables(env, "headers", endpoint.headers)
-  );
-  const body = rawDataIfVariablesMissing(endpoint, "body", env, assignEndpointVariables(env, "body", endpoint.body));
-  const params = rawDataIfVariablesMissing(
-    endpoint,
-    "params",
-    env,
-    assignEndpointVariables(env, "params", endpoint.params)
-  );
-  const steps = new Map();
-  const variables: { [key: string]: string } = {};
-  assignValues(headers, "headers", variables);
-  assignValues(body, "body", variables);
-  assignValues(params, "params", variables);
-  steps.set("prepare_step", {
-    assign: variables,
-  });
-  const bodyStr = Object.keys(body ?? {}).map((b) => `["${b.replaceAll("__", ".")}", body_${b}]`);
-  steps.set("combine_step", {
-    assign: {
-      sensitive: `\${new Map([${typeof headers === "string"
-        ? `["headers", headers]`
-        : `["headers", new Map([${Object.keys(headers ?? {}).map(
-          (h) => `["${h.replaceAll("__", ".")}", headers_${h}]`
-        )}])]`
-        }, ${typeof body === "string"
-          ? `["body", body]`
-          : `["body", new Map([${bodyStr}])]`
-        }, ${typeof params === "string"
-          ? `["params", params]`
-          : `["params", new Map([${Object.keys(params ?? {}).map(
-            (p) => `["${p.replaceAll("__", ".")}", params_${p}]`
-          )}])]`
-        }])}`,
-    },
-  });
-  steps.set("return_value", { wrapper: false, return: "${sensitive}" });
-  const result = Object.fromEntries(steps.entries());
-
-  await axios
-    .post(
-      jsonToYml(),
-      { result },
-      {
-        params: {
-          location: `/Ruuter/POST/services/endpoints/configs/${data.isCommon ? "common/" : ""}${endpointName}-${env === EndpointEnv.Live ? "prod" : "test"
-            }-configs.yml`,
-        },
-      }
-    )
-    .then(console.log)
-    .catch(console.log)
-};
-
-const rawDataIfVariablesMissing = (
-  endpoint: EndpointType,
-  key: "headers" | "body" | "params",
-  env: EndpointEnv,
-  data: { [key: string]: string }
-): { [key: string]: any } | string => {
-  if (Object.keys(data).length > 0) return data;
-  const rawData =
-    endpoint[key]?.rawData[env === EndpointEnv.Live ? "value" : "testValue"] ?? endpoint[key]?.rawData.value ?? "";
-  try {
-    assignNestedRawVariables(JSON.parse(rawData), key, "", data);
-    return data;
-  } catch (e) {
-    return "";
-  }
-};
-const assignValues = (
-  data: string | { [key: string]: string },
-  key: string,
-  variables: { [key: string]: string }
-) => {
-  if (typeof data === "string") variables[key] = data;
-  else
-    Object.keys(data).forEach((v) => {
-      variables[`${key}_${v}`] = data[v];
-    });
-};
-
-const assignNestedRawVariables = (
-  data: { [key: string]: any },
-  key: string,
-  path: string,
-  result: { [key: string]: string }
-) => {
-  Object.keys(data).forEach((k) => {
-    if (typeof data[k] === "object") {
-      return assignNestedRawVariables(data[k], key, path.length === 0 ? k : `${path}__${k}`, result);
-    }
-    result[path.length > 0 ? `${path}__${k}` : k] =
-      typeof data[k] === "string" && data[k].startsWith("{{")
-        ? data[k].replace("{{", `\${incoming.body.${key}["`).replace("}}", `"]}`)
-        : data[k];
-  });
-};
-
-const assignNestedVariable = (
-  variable: EndpointVariableData,
-  key: string,
-  env: EndpointEnv,
-  path: string,
-  result: { [key: string]: string }
-) => {
-  const variableData = variable.type === "schema" ? variable.schemaData : variable.arrayData;
-  if (variableData instanceof Array) {
-    variableData.forEach((v) => {
-      if (["schema", "array"].includes(v.type)) assignNestedVariable(v, key, env, `${path}__${v.name}`, result);
-      if (!v.value) return;
-
-      result[`${path}__${v.name}`] = (env === EndpointEnv.Test && v.testValue ? v.testValue : v.value)
-        .replace("{{", `\${incoming.body.${key}["`)
-        .replace("}}", `"]}`);
-    });
-  }
-};
-
-const assignEndpointVariables = (
-  env: EndpointEnv,
-  key: string,
-  data?: { variables: EndpointVariableData[]; rawData: RawData }
-): { [key: string]: string } => {
-  if (!data) return {};
-  const result: { [key: string]: string } = {};
-  data.variables.forEach((v) => {
-    if (!v.value) {
-      assignNestedVariable(v, key, env, v.name, result);
-      return;
-    }
-    // if test value is missing use live value
-    result[v.name] = (env === EndpointEnv.Test && v.testValue ? v.testValue : v.value)
-      .replace("{{", `\${incoming.body.${key}["`)
-      .replace("}}", `"]}`);
-  });
-  return result;
-};
-
-export async function saveEndpoints(
-  endpoints: EndpointData[],
-  name: string,
-  id: string,
-  onSuccess?: (e: any) => void,
-  onError?: (e: any) => void,
-) {
+export async function saveEndpoints(endpoints: EndpointData[], onSuccess?: () => void, onError?: (e: any) => void) {
   const tasks: Promise<any>[] = [];
-  const serviceEndpoints = endpoints.filter(e => e.serviceId === id || !e.hasOwnProperty('serviceId')).map(x => x);
+  const serviceId = useServiceStore.getState().serviceId;
 
-  for (const endpoint of serviceEndpoints) {
-    if (!endpoint) continue;            
-    endpoint.serviceId = id
-    const selectedEndpointType = endpoint.definedEndpoints.find((e) => e.isSelected);
+  for (const endpoint of endpoints) {
+    const selectedEndpointType = endpoint.definitions.find((e) => e.isSelected);
     if (!selectedEndpointType) continue;
-
-    const endpointName = `${name.replaceAll(" ", "_")}-${(endpoint.name.trim().length ?? 0) > 0 ? endpoint?.name.replaceAll(" ", "_") : endpoint?.id}`;
-    for (const env of [EndpointEnv.Live, EndpointEnv.Test]) {
-      await saveEndpointInfo(selectedEndpointType, env, endpointName, endpoint);
-    }
-    const steps = buildSteps(endpointName, endpoint, selectedEndpointType);
-    const result = Object.fromEntries(steps.entries());
-
-    const isCommonPath = endpoint.isCommon ? "common/" : "";
-
-    tasks.push(axios.post(
-      jsonToYml(),
-      { result },
-      {
-        params: {
-          location: `/Ruuter/${selectedEndpointType.methodType.toUpperCase()}/services/endpoints/${isCommonPath}${endpointName}.yml`,
-        },
-      }
-    ));
+    endpoint.serviceId = serviceId;
+    endpoint.isCommon = endpoint.isCommon ?? false;
   }
 
-  tasks.push(axios.post(updateServiceEndpoints(id), {
-    endpoints: JSON.stringify(serviceEndpoints),
-  }));
+  endpoints.forEach((endpoint) => {
+    if (endpoint.isNew) {
+      tasks.push(createEndpointAndUpdateState(endpoint));
+    } else {
+      tasks.push(
+        api.post(updateEndpoint(endpoint.endpointId), {
+          ...endpoint,
+          // Stringify needed for Resql to save nested data in a proper parsable format
+          definitions: JSON.stringify(endpoint.definitions),
+        }),
+      );
+    }
+  });
 
   await Promise.all(tasks).then(onSuccess).catch(onError);
 }
 
-const buildSteps = (endpointName: string, endpoint: EndpointData, selectedEndpointType: EndpointType) => {
-  const steps = new Map();
-  steps.set("extract_request_data", {
-    assign: {
-      type: "${incoming.params.type}",
-    },
-    next: "check_for_type",
+async function createEndpointAndUpdateState(endpoint: EndpointData): Promise<any> {
+  const response = await api.post(createEndpoint(), {
+    ...endpoint,
+    // Stringify needed for Resql to save nested data in a proper parsable format
+    definitions: JSON.stringify(endpoint.definitions),
   });
-  steps.set("check_for_type", {
-    switch: [{ condition: "${type == null}", next: "return_no_type_error" }],
-    next: "check_for_environment",
-  });
-  steps.set("check_for_environment", {
-    switch: [{ condition: "${type.toLowerCase() == 'prod'}", next: "get_prod_info" }],
-    next: "get_test_info",
-  });
-  steps.set("get_prod_info", {
-    call: "http.post",
-    args: {
-      url: `${process.env.REACT_APP_API_URL}/services/endpoints/info/${endpoint.isCommon ? "common/" : ""
-        }${endpointName}-prod-info`,
-      body: {
-        params: "${incoming.body.params ?? new Map()}",
-        headers: "${incoming.body.headers ?? new Map()}",
-        body: "${incoming.body.body ?? new Map()}",
-      },
-    },
-    result: "info",
-    next: "assign_endpoint_url",
-  });
-  steps.set("get_test_info", {
-    call: `http.post`,
-    args: {
-      url: `${process.env.REACT_APP_API_URL}/services/endpoints/info/${endpoint.isCommon ? "common/" : ""
-        }${endpointName}-test-info`,
-      body: {
-        params: "${incoming.body.params ?? new Map()}",
-        headers: "${incoming.body.headers ?? new Map()}",
-        body: "${incoming.body.body ?? new Map()}",
-      },
-    },
-    result: "info",
-    next: "assign_endpoint_url",
-  });
-  const endpointParams = getEndpointVariables("params", selectedEndpointType.params);
-  const endpointHeaders = getEndpointVariables("headers", selectedEndpointType.headers);
-  const endpointBody = getEndpointVariables("body", selectedEndpointType.body);
-  const headers = Object.keys(endpointHeaders).length > 0 ? endpointHeaders : undefined;
-  const body = Object.keys(endpointBody).length > 0 ? endpointBody : undefined;
-
-  let endpointUrl = selectedEndpointType.url;
-  if (endpointUrl?.includes("{")) {
-    const variable = selectedEndpointType.url?.slice(
-      selectedEndpointType.url?.indexOf("{") + 1,
-      selectedEndpointType.url.indexOf("}")
-    );
-    endpointUrl = selectedEndpointType.url?.replace(`{${variable}}`, endpointParams[variable ?? ""]);
-  }
-  steps.set("assign_endpoint_url", {
-    assign: {
-      endpoint_url: endpointUrl,
-    },
-    next: "execute_endpoint",
-  });
-  steps.set("execute_endpoint", {
-    call: selectedEndpointType.methodType.toLowerCase() === "get" ? "http.get" : "http.post",
-    args: {
-      url: "${endpoint_url}",
-      headers,
-      body
-    },
-    result: "res",
-    next: "return_result",
-  });
-  steps.set("return_result", {
-    wrapper: false,
-    return: "${res.response.body}",
-    next: "end",
-  });
-  steps.set("return_no_type_error", {
-    status: "400",
-    return: "Please Specify Endpoint Type 'prod' Or 'test'",
-    next: "end",
-  });
-
-  return steps;
+  endpoint.isNew = false;
+  return response;
 }
 
 interface SaveFlowConfig {
-  steps: Step[],
-  name: string,
-  edges: Edge[],
-  nodes: Node[],
-  onSuccess: (e: any) => void,
-  onError: (e: any) => void,
-  description: string,
-  isCommon: boolean,
-  serviceId: string,
-  isNewService: boolean,
+  name: string;
+  edges: Edge[];
+  nodes: Node<NodeDataProps>[];
+  onSuccess: (e: any) => void;
+  onError: (e: any) => void;
+  description: string;
+  slot: string;
+  isCommon: boolean;
+  serviceId: string;
+  isNewService: boolean;
+  status: 'draft' | 'ready';
+  showError?: boolean;
 }
 
+const hasInvalidRules = (elements: any[]): boolean => {
+  return elements.some((e) => {
+    if ('children' in e) {
+      const group = e as Group;
+      if (group.children.length === 0) return true;
+      return hasInvalidRules(group.children);
+    } else {
+      const rule = e as Rule;
+      return rule.value === '' || rule.field === '' || rule.operator === '';
+    }
+  });
+};
+
+const hasInvalidElements = (elements: any[]): boolean => {
+  return elements.some((e) => {
+    const element = e as Assign;
+    return element.key === '' || element.value === '';
+  });
+};
+
+const buildConditionString = (group: any): string => {
+  if ('children' in group) {
+    const subgroup = group as Group;
+    if (subgroup.children.length === 0) {
+      return '';
+    }
+
+    const conditions = subgroup.children.map((child) => {
+      if ('children' in child) {
+        return `(${buildConditionString(child)})`;
+      } else {
+        const rule = child;
+        const absoluteValue = removeWrapperQuotes(rule.value.replaceAll('${', '').replaceAll('}', ''));
+        const value = isNumericString(absoluteValue) ? absoluteValue : `"${absoluteValue}"`;
+        return `${rule.field.replaceAll('${', '').replaceAll('}', '')} ${rule.operator} ${value}`;
+      }
+    });
+
+    if (subgroup.not) {
+      return `!(${subgroup.type === 'and' ? conditions.join(' && ') : conditions.join(' || ')})`;
+    } else {
+      return subgroup.type === 'and' ? conditions.join(' && ') : conditions.join(' || ');
+    }
+  } else {
+    const rule = group as Rule;
+    const absoluteValue = removeWrapperQuotes(rule.value.replaceAll('${', '').replaceAll('}', ''));
+    const value = isNumericString(absoluteValue) ? absoluteValue : `"${absoluteValue}"`;
+    return `${rule.field.replaceAll('${', '').replaceAll('}', '')} ${rule.operator} ${value}`;
+  }
+};
+
 export const saveFlow = async ({
-  steps,
   name,
   edges,
   nodes,
   onSuccess,
   onError,
   description,
+  slot,
   isCommon,
   serviceId,
   isNewService,
+  status = 'ready',
+  showError = true,
 }: SaveFlowConfig) => {
   try {
-    const allRelations: any[] = [];
-    // find regular edges 1 -> 1
-    edges.forEach((edge) => {
-      const node = nodes.find((node) => node.id === edge.source);
-      const followingNode = nodes.find((node) => node.id === edge.target);
-      if (!node) return;
-      let error;
-      switch(node.data.stepType) {
+    let yamlContent = getYamlContent(nodes, edges, name, description, showError);
+
+    const mcqNodes = nodes.filter(
+      (node) => node.data?.stepType === StepType.MultiChoiceQuestion,
+    ) as Node<NodeDataProps>[];
+
+    if (mcqNodes.length > 0) {
+      const nodesUpToFirstMcq = nodes.slice(
+        0,
+        nodes.findIndex((node) => node.data?.stepType === StepType.MultiChoiceQuestion) + 1,
+      );
+      yamlContent = getYamlContent(nodesUpToFirstMcq, edges, name, description, showError);
+    }
+
+    await saveService(
+      yamlContent,
+      { name, serviceId, description, slot, isCommon, nodes, edges, isNewService } as SaveFlowConfig,
+      true,
+      status,
+      onSuccess,
+      onError,
+    );
+
+    for (const mcqNode of mcqNodes) {
+      const mcqEdges = edges.filter((edge) => edge.source === mcqNode.id);
+
+      for (const edge of mcqEdges) {
+        const nextNode = nodes.find((n) => n.id === edge.target);
+        if (!nextNode) continue;
+
+        const buttonIndex = mcqNode?.data?.multiChoiceQuestion?.buttons.findIndex((e: any) => e.title === edge.label);
+        const mcqNodeId = getLastDigits(toSnakeCase(mcqNode.data.label ?? ''));
+        const serviceName = `${name}_mcq_${mcqNodeId}_${buttonIndex}`;
+        const branchNodes = getBranchNodes(nodes, edges, nextNode);
+        const branchEdges = edges.filter((edge) =>
+          branchNodes.some((n: any) => n.id === edge.source || n.id === edge.target),
+        );
+
+        await saveService(
+          getYamlContent(branchNodes, branchEdges, serviceName, description, showError),
+          { name: serviceName, serviceId, description, slot, isCommon, nodes, edges, isNewService } as SaveFlowConfig,
+          false,
+          status,
+        );
+      }
+    }
+  } catch (e: any) {
+    onError(e);
+  }
+};
+
+async function saveService(
+  content: any,
+  config: SaveFlowConfig,
+  updateServiceDb: boolean,
+  status: 'draft' | 'ready' = 'ready',
+  onSuccess?: (e: any) => void,
+  onError?: (e: any) => void,
+) {
+  const { isNewService, serviceId, name, description, slot, isCommon, edges, nodes } = config;
+  if (updateServiceDb) {
+    useServiceStore.getState().changeServiceName(removeTrailingUnderscores(name));
+  }
+  await api
+    .post(
+      isNewService ? createNewService() : editService(serviceId),
+      {
+        name: removeTrailingUnderscores(name),
+        serviceId,
+        description,
+        slot,
+        type: 'POST',
+        content: content,
+        isCommon,
+        structure: JSON.stringify({ edges, nodes }),
+        updateServiceDb: updateServiceDb,
+        state: status,
+      },
+      {
+        params: {
+          location: `${import.meta.env.REACT_APP_RUUTER_SERVICES_POST_PATH}/${name}.yml`,
+        },
+      },
+    )
+    .then(onSuccess)
+    .catch(onError);
+}
+
+const validateMCQ = (node: NodeDataProps | undefined) => {
+  if (!node?.multiChoiceQuestion?.question || node.multiChoiceQuestion.question === '')
+    return i18next.t('toast.missing-mcq-question');
+  if (!node?.multiChoiceQuestion?.buttons || node.multiChoiceQuestion.buttons.length === 0)
+    return i18next.t('toast.missing-mcq-options');
+  return null;
+};
+
+export const validateCondition = (node: NodeDataProps | undefined) => {
+  const invalidRulesExist = hasInvalidRules(node?.rules?.children ?? []);
+  const isInvalid = node?.rules?.children === undefined || invalidRulesExist || node?.rules?.children.length === 0;
+  return isInvalid ? (i18next.t('toast.missing-condition-rules') ?? 'Error') : null;
+};
+
+function getYamlContent(
+  nodes: Node<NodeDataProps>[],
+  edges: Edge[],
+  name: string,
+  description: string,
+  showError = true,
+): any {
+  const allRelations: any[] = [];
+
+  nodes.forEach((node) => {
+    const outgoingEdges = edges.filter((edge) => edge.source === node.id);
+
+    outgoingEdges.forEach((edge) => {
+      const followingNode = nodes.find((n) => n.id === edge.target)?.data;
+      let error: string | null = null;
+
+      switch (followingNode?.stepType) {
         case StepType.Textfield:
-            if (node.data.message === undefined) {
-              error = i18next.t("toast.missing-textfield-message");
-            }
-            break;
+          error = validateTextField(followingNode);
+          break;
         case StepType.OpenWebpage:
-          if(node.data.link === undefined || node.data.linkText === undefined) {
-            error = i18next.t("toast.missing-website");
-          }
+          error = validateOpenWebpage(followingNode);
           break;
         case StepType.FileGenerate:
-          if (node.data.fileName === undefined || node.data.fileContent === undefined) {
-            error = i18next.t("toast.missing-file-generation");
-          }
+          error = validateFileGenerate(followingNode);
+          break;
+        case StepType.Assign:
+          error = validateAssign(followingNode);
+          break;
+        case StepType.MultiChoiceQuestion:
+          error = validateMCQ(followingNode);
+          break;
+        case StepType.DynamicChoices:
+          error = validateDynamicChoices(followingNode);
+          break;
+        case StepType.Condition:
+          error = validateCondition(followingNode);
           break;
         case StepType.Input:
-          if(followingNode?.type === "placeholder" && !allRelations.includes(node.id)) {
+          if (followingNode?.type === 'placeholder' && !allRelations.includes(node.id)) {
             allRelations.push(node.id);
             return;
           }
           break;
       }
 
-      if(error) {
+      if (error && showError) {
         throw new Error(error);
       }
 
-      allRelations.push(`${edge.source}-${edge.target}`);
+      allRelations.push(`${edge.source},${edge.target}`);
     });
-    // find finishing nodes
-    edges.forEach((edge) => {
-      const current = edges.find((lastEdge) => lastEdge.source === edge.source);
-      const nextStep = edges.find((lastEdge) => lastEdge.source === edge.target);
-      if (!nextStep && current?.type !== "placeholder") allRelations.push(edge.target);
-    });
+  });
+  // find finishing nodes
+  edges.forEach((edge) => {
+    const current = edges.find((lastEdge) => lastEdge.source === edge.source);
+    const nextStep = edges.find((lastEdge) => lastEdge.source === edge.target);
+    if (!nextStep && current?.type !== 'placeholder') allRelations.push(edge.target);
+  });
 
-    const finishedFlow = new Map();
-    finishedFlow.set("get_secrets", {
-      call: "http.get",
-      args: {
-        url: `${process.env.REACT_APP_API_URL}/secrets-with-priority`,
-      },
-      result: "secrets",
-    });
-    allRelations.forEach((r) => {
-      const [parentNodeId, childNodeId] = r.split("-");
-      const parentNode = nodes.find((node) => node.id === parentNodeId);
-      if (
-        !parentNode ||
-        parentNode.type !== "customNode" ||
-        [StepType.Rule, StepType.RuleDefinition].includes(parentNode.data.stepType)
-      )
-        return;
+  const finishedFlow = new Map();
 
-      const childNode = nodes.find((node) => node.id === childNodeId);
-      const parentStepName = `${parentNode.data.stepType}-${parentNodeId}`;
-      if (parentNode.data.stepType === StepType.Input) {
-        if (parentNode.data.rules === undefined) {
-          throw new Error(i18next.t("toast.missing-client_input-rules") ?? "Error");
-        }
-
-        const clientInput = `ClientInput_${parentNode.data.clientInputId}`;
-        const clientInputName = `${clientInput}-step`;
-        finishedFlow.set(parentStepName, getTemplate(steps, parentNode, clientInputName, `${clientInput}-assign`));
-        finishedFlow.set(`${clientInput}-assign`, {
-          assign: {
-            [clientInput]: `\${${clientInput}_result.input}`,
-          },
-          next: `${clientInput}-switch`,
-        });
-
-        const clientInputYesOrNo = (label: string) => label === "rule 1" ? '"Yes"' : '"No"';
-
-        const findTargetNodeId = (node: Node) => edges.find((edge) => edge.source === node.id)?.target;
-        const findFollowingNode = (node: Node) => {
-          const target = findTargetNodeId(node);
-          return nodes.find((n) => n.id === target);
-        }
-
-        finishedFlow.set(
-          `${clientInput}-switch`,
-          getSwitchCase(
-            edges
-              .filter((e) => e.source === parentNodeId)
-              .map((e) => {
-                const node = nodes.find((node) => node.id === e.target);
-                if (!node) return e.target;
-                const matchingRule = parentNode.data?.rules?.children?.find(
-                  (_: never, i: number) => `rule ${i + 1}` === node.data.label
-                );
-                const followingNode = findFollowingNode(node);
-                return {
-                  case:
-                    matchingRule && !["Yes", "No"].includes(matchingRule?.condition)
-                      ? `\${${matchingRule.name.replace("{{", "").replace("}}", "")} ${matchingRule.condition} ${matchingRule.value
-                      }}`
-                      : `\${${clientInput} == ${clientInputYesOrNo(node.data.label)}}`,
-                  nextStep:
-                    followingNode?.type === "customNode"
-                      ? `${followingNode.data.stepType}-${followingNode.id}`
-                      : "service-end",
-                };
-              })
-          )
-        );
-        return;
-      }
-      return finishedFlow.set(
-        parentStepName,
-        getTemplate(steps, parentNode, parentStepName, childNode ? `${childNode.data.stepType}-${childNodeId}` : childNodeId)
-      );
-    });
-    finishedFlow.set("service-end", {
-      wrapper: false,
-      return: "",
-    });
-
-    const result = Object.fromEntries(finishedFlow.entries());
-
-    await axios
-      .post(
-        isNewService ? createNewService() : editService(serviceId),
+  finishedFlow.set('declaration', {
+    call: 'declare',
+    version: 0.1,
+    description: description ?? `Description placeholder for '${name ?? ''}'`,
+    method: 'post',
+    accepts: 'json',
+    returns: 'json',
+    namespace: 'service',
+    allowList: {
+      body: [
         {
-          name,
-          serviceId,
-          description,
-          type: "POST",
-          content: result,
-          isCommon,
-          structure: JSON.stringify({ edges, nodes }),
+          field: 'chatId',
+          type: 'string',
+          description: 'The chat ID for the message',
         },
         {
-          params: {
-            location: "/Ruuter/POST/services/tests.yml",
-          },
-        }
-      )
-      .then(onSuccess)
-      .catch(onError);
-
-
-    const endpoints = steps.filter(x => !!x.data).map(x => x.data!);
-    await saveEndpoints(endpoints, name, serviceId);
-  } catch (e: any) {
-    onError(e);
-    useToastStore.getState().error({
-      title: i18next.t("toast.cannot-save-flow"),
-      message: e?.message,
-    });
-  }
-};
-
-const getMapEntry = (value: string) => {
-  const secrets = useServiceStore.getState().secrets;
-
-  const parts = value.replace("{{", "").replace("}}", "").split(".");
-  const key = value.replace("{{", '"').replace("}}", '"');
-  if ([...(secrets?.prod ?? []), ...(secrets?.test ?? [])].includes(value)) {
-    return `[${key}, secrets.response.body.${parts.join(".")}]`;
-  }
-  if (!value.includes("ClientInput")) parts.splice(1, 0, "response", "body");
-  return `[${key}, ${parts.join(".")}]`;
-};
-
-const getNestedPreDefinedRawVariables = (data: { [key: string]: any }, result: string[]) => {
-  Object.keys(data).forEach((k) => {
-    if (typeof data[k] === "object") {
-      return getNestedPreDefinedRawVariables(data[k], result);
-    }
-    if (typeof data[k] === "string" && data[k].startsWith("{{")) {
-      result.push(getMapEntry(data[k]));
-    }
+          field: 'authorId',
+          type: 'string',
+          description: 'The author ID for the message',
+        },
+        {
+          field: 'input',
+          type: 'object',
+          description: 'The Input from the user',
+        },
+      ],
+    },
   });
-};
 
-const getNestedPreDefinedEndpointVariables = (variable: EndpointVariableData, result: string[]) => {
-  const variableData = variable.type === "schema" ? variable.schemaData : variable.arrayData;
-  if (variableData instanceof Array) {
-    variableData.forEach((v) => {
-      if (["schema", "array"].includes(v.type)) getNestedPreDefinedEndpointVariables(v, result);
-
-      if (v.value?.startsWith("{{")) result.push(getMapEntry(v.value));
-      if (v.testValue?.startsWith("{{")) result.push(getMapEntry(v.testValue));
-    });
-  }
-};
-
-const getPreDefinedEndpointVariables = (data?: { variables: EndpointVariableData[]; rawData: RawData }): string[] => {
-  if (!data) return [];
-  const result: string[] = [];
-  data.variables.forEach((v) => {
-    if (!v.value) getNestedPreDefinedEndpointVariables(v, result);
-
-    if (v.value?.startsWith("{{")) result.push(getMapEntry(v.value));
-    if (v.testValue?.startsWith("{{")) result.push(getMapEntry(v.testValue));
+  const firstNode = nodes.find((node) => node.type === 'custom');
+  finishedFlow.set('prepare', {
+    assign: {
+      chatId: '${incoming.body.chatId}',
+      authorId: '${incoming.body.authorId}',
+      input: '${incoming.body.input}',
+      buttons: [],
+      res: {
+        result: '',
+      },
+    },
+    next: firstNode ? toSnakeCase(firstNode.data.label?.toString() ?? 'format_messages') : 'format_messages',
   });
+
   try {
-    getNestedPreDefinedRawVariables(JSON.parse(data.rawData?.value ?? "{}"), result);
-    getNestedPreDefinedRawVariables(JSON.parse(data.rawData?.testValue ?? "{}"), result);
-  } catch (_) { }
+    allRelations.forEach((r) => {
+      const [parentNodeId, childNodeId] = r.split(',');
+      const parentNode = nodes.findLast((node) => node.id === parentNodeId) as Node<NodeDataProps> | undefined;
+      if (
+        !parentNode?.type ||
+        parentNode.type !== 'custom' ||
+        [StepType.Rule, StepType.RuleDefinition].includes(parentNode.data?.stepType)
+      ) {
+        return;
+      }
 
-  return result;
-};
+      const childNode = nodes.find((node) => node.id === childNodeId) as Node<NodeDataProps> | undefined;
+      const parentStepName = toSnakeCase(parentNode.data.label);
 
-const getSwitchCase = (conditions: any[]) => {
-  return {
-    switch: conditions.map((c) => {
-      return {
-        condition: c.case,
-        next: c.nextStep,
-      };
-    }),
-  };
-};
+      if (parentNode.data.stepType === StepType.Textfield) {
+        return handleTextField(finishedFlow, parentStepName, parentNode, childNode);
+      }
 
-const getTemplate = (steps: Step[], node: Node, stepName: string, nextStep?: string) => {
-  const data = getTemplateDataFromNode(node);
-  if (node.data.stepType === StepType.UserDefined) {
-    return {
-      ...getDefinedEndpointStep(steps, node),
-      next: nextStep ?? "service-end",
-    };
+      if (parentNode.data.stepType === StepType.Assign) {
+        return handleAssignStep(parentNode, finishedFlow, parentStepName, childNode);
+      }
+
+      if (parentNode.data.stepType === StepType.Condition) {
+        return handleConditionStep(allRelations, parentNodeId, nodes, parentNode, finishedFlow, parentStepName);
+      }
+
+      if (parentNode.data.stepType === StepType.Input) {
+        return;
+      }
+
+      if (parentNode.data.stepType === StepType.MultiChoiceQuestion) {
+        return handleMultiChoiceQuestion(finishedFlow, parentStepName, parentNode, childNode);
+      }
+
+      if (parentNode.data.stepType === StepType.DynamicChoices) {
+        return handleDynamicChoices(finishedFlow, parentStepName, parentNode, childNode);
+      }
+
+      if (parentNode.data.stepType === StepType.UserDefined) {
+        return handleEndpointStep(parentNode, finishedFlow, parentStepName, childNode);
+      }
+
+      const nextStep = childNode ? toSnakeCase(childNode.data.label ?? 'format_messages') : 'format_messages';
+      const template = getTemplate(parentNode, parentStepName, nextStep);
+
+      finishedFlow.set(parentStepName, template);
+    });
+  } catch (e: any) {
+    if (showError) {
+      throw new Error(i18next.t('toast.cannot-save-flow') ?? (e?.message as string) ?? 'Error');
+    }
   }
+
+  finishedFlow.set('format_messages', {
+    call: 'http.post',
+    args: {
+      url: '[#SERVICE_DMAPPER_HBS]/bot_responses_to_messages',
+      headers: {
+        type: 'json',
+      },
+      body: {
+        data: {
+          botMessages: '${[res]}',
+          chatId: "${chatId ?? ''}",
+          authorId: "${authorId ?? ''}",
+          authorFirstName: '',
+          authorLastName: '',
+          authorTimestamp: '${new Date().toISOString()}',
+          created: '${new Date().toISOString()}',
+          buttons: '${buttons ?? []}',
+        },
+      },
+    },
+    result: 'formatMessage',
+    next: 'service-end',
+  });
+
+  finishedFlow.set('service-end', {
+    return: "${formatMessage.response.body ?? ''}",
+  });
+
+  return Object.fromEntries(finishedFlow.entries());
+}
+
+export const validateTextField = (nodeData: NodeDataProps): string | null => {
+  if (nodeData?.message === undefined) {
+    return i18next.t('toast.missing-textfield-message');
+  }
+  return null;
+};
+
+export const validateOpenWebpage = (nodeData: NodeDataProps): string | null => {
+  if (nodeData?.link === undefined || nodeData?.linkText === undefined) {
+    return i18next.t('toast.missing-website');
+  }
+  return null;
+};
+
+export const validateFileGenerate = (nodeData: NodeDataProps): string | null => {
+  if (nodeData?.fileName === undefined || nodeData?.fileContent === undefined) {
+    return i18next.t('toast.missing-file-generation');
+  }
+  return null;
+};
+
+export const validateAssign = (nodeData: NodeDataProps): string | null => {
+  if (nodeData?.assignElements === undefined || nodeData?.assignElements?.length === 0) {
+    return i18next.t('toast.missing-assign-elements');
+  }
+  return null;
+};
+
+export const validateMultiChoiceQuestion = (nodeData: NodeDataProps): string | null => {
+  if (nodeData?.multiChoiceQuestion?.question === undefined || nodeData?.multiChoiceQuestion.question === '') {
+    return i18next.t('toast.missing-mcq-question');
+  }
+  if (!nodeData?.multiChoiceQuestion?.buttons || nodeData?.multiChoiceQuestion.buttons.length === 0) {
+    return i18next.t('toast.missing-mcq-options');
+  }
+  return null;
+};
+
+export const validateDynamicChoices = (nodeData: NodeDataProps): string | null => {
+  if (nodeData?.dynamicChoices?.list === undefined || nodeData?.dynamicChoices.list === '') {
+    return i18next.t('toast.missing-dynamic-choices-list');
+  }
+  if (nodeData?.dynamicChoices?.serviceName === undefined || nodeData?.dynamicChoices.serviceName === '') {
+    return i18next.t('toast.missing-dynamic-choices-service-name');
+  }
+  if (nodeData?.dynamicChoices?.key === undefined || nodeData?.dynamicChoices.key === '') {
+    return i18next.t('toast.missing-dynamic-choices-key');
+  }
+  return null;
+};
+
+function getBranchNodes(
+  nodes: Node<NodeDataProps>[],
+  edges: Edge[],
+  startNode: Node<NodeDataProps>,
+): Node<NodeDataProps>[] {
+  const branchNodes: Node<NodeDataProps>[] = [startNode];
+  const visited = new Set<string>([startNode.id]);
+  const queue: string[] = [startNode.id];
+
+  while (queue.length > 0) {
+    const currentId = queue.shift()!;
+
+    const currentNode = nodes.find((n) => n.id === currentId);
+    if (currentNode?.data?.stepType === StepType.MultiChoiceQuestion) {
+      continue;
+    }
+
+    const outgoingEdges = edges.filter((edge) => edge.source === currentId);
+
+    for (const edge of outgoingEdges) {
+      if (visited.has(edge.target)) continue;
+
+      const nextNode = nodes.find((node) => node.id === edge.target);
+      if (!nextNode) continue;
+
+      branchNodes.push(nextNode);
+      visited.add(nextNode.id);
+      queue.push(nextNode.id);
+    }
+  }
+
+  return branchNodes;
+}
+
+function handleTextField(
+  finishedFlow: Map<any, any>,
+  parentStepName: string,
+  parentNode: Node,
+  childNode: Node<NodeDataProps> | undefined,
+) {
+  const htmlToMarkdown = new NodeHtmlMarkdown({
+    textReplace: [
+      [/\\_/g, '_'],
+      [/\\\[/g, '['],
+      [/\\\]/g, ']'],
+    ],
+  });
+
+  finishedFlow.set(parentStepName, {
+    assign: {
+      res: {
+        result: `${htmlToMarkdown.translate(
+          typeof parentNode.data.message === 'string'
+            ? parentNode.data.message.replace('{{', '${').replace('}}', '}')
+            : '',
+        )}`,
+      },
+    },
+    next: childNode ? toSnakeCase(childNode.data.label ?? 'format_messages') : 'format_messages',
+  });
+}
+
+function handleConditionStep(
+  allRelations: any[],
+  parentNodeId: any,
+  nodes: Node[],
+  parentNode: Node<NodeDataProps>,
+  finishedFlow: Map<any, any>,
+  parentStepName: string,
+) {
+  const conditionRelations: string[] = allRelations.filter((r) => r.startsWith(parentNodeId));
+  const firstChildNode = conditionRelations[0].split(',')[1];
+  const secondChildNode = conditionRelations[1].split(',')[1];
+
+  const firstChild = nodes.find((node) => node.id === firstChildNode) as Node<NodeDataProps> | undefined;
+  const secondChild = nodes.find((node) => node.id === secondChildNode) as Node<NodeDataProps> | undefined;
+
+  const invalidRulesExist = hasInvalidRules(parentNode.data.rules?.children ?? []);
+  const isInvalid =
+    parentNode.data.rules?.children === undefined || invalidRulesExist || parentNode.data.rules?.children.length === 0;
+  if (isInvalid) {
+    throw new Error(i18next.t('toast.missing-condition-rules') ?? 'Error');
+  }
+
+  finishedFlow.set(parentStepName, {
+    switch: [
+      {
+        condition: `\${${buildConditionString(parentNode.data.rules)}}`,
+        next: toSnakeCase(firstChild?.data?.label ?? '') ?? '',
+      },
+    ],
+    next: toSnakeCase(secondChild?.data?.label ?? '') ?? '',
+  });
+}
+
+function handleAssignStep(
+  parentNode: Node<NodeDataProps>,
+  finishedFlow: Map<any, any>,
+  parentStepName: string,
+  childNode: Node<NodeDataProps> | undefined,
+) {
+  const invalidElementsExist = hasInvalidElements(parentNode.data.assignElements ?? []);
+  const isInvalid =
+    parentNode.data?.assignElements === undefined ||
+    invalidElementsExist ||
+    parentNode.data?.assignElements.length === 0;
+
+  if (isInvalid) {
+    throw new Error(i18next.t('toast.missing-assign-elements') ?? 'Error');
+  }
+
+  finishedFlow.set(parentStepName, {
+    assign: parentNode.data.assignElements?.reduce((acc: Record<string, any>, e: Assign) => {
+      acc[e.key] = e.value;
+      return acc;
+    }, {}),
+    next: childNode ? toSnakeCase(childNode.data.label ?? 'format_messages') : 'format_messages',
+  });
+}
+
+function handleEndpointStep(
+  parentNode: Node<NodeDataProps>,
+  finishedFlow: Map<any, any>,
+  parentStepName: string,
+  childNode: Node<NodeDataProps> | undefined,
+) {
+  const endpointDefinition = parentNode.data.endpoint?.definitions[0];
+  const paramsVariables = endpointDefinition?.params?.variables;
+  const bodyVariables = endpointDefinition?.body?.variables;
+  const isRawBodySelected = endpointDefinition?.body?.isRowSelected ?? false;
+  const rawBody = endpointDefinition?.body?.rawData ?? {};
+  const headersVariables = endpointDefinition?.headers?.variables;
+  const methodType = endpointDefinition?.methodType?.toLowerCase();
+  const hasNonEqualOperator = paramsVariables?.some((param: any) => param.operator && param.operator !== '=');
+
+  const stepConfig: any = {
+    call: `http.${methodType ?? 'post'}`,
+    args: {
+      url: hasNonEqualOperator ? (endpointDefinition?.url ?? '') : (endpointDefinition?.url?.split('?')[0] ?? ''),
+    },
+    result: `${parentNode.data.endpoint?.name.replaceAll(' ', '_')}_res`,
+    next: childNode ? toSnakeCase(childNode.data.label ?? 'format_messages') : 'format_messages',
+  };
+
+  if (Array.isArray(paramsVariables) && paramsVariables.length > 0 && !hasNonEqualOperator) {
+    stepConfig.args.query = paramsVariables.reduce((acc: any, e: any) => {
+      acc[e.name] = e.value;
+      return acc;
+    }, {});
+  }
+
+  if (isRawBodySelected) {
+    try {
+      const rawJson = JSON.parse(rawBody?.value ?? '');
+      stepConfig.args.body = rawJson;
+    } catch (e: any) {
+      console.log(`Unable to save JSON to Yaml. ${e.message}`);
+    }
+  } else if (Array.isArray(bodyVariables) && bodyVariables.length > 0) {
+    stepConfig.args.body = bodyVariables.reduce((acc: any, e: any) => {
+      acc[e.name] = e.value;
+      return acc;
+    }, {});
+  }
+
+  if (Array.isArray(headersVariables) && headersVariables.length > 0) {
+    stepConfig.args.headers = headersVariables.reduce((acc: any, e: any) => {
+      acc[e.name] = e.value;
+      return acc;
+    }, {});
+  }
+
+  finishedFlow.set(parentStepName, stepConfig);
+}
+
+function handleMultiChoiceQuestion(
+  finishedFlow: Map<any, any>,
+  parentStepName: string,
+  parentNode: Node<NodeDataProps>,
+  childNode: Node<NodeDataProps> | undefined,
+) {
+  return finishedFlow.set(parentStepName, {
+    assign: {
+      buttons: parentNode?.data?.multiChoiceQuestion?.buttons ?? [],
+      res: {
+        result: parentNode?.data?.multiChoiceQuestion?.question ?? '',
+      },
+    },
+    next: childNode ? toSnakeCase(childNode.data.label ?? 'format_messages') : 'format_messages',
+  });
+}
+
+function handleDynamicChoices(
+  finishedFlow: Map<any, any>,
+  parentStepName: string,
+  parentNode: Node<NodeDataProps>,
+  childNode: Node<NodeDataProps> | undefined,
+) {
+  const list = parentNode.data.dynamicChoices?.list ?? '';
+  finishedFlow.set(parentStepName, {
+    call: 'http.post',
+    args: {
+      url: '[#SERVICE_DMAPPER]/generate/buttons-list',
+      body: {
+        list: stringToArray(list, list),
+        service_name: parentNode.data.dynamicChoices?.serviceName ?? '',
+        key: parentNode.data.dynamicChoices?.key ?? '',
+        payload_prefix: '#service, /POST/services/active/',
+        payload_keys: parentNode.data.dynamicChoices?.payloadKeys.split(',').filter((item) => item.trim()) ?? [],
+      },
+    },
+    result: 'dynamic_choices_res',
+    next: 'assign_dynamic_choices_buttons',
+  });
+
+  return finishedFlow.set('assign_dynamic_choices_buttons', {
+    assign: {
+      buttons: '${dynamic_choices_res.response.body.response ?? []}',
+    },
+    next: childNode ? toSnakeCase(childNode.data.label ?? 'format_messages') : 'format_messages',
+  });
+}
+
+const getTemplate = (node: Node, stepName: string, nextStep?: string) => {
+  const data = getTemplateDataFromNode(node);
+
   return {
     template: `${data?.templateName}`,
-    requestType: "templates",
+    requestType: 'templates',
     body: data?.body,
     result: data?.resultName ?? `${stepName}_result`,
-    next: nextStep ?? "service-end",
+    next: nextStep ?? 'format_messages',
   };
 };
 
 const getTemplateDataFromNode = (node: Node): { templateName: string; body?: any; resultName?: string } | undefined => {
   if (node.data.stepType === StepType.Auth) {
     return {
-      templateName: "tara",
-      resultName: "TARA",
-    };
-  }
-  if (node.data.stepType === StepType.Textfield) {
-    return {
-      templateName: "send-message-to-client",
-      body: {
-        message: `${node.data.message?.replace("{{", "${").replace("}}", "}")}`,
-      },
+      templateName: '[#SERVICE_PROJECT_LAYER]/tara',
+      resultName: 'TARA',
     };
   }
   if (node.data.stepType === StepType.Input) {
     return {
-      templateName: "client-input",
-      resultName: `ClientInput_${node.data.clientInputId}_result`,
+      templateName: '[#SERVICE_PROJECT_LAYER]/client-input',
+      resultName: `client_input_${node.data.clientInputId}_result`,
     };
   }
   if (node.data.stepType === StepType.FileGenerate) {
     return {
-      templateName: "file-generate",
+      templateName: '[#SERVICE_PROJECT_LAYER]/file-generate',
       body: {
-        fileName: node.data.fileName ?? "",
-        fileContent: node.data.fileContent ?? "",
+        fileName: node.data.fileName ?? '',
+        fileContent: node.data.fileContent ?? '',
       },
     };
   }
   if (node.data.stepType === StepType.FileSign) {
     return {
-      templateName: "siga",
+      templateName: '[#SERVICE_PROJECT_LAYER]/siga',
       body: {
-        type: "smart_id",
-        country: "EE",
+        type: 'smart_id',
+        country: 'EE',
       },
-      resultName: "SiGa",
+      resultName: 'SiGa',
     };
   }
   if (node.data.stepType === StepType.FinishingStepRedirect) {
     return {
-      templateName: "direct-to-cs",
+      templateName: '[#SERVICE_PROJECT_LAYER]/direct-to-cs',
       body: {
-        message: node.data.message ?? "",
+        message: node.data.message ?? '',
       },
     };
   }
   if (node.data.stepType === StepType.FinishingStepEnd) {
     return {
-      templateName: "end-conversation",
+      templateName: '[#SERVICE_PROJECT_LAYER]/end-conversation',
       body: {
-        message: node.data.message ?? "",
+        message: node.data.message ?? '',
       },
     };
   }
   if (node.data.stepType === StepType.OpenWebpage) {
     return {
-      templateName: "open-webpage",
+      templateName: '[#SERVICE_PROJECT_LAYER]/open-webpage',
       body: {
-        link: node.data.link ?? "",
-        linkText: node.data.linkText ?? "",
+        link: node.data.link ?? '',
+        linkText: node.data.linkText ?? '',
       },
     };
   }
 };
 
-const getDefinedEndpointStep = (steps: Step[], node: Node) => {
-  const name = useServiceStore.getState().name;
-  const endpoint = steps.find((e) => e.label === node.data.label)?.data;
-  const selectedEndpoint = endpoint?.definedEndpoints.find((e) => e.isSelected);
-  if (!selectedEndpoint || !endpoint) {
-    return {
-      return: "",
-    };
-  }
-  return {
-    call: `http.post`,
-    args: {
-      url: `${process.env.REACT_APP_API_URL
-        }/services/endpoints/${selectedEndpoint.methodType.toLowerCase()}-${name}-${(endpoint.name.trim().length ?? 0) > 0 ? endpoint.name : endpoint.id
-        }?type=prod`,
-      body: {
-        headers: `\${new Map([${getPreDefinedEndpointVariables(selectedEndpoint.headers)}])}`,
-        body: `\${new Map([${getPreDefinedEndpointVariables(selectedEndpoint.body)}])}`,
-        params: `\${new Map([${getPreDefinedEndpointVariables(selectedEndpoint.params)}])}`,
-      },
-      params: {
-        type: "prod",
-      },
-    },
-    result: (endpoint.name.trim().length ?? 0) > 0 ? endpoint.name : endpoint.id,
-  };
-};
-
-export const saveDraft = async () => {
-  const vaildServiceInfo = useServiceStore.getState().vaildServiceInfo();
-  const endpoints = useServiceStore.getState().endpoints;
-  const name = useServiceStore.getState().name;
-  const id = useServiceStore.getState().serviceId;
-
-  if (!vaildServiceInfo) {
-    useToastStore.getState().error({
-      title: i18next.t("newService.toast.missingFields"),
-      message: i18next.t("newService.toast.serviceMissingFields"),
-    });
-    return;
-  }
-
-  await saveEndpoints(
-    endpoints,
-    name,
-    id,
-    () => {
-      useToastStore.getState().success({
-        title: i18next.t("newService.toast.success"),
-        message: i18next.t("newService.toast.savedSuccessfully"),
-      });
-    },
-    (e) => {
-      useToastStore.getState().error({
-        title: i18next.t("newService.toast.failed"),
-        message: i18next.t("newService.toast.saveFailed"),
-      });
-    },
-  );
-  return true;
-};
-
-export const saveFlowClick = async () => {
-  const name = useServiceStore.getState().serviceNameDashed();
+export const saveFlowClick = async (status: 'draft' | 'ready' = 'ready', showError: boolean = true) => {
+  const name = removeTrailingUnderscores(useServiceStore.getState().serviceNameDashed());
   const serviceId = useServiceStore.getState().serviceId;
   const description = useServiceStore.getState().description;
+  const slot = useServiceStore.getState().slot;
   const isCommon = useServiceStore.getState().isCommon;
-  const steps = useServiceStore.getState().mapEndpointsToSetps();
   const isNewService = useServiceStore.getState().isNewService;
   const edges = useServiceStore.getState().edges;
-  const nodes = useServiceStore.getState().nodes;
+  const nodes = useServiceStore.getState().nodes as Node<NodeDataProps>[];
 
   await saveFlow({
-    steps,
-    name,
+    name: !name
+      ? `${t('newService.defaultServiceName').toString()}_${format(new Date(), 'dd_MM_yyyy_HH_mm_ss')}`
+      : name,
     edges,
     nodes,
     onSuccess: () => {
       useToastStore.getState().success({
-        title: i18next.t("newService.toast.success"),
-        message: i18next.t("newService.toast.savedSuccessfully"),
+        title: i18next.t('newService.toast.success'),
+        message: i18next.t('newService.toast.savedSuccessfully'),
       });
       useServiceStore.getState().enableTestButton();
     },
-    onError: (e) => {
+    onError: (e: AxiosError) => {
       useToastStore.getState().error({
-        title: i18next.t("toast.cannot-save-flow"),
-        message: e?.message,
+        title: i18next.t('newService.toast.failed'),
+        message: e.response?.status === 409 ? t('newService.toast.serviceNameAlreadyExists') : e?.message,
       });
+      throw new Error(
+        e.response?.status === 409 ? t('newService.toast.serviceNameAlreadyExists').toString() : e?.message,
+      );
     },
     description,
+    slot,
     isCommon,
     serviceId,
-    isNewService
+    isNewService,
+    status,
+    showError,
   });
-}
+};
 
 export const editServiceInfo = async () => {
-  const name = useServiceStore.getState().serviceNameDashed();
+  const name = removeTrailingUnderscores(useServiceStore.getState().serviceNameDashed());
   const description = useServiceStore.getState().description;
-  const endpoints = useServiceStore.getState().endpoints;
   const serviceId = useServiceStore.getState().serviceId;
-  const endPointsName = useServiceStore.getState().name;
+  const slot = useServiceStore.getState().slot;
 
   const tasks: Promise<any>[] = [];
 
-  tasks.push(axios.post(editService(serviceId), {
-    name,
-    description,
-    type: "POST",
-  }
-  ));
-
-  await saveEndpoints(endpoints, endPointsName, serviceId);
+  tasks.push(
+    api.post(editService(serviceId), {
+      name,
+      description,
+      slot,
+      type: 'POST',
+      updateServiceDb: true,
+      state: 'ready',
+    }),
+  );
 
   await Promise.all(tasks)
-    .then(() => useToastStore.getState().success({
-      title: i18next.t("newService.toast.success"),
-      message: i18next.t("newService.toast.savedSuccessfully"),
-    }))
+    .then(() =>
+      useToastStore.getState().success({
+        title: i18next.t('newService.toast.success'),
+        message: i18next.t('newService.toast.savedSuccessfully'),
+      }),
+    )
     .catch((e) => {
       useToastStore.getState().error({
-        title: i18next.t("newService.toast.saveFailed"),
+        title: i18next.t('newService.toast.saveFailed'),
         message: e?.message,
       });
     });
-}
-
-export const runServiceTest = async () => {
-  const name = useServiceStore.getState().serviceNameDashed();
-  const state = useServiceStore.getState().serviceState;
-
-  try {
-    await axios.post(testService(state, name), {});
-    useToastStore.getState().success({
-      title: "Test result- success",
-    });
-  } catch (error) {
-    console.log("ERROR: ", error);
-    useToastStore.getState().error({
-      title: "Test result - error",
-    });
-  }
 };

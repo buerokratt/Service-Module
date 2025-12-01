@@ -1,10 +1,11 @@
+import { Assign } from 'types';
 import { v4 as uuidv4 } from 'uuid';
 
 export interface RuleGroupBuilderProps {
   group?: Group;
   onRemove?: (id: string) => void;
   onChange: (config: any) => void;
-  seedGroup?: any;
+  seedGroup?: Group | GroupOrRule[];
 }
 
 export interface Rule {
@@ -12,6 +13,10 @@ export interface Rule {
   field: string;
   operator: string;
   value: string;
+  fieldDragElement?: Assign;
+  valueDragElement?: Assign;
+  isFieldManual?: boolean;
+  isValueManual?: boolean;
 }
 
 export type GroupType = 'and' | 'or';
@@ -33,8 +38,12 @@ export const getInitialRule = () => {
     field: '',
     operator: '',
     value: '',
+    fieldDragElement: undefined,
+    valueDragElement: undefined,
+    isFieldManual: false,
+    isValueManual: false,
   };
-}
+};
 
 export const getInitialGroup = () => {
   return {
@@ -43,4 +52,4 @@ export const getInitialGroup = () => {
     type: 'and',
     not: false,
   } as Group;
-}
+};

@@ -1,0 +1,6 @@
+@import 'src/styles/tools/color';
+
+.formError {
+  color: get-color(jasper-10);
+  font-size: 14px;
+}

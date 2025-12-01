@@ -1,20 +1,19 @@
-import React, { useEffect, useState } from "react";
-import { getOpenApiSpec } from "../../../../resources/api-constants";
-import { Button, FormInput, FormSelect, RequestVariables, Track } from "../../..";
-import { useTranslation } from "react-i18next";
-import axios from "axios";
-import { v4 as uuid } from "uuid";
-import { RequestTab, Option } from "../../../../types";
-import { ApiSpecProperty } from "../../../../types/api-spec-property";
+import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import api from 'services/api';
+import { v4 as uuid } from 'uuid';
+
+import { Button, FormInput, FormSelect, RequestVariables, Track } from '../../..';
+import { getOpenApiSpec } from '../../../../resources/api-constants';
+import useServiceStore from '../../../../store/new-services.store';
+import { Option, RequestTab } from '../../../../types';
+import { ApiSpecProperty } from '../../../../types/api-spec-property';
 import {
   EndpointData,
-  EndpointType,
+  EndpointDefinition,
   EndpointVariableData,
-  EndpointTab,
   PreDefinedEndpointEnvVariables,
-} from "../../../../types/endpoint";
-import { RequestVariablesRowData, RequestVariablesTabsRowsData } from "../../../../types/request-variables";
-import useServiceStore from "store/new-services.store";
+} from '../../../../types/endpoint';
 
 type EndpointOpenAPIProps = {
   endpoint: EndpointData;
@@ -26,25 +25,34 @@ type EndpointOpenAPIProps = {
 
 const EndpointOpenAPI: React.FC<EndpointOpenAPIProps> = ({
   endpoint,
+  // This needs to be removed in the future
+  // This is always true as we have removed the Test tab
   isLive,
   requestValues,
   requestTab,
   setRequestTab,
 }) => {
-  const [openApiUrl, setOpenApiUrl] = useState<string>(endpoint.openApiUrl ?? "");
-  const [selectedEndpoint, setSelectedEndpoint] = useState<EndpointType | undefined>(
-    endpoint.definedEndpoints.find((e) => e.isSelected)
+  const [openApiUrl, setOpenApiUrl] = useState<string>(endpoint?.definitions[0]?.openApiUrl ?? '');
+  const [selectedEndpoint, setSelectedEndpoint] = useState<EndpointDefinition | undefined>(
+    endpoint.definitions.find((e) => e.isSelected),
   );
-  const [openApiEndpoints, setOpenApiEndpoints] = useState<EndpointType[]>(endpoint.definedEndpoints ?? []);
+  const [openApiEndpoints, setOpenApiEndpoints] = useState<EndpointDefinition[]>(endpoint.definitions ?? []);
   const [key, setKey] = useState<number>(0);
+  const { triggerJsonRequest } = useServiceStore();
   const { t } = useTranslation();
-  const { setEndpoints } = useServiceStore();
 
-  useEffect(() => setKey(key + 1), [isLive]);
+  useEffect(() => setKey((prevKey) => prevKey + 1), [isLive]);
+
+  const handleJsonRequestClick = () => {
+    if (selectedEndpoint) {
+      const endpointData = { ...endpoint, definitions: [selectedEndpoint] };
+      triggerJsonRequest(endpointData);
+    }
+  };
 
   const getEndpointSchema = (
     apiSpec: ApiSpecProperty,
-    contentSchema?: ApiSpecProperty
+    contentSchema?: ApiSpecProperty,
   ): EndpointVariableData[] | undefined => {
     if (!contentSchema) return;
     if (contentSchema.items) {
@@ -52,9 +60,9 @@ const EndpointOpenAPI: React.FC<EndpointOpenAPIProps> = ({
       return [
         {
           id: uuid(),
-          name: schemaPath.split("/").pop() ?? "",
-          type: "array",
-          arrayType: "schema",
+          name: schemaPath.split('/').pop() ?? '',
+          type: 'array',
+          arrayType: 'schema',
           required: false,
           arrayData: parseSchemaProperty(apiSpec, getPropertySchema(apiSpec, schemaPath)),
         },
@@ -66,25 +74,25 @@ const EndpointOpenAPI: React.FC<EndpointOpenAPIProps> = ({
 
   const getEndpointResponse = (
     apiSpec: ApiSpecProperty,
-    response?: ApiSpecProperty
+    response?: ApiSpecProperty,
   ): EndpointVariableData[] | undefined => {
     if (!response) return;
-    if (response.type === "object")
+    if (response.type === 'object')
       return [
         {
           id: uuid(),
-          name: "response",
+          name: 'response',
           type: response.additionalProperties?.type,
           integerFormat: response.additionalProperties?.format,
         },
       ];
-    if (response.$ref || response.type === "array") return getEndpointSchema(apiSpec, response);
-    return [{ id: uuid(), name: "response", type: response.type }];
+    if (response.$ref || response.type === 'array') return getEndpointSchema(apiSpec, response);
+    return [{ id: uuid(), name: 'response', type: response.type }];
   };
 
   const parseSchemaProperty = (
     apiSpec: ApiSpecProperty,
-    schema: ApiSpecProperty
+    schema: ApiSpecProperty,
   ): EndpointVariableData[] | undefined => {
     if (!schema.properties) return;
 
@@ -94,41 +102,44 @@ const EndpointOpenAPI: React.FC<EndpointOpenAPIProps> = ({
         id: uuid(),
         name: variableName,
         required: false,
-        type: Object.keys(data).includes("$ref") ? "schema" : data.type,
+        type: Object.keys(data).includes('$ref') ? 'schema' : data.type,
       };
       variableData.description = data.description;
 
-      if (Object.keys(data).includes("$ref")) {
+      if (Object.keys(data).includes('$ref')) {
         const subSchema = getPropertySchema(apiSpec, data.$ref);
         const parsedSubSchema = parseSchemaProperty(apiSpec, subSchema);
         variableData.schemaData = parsedSubSchema;
       }
-      if (data.type === "array") {
-        if (!Object.keys(data.items).includes("$ref")) {
+      if (data.type === 'array') {
+        if (!Object.keys(data.items).includes('$ref')) {
           variableData.arrayType = data.items.type;
         } else {
-          variableData.arrayType = "schema";
+          variableData.arrayType = 'schema';
           variableData.arrayData = parseSchemaProperty(apiSpec, getPropertySchema(apiSpec, data.items.$ref));
         }
       }
-      if (Object.keys(data).includes("enum")) variableData.enum = data.enum;
-      if (data.type === "integer") variableData.integerFormat = data.format;
+      if (Object.keys(data).includes('enum')) variableData.enum = data.enum;
+      if (data.type === 'integer') variableData.integerFormat = data.format;
 
       result.push(variableData);
     });
     if (!schema.required) return result;
+    // The types are ambiguous here
+    // Required can a record of strings (here) or a boolean (in getParams)
+    // This might be a bug, impossible to resolve without refactoring this old component
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     Object.values(schema?.required).forEach((name) => {
-      result.map((variable) => {
-        if (variable.name !== name) return variable;
+      result.forEach((variable) => {
+        if (variable.name !== name) return;
         variable.required = true;
-        return variable;
       });
     });
     return result;
   };
 
   const getPropertySchema = (apiSpec: ApiSpecProperty, propertyPath: string): ApiSpecProperty => {
-    const indices = propertyPath.split("/").slice(1);
+    const indices = propertyPath.split('/').slice(1);
     let schema = apiSpec;
     indices.forEach((indice) => (schema = schema[indice]));
     return schema;
@@ -152,61 +163,66 @@ const EndpointOpenAPI: React.FC<EndpointOpenAPIProps> = ({
   };
 
   const fetchOpenApiSpecMock = async () => {
-    const result = await axios.post(getOpenApiSpec(), { url: openApiUrl });
+    const result = await api.post<{ response: ApiSpecProperty }>(getOpenApiSpec(), { url: openApiUrl });
     const apiSpec = result.data.response;
-    const url = new URL(openApiUrl).origin + apiSpec.basePath;
-    const paths: EndpointType[] = [];
+    const url = new URL(openApiUrl).origin + (apiSpec.basePath ?? '');
+    const paths: EndpointDefinition[] = [];
 
     Object.entries(apiSpec.paths).forEach(([path, endpointData]) => {
-      Object.entries(endpointData as ApiSpecProperty).forEach(([method, data]: [string, ApiSpecProperty]) => {
+      Object.entries(endpointData).forEach(([method, data]) => {
         const endpointUrl = url + path;
         const label = `${method.toUpperCase()} ${path}`;
-        if (!["get", "post"].includes(method.toLowerCase())) {
+        if (!['get', 'post'].includes(method.toLowerCase())) {
           paths.push({
             id: uuid(),
             label,
             path,
             url: endpointUrl,
-            type: "openApi",
+            openApiUrl,
+            type: 'openApi',
             methodType: method,
-            supported: false,
-            isSelected: false,
+            supported: true,
+            isSelected: true,
             dataType: 'custom',
           });
           return;
         }
-        const body = getEndpointSchema(apiSpec, data.requestBody?.content["application/json"]?.schema);
+        const body = getEndpointSchema(apiSpec, data.requestBody?.content['application/json']?.schema);
         const params = getParams(data.parameters);
         const headers = undefined; // where to get headers ?
-        const response = getEndpointResponse(apiSpec, data.responses["200"]);
+        const response = getEndpointResponse(apiSpec, data.responses['200']);
 
         paths.push({
           id: uuid(),
           label,
           path,
-          type: "openApi",
+          type: 'openApi',
           methodType: method,
           supported: true,
-          isSelected: false,
+          isSelected: true,
           description: data.summary ?? data.description,
           url: endpointUrl,
+          openApiUrl,
           dataType: 'custom',
           body: body
             ? {
                 variables: body,
                 rawData: {},
+                isRowSelected: false,
               }
             : undefined,
           headers: headers
             ? {
                 variables: headers,
                 rawData: {},
+                isRowSelected: false,
               }
             : undefined,
           params: params
             ? {
                 variables: params,
                 rawData: {},
+                isRowSelected: false,
               }
             : undefined,
           response,
@@ -214,111 +230,48 @@ const EndpointOpenAPI: React.FC<EndpointOpenAPIProps> = ({
       });
     });
     setOpenApiEndpoints(paths);
-    setEndpoints((prevEndpoints) => {
-      prevEndpoints.map((prevEndpoint) => {
-        if (prevEndpoint.id !== endpoint.id) return prevEndpoint;
-        prevEndpoint.definedEndpoints = paths;
-        prevEndpoint.openApiUrl = openApiUrl;
-        return prevEndpoint;
-      });
-      return prevEndpoints;
-    });
+    endpoint.definitions = paths;
+    endpoint.definitions[0].openApiUrl = openApiUrl;
     setKey(key + 1);
   };
-
-  const checkNestedVariables = (variable: EndpointVariableData, data: RequestVariablesRowData[]) => {
-    const variableData = variable.type === "schema" ? variable.schemaData : variable.arrayData;
-    if (variableData instanceof Array) {
-      variableData.forEach((variableData) => {
-        const updatedVariable = data.find((updated) => updated.endpointVariableId === variableData.id);
-        variableData[isLive ? "value" : "testValue"] = updatedVariable?.value;
-        if (["schema", "array"].includes(variableData.type)) {
-          checkNestedVariables(variableData, data);
-        }
-      });
-    }
-  };
-
-  const updateEndpointData = (data: RequestVariablesTabsRowsData, openApiEndpointId?: string) => {
-    if (!openApiEndpointId) return;
-    setEndpoints((prevEndpoints) => {
-      return prevEndpoints.map((prevEndpoint) => {
-        if (prevEndpoint.id !== endpoint.id) return prevEndpoint;
-        updateEndpoint(prevEndpoint, data, openApiEndpointId);
-        return prevEndpoint;
-      });
-    });
-    setKey(key + 1);
-  };
-
-  const updateEndpoint = (prevEndpoint: EndpointData, data: RequestVariablesTabsRowsData, openApiEndpointId?: string) => {
-    prevEndpoint.definedEndpoints.map((openApiEndpoint) => {
-      if (openApiEndpoint.id === openApiEndpointId) {
-        updateOpenApiEndpoint(data, openApiEndpoint)
-      }
-      return openApiEndpoint;
-    });
-  }
-
-  const updateOpenApiEndpoint = (data: RequestVariablesTabsRowsData, openApiEndpoint: EndpointType) => {
-    for (const key in data) {
-      openApiEndpoint[key as EndpointTab]?.variables.forEach((variable) => {
-        if (["schema", "array"].includes(variable.type)) {
-          checkNestedVariables(variable, data[key as EndpointTab]!);
-        }
-        const updatedVariable = data[key as EndpointTab]!.find((updated) => updated.endpointVariableId === variable.id);
-        variable[isLive ? "value" : "testValue"] = updatedVariable?.value;
-      });
-    }
-  }
 
   const onSelectEndpoint = (selection: Option | null) => {
     const newSelectedEndpoint = openApiEndpoints.find((openApiEndpoint) => openApiEndpoint.label === selection?.label);
     setSelectedEndpoint(newSelectedEndpoint);
-    setEndpoints((prevEndpoints) => {
-      return updateSelectedEndpoint(prevEndpoints, newSelectedEndpoint)
-    });
+    if (!newSelectedEndpoint) return;
+    endpoint.definitions = [];
+    endpoint.definitions.push(newSelectedEndpoint);
     setKey(key + 1);
   };
-
-  const updateSelectedEndpoint = (prevEndpoints:EndpointData[], newSelectedEndpoint: EndpointType | undefined) => {
-    return prevEndpoints.map((prevEndpoint) => {
-      if (prevEndpoint.id !== endpoint.id) return prevEndpoint;
-      prevEndpoint.definedEndpoints.map((definedEndpoint) => {
-        definedEndpoint.isSelected = definedEndpoint === newSelectedEndpoint;
-        return definedEndpoint;
-      });
-      return prevEndpoint;
-    });
-  }
 
   return (
     <Track direction="vertical" align="stretch" gap={16}>
       <div>
-        <label htmlFor="endpointUrl">{t("newService.endpoint.url")}</label>
+        <label htmlFor="endpointUrl">{t('newService.endpoint.url')}</label>
         <Track gap={8}>
           <FormInput
             name="endpointUrl"
             label=""
-            placeholder={t("newService.endpoint.insert") ?? ""}
+            placeholder={t('newService.endpoint.insert') ?? ''}
             value={openApiUrl}
             onChange={(e) => setOpenApiUrl(e.target.value)}
           />
           <Button
             onClick={() => {
-              fetchOpenApiSpecMock();
+              void fetchOpenApiSpecMock();
             }}
           >
-            {t("newService.endpoint.ask")}
+            {t('newService.endpoint.ask')}
           </Button>
         </Track>
       </div>
       {openApiEndpoints.length > 0 && (
         <div>
-          <label htmlFor="select-endpoint">{t("newService.endpoint.single")}</label>
+          <label htmlFor="select-endpoint">{t('newService.endpoint.single')}</label>
           <FormSelect
-            name={"select-endpoint"}
-            label={""}
+            name={'select-endpoint'}
+            label={''}
+            style={{ fontSize: '15px' }}
             defaultValue={selectedEndpoint?.label}
             options={openApiEndpoints.map((openApiEndpoint) => {
               return { label: openApiEndpoint.label, value: openApiEndpoint.label };
@@ -330,20 +283,23 @@ const EndpointOpenAPI: React.FC<EndpointOpenAPIProps> = ({
       {selectedEndpoint &&
         (selectedEndpoint?.supported ? (
           <>
-            <p>{selectedEndpoint?.description}</p>
+            <Track justify="between" gap={16}>
+              <p>{selectedEndpoint?.description}</p>
+              <Button onClick={handleJsonRequestClick}>{t('newService.test')}</Button>
+            </Track>
             <RequestVariables
               key={key}
               disableRawData
               isLive={isLive}
-              endpointData={selectedEndpoint}
-              updateEndpointData={updateEndpointData}
+              endpoint={endpoint}
               requestValues={requestValues}
               requestTab={requestTab}
               setRequestTab={setRequestTab}
+              onParametersChange={() => {}}
             />
           </>
         ) : (
-          <p>{t("newService.endpoint.unsupported")}</p>
+          <p>{t('newService.endpoint.unsupported')}</p>
         ))}
     </Track>
   );

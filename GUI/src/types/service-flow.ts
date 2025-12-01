@@ -1,33 +1,18 @@
-import { StepType } from "./step-type.enum";
-import { MarkerType, Node } from "reactflow";
+import { Edge, Node } from '@xyflow/react';
+import { Group } from 'components/FlowElementsPopup/RuleBuilder/types';
+import { Dispatch, SetStateAction } from 'react';
+import { generateUniqueId } from 'utils/flow-utils';
+
+import { Assign } from './assign';
+import { DynamicChoices } from './dynamic-choices';
+import { EndpointData } from './endpoint';
+import { MultiChoiceQuestion } from './multi-choice-question';
+import { StepType } from './step-type.enum';
 
 export const GRID_UNIT = 16;
 export const EDGE_LENGTH = 5 * GRID_UNIT;
-
-export const initialPlaceholder = {
-  id: "2",
-  type: "placeholder",
-  position: {
-    x: 3 * GRID_UNIT,
-    y: 8 * GRID_UNIT,
-  },
-  data: {
-    type: "placeholder",
-  },
-  className: "placeholder",
-  selectable: false,
-  draggable: false,
-};
-
-export const initialEdge = {
-  type: "smoothstep",
-  id: "edge-1-2",
-  source: "1",
-  target: "2",
-  markerEnd: {
-    type: MarkerType.ArrowClosed,
-  },
-};
+const startNodeId = generateUniqueId();
+const ghostNodeId = generateUniqueId();
 
 export type NodeDataProps = {
   label: string;
@@ -36,27 +21,65 @@ export type NodeDataProps = {
   type: string;
   stepType: StepType;
   readonly: boolean;
+  name?: string;
+  condition?: string;
+  value?: string;
   message?: string;
   link?: string;
   linkText?: string;
   fileName?: string;
   fileContent?: string;
-  signOption?: any;
-  rules?: any;
+  signOption?: { label: string; value: string };
+  originalDefinedNodeId?: string;
+  rules?: Group;
+  assignElements?: Assign[];
+  multiChoiceQuestion?: MultiChoiceQuestion;
+  dynamicChoices?: DynamicChoices;
+  childrenCount: number;
+  clientInputId?: number;
+  endpoint?: EndpointData;
+  testingPassed?: boolean;
+  setClickedNode: Dispatch<SetStateAction<string>>;
 };
 
 export const initialNodes: Node[] = [
   {
-    id: "1",
-    type: "startNode",
+    id: startNodeId,
+    type: 'start',
     position: {
-      x: 13.5 * GRID_UNIT,
-      y: GRID_UNIT,
+      x: 0,
+      y: 0,
     },
-    data: {},
-    className: "start",
+    data: {
+      type: 'start',
+    },
+    className: 'start',
     selectable: false,
     draggable: false,
   },
-  initialPlaceholder,
+  {
+    id: ghostNodeId,
+    type: 'ghost',
+    position: {
+      x: 0,
+      y: 150,
+    },
+    data: {
+      type: 'ghost',
+    },
+    className: 'ghost',
+    selectable: false,
+    draggable: false,
+  },
+];
+
+export const initialEdges: Edge[] = [
+  {
+    type: 'step',
+    id: `edge-${startNodeId}-${ghostNodeId}`,
+    source: startNodeId,
+    target: ghostNodeId,
+    animated: true,
+    deletable: false,
+  },
 ];

@@ -1,123 +1,255 @@
-import React, { FC, useCallback, useRef } from "react";
-import ReactFlow, {
-  Background,
-  Controls,
-  Edge,
-  MiniMap,
-  Node,
-} from "reactflow";
-import "reactflow/dist/style.css";
-import CustomNode from "../Steps/CustomNode";
-import PlaceholderNode from "../Steps/PlaceholderNode";
-import { StepType } from "../../types";
-import StartNode from "../Steps/StartNode";
-import { useTranslation } from "react-i18next";
-import useServiceStore from "store/new-services.store";
-import { onDrop, onFlowNodeDragStop, onNodeDrag } from "services/flow-builder";
-import { GRID_UNIT } from "types/service-flow";
+import { Background, ColorMode, Controls, Edge, MiniMap, Node, Panel, ReactFlow, useReactFlow } from '@xyflow/react';
+import { Button, Icon, Modal, Switch, ThemeToggle, Tooltip, Track } from 'components';
+import Chat from 'components/chat/chat';
+import CopyPasteControls from 'components/Flow/Controls/CopyPasteControls';
+import ImportExportControls from 'components/Flow/Controls/ImportExportControls';
+import LassoSelectionControls from 'components/Flow/Controls/LassoSelectionControls';
+import UndoRedoControls from 'components/Flow/Controls/UndoRedoControls';
+import edgeTypes from 'components/Flow/EdgeTypes';
+import { Lasso } from 'components/Flow/LassoSelection/Lasso';
+import nodeTypes from 'components/Flow/NodeTypes';
+import useLayout from 'hooks/flow/useLayout';
+import { useOnNodesDelete } from 'hooks/flow/useOnNodeDelete';
+import { ChangeEventHandler, FC, useCallback, useEffect, useState } from 'react';
+import '@xyflow/react/dist/style.css';
+import { useTranslation } from 'react-i18next';
+import { MdCenterFocusStrong, MdOutlineCenterFocusStrong } from 'react-icons/md';
+import useNewServiceStore from 'store/new-services.store';
+import useServiceStore from 'store/services.store';
+import { StepType } from 'types';
+import '../Flow/LassoSelection/Lasso.css';
 
-const nodeTypes = {
-  startNode: StartNode,
-  customNode: CustomNode,
-  placeholder: PlaceholderNode,
-};
+import { useThemeSyncWithFlow } from '../../hooks/useThemeSyncWithFlow';
+import HorizontalFlow from '../../static/icons/horizontal_flow.svg';
+import VerticalFlow from '../../static/icons/vertical_flow.svg';
 
 type FlowBuilderProps = {
   nodes: Node[];
   edges: Edge[];
-  setNodes: (nodes: Node[] | ((prev: Node[]) => Node[])) => void;
-  description: string;
 };
 
-const FlowBuilder: FC<FlowBuilderProps> = ({
-  nodes,
-  setNodes,
-  edges,
-  description,
-}) => {
+const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
+  const { getNodes, getEdges, setNodes, setEdges, getNode } = useReactFlow();
+  const setReactFlowInstance = useNewServiceStore((state) => state.setReactFlowInstance);
+  const [colorMode, setColorMode] = useState<ColorMode>('light');
   const { t } = useTranslation();
 
-  const reactFlowWrapper = useRef<HTMLDivElement>(null);
-  const startDragNode = useRef<Node | undefined>(undefined);
+  useThemeSyncWithFlow();
 
-  const reactFlowInstance = useServiceStore(state => state.reactFlowInstance);
-  const setReactFlowInstance = useServiceStore(state => state.setReactFlowInstance);
+  const {
+    onNodesDelete,
+    onEdgesDelete,
+    isDeleteConnectionsModalVisible,
+    setIsDeleteConnectionsModalVisible,
+    onDeleteConfirmed,
+    onKeepItConfirmed,
+    hasConnectedNodes,
+    setDeletedNodes,
+    setNodeToDelete,
+  } = useOnNodesDelete();
+  const [isLassoActive, setIsLassoActive] = useState(false);
+  const { saveToHistory, historyIndex, setFlowSelectedNodes, setHasUnsavedChanges } = useNewServiceStore();
+  const orientation = useServiceStore((state) => state.orientation);
+  const toggleOrientation = useServiceStore((state) => state.toggleOrientation);
+  useLayout(orientation);
+  const autoView = useServiceStore((state) => state.autoView);
+  const toggleAutoView = useServiceStore((state) => state.toggleAutoView);
 
-  const onNodeDragStart = useCallback((event: any, draggedNode: Node) => {
-      if (!reactFlowInstance || !reactFlowWrapper.current) return;
-      startDragNode.current = draggedNode;
+  const { runLayout } = useLayout(orientation);
+
+  const onConnect = useCallback(
+    ({ source, target }: any) => {
+      const nodes = getNodes();
+      const edges = getEdges();
+
+      const parentOutgoingEdges = edges.filter((edge) => edge.source === source);
+
+      const ghostEdges = parentOutgoingEdges.filter((edge) => {
+        const targetNode = nodes.find((n) => n.id === edge.target);
+        return targetNode?.type === 'ghost';
+      });
+
+      if (ghostEdges.length > 0) {
+        const ghostNodeIds = ghostEdges.map((edge) => edge.target);
+        const updatedEdges = edges.filter((edge) => !ghostEdges.includes(edge));
+        const updatedNodes = nodes.filter((node) => !ghostNodeIds.includes(node.id));
+        setNodes(updatedNodes);
+        setEdges(updatedEdges);
+      }
+
+      setEdges((eds) => [
+        ...eds,
+        {
+          id: `${source}->${target}`,
+          source: source,
+          target: target,
+          type: 'step',
+        },
+      ]);
+      setHasUnsavedChanges(true);
+      saveToHistory();
     },
-    [reactFlowInstance, edges]
+    [getEdges, getNodes, setEdges, setHasUnsavedChanges, setNodes, saveToHistory],
   );
 
-  const onNodeDragStop = useCallback((event: any, draggedNode: Node) => {
-    onFlowNodeDragStop(event, draggedNode, reactFlowWrapper, startDragNode)
+  const zIndexStyle = { zIndex: 20 };
+
+  const onChange: ChangeEventHandler<HTMLSelectElement> = (evt) => {
+    setColorMode(evt.target.value as ColorMode);
+  };
+
+  const isValidConnection = useCallback((connection: any) => {
+    return connection.source !== connection.target;
   }, []);
 
-  const onDragOver = useCallback((event: any) => {
-    event.preventDefault();
-    event.dataTransfer.dropEffect = "move";
+  const onSelectionChange = useCallback(
+    ({ nodes: selectedNodes }: { nodes: Node[] }) => {
+      setFlowSelectedNodes(selectedNodes);
+      setHasUnsavedChanges(true);
+    },
+    [setFlowSelectedNodes, setHasUnsavedChanges],
+  );
+
+  const onBeforeDelete = useCallback(
+    ({ nodes: nodesToDelete, edges: edgesToDelete }: { nodes: Node[]; edges: Edge[] }) => {
+      setDeletedNodes(null);
+      try {
+        if (edgesToDelete.length > 0 && nodesToDelete.length === 0) {
+          const shouldPreventDelete = getNode(edgesToDelete[0].source)?.data.stepType === StepType.MultiChoiceQuestion;
+          if (shouldPreventDelete) {
+            return Promise.resolve(false);
+          }
+        }
+
+        if (
+          nodesToDelete.length === 0 ||
+          ![StepType.MultiChoiceQuestion, StepType.Condition, StepType.Input].includes(
+            nodesToDelete[0]?.data.stepType as StepType,
+          )
+        )
+          return Promise.resolve(true);
+
+        const shouldPreventDelete = hasConnectedNodes(nodesToDelete[0].id);
+        if (shouldPreventDelete) {
+          setDeletedNodes(nodesToDelete);
+          setIsDeleteConnectionsModalVisible(true);
+        }
+        return Promise.resolve(!shouldPreventDelete);
+      } catch (error) {
+        console.error('Error in onBeforeDelete:', error);
+        return Promise.resolve(true);
+      }
+    },
+    [getNode, hasConnectedNodes, setDeletedNodes, setIsDeleteConnectionsModalVisible],
+  );
+
+  const handleToggleLasso = useCallback(() => {
+    setIsLassoActive((prev) => !prev);
   }, []);
 
-  const setDefaultMessages = useCallback((stepType: StepType) => {
-    switch (stepType) {
-      case StepType.FinishingStepEnd:
-        return t("serviceFlow.popup.serviceEnded");
-      case StepType.FinishingStepRedirect:
-        return t("serviceFlow.popup.redirectToCustomerSupport");
-    }
-  }, [t]);
-
-  const onNodeMouseEnter = (event: any, node: Node) => {
-    setNodes((prevNodes) =>
-      prevNodes.map((prevNode) => {
-        if (prevNode.type === "customNode" && prevNode.data === node.data) {
-          prevNode.selected = true;
-          prevNode.className = "selected";
-        }
-        return prevNode;
-      })
-    );
-  }
-
-  const onNodeMouseLeave = (event: any, node: Node) => {
-    setNodes((prevNodes) =>
-      prevNodes.map((prevNode) => {
-        if (prevNode.type === "customNode" && prevNode.data === node.data) {
-          prevNode.selected = false;
-          prevNode.className = prevNode.data.type;
-        }
-        return prevNode;
-      })
-    );
-  }
+  useEffect(() => {
+    runLayout();
+  }, [historyIndex, runLayout]);
 
   return (
-    <div className={description.length > 0 ? "graph__bodyWithDescription" : "graph__body"} ref={reactFlowWrapper}>
+    <>
       <ReactFlow
         nodes={nodes}
         edges={edges}
-        onNodesChange={useServiceStore.getState().onNodesChange}
-        onEdgesChange={useServiceStore.getState().onEdgesChange}
+        onNodesChange={useNewServiceStore.getState().onNodesChange}
+        onEdgesChange={useNewServiceStore.getState().onEdgesChange}
         snapToGrid
-        snapGrid={[GRID_UNIT, GRID_UNIT]}
-        defaultViewport={{ x: 38 * GRID_UNIT, y: 3 * GRID_UNIT, zoom: 0 }}
+        proOptions={{ hideAttribution: true }}
         panOnScroll
         nodeTypes={nodeTypes}
-        onInit={setReactFlowInstance}
-        onDragOver={onDragOver}
-        onDrop={(event) => onDrop(event, reactFlowWrapper, setDefaultMessages)}
-        onNodeDrag={onNodeDrag}
-        onNodeDragStop={onNodeDragStop}
-        onNodeDragStart={onNodeDragStart}
-        onNodeMouseEnter={onNodeMouseEnter}
-        onNodeMouseLeave={onNodeMouseLeave}
+        edgeTypes={edgeTypes}
+        onInit={(instance) => {
+          setReactFlowInstance(instance);
+          useNewServiceStore.getState().loadEndpointsResponseVariables();
+        }}
+        nodesDraggable={false}
+        onSelectionChange={onSelectionChange}
+        onConnect={onConnect}
+        onEdgesDelete={(edges) => {
+          onEdgesDelete(edges);
+          setHasUnsavedChanges(true);
+          saveToHistory();
+        }}
+        onBeforeDelete={onBeforeDelete}
+        onNodesDelete={(nodes) => {
+          onNodesDelete(nodes);
+          setHasUnsavedChanges(true);
+          saveToHistory();
+        }}
+        fitView
+        fitViewOptions={{ padding: 5 }}
+        colorMode={colorMode}
+        isValidConnection={isValidConnection}
+        defaultEdgeOptions={{ type: 'step', deletable: false }}
       >
-        <Controls />
-        <MiniMap />
-        <Background color="#D2D3D8" gap={16} lineWidth={2} />
+        <Chat />
+        <MiniMap style={zIndexStyle} />
+        <Background color="#D2D3D8" gap={16} lineWidth={9} />
+        {isLassoActive && <Lasso />}
+        <Panel position="top-left" style={zIndexStyle}>
+          <Track gap={10} direction="vertical" align="left">
+            <ImportExportControls />
+            <CopyPasteControls onNodesDelete={onNodesDelete} />
+            <UndoRedoControls />
+          </Track>
+        </Panel>
+        <Panel position="top-right" style={{ zIndex: 20, marginRight: '30px' }}>
+          <Track gap={10} direction="vertical" align="right">
+            <LassoSelectionControls isLassoActive={isLassoActive} onToggleLasso={handleToggleLasso} />
+            <ThemeToggle onChange={onChange} />
+            <Tooltip content={t('serviceFlow.orientationTooltip')}>
+              <Button onClick={toggleOrientation} size="s" style={{ backgroundColor: '#005aa3', height: '36px' }}>
+                <img
+                  src={orientation === 'horizontal' ? HorizontalFlow : VerticalFlow}
+                  width={32}
+                  className="logo"
+                  loading="eager"
+                  alt="orientation toggle"
+                />
+              </Button>
+            </Tooltip>
+          </Track>
+        </Panel>
+        <Panel position="bottom-left">
+          <Track gap={10} direction="horizontal" align="center" style={{ paddingLeft: '110px', paddingBottom: '7px' }}>
+            <Controls orientation="horizontal" showInteractive={false} style={{ marginBottom: '12px' }} />
+            <Tooltip content={t('serviceFlow.autoFocus')}>
+              <span>
+                <Switch
+                  checked={autoView}
+                  onCheckedChange={toggleAutoView}
+                  onLabel={<Icon icon={<MdCenterFocusStrong fontSize={30} />} size="medium" />}
+                  offLabel={<Icon icon={<MdOutlineCenterFocusStrong fontSize={30} />} size="medium" />}
+                />
+              </span>
+            </Tooltip>
+          </Track>
+        </Panel>
       </ReactFlow>
-    </div>
+      {isDeleteConnectionsModalVisible && (
+        <Modal
+          title={t('overview.popup.deleteNodeConnections')}
+          onClose={() => {
+            setNodeToDelete(null);
+            setIsDeleteConnectionsModalVisible(false);
+          }}
+        >
+          <Track justify="end" gap={16}>
+            <Button appearance="primary" onClick={onDeleteConfirmed}>
+              {t('global.delete')}
+            </Button>
+            <Button appearance="primary" onClick={onKeepItConfirmed}>
+              {t('global.keepIt')}
+            </Button>
+          </Track>
+        </Modal>
+      )}
+    </>
   );
 };
 

@@ -1,12 +1,19 @@
+@import 'src/styles/tools/spacing';
+@import 'src/styles/tools/color';
+@import 'src/styles/settings/variables/other';
+@import 'src/styles/settings/variables/typography';
+@import 'src/styles/settings/mixins';
+@import 'src/styles/settings/variables/_colors';
+
 .yellow-tag {
-  padding: 0 .3rem;
+  padding: 0 0.3rem;
   background: #fff9e8;
   border: 1px solid #ffde92;
   border-radius: 1rem;
 }
 
 .green-tag {
-  padding: 0 .3rem;
+  padding: 0 0.3rem;
   background: #d9e8de;
   border: 1px solid #b4d3c0;
   border-radius: 1rem;
@@ -24,31 +31,31 @@
 }
 
 .flow-item-footer {
-  width: 100%
+  width: 100%;
 }
 
 .flow-body-reverse-margin {
-  margin: -16px
+  margin: -16px;
 }
 
 .flow-body-padding {
-  padding: 16px
+  padding: 16px;
 }
 
 .flow-tags-container {
-  flex-wrap: wrap
+  flex-wrap: wrap;
 }
 
 .popup-darker-track {
-  background: #f9f9f9
+  background: #f9f9f9;
 }
 
 .flow-rule-container {
-  width: 5rem
+  width: 5rem;
 }
 
 .flow-darker-container {
-  padding: 0 .5rem;
+  padding: 0 0.5rem;
   color: grey;
 }
 
@@ -85,18 +92,18 @@
   border: 1px solid #f002;
 }
 
-div>.small-rule-group-button {
+div > .small-rule-group-button {
   padding: 4px;
   min-width: 40px;
   text-align: center;
 }
 
-div>.small-rule-group-button:first-child {
+div > .small-rule-group-button:first-child {
   padding: 4px 10px;
   border-radius: 10px 0 0 10px;
 }
 
-div>.small-rule-group-button:last-child {
+div > .small-rule-group-button:last-child {
   border-radius: 0 10px 10px 0;
 }
 
@@ -130,4 +137,108 @@ div>.small-rule-group-button:last-child {
 
 .rule-gray:hover {
   background: #0002;
+}
+
+.assign-action-container {
+  background: rgba(25, 0, 255, 0.067);
+  border: 1px solid rgba(25, 0, 255, 0.067);
+}
+
+.small-assign-button {
+  padding: 4px 10px;
+  margin: 4px;
+  border-radius: 10px;
+}
+
+.assign-blue {
+  background: #00f5;
+}
+
+.assign-blue:hover {
+  background: #00f6;
+}
+
+.assign-red {
+  background: #f007;
+}
+
+.assign-red:hover {
+  background: #f008;
+}
+
+// Workaround for chips to show properly in JSONTree
+li:not(:has(> div > div)) .object-tree-chip {
+  text-indent: 0;
+  margin-left: -7px;
+}
+
+.object-tree-checkbox {
+  @include veera-checkbox;
+
+  input[type='checkbox'] {
+    + label {
+      display: inline;
+      padding-left: 25px;
+      padding-right: 10px;
+      color: get-color(black-coral-8);
+      font-style: italic;
+
+      &::before {
+        top: 2px;
+      }
+    }
+  }
+}
+
+.multiple-choice-question-button {
+  background-color: get-color(sapphire-blue-10) !important;
+  height: 36px !important;
+  cursor: default !important;
+}
+
+[data-theme='dark'] .assign-blue,
+.rule-blue {
+  background: get-color(sapphire-blue-12);
+  color: var(--dark-text-secondary);
+  border: 1px solid get-color(sapphire-blue-10);
+
+  &:hover {
+    background: get-color(sapphire-blue-11);
+  }
+}
+
+[data-theme='dark'] .assign-red,
+.rule-red {
+  background: get-color(jasper-12);
+  border: 1px solid get-color(jasper-10);
+  color: var(--dark-text-secondary);
+
+  &:hover {
+    background: get-color(jasper-11);
+  }
+}
+
+[data-theme='dark'] .rule-action-container {
+  background-color: var(--dark-bg-light);
+  border: 1px solid var(--dark-bg-extra-light);
+}
+
+[data-theme='dark'] .rule-green {
+  background: get-color(sea-green-12);
+  border: 1px solid get-color(sea-green-10);
+  color: var(--dark-text-secondary);
+
+  &:hover {
+    background: get-color(sea-green-11);
+  }
+}
+
+[data-theme='dark'] .rule-gray {
+  background-color: var(--dark-bg-highlight);
+  border: 1px solid var(--dark-bg-highlight);
+  color: var(--dark-text-secondary);
+
+  &:hover {
+    background-color: var(--dark-bg-extra-light);
+  }
 }

@@ -1,10 +1,14 @@
+@import 'src/styles/settings/variables/_colors';
+@import 'src/styles/tools/color';
+
 .chatWrapper {
   z-index: 99;
   position: fixed;
   margin: 1em;
   right: 250px;
-  bottom: 0;
-  max-width: 350px;
+  bottom: 30px;
+  width: 650px;
+  height: 500px;
 }
 
 .chat {
@@ -94,6 +98,7 @@
     padding: 0.4em 1em;
     word-break: break-word;
     white-space: pre-wrap;
+    min-height: 2.3em;
   }
 
   .icon {
@@ -102,7 +107,6 @@
     height: 2.8em;
     flex-shrink: 0;
   }
-
 
   &.client {
     margin-left: 4em;
@@ -138,7 +142,7 @@
         border-radius: 6px 48px 48px 29px;
         background-color: blue;
       }
-      
+
       .icon {
         padding-right: 0.5em;
       }
@@ -146,12 +150,19 @@
   }
 }
 
+.keypadContainer {
+  margin: 1em;
+}
+
 .keypad {
   display: flex;
   align-items: center;
-  height: 50px;
-  bottom: 0;
-  padding: 5px;
+  background: blue;
+  border-radius: 8px;
+  padding: 12px 16px;
+  gap: 12px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
   &.disabled {
     pointer-events: none;
     user-select: none;
@@ -159,41 +170,66 @@
       stroke: #575a5d;
     }
   }
+
+  .label {
+    color: white;
+    font-weight: 500;
+    font-size: 14px;
+    white-space: nowrap;
+  }
+
   .input {
-    display: inline-flex;
-    justify-content: center;
-    align-items: center;
-    margin: 1em;
-    margin-right: 0.5em;
     flex: 1;
-    border: 0;
+    background: white;
+    border: none;
+    border-radius: 6px;
+    padding: 8px 12px;
+    font-size: 14px;
     outline: none;
-    border-bottom: 1px solid blue;
-    border-radius: 0;
-    padding-bottom: 5px;
-    color: inherit;
-    font: inherit;
+    color: #333;
+
     &::placeholder {
-      color: lightgray;
+      color: #999;
     }
+
     &:disabled {
       pointer-events: none;
       user-select: none;
-      background-color: transparent;
-      border-bottom: 1px solid lightgray;
+      background-color: #f5f5f5;
+      color: #999;
     }
   }
+
   .button {
+    background: transparent;
+    border: none;
     cursor: pointer;
     width: 32px;
     height: 32px;
     display: flex;
     justify-content: center;
     align-items: center;
-    margin: 0;
+    border-radius: 4px;
+    transition: background-color 0.2s ease;
+
+    &:hover:not(:disabled) {
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+
     &:focus {
-      outline: 2px solid gray;
-      border-radius: 1px;
+      outline: 2px solid rgba(255, 255, 255, 0.5);
+      outline-offset: 2px;
+    }
+
+    &:disabled {
+      cursor: not-allowed;
+      opacity: 0.5;
+    }
+
+    img {
+      width: 20px;
+      height: 20px;
+      filter: brightness(0) invert(1);
     }
   }
 }
@@ -202,7 +238,7 @@
   padding: 0.25em;
   margin: 0.4em;
   text-align: center;
-  font-style: italic;
+  font-weight: bold;
 
   &.success {
     color: rgb(0, 138, 0);
@@ -227,12 +263,28 @@
     text-decoration: underline;
     padding-left: 0.1em;
   }
-}
 
+  .payload {
+    margin-top: 0.5em;
+    text-align: left;
+    font-weight: normal;
+
+    .payloadItem {
+      margin: 0.25em 0;
+      padding: 0.25em 0.5em;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 4px;
+
+      strong {
+        color: inherit;
+      }
+    }
+  }
+}
 
 .profile {
   position: fixed;
-  bottom: 0;
+  bottom: 0px;
   right: 250px;
 
   display: flex;
@@ -250,5 +302,82 @@
     position: fixed;
     bottom: 0;
     right: 0;
+    z-index: 20;
+  }
+}
+
+[data-theme='dark'] .profile {
+  background-color: get-color(sapphire-blue-12);
+  color: var(--dark-bg-extra-light);
+}
+
+[data-theme='dark'] .keypad {
+  background-color: get-color(sapphire-blue-12);
+  color: var(--dark-bg-extra-light);
+
+  .input {
+    color: var(--dark-text-secondary);
+    background-color: var(--dark-bg-extra-light);
+  }
+}
+
+[data-theme='dark'] .header {
+  color: var(--dark-bg-extra-light);
+  background-color: get-color(sapphire-blue-12);
+}
+
+[data-theme='dark'] .chatContent {
+  background-color: var(--dark-bg-light);
+}
+
+[data-theme='dark'] .keypadContainer {
+  background-color: var(--dark-bg-light);
+}
+
+[data-theme='dark'] .chat {
+  background-color: var(--dark-bg-light);
+}
+
+[data-theme='dark'] .message {
+  color: var(--dark-text-secondary);
+
+  &.client {
+    .content {
+      background-color: #764ca0;
+    }
+  }
+
+  &.admin {
+    .main {
+      .content {
+        background-color: get-color(sapphire-blue-12);
+      }
+    }
+  }
+}
+
+[data-theme='dark'] .system {
+  &.success {
+    color: get-color(sea-green-11);
+    background: get-color(sea-green-6);
+  }
+
+  &.error {
+    color: get-color(jasper-11);
+    background: get-color(jasper-6);
+  }
+
+  &.info {
+    color: get-color(sapphire-blue-11);
+    background: get-color(sapphire-blue-6);
+  }
+
+  &.normal {
+    background: #0001;
+  }
+
+  .link {
+    text-decoration: underline;
+    padding-left: 0.1em;
   }
 }

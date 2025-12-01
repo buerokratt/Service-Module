@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from "react";
-import { useTranslation } from "react-i18next";
-import { Button, FormInput, Track } from "../components";
-import { getServiceSettings, saveServiceSettings } from "../resources/api-constants";
-import axios from "axios";
-import useToastStore from "store/toasts.store";
-import withAuthorization, { ROLES } from "hoc/with-authorization";
+import withAuthorization, { ROLES } from 'hoc/with-authorization';
+import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import useToastStore from 'store/toasts.store';
+
+import { Button, FormInput, Track } from '../components';
+import { getServiceSettings, saveServiceSettings } from '../resources/api-constants';
+import api from '../services/api-dev';
 
 const ServiceSettingPage: React.FC = () => {
   const [tryCount, setTryCount] = useState(0);
@@ -14,26 +15,26 @@ const ServiceSettingPage: React.FC = () => {
   const maxLimit = 100;
 
   useEffect(() => {
-    axios
+    api
       .get(getServiceSettings())
       .then((x) => {
-        const settings = x.data.filter((x: any) => x.name === "maxInputTry");
-        const maxInputTry = settings[0].value;
+        const settings = x.data.filter((x: any) => x.name === 'maxInputTry');
+        const maxInputTry = Number(settings[0].value);
         setInitValue(maxInputTry);
         setTryCount(maxInputTry);
       })
       .catch(() => {
         useToastStore.getState().error({
-          title: t("newService.toast.failed"),
-          message: t("global.errorMessage"),
+          title: t('newService.toast.failed'),
+          message: t('global.errorMessage'),
         });
       });
-  }, []);
+  }, [t]);
 
   const handleSave = async (value: number) => {
-    axios
+    await api
       .post(saveServiceSettings(), {
-        name: "maxInputTry",
+        name: 'maxInputTry',
         value: value,
       })
       .then(() => {
@@ -48,15 +49,15 @@ const ServiceSettingPage: React.FC = () => {
   return (
     <>
       <Track justify="between">
-        <h1>{t("settings.title")}</h1>
+        <h1>{t('settings.title')}</h1>
       </Track>
       <div className="vertical-tabs__content-header">
         <Track gap={8} direction="vertical" align="stretch">
           <Track gap={16}>
             <FormInput
-              label={t("settings.maxUserInputTryCount")}
+              label={t('settings.maxUserInputTryCount').toString()}
               name="maxInputTry"
-              placeholder={t("settings.maxUserInputTryCount") + ""}
+              placeholder={t('settings.maxUserInputTryCount') + ''}
               type="number"
               min={1}
               max={maxLimit}
@@ -68,7 +69,7 @@ const ServiceSettingPage: React.FC = () => {
               }}
             />
             <Button disabled={canBeSaved} onClick={() => handleSave(tryCount)}>
-              {t("intents.save")}
+              {t('intents.save')}
             </Button>
           </Track>
         </Track>
@@ -77,7 +78,8 @@ const ServiceSettingPage: React.FC = () => {
   );
 };
 
-export default withAuthorization(ServiceSettingPage, [
+const AuthorizedServiceSettingPage = withAuthorization(ServiceSettingPage, [
   ROLES.ROLE_ADMINISTRATOR,
   ROLES.ROLE_SERVICE_MANAGER,
 ]);
+export default AuthorizedServiceSettingPage;

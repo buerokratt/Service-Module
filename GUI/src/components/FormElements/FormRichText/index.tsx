@@ -1,25 +1,27 @@
-import { FC } from "react";
-import ReactQuill from "react-quill";
+import { FC, Ref } from 'react';
+import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import './FormRichText.scss';
 
 type FormRichTextProps = {
   readonly defaultValue?: string;
-  onChange(value: string | null): void
-}
+  quill?: Ref<ReactQuill>;
+  onChange(value: string | null): void;
+};
 
-const FormRichText: FC<FormRichTextProps> = ({ defaultValue, onChange }) => {
+const FormRichText: FC<FormRichTextProps> = ({ defaultValue, onChange, quill }) => {
   const modules = {
     toolbar: [
       ['italic', 'bold', 'underline', 'strike', 'blockquote'],
       [{ align: '' }, { align: 'center' }, { align: 'right' }, { align: 'justify' }],
-      [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+      [{ list: 'ordered' }, { list: 'bullet' }],
       ['link'],
     ],
   };
 
   return (
     <ReactQuill
+      ref={quill}
       defaultValue={defaultValue}
       onChange={(value) => {
         value = value === '<p><br></p>' ? '' : value;
@@ -28,7 +30,7 @@ const FormRichText: FC<FormRichTextProps> = ({ defaultValue, onChange }) => {
       modules={modules}
       style={{ width: '100%' }}
     />
-  )
-}
+  );
+};
 
 export default FormRichText;

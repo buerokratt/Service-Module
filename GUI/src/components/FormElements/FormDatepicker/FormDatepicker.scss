@@ -96,7 +96,7 @@
   border: 1px solid get-color(black-coral-6);
   border-radius: 4px;
 
-  &-popper[data-placement^=bottom] {
+  &-popper[data-placement^='bottom'] {
     padding: 0;
   }
 

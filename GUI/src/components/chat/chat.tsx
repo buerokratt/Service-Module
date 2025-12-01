@@ -1,29 +1,31 @@
-import { motion } from "framer-motion";
-import styles from "./chat.module.scss";
-import ChatHeader from "components/chat/chat-header";
-import ChatContent from "./chat-content";
-import ChatKeyPad from "./chat-keypad";
-import useTestServiceStore from "store/test-services.store";
-import Profile from "./profile";
+import ChatHeader from 'components/chat/chat-header';
+import { motion } from 'framer-motion';
+import React from 'react';
+import useServiceStore from 'store/new-services.store';
+import useTestServiceStore from 'store/test-services.store';
 
-const Chat = (): JSX.Element => {
-  const opened = useTestServiceStore(x => x.isChatOpened);
+import ChatContent from './chat-content';
+import ChatInput from './chat-input';
+import styles from './chat.module.scss';
+import Profile from './profile';
 
-  return !opened 
-  ? <Profile /> 
-  : (
+const Chat = (): React.JSX.Element => {
+  const state = useServiceStore((x) => x.serviceState);
+  const opened = useTestServiceStore((x) => x.isChatOpened);
+
+  if (!state) return <></>;
+
+  return opened ? (
     <div className={styles.chatWrapper}>
-      <motion.div
-        className={styles.chat}
-        animate={{ y: 0 }}
-        style={{ y: 400 }}
-      >
+      <motion.div className={styles.chat} animate={{ y: 0 }} style={{ y: 400 }}>
         <ChatHeader />
         <ChatContent />
-        <ChatKeyPad />
+        <ChatInput />
       </motion.div>
     </div>
+  ) : (
+    <Profile />
   );
-}
+};
 
 export default Chat;

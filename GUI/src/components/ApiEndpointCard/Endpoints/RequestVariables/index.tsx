@@ -1,28 +1,30 @@
-import React, { useEffect, useMemo, useState } from "react";
-import { useTranslation } from "react-i18next";
-import { Button, FormTextarea, SwitchBox, Track } from "../../..";
-import * as Tabs from "@radix-ui/react-tabs";
-import DataTable from "../../../DataTable";
-import { RequestTab } from "../../../../types";
+import * as Tabs from '@radix-ui/react-tabs';
+import { PaginationState, SortingState } from '@tanstack/react-table';
+import React, { ReactElement, useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import useServiceStore from 'store/new-services.store';
+import { FieldType } from 'types/endpoint/field-type';
+import { RequestOperator } from 'types/endpoint/request-operator';
+
+import { getColumns } from './columns';
+import { Button, FormTextarea, SwitchBox, Track } from '../../..';
+import { RequestTab } from '../../../../types';
 import {
-  EndpointType,
   EndpointData,
   EndpointTab,
   EndpointVariableData,
   PreDefinedEndpointEnvVariables,
-} from "../../../../types/endpoint";
+} from '../../../../types/endpoint';
 import {
-  RequestVariablesTabsRowsData,
-  RequestVariablesTabsRawData,
   RequestVariablesRowData,
-} from "../../../../types/request-variables";
-import useServiceStore from "store/new-services.store";
-import { getColumns } from "./columns";
-import { PaginationState, SortingState } from "@tanstack/react-table";
+  RequestVariablesTabsRawData,
+  RequestVariablesTabsRowsData,
+} from '../../../../types/request-variables';
+import DataTable from '../../../DataTable';
 
 type RequestVariablesProps = {
   disableRawData?: boolean;
-  endpointData: EndpointType;
+  endpoint: EndpointData;
   parentEndpointId?: string;
   isLive: boolean;
   requestValues: PreDefinedEndpointEnvVariables;
@@ -33,25 +35,25 @@ type RequestVariablesProps = {
 
 const RequestVariables: React.FC<RequestVariablesProps> = ({
   disableRawData,
-  endpointData,
+  endpoint,
   isLive,
   requestValues,
   requestTab,
   setRequestTab,
-  parentEndpointId,
   onParametersChange,
 }) => {
   const { t } = useTranslation();
   const tabs: EndpointTab[] = [EndpointTab.Params, EndpointTab.Headers, EndpointTab.Body];
   const [jsonError, setJsonError] = useState<string>();
   const [key, setKey] = useState<number>(0);
-  const { setEndpoints, updateEndpointRawData, updateEndpointData } = useServiceStore();
+  const { updateEndpointRawData, updateEndpointData } = useServiceStore();
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
-    pageSize: 10,
+    pageSize: 5,
   });
 
   const [sorting, setSorting] = useState<SortingState>([]);
+  const [deletedVariable, setDeletedVariable] = useState<RequestVariablesRowData | undefined>(undefined);
 
   const constructRow = (id: number, data: EndpointVariableData, nestedLevel: number): RequestVariablesRowData => {
     const value = isLive ? data.value : data.testValue;
@@ -61,7 +63,8 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
       required: data.required ?? false,
       variable: data.name,
       value,
-      isNameEditable: data.type === "custom",
+      operator: data.operator ?? '=',
+      isNameEditable: data.type === 'custom',
       type: data.type,
       description: data.description,
       arrayType: data.arrayType,
@@ -72,18 +75,19 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
   const getTabsRowsData = (): RequestVariablesTabsRowsData => {
     return tabs.reduce((tabsRowsData, tab) => {
       const rows: RequestVariablesRowData[] = [];
+      const endpointData = endpoint.definitions[0];
       if (endpointData) {
         if (!endpointData[tab]) return tabsRowsData;
         let rowIdx = 0;
-        endpointData[tab]!.variables.forEach((variable) => {
+        endpointData[tab].variables.forEach((variable) => {
           rows.push(constructRow(rowIdx, variable, 0));
-          if (["schema", "array"].includes(variable.type)) {
+          if (['schema', 'array'].includes(variable.type)) {
             rowIdx = getRowsFromNestedSchema(variable, rowIdx, rows, 1);
           }
           rowIdx++;
         });
       }
-      if (rows.length === 0 || endpointData.type === "custom") {
+      if (rows.length === 0 || endpointData.type === 'custom') {
         rows.push({
           id: `${rows.length}`,
           required: false,
@@ -99,15 +103,15 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
     variable: EndpointVariableData,
     oldRowIdx: number,
     rows: RequestVariablesRowData[],
-    nestedLevel: number
+    nestedLevel: number,
   ): number => {
     let rowIdx = oldRowIdx;
-    const variableData = variable.type === "schema" ? variable.schemaData : variable.arrayData;
-    if (variableData instanceof Array) {
+    const variableData = variable.type === 'schema' ? variable.schemaData : variable.arrayData;
+    if (Array.isArray(variableData)) {
       variableData.forEach((data) => {
         rowIdx++;
         rows.push(constructRow(rowIdx, data, nestedLevel));
-        if (["schema", "array"].includes(data.type)) {
+        if (['schema', 'array'].includes(data.type)) {
           rowIdx = getRowsFromNestedSchema(data, rowIdx, rows, nestedLevel + 1);
         }
       });
@@ -115,68 +119,123 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
     return rowIdx;
   };
 
+  const [rowsData, setRowsData] = useState<RequestVariablesTabsRowsData>(getTabsRowsData());
+
   useEffect(() => {
     setRequestTab((rt) => {
       const availableTabs = Object.keys(rowsData);
       rt.tab = availableTabs.includes(rt.tab) ? rt.tab : (availableTabs[0] as EndpointTab);
       return rt;
     });
-    setKey(key + 1);
-  }, []);
+    setKey((key) => key + 1);
+    // Adding rowsData dependency breaks focus on typing in variable inputs
+    // Impossible to fix without a significant refactor
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [setRequestTab]);
 
   const getInitialTabsRawData = (): RequestVariablesTabsRawData => {
     return tabs.reduce((tabsRawData, tab) => {
-      return { ...tabsRawData, [tab]: endpointData[tab]?.rawData[isLive ? "value" : "testValue"] ?? "" };
+      const endpointData = endpoint.definitions[0];
+      if (!endpointData?.[tab]) return tabsRawData;
+      return { ...tabsRawData, [tab]: endpointData[tab]?.rawData[isLive ? 'value' : 'testValue'] ?? '' };
     }, {});
   };
-  const [rowsData, setRowsData] = useState<RequestVariablesTabsRowsData>(getTabsRowsData());
   const [tabRawData, setTabRawData] = useState<RequestVariablesTabsRawData>(getInitialTabsRawData());
 
   const getTabTriggerClasses = (tab: EndpointTab) =>
-    `endpoint-tab-group__tab-btn ${requestTab.tab === tab ? "active" : ""}`;
+    `endpoint-tab-group__tab-btn ${requestTab.tab === tab ? 'active' : ''}`;
 
-  const updateRowVariable = (id: string, variable: string) => {
-    setRowsData((prevRowsData) => {
-      prevRowsData[requestTab.tab]!.map((row) => {
-        if (row.id !== id) return row;
-        row.variable = variable;
-        return row;
-      });
-      // if last row name is edited, add a new row
-      if (!rowsData[requestTab.tab] || id !== `${rowsData[requestTab.tab]!.length - 1}`) return prevRowsData;
-      prevRowsData[requestTab.tab]!.push({
-        id: `${rowsData[requestTab.tab]!.length}`,
-        required: false,
-        isNameEditable: true,
-        nestedLevel: 0,
-      });
-      return prevRowsData;
-    });
-    updateEndpointData(rowsData, endpointData?.id);
+  const maintainSingleEmptyRow = (rows: RequestVariablesRowData[]) => {
+    const emptyRow = rows.find((row) => row.value === undefined && row.variable === undefined);
+    const nonEmptyRows = rows.filter((row) => row.value !== undefined || row.variable !== undefined);
+
+    const baseEmptyRow: RequestVariablesRowData = {
+      id: nonEmptyRows.length.toString(),
+      required: false,
+      isNameEditable: true,
+      nestedLevel: 0,
+    };
+
+    return [...nonEmptyRows, emptyRow ? { ...baseEmptyRow, ...emptyRow } : baseEmptyRow];
   };
 
-  const updateRowValue = (id: string, value: string) => {
-    if (!rowsData[requestTab.tab]) return;
-    rowsData[requestTab.tab]!.map((row) => {
-      if (row.id !== id) return row;
-      row.value = value;
+  const updateRowField = (id: string, field: FieldType, newValue: string) => {
+    setRowsData((prevRowsData) => {
+      const newRowsData = { ...prevRowsData };
+      newRowsData[requestTab.tab] = [...(newRowsData[requestTab.tab] || [])];
+
+      newRowsData[requestTab.tab]!.forEach((row) => {
+        if (row.id !== id) return;
+        if (field === 'operator') {
+          row[field] = newValue as RequestOperator;
+        } else {
+          row[field] = newValue;
+        }
+      });
+
+      if (endpoint.type === 'custom') {
+        newRowsData[requestTab.tab] = maintainSingleEmptyRow(newRowsData[requestTab.tab] || []);
+      }
+      updateEndpointData(newRowsData, endpoint);
+
+      if (requestTab.tab === 'params') {
+        onParametersChange(
+          newRowsData[requestTab.tab]
+            ?.filter((row) => row.variable)
+            .map((row) => ({
+              id: row.endpointVariableId ?? row.id,
+              name: row.variable!,
+              type: row.type ?? 'custom',
+              required: row.required ?? false,
+              value: row.value!,
+              operator: row.operator as RequestOperator,
+            })) ?? [],
+        );
+      }
+      return newRowsData;
+    });
+  };
+
+  const updateOperator = (rowId: string, operator: string) => {
+    if (!rowsData[requestTab.tab] || requestTab.tab !== EndpointTab.Params) return;
+
+    const newData = rowsData[requestTab.tab]!.map((row) => {
+      if (row.id !== rowId) return row;
+      row.operator = operator as RequestOperator;
       return row;
     });
-    updateEndpointData(rowsData, endpointData?.id);
-    setKey(key + 1);
+
+    const variables: EndpointVariableData[] = [];
+    newData.forEach((row) => {
+      if (!row.variable) return;
+
+      const newVariable: EndpointVariableData = {
+        id: row.endpointVariableId ?? row.id,
+        name: row.variable ?? '',
+        type: row.type ?? 'custom',
+        required: row.required ?? false,
+        value: row.value,
+        operator: requestTab.tab === EndpointTab.Params ? (row.operator as RequestOperator) || '=' : undefined,
+      };
+      variables.push(newVariable);
+    });
+
+    if (requestTab.tab === 'params') {
+      onParametersChange(variables);
+    }
   };
 
   const checkNestedVariables = (rowVariableId: string, variable: EndpointVariableData) => {
-    const variableData = variable.type === "schema" ? variable.schemaData : variable.arrayData;
-    if (variableData instanceof Array) {
+    const variableData = variable.type === 'schema' ? variable.schemaData : variable.arrayData;
+    if (Array.isArray(variableData)) {
       if (rowVariableId && variableData.map((v) => v.id).includes(rowVariableId)) {
-        variable[variable.type === "schema" ? "schemaData" : "arrayData"] = variableData.filter(
-          (v) => v.id !== rowVariableId
+        variable[variable.type === 'schema' ? 'schemaData' : 'arrayData'] = variableData.filter(
+          (v) => v.id !== rowVariableId,
         );
         return;
       }
       variableData.forEach((v) => {
-        if (["schema", "array"].includes(v.type)) {
+        if (['schema', 'array'].includes(v.type)) {
           checkNestedVariables(rowVariableId, v);
         }
       });
@@ -184,55 +243,68 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
   };
 
   const deleteVariable = (rowData: RequestVariablesRowData) => {
-    setEndpoints((prevEndpoints: EndpointData[]) => {
-      const newEndpoints: EndpointData[] = [];
-      for (const prevEndpoint of prevEndpoints) {
-        const defEndpoint = prevEndpoint.definedEndpoints.find((x) => x.id === endpointData.id);
-        const endpoint = defEndpoint?.[requestTab.tab];
+    if (rowData.variable === undefined || rowData.value === undefined) return;
+    const endpointData = endpoint.definitions[0];
+    const defEndpoint = endpoint.definitions.find((x) => x.id === endpointData.id);
+    const endpointTab = defEndpoint?.[requestTab.tab];
 
-        if (defEndpoint && endpoint) {
-          if (rowData.endpointVariableId && endpoint.variables.map((v) => v.id).includes(rowData.endpointVariableId)) {
-            endpoint.variables = endpoint.variables.filter((v) => v.id !== rowData.endpointVariableId);
-          } else {
-            endpoint.variables
-              .filter((variable) => ["schema", "array"].includes(variable.type))
-              .forEach((variable) => checkNestedVariables(rowData.endpointVariableId!, variable));
-          }
-        }
-
-        newEndpoints.push(prevEndpoint);
+    if (defEndpoint && endpointTab) {
+      if (rowData.endpointVariableId && endpointTab.variables.map((v) => v.id).includes(rowData.endpointVariableId)) {
+        endpointTab.variables = endpointTab.variables.filter((v) => v.id !== rowData.endpointVariableId);
+      } else {
+        endpointTab.variables
+          .filter((variable) => ['schema', 'array'].includes(variable.type))
+          .forEach((variable) => checkNestedVariables(rowData.endpointVariableId!, variable));
       }
-      return newEndpoints;
-    });
+    }
+
+    if (requestTab.tab === 'params') {
+      onParametersChange(endpointTab?.variables ?? []);
+    }
+    setDeletedVariable(rowData);
   };
 
   const updateParams = (isValue: boolean, rowId: string, value: string) => {
-    if (requestTab.tab === "params") {
-      if (!rowsData[requestTab.tab]) return;
-      const newData = rowsData[requestTab.tab]!.map((row) => {
-        if (row.id !== rowId) return row;
-        if (isValue) {
-          row.value = value;
-        } else {
-          row.variable = value;
-        }
-        return row;
-      });
+    if (!rowsData[requestTab.tab]) return;
+    const newData = rowsData[requestTab.tab]!.map((row) => {
+      if (row.id !== rowId) return row;
+      if (isValue) {
+        row.value = value;
+      } else {
+        row.variable = value;
+      }
+      return row;
+    });
 
-      const parameters: EndpointVariableData[] = [];
-      newData.forEach((row) => {
-        if (!row.value || !row.variable) return;
+    const variables: EndpointVariableData[] = [];
+    newData.forEach((row) => {
+      if (!row.value || !row.variable) return;
 
-        parameters.push({
-          id: row.endpointVariableId !== undefined ? row.endpointVariableId : row.id,
-          name: row.variable,
-          type: row.type ?? "custom",
-          required: row.required ?? false,
-          value: row.value,
-        });
-      });
+      const newVariable: EndpointVariableData = {
+        id: row.endpointVariableId ?? row.id,
+        name: row.variable ?? '',
+        type: row.type ?? 'custom',
+        required: row.required ?? false,
+        value: row.value,
+        operator: requestTab.tab === EndpointTab.Params ? (row.operator as RequestOperator) || '=' : undefined,
+      };
+      variables.push(newVariable);
+    });
 
-      onParametersChange(parameters);
+    if (requestTab.tab === 'params') {
+      onParametersChange(variables);
+    } else if (requestTab.tab === 'body') {
+      endpoint.definitions[0].body = {
+        variables: variables,
+        rawData: {},
+        isRowSelected: false,
+      };
+    } else if (requestTab.tab === 'headers') {
+      endpoint.definitions[0].headers = {
+        variables: variables,
+        rawData: {},
+        isRowSelected: false,
+      };
     }
   };
 
@@ -244,27 +316,31 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
         requestTab,
         deleteVariable,
         setRowsData,
-        updateRowVariable,
+        updateRowField,
+        updateOperator,
         requestValues,
         isLive,
-        updateRowValue,
         getTabsRowsData,
       }),
-    []
+    // Adding missing dependencies breaks focus on typing in variable inputs
+    // Impossible to fix without a significant refactor
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [deletedVariable, requestTab.tab],
   );
 
-  const buildRawDataView = (): JSX.Element => {
+  const buildRawDataView = (): ReactElement => {
     return (
       <>
-        <Track justify="between" style={{ padding: "8px 0 8px 0" }}>
-          <p style={{ color: "#d73e3e" }}>{jsonError}</p>
+        <Track justify="between" style={{ padding: '8px 0 8px 0' }}>
+          <p style={{ color: '#d73e3e' }}>{jsonError}</p>
           <Button
             appearance="text"
             onMouseDown={() => {
               setTabRawData((prevRawData) => {
                 try {
-                  const content = prevRawData[requestTab.tab] ?? "";
+                  const content = prevRawData[requestTab.tab] ?? '';
                   prevRawData[requestTab.tab] = JSON.stringify(JSON.parse(content), null, 4);
+                  updateEndpointRawData(prevRawData, endpoint);
                 } catch (e: any) {
                   setJsonError(`Unable to format JSON. ${e.message}`);
                 }
@@ -273,18 +349,17 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
               setKey(key + 1);
             }}
           >
-            Format JSON
+            {t('newService.endpoint.formatJson')}
           </Button>
         </Track>
         <FormTextarea
           key={`${requestTab.tab}-raw-data`}
-          name={`${requestTab.tab}-raw-data`}
-          label={""}
+          label={''}
           defaultValue={tabRawData[requestTab.tab]}
-          onBlur={() => updateEndpointRawData(tabRawData, endpointData.id, parentEndpointId)}
           onChange={(event) => {
             setJsonError(undefined);
             tabRawData[requestTab.tab] = event.target.value;
+            updateEndpointRawData(tabRawData, endpoint);
           }}
         />
       </>
@@ -304,7 +379,7 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
       className="endpoint-tab-group"
       key={key}
     >
-      <Track justify="between" style={{ borderBottom: "solid 1px #5d6071" }}>
+      <Track justify="between" style={{ borderBottom: 'solid 1px #5d6071' }}>
         <Tabs.List className="endpoint-tab-group__list" aria-label="environment">
           {Object.keys(rowsData).map((tab) => {
             return (
@@ -314,41 +389,46 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
             );
           })}
         </Tabs.List>
-        {!disableRawData && (
+        {!disableRawData && requestTab.tab === 'body' && (
           <Track style={{ paddingRight: 16 }} gap={8}>
             <SwitchBox
-              style={{ width: "fit-content" }}
-              label={""}
-              name={"raw-data"}
-              checked={requestTab.showRawData}
+              style={{ width: 'fit-content' }}
+              label={''}
+              name={'raw-data'}
+              checked={endpoint.definitions[0][requestTab.tab]?.isRowSelected ?? requestTab.showRawData}
               onCheckedChange={(checked) => {
                 setRequestTab((rt) => {
                   rt.showRawData = checked;
                   return rt;
                 });
+                if (endpoint.definitions[0][requestTab.tab]) {
+                  endpoint.definitions[0][requestTab.tab]!.isRowSelected = checked;
+                }
                 setKey(key + 1);
               }}
             />
-            <p style={{ whiteSpace: "nowrap", color: "#34394C" }}>Raw data</p>
+            <p style={{ whiteSpace: 'nowrap', color: '#34394C' }}>Raw data</p>
           </Track>
         )}
       </Track>
       {Object.keys(rowsData).map((tab) => (
         <Tabs.Content className="endpoint-tab-group__tab-content" value={tab} key={tab}>
-          {requestTab.showRawData ? (
+          {(requestTab.showRawData || endpoint.definitions[0][requestTab.tab]?.isRowSelected) &&
+          requestTab.tab === 'body' ? (
             buildRawDataView()
           ) : (
             <>
               <DataTable
                 sortable
-                data={rowsData[tab as EndpointTab]}
+                data={rowsData[tab as EndpointTab] ?? []}
                 columns={columns}
                 setPagination={setPagination}
                 setSorting={setSorting}
                 pagination={pagination}
                 sorting={sorting}
+                withScrollWrapper={false}
               />
-              <hr style={{ margin: 0, borderTop: "1px solid #D2D3D8" }} />
+              <hr style={{ margin: 0, borderTop: '1px solid #D2D3D8' }} />
             </>
           )}
         </Tabs.Content>

@@ -1,0 +1,59 @@
+@import 'src/styles/tools/color';
+
+.popupText {
+  padding-bottom: 10px;
+}
+
+.popupList {
+  padding-left: 25px;
+  padding-top: 10px;
+}
+
+.box {
+  position: relative;
+
+  .labelContainer {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    min-width: 0;
+    gap: 8px;
+
+    .label {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      min-width: 0;
+    }
+
+    .apiBadge,
+    .publicBadge {
+      color: white;
+      font-size: 10px;
+      font-weight: bold;
+      padding: 2px 6px;
+      border-radius: 2px;
+      white-space: nowrap;
+      text-transform: uppercase;
+    }
+
+    .apiBadge {
+      background-color: #8bb4d5;
+    }
+
+    .publicBadge {
+      background-color: #6b9bc5;
+    }
+  }
+
+  .loader {
+    width: 20px;
+    height: 20px;
+  }
+
+  .deleteButton {
+    align-items: center;
+    color: get-color(black-coral-9);
+    display: flex;
+    transition: opacity 0.1s ease-in-out;
+  }
+}

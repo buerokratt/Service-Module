@@ -1,12 +1,23 @@
+import DragInput from './DragInput';
 import FormAutocomplete from './FormAutocomplete';
-import FormInput from './FormInput';
-import FormTextarea from './FormTextarea';
-import FormSelect from './FormSelect';
-import Switch from './Switch';
-import FormCheckboxes from './FormCheckboxes';
 import FormCheckbox from './FormCheckbox';
-import FormDatepicker from './FormDatepicker';
-import SwitchBox from './SwitchBox';
+import FormCheckboxes from './FormCheckboxes';
+import FormInput from './FormInput';
 import FormRichText from './FormRichText';
+import FormSelect from './FormSelect';
+import FormTextarea from './FormTextarea';
+import Switch from './Switch';
+import SwitchBox from './SwitchBox';
 
-export { FormAutocomplete, FormInput, FormTextarea, FormSelect, Switch, FormCheckboxes, FormCheckbox, FormDatepicker, SwitchBox, FormRichText, };
+export {
+  DragInput,
+  FormAutocomplete,
+  FormInput,
+  FormTextarea,
+  FormSelect,
+  Switch,
+  FormCheckboxes,
+  FormCheckbox,
+  SwitchBox,
+  FormRichText,
+};

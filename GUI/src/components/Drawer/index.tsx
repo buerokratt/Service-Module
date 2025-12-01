@@ -1,28 +1,28 @@
-import React, { CSSProperties, FC, PropsWithChildren, useEffect, useRef } from 'react'
-import { MdOutlineClose } from 'react-icons/md'
-import autoAnimate from '@formkit/auto-animate'
+import autoAnimate from '@formkit/auto-animate';
+import React, { CSSProperties, FC, PropsWithChildren, useEffect, useRef } from 'react';
+import { MdOutlineClose } from 'react-icons/md';
 
-import { Icon } from '../../components'
-import './Drawer.scss'
+import { Icon } from '../../components';
+import './Drawer.scss';
 
 type DrawerProps = {
-  title: string
-  onClose: () => void
-  style?: CSSProperties
-}
+  title: string;
+  onClose: () => void;
+  style?: CSSProperties;
+};
 
 const Drawer: FC<PropsWithChildren<DrawerProps>> = ({ title, onClose, children, style }) => {
-  const ref = useRef<HTMLDivElement>(null)
+  const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    ref.current && autoAnimate(ref.current)
+    ref.current && autoAnimate(ref.current);
     const handleKeyup = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose()
-    }
-    document.addEventListener('keyup', handleKeyup)
+      if (e.key === 'Escape') onClose();
+    };
+    document.addEventListener('keyup', handleKeyup);
 
-    return () => document.removeEventListener('keyup', handleKeyup)
-  }, [onClose])
+    return () => document.removeEventListener('keyup', handleKeyup);
+  }, [onClose]);
 
   return (
     <div className="drawer" style={style}>
@@ -34,7 +34,7 @@ const Drawer: FC<PropsWithChildren<DrawerProps>> = ({ title, onClose, children, 
       </div>
       <div className="drawer__body">{children}</div>
     </div>
-  )
-}
+  );
+};
 
-export default Drawer
+export default Drawer;

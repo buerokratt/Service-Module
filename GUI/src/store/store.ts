@@ -1,6 +1,6 @@
-import { create } from 'zustand';
-import { UserInfo } from 'types/userInfo';
 import { CHAT_STATUS, Chat as ChatType } from 'types/chat';
+import { UserInfo } from 'types/userInfo';
+import { create } from 'zustand';
 
 interface StoreState {
   userInfo: UserInfo | null;
@@ -17,31 +17,33 @@ interface StoreState {
   forwordedChats: () => ChatType[];
   unansweredChatsLength: () => number;
   forwordedChatsLength: () => number;
+  userDomains: string[];
+  setUserDomains: (domains: string[]) => void;
 }
 
-const useStore = create<StoreState>((set, get, store) => ({
+const useStore = create<StoreState>((set, get) => ({
   userInfo: null,
   userId: '',
   activeChats: [],
   selectedChatId: null,
+  userDomains: [],
   chatCsaActive: false,
   setActiveChats: (chats) => set({ activeChats: chats }),
   setUserInfo: (data) => set({ userInfo: data, userId: data?.idCode || '' }),
   setSelectedChatId: (id) => set({ selectedChatId: id }),
+  setUserDomains: (data: string[]) => set({ userDomains: data }),
   setChatCsaActive: (active) => set({ chatCsaActive: active }),
 
   selectedChat: () => {
     const selectedChatId = get().selectedChatId;
-    return get().activeChats.find(c => c.id === selectedChatId);
+    return get().activeChats.find((c) => c.id === selectedChatId);
   },
   unansweredChats: () => {
-    return get().activeChats.filter(c => c.customerSupportId === '');
+    return get().activeChats.filter((c) => c.customerSupportId === '');
   },
   forwordedChats: () => {
     const userId = get().userId;
-    return get().activeChats.filter(c =>
-        c.status === CHAT_STATUS.REDIRECTED && c.customerSupportId === userId
-    ) || [];
+    return get().activeChats.filter((c) => c.status === CHAT_STATUS.REDIRECTED && c.customerSupportId === userId) || [];
   },
   unansweredChatsLength: () => get().unansweredChats().length,
   forwordedChatsLength: () => get().forwordedChats().length,

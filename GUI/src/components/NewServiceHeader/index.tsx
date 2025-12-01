@@ -1,43 +1,126 @@
-import React, { FC } from "react";
-import { t } from "i18next";
-import { Button, HeaderStepCounter, Track } from "..";
-import useServiceStore from "store/new-services.store";
-import { runServiceTest } from "services/service-builder";
-import "@buerokratt-ria/header/src/header/Header.scss";
+import { t } from 'i18next';
+import { FC, useState } from 'react';
+import '@buerokratt-ria/header/src/Header.scss';
+import { useNavigate, useParams } from 'react-router-dom';
+import { deleteService } from 'resources/api-constants';
+import { ROUTES } from 'resources/routes-constants';
+import useServiceStore from 'store/new-services.store';
+import useToastStore from 'store/toasts.store';
+import { ServiceState } from 'types';
+import { removeTrailingUnderscores } from 'utils/string-util';
+
+import { Button, HeaderStepCounter, Modal, Track } from '..';
+import api from '../../services/api-dev';
+import useServiceListStore from '../../store/services.store';
+import './NewServiceHeader.scss';
 
 type NewServiceHeaderProps = {
   activeStep: number;
+  backOnClick: () => void;
   continueOnClick: () => void;
-  saveDraftOnClick: () => void;
+  saveOnClick: () => void;
 };
 
-const NewServiceHeader: FC<NewServiceHeaderProps> = ({
-  activeStep,
-  continueOnClick,
-  saveDraftOnClick,
-}) => {
-  const isSaveButtonEnabled = useServiceStore(state => state.isSaveButtonEnabled());
-  const isTestButtonVisible = useServiceStore(state => state.isTestButtonVisible);
-  const isTestButtonEnabled = useServiceStore(state => state.isTestButtonEnabled);
+const NewServiceHeader: FC<NewServiceHeaderProps> = ({ activeStep, backOnClick, continueOnClick, saveOnClick }) => {
+  const name = removeTrailingUnderscores(useServiceStore((state) => state.serviceNameDashed()));
+  const serviceState = useServiceStore((state) => state.serviceState);
+  const selectedService = useServiceListStore((state) => state.selectedService);
+  const navigate = useNavigate();
+  const [isSaving, setIsSaving] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [isContinuing, setIsContinuing] = useState(false);
+  const [isDeleteServiceModalVisible, setIsDeleteServiceModalVisible] = useState(false);
+  const { id } = useParams();
 
   return (
-    <header className="header" style={{ paddingLeft: 24 }}>
-      <Track justify="between" gap={16}>
-        <h1 style={{ whiteSpace: "nowrap" }}>{t("menu.newService")}</h1>
-        <HeaderStepCounter activeStep={activeStep} />
-        <Button onClick={saveDraftOnClick} appearance="secondary" disabled={!isSaveButtonEnabled}>
-          {t("newService.saveDraft")}
-        </Button>
-        <Button onClick={continueOnClick} disabled={activeStep === 3 && !isTestButtonVisible}>
-          {t("global.continue")}
-        </Button>
-        {isTestButtonVisible && (
-          <Button onClick={runServiceTest} disabled={!isTestButtonEnabled}>
-            {t("global.testService")}
+    <>
+      <header className="header">
+        <Track justify="between" gap={16}>
+          <Button appearance="text" style={{ textDecoration: 'none', boxShadow: 'none' }} onClick={backOnClick}>
+            <h1>{`< ${t('menu.backToServiceListing')}`}</h1>
           </Button>
-        )}
-      </Track>
-    </header>
+          <HeaderStepCounter activeStep={activeStep} />
+          <Button
+            appearance={isDeleting ? 'loading' : 'error'}
+            disabled={
+              serviceState && id ? serviceState !== ServiceState.Draft && serviceState !== ServiceState.Ready : true
+            }
+            onClick={() => {
+              setIsDeleteServiceModalVisible(true);
+            }}
+          >
+            {t('serviceFlow.apiElements.delete')}
+          </Button>
+          <Button
+            appearance={isSaving ? 'loading' : 'primary'}
+            onClick={async () => {
+              setIsSaving(true);
+              await useServiceStore.getState().onServiceSave(ServiceState.Draft, false);
+              setIsSaving(false);
+              saveOnClick();
+            }}
+          >
+            {t('global.save')}
+          </Button>
+          <Button
+            appearance={isContinuing ? 'loading' : 'primary'}
+            onClick={() => {
+              if (isSaving) {
+                useToastStore.getState().info({ title: t('overview.service.toast.cannotContinueUntilServiceIsSaved') });
+                return;
+              }
+              setIsContinuing(true);
+              useServiceStore
+                .getState()
+                .onContinueClick()
+                .then(() => {
+                  setIsContinuing(false);
+                  continueOnClick();
+                })
+                .catch((error) => {
+                  setIsContinuing(false);
+                  console.error(error);
+                });
+            }}
+            disabled={!name}
+          >
+            {t('global.confirm')}
+          </Button>
+        </Track>
+      </header>
+      {isDeleteServiceModalVisible && (
+        <Modal title={t('overview.popup.delete')} onClose={() => setIsDeleteServiceModalVisible(false)}>
+          <Track justify="end" gap={16}>
+            <Button appearance="secondary" onClick={() => setIsDeleteServiceModalVisible(false)}>
+              {t('overview.cancel')}
+            </Button>
+            <Button
+              appearance="error"
+              onClick={() => {
+                setIsDeleteServiceModalVisible(false);
+                setIsDeleting(true);
+                api
+                  .post(deleteService(), {
+                    id: selectedService?.serviceId,
+                    type: selectedService?.type,
+                  })
+                  .then(() => {
+                    navigate(ROUTES.OVERVIEW_ROUTE, { replace: true });
+                    useServiceStore.getState().resetState();
+                    setIsDeleting(false);
+                  })
+                  .catch((error) => {
+                    setIsDeleting(false);
+                    console.error(error);
+                  });
+              }}
+            >
+              {t('overview.delete')}
+            </Button>
+          </Track>
+        </Modal>
+      )}
+    </>
   );
 };
 

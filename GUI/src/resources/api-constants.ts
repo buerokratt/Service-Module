@@ -1,4 +1,4 @@
-import { ServiceState } from "types";
+import { ServiceState } from 'types';
 
 const baseUrl = import.meta.env.REACT_APP_API_URL;
 const trainingModuleBaseUrl = import.meta.env.REACT_APP_TRAINING_MODULE_GUI_BASE_URL;
@@ -6,7 +6,7 @@ const trainingModuleBaseUrl = import.meta.env.REACT_APP_TRAINING_MODULE_GUI_BASE
 export const getOpenApiSpec = (): string => `${baseUrl}/services/open-api-spec`;
 export const servicesRequestsExplain = (): string => `${baseUrl}/services/requests/explain`;
 export const getSecretVariables = (): string => `${baseUrl}/secrets`;
-export const getDomainFile = (): string => `${baseUrl}/domain-file`;
+export const getDomainFile = (): string => `${baseUrl}/internal/domain-file`;
 export const getServiceSettings = (): string => `${baseUrl}/service-settings`;
 export const saveServiceSettings = (): string => `${baseUrl}/service-settings`;
 export const getTaraAuthResponseVariables = (): string => `${baseUrl}/user-info`;
@@ -30,4 +30,9 @@ export const getFaultyServices = (page: number, pageSize: number, sort: string, 
   `${baseUrl}/services/services-detailed/nok?page=${page}&page_size=${pageSize}&sort=${sort}&order=${order}`;
 export const trainingModuleTraining = (): string => `${trainingModuleBaseUrl}/treening/treeni-uus-mudel`;
 export const getServiceById = (id: string): string => `${baseUrl}/service-by-id?id=${id}`;
-export const updateServiceEndpoints = (id: string): string => `${baseUrl}/services/update-service-endpoints?id=${id}`;
+export const createEndpoint = (): string => `${baseUrl}/services/create-endpoint`;
+export const updateEndpoint = (id: string): string => `${baseUrl}/services/update-endpoint?id=${id}`;
+export const deleteEndpoint = (): string => `${baseUrl}/services/delete-endpoint`;
+export const getSlots = (): string => `${baseUrl}/slots`;
+export const userStepPreferences = (): string => `${baseUrl}/steps/preferences`;
+export const getCommonEndpoints = (): string => `${baseUrl}/endpoints/common`;

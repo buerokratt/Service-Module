@@ -1,11 +1,11 @@
-import React, { FC, useEffect } from "react";
-import { Track } from "..";
-import Step from "./HeaderStep";
-import { useTranslation } from "react-i18next";
-import { useNavigate, useParams } from "react-router-dom";
-import { ROUTES } from "../../resources/routes-constants";
-import useServiceStore from "store/new-services.store";
-import "./HeaderStepCounter.scss";
+import React, { FC, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useParams } from 'react-router-dom';
+import useServiceStore from 'store/new-services.store';
+
+import { Track } from '..';
+import Step from './HeaderStep';
+import './HeaderStepCounter.scss';
 
 type StepCounterProps = {
   activeStep: number;
@@ -13,41 +13,17 @@ type StepCounterProps = {
 
 const HeaderStepCounter: FC<StepCounterProps> = ({ activeStep }) => {
   const { t } = useTranslation();
-  const navigate = useNavigate();
   const { id } = useParams();
 
   useEffect(() => {
-    if(id) {
+    if (id) {
       useServiceStore.getState().setServiceId(id);
     }
   }, [id]);
 
   return (
     <Track className="header-step-counter" gap={24}>
-      <Step 
-        step={1}
-        activeStep={activeStep}
-        name={t("newService.trainingModuleSetup")} 
-        onClick={() => navigate(ROUTES.OVERVIEW_ROUTE)}
-      />
-      <Step
-        step={2}
-        activeStep={activeStep}
-        name={t("newService.serviceSetup")}
-        onClick={() => {
-          if(id) {
-            navigate(ROUTES.replaceWithId(ROUTES.EDITSERVICE_ROUTE, id));
-          } else {
-            navigate(ROUTES.NEWSERVICE_ROUTE);
-          }
-        }}
-      />
-      <Step
-        step={3}
-        activeStep={activeStep}
-        name={t("newService.serviceFlowCreation")}
-        onClick={() => useServiceStore.getState().onContinueClick(navigate)}
-      />
+      <Step step={1} activeStep={activeStep} name={t('newService.serviceFlowCreation')} onClick={() => {}} />
     </Track>
   );
 };
