@@ -243,9 +243,6 @@ rename_dsl:
       new_path: "[#RUUTER_SERVICES_PATH]/${type}/[#RUUTER_SERVICES_DIR_PATH]/${old_state}/${name}.tmp"
   result: results
 
-checkV5:
-  log: ${examples}
-
 service_edit:
   call: http.post
   args:
