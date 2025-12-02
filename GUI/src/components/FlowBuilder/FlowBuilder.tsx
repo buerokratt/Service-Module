@@ -188,7 +188,9 @@ const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
         defaultEdgeOptions={{ type: 'step', deletable: false }}
       >
         <Chat />
-        <MiniMap style={zIndexStyle} />
+        <div className={'controls-adjustment'}>
+          <MiniMap />
+        </div>
         <Background color="#D2D3D8" gap={16} lineWidth={9} />
         {isLassoActive && <Lasso />}
         <Panel position="top-left" style={zIndexStyle}>

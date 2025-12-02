@@ -211,6 +211,26 @@
   },
   "newService": {
     "endpoints": "Otspunktid",
+    "serviceName": {
+      "title": "Pealkiri",
+      "placeholder": "Pealkiri on kohustuslik",
+      "tooltip": "Teenuse nimi, mis kuvatakse kasutajale ja süsteemis"
+    },
+    "serviceDescription": {
+      "title": "Kirjeldus",
+      "placeholder": "Kirjelda, mida teenus teeb...",
+      "tooltip": "Lühikirjeldus teenuse eesmärgist või funktsioonist. Soovitatav lisada selge ja sisukas kirjeldus."
+    },
+    "examples": {
+      "title": "Näidisküsimused",
+      "placeholder": "Lisa näiteid, mida kasutaja võiks küsida, et teenus käivituks",
+      "tooltip": "Sisesta näidisküsimused, mille kaudu teenus käivitub (nt. ‘Millal on Jaanipäev?’)"
+    },
+    "keywords": {
+      "title": "Märksõnad",
+      "placeholder": "Lisa teenusele vajalikud märksõnad (nt. ‘riigipüha’, ‘aasta’)",
+      "tooltip": "Sisesta teenuse tuvastamiseks olulised märksõnad, mida tehisintellekt kasutab kavatsuse tuvastamisel."
+    },
     "test": "Testi URLi",
     "isCommon": "Üldteenus",
     "slot": "Mälukoht",
@@ -277,6 +297,7 @@
     "chooseMemorySlots": "Vali mälukohad"
   },
   "serviceFlow": {
+    "serviceConfiguration": "Teenuse seaded",
     "element": {
       "taraAuthentication": "TARA autentimine",
       "textfield": "Sõnum kliendile",
