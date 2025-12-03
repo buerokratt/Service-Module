@@ -87,9 +87,11 @@ const FlowElementsPopup: React.FC = () => {
 
   useEffect(() => {
     if (node) {
-      node.data.rules = node.data.rules
+      const rulesCheck = node.data.rules
         ? { ...node.data.rules, children: rules }
         : { ...getInitialGroup(), children: rules };
+      node.data.rules =
+        node.data.stepType === StepType.Condition || node.data.stepType === StepType.Input ? rulesCheck : undefined;
     }
   }, [node, rules]);
 
@@ -189,11 +191,14 @@ const FlowElementsPopup: React.FC = () => {
         fileName: fileName ?? node.data?.fileName,
         fileContent: fileContent ?? node.data?.fileContent,
         signOption: signOption ?? node.data?.signOption,
-        multiChoiceQuestion: {
-          question: multiChoiceQuestionQuestion,
-          buttons: multiChoiceQuestionButtons,
-        },
-        dynamicChoices: dynamicChoices,
+        multiChoiceQuestion:
+          node.data.stepType === StepType.MultiChoiceQuestion
+            ? {
+                question: multiChoiceQuestionQuestion,
+                buttons: multiChoiceQuestionButtons,
+              }
+            : undefined,
+        dynamicChoices: node.data.stepType === StepType.DynamicChoices ? dynamicChoices : undefined,
         endpoint: nodeEndpoint ?? node.data?.endpoint,
         testingPassed: undefined,
       },
