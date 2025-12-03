@@ -243,6 +243,7 @@ services:
   storage-ferry:
     container_name: s3-ferry
     image: s3-ferry
+    platform: linux/amd64
     environment:
       - API_CORS_ORIGIN=*
       - API_DOCUMENTATION_ENABLED=true
