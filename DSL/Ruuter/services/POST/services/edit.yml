@@ -105,16 +105,6 @@ delete_all_mcq_files:
       path: "[#RUUTER_SERVICES_PATH]/${type}/services/draft"
       keyword: "${name}_"
   result: deleteRes
-  next: delete_all_json_files
-
-delete_all_json_files:
-  call: http.post
-  args:
-    url: "[#SERVICE_DMAPPER]/file-manager/delete-all-that-starts-with"
-    body:
-      path: "[#RUUTER_SERVICES_JSON_PATH]/"
-      keyword: "${name}_"
-  result: deletedJson
   next: check_for_content
 
 check_for_content:
@@ -137,29 +127,6 @@ check_for_type:
       next: add_get_dsl
   next: add_post_dsl
 
-generateServiceJson:
-  call: http.post
-  args:
-    url: "[#SERVICE_DMAPPER_HBS]/service_declaration"
-    headers:
-      type: 'json'
-    body:
-      name: ${name}
-      description: ${description}
-      examples: ${examples}
-      entities: ${entities}
-  result: serviceJson
-
-createJsonService:
-  call: http.post
-  args:
-    url: "[#SERVICE_DMAPPER]/file-manager/create"
-    body:
-      file_path: "[#RUUTER_SERVICES_JSON_PATH]/${name}_.json"
-      content: ${JSON.stringify(serviceJson.response.body)}
-  result: savedJson
-  next: check_for_required_parameters
-
 add_get_dsl:
   call: http.post
   args:
@@ -168,7 +135,7 @@ add_get_dsl:
       file_path: "[#RUUTER_SERVICES_GET_PATH]/draft/${name}.tmp"
       content: ${ymlResult.response.body.yaml}
   result: results
-  next: generateServiceJson
+  next: check_for_required_parameters
 
 add_post_dsl:
   call: http.post
@@ -178,7 +145,7 @@ add_post_dsl:
       file_path: "[#RUUTER_SERVICES_POST_PATH]/draft/${name}.tmp"
       content: ${ymlResult.response.body.yaml}
   result: results
-  next: generateServiceJson
+  next: check_for_required_parameters
 
 check_for_required_parameters:
   switch:
