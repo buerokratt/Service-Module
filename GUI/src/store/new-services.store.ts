@@ -850,8 +850,22 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
     const { history, historyIndex } = get();
     if (historyIndex > 0) {
       const previousState = history[historyIndex - 1];
+      let nodes = JSON.parse(JSON.stringify(previousState.nodes));
+
+      nodes = nodes.map((node: any) => {
+        if (node.type !== 'custom') return node;
+        node.data = {
+          ...node.data,
+          onDelete: get().onDelete,
+          setClickedNode: get().setClickedNode,
+          onEdit: get().handleNodeEdit,
+          update: updateFlowInputRules,
+        };
+        return node;
+      });
+
       set({
-        nodes: JSON.parse(JSON.stringify(previousState.nodes)),
+        nodes: nodes,
         edges: JSON.parse(JSON.stringify(previousState.edges)),
         historyIndex: historyIndex - 1,
         hasUnsavedChanges: true,
@@ -863,8 +877,22 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
     const { history, historyIndex } = get();
     if (historyIndex < history.length - 1) {
       const nextState = history[historyIndex + 1];
+      let nodes = JSON.parse(JSON.stringify(nextState.nodes));
+
+      nodes = nodes.map((node: any) => {
+        if (node.type !== 'custom') return node;
+        node.data = {
+          ...node.data,
+          onDelete: get().onDelete,
+          setClickedNode: get().setClickedNode,
+          onEdit: get().handleNodeEdit,
+          update: updateFlowInputRules,
+        };
+        return node;
+      });
+
       set({
-        nodes: JSON.parse(JSON.stringify(nextState.nodes)),
+        nodes: nodes,
         edges: JSON.parse(JSON.stringify(nextState.edges)),
         historyIndex: historyIndex + 1,
         hasUnsavedChanges: true,
