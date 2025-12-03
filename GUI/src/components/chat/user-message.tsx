@@ -3,8 +3,8 @@ import { motion } from 'framer-motion';
 import { TestingMessage } from 'store/test-services.store';
 
 import styles from './chat.module.scss';
-import PersonIcon from '../../static/icons/person.svg';
 import Markdownify from './Markdownify';
+import PersonIcon from '../../static/icons/person.svg';
 
 const rightAnimation = {
   animate: { opacity: 1, x: 0 },

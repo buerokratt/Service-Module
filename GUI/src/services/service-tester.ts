@@ -176,11 +176,11 @@ export function isErrorResponse(response: unknown): response is ServiceTestError
 export function hasResponseData(error: unknown): error is { response: { data: unknown } } {
   return Boolean(
     error &&
-      typeof error === 'object' &&
-      'response' in error &&
-      error.response &&
-      typeof error.response === 'object' &&
-      'data' in error.response,
+    typeof error === 'object' &&
+    'response' in error &&
+    error.response &&
+    typeof error.response === 'object' &&
+    'data' in error.response,
   );
 }
 

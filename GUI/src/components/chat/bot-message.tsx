@@ -4,8 +4,8 @@ import { useCallback } from 'react';
 import { TestingMessage } from 'store/test-services.store';
 
 import styles from './chat.module.scss';
-import RobotIcon from '../../static/icons/buerokratt.svg';
 import Markdownify from './Markdownify';
+import RobotIcon from '../../static/icons/buerokratt.svg';
 
 const leftAnimation = {
   animate: { opacity: 1, x: 0 },

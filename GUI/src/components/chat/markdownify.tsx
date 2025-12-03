@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
 import Markdown from 'markdown-to-jsx';
+import React, { useState } from 'react';
 
 interface MarkdownifyProps {
   message: string | undefined;
@@ -59,7 +59,7 @@ const Markdownify: React.FC<MarkdownifyProps> = ({ message, sanitizeLinks = fals
       }}
     >
       {message
-        ?.replaceAll(/&#x([0-9A-Fa-f]+);/g, (_, hex) => String.fromCodePoint(Number.parseInt(hex, 16)))
+        ?.replaceAll(/&#x([0-9A-Fa-f]+);/g, (_, hex: string) => String.fromCodePoint(Number.parseInt(hex, 16)))
         ?.replaceAll(/(?<=\n)\d+\.\s/g, hasSpecialFormat(message) ? '\n\n$&' : '$&') ?? ''}
     </Markdown>
   </div>
