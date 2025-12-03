@@ -38,9 +38,9 @@ export const runServiceTest = async (input: string) => {
   clearPreviousTestStates(serviceStore);
 
   try {
-    await executeServiceTest(headerValue, state, name, input);
+    await executeServiceTest(headerValue, state, name, input.split(','));
 
-    const response = await executeService(state, name, input);
+    const response = await executeService(state, name, input.split(','));
 
     addSuccessMessages(response.data);
   } catch (error) {
@@ -117,7 +117,7 @@ export const clearPreviousTestStates = (serviceStore: ServiceStoreState) => {
   );
 };
 
-export const executeServiceTest = async (headerValue: string, state: ServiceState, name: string, input: string) => {
+export const executeServiceTest = async (headerValue: string, state: ServiceState, name: string, input: string[]) => {
   const testApi = createApiInstance({
     'x-ruuter-testing': headerValue,
   });
@@ -208,7 +208,7 @@ export function translateError(error: ServiceTestError, nodeLabel: string): Reco
   return translateObjectKeys(translatedError, 'chat.service-test-error');
 }
 
-export const executeService = async (state: ServiceState, name: string, input: string) => {
+export const executeService = async (state: ServiceState, name: string, input: string[]) => {
   return api.post<ServiceResponse>(testService(state, name), { input });
 };
 
