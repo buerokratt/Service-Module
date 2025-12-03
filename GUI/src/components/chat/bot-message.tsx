@@ -1,11 +1,11 @@
 import classNames from 'classnames';
 import { motion } from 'framer-motion';
 import { useCallback } from 'react';
-import { useTranslation } from 'react-i18next';
 import { TestingMessage } from 'store/test-services.store';
 
 import styles from './chat.module.scss';
 import RobotIcon from '../../static/icons/buerokratt.svg';
+import Markdownify from './Markdownify';
 
 const leftAnimation = {
   animate: { opacity: 1, x: 0 },
@@ -18,12 +18,10 @@ interface ChatMessageProps {
 }
 
 const BotMessage = ({ message }: ChatMessageProps) => {
-  const { t } = useTranslation();
-
   const renderConent = useCallback(() => {
     if (message.message.startsWith('<p>')) return message.message.replace('<p>', '').replace('</p>', '');
-    return t(message.message);
-  }, [message.message, t]);
+    return <Markdownify message={message.message} />;
+  }, [message.message]);
 
   return (
     <motion.div animate={leftAnimation.animate} initial={leftAnimation.initial} transition={leftAnimation.transition}>

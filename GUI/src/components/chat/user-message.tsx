@@ -4,6 +4,7 @@ import { TestingMessage } from 'store/test-services.store';
 
 import styles from './chat.module.scss';
 import PersonIcon from '../../static/icons/person.svg';
+import Markdownify from './Markdownify';
 
 const rightAnimation = {
   animate: { opacity: 1, x: 0 },
@@ -27,7 +28,7 @@ const UserMessage = ({ message }: ChatMessageProps) =>
           <img src={PersonIcon} alt="Person icon" />
         </div>
         <div className={styles.content}>
-          <span>{message.message}</span>
+          <Markdownify message={message.message} />
         </div>
       </div>
     </motion.div>
