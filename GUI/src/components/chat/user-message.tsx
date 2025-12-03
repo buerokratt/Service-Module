@@ -1,4 +1,5 @@
 import classNames from 'classnames';
+import Markdownify from 'components/Markdowify';
 import { motion } from 'framer-motion';
 import { TestingMessage } from 'store/test-services.store';
 
@@ -27,7 +28,7 @@ const UserMessage = ({ message }: ChatMessageProps) =>
           <img src={PersonIcon} alt="Person icon" />
         </div>
         <div className={styles.content}>
-          <span>{message.message}</span>
+          <Markdownify message={message.message} />
         </div>
       </div>
     </motion.div>
