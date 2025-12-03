@@ -240,8 +240,52 @@ services:
     networks:
       - bykstack
 
+  storage-ferry:
+    container_name: s3-ferry
+    image: s3-ferry
+    environment:
+      - AZURE_ACCOUNT_1_CONNECTION_STRING=DefaultEndpointsProtocol=http;AccountName=testaccount1;AccountKey=dGVzdGtleTE9PQ==;BlobEndpoint=http://localhost:10000/testaccount1;QueueEndpoint=http://localhost:10001/testaccount1;TableEndpoint=http://localhost:10002/testaccount1;
+      # - API_CORS_ORIGIN=*
+      # - API_DOCUMENTATION_ENABLED=true
+      # - S3_REGION=us-east-1
+      # - S3_ENDPOINT_URL=http://localstack:4566
+      # - S3_ACCESS_KEY_ID=accessKey
+      # - S3_SECRET_ACCESS_KEY=secretKey
+      # - S3_DATA_BUCKET_NAME=buerokratt
+      # - S3_DATA_BUCKET_PATH=
+      # - FS_DATA_DIRECTORY_PATH=./data
+    ports:
+      - 3005:3000
+    networks:
+      - bykstack
+
+  azurite:
+    image: mcr.microsoft.com/azure-storage/azurite:latest
+    ports:
+      - 10000:10000
+      - 10001:10001
+      - 10002:10002
+    environment:
+      - AZURITE_ACCOUNTS=testaccount1:dGVzdGtleTE9PQ==;testaccount2:dGVzdGtleTI9PQ==;testaccount3:dGVzdGtleTM9PQ==
+    volumes:
+      - azurite-data:/data
+    networks:
+      - bykstack
+
+  azurite-init:
+    image: node:24-alpine
+    depends_on:
+      - azurite
+    volumes:
+      - ./scripts:/scripts:ro
+    entrypoint: /bin/sh
+    command: -c "/scripts/azurite-init.sh"
+    networks:
+      - bykstack
+
 volumes:
   opensearch-data1:
+  azurite-data:
 
 networks:
   bykstack:
