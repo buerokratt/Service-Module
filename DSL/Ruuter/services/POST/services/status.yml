@@ -183,6 +183,18 @@ deactivate_service:
       file_path: "[#RUUTER_SERVICES_PATH]/${ruuter_type}/[#RUUTER_SERVICES_DIR_PATH]/${old_file_status_path}/${name + old_file_end}"
       new_path: "[#RUUTER_SERVICES_PATH]/${ruuter_type}/[#RUUTER_SERVICES_DIR_PATH]/inactive/${name}.tmp"
   result: deactivate_service_result
+  next: delete_from_storage
+
+delete_from_storage:
+  call: http.post
+  args:
+    url: "[#STORAGE_FERRY]/v1/files/delete"
+    body:
+      files:
+        - storageAccountId: "[#STORAGE_FERRY_ACCOUNT_ID]"
+          container: "[#STORAGE_FERRY_CONTAINER]"
+          fileName: "${name}.json"
+  result: ferry_delete_result
   next: dactivate_all_mcq_services
 
 dactivate_all_mcq_services:

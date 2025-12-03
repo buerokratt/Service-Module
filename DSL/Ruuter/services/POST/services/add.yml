@@ -129,20 +129,6 @@ check_for_type:
       next: add_get_dsl
   next: add_post_dsl
 
-# todo likely needs to be moved to activate/deactivate service + call Azure here
-# generateServiceJson:
-#   call: http.post
-#   args:
-#     url: "[#SERVICE_DMAPPER_HBS]/service_declaration"
-#     headers:
-#       type: 'json'
-#     body:
-#       name: ${name}
-#       description: ${description}
-#       examples: ${examples}
-#       entities: ${entities}
-#   result: serviceJson
-
 add_get_dsl:
   call: http.post
   args:
