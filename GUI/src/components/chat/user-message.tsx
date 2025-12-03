@@ -1,9 +1,9 @@
 import classNames from 'classnames';
+import Markdownify from 'components/Markdowify';
 import { motion } from 'framer-motion';
 import { TestingMessage } from 'store/test-services.store';
 
 import styles from './chat.module.scss';
-import Markdownify from './Markdownify';
 import PersonIcon from '../../static/icons/person.svg';
 
 const rightAnimation = {

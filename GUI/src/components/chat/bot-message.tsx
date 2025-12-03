@@ -1,10 +1,10 @@
 import classNames from 'classnames';
+import Markdownify from 'components/Markdowify';
 import { motion } from 'framer-motion';
 import { useCallback } from 'react';
 import { TestingMessage } from 'store/test-services.store';
 
 import styles from './chat.module.scss';
-import Markdownify from './Markdownify';
 import RobotIcon from '../../static/icons/buerokratt.svg';
 
 const leftAnimation = {
