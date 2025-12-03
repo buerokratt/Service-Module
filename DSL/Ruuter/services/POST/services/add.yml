@@ -129,6 +129,7 @@ check_for_type:
       next: add_get_dsl
   next: add_post_dsl
 
+# todo same stuff in edit.yml
 # todo likely needs to be moved to activate/deactivate service + call Azure here
 generateServiceJson:
   call: http.post
