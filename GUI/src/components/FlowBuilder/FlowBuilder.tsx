@@ -18,6 +18,7 @@ import useNewServiceStore from 'store/new-services.store';
 import useServiceStore from 'store/services.store';
 import { StepType } from 'types';
 import '../Flow/LassoSelection/Lasso.css';
+import './FlowBuilder.scss';
 
 import { useThemeSyncWithFlow } from '../../hooks/useThemeSyncWithFlow';
 import HorizontalFlow from '../../static/icons/horizontal_flow.svg';
@@ -29,6 +30,7 @@ type FlowBuilderProps = {
 };
 
 const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
+  useLayout();
   const { getNodes, getEdges, setNodes, setEdges, getNode } = useReactFlow();
   const setReactFlowInstance = useNewServiceStore((state) => state.setReactFlowInstance);
   const [colorMode, setColorMode] = useState<ColorMode>('light');
@@ -55,7 +57,7 @@ const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
   const autoView = useServiceStore((state) => state.autoView);
   const toggleAutoView = useServiceStore((state) => state.toggleAutoView);
 
-  const { runLayout } = useLayout(orientation);
+  const { runLayout } = useLayout();
 
   const onConnect = useCallback(
     ({ source, target }: any) => {
@@ -188,9 +190,7 @@ const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
         defaultEdgeOptions={{ type: 'step', deletable: false }}
       >
         <Chat />
-        <div className={'controls-adjustment'}>
-          <MiniMap />
-        </div>
+        <MiniMap className={'minimap'} />
         <Background color="#D2D3D8" gap={16} lineWidth={9} />
         {isLassoActive && <Lasso />}
         <Panel position="top-left" style={zIndexStyle}>
@@ -218,18 +218,25 @@ const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
           </Track>
         </Panel>
         <Panel position="bottom-left">
-          <Track gap={10} direction="horizontal" align="center" style={{ paddingLeft: '110px', paddingBottom: '7px' }}>
-            <Controls orientation="horizontal" showInteractive={false} style={{ marginBottom: '12px' }} />
-            <Tooltip content={t('serviceFlow.autoFocus')}>
-              <span>
-                <Switch
-                  checked={autoView}
-                  onCheckedChange={toggleAutoView}
-                  onLabel={<Icon icon={<MdCenterFocusStrong fontSize={30} />} size="medium" />}
-                  offLabel={<Icon icon={<MdOutlineCenterFocusStrong fontSize={30} />} size="medium" />}
-                />
-              </span>
-            </Tooltip>
+          <Track gap={10} direction="horizontal" align="center" style={{}}>
+            <Controls
+              orientation="horizontal"
+              showInteractive={false}
+              style={{ marginLeft: '0' }}
+              className={'zoom-controls'}
+            />
+            <div className={'center-controls'}>
+              <Tooltip content={t('serviceFlow.autoFocus')}>
+                <span>
+                  <Switch
+                    checked={autoView}
+                    onCheckedChange={toggleAutoView}
+                    onLabel={<Icon icon={<MdCenterFocusStrong fontSize={30} />} size="medium" />}
+                    offLabel={<Icon icon={<MdOutlineCenterFocusStrong fontSize={30} />} size="medium" />}
+                  />
+                </span>
+              </Tooltip>
+            </div>
           </Track>
         </Panel>
       </ReactFlow>
