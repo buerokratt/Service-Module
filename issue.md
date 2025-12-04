@@ -55,8 +55,6 @@ Agreed on call with Ahmed, Varmo, Janno.
 
 After refactoring the SQL files, the following functionality should be tested:
 
-**UPDATE/DELETE operations:**
-
 - [ ] **Edit Service** - Verify service details can be updated correctly. Test with normal and common services.
 - [ ] **Change Service Status** - Verify status changes work (draft → ready → active → inactive)
 - [ ] **Delete Service** - Verify services can be deleted and active services show error
@@ -64,17 +62,4 @@ After refactoring the SQL files, the following functionality should be tested:
 - [ ] **Delete Single Endpoint** - Verify endpoint deletion and removal from user preferences
 - [ ] **Delete Multiple Endpoints with service** - Verify all service endpoints are deleted when service is deleted
 - [ ] **Update User Preferences** - Verify user preferences can be updated: endpoint order (API elements) and step type order (All elements)
-
-**SELECT queries:**
-
-- [ ] **Get Service by ID** - Verify service details are retrieved correctly
-- [ ] **Get Services List** - Verify services list is displayed correctly with pagination and sorting
-- [ ] **Get Common Services List** - Verify common services list is displayed correctly
-- [ ] **Check Service Name Exists** - Verify name existence check works correctly
-- [ ] **Get Service Status** - Verify service status is retrieved correctly
-- [ ] **Get Service Name by ID** - Verify service name is retrieved correctly
-- [ ] **Get Service Settings** - Verify service settings are retrieved correctly
-- [ ] **Get Endpoints by Service ID** - Verify endpoints are retrieved and ordered by user preferences
-- [ ] **Get Common Endpoints** - Verify common endpoints are retrieved correctly
-- [ ] **Get Services by IDs** - Verify multiple services are retrieved correctly
-- [ ] **Get User Step Preferences** - Verify user step preferences are retrieved correctly
+- [ ] **Listing services and endpoints** - Verify services and endpoints are listed correctly in the GUI. Test with normal and common services. Should not be any duplicates.

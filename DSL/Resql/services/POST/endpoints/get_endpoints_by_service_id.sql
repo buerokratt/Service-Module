@@ -2,6 +2,8 @@ WITH UserPreferences AS (
   SELECT endpoints
   FROM user_step_preference
   WHERE user_id_code = :user_id_code
+  ORDER BY created_at DESC
+  LIMIT 1
 )
 SELECT
   e.endpoint_id,
