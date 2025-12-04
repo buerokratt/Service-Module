@@ -1,4 +1,3 @@
--- todo still simpler?
 WITH UserPreferences AS (
   SELECT endpoints
   FROM user_step_preference
