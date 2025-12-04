@@ -12,9 +12,9 @@ The following changes are implemented:
 - [x] Review existing SQL files that use the INSERT workaround pattern and consider refactoring them to use UPDATE/DELETE where appropriate
 - [ ] Ensure all team members are aware of this change
 
-### SQL Files to Refactor
+### SQL Files Refactored
 
-The following SQL files use the INSERT-based workaround pattern and should be refactored to use UPDATE/DELETE statements:
+**UPDATE/DELETE queries:**
 
 - [x] `DSL/Resql/services/POST/edit.sql` - Updates service details
 - [x] `DSL/Resql/services/POST/set-status.sql` - Updates service status
@@ -26,6 +26,20 @@ The following SQL files use the INSERT-based workaround pattern and should be re
 - [x] `DSL/Resql/services/POST/endpoints/remove_service_endpoints_from_preferences.sql` - Removes service endpoints from user step preferences
 - [x] `DSL/Resql/services/POST/update-user-step-preferences.sql` - Updates user step preferences
 - [x] `DSL/Resql/services/POST/update-settings.sql` - Updates service settings
+
+**SELECT queries:**
+
+- [x] `DSL/Resql/services/POST/get-service-by-id.sql` - Gets service by ID
+- [x] `DSL/Resql/services/POST/get-services-list.sql` - Gets list of services
+- [x] `DSL/Resql/services/POST/get-common-services-list.sql` - Gets list of common services
+- [x] `DSL/Resql/services/POST/services/check_name_exist.sql` - Checks if service name exists
+- [x] `DSL/Resql/services/POST/status.sql` - Gets service status
+- [x] `DSL/Resql/services/POST/get-service-name-by-id.sql` - Gets service name by ID
+- [x] `DSL/Resql/services/POST/get-settings.sql` - Gets service settings
+- [x] `DSL/Resql/services/POST/endpoints/get_endpoints_by_service_id.sql` - Gets endpoints by service ID
+- [x] `DSL/Resql/services/POST/endpoints/get_common_endpoints.sql` - Gets common endpoints
+- [x] `DSL/Resql/services/POST/services/get_services_by_ids.sql` - Gets services by IDs
+- [x] `DSL/Resql/services/POST/get-user-step-preferences.sql` - Gets user step preferences
 
 **Note:** Training database queries (`DSL/Resql/training/`) still use the INSERT pattern and are not being refactored.
 
@@ -41,56 +55,26 @@ Agreed on call with Ahmed, Varmo, Janno.
 
 After refactoring the SQL files, the following functionality should be tested:
 
-- [ ] **Edit Service** (`edit.sql`)
-  - Edit service name, description, slot, examples, entities, structure, and common flag
-  - Verify service details are updated correctly
-  - Verify service can be edited multiple times
-  - Verify only one record exists per service_id (no duplicates)
+**UPDATE/DELETE operations:**
 
-- [ ] **Change Service Status** (`set-status.sql`)
-  - Change service status from draft → ready
-  - Change service status from ready → active
-  - Change service status from active → inactive
-  - Change service status from inactive → draft
-  - Verify status changes are reflected correctly in the UI
-  - Verify only one record exists per service_id (no duplicates)
+- [ ] **Edit Service** - Verify service details can be updated correctly. Test with normal and common services.
+- [ ] **Change Service Status** - Verify status changes work (draft → ready → active → inactive)
+- [ ] **Delete Service** - Verify services can be deleted and active services show error
+- [ ] **Update Endpoint** - Verify endpoint details can be updated correctly
+- [ ] **Delete Single Endpoint** - Verify endpoint deletion and removal from user preferences
+- [ ] **Delete Multiple Endpoints with service** - Verify all service endpoints are deleted when service is deleted
+- [ ] **Update User Preferences** - Verify user preferences can be updated: endpoint order (API elements) and step type order (All elements)
 
-- [ ] **Delete Service** (`delete-service.sql`)
-  - Delete a service in draft state
-  - Delete a service in ready state
-  - Verify active services cannot be deleted (should show error)
-  - Verify deleted service is marked as deleted (deleted = TRUE)
-  - Verify deleted service no longer appears in service lists
-  - Verify only one record exists per service_id (no duplicates)
+**SELECT queries:**
 
-- [ ] **Update Endpoint** (`update_endpoint.sql`)
-  - Update endpoint name, type, isCommon flag, serviceId, and definitions
-  - Verify endpoint details are updated correctly
-  - Verify endpoint can be updated multiple times
-  - Verify only one record exists per endpoint_id (no duplicates)
-
-- [ ] **Delete Single Endpoint** (`delete_endpoint.sql`, `remove_endpoint_from_preferences.sql`)
-  - Delete an endpoint from a service
-  - Verify endpoint is marked as deleted (deleted = TRUE)
-  - Verify endpoint is removed from all user step preferences that reference it
-  - Verify endpoint no longer appears in endpoint lists
-  - Verify only one record exists per endpoint_id (no duplicates)
-
-- [ ] **Delete Multiple Endpoints** (`delete_endpoints_by_service_id.sql`, `remove_service_endpoints_from_preferences.sql`)
-  - Delete a service that has multiple endpoints
-  - Verify all non-common service endpoints are marked as deleted
-  - Verify all deleted endpoints are removed from user step preferences
-  - Verify endpoints no longer appear in endpoint lists
-  - Verify only one record exists per endpoint_id (no duplicates)
-
-- [ ] **Update User Step Preferences** (`update-user-step-preferences.sql`)
-  - Update user step preferences (steps and endpoints arrays)
-  - Verify preferences are updated correctly
-  - Verify preferences can be updated multiple times
-  - Verify only the latest preference record is updated
-
-- [ ] **Update Service Settings** (`update-settings.sql`)
-  - Update service settings (name-value pairs)
-  - Verify settings are updated correctly
-  - Verify settings can be updated multiple times
-  - Verify only the latest setting record is updated per setting name
+- [ ] **Get Service by ID** - Verify service details are retrieved correctly
+- [ ] **Get Services List** - Verify services list is displayed correctly with pagination and sorting
+- [ ] **Get Common Services List** - Verify common services list is displayed correctly
+- [ ] **Check Service Name Exists** - Verify name existence check works correctly
+- [ ] **Get Service Status** - Verify service status is retrieved correctly
+- [ ] **Get Service Name by ID** - Verify service name is retrieved correctly
+- [ ] **Get Service Settings** - Verify service settings are retrieved correctly
+- [ ] **Get Endpoints by Service ID** - Verify endpoints are retrieved and ordered by user preferences
+- [ ] **Get Common Endpoints** - Verify common endpoints are retrieved correctly
+- [ ] **Get Services by IDs** - Verify multiple services are retrieved correctly
+- [ ] **Get User Step Preferences** - Verify user step preferences are retrieved correctly

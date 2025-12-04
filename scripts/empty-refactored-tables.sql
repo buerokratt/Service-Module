@@ -10,7 +10,3 @@ DELETE FROM endpoints;
 
 -- 3. Services
 DELETE FROM services;
-
--- 4. Service settings (independent)
-DELETE FROM services_settings;
-
