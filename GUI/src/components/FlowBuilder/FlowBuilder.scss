@@ -8,3 +8,21 @@
 .zoom-position > div {
   margin-bottom: 261px !important;
 }
+
+.minimap {
+  left: 0;
+  position: absolute;
+  right: unset !important;
+  margin-bottom: 93px;
+}
+
+.center-controls {
+  left: 90px;
+  position: absolute;
+  margin-bottom: 507px;
+}
+
+.zoom-controls {
+  padding-left: 0 !important;
+  margin-bottom: 241px;
+}

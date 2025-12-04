@@ -66,10 +66,16 @@ const StepNode: FC<StepNodeProps> = ({ data }) => {
         {data.label}
       </p>
       {data.stepType === StepType.Textfield && (
-        <div style={boldText} dangerouslySetInnerHTML={createMarkup(data.message ?? '')}></div>
+        <div
+          style={{ ...boldText, whiteSpace: 'pre-wrap' }}
+          dangerouslySetInnerHTML={createMarkup(data.message ?? '')}
+        ></div>
       )}
       {data.stepType === StepType.MultiChoiceQuestion && (
-        <div style={boldText} dangerouslySetInnerHTML={createMarkup(data.multiChoiceQuestion?.question ?? '')}></div>
+        <div
+          style={{ ...boldText, whiteSpace: 'pre-wrap' }}
+          dangerouslySetInnerHTML={createMarkup(data.multiChoiceQuestion?.question ?? '')}
+        ></div>
       )}
       {data.stepType === StepType.Auth && <p style={boldText}>&quot;{t('serviceFlow.popup.loginWithTARA')}&quot;</p>}
       {data.stepType === StepType.Input && (

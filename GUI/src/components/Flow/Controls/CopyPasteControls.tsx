@@ -20,7 +20,7 @@ interface CopyPasteControlsProps {
 const CopyPasteControls: FC<CopyPasteControlsProps> = ({ onNodesDelete }) => {
   const { getNodes, getEdges, setNodes, setEdges } = useReactFlow();
   const { t } = useTranslation();
-  const { setHasUnsavedChanges } = useServiceStore();
+  const { setHasUnsavedChanges, saveToHistory } = useServiceStore();
   const [hasClipboardData, setHasClipboardData] = useState<boolean>(false);
   const selectedNodes = useServiceStore((state) => state.flowSelectedNodes);
   const reactFlowInstance = useServiceStore.getState().reactFlowInstance;
@@ -296,11 +296,12 @@ const CopyPasteControls: FC<CopyPasteControlsProps> = ({ onNodesDelete }) => {
     setNodes((prevNodes) => [...prevNodes, ...newNodes, ...ghostNodes]);
     setEdges((prevEdges) => [...prevEdges, ...newEdges, ...ghostEdges]);
     setHasUnsavedChanges(true);
+    saveToHistory();
 
     useToastStore
       .getState()
       .success({ title: t('serviceFlow.nodesPasted', { count: newNodes.length, s: newNodes.length > 1 ? 's' : '' }) });
-  }, [fallbackClipboardData, getNodes, setNodes, setEdges, setHasUnsavedChanges, t]);
+  }, [fallbackClipboardData, getNodes, setNodes, setEdges, setHasUnsavedChanges, t, saveToHistory]);
 
   const cutNodes = useCallback(async () => {
     if (selectedNodes.length === 0) {
@@ -318,14 +319,21 @@ const CopyPasteControls: FC<CopyPasteControlsProps> = ({ onNodesDelete }) => {
     }
 
     setHasUnsavedChanges(true);
+    saveToHistory();
 
     useToastStore.getState().success({
       title: t('serviceFlow.nodesCut', { count: selectedNodes.length, s: selectedNodes.length > 1 ? 's' : '' }),
     });
-  }, [selectedNodes, copyNodes, onNodesDelete, reactFlowInstance, setHasUnsavedChanges, t]);
+  }, [selectedNodes, copyNodes, onNodesDelete, reactFlowInstance, setHasUnsavedChanges, t, saveToHistory]);
 
   useEffect(() => {
     const handleKeyDown = async (event: KeyboardEvent) => {
+      const isDialogOpen =
+        (event.target instanceof Element && event.target.closest('[role="dialog"], [role="alertdialog"]')) ||
+        document.querySelector('[role="dialog"]:not([aria-hidden="true"])');
+
+      if (isDialogOpen) return;
+
       const isMac = navigator.userAgent.toUpperCase().indexOf('MAC') >= 0;
       const isCtrlOrCmd = isMac ? event.metaKey : event.ctrlKey;
 

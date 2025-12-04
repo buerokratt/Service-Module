@@ -33,6 +33,7 @@ import HeaderStep from './HeaderStepCounter/HeaderStep';
 import Icon from './Icon';
 import Label from './Label';
 import Layout from './Layout';
+import Markdownify from './Markdowify';
 import Modal from './Modal';
 import NewServiceHeader from './NewServiceHeader';
 import OutputElementBox from './OutputElementBox';
@@ -88,4 +89,5 @@ export {
   StepElement,
   Dropdown,
   ThemeToggle,
+  Markdownify,
 };
