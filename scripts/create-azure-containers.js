@@ -1,5 +1,5 @@
 /* eslint-disable */
-// This scriptreates required Azure blob storage containers in Azurite (local Azure Storage emulator)
+// This script creates required Azure blob storage containers in Azurite (local Azure Storage emulator)
 const { BlobServiceClient } = require('@azure/storage-blob');
 
 const containers = ['buerokratt']; // Add more container names as needed
