@@ -1,15 +1,10 @@
-WITH LatestEndpoints AS (
-  SELECT DISTINCT ON (e.endpoint_id) e.*
-  FROM endpoints AS e
-  WHERE e.is_common = true
-  ORDER BY e.endpoint_id, e.id DESC
-)
 SELECT
   endpoint_id,
   name,
   type,
   is_common,
   definitions
-FROM LatestEndpoints
-WHERE deleted IS FALSE
+FROM endpoints
+WHERE is_common = true
+  AND deleted IS FALSE
 ORDER BY id DESC;
