@@ -129,29 +129,6 @@ check_for_type:
       next: add_get_dsl
   next: add_post_dsl
 
-generateServiceJson:
-  call: http.post
-  args:
-    url: "[#SERVICE_DMAPPER_HBS]/service_declaration"
-    headers:
-      type: 'json'
-    body:
-      name: ${name}
-      description: ${description}
-      examples: ${examples}
-      entities: ${entities}
-  result: serviceJson
-
-createJsonService:
-  call: http.post
-  args:
-    url: "[#SERVICE_DMAPPER]/file-manager/create"
-    body:
-      file_path: "[#RUUTER_SERVICES_JSON_PATH]/${name}_.json"
-      content: ${JSON.stringify(serviceJson.response.body)}
-  result: savedJson
-  next: check_result
-
 add_get_dsl:
   call: http.post
   args:
@@ -160,7 +137,7 @@ add_get_dsl:
       file_path: "[#RUUTER_SERVICES_GET_PATH]/draft/${name}.tmp"
       content: ${ymlResult.response.body.yaml}
   result: results
-  next: generateServiceJson
+  next: check_result
 
 add_post_dsl:
   call: http.post
@@ -170,7 +147,7 @@ add_post_dsl:
       file_path: "[#RUUTER_SERVICES_POST_PATH]/draft/${name}.tmp"
       content: ${ymlResult.response.body.yaml}
   result: results
-  next: generateServiceJson
+  next: check_result
 
 check_result:
   switch:
