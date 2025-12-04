@@ -85,7 +85,6 @@ const FlowElementsPopup: React.FC = () => {
     [],
   );
 
-
   // StepType.Textfield
   const [textfieldMessage, setTextfieldMessage] = useState<string | null>(null);
   const [textfieldMessagePlaceholders, setTextfieldMessagePlaceholders] = useState<{ [key: string]: string }>({});
