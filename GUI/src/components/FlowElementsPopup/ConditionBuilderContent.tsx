@@ -14,6 +14,8 @@ const ConditionBuilderContent: React.FC = () => {
   const { t } = useTranslation();
   const isYesNoQuestion = useServiceStore((state) => state.isYesNoQuestion);
   const rules = useServiceStore((state) => state.rules);
+  const node = useServiceStore((state) => state.selectedNode);
+  const seedGroup = node?.data?.rules || (Array.isArray(rules) && rules.length > 0 ? rules : undefined);
 
   return (
     <Track direction="vertical" align="stretch">
@@ -33,7 +35,7 @@ const ConditionBuilderContent: React.FC = () => {
       {!isYesNoQuestion && (
         <RuleBuilder
           onChange={(group: Group) => useServiceStore.getState().changeRulesNode(group.children)}
-          seedGroup={rules}
+          seedGroup={seedGroup}
         />
       )}
     </Track>
