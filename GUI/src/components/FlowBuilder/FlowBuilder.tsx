@@ -56,6 +56,7 @@ const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
   useLayout(orientation);
   const autoView = useServiceStore((state) => state.autoView);
   const toggleAutoView = useServiceStore((state) => state.toggleAutoView);
+  const { fitView } = useReactFlow();
 
   const { runLayout } = useLayout();
 
@@ -165,9 +166,10 @@ const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
         panOnScroll
         nodeTypes={nodeTypes}
         edgeTypes={edgeTypes}
-        onInit={(instance) => {
+        onInit={async (instance) => {
           setReactFlowInstance(instance);
           useNewServiceStore.getState().loadEndpointsResponseVariables();
+          await fitView({ duration: 200, padding: 5 });
         }}
         nodesDraggable={false}
         onSelectionChange={onSelectionChange}
@@ -224,6 +226,7 @@ const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
               showInteractive={false}
               style={{ marginLeft: '0' }}
               className={'zoom-controls'}
+              fitViewOptions={{ padding: 5 }}
             />
             <div className={'center-controls'}>
               <Tooltip content={t('serviceFlow.autoFocus')}>
