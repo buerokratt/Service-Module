@@ -115,6 +115,7 @@ export const validateStep = (node: NodeDataProps): ValidationResult => {
 // More need to be added later
 export const validateInputOrConditionStep = (node: NodeDataProps): ValidationResult => {
   const hasInvalidRules = (elements: any[]): boolean => {
+    if (!Array.isArray(elements)) return true;
     return elements.some((e) => {
       if ('children' in e) {
         const group = e as Group;
@@ -127,9 +128,10 @@ export const validateInputOrConditionStep = (node: NodeDataProps): ValidationRes
     });
   };
 
-  const invalidRulesExist = hasInvalidRules(node.rules?.children ?? []);
+  const rulesChildren = Array.isArray(node.rules?.children) ? node.rules.children : [];
+  const invalidRulesExist = hasInvalidRules(rulesChildren);
 
-  if (node.rules?.children === undefined || node.rules.children.length === 0) {
+  if (!Array.isArray(node.rules?.children) || node.rules.children.length === 0) {
     const errorMessage =
       node.stepType === StepType.Input
         ? (t('chat.service-flow-error.client-input-rules-required') as string)
