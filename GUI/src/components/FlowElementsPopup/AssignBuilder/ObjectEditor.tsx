@@ -5,7 +5,7 @@ import 'jsoneditor/dist/jsoneditor.css';
 import './json.scss';
 import { getDragData } from 'utils/component-util';
 import { searchForProperty, searchForValue, updateValueAtPath } from 'utils/object-util';
-import { stringToTemplate } from 'utils/string-util';
+import { stringToEscapedTemplate } from 'utils/string-util';
 
 import styles from './ObjectEditor.module.scss';
 
@@ -56,7 +56,7 @@ const ObjectEditor: React.FC<ObjectEditorProps> = ({ onChange, data }) => {
           [i18n.language]: jsonEditor,
         },
         onChange: () => {
-          onChange(stringToTemplate(JSON.stringify(jsonEditorRef.current?.get())));
+          onChange(stringToEscapedTemplate(JSON.stringify(jsonEditorRef.current?.get())));
         },
       });
 
@@ -146,7 +146,7 @@ const ObjectEditor: React.FC<ObjectEditorProps> = ({ onChange, data }) => {
 
               jsonEditorRef.current.update(newData);
 
-              onChange(stringToTemplate(JSON.stringify(newData)));
+              onChange(stringToEscapedTemplate(JSON.stringify(newData)));
             }
           }
         }
