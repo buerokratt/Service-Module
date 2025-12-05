@@ -8,7 +8,7 @@ import { isArray, isObject } from 'utils/object-util';
 import { isTemplate, stringToTemplate, templateToString } from 'utils/string-util';
 
 import styles from './AssignElement.module.scss';
-import ObjectEditor from './ObjectEditor';
+import ObjectEditor from '../ObjectEditor/ObjectEditor';
 import { Assign } from '../../../types/assign';
 
 import '../styles.scss';
