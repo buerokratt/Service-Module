@@ -151,7 +151,7 @@ export const generateDateCode = (
 export const createDateTimeDragData = (dateCode: string): Assign => ({
   id: v4(),
   key: 'dateTime',
-    value: stringToEscapedTemplate(dateCode),
+  value: stringToEscapedTemplate(dateCode),
   data: dateCode,
 });
 
