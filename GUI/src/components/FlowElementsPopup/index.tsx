@@ -236,6 +236,10 @@ const FlowElementsPopup: React.FC = () => {
     if (stepType === StepType.Assign) {
       const flatEndpointVariables = endpointsVariables.map((endpoint) => endpoint.chips).flat();
       assignElements.forEach((element) => {
+
+        const key = removeTrailingUnderscores(element.key);
+        element.key = key;
+        
         // Convert simple values such as "some input" to simple string
         if (!isTemplate(element.value)) {
           element.value = stringToTemplate('"' + element.value + '"');

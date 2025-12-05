@@ -45,7 +45,11 @@ const AssignElement: React.FC<AssignElementProps> = ({
   const [isObjectEditorOpen, setIsObjectEditorOpen] = useState(element.isObject ?? false);
 
   const changeKey = (e: React.ChangeEvent<HTMLInputElement>) => {
-    onChange({ ...element, key: e.target.value });
+    const value = e.target.value.trimStart().replaceAll(/_+/g, '_');
+    const hasSpecialCharacters = /[^\p{L}\p{N}_ ]/u;
+    if (!hasSpecialCharacters.test(value) && !value.startsWith(' ')) {
+      onChange({ ...element, key: value.replaceAll(' ', '_') });
+    }
   };
 
   const changeValue = (e: React.ChangeEvent<HTMLInputElement>) => {
