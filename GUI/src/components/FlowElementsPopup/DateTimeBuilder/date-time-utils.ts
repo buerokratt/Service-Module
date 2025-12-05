@@ -1,6 +1,6 @@
 import { t } from 'i18next';
 import { Assign } from 'types';
-import { stringToTemplate } from 'utils/string-util';
+import { stringToEscapedTemplate } from 'utils/string-util';
 import { v4 } from 'uuid';
 
 export type BaseDate = 'startOfDay' | 'startOfMonth' | 'startOfYear' | 'endOfDay' | 'endOfMonth' | 'endOfYear' | 'now';
@@ -151,7 +151,7 @@ export const generateDateCode = (
 export const createDateTimeDragData = (dateCode: string): Assign => ({
   id: v4(),
   key: 'dateTime',
-  value: stringToTemplate(dateCode),
+    value: stringToEscapedTemplate(dateCode),
   data: dateCode,
 });
 
