@@ -80,6 +80,7 @@ const AssignElement: React.FC<AssignElementProps> = ({
   const toggleManualEdit = () => {
     const newMode = !element.isValueManual;
     setIsEditingManually(newMode);
+    setIsObjectEditorOpen(false);
     onChange({ ...element, slots: undefined, isValueManual: newMode });
   };
 
@@ -173,21 +174,13 @@ const AssignElement: React.FC<AssignElementProps> = ({
         />
         :
         <Track style={{ flex: '1 0 75%', justifyContent: 'flex-end' }} gap={5}>
-          {!isObjectEditorOpen && (
-            <>
-              {isEditingManually ? renderManualValueInput() : renderDragInputs()}
-              {renderManualToggle()}
-            </>
-          )}
-
-          {!isEditingManually && (
-            <Tooltip content={t('serviceFlow.popup.openObjectEditor')} onButtonClick={toggleObjectEditor}>
-              <div className="small-assign-button assign-blue">
-                <Icon icon={<MdDataObject />} />
-              </div>
-            </Tooltip>
-          )}
-
+          {!isObjectEditorOpen && <>{isEditingManually ? renderManualValueInput() : renderDragInputs()}</>}
+          {renderManualToggle()}
+          <Tooltip content={t('serviceFlow.popup.openObjectEditor')} onButtonClick={toggleObjectEditor}>
+            <div className="small-assign-button assign-blue">
+              <Icon icon={<MdDataObject />} />
+            </div>
+          </Tooltip>
           {onRemove && (
             <button onClick={() => onRemove(element.id)} className="small-assign-button assign-red">
               <Icon icon={<MdDeleteOutline />} />
