@@ -34,17 +34,7 @@ export async function saveEndpoints(endpoints: EndpointData[], onSuccess?: () =>
   }
 
   endpoints.forEach((endpoint) => {
-    if (endpoint.definitions) {
-      for (const definition of endpoint.definitions) {
-        for (const section of ['body', 'headers', 'params'] as const) {
-          if (definition[section]?.variables) {
-            for (const v of definition[section].variables) {
-              v.name = removeTrailingUnderscores(v.name);
-            }
-          }
-        }
-      }
-    }
+    filterOutEndpointsTrailingUnderscores(endpoint);
     if (endpoint.isNew) {
       tasks.push(createEndpointAndUpdateState(endpoint));
     } else {
@@ -59,6 +49,20 @@ export async function saveEndpoints(endpoints: EndpointData[], onSuccess?: () =>
   });
 
   await Promise.all(tasks).then(onSuccess).catch(onError);
+}
+
+function filterOutEndpointsTrailingUnderscores(endpoint: EndpointData) {
+  if (endpoint.definitions) {
+    for (const definition of endpoint.definitions) {
+      for (const section of ['body', 'headers', 'params'] as const) {
+        if (definition[section]?.variables) {
+          for (const v of definition[section].variables) {
+            v.name = removeTrailingUnderscores(v.name);
+          }
+        }
+      }
+    }
+  }
 }
 
 async function createEndpointAndUpdateState(endpoint: EndpointData): Promise<any> {

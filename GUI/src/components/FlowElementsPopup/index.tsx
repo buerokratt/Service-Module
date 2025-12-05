@@ -197,21 +197,7 @@ const FlowElementsPopup: React.FC = () => {
     };
 
     if (stepType === StepType.Input || stepType === StepType.Condition) {
-      const rulesArray = Array.isArray(rules) ? rules : [];
-      for (const item of rulesArray) {
-        const processRuleField = (obj: GroupOrRule) => {
-          if ('field' in obj) obj.field = removeTrailingUnderscores(obj.field);
-          else {
-            for (const child of obj.children) {
-              processRuleField(child);
-            }
-          }
-        };
-        processRuleField(item);
-      }
-      updatedNode.data.rules = node.data.rules
-        ? { ...node.data.rules, children: rulesArray }
-        : { ...getInitialGroup(), children: rulesArray };
+      prepareRulesForSaving(updatedNode);
     }
 
     if (stepType === StepType.MultiChoiceQuestion) {
@@ -219,70 +205,100 @@ const FlowElementsPopup: React.FC = () => {
     }
 
     if (stepType === StepType.UserDefined) {
-      if (updatedNode.data?.endpoint?.definitions) {
-        for (const definition of updatedNode.data.endpoint.definitions) {
-          for (const section of ['body', 'headers', 'params'] as const) {
-            if (definition[section]?.variables) {
-              for (const v of definition[section].variables) {
-                v.name = removeTrailingUnderscores(v.name);
-              }
-            }
-          }
-        }
-      }
-      const newLabel = updatedNode.data.label?.toString().split(' ');
-      if (updatedNode.data.endpoint?.name) {
-        newLabel[0] = updatedNode.data.endpoint?.name ?? node.data.label?.toString().split(' ')[0];
-        const nodeWithSameLabel = instance
-          ?.getNodes()
-          .find((n) => n.data.label === newLabel.join(' ') && n.id !== updatedNode.id);
-        if (nodeWithSameLabel) {
-          useToastStore.getState().error({
-            title: t('newService.toast.elementNameAlreadyExists'),
-            message: t('newService.toast.elementNameAlreadyExistsMessage'),
-          });
-          return;
-        }
-        updatedNode.data.label = newLabel.join(' ');
-      }
-      useServiceStore.getState().loadEndpointsResponseVariables();
+      prepareEndpointsForSaving(updatedNode);
     }
 
     if (stepType === StepType.Assign) {
-      const flatEndpointVariables = endpointsVariables.map((endpoint) => endpoint.chips).flat();
-      assignElements.forEach((element) => {
-        const key = removeTrailingUnderscores(element.key);
-        element.key = key;
-
-        // Convert simple values such as "some input" to simple string
-        if (!isTemplate(element.value)) {
-          element.value = stringToTemplate('"' + element.value + '"');
-          return;
-        }
-
-        const fullPath = templateToString(element.value);
-        const endpointVariable = flatEndpointVariables.find((variable) => fullPath.startsWith(String(variable.value)));
-
-        if (!endpointVariable) {
-          // Element is not an object so no data for ObjectTree
-          return;
-        }
-
-        const value = String(endpointVariable.value);
-        const remainingPath = fullPath.substring(
-          fullPath[value.length] === '['
-            ? // Uses array notation, e.g. endpointVariable[1].something; needed for backwards compatibility
-              value.length
-            : // Uses object notation, e.g. endpointVariable.1.something
-              value.length + 1,
-        );
-        element.data = remainingPath ? getValueByPath(endpointVariable.data, remainingPath) : endpointVariable.data;
-      });
-      updatedNode.data.assignElements = assignElements;
+      prepareAssignForSaving(updatedNode);
     }
 
     useServiceStore.getState().handlePopupSave(updatedNode);
     onClose();
+  };
+
+  const prepareAssignForSaving = (updatedNode: Node<NodeDataProps>) => {
+    const flatEndpointVariables = endpointsVariables.map((endpoint) => endpoint.chips).flat();
+    assignElements.forEach((element) => {
+      const key = removeTrailingUnderscores(element.key);
+      element.key = key;
+
+      // Convert simple values such as "some input" to simple string
+      if (!isTemplate(element.value)) {
+        element.value = stringToTemplate('"' + element.value + '"');
+        return;
+      }
+
+      const fullPath = templateToString(element.value);
+      const endpointVariable = flatEndpointVariables.find((variable) => fullPath.startsWith(String(variable.value)));
+
+      if (!endpointVariable) {
+        // Element is not an object so no data for ObjectTree
+        return;
+      }
+
+      const value = String(endpointVariable.value);
+      const remainingPath = fullPath.substring(
+        fullPath[value.length] === '['
+          ? // Uses array notation, e.g. endpointVariable[1].something; needed for backwards compatibility
+            value.length
+          : // Uses object notation, e.g. endpointVariable.1.something
+            value.length + 1,
+      );
+      element.data = remainingPath ? getValueByPath(endpointVariable.data, remainingPath) : endpointVariable.data;
+    });
+    updatedNode.data.assignElements = assignElements;
+  };
+
+  const prepareEndpointsForSaving = (updatedNode: Node<NodeDataProps>) => {
+    filterOutEndpointsTrailingUnderscores(updatedNode);
+    const newLabel = updatedNode.data.label?.toString().split(' ');
+    if (updatedNode.data.endpoint?.name) {
+      newLabel[0] = updatedNode.data.endpoint?.name ?? node.data.label?.toString().split(' ')[0];
+      const nodeWithSameLabel = instance
+        ?.getNodes()
+        .find((n) => n.data.label === newLabel.join(' ') && n.id !== updatedNode.id);
+      if (nodeWithSameLabel) {
+        useToastStore.getState().error({
+          title: t('newService.toast.elementNameAlreadyExists'),
+          message: t('newService.toast.elementNameAlreadyExistsMessage'),
+        });
+        return;
+      }
+      updatedNode.data.label = newLabel.join(' ');
+    }
+    useServiceStore.getState().loadEndpointsResponseVariables();
+  };
+
+  const filterOutEndpointsTrailingUnderscores = (updatedNode: Node<NodeDataProps>) => {
+    if (updatedNode.data?.endpoint?.definitions) {
+      for (const definition of updatedNode.data.endpoint.definitions) {
+        for (const section of ['body', 'headers', 'params'] as const) {
+          if (definition[section]?.variables) {
+            for (const v of definition[section].variables) {
+              v.name = removeTrailingUnderscores(v.name);
+            }
+          }
+        }
+      }
+    }
+  };
+
+  const prepareRulesForSaving = (updatedNode: Node<NodeDataProps>) => {
+    const rulesArray = Array.isArray(rules) ? rules : [];
+    for (const item of rulesArray) {
+      const processRuleField = (obj: GroupOrRule) => {
+        if ('field' in obj) obj.field = removeTrailingUnderscores(obj.field);
+        else {
+          for (const child of obj.children) {
+            processRuleField(child);
+          }
+        }
+      };
+      processRuleField(item);
+    }
+    updatedNode.data.rules = node.data.rules
+      ? { ...node.data.rules, children: rulesArray }
+      : { ...getInitialGroup(), children: rulesArray };
   };
 
   const handleJsonRequestClick = async () => {
