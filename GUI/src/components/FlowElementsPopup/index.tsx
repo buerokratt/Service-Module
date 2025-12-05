@@ -85,16 +85,6 @@ const FlowElementsPopup: React.FC = () => {
     [],
   );
 
-  useEffect(() => {
-    if (node) {
-      const rulesCheck = node.data.rules
-        ? { ...node.data.rules, children: rules }
-        : { ...getInitialGroup(), children: rules };
-      node.data.rules =
-        node.data.stepType === StepType.Condition || node.data.stepType === StepType.Input ? rulesCheck : undefined;
-    }
-  }, [node, rules]);
-
   // StepType.Textfield
   const [textfieldMessage, setTextfieldMessage] = useState<string | null>(null);
   const [textfieldMessagePlaceholders, setTextfieldMessagePlaceholders] = useState<{ [key: string]: string }>({});
@@ -129,8 +119,10 @@ const FlowElementsPopup: React.FC = () => {
     switch (stepType) {
       case StepType.Input:
       case StepType.Condition:
-        if (node.data?.rules) {
+        if (node.data?.rules && Array.isArray(node.data.rules.children)) {
           useServiceStore.getState().changeRulesNode(node.data.rules.children);
+        } else {
+          useServiceStore.getState().changeRulesNode([]);
         }
         break;
 
@@ -205,9 +197,10 @@ const FlowElementsPopup: React.FC = () => {
     };
 
     if (stepType === StepType.Input || stepType === StepType.Condition) {
-      updatedNode.data.rules = updatedNode.data.rules
-        ? { ...updatedNode.data.rules, children: rules }
-        : { ...getInitialGroup(), children: rules };
+      const rulesArray = Array.isArray(rules) ? rules : [];
+      updatedNode.data.rules = node.data.rules
+        ? { ...node.data.rules, children: rulesArray }
+        : { ...getInitialGroup(), children: rulesArray };
     }
 
     if (stepType === StepType.MultiChoiceQuestion) {

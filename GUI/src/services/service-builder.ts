@@ -89,6 +89,7 @@ interface SaveFlowConfig {
 }
 
 const hasInvalidRules = (elements: any[]): boolean => {
+  if (!Array.isArray(elements)) return true;
   return elements.some((e) => {
     if ('children' in e) {
       const group = e as Group;
@@ -277,8 +278,9 @@ const validateMCQ = (node: NodeDataProps | undefined) => {
 };
 
 export const validateCondition = (node: NodeDataProps | undefined) => {
-  const invalidRulesExist = hasInvalidRules(node?.rules?.children ?? []);
-  const isInvalid = node?.rules?.children === undefined || invalidRulesExist || node?.rules?.children.length === 0;
+  const rulesChildren = Array.isArray(node?.rules?.children) ? node.rules.children : [];
+  const invalidRulesExist = hasInvalidRules(rulesChildren);
+  const isInvalid = !Array.isArray(node?.rules?.children) || invalidRulesExist || node.rules.children.length === 0;
   return isInvalid ? (i18next.t('toast.missing-condition-rules') ?? 'Error') : null;
 };
 
@@ -600,9 +602,10 @@ function handleConditionStep(
   const firstChild = nodes.find((node) => node.id === firstChildNode) as Node<NodeDataProps> | undefined;
   const secondChild = nodes.find((node) => node.id === secondChildNode) as Node<NodeDataProps> | undefined;
 
-  const invalidRulesExist = hasInvalidRules(parentNode.data.rules?.children ?? []);
+  const rulesChildren = Array.isArray(parentNode.data.rules?.children) ? parentNode.data.rules.children : [];
+  const invalidRulesExist = hasInvalidRules(rulesChildren);
   const isInvalid =
-    parentNode.data.rules?.children === undefined || invalidRulesExist || parentNode.data.rules?.children.length === 0;
+    !Array.isArray(parentNode.data.rules?.children) || invalidRulesExist || parentNode.data.rules.children.length === 0;
   if (isInvalid) {
     throw new Error(i18next.t('toast.missing-condition-rules') ?? 'Error');
   }
