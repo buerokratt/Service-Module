@@ -81,7 +81,7 @@ const AssignElement: React.FC<AssignElementProps> = ({
     const newMode = !element.isValueManual;
     setIsEditingManually(newMode);
     setIsObjectEditorOpen(false);
-    onChange({ ...element, slots: undefined, isValueManual: newMode });
+    onChange({ ...element, slots: undefined, isValueManual: newMode, isObject: false });
   };
 
   const canOpenObjectEditor = () => {
