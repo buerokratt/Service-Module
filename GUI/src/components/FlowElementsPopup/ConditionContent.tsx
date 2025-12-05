@@ -6,6 +6,7 @@ import { NodeDataProps } from 'types/service-flow';
 import Track from '../Track';
 import PreviousVariables from './PreviousVariables';
 import RuleBuilder from './RuleBuilder';
+import { Group } from './RuleBuilder/types';
 
 type ConditionContentProps = {
   readonly node: Node<NodeDataProps>;
@@ -13,10 +14,14 @@ type ConditionContentProps = {
 
 const ConditionContent: FC<ConditionContentProps> = ({ node }) => {
   const rules = useServiceStore((state) => state.rules);
+  const seedGroup = node.data?.rules || (Array.isArray(rules) && rules.length > 0 ? rules : undefined);
 
   return (
     <Track direction="vertical" align="stretch">
-      <RuleBuilder onChange={useServiceStore.getState().changeRulesNode} seedGroup={rules} />
+      <RuleBuilder
+        onChange={(group: Group) => useServiceStore.getState().changeRulesNode(group.children)}
+        seedGroup={seedGroup}
+      />
       <PreviousVariables node={node} />
     </Track>
   );
