@@ -23,9 +23,14 @@ const VariableCell: React.FC<VariableCellProps> = ({ row, updateRowVariable, var
       name={`endpoint-variable-${row.id}`}
       label=""
       onChange={(e) => {
-        onValueChange(row.id, e.target.value);
-        setInputValue(e.target.value);
-        updateRowVariable(row.id, e.target.value);
+        const value = e.target.value.trimStart().replaceAll(/_+/g, '_');
+        const hasSpecialCharacters = /[^\p{L}\p{N}_ ]/u;
+        if (!hasSpecialCharacters.test(value) && !value.startsWith(' ')) {
+          const formattedValue = value.replaceAll(' ', '_');
+          onValueChange(row.id, formattedValue);
+          setInputValue(formattedValue);
+          updateRowVariable(row.id, formattedValue);
+        }
       }}
       value={inputValue}
       placeholder={t('newService.endpoint.variable') + '..'}

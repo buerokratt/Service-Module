@@ -215,6 +215,17 @@ const FlowElementsPopup: React.FC = () => {
     }
 
     if (stepType === StepType.UserDefined) {
+      if (updatedNode.data?.endpoint?.definitions) {
+        for (const definition of updatedNode.data.endpoint.definitions) {
+          for (const section of ['body', 'headers', 'params'] as const) {
+            if (definition[section]?.variables) {
+              for (const v of definition[section].variables) {
+                v.name = removeTrailingUnderscores(v.name);
+              }
+            }
+          }
+        }
+      }
       const newLabel = updatedNode.data.label?.toString().split(' ');
       if (updatedNode.data.endpoint?.name) {
         newLabel[0] = updatedNode.data.endpoint?.name ?? node.data.label?.toString().split(' ')[0];

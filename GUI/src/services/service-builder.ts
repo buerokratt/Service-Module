@@ -34,6 +34,17 @@ export async function saveEndpoints(endpoints: EndpointData[], onSuccess?: () =>
   }
 
   endpoints.forEach((endpoint) => {
+    if (endpoint.definitions) {
+      for (const definition of endpoint.definitions) {
+        for (const section of ['body', 'headers', 'params'] as const) {
+          if (definition[section]?.variables) {
+            for (const v of definition[section].variables) {
+              v.name = removeTrailingUnderscores(v.name);
+            }
+          }
+        }
+      }
+    }
     if (endpoint.isNew) {
       tasks.push(createEndpointAndUpdateState(endpoint));
     } else {
