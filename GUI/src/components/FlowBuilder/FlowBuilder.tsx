@@ -108,7 +108,6 @@ const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
   const onSelectionChange = useCallback(
     ({ nodes: selectedNodes }: { nodes: Node[] }) => {
       setFlowSelectedNodes(selectedNodes);
-      setHasUnsavedChanges(true);
     },
     [setFlowSelectedNodes, setHasUnsavedChanges],
   );
