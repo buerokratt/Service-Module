@@ -109,7 +109,7 @@ const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
     ({ nodes: selectedNodes }: { nodes: Node[] }) => {
       setFlowSelectedNodes(selectedNodes);
     },
-    [setFlowSelectedNodes, setHasUnsavedChanges],
+    [setFlowSelectedNodes],
   );
 
   const onBeforeDelete = useCallback(
