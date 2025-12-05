@@ -1,8 +1,3 @@
-WITH MaxServices AS (
-  SELECT MAX(id) AS maxId
-  FROM services
-  GROUP BY service_id
-)
 SELECT
   name,
   description,
@@ -12,7 +7,6 @@ SELECT
   slot,
   CEIL(COUNT(*) OVER() / :page_size::DECIMAL) AS total_pages
 FROM services
-JOIN MaxServices ON id = maxId
 WHERE NOT deleted AND NOT is_common
 ORDER BY 
    CASE WHEN :sorting = 'name asc' THEN name END ASC,
