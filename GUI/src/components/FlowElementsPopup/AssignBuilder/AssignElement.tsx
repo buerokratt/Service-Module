@@ -78,10 +78,15 @@ const AssignElement: React.FC<AssignElementProps> = ({
   };
 
   const toggleManualEdit = () => {
-    const newMode = !element.isValueManual;
-    setIsEditingManually(newMode);
-    setIsObjectEditorOpen(false);
-    onChange({ ...element, slots: undefined, isValueManual: newMode, isObject: false });
+    if (element.isObject) {
+      setIsObjectEditorOpen(false);
+      onChange({ ...element, slots: undefined, isObject: false });
+    } else {
+      const newMode = !element.isValueManual;
+      setIsEditingManually(newMode);
+      setIsObjectEditorOpen(false);
+      onChange({ ...element, slots: undefined, isValueManual: newMode, isObject: false });
+    }
   };
 
   const canOpenObjectEditor = () => {
@@ -105,11 +110,13 @@ const AssignElement: React.FC<AssignElementProps> = ({
   const toggleObjectEditor = () => {
     if (isObjectEditorOpen) {
       setIsObjectEditorOpen(false);
+      onChange({ ...element, slots: undefined, isObject: false });
       return;
     }
 
     if (canOpenObjectEditor()) {
       setIsObjectEditorOpen(true);
+      onChange({ ...element, slots: undefined, isObject: true });
     }
   };
 
