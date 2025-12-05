@@ -35,7 +35,7 @@ import TextfieldTestContent from './TextfieldTestContent';
 import { servicesRequestsExplain } from '../../resources/api-constants';
 import api from '../../services/api-dev';
 import { StepType } from '../../types';
-import { getInitialGroup } from './RuleBuilder/types';
+import { getInitialGroup, GroupOrRule } from './RuleBuilder/types';
 import './styles.scss';
 
 const FlowElementsPopup: React.FC = () => {
@@ -198,6 +198,17 @@ const FlowElementsPopup: React.FC = () => {
 
     if (stepType === StepType.Input || stepType === StepType.Condition) {
       const rulesArray = Array.isArray(rules) ? rules : [];
+      for (const item of rulesArray) {
+        const processRuleField = (obj: GroupOrRule) => {
+          if ('field' in obj) obj.field = removeTrailingUnderscores(obj.field);
+          else {
+            for (const child of obj.children) {
+              processRuleField(child);
+            }
+          }
+        };
+        processRuleField(item);
+      }
       updatedNode.data.rules = node.data.rules
         ? { ...node.data.rules, children: rulesArray }
         : { ...getInitialGroup(), children: rulesArray };
