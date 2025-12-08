@@ -320,4 +320,41 @@ describe('ObjectEditor', () => {
 
     expect(mockSet).toHaveBeenCalledWith(data);
   });
+
+  it('should allow entering object keys and values with spaces', async () => {
+    const onChange = vi.fn();
+    const data = {};
+    const dataWithSpaces = { 'key with space': 'value with space', 'another key': 'another value' };
+
+    mockGet.mockReturnValue(dataWithSpaces);
+
+    render(<ObjectEditor onChange={onChange} data={data} />);
+
+    const editor = screen.getByRole('application');
+
+    // Simulate pressing space key - should not prevent default
+    const spaceKeyEvent = new KeyboardEvent('keydown', {
+      key: ' ',
+      bubbles: true,
+      cancelable: true,
+    });
+    const preventDefaultSpy = vi.spyOn(spaceKeyEvent, 'preventDefault');
+
+    fireEvent(editor, spaceKeyEvent);
+
+    // Verify that preventDefault was NOT called (spaces should be allowed)
+    expect(preventDefaultSpy).not.toHaveBeenCalled();
+
+    // Verify that data with spaces in keys and values can be handled
+    if (onChangeCallback) {
+      onChangeCallback();
+    }
+
+    await waitFor(() => {
+      expect(onChange).toHaveBeenCalled();
+    });
+
+    // Verify the onChange was called with the escaped template containing spaces
+    expect(onChange).toHaveBeenCalledWith('$= {"key with space":"value with space","another key":"another value"} =');
+  });
 });
