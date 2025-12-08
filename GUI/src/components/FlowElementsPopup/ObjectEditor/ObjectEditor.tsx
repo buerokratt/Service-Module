@@ -138,7 +138,6 @@ const ObjectEditor: React.FC<ObjectEditorProps> = ({ onChange, data }) => {
       className={styles.editor}
       role="application"
       aria-label={t('objectEditor.editor')!}
-      tabIndex={0}
     />
   );
 };
