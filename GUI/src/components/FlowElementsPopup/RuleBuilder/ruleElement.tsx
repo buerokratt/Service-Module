@@ -16,7 +16,15 @@ interface RuleElementProps {
 }
 
 const RuleElement: React.FC<RuleElementProps> = ({ rule, onRemove, onChange }) => {
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleFieldChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const value = e.target.value.trimStart().replaceAll(/_+/g, '_');
+    const hasSpecialCharacters = /[^\p{L}\p{N}_ ]/u;
+    if (!hasSpecialCharacters.test(value) && !value.startsWith(' ')) {
+      change(e.target.name, value.replaceAll(' ', '_'));
+    }
+  };
+
+  const handleValueChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     change(e.target.name, e.target.value);
   };
 
@@ -82,7 +90,7 @@ const RuleElement: React.FC<RuleElementProps> = ({ rule, onRemove, onChange }) =
           <FormInput
             value={rule.field}
             name="field"
-            onChange={handleChange}
+            onChange={handleFieldChange}
             onDrop={handleFieldDrop}
             label=""
             hideLabel
@@ -109,7 +117,7 @@ const RuleElement: React.FC<RuleElementProps> = ({ rule, onRemove, onChange }) =
           <FormInput
             value={rule.value}
             name="value"
-            onChange={handleChange}
+            onChange={handleValueChange}
             onDrop={handleValueDrop}
             label=""
             hideLabel
