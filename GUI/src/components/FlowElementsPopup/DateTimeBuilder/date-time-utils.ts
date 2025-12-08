@@ -1,6 +1,6 @@
 import { t } from 'i18next';
 import { Assign } from 'types';
-import { stringToTemplate } from 'utils/string-util';
+import { stringToEscapedTemplate } from 'utils/string-util';
 import { v4 } from 'uuid';
 
 export type BaseDate = 'startOfDay' | 'startOfMonth' | 'startOfYear' | 'endOfDay' | 'endOfMonth' | 'endOfYear' | 'now';
@@ -107,9 +107,9 @@ export const generateDateCode = (
   const baseDate = baseOptionsConfig.find((option) => option.value === base)?.baseDate || 'new Date()';
 
   // Parse offsets
-  const daysNum = parseInt(options?.days ?? '0');
-  const monthsNum = parseInt(options?.months ?? '0');
-  const yearsNum = parseInt(options?.years ?? '0');
+  const daysNum = Number.parseInt(options?.days ?? '0');
+  const monthsNum = Number.parseInt(options?.months ?? '0');
+  const yearsNum = Number.parseInt(options?.years ?? '0');
 
   // Build operations using IIFE to avoid nested new Date() calls
   const operations: string[] = [];
@@ -151,7 +151,7 @@ export const generateDateCode = (
 export const createDateTimeDragData = (dateCode: string): Assign => ({
   id: v4(),
   key: 'dateTime',
-  value: stringToTemplate(dateCode),
+  value: stringToEscapedTemplate(dateCode),
   data: dateCode,
 });
 

@@ -6,6 +6,7 @@ import {
   isTemplate,
   removeTrailingUnderscores,
   stringToArray,
+  stringToEscapedTemplate,
   stringToTemplate,
   templateToString,
   toSnakeCase,
@@ -36,6 +37,32 @@ describe('String Utils', () => {
     it('should handle empty values', () => {
       expect(stringToTemplate('')).toBe('${""}');
       expect(stringToTemplate(0)).toBe('${""}');
+    });
+  });
+
+  describe('stringToEscapedTemplate', () => {
+    it('should convert string to template with equals', () => {
+      expect(stringToEscapedTemplate('test')).toBe('$= test =');
+      expect(stringToEscapedTemplate('123')).toBe('$= 123 =');
+    });
+
+    it('should convert number to template with equals', () => {
+      expect(stringToEscapedTemplate(123)).toBe('$= 123 =');
+    });
+
+    it('should handle expressions with curly brackets', () => {
+      const functionExpression = '(function() { const d = new Date(); return d.getFullYear(); })()';
+      expect(stringToEscapedTemplate(functionExpression)).toBe(
+        '$= (function() { const d = new Date(); return d.getFullYear(); })() =',
+      );
+
+      const objectExpression = '{"key1":"value1","key2":"value2"}';
+      expect(stringToEscapedTemplate(objectExpression)).toBe('$= {"key1":"value1","key2":"value2"} =');
+    });
+
+    it('should handle empty values', () => {
+      expect(stringToEscapedTemplate('')).toBe('$= "" =');
+      expect(stringToEscapedTemplate(0)).toBe('$= "" =');
     });
   });
 
