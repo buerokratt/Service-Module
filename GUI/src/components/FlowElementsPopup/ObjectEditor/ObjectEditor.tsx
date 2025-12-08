@@ -2,39 +2,12 @@ import JSONEditor from 'jsoneditor';
 import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import 'jsoneditor/dist/jsoneditor.css';
-import './json.scss';
 import { getDragData } from 'utils/component-util';
-import { searchForProperty, searchForValue, updateValueAtPath } from 'utils/object-util';
-import { stringToTemplate } from 'utils/string-util';
+import { updateValueAtPath } from 'utils/object-util';
+import { stringToEscapedTemplate } from 'utils/string-util';
 
+import { findNodePath } from './object-editor-utils';
 import styles from './ObjectEditor.module.scss';
-
-// Helper function to find the path to a node in the JSON structure
-const findNodePath = (node: Element, data: Record<string, unknown>): string | null => {
-  // Try to find by text content (for values)
-  const textContent = node.textContent?.trim();
-  if (textContent) {
-    const path = searchForValue(data, textContent);
-    return path;
-  }
-
-  // If no text content (empty value), try to find by the associated property name
-  // Look for the property name in the same table row
-  const tableRow = node.closest('tr');
-  if (tableRow) {
-    const fieldElement = tableRow.querySelector('.jsoneditor-field');
-    if (fieldElement) {
-      const propertyName = fieldElement.textContent?.trim();
-      if (propertyName) {
-        // Search for the property name in the data structure
-        const path = searchForProperty(data, propertyName);
-        return path;
-      }
-    }
-  }
-
-  return null;
-};
 
 interface ObjectEditorProps {
   onChange: (value: string) => void;
@@ -56,7 +29,7 @@ const ObjectEditor: React.FC<ObjectEditorProps> = ({ onChange, data }) => {
           [i18n.language]: jsonEditor,
         },
         onChange: () => {
-          onChange(stringToTemplate(JSON.stringify(jsonEditorRef.current?.get())));
+          onChange(stringToEscapedTemplate(JSON.stringify(jsonEditorRef.current?.get())));
         },
       });
 
@@ -146,7 +119,7 @@ const ObjectEditor: React.FC<ObjectEditorProps> = ({ onChange, data }) => {
 
               jsonEditorRef.current.update(newData);
 
-              onChange(stringToTemplate(JSON.stringify(newData)));
+              onChange(stringToEscapedTemplate(JSON.stringify(newData)));
             }
           }
         }
