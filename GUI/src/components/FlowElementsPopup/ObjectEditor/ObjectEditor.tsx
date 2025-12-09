@@ -138,15 +138,6 @@ const ObjectEditor: React.FC<ObjectEditorProps> = ({ onChange, data }) => {
       className={styles.editor}
       role="application"
       aria-label={t('objectEditor.editor')!}
-      tabIndex={0}
-      onKeyDown={(e) => {
-        // Handle keyboard interactions for accessibility
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          // Focus the editor for keyboard navigation
-          editorRef.current?.focus();
-        }
-      }}
     />
   );
 };
