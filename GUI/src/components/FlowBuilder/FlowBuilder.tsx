@@ -73,9 +73,9 @@ const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
       });
 
       if (ghostEdges.length > 0) {
-        const ghostNodeIds = ghostEdges.map((edge) => edge.target);
+        const ghostNodeIds = new Set(ghostEdges.map((edge) => edge.target));
         const updatedEdges = edges.filter((edge) => !ghostEdges.includes(edge));
-        const updatedNodes = nodes.filter((node) => !ghostNodeIds.includes(node.id));
+        const updatedNodes = nodes.filter((node) => !ghostNodeIds.has(node.id));
         setNodes(updatedNodes);
         setEdges(updatedEdges);
       }
@@ -108,9 +108,8 @@ const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
   const onSelectionChange = useCallback(
     ({ nodes: selectedNodes }: { nodes: Node[] }) => {
       setFlowSelectedNodes(selectedNodes);
-      setHasUnsavedChanges(true);
     },
-    [setFlowSelectedNodes, setHasUnsavedChanges],
+    [setFlowSelectedNodes],
   );
 
   const onBeforeDelete = useCallback(

@@ -45,7 +45,11 @@ const AssignElement: React.FC<AssignElementProps> = ({
   const [isObjectEditorOpen, setIsObjectEditorOpen] = useState(element.isObject ?? false);
 
   const changeKey = (e: React.ChangeEvent<HTMLInputElement>) => {
-    onChange({ ...element, key: e.target.value });
+    const value = e.target.value.trimStart().replaceAll(/_+/g, '_');
+    const hasSpecialCharacters = /[^\p{L}\p{N}_ ]/u;
+    if (!hasSpecialCharacters.test(value) && !value.startsWith(' ')) {
+      onChange({ ...element, key: value.replaceAll(' ', '_') });
+    }
   };
 
   const changeValue = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -78,9 +82,15 @@ const AssignElement: React.FC<AssignElementProps> = ({
   };
 
   const toggleManualEdit = () => {
-    const newMode = !element.isValueManual;
-    setIsEditingManually(newMode);
-    onChange({ ...element, slots: undefined, isValueManual: newMode });
+    if (element.isObject) {
+      setIsObjectEditorOpen(false);
+      onChange({ ...element, slots: undefined, isObject: false });
+    } else {
+      const newMode = !element.isValueManual;
+      setIsEditingManually(newMode);
+      setIsObjectEditorOpen(false);
+      onChange({ ...element, slots: undefined, isValueManual: newMode, isObject: false });
+    }
   };
 
   const canOpenObjectEditor = () => {
@@ -104,11 +114,13 @@ const AssignElement: React.FC<AssignElementProps> = ({
   const toggleObjectEditor = () => {
     if (isObjectEditorOpen) {
       setIsObjectEditorOpen(false);
+      onChange({ ...element, slots: undefined, isObject: false });
       return;
     }
 
     if (canOpenObjectEditor()) {
       setIsObjectEditorOpen(true);
+      onChange({ ...element, slots: undefined, isObject: true });
     }
   };
 
@@ -173,21 +185,13 @@ const AssignElement: React.FC<AssignElementProps> = ({
         />
         :
         <Track style={{ flex: '1 0 75%', justifyContent: 'flex-end' }} gap={5}>
-          {!isObjectEditorOpen && (
-            <>
-              {isEditingManually ? renderManualValueInput() : renderDragInputs()}
-              {renderManualToggle()}
-            </>
-          )}
-
-          {!isEditingManually && (
-            <Tooltip content={t('serviceFlow.popup.openObjectEditor')} onButtonClick={toggleObjectEditor}>
-              <div className="small-assign-button assign-blue">
-                <Icon icon={<MdDataObject />} />
-              </div>
-            </Tooltip>
-          )}
-
+          {!isObjectEditorOpen && <>{isEditingManually ? renderManualValueInput() : renderDragInputs()}</>}
+          {renderManualToggle()}
+          <Tooltip content={t('serviceFlow.popup.openObjectEditor')} onButtonClick={toggleObjectEditor}>
+            <div className="small-assign-button assign-blue">
+              <Icon icon={<MdDataObject />} />
+            </div>
+          </Tooltip>
           {onRemove && (
             <button onClick={() => onRemove(element.id)} className="small-assign-button assign-red">
               <Icon icon={<MdDeleteOutline />} />
