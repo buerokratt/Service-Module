@@ -10,3 +10,21 @@ export const parseButtons = (message: TestingMessage): MessageButton[] => {
     return [];
   }
 };
+
+export interface ParsedService {
+  serviceName: string;
+  serviceInputs: string;
+}
+
+export const parseServiceString = (input: string): ParsedService => {
+  const servicePathMatch = new RegExp(/\/\w+\/services\/active\/([^,\s(]+)/).exec(input);
+  const serviceName = servicePathMatch ? servicePathMatch[1] : '';
+
+  const inputsMatch = new RegExp(/\(([^()]*(?:\([^()]*\)[^()]*)*)\)/).exec(input);
+  const serviceInputs = inputsMatch ? inputsMatch[1] : '';
+
+  return {
+    serviceName,
+    serviceInputs,
+  };
+};
