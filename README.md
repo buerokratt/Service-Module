@@ -159,10 +159,14 @@ When services are created, updated, or deleted, the intent files are published t
 
 The variables below are necessary to achieve this.
 
+**Note:** For local development, `STORAGE_FERRY_ACCOUNT_ID` and `STORAGE_FERRY_CONTAINER` use Azurite (Azure Storage emulator) as configured in `docker-compose.yml`. Files are created in the local Azurite instance.
+
+**Note:** If `AZURE_SEARCH_SERVICE_NAME`, `AZURE_SEARCH_INDEXER_NAME`, or `AZURE_SEARCH_API_KEY` are missing or empty, a warning will be logged and the Azure Search indexer will not be triggered. The operation will continue normally without updating the indexer.
+
 | Ruuter Variable            | Description                                          | Required | Default Value |
 | -------------------------- | ---------------------------------------------------- | -------- | ------------- |
 | `AZURE_SEARCH_SERVICE_NAME` | Azure Search service name for indexer API            |          |               |
 | `AZURE_SEARCH_INDEXER_NAME` | Azure Search indexer name to trigger after storage operations |          |               |
 | `AZURE_SEARCH_API_KEY`      | Azure Search API key for authentication              |          |               |
-| `STORAGE_FERRY_ACCOUNT_ID`  | Azure storage account ID for Storage Ferry service   | Yes      |               |
-| `STORAGE_FERRY_CONTAINER`   | Azure storage container name for Storage Ferry service | Yes      |               |
+| `STORAGE_FERRY_ACCOUNT_ID`  | Azure storage account ID for Storage Ferry service. For local development, uses Azurite (Azure emulator) | Yes      |               |
+| `STORAGE_FERRY_CONTAINER`   | Azure storage container name for Storage Ferry service. For local development, uses Azurite (Azure emulator) | Yes      |               |
