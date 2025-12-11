@@ -28,6 +28,7 @@ interface AssignElementProps {
   isKeyEditable?: boolean;
   keyStyle?: React.CSSProperties;
   valueStyle?: React.CSSProperties;
+  showObjectEditorToggle?: boolean;
 }
 
 const AssignElement: React.FC<AssignElementProps> = ({
@@ -38,6 +39,7 @@ const AssignElement: React.FC<AssignElementProps> = ({
   isKeyEditable,
   keyStyle,
   valueStyle,
+  showObjectEditorToggle = true,
 }) => {
   const slots = element.slots ?? [];
   const [isSecondSlotOpen, setIsSecondSlotOpen] = useState(!!slots[1]);
@@ -187,11 +189,13 @@ const AssignElement: React.FC<AssignElementProps> = ({
         <Track style={{ flex: '1 0 75%', justifyContent: 'flex-end' }} gap={5}>
           {!isObjectEditorOpen && <>{isEditingManually ? renderManualValueInput() : renderDragInputs()}</>}
           {renderManualToggle()}
-          <Tooltip content={t('serviceFlow.popup.openObjectEditor')} onButtonClick={toggleObjectEditor}>
-            <div className="small-assign-button assign-blue">
-              <Icon icon={<MdDataObject />} />
-            </div>
-          </Tooltip>
+          {showObjectEditorToggle && (
+            <Tooltip content={t('serviceFlow.popup.openObjectEditor')} onButtonClick={toggleObjectEditor}>
+              <div className="small-assign-button assign-blue">
+                <Icon icon={<MdDataObject />} />
+              </div>
+            </Tooltip>
+          )}
           {onRemove && (
             <button onClick={() => onRemove(element.id)} className="small-assign-button assign-red">
               <Icon icon={<MdDeleteOutline />} />

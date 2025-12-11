@@ -69,6 +69,7 @@ const DynamicChoicesContent: FC<DynamicChoicesContentProps> = ({
               key={field.key}
               manualEdit={true}
               isKeyEditable={false}
+              showObjectEditorToggle={false}
               keyStyle={{
                 textAlign: 'center',
                 border: '0.5px',
