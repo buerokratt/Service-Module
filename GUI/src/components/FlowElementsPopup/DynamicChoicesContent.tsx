@@ -85,7 +85,9 @@ const DynamicChoicesContent: FC<DynamicChoicesContentProps> = ({
               onChange={(element) => handleChange(field.key, element.value)}
             />
             <Tooltip content={field.tooltip}>
-              <MdOutlineInfo size={20} color={'#005aa3'} />
+              <span>
+                <MdOutlineInfo size={20} color={'#005aa3'} />
+              </span>
             </Tooltip>
           </Track>
         ))}
