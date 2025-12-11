@@ -1,11 +1,14 @@
 import classNames from 'classnames';
 import Markdownify from 'components/Markdowify';
 import { motion } from 'framer-motion';
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 import { TestingMessage } from 'store/test-services.store';
 
 import styles from './chat.module.scss';
 import RobotIcon from '../../static/icons/buerokratt.svg';
+import { parseButtons } from 'utils/chat-utils';
+import ChatButtonGroup from './chat-button-group';
+import { Track } from 'components';
 
 const leftAnimation = {
   animate: { opacity: 1, x: 0 },
@@ -23,6 +26,10 @@ const BotMessage = ({ message }: ChatMessageProps) => {
     return <Markdownify message={message.message} />;
   }, [message.message]);
 
+  const hasButtons = useMemo(() => {
+    return parseButtons(message).length > 0;
+  }, [message.buttons]);
+
   return (
     <motion.div animate={leftAnimation.animate} initial={leftAnimation.initial} transition={leftAnimation.transition}>
       <div className={classNames(styles.message, styles.admin)}>
@@ -30,7 +37,10 @@ const BotMessage = ({ message }: ChatMessageProps) => {
           <div className={styles.icon}>
             <img src={RobotIcon} alt="Robot icon" />
           </div>
-          <div className={styles.content}>{renderConent()}</div>
+          <Track direction="vertical" gap={5} align="left">
+            <div className={styles.content}>{renderConent()}</div>
+            {hasButtons && <ChatButtonGroup message={message} />}
+          </Track>
         </div>
       </div>
     </motion.div>

@@ -9,6 +9,7 @@ export interface TestingMessage {
   id: string;
   author: TestingMessageAuthor;
   message: string;
+  buttons?: string;
   type: TestingMessageType;
   payload?: Record<string, string>;
 }
@@ -24,12 +25,13 @@ export interface TestServiceStoreState {
   changeCurrentNodeId: (currentNodeId?: string) => void;
   clearCurrentNodeId: () => void;
   addUserMessage: (message: string) => void;
-  addBotMessage: (message: string) => void;
+  addBotMessage: (message: string, buttons?: string) => void;
   pushMessage: (
     message: string,
     author: TestingMessageAuthor,
     type?: TestingMessageType,
     payload?: TestingMessagePayload,
+    buttons?: string,
   ) => void;
   addError: (error: string, payload?: TestingMessagePayload) => void;
   addInfo: (info: string, payload?: TestingMessagePayload) => void;
@@ -38,7 +40,7 @@ export interface TestServiceStoreState {
   waitingForInput: boolean;
   userInput: string | null;
   waitForUserInput: () => void;
-  sendUserInput: (input: string) => void;
+  sendUserInput: (input: string, serviceName?: string) => void;
 }
 
 const useTestServiceStore = create<TestServiceStoreState>((set, get) => ({
@@ -57,14 +59,15 @@ const useTestServiceStore = create<TestServiceStoreState>((set, get) => ({
   changeCurrentNodeId: (currentNodeId) => set({ currentNodeId }),
   clearCurrentNodeId: () => set({ currentNodeId: null }),
   addUserMessage: (message) => get().pushMessage(message, 'enduser'),
-  addBotMessage: (message) => get().pushMessage(message, 'bot'),
-  pushMessage: (message, author, type = 'normal', payload = undefined) => {
+  addBotMessage: (message, buttons) => get().pushMessage(message, 'bot', 'normal', undefined, buttons),
+  pushMessage: (message, author, type = 'normal', payload = undefined, buttons = undefined) => {
     const msg = {
       id: uuid(),
       message,
       author,
       type,
       payload,
+      buttons,
     };
 
     set({
@@ -91,13 +94,13 @@ const useTestServiceStore = create<TestServiceStoreState>((set, get) => ({
       waitingForInput: true,
       userInput: null,
     }),
-  sendUserInput: async (userInput) => {
+  sendUserInput: async (userInput, serviceName) => {
     get().addUserMessage(userInput);
     set({
       waitingForInput: false,
       userInput,
     });
-    await runServiceTest(userInput);
+    await runServiceTest(userInput, serviceName);
   },
 }));
 
