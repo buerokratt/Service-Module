@@ -161,6 +161,16 @@ create_in_storage:
           fileName: "${name}.json"
       content: ${JSON.stringify(service_json_result.response.body)}
   result: ferry_upload_result
+  next: trigger_azure_indexer_after_create
+
+trigger_azure_indexer_after_create:
+  call: http.post
+  args:
+    url: "https://[#AZURE_SEARCH_SERVICE_NAME].search.windows.net/indexers/[#AZURE_SEARCH_INDEXER_NAME]/run?api-version=2024-07-01"
+    headers:
+      api-key: "[#AZURE_SEARCH_API_KEY]"
+      Content-Type: "application/json"
+  result: azure_indexer_result
   next: activate_all_mcq_services
  
 activate_all_mcq_services:
@@ -195,6 +205,16 @@ delete_from_storage:
           container: "[#STORAGE_FERRY_CONTAINER]"
           fileName: "${name}.json"
   result: ferry_delete_result
+  next: trigger_azure_indexer_after_delete
+
+trigger_azure_indexer_after_delete:
+  call: http.post
+  args:
+    url: "https://[#AZURE_SEARCH_SERVICE_NAME].search.windows.net/indexers/[#AZURE_SEARCH_INDEXER_NAME]/run?api-version=2024-07-01"
+    headers:
+      api-key: "[#AZURE_SEARCH_API_KEY]"
+      Content-Type: "application/json"
+  result: azure_indexer_result
   next: dactivate_all_mcq_services
 
 dactivate_all_mcq_services:

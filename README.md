@@ -152,3 +152,17 @@ The repository uses [SQLFluff](https://sqlfluff.com/) for linting and formatting
 | Ruuter Variable                    | GUI Variable                               | Description                                          | Required | Default Value       |
 | ---------------------------------- | ------------------------------------------ | ---------------------------------------------------- | -------- | ------------------- |
 | `application.apiRequestTestingKey` | `REACT_APP_RUUTER_SERVICES_TESTING_HEADER` | `x-ruuter-testing` header value for testing services |          | `voorshpellhappilo` |
+
+### Azure LLM Integration
+
+When services are created, updated, or deleted, the intent files are published to Azure Blob Storage using Storage Ferry. This is necessary for intent detection using an LLM in Azure. Publishing the intent files to Azure also triggers the Azure Search indexer to index the data.
+
+The variables below are necessary to achieve this.
+
+| Ruuter Variable            | Description                                          | Required | Default Value |
+| -------------------------- | ---------------------------------------------------- | -------- | ------------- |
+| `AZURE_SEARCH_SERVICE_NAME` | Azure Search service name for indexer API            |          |               |
+| `AZURE_SEARCH_INDEXER_NAME` | Azure Search indexer name to trigger after storage operations |          |               |
+| `AZURE_SEARCH_API_KEY`      | Azure Search API key for authentication              |          |               |
+| `STORAGE_FERRY_ACCOUNT_ID`  | Azure storage account ID for Storage Ferry service   | Yes      |               |
+| `STORAGE_FERRY_CONTAINER`   | Azure storage container name for Storage Ferry service | Yes      |               |

@@ -292,6 +292,16 @@ replace_in_storage:
           fileName: "${name}.json"
       content: ${JSON.stringify(service_json_result.response.body)}
   result: ferry_upload_result
+  next: trigger_azure_indexer
+
+trigger_azure_indexer:
+  call: http.post
+  args:
+    url: "https://[#AZURE_SEARCH_SERVICE_NAME].search.windows.net/indexers/[#AZURE_SEARCH_INDEXER_NAME]/run?api-version=2024-07-01"
+    headers:
+      api-key: "[#AZURE_SEARCH_API_KEY]"
+      Content-Type: "application/json"
+  result: azure_indexer_result
   next: return_ok
 
 return_ok:
