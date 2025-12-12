@@ -161,23 +161,16 @@ create_in_storage:
           fileName: "${name}.json"
       content: ${JSON.stringify(service_json_result.response.body)}
   result: ferry_upload_result
-  next: check_azure_config_after_create
-
-check_azure_config_after_create:
-  assign:
-    azure_service_name: "[#AZURE_SEARCH_SERVICE_NAME]"
-    azure_indexer_name: "[#AZURE_SEARCH_INDEXER_NAME]"
-    azure_api_key: "[#AZURE_SEARCH_API_KEY]"
   next: check_if_azure_configured_after_create
 
 check_if_azure_configured_after_create:
   switch:
-    - condition: ${azure_service_name !== "" && azure_indexer_name !== "" && azure_api_key !== ""}
+    - condition: ${"[#AZURE_SEARCH_SERVICE_NAME]" !== "" && "[#AZURE_SEARCH_INDEXER_NAME]" !== "" && "[#AZURE_SEARCH_API_KEY]" !== ""}
       next: trigger_azure_indexer_after_create
   next: log_azure_not_configured_after_create
 
 log_azure_not_configured_after_create:
-  log: "Azure Search configuration not found. Skipping Azure indexer trigger. Please configure AZURE_SEARCH_SERVICE_NAME, AZURE_SEARCH_INDEXER_NAME, and AZURE_SEARCH_API_KEY in constants.ini"
+  log: "Warning! Azure Search configuration not found. Skipping Azure indexer trigger. Please configure AZURE_SEARCH_SERVICE_NAME, AZURE_SEARCH_INDEXER_NAME, and AZURE_SEARCH_API_KEY in constants.ini"
   next: activate_all_mcq_services
 
 trigger_azure_indexer_after_create:
@@ -222,23 +215,16 @@ delete_from_storage:
           container: "[#STORAGE_FERRY_CONTAINER]"
           fileName: "${name}.json"
   result: ferry_delete_result
-  next: check_azure_config_after_delete
-
-check_azure_config_after_delete:
-  assign:
-    azure_service_name: "[#AZURE_SEARCH_SERVICE_NAME]"
-    azure_indexer_name: "[#AZURE_SEARCH_INDEXER_NAME]"
-    azure_api_key: "[#AZURE_SEARCH_API_KEY]"
   next: check_if_azure_configured_after_delete
 
 check_if_azure_configured_after_delete:
   switch:
-    - condition: ${azure_service_name !== "" && azure_indexer_name !== "" && azure_api_key !== ""}
+    - condition: ${"[#AZURE_SEARCH_SERVICE_NAME]" !== "" && "[#AZURE_SEARCH_INDEXER_NAME]" !== "" && "[#AZURE_SEARCH_API_KEY]" !== ""}
       next: trigger_azure_indexer_after_delete
   next: log_azure_not_configured_after_delete
 
 log_azure_not_configured_after_delete:
-  log: "Azure Search configuration not found. Skipping Azure indexer trigger. Please configure AZURE_SEARCH_SERVICE_NAME, AZURE_SEARCH_INDEXER_NAME, and AZURE_SEARCH_API_KEY in constants.ini"
+  log: "Warning! Azure Search configuration not found. Skipping Azure indexer trigger. Please configure AZURE_SEARCH_SERVICE_NAME, AZURE_SEARCH_INDEXER_NAME, and AZURE_SEARCH_API_KEY in constants.ini"
   next: dactivate_all_mcq_services
 
 trigger_azure_indexer_after_delete:
