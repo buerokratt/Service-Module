@@ -153,7 +153,9 @@ The repository uses [SQLFluff](https://sqlfluff.com/) for linting and formatting
 | ---------------------------------- | ------------------------------------------ | ---------------------------------------------------- | -------- | ------------------- |
 | `application.apiRequestTestingKey` | `REACT_APP_RUUTER_SERVICES_TESTING_HEADER` | `x-ruuter-testing` header value for testing services |          | `voorshpellhappilo` |
 
-### Azure LLM Integration
+## Intent classification
+
+### Blob Storage & Indexing
 
 When services are created, updated, or deleted, the intent files are published to Azure Blob Storage using Storage Ferry. This is necessary for intent detection using an LLM in Azure. Publishing the intent files to Azure also triggers the Azure Search indexer to index the data.
 
