@@ -99,7 +99,7 @@ const ServicesTable: FC<ServicesTableProps> = ({ isCommon = false }) => {
     return getColumns({
       isCommon,
       navigate,
-      checkIntentConnection,
+      // checkIntentConnection,
       hideDeletePopup: () => setIsDeletePopupVisible(true),
       showReadyPopup: () => {
         setIsReadyStatusChecking(true);
