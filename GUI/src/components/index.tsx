@@ -44,6 +44,7 @@ import ThemeToggle from './ThemeToggle';
 import Toast from './Toast';
 import Tooltip from './Tooltip';
 import Track from './Track';
+import ExportServicesModal from './ExportServicesModal';
 
 export {
   Box,
@@ -90,4 +91,5 @@ export {
   Dropdown,
   ThemeToggle,
   Markdownify,
+  ExportServicesModal,
 };

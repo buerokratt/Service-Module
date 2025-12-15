@@ -145,6 +145,11 @@
     "edit": "Muuda",
     "delete": "Kustuta",
     "cancel": "Tühista",
+    "exportMany": "Ekspordi mitu",
+    "exportAll": "Ekspordi kõik",
+    "export": "Ekspordi",
+    "exportManyTitle": "Ekspordi mitu",
+    "exportAllConfirmation": "Kas olete kindel, et soovite eksportida kõik teenused?",
     "trainingModuleLink": {
       "text": "Uute teenuste lõppkasutajatele kättesaadavaks tegemiseks tuleb treenida uus mudel. Mudeli treenimine toimub treeningmooduli alamlehel",
       "train": "Treeni uus mudel"
