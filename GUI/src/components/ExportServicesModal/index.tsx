@@ -102,10 +102,7 @@ const ExportServicesModal: FC<ExportServicesModalProps> = ({ isVisible, onClose 
     if (selectedServices.length === 0) return;
 
     setIsExporting(true);
-    const servicesToExport = services.filter((service) =>
-      selectedServices.some((s) => s.serviceId === service.serviceId),
-    );
-    await exportServices(servicesToExport);
+    await exportServices(selectedServices);
     setIsExporting(false);
     onClose();
   }, [selectedServices, services, t, onClose]);
