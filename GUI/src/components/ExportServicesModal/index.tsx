@@ -13,12 +13,12 @@ interface ExportServicesModalProps {
   onClose: () => void;
 }
 
-type LoadingState = 'idle' | 'loading' | 'success' | 'error';
+type LoadingState = 'loading' | 'success' | 'error';
 
 const ExportServicesModal: FC<ExportServicesModalProps> = ({ isVisible, onClose }) => {
   const { t } = useTranslation();
   const [services, setServices] = useState<Service[]>([]);
-  const [loadingState, setLoadingState] = useState<LoadingState>('idle');
+  const [loadingState, setLoadingState] = useState<LoadingState>('loading');
   const [error, setError] = useState<string | null>(null);
   const [selectedServices, setSelectedServices] = useState<Service[]>([]);
   const [isExporting, setIsExporting] = useState(false);
@@ -30,17 +30,18 @@ const ExportServicesModal: FC<ExportServicesModalProps> = ({ isVisible, onClose 
   const [sorting, setSorting] = useState<SortingState>([]);
 
   const fetchServices = useCallback(
-    async (paginationState: PaginationState, search?: string) => {
+    async (paginationState: PaginationState, sortingState: SortingState, search?: string) => {
       if (!isVisible) return;
 
-      setLoadingState('loading');
       setError(null);
 
       try {
+        const order = sortingState[0]?.desc ? 'desc' : 'asc';
+        const sort = sortingState.length === 0 ? 'id asc' : sortingState[0]?.id + ' ' + order;
         const response = await api.post(getAllServices(), {
           page: paginationState.pageIndex + 1,
           page_size: paginationState.pageSize,
-          sorting: 'name asc',
+          sorting: sort,
           search: search ?? searchQuery,
         });
         const servicesData = response.data.response ?? [];
@@ -64,7 +65,7 @@ const ExportServicesModal: FC<ExportServicesModalProps> = ({ isVisible, onClose 
   );
 
   useEffect(() => {
-    fetchServices(pagination, searchQuery);
+    fetchServices(pagination, sorting, searchQuery);
   }, [fetchServices, searchQuery]);
 
   useEffect(() => {
@@ -130,7 +131,7 @@ const ExportServicesModal: FC<ExportServicesModalProps> = ({ isVisible, onClose 
     const columnHelper = createColumnHelper<Service>();
 
     return [
-      columnHelper.display({
+      columnHelper.accessor('name', {
         id: 'name',
         header: t('overview.service.name') ?? 'Service Name',
         cell: (props) => buildNameCell(props),
@@ -173,7 +174,7 @@ const ExportServicesModal: FC<ExportServicesModalProps> = ({ isVisible, onClose 
         {loadingState === 'error' && (
           <Track direction="vertical" gap={16} justify="center" style={{ padding: '3rem' }}>
             <label style={{ color: '#d32f2f', textAlign: 'center' }}>{error}</label>
-            <Button onClick={() => fetchServices(pagination)}>{t('global.retry') || 'Retry'}</Button>
+            <Button onClick={() => fetchServices(pagination, sorting)}>{t('global.retry') || 'Retry'}</Button>
           </Track>
         )}
         {loadingState === 'success' && (
@@ -192,10 +193,11 @@ const ExportServicesModal: FC<ExportServicesModalProps> = ({ isVisible, onClose 
                 pagination={pagination}
                 setPagination={(state: PaginationState) => {
                   setPagination(state);
-                  fetchServices(state);
+                  fetchServices(state, sorting);
                 }}
                 setSorting={(state: SortingState) => {
                   setSorting(state);
+                  fetchServices(pagination, state);
                 }}
                 isClientSide={false}
                 meta={{
