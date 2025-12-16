@@ -93,12 +93,18 @@ const ExportServicesModal: FC<ExportServicesModalProps> = ({ isVisible, onClose 
     if (selectedServices.length === 0) return;
 
     setIsExporting(true);
-    await exportServices(selectedServices);
+    const success = await exportServices(selectedServices);
     setIsExporting(false);
-    onClose();
+    if (success) {
+      onClose();
+    }
   }, [selectedServices, services, t, onClose]);
 
   const handleCancel = useCallback(() => {
+    setSelectedServices([]);
+    setSearchQuery('');
+    setPagination({ pageIndex: 0, pageSize: 10 });
+    setSorting([]);
     onClose();
   }, [onClose]);
 
