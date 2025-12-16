@@ -30,7 +30,7 @@ const ExportServicesModal: FC<ExportServicesModalProps> = ({ isVisible, onClose 
   const [sorting, setSorting] = useState<SortingState>([]);
 
   const fetchServices = useCallback(
-    async (paginationState: PaginationState) => {
+    async (paginationState: PaginationState, search?: string) => {
       if (!isVisible) return;
 
       setLoadingState('loading');
@@ -41,6 +41,7 @@ const ExportServicesModal: FC<ExportServicesModalProps> = ({ isVisible, onClose 
           page: paginationState.pageIndex + 1,
           page_size: paginationState.pageSize,
           sorting: 'name asc',
+          search: search ?? searchQuery,
         });
         const servicesData = response.data.response ?? [];
         const fetchedServices: Service[] = servicesData.map((item: Service) => ({
@@ -63,8 +64,8 @@ const ExportServicesModal: FC<ExportServicesModalProps> = ({ isVisible, onClose 
   );
 
   useEffect(() => {
-    fetchServices(pagination);
-  }, [fetchServices]);
+    fetchServices(pagination, searchQuery);
+  }, [fetchServices, searchQuery]);
 
   useEffect(() => {
     if (isVisible) {
@@ -74,17 +75,7 @@ const ExportServicesModal: FC<ExportServicesModalProps> = ({ isVisible, onClose 
       setSorting([]);
     }
   }, [isVisible]);
-
-  const filteredServices = useMemo(() => {
-    if (!searchQuery.trim()) {
-      return services;
-    }
-    const query = searchQuery.toLowerCase();
-    return services.filter(
-      (service) => service.name.toLowerCase().includes(query) || service.serviceId.toLowerCase().includes(query),
-    );
-  }, [services, searchQuery]);
-
+  
   const toggleServiceSelection = useCallback((service: Service) => {
     setSelectedServices((prev) => {
       const newSelected = [...prev];
@@ -181,13 +172,13 @@ const ExportServicesModal: FC<ExportServicesModalProps> = ({ isVisible, onClose 
         )}
         {loadingState === 'success' && (
           <>
-            {filteredServices.length === 0 ? (
+            {services.length === 0 ? (
               <Track justify="center" style={{ padding: '2rem' }}>
                 <label>{t('overview.noServicesFound')}</label>
               </Track>
             ) : (
               <DataTable
-                data={filteredServices}
+                data={services}
                 columns={columns}
                 sortable
                 pagesCount={services.at(-1)?.totalPages ?? 1}

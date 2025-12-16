@@ -39,6 +39,7 @@ SELECT
   CEIL(sc.total_count / :page_size::DECIMAL) AS total_pages
 FROM distinct_services ds
 CROSS JOIN service_counts sc
+WHERE ds.name ILIKE '%' || :search || '%'
 ORDER BY 
   CASE WHEN :sorting = 'name asc' THEN ds.name END ASC,
   CASE WHEN :sorting = 'name desc' THEN ds.name END DESC,
