@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
-import { Button, Track, ExportServicesModal } from '../components';
+import { Button, ExportServicesModal, Track } from '../components';
 import ServicesTable from '../components/ServicesTable';
 import { trainingModuleTraining } from '../resources/api-constants';
 import { ROUTES } from '../resources/routes-constants';

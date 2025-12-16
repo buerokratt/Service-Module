@@ -1,11 +1,12 @@
 import { CellContext, createColumnHelper, PaginationState, SortingState } from '@tanstack/react-table';
 import { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Button, DataTable, FormCheckbox, FormInput, Modal, Track } from '..';
 import { getAllServices } from 'resources/api-constants';
 import api from 'services/api-dev';
 import { Service } from 'types';
 import { exportServices } from 'utils/service-export';
+
+import { Button, DataTable, FormCheckbox, FormInput, Modal, Track } from '..';
 import './ExportServicesModal.scss';
 
 interface ExportServicesModalProps {
@@ -76,7 +77,7 @@ const ExportServicesModal: FC<ExportServicesModalProps> = ({ isVisible, onClose 
       setSorting([]);
     }
   }, [isVisible]);
-  
+
   const toggleServiceSelection = useCallback((service: Service) => {
     setSelectedServices((prev) => {
       const newSelected = [...prev];

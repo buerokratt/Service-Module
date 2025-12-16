@@ -1,13 +1,18 @@
 import { format } from 'date-fns';
-import JSZip from 'jszip';
 import i18n from 'i18n';
+import JSZip from 'jszip';
 import useToastStore from 'store/toasts.store';
 import { Service } from 'types';
 
 const sanitizeFileName = (name: string): string => name.replaceAll(/[^a-z0-9]/gi, '_');
 const getTimestamp = (): string => format(new Date(), 'yyyy_MM_dd_HH_mm_ss');
 
-const downloadBlob = async (blob: Blob, fileName: string, mimeType: string, fileExtension: string): Promise<boolean> => {
+const downloadBlob = async (
+  blob: Blob,
+  fileName: string,
+  mimeType: string,
+  fileExtension: string,
+): Promise<boolean> => {
   if ('showSaveFilePicker' in globalThis) {
     try {
       const handle = await (globalThis as any).showSaveFilePicker({

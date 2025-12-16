@@ -14,6 +14,7 @@ import Dialog from './Dialog';
 import Drawer from './Drawer';
 import Dropdown from './Dropdown';
 import ExclamationBadge from './ExclamationBadge';
+import ExportServicesModal from './ExportServicesModal';
 import FlowBuilder from './FlowBuilder/FlowBuilder';
 import FlowElementsPopup from './FlowElementsPopup';
 import {
@@ -44,7 +45,6 @@ import ThemeToggle from './ThemeToggle';
 import Toast from './Toast';
 import Tooltip from './Tooltip';
 import Track from './Track';
-import ExportServicesModal from './ExportServicesModal';
 
 export {
   Box,
