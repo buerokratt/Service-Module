@@ -43,7 +43,7 @@ const ExportServicesModal: FC<ExportServicesModalProps> = ({ isVisible, onClose 
           page: paginationState.pageIndex + 1,
           page_size: paginationState.pageSize,
           sorting: sort,
-          search: search ?? searchQuery,
+          search: search ?? '',
         });
         const servicesData = response.data.response ?? [];
         const fetchedServices: Service[] = servicesData.map((item: Service) => ({
@@ -66,8 +66,8 @@ const ExportServicesModal: FC<ExportServicesModalProps> = ({ isVisible, onClose 
   );
 
   useEffect(() => {
-    fetchServices(pagination, sorting, searchQuery);
-  }, [fetchServices, searchQuery]);
+    void fetchServices(pagination, sorting, searchQuery);
+  }, [fetchServices, pagination, sorting, searchQuery]);
 
   useEffect(() => {
     if (isVisible) {
@@ -100,7 +100,7 @@ const ExportServicesModal: FC<ExportServicesModalProps> = ({ isVisible, onClose 
     if (success) {
       onClose();
     }
-  }, [selectedServices, services, t, onClose]);
+  }, [selectedServices, onClose]);
 
   const handleCancel = useCallback(() => {
     setSelectedServices([]);
@@ -110,23 +110,26 @@ const ExportServicesModal: FC<ExportServicesModalProps> = ({ isVisible, onClose 
     onClose();
   }, [onClose]);
 
-  const buildNameCell = (props: CellContext<Service, unknown>) => {
-    const service = props.row.original;
-    const serviceId = service.serviceId;
+  const buildNameCell = useCallback(
+    (props: CellContext<Service, unknown>) => {
+      const service = props.row.original;
+      const serviceId = service.serviceId;
 
-    if (!serviceId) return null;
+      if (!serviceId) return null;
 
-    return (
-      <FormCheckbox
-        item={{
-          label: service.name,
-          value: service.serviceId,
-        }}
-        checked={selectedServices.some((s) => s.serviceId === serviceId)}
-        onChange={() => toggleServiceSelection(service)}
-      />
-    );
-  };
+      return (
+        <FormCheckbox
+          item={{
+            label: service.name,
+            value: service.serviceId,
+          }}
+          checked={selectedServices.some((s) => s.serviceId === serviceId)}
+          onChange={() => toggleServiceSelection(service)}
+        />
+      );
+    },
+    [selectedServices, toggleServiceSelection],
+  );
 
   const columns = useMemo(() => {
     const columnHelper = createColumnHelper<Service>();
@@ -138,7 +141,7 @@ const ExportServicesModal: FC<ExportServicesModalProps> = ({ isVisible, onClose 
         cell: (props) => buildNameCell(props),
       }),
     ];
-  }, [selectedServices, toggleServiceSelection, t]);
+  }, [buildNameCell, t]);
 
   if (!isVisible) return null;
 
@@ -175,7 +178,7 @@ const ExportServicesModal: FC<ExportServicesModalProps> = ({ isVisible, onClose 
         {loadingState === 'error' && (
           <Track direction="vertical" gap={16} justify="center" style={{ padding: '3rem' }}>
             <label style={{ color: '#d32f2f', textAlign: 'center' }}>{error}</label>
-            <Button onClick={() => fetchServices(pagination, sorting)}>{t('global.retry') || 'Retry'}</Button>
+            <Button onClick={() => void fetchServices(pagination, sorting, searchQuery)}>{t('global.retry')}</Button>
           </Track>
         )}
         {loadingState === 'success' && (
@@ -194,11 +197,11 @@ const ExportServicesModal: FC<ExportServicesModalProps> = ({ isVisible, onClose 
                 pagination={pagination}
                 setPagination={(state: PaginationState) => {
                   setPagination(state);
-                  fetchServices(state, sorting);
+                  void fetchServices(state, sorting, searchQuery);
                 }}
                 setSorting={(state: SortingState) => {
                   setSorting(state);
-                  fetchServices(pagination, state);
+                  void fetchServices(pagination, state, searchQuery);
                 }}
                 isClientSide={false}
                 meta={{
@@ -211,7 +214,7 @@ const ExportServicesModal: FC<ExportServicesModalProps> = ({ isVisible, onClose 
                     };
                   },
                   onRowClick: (row) => {
-                    toggleServiceSelection(row.original);
+                    toggleServiceSelection(row.original as Service);
                   },
                 }}
               />
