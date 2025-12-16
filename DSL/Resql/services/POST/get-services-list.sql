@@ -5,14 +5,17 @@ WITH filtered_services AS (
     description,
     current_state AS state,
     ruuter_type AS type,
-    slot
+    slot,
+    structure
   FROM services
-  WHERE NOT deleted AND NOT is_common
+  WHERE NOT deleted AND 
+    is_common = :is_common::BOOLEAN
 ),
 service_counts AS (
   SELECT COUNT(DISTINCT service_id) AS total_count
   FROM services
-  WHERE NOT deleted AND NOT is_common
+  WHERE NOT deleted AND 
+    is_common = :is_common::BOOLEAN
 ),
 distinct_services AS (
   SELECT DISTINCT ON (service_id)
@@ -21,7 +24,8 @@ distinct_services AS (
     description,
     state,
     type,
-    slot
+    slot,
+    structure
   FROM filtered_services
   ORDER BY 
     service_id
@@ -33,6 +37,7 @@ SELECT
   ds.state,
   ds.type,
   ds.slot,
+  ds.structure,
   CEIL(sc.total_count / :page_size::DECIMAL) AS total_pages
 FROM distinct_services ds
 CROSS JOIN service_counts sc

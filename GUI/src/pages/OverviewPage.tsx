@@ -18,9 +18,7 @@ const OverviewPage: React.FC = () => {
       <Track justify="between">
         <h1>{t('overview.services')}</h1>
         <Track gap={16}>
-          <Button appearance="secondary" onClick={() => setIsExportModalVisible(true)}>
-            {t('overview.exportMany')}
-          </Button>
+          <Button onClick={() => setIsExportModalVisible(true)}>{t('overview.exportMany')}</Button>
           <Button onClick={() => navigate(ROUTES.NEWSERVICE_ROUTE)}>{t('overview.create')}</Button>
         </Track>
       </Track>
@@ -33,10 +31,7 @@ const OverviewPage: React.FC = () => {
         {t('overview.trainingModuleLink.text')}{' '}
         <a href={trainingModuleTraining()}>{t('overview.trainingModuleLink.train')}</a>.
       </p>
-      <ExportServicesModal
-        isVisible={isExportModalVisible}
-        onClose={() => setIsExportModalVisible(false)}
-      />
+      <ExportServicesModal isVisible={isExportModalVisible} onClose={() => setIsExportModalVisible(false)} />
     </>
   );
 };

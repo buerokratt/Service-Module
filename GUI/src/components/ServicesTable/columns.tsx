@@ -12,7 +12,7 @@ import useServiceListStore from 'store/services.store';
 import useStore from 'store/store';
 import useToastStore from 'store/toasts.store';
 import { Service, ServiceState } from 'types';
-import { exportService } from 'utils/service-export';
+import { exportServices } from 'utils/service-export';
 
 interface GetColumnsConfig {
   isCommon: boolean;
@@ -173,7 +173,7 @@ export const getColumns = ({
           <Button
             appearance="text"
             onClick={async () => {
-              await exportService(props.row.original, i18n.t);
+              await exportServices([props.row.original]);
             }}
           >
             <Icon icon={<AiOutlineExport />} size="medium" />

@@ -66,7 +66,8 @@
     "paste": "Kleebi",
     "cut": "Lõika",
     "undo": "Võta tagasi",
-    "redo": "Taasta"
+    "redo": "Taasta",
+    "retry": "Proovi uuesti"
   },
   "menu": {
     "overview": "Ülevaade",
@@ -150,6 +151,10 @@
     "export": "Ekspordi",
     "exportManyTitle": "Ekspordi mitu",
     "exportAllConfirmation": "Kas olete kindel, et soovite eksportida kõik teenused?",
+    "noServicesFound": "Ühtegi teenust ei leitud",
+    "error": {
+      "fetchingServices": "Teenuste päring ebaõnnestus"
+    },
     "trainingModuleLink": {
       "text": "Uute teenuste lõppkasutajatele kättesaadavaks tegemiseks tuleb treenida uus mudel. Mudeli treenimine toimub treeningmooduli alamlehel",
       "train": "Treeni uus mudel"

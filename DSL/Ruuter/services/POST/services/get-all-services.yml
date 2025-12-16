@@ -1,7 +1,7 @@
 declaration:
   call: declare
   version: 0.1
-  description: "Decription placeholder for 'COMMON SERVICES'"
+  description: "Get all services with name and structure only"
   method: post
   accepts: json
   returns: json
@@ -18,31 +18,18 @@ declaration:
         type: string
         description: "Body field 'sorting'"
 
-get_services_list:
+get_all_services:
   call: http.post
   args:
-    url: "[#SERVICE_RESQL]/get-common-services-list"
+    url: "[#SERVICE_RESQL]/get-all-services"
     body:
       page: ${incoming.body.page}
       page_size: ${incoming.body.page_size}
       sorting: ${incoming.body.sorting}
+  limit: 400
   result: services_res
 
-assign_services_result:
-  assign:
-    services: ${services_res.response.body}
-
-get_approved_triggers:
-  call: http.post
-  args:
-    url: "[#SERVICE_TRAINING_RESQL]/get-approved-tiggers"
-  result: triggers_res
-
-assign_training_result:
-  assign:
-    triggers: ${triggers_res.response.body}
-
-return_ok:
-  status: 200
-  return: ${[services, triggers]}
+return_result:
+  return: ${services_res.response.body}
   next: end
+
