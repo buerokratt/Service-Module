@@ -1,4 +1,3 @@
-import ConnectionRequestsPage from 'pages/ConnectionRequestsPage';
 import React from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
 
@@ -24,7 +23,6 @@ const RootComponent: React.FC = () => {
       <Route element={<Layout />}>
         <Route path={'/service'} element={<Navigate to="/services/overview" />} />
         <Route path={ROUTES.OVERVIEW_ROUTE} element={<OverviewPage />} />
-        <Route path={ROUTES.AUTOSERVICES_ROUTE} element={<ConnectionRequestsPage />} />
         <Route path={ROUTES.FAULTY_SERVICES_ROUTE} element={<FaultyServicesPage />} />
         <Route path={ROUTES.SERVICE_SETTINGS} element={<ServiceSettingPage />} />
         <Route path={ROUTES.FAULTY_SERVICES_ROUTE} element={<FaultyServicesPage />} />

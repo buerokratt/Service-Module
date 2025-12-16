@@ -3,12 +3,9 @@ import {
   changeServiceStatus,
   deleteService as deleteServiceApi,
   getCommonServicesList,
-  getConnectionRequests,
   getServicesList,
-  respondToConnectionRequest,
 } from 'resources/api-constants';
 import { Service, ServiceState } from 'types';
-import { Trigger } from 'types/Trigger';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
@@ -43,18 +40,6 @@ interface ServiceStoreState {
     errorMessage: string,
     pagination: PaginationState,
     sorting: SortingState,
-  ) => Promise<void>;
-  loadRequestsList: (
-    onEnd: (requests: Trigger[]) => void,
-    errorMessage: string,
-    pagination: PaginationState,
-    sorting: SortingState,
-  ) => Promise<void>;
-  cancelConnectionRequest: (
-    onEnd: () => void,
-    successMessage: string,
-    errorMessage: string,
-    request: Trigger,
   ) => Promise<void>;
 }
 
@@ -191,56 +176,6 @@ const useServiceListStore = create<ServiceStoreState>()(
         set({
           selectedService: undefined,
         });
-        onEnd();
-      },
-      loadRequestsList: async (onEnd, errorMessage, pagination, sorting) => {
-        try {
-          const order = sorting[0]?.desc ? 'desc' : 'asc';
-          const sort = sorting.length === 0 ? 'requestedAt desc' : sorting[0]?.id + ' ' + order;
-          const requests = await api.post<{ response: Trigger[] }>(getConnectionRequests(), {
-            page: pagination.pageIndex + 1,
-            page_size: pagination.pageSize,
-            sorting: sort,
-          });
-          onEnd(requests.data.response);
-        } catch (error) {
-          console.error(error);
-          onEnd([]);
-          useToastStore.getState().error({ title: errorMessage });
-        }
-      },
-      respondToConnectionRequest: async (onEnd, successMessage, errorMessage, status, request) => {
-        try {
-          await api.post(respondToConnectionRequest(), {
-            serviceId: request.service,
-            serviceName: request.serviceName,
-            serviceMethod: 'POST',
-            intent: request.intent,
-            authorRole: request.authorRole,
-            status: status === true ? 'approved' : 'declined',
-          });
-          useToastStore.getState().success({ title: successMessage });
-        } catch (error) {
-          console.error(error);
-          useToastStore.getState().error({ title: errorMessage });
-        }
-        onEnd();
-      },
-      cancelConnectionRequest: async (onEnd, successMessage, errorMessage, request) => {
-        try {
-          await api.post(respondToConnectionRequest(), {
-            serviceId: request.service,
-            serviceName: request.serviceName,
-            serviceMethod: 'POST',
-            intent: request.intent,
-            authorRole: request.authorRole,
-            status: 'deleted',
-          });
-          useToastStore.getState().success({ title: successMessage });
-        } catch (error) {
-          console.error(error);
-          useToastStore.getState().error({ title: errorMessage });
-        }
         onEnd();
       },
     }),

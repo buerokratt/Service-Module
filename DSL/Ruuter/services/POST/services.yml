@@ -33,17 +33,7 @@ assign_services_result:
   assign:
     services: ${services_res.response.body}
 
-get_approved_triggers:
-  call: http.post
-  args:
-    url: "[#SERVICE_TRAINING_RESQL]/get-approved-tiggers"
-  result: triggers_res
-
-assign_training_result:
-  assign:
-    triggers: ${triggers_res.response.body}
-
 return_ok:
   status: 200
-  return: ${[services, triggers]}
+  return: ${[services]}
   next: end
