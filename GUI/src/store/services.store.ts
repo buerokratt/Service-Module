@@ -1,17 +1,13 @@
 import { PaginationState, SortingState } from '@tanstack/react-table';
 import {
-  changeIntentConnection,
   changeServiceStatus,
   deleteService as deleteServiceApi,
-  getAvailableIntents,
   getCommonServicesList,
   getConnectionRequests,
   getServicesList,
-  requestServiceIntentConnection,
   respondToConnectionRequest,
 } from 'resources/api-constants';
 import { Service, ServiceState } from 'types';
-import { Intent } from 'types/Intent';
 import { Trigger } from 'types/Trigger';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
@@ -41,19 +37,10 @@ interface ServiceStoreState {
     pagination: PaginationState,
     sorting: SortingState,
   ) => Promise<void>;
-  checkServiceIntentConnection: (onConnected: (response: Trigger) => void, onNotConnected: () => void) => Promise<void>;
   deleteSelectedService: (
     onEnd: () => void,
     successMessage: string,
     errorMessage: string,
-    pagination: PaginationState,
-    sorting: SortingState,
-  ) => Promise<void>;
-  requestServiceIntentConnection: (
-    onEnd: () => void,
-    successMessage: string,
-    errorMessage: string,
-    intent: string,
     pagination: PaginationState,
     sorting: SortingState,
   ) => Promise<void>;
@@ -62,20 +49,6 @@ interface ServiceStoreState {
     errorMessage: string,
     pagination: PaginationState,
     sorting: SortingState,
-  ) => Promise<void>;
-  loadAvailableIntentsList: (
-    onEnd: (requests: Intent[]) => void,
-    errorMessage: string,
-    pagination: PaginationState,
-    sorting: SortingState,
-    search: string,
-  ) => Promise<void>;
-  respondToConnectionRequest: (
-    onEnd: () => void,
-    successMessage: string,
-    errorMessage: string,
-    status: boolean,
-    request: Trigger,
   ) => Promise<void>;
   cancelConnectionRequest: (
     onEnd: () => void,
@@ -109,7 +82,6 @@ const useServiceListStore = create<ServiceStoreState>()(
           page_size: pagination.pageSize,
           sorting: sort,
         });
-        const triggers = result.data.response[1];
         const services =
           result.data.response[0].map?.((item: any) => ({
             id: item.id,
@@ -122,7 +94,6 @@ const useServiceListStore = create<ServiceStoreState>()(
             serviceId: item.serviceId,
             usedCount: 0,
             totalPages: item.totalPages,
-            linkedIntent: triggers.find((e: Trigger) => e.service === item.serviceId)?.intent ?? '',
             endpoints: [],
           })) ?? [];
         set({
@@ -137,7 +108,6 @@ const useServiceListStore = create<ServiceStoreState>()(
           page_size: pagination.pageSize,
           sorting: sort,
         });
-        const triggers = result.data.response[1];
         const services =
           result.data.response[0].map?.((item: any) => ({
             id: item.id,
@@ -149,7 +119,6 @@ const useServiceListStore = create<ServiceStoreState>()(
             serviceId: item.serviceId,
             totalPages: item.totalPages,
             usedCount: 0,
-            linkedIntent: triggers.find((e: Trigger) => e.service === item.serviceId)?.intent ?? '',
             endpoints: [],
             slot: '',
           })) ?? [];
@@ -161,8 +130,8 @@ const useServiceListStore = create<ServiceStoreState>()(
       deleteService: (id) => {
         const services = get().services.filter((e: Service) => e.serviceId !== id);
         set({
-          commonServices: services.filter((e: Service) => e.isCommon === true),
-          notCommonServices: services.filter((e: Service) => e.isCommon === false),
+          commonServices: services.filter((e: Service) => e.isCommon),
+          notCommonServices: services.filter((e: Service) => !e.isCommon),
         });
       },
       selectedService: undefined,
@@ -205,24 +174,6 @@ const useServiceListStore = create<ServiceStoreState>()(
         });
         onEnd();
       },
-      checkServiceIntentConnection: async (onConnected, onNotConnected) => {
-        const selectedService = get().selectedService;
-        if (!selectedService) return;
-
-        try {
-          const res = await api.post<{ response: Trigger }>(changeIntentConnection(), {
-            serviceId: selectedService.serviceId,
-          });
-          if (res.data.response) {
-            onConnected(res.data.response);
-          } else {
-            onNotConnected();
-          }
-        } catch (error) {
-          console.error(error);
-          onNotConnected();
-        }
-      },
       deleteSelectedService: async (onEnd, successMessage, errorMessage) => {
         const selectedService = get().selectedService;
         if (!selectedService) return;
@@ -242,27 +193,6 @@ const useServiceListStore = create<ServiceStoreState>()(
         });
         onEnd();
       },
-      requestServiceIntentConnection: async (onEnd, successMessage, errorMessage, intent, pagination, sorting) => {
-        const selectedService = get().selectedService;
-        if (!selectedService) return;
-
-        try {
-          await api.post(requestServiceIntentConnection(), {
-            serviceId: selectedService.serviceId,
-            serviceName: selectedService.name,
-            serviceMethod: selectedService.type,
-            serviceSlot: selectedService.slot ?? '',
-            intent: intent,
-          });
-          useToastStore.getState().success({ title: successMessage });
-          await useServiceListStore.getState().loadServicesList(pagination, sorting);
-          await useServiceListStore.getState().loadCommonServicesList(pagination, sorting);
-        } catch (error) {
-          console.error(error);
-          useToastStore.getState().error({ title: errorMessage });
-        }
-        onEnd();
-      },
       loadRequestsList: async (onEnd, errorMessage, pagination, sorting) => {
         try {
           const order = sorting[0]?.desc ? 'desc' : 'asc';
@@ -271,23 +201,6 @@ const useServiceListStore = create<ServiceStoreState>()(
             page: pagination.pageIndex + 1,
             page_size: pagination.pageSize,
             sorting: sort,
-          });
-          onEnd(requests.data.response);
-        } catch (error) {
-          console.error(error);
-          onEnd([]);
-          useToastStore.getState().error({ title: errorMessage });
-        }
-      },
-      loadAvailableIntentsList: async (onEnd, errorMessage, pagination, sorting, search) => {
-        try {
-          const order = sorting[0]?.desc ? 'desc' : 'asc';
-          const sort = sorting.length === 0 ? 'intent asc' : sorting[0]?.id + ' ' + order;
-          const requests = await api.post<{ response: Intent[] }>(getAvailableIntents(), {
-            page: pagination.pageIndex + 1,
-            page_size: pagination.pageSize,
-            sorting: sort,
-            search: search,
           });
           onEnd(requests.data.response);
         } catch (error) {

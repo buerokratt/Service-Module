@@ -1,10 +1,8 @@
 import { PaginationState, SortingState } from '@tanstack/react-table';
-import ConnectServiceToIntentModel from 'pages/Integration/ConnectServiceToIntentModel';
 import { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import useServiceListStore from 'store/services.store';
-import { Trigger } from 'types/Trigger';
 
 import { Button, Card, Modal, Track } from '..';
 import DataTable from '../DataTable';
@@ -20,19 +18,13 @@ type ServicesTableProps = {
 const ServicesTable: FC<ServicesTableProps> = ({ isCommon = false }) => {
   const { t } = useTranslation();
   const [isDeletePopupVisible, setIsDeletePopupVisible] = useState(false);
-  const [isReadyPopupVisible, setIsReadyPopupVisible] = useState(false);
-  const [isIntentConnectionPopupVisible, setIsIntentConnectionPopupVisible] = useState(false);
-  const [readyPopupText, setReadyPopupText] = useState('');
-  const [isReadyStatusChecking, setIsReadyStatusChecking] = useState(false);
   const services = useServiceListStore((state) => (isCommon ? state.commonServices : state.notCommonServices));
   const navigate = useNavigate();
-  const [selectedConnectionTrigger, setSelectedConnectionTrigger] = useState<Trigger | undefined>();
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
     pageSize: 10,
   });
   const [sorting, setSorting] = useState<SortingState>([{ id: 'name', desc: false }]);
-  const [isActivating, setIsActivating] = useState(false);
 
   const loadServices = (paginationState: PaginationState, sortingState: SortingState) => {
     void useServiceListStore.getState().loadServicesList(paginationState, sortingState);
@@ -57,9 +49,7 @@ const ServicesTable: FC<ServicesTableProps> = ({ isCommon = false }) => {
       useServiceListStore
         .getState()
         .changeServiceState(
-          () => {
-            setIsReadyPopupVisible(false);
-          },
+          () => {},
           t('overview.service.toast.updated'),
           t('overview.service.toast.failed.state'),
           activate,
@@ -67,49 +57,24 @@ const ServicesTable: FC<ServicesTableProps> = ({ isCommon = false }) => {
           pagination,
           sorting,
         )
-        .then(() => {
-          setIsActivating(false);
-        })
-        .catch(() => {
-          setIsActivating(false);
+        .then(() => {})
+        .catch((e) => {
+          console.error(e);
         });
     },
     [t, pagination, sorting],
   );
 
   const columns = useMemo(() => {
-    const checkIntentConnection = () => {
-      void useServiceListStore.getState().checkServiceIntentConnection(
-        (response) => {
-          setSelectedConnectionTrigger(response);
-          setIsReadyStatusChecking(false);
-          if (response.status === 'pending') {
-            setReadyPopupText(t('overview.popup.connectionPending').toString());
-          } else {
-            setReadyPopupText(t('overview.popup.setActive').toString());
-          }
-        },
-        () => {
-          setIsReadyStatusChecking(false);
-          setReadyPopupText(t('overview.popup.intentNotConnected').toString());
-        },
-      );
-    };
-
     return getColumns({
       isCommon,
       navigate,
-      // checkIntentConnection,
       hideDeletePopup: () => setIsDeletePopupVisible(true),
       showReadyPopup: () => {
-        setIsReadyStatusChecking(true);
-        setIsReadyPopupVisible(true);
-      },
-      showIntentConnectionModal: () => {
-        setIsIntentConnectionPopupVisible(true);
+        changeServiceState(true);
       },
     });
-  }, [isCommon, navigate, t]);
+  }, [isCommon, changeServiceState, navigate]);
 
   const deleteSelectedService = () => {
     setIsDeletingService(true);
@@ -134,48 +99,6 @@ const ServicesTable: FC<ServicesTableProps> = ({ isCommon = false }) => {
       });
   };
 
-  const cancelConnectionRequest = () => {
-    if (selectedConnectionTrigger) {
-      void useServiceListStore
-        .getState()
-        .cancelConnectionRequest(
-          () => setIsReadyPopupVisible(false),
-          t('overview.service.toast.cancelledConnection'),
-          t('overview.service.toast.failed.cancelledConnection'),
-          selectedConnectionTrigger,
-        );
-    }
-  };
-
-  const getActiveAndConnectionButton = () => {
-    if (readyPopupText === t('overview.popup.setActive')) {
-      return (
-        <Button
-          appearance={!isActivating ? 'primary' : 'loading'}
-          onClick={() => {
-            setIsActivating(true);
-            changeServiceState(true);
-          }}
-        >
-          {t('overview.popup.activateService')}
-        </Button>
-      );
-    }
-    if (readyPopupText === t('overview.popup.connectionPending')) {
-      return <Button onClick={cancelConnectionRequest}>{t('overview.popup.cancelRequest')}</Button>;
-    }
-    return (
-      <Button
-        onClick={() => {
-          setIsReadyPopupVisible(false);
-          setIsIntentConnectionPopupVisible(true);
-        }}
-      >
-        {t('overview.popup.connectToIntent')}
-      </Button>
-    );
-  };
-
   return (
     <Card>
       {isDeletePopupVisible && (
@@ -189,34 +112,6 @@ const ServicesTable: FC<ServicesTableProps> = ({ isCommon = false }) => {
             </Button>
           </Track>
         </Modal>
-      )}
-      {isReadyPopupVisible && (
-        <Modal title={isReadyStatusChecking ? null : readyPopupText} onClose={() => setIsReadyPopupVisible(false)}>
-          {isReadyStatusChecking ? (
-            <Track justify="center" gap={16} direction="vertical">
-              <label>{t('overview.popup.checking')}</label>
-              <div className="loader" />
-            </Track>
-          ) : (
-            <Track justify="end" gap={16}>
-              <Button appearance="secondary" onClick={() => setIsReadyPopupVisible(false)}>
-                {t('overview.cancel')}
-              </Button>
-              {readyPopupText != t('overview.popup.connectionPending').toString() &&
-                readyPopupText != t('overview.popup.setActive').toString() &&
-                readyPopupText != t('overview.popup.intentNotConnected').toString() && (
-                  <Button onClick={() => changeServiceState()}>{t('overview.popup.setToDraft')}</Button>
-                )}
-              {getActiveAndConnectionButton()}
-            </Track>
-          )}
-        </Modal>
-      )}
-      {isIntentConnectionPopupVisible && (
-        <ConnectServiceToIntentModel
-          onModalClose={() => setIsIntentConnectionPopupVisible(false)}
-          onConnect={() => setIsIntentConnectionPopupVisible(false)}
-        />
       )}
       <DataTable
         sortable

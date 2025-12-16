@@ -152,7 +152,7 @@
     "service": {
       "name": "Name",
       "state": "State",
-      "linkedIntent": "Linked Intent",
+      "description": "Description",
       "states": {
         "active": "Active",
         "inactive": "Inactive",
