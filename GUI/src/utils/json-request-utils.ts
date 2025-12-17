@@ -18,13 +18,28 @@ export const extractMapValues = (element: any) => {
 
 export const generateJsonRequest = async (endpoint: EndpointDefinition) => {
   try {
+    console.log('Generating JSON request for endpoint: ', endpoint);
+    const isRawBodySelected = endpoint?.body?.isRawSelected ?? false;
+    const rawBody = endpoint?.body?.rawData ?? {};
+    let body: any = extractMapValues(endpoint.body);
+
+    if (isRawBodySelected) {
+      try {
+        const rawJson = JSON.parse(rawBody?.value ?? '');
+        body = rawJson;
+      } catch (e: any) {
+        body = extractMapValues(endpoint.body);
+        console.log(`Unable to save JSON to Yaml. ${e.message}`);
+      }
+    }
+
     const response = await api.post(servicesRequestsExplain(), {
       requests: [
         {
           url: endpoint.url,
           method: endpoint.methodType,
           headers: extractMapValues(endpoint.headers),
-          body: extractMapValues(endpoint.body),
+          body: body,
           params: extractMapValues(endpoint.params),
         },
       ],
