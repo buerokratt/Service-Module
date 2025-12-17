@@ -8,14 +8,14 @@ WITH filtered_services AS (
     slot,
     structure
   FROM services
-  WHERE NOT deleted AND 
-    is_common = :is_common::BOOLEAN
+  WHERE NOT deleted 
+    AND (:is_common::TEXT = '' OR is_common = (:is_common::TEXT)::BOOLEAN)
 ),
 service_counts AS (
   SELECT COUNT(DISTINCT service_id) AS total_count
   FROM services
-  WHERE NOT deleted AND 
-    is_common = :is_common::BOOLEAN
+  WHERE NOT deleted
+    AND (:is_common::TEXT = '' OR is_common = (:is_common::TEXT)::BOOLEAN)
 )
 SELECT
   fs.service_id,

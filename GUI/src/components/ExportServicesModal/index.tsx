@@ -1,7 +1,7 @@
 import { CellContext, createColumnHelper, PaginationState, SortingState } from '@tanstack/react-table';
 import { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { getAllServices } from 'resources/api-constants';
+import { getServicesList } from 'resources/api-constants';
 import api from 'services/api-dev';
 import { Service } from 'types';
 import { exportServices } from 'utils/service-export';
@@ -39,13 +39,14 @@ const ExportServicesModal: FC<ExportServicesModalProps> = ({ isVisible, onClose 
       try {
         const order = sortingState[0]?.desc ? 'desc' : 'asc';
         const sort = sortingState.length === 0 ? 'id asc' : sortingState[0]?.id + ' ' + order;
-        const response = await api.post(getAllServices(), {
+        const response = await api.post(getServicesList(), {
           page: paginationState.pageIndex + 1,
           page_size: paginationState.pageSize,
           sorting: sort,
           search: search ?? '',
+          is_common: '',
         });
-        const servicesData = response.data.response ?? [];
+        const servicesData = response.data.response[0] ?? [];
         const fetchedServices: Service[] = servicesData.map((item: Service) => ({
           name: item.name,
           serviceId: item.serviceId,
