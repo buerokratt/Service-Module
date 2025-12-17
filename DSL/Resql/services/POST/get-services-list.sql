@@ -16,35 +16,22 @@ service_counts AS (
   FROM services
   WHERE NOT deleted AND 
     is_common = :is_common::BOOLEAN
-),
-distinct_services AS (
-  SELECT DISTINCT ON (service_id)
-    service_id,
-    name,
-    description,
-    state,
-    type,
-    slot,
-    structure
-  FROM filtered_services
-  ORDER BY 
-    service_id
 )
 SELECT
-  ds.service_id,
-  ds.name,
-  ds.description,
-  ds.state,
-  ds.type,
-  ds.slot,
-  ds.structure,
+  fs.service_id,
+  fs.name,
+  fs.description,
+  fs.state,
+  fs.type,
+  fs.slot,
+  fs.structure,
   CEIL(sc.total_count / :page_size::DECIMAL) AS total_pages
-FROM distinct_services ds
+FROM filtered_services fs
 CROSS JOIN service_counts sc
 ORDER BY 
-  CASE WHEN :sorting = 'name asc' THEN ds.name END ASC,
-  CASE WHEN :sorting = 'name desc' THEN ds.name END DESC,
-  CASE WHEN :sorting = 'state asc' THEN ds.state END ASC,
-  CASE WHEN :sorting = 'state desc' THEN ds.state END DESC,
-  ds.name asc
+  CASE WHEN :sorting = 'name asc' THEN fs.name END ASC,
+  CASE WHEN :sorting = 'name desc' THEN fs.name END DESC,
+  CASE WHEN :sorting = 'state asc' THEN fs.state END ASC,
+  CASE WHEN :sorting = 'state desc' THEN fs.state END DESC,
+  fs.name asc
 OFFSET ((GREATEST(:page, 1) - 1) * :page_size) LIMIT :page_size;
