@@ -15,5 +15,5 @@ ORDER BY
   CASE WHEN :sorting = 'name desc' THEN name END DESC,
   CASE WHEN :sorting = 'state asc' THEN current_state END ASC,
   CASE WHEN :sorting = 'state desc' THEN current_state END DESC,
-  name asc
+  name ASC
 OFFSET ((GREATEST(:page, 1) - 1) * :page_size) LIMIT :page_size;
