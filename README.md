@@ -196,3 +196,108 @@ The following variables need to be configured in the `constants.ini` file:
 | `AZURE_SEARCH_API_KEY`      | Azure Search API key for authentication              |          |               |
 
 **Note:** If `AZURE_SEARCH_SERVICE_NAME`, `AZURE_SEARCH_INDEXER_NAME`, or `AZURE_SEARCH_API_KEY` are missing or empty, a warning will be logged and the Azure Search indexer will not be triggered. The operation will continue normally without updating the indexer.
+
+## LLM Classification Contract
+
+### Input format
+
+The LLM receives a sequence of messages and parameters designed to:
+- Provide system-level instructions and constraints
+- Pass the actual user input for classification
+- Fine tune used model for classification.
+
+---
+
+### Message Flow
+
+The intent classification request consists of **two messages**, that define processing rules, behavior and user input, followed by configurable set of parameters.
+
+#### 1. Request
+
+Array of messages consists of 2 objects with following structure:
+
+````
+{
+  "role":"role name system/user",
+  "content":"input"
+}
+````
+
+- **System message**: Defines how the LLM should behave, including processing instructions, allowed intent outputs, and the current date.
+- **User message**: Contains the raw input provided by the end user (via widget) and represents the content analyzed by the LLM to determine intent.
+- Rest is configuration elements.
+
+Example body:
+```` 
+ {
+    "messages": [
+        {
+            "role": "system",
+            "content": "You are a precise intent classifier and entity extractor.\n\nYou will receive:\n- A user query.\n- A set of retrieved intents (each with an `id`, `name`, `description`, `examples`, and `entities`).\n\nYou will output:\n- The retrieved intent ID.\n- Extracted entities (**only** if defined in the retrieved intent).\n\nYour goal:\nDetermine whether the user query matches one of the retrieved intents. If it does, return that intent's ID and any required entities. Since your output directly triggers backend services, it is **critical** that you **only** output intents and entities that exist in the retrieved data, and **never** generate new ones.\n\nYour task:\n1. Identify the single best-matching intent **only** from the retrieved intents.\n2. You must never invent or create new intent IDs or names.\n3. If none of the retrieved intents clearly match, return the special intent ID `\"OOD\"`.\n4. Extract only the entities listed in the selected intent’s `entities` array.\n5. Do not infer or create additional entities that are not listed.\n6. If an expected entity is not present in the query, set its value to `null`.\n7. For each extracted entity, return the canonical (nominative) form (e.g., if the user says \"Tartus\", return \"Tartu\").\n\nRules:\n- Only use entity names explicitly listed in the retrieved intent’s `entities` array.\n- Ignore any extra information (e.g., dates, times, years) not part of the listed entities.\n- If an entity listed in the `entities` array cannot be extracted, set its value to `null`.\n- Return **only** valid JSON. No text, comments, or explanations.\n- The `\"intent\"` field must exactly match one of the retrieved intent IDs or be `\"OOD\"`.\n\nStrict output format:\n{\n  \"intent\": \"<intent_id or 'OOD'>\",\n  \"entities\": {\n    \"<entity_name>\": \"<value or null>\"\n  }\n}\n\nIf your output does not strictly follow this JSON schema, it will be rejected. The current date is 2025-12-05"
+        },
+        {
+            "role": "user", 
+            "content": "mis ilm on Tartus?"
+        }
+    ],
+    "max_tokens": 800,
+    "temperature": 0,
+    "top_p": 1,
+    "stream": false,
+    "frequency_penalty": 0,
+    "presence_penalty": 0,
+    "data_sources": [
+        {
+            "type": "azure_search",
+            "parameters": {
+                "endpoint": "https://buerokratt.search.windows.net",
+                "in_scope": false,
+                "top_n_documents": 3,
+                "semantic_configuration": "teenused-index-semantic-configuration",
+                "strictness": 3,
+                "query_type": "vector_semantic_hybrid",
+                "index_name": "teenused-index",
+                "embedding_dependency": {
+                    "type": "endpoint",
+                    "endpoint": "classification endpoint",
+                    "authentication": {
+                        "type": "api_key",
+                        "key": "your_api_key"
+                    }
+                },
+                "authentication": {
+                    "type": "api_key",
+                    "key": "your_auth_api_key"
+                }
+            }
+        }
+    ]
+}
+````
+
+## Routing Logic
+
+# 8. API Contracts
+
+This section defines the API contracts exposed by the system.
+
+The following APIs are documented:
+- Classification Endpoint
+- Routing / Validation Endpoint
+
+---
+
+## 8.1 Intent CRUD APIs
+
+### Create Intent
+
+**Method:** `POST`  
+**Endpoint:** `/api/intents`
+
+#### Request Body
+```json
+{
+  "name": "string",
+  "description": "string",
+  "trainingPhrases": ["string"]
+}
