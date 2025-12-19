@@ -241,26 +241,3 @@ Currently, we had low test sample size during development making testing results
 
 ### 8.2 Blob/Indexing api
 - Additional information is located here:  [Storage Ferry README](https://github.com/buerokratt/S3-Ferry/blob/dev/README.md#endpoints).
-
-This section defines the API contracts exposed by the system.
-
-The following APIs are documented:
-- Classification Endpoint
-- Routing / Validation Endpoint
-
----
-
-## Intent CRUD APIs
-
-### Create Intent
-
-**Method:** `POST`  
-**Endpoint:** `/api/intents`
-
-#### Request Body
-```json
-{
-  "name": "string",
-  "description": "string",
-  "trainingPhrases": ["string"]
-}
