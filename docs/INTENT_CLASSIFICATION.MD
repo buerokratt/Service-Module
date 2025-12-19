@@ -129,10 +129,24 @@ Example body:
 }
 ````
 LLM specific configurations:
-- index_name: Stores vectors and data about possible intents, and other anchors
-- semantic_configuration: indexing configuration
-- query_type: define how to query form index(vector/semantic/...)
-- in_scope: use or not document in scope
+
+| Ruuter Variable            | Description                                                      | Required | Default Value |
+| -------------------------- |------------------------------------------------------------------|----------|---------------|
+| `ID_STRICTNESS` | Strictness parameter                                             | yes | 3             |
+| `ID_MAX_TOKENS` | Maximum tokens use param                                         | yes | 1000          |
+| `ID_DOCUMENTS`      | Top number of documents param                                    | yes | 5             |
+| `ID_INDEX_NAME` | Stores vectors and data about possible intents, and other anchors | yes |               |
+| `ID_QUERY_TYPE`      | Define how to query form index(vector/semantic/...)              | yes |               |
+| `ID_SEARCH_ENDPOINT` | Search endpoint                                                  | yes |               |
+| `ID_COMPLETION_ENDPOINT`      | Completion model endpoint(where llm call goes)                   | yes |               |
+| `ID_CHATBOT_EXTERNAL_KEY` | Model API key                                                    | yes |               |
+| `ID_EMBEDDED_ENDPOINT_AZURE`      | End point for embeddings                                         | yes |               |
+| `ID_CHATBOT_EXTERNAL_API_KEY` | Key provided in headers for completion url                       | yes |               |
+| `ID_CHATBOT_EXTERNAL_BOT_URL`      | External endpoint                                                | yes |               |
+| `ID_SEMANTIC_CONFIGURATION` | Configure how indexing should be processed                       | yes |               |
+| `ID_IN_SCOPE`      | Should use documents in scope or not                             | yes | false         |
+| `ID_STREAM` | Should use streaming response                                    | yes | false         |
+| `ID_ACTIVE`      | Enable/Disable llm proccessing                                   | yes | false         |
 
 Do not skip any settings as they affect the accuracy of intent detection.
 
@@ -192,17 +206,41 @@ When we have a proper response, then we proceed to next step where it checks the
 
 ## 5. Routing Logic
 
+### 5.1 Intent validation
+- After LLM gives a response and intent detected is not `OOD` we can validate.
+Detected intent should match a service name precisely.So we will check against a DATABASE for a match where `detected intent = service name` and its latest status is `active`.
+This means that we have a valid service to be triggered.
+
+### 5.2 Fall back
+- If no valid intend found or LLM response is `OOD` we trigger the `skip` step in DSL which would stop LLM processing and resume the regular flow.
+
 ---
 
 ## 6. Entity Handling
+
+Current iteration is simple and would be extended with further improvements.
+
+- Entities are mapped and passed as array of value where's they used in order: 
+```
+    { "Location": "Tartu"}
+```
+In this scenario we will pass just `Tartu`. When we will get to the more complex implementation and do enchantments this section should be also updated.
+
+Currently, we had low test sample size during development making testing results to be hard and inconsistent.
 
 ---
 
 ## 7. Logging & Error model
 
+### 7.1 Blob Storage / Indexing
+- Information could be found here:  [Storage Ferry README](https://github.com/buerokratt/S3-Ferry/blob/dev/README.md#endpoints).
+
 ---
 
 ## 8. API Contracts
+
+### 8.2 Blob/Indexing api
+- Additional information is located here:  [Storage Ferry README](https://github.com/buerokratt/S3-Ferry/blob/dev/README.md#endpoints).
 
 This section defines the API contracts exposed by the system.
 
