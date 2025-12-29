@@ -2,6 +2,12 @@
 
 ## 1. System Flow
 
+### 1.2 Dependencies
+- Public Ruuter(DSLS from chatbot, SERVICE MODULE)
+- Service Module
+- LLM Configuration
+- Widget
+
 ---
 
 ## 2. Intent Data specification
