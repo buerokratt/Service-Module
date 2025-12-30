@@ -145,6 +145,7 @@
     "edit": "Muuda",
     "delete": "Kustuta",
     "cancel": "Tühista",
+    "importMany": "Impordi mitu",
     "trainingModuleLink": {
       "text": "Uute teenuste lõppkasutajatele kättesaadavaks tegemiseks tuleb treenida uus mudel. Mudeli treenimine toimub treeningmooduli alamlehel",
       "train": "Treeni uus mudel"

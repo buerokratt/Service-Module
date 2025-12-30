@@ -7,12 +7,8 @@ import { AiOutlineExport, AiOutlineImport } from 'react-icons/ai';
 import { updateFlowInputRules } from 'services/flow-builder';
 import useServiceStore from 'store/new-services.store';
 import useToastStore from 'store/toasts.store';
+import { FlowData } from 'types/service-flow';
 import { removeTrailingUnderscores } from 'utils/string-util';
-
-interface FlowData {
-  nodes: any[];
-  edges: any[];
-}
 
 const ImportExportControls: FC = () => {
   const { getNodes, getEdges, setNodes, setEdges } = useReactFlow();

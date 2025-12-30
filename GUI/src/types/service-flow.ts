@@ -14,6 +14,11 @@ export const EDGE_LENGTH = 5 * GRID_UNIT;
 const startNodeId = generateUniqueId();
 const ghostNodeId = generateUniqueId();
 
+export interface FlowData {
+  nodes: any[];
+  edges: any[];
+}
+
 export type NodeDataProps = {
   label: string;
   onDelete: (id: string) => void;
