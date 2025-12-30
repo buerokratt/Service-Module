@@ -6,6 +6,7 @@
 - Public Ruuter(DSLS from chatbot, SERVICE MODULE)
 - Service Module
 - LLM Configuration
+- RESQL(Service message configuration value is held in database)
 - Widget
 
 ---
@@ -87,6 +88,10 @@ Array of messages consists of 2 objects with following structure:
 - **User message**: Contains the raw input provided by the end user (via widget) and represents the content analyzed by the LLM to determine intent.
 - Rest is configuration elements.
 
+### Important note !!!
+In current implementation the system message is stored in DATABASE as its content is hard to process for our environment.
+id_system_message is the key by which we should receive the system message from database and pass it to the api call.
+
 Example body:
 ```` 
  {
@@ -155,6 +160,7 @@ LLM specific configurations:
 | `ID_ACTIVE`      | Enable/Disable llm proccessing                                   | yes | false         |
 
 Do not skip any settings as they affect the accuracy of intent detection.
+If ID_ACTIVE set to false then the Intent Classification DSL would not be triggered at all.
 
 #### INTENT FOUND RESPONSE
 ```
@@ -200,7 +206,7 @@ Do not skip any settings as they affect the accuracy of intent detection.
 ```
 Responses are bigger and contain more information, I highlighted the important areas, that contain INTENT part.
 
-If LLM response was malformed or incorrect then we trigger SKIP step that would not process llm response due to its incorrect response.
+If LLM response was malformed or incorrect then would be triggered an `SKIP` step that would not process llm response due to its incorrect response, stop all further executions in regard to llm and will resume the natural flow
 
 When we have a proper response, then we proceed to next step where it checks the content for intent:
 
@@ -212,13 +218,19 @@ When we have a proper response, then we proceed to next step where it checks the
 
 ## 5. Routing Logic
 
+After receiving response from LLM, then DSL would proceed to validation steps.
+Response part that we will process is strictly configured to be of certain structure described earlier.
+Any error would cause to skip processing of llm call.
+
+
+
 ### 5.1 Intent validation
 - After LLM gives a response and intent detected is not `OOD` we can validate.
 Detected intent should match a service name precisely.So we will check against a DATABASE for a match where `detected intent = service name` and its latest status is `active`.
 This means that we have a valid service to be triggered.
 
 ### 5.2 Fall back
-- If no valid intend found or LLM response is `OOD` we trigger the `skip` step in DSL which would stop LLM processing and resume the regular flow.
+- If no valid intend found or LLM response is `OOD` we trigger the `SKIP` step in DSL which would stop LLM processing and resume the regular flow.
 
 ---
 
@@ -247,3 +259,8 @@ Currently, we had low test sample size during development making testing results
 
 ### 8.2 Blob/Indexing api
 - Additional information is located here:  [Storage Ferry README](https://github.com/buerokratt/S3-Ferry/blob/dev/README.md#endpoints).
+
+
+### Follow-up note.
+
+As in its current iteration we have only basic MVP version, some aspects of this procedure are still raw and inconsistent, and with its development this document should be updated accordingly.
