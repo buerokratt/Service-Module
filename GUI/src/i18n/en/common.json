@@ -522,6 +522,9 @@
     "ROLE_UNAUTHENTICATED": "Unauthenticated"
   },
   "chat": {
+    "unanswered": "Unanswered",
+    "forwarded": "Forwarded",
+    "pending": "Pending",
     "service-test-error": {
       "title": "Service test error",
       "dslName": "Service file",

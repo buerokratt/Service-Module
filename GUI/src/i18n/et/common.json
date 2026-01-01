@@ -523,6 +523,9 @@
     "ROLE_UNAUTHENTICATED": "Autentimata"
   },
   "chat": {
+    "unanswered": "Vastamata",
+    "forwarded": "Suunatud",
+    "pending": "Ootel",
     "service-test-error": {
       "title": "Teenuse testimise viga",
       "dslName": "Teenuse fail",
