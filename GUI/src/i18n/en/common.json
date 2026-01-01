@@ -146,6 +146,10 @@
     "delete": "Delete",
     "cancel": "Cancel",
     "importMany": "Import many",
+    "import": {
+      "importSuccess": "{{count}} service{{lengthCheck}} imported successfully",
+      "importFailure": "Could not import the following files (Wrong format or corrupted): {{files}}"
+    },
     "trainingModuleLink": {
       "text": "For the service to be accessible to users a new model needs to be trained. Model training happens on the Training Module page",
       "train": "Train new model"

@@ -146,6 +146,10 @@
     "delete": "Kustuta",
     "cancel": "Tühista",
     "importMany": "Impordi mitu",
+    "import": {
+      "importSuccess": "{{count}} teenus{{lengthCheck}} edukalt imporditud",
+      "importFailure": "Järgmisi faile ei õnnestunud importida (vale vorming või rikutud): {{files}}"
+    },
     "trainingModuleLink": {
       "text": "Uute teenuste lõppkasutajatele kättesaadavaks tegemiseks tuleb treenida uus mudel. Mudeli treenimine toimub treeningmooduli alamlehel",
       "train": "Treeni uus mudel"
