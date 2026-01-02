@@ -1,8 +1,11 @@
-import i18n from "i18n";
-import { t } from "i18next";
-import { ChangeEvent } from "react";
-import useToastStore from "store/toasts.store";
-import { FlowData } from "types/service-flow";
+import i18n from 'i18n';
+import { t } from 'i18next';
+import { ChangeEvent } from 'react';
+import { importMultipleServices } from 'resources/api-constants';
+import api from 'services/api';
+import { getYamlContent } from 'services/service-builder';
+import useToastStore from 'store/toasts.store';
+import { FlowData } from 'types/service-flow';
 
 const isValidFlowData = (data: any): data is FlowData =>
   data?.nodes && data?.edges && Array.isArray(data.nodes) && Array.isArray(data.edges);
@@ -16,11 +19,11 @@ const handleImportServices = async (
   const files = event.target.files;
   if (!files) return { validFiles: [], corruptedFiles: [] };
 
-  const validFiles: Array<{ fileName: string; flowData: FlowData }> = [];
+  const validFiles: Array<{ fileName: string; flowData: FlowData; content: any }> = [];
   const corruptedFiles: string[] = [];
 
   const fileProcessingPromises = Array.from(files).map(async (file) => {
-    const name = file.name.replaceAll(/\s+/g, '_');
+    const name = file.name.replaceAll(/\s+/g, '_').replace(/\.[^/.]+$/, '');
     try {
       const content = await file.text();
       const flowData = JSON.parse(content) as FlowData;
@@ -32,6 +35,7 @@ const handleImportServices = async (
       validFiles.push({
         fileName: name,
         flowData,
+        content: getYamlContent(flowData.nodes, flowData.edges, name, '', false),
       });
     } catch (error) {
       corruptedFiles.push(name);
@@ -55,21 +59,21 @@ export const importServices = async (event: ChangeEvent<HTMLInputElement>) => {
   }
 
   if (validFiles.length > 0) {
-    validFiles.forEach(({ fileName, flowData }) => {
-      console.log(`Successfully imported ${fileName}`, flowData);
-      // Add your logic to handle each valid flowData
-    });
-
-    if (validFiles.length > 0) {
-      const lengthCheck = i18n.language === 'en' ? 's' : 'ed';
-      useToastStore.getState().success({
-        title: t('newService.toast.success'),
-        message: t('overview.import.importSuccess', {
-          count: validFiles.length,
-          lengthCheck: validFiles.length === 1 ? '' : lengthCheck,
-        }),
+    api
+      .post(importMultipleServices(), {
+        services: validFiles,
+        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+      })
+      .then(() => {
+        const lengthCheck = i18n.language === 'en' ? 's' : 'ed';
+        useToastStore.getState().success({
+          title: t('newService.toast.success'),
+          message: t('overview.import.importSuccess', {
+            count: validFiles.length,
+            lengthCheck: validFiles.length === 1 ? '' : lengthCheck,
+          }),
+        });
       });
-    }
   }
 
   event.target.value = '';
