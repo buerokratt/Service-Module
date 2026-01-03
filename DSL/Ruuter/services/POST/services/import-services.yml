@@ -46,4 +46,4 @@ insert_services:
   result: insert_services_res    
 
 return_result:
-  return: ${services}
+  return: "Services imported successfully"

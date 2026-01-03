@@ -4,6 +4,7 @@ import { ChangeEvent } from 'react';
 import { importMultipleServices } from 'resources/api-constants';
 import api from 'services/api';
 import { getYamlContent } from 'services/service-builder';
+import useServiceListStore from 'store/services.store';
 import useToastStore from 'store/toasts.store';
 import { FlowData } from 'types/service-flow';
 
@@ -13,13 +14,13 @@ const isValidFlowData = (data: any): data is FlowData =>
 const handleImportServices = async (
   event: ChangeEvent<HTMLInputElement>,
 ): Promise<{
-  validFiles: Array<{ fileName: string; flowData: FlowData }>;
+  validFiles: Array<{ fileName: string; flowData: string }>;
   corruptedFiles: string[];
 }> => {
   const files = event.target.files;
   if (!files) return { validFiles: [], corruptedFiles: [] };
 
-  const validFiles: Array<{ fileName: string; flowData: FlowData; content: any }> = [];
+  const validFiles: Array<{ fileName: string; flowData: string; content: any }> = [];
   const corruptedFiles: string[] = [];
 
   const fileProcessingPromises = Array.from(files).map(async (file) => {
@@ -34,7 +35,7 @@ const handleImportServices = async (
 
       validFiles.push({
         fileName: name,
-        flowData,
+        flowData: JSON.stringify({ nodes: flowData.nodes, edges: flowData.edges }),
         content: getYamlContent(flowData.nodes, flowData.edges, name, '', false),
       });
     } catch (error) {
@@ -64,7 +65,7 @@ export const importServices = async (event: ChangeEvent<HTMLInputElement>) => {
         services: validFiles,
         timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
       })
-      .then(() => {
+      .then(async () => {
         const lengthCheck = i18n.language === 'en' ? 's' : 'ed';
         useToastStore.getState().success({
           title: t('newService.toast.success'),
@@ -73,6 +74,10 @@ export const importServices = async (event: ChangeEvent<HTMLInputElement>) => {
             lengthCheck: validFiles.length === 1 ? '' : lengthCheck,
           }),
         });
+        const pagination = { pageIndex: 0, pageSize: 10 };
+        const sorting = [{ id: 'name', desc: false }];
+        await useServiceListStore.getState().loadServicesList(pagination, sorting);
+        await useServiceListStore.getState().loadCommonServicesList(pagination, sorting);
       });
   }
 
