@@ -15,7 +15,6 @@ declaration:
         type: string
         description: "Body field 'timezone'"
 
-
 extract_request_data:
   assign:
     services: ${incoming.body.services ?? []}
@@ -35,15 +34,38 @@ assign_imported_names:
   assign:
     imported_names: ${import_names_res.response.body[0].names.split(",")}
     services: "$=services.map((s, i) => ({ ...s, fileName: imported_names[i] }))="
+    file_names: ${services.map(s => s.fileName)}
 
 insert_services:
   call: http.post
   args:
     url: "[#SERVICE_RESQL]/add-services"
     body:
-      names: ${services.map(s => s.fileName)}
+      names: ${file_names}
       structures: ${services.map(s => s.flowData)}
-  result: insert_services_res    
+  result: insert_services_res
+
+convert_json_content_to_yml:
+  call: http.post
+  args:
+    url: "[#SERVICE_DMAPPER]/conversion/json_to_yaml_data_multiple"
+    body:
+      data: ${services.map(s => s.content)}
+  result: ymls_res
+
+prepare_files:
+  assign:
+    file_paths: "$=file_names.map(name => `[#RUUTER_SERVICES_POST_PATH]/draft/${name}.tmp`)="
+    yaml_contents: ${ymls_res.response.body.yamls}
+
+add_dsls:
+  call: http.post
+  args:
+    url: "[#SERVICE_DMAPPER]/file-manager/create_multiple"
+    body:
+      file_paths: ${file_paths}
+      contents: ${yaml_contents}
+  result: add_dsls_res
 
 return_result:
   return: "Services imported successfully"
