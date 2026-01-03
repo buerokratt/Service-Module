@@ -148,7 +148,8 @@
     "importMany": "Impordi mitu",
     "import": {
       "importSuccess": "{{count}} teenus{{lengthCheck}} edukalt imporditud",
-      "importFailure": "Järgmisi faile ei õnnestunud importida (vale vorming või rikutud): {{files}}"
+      "importFailure": "Järgmisi faile ei õnnestunud importida (vale vorming või rikutud): {{files}}",
+      "failedToImport": "Teenuste importimine ebaõnnestus"
     },
     "trainingModuleLink": {
       "text": "Uute teenuste lõppkasutajatele kättesaadavaks tegemiseks tuleb treenida uus mudel. Mudeli treenimine toimub treeningmooduli alamlehel",

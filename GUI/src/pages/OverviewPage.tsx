@@ -2,12 +2,12 @@ import withAuthorization, { ROLES } from 'hoc/with-authorization';
 import React, { useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
+import { importServices } from 'utils/service-import';
 
 import { Button, Track } from '../components';
 import ServicesTable from '../components/ServicesTable';
 import { trainingModuleTraining } from '../resources/api-constants';
 import { ROUTES } from '../resources/routes-constants';
-import { importServices } from 'utils/service-import';
 
 const OverviewPage: React.FC = () => {
   const { t } = useTranslation();

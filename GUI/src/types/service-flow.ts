@@ -15,8 +15,8 @@ const startNodeId = generateUniqueId();
 const ghostNodeId = generateUniqueId();
 
 export interface FlowData {
-  nodes: any[];
-  edges: any[];
+  nodes: Node<NodeDataProps>[];
+  edges: Edge[];
 }
 
 export type NodeDataProps = {

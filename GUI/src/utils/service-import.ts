@@ -78,6 +78,13 @@ export const importServices = async (event: ChangeEvent<HTMLInputElement>) => {
         const sorting = [{ id: 'name', desc: false }];
         await useServiceListStore.getState().loadServicesList(pagination, sorting);
         await useServiceListStore.getState().loadCommonServicesList(pagination, sorting);
+      })
+      .catch((error) => {
+        console.error('Error importing services:', error);
+        useToastStore.getState().error({
+          title: t('global.notificationError'),
+          message: t('overview.import.failedToImport'),
+        });
       });
   }
 
