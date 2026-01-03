@@ -15,17 +15,24 @@ const OverviewPage: React.FC = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const triggerFileInput = useCallback(() => {
-      if (fileInputRef.current) {
-        fileInputRef.current.click();
-      }
-    }, []);
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
+    }
+  }, []);
 
   return (
     <>
       <Track justify="between">
         <h1>{t('overview.services')}</h1>
         <Track gap={16}>
-          <input type="file" ref={fileInputRef} onChange={importServices} accept=".json" style={{ display: 'none' }} multiple />
+          <input
+            type="file"
+            ref={fileInputRef}
+            onChange={importServices}
+            accept=".json"
+            style={{ display: 'none' }}
+            multiple
+          />
           <Button onClick={triggerFileInput}>{t('overview.importMany')}</Button>
           <Button onClick={() => navigate(ROUTES.NEWSERVICE_ROUTE)}>{t('overview.create')}</Button>
         </Track>
