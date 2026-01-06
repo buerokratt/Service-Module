@@ -153,46 +153,6 @@ The repository uses [SQLFluff](https://sqlfluff.com/) for linting and formatting
 | ---------------------------------- | ------------------------------------------ | ---------------------------------------------------- | -------- | ------------------- |
 | `application.apiRequestTestingKey` | `REACT_APP_RUUTER_SERVICES_TESTING_HEADER` | `x-ruuter-testing` header value for testing services |          | `voorshpellhappilo` |
 
-## Intent classification
+## Intent Classification 
 
-### Blob Storage & Indexing
-
-Intent files are published to Azure Blob Storage and indexed for LLM-based intent detection. Each intent file is stored as a separate blob. The behavior differs between `edit.yml` and `status.yml`:
-
-**In `edit.yml`:**
-
-- Blob storage operations occur **only when the service state is being set to 'active'**
-- When a service is edited and the state is set to 'active', the intent file (JSON format) is uploaded or updated in Azure Blob Storage using Storage Ferry
-- The file is stored with the service name as the filename (e.g., `service-name.json`)
-
-**In `status.yml`:**
-
-- When a service is **activated** (state changed to 'active'): the intent file is created in blob storage
-- When a service is **deactivated** (state changed to inactive): the intent file is deleted from blob storage
-
-**Blob storage operations:**
-
-The Storage Ferry service is used to upload the intent file to Azure Blob Storage. The ferry operation is documented in detail in the [Storage Ferry README](https://github.com/buerokratt/S3-Ferry/blob/dev/README.md#endpoints).
-
-The following variables need to be configured in the `constants.ini` file:
-
-| Variable                    | Description                                          | Required | Default Value |
-| --------------------------- | ---------------------------------------------------- | -------- | ------------- |
-| `STORAGE_FERRY_ACCOUNT_ID`  | Azure storage account ID for Storage Ferry service. For local development, uses Azurite (Azure emulator) | Yes      |               |
-| `STORAGE_FERRY_CONTAINER`   | Azure storage container name for Storage Ferry service. For local development, uses Azurite (Azure emulator) | Yes      |               |
-
-**Note:** For local development, `STORAGE_FERRY_ACCOUNT_ID` and `STORAGE_FERRY_CONTAINER` use Azurite (Azure Storage emulator) as configured in `docker-compose.yml`. Files are created in the local Azurite instance.
-
-**Azure Search Indexing:**
-
-After each blob storage operation (create, update, or delete), the Azure Search indexer is automatically triggered to index the updated data. This ensures that the LLM has access to the latest service definitions for intent classification.
-
-The following variables need to be configured in the `constants.ini` file:
-
-| Ruuter Variable            | Description                                          | Required | Default Value |
-| -------------------------- | ---------------------------------------------------- | -------- | ------------- |
-| `AZURE_SEARCH_SERVICE_NAME` | Azure Search service name for indexer API            |          |               |
-| `AZURE_SEARCH_INDEXER_NAME` | Azure Search indexer name to trigger after storage operations |          |               |
-| `AZURE_SEARCH_API_KEY`      | Azure Search API key for authentication              |          |               |
-
-**Note:** If `AZURE_SEARCH_SERVICE_NAME`, `AZURE_SEARCH_INDEXER_NAME`, or `AZURE_SEARCH_API_KEY` are missing or empty, a warning will be logged and the Azure Search indexer will not be triggered. The operation will continue normally without updating the indexer.
+Flow is desribed in [INTENT CLASSIFICATION README](./docs/INTENT_CLASSIFICATION.MD)
