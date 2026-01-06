@@ -63,7 +63,7 @@ describe('useTestServiceStore', () => {
 
       useTestServiceStore.getState().sendUserInput(userInput);
 
-      expect(runServiceTest).toHaveBeenCalledWith(userInput);
+      expect(runServiceTest).toHaveBeenCalledWith(userInput, undefined);
       expect(runServiceTest).toHaveBeenCalledTimes(1);
     });
 
@@ -77,9 +77,9 @@ describe('useTestServiceStore', () => {
       expect(useTestServiceStore.getState().chat).toHaveLength(3);
       expect(useTestServiceStore.getState().userInput).toBe('Third message');
       expect(runServiceTest).toHaveBeenCalledTimes(3);
-      expect(runServiceTest).toHaveBeenNthCalledWith(1, 'First message');
-      expect(runServiceTest).toHaveBeenNthCalledWith(2, 'Second message');
-      expect(runServiceTest).toHaveBeenNthCalledWith(3, 'Third message');
+      expect(runServiceTest).toHaveBeenNthCalledWith(1, 'First message', undefined);
+      expect(runServiceTest).toHaveBeenNthCalledWith(2, 'Second message', undefined);
+      expect(runServiceTest).toHaveBeenNthCalledWith(3, 'Third message', undefined);
     });
 
     it('should handle empty string input', () => {
@@ -90,7 +90,7 @@ describe('useTestServiceStore', () => {
       expect(useTestServiceStore.getState().chat).toHaveLength(1);
       expect(useTestServiceStore.getState().chat[0].message).toBe('');
       expect(useTestServiceStore.getState().userInput).toBe('');
-      expect(runServiceTest).toHaveBeenCalledWith('');
+      expect(runServiceTest).toHaveBeenCalledWith('', undefined);
     });
 
     it('should handle special characters in input', () => {
@@ -101,7 +101,7 @@ describe('useTestServiceStore', () => {
       expect(useTestServiceStore.getState().chat).toHaveLength(1);
       expect(useTestServiceStore.getState().chat[0].message).toBe(userInput);
       expect(useTestServiceStore.getState().userInput).toBe(userInput);
-      expect(runServiceTest).toHaveBeenCalledWith(userInput);
+      expect(runServiceTest).toHaveBeenCalledWith(userInput, undefined);
     });
   });
 });
