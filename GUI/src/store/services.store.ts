@@ -4,7 +4,6 @@ import {
   changeServiceStatus,
   deleteService as deleteServiceApi,
   getAvailableIntents,
-  getCommonServicesList,
   getConnectionRequests,
   getServicesList,
   requestServiceIntentConnection,
@@ -108,6 +107,7 @@ const useServiceListStore = create<ServiceStoreState>()(
           page: pagination.pageIndex + 1,
           page_size: pagination.pageSize,
           sorting: sort,
+          is_common: false,
         });
         const triggers = result.data.response[1];
         const services =
@@ -124,6 +124,7 @@ const useServiceListStore = create<ServiceStoreState>()(
             totalPages: item.totalPages,
             linkedIntent: triggers.find((e: Trigger) => e.service === item.serviceId)?.intent ?? '',
             endpoints: [],
+            structure: item.structure,
           })) ?? [];
         set({
           notCommonServices: services,
@@ -132,10 +133,11 @@ const useServiceListStore = create<ServiceStoreState>()(
       loadCommonServicesList: async (pagination, sorting) => {
         const order = sorting[0]?.desc ? 'desc' : 'asc';
         const sort = sorting.length === 0 ? 'id asc' : sorting[0]?.id + ' ' + order;
-        const result = await api.post(getCommonServicesList(), {
+        const result = await api.post(getServicesList(), {
           page: pagination.pageIndex + 1,
           page_size: pagination.pageSize,
           sorting: sort,
+          is_common: true,
         });
         const triggers = result.data.response[1];
         const services =
@@ -152,6 +154,7 @@ const useServiceListStore = create<ServiceStoreState>()(
             linkedIntent: triggers.find((e: Trigger) => e.service === item.serviceId)?.intent ?? '',
             endpoints: [],
             slot: '',
+            structure: item.structure,
           })) ?? [];
 
         set({
