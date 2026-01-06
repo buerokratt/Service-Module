@@ -659,7 +659,7 @@ function handleEndpointStep(
   const endpointDefinition = parentNode.data.endpoint?.definitions[0];
   const paramsVariables = endpointDefinition?.params?.variables;
   const bodyVariables = endpointDefinition?.body?.variables;
-  const isRawBodySelected = endpointDefinition?.body?.isRowSelected ?? false;
+  const isRawBodySelected = endpointDefinition?.body?.isRawSelected ?? false;
   const rawBody = endpointDefinition?.body?.rawData ?? {};
   const headersVariables = endpointDefinition?.headers?.variables;
   const methodType = endpointDefinition?.methodType?.toLowerCase();
