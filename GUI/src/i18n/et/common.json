@@ -66,7 +66,8 @@
     "paste": "Kleebi",
     "cut": "Lõika",
     "undo": "Võta tagasi",
-    "redo": "Taasta"
+    "redo": "Taasta",
+    "retry": "Proovi uuesti"
   },
   "menu": {
     "overview": "Ülevaade",
@@ -150,6 +151,14 @@
       "importSuccess": "{{count}} teenus{{lengthCheck}} edukalt imporditud",
       "importFailure": "Järgmisi faile ei õnnestunud importida (vale vorming või rikutud): {{files}}",
       "failedToImport": "Teenuste importimine ebaõnnestus"
+    },
+    "exportMany": "Ekspordi mitu",
+    "exportAll": "Ekspordi kõik",
+    "export": "Ekspordi",
+    "exportAllConfirmation": "Kas olete kindel, et soovite eksportida kõik teenused?",
+    "noServicesFound": "Ühtegi teenust ei leitud",
+    "error": {
+      "fetchingServices": "Teenuste päring ebaõnnestus"
     },
     "trainingModuleLink": {
       "text": "Uute teenuste lõppkasutajatele kättesaadavaks tegemiseks tuleb treenida uus mudel. Mudeli treenimine toimub treeningmooduli alamlehel",

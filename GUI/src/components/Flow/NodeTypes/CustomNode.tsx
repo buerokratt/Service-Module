@@ -73,6 +73,10 @@ const CustomNode: FC<NodeProps & CustomNodeProps> = (props) => {
             onClick={() => {
               data.setClickedNode(id);
               data.onEdit(id);
+              // Workaround for a bug that prevents @radix-ui/react-dialog and jsoneditor working together
+              // https://github.com/radix-ui/primitives/issues/2122
+              // Second part of the fix is in Popup.tsx
+              setTimeout(() => (document.body.style.pointerEvents = ''), 0);
             }}
           >
             <Icon icon={data.readonly ? <MdOutlineRemoveRedEye /> : <MdOutlineEdit />} size="medium" />

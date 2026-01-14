@@ -66,7 +66,8 @@
     "paste": "Paste",
     "cut": "Cut",
     "undo": "Undo",
-    "redo": "Redo"
+    "redo": "Redo",
+    "retry": "Retry"
   },
   "menu": {
     "overview": "Overview",
@@ -150,6 +151,14 @@
       "importSuccess": "{{count}} service{{lengthCheck}} imported successfully",
       "importFailure": "Could not import the following files (Wrong format or corrupted): {{files}}",
       "failedToImport": "Failed to import services"
+    },
+    "exportMany": "Export many",
+    "exportAll": "Export All",
+    "export": "Export",
+    "exportAllConfirmation": "Are you sure you want to export all services?",
+    "noServicesFound": "No services found",
+    "error": {
+      "fetchingServices": "Error fetching services"
     },
     "trainingModuleLink": {
       "text": "For the service to be accessible to users a new model needs to be trained. Model training happens on the Training Module page",

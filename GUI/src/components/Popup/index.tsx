@@ -76,6 +76,20 @@ const Popup: FC<PropsWithChildren<DialogProps>> = ({
 
   const titleRef = useRef<HTMLInputElement>(null);
 
+  // Workaround for a bug that prevents @radix-ui/react-dialog and jsoneditor working together
+  // https://github.com/radix-ui/primitives/issues/2122
+  // Second part of the fix is in Flow/NodeTypes/CustomNode.tsx
+  // Prevent closing the dialog when clicking on JSONEditor modals
+  // JSONEditor modals are rendered outside the Radix Dialog portal,
+  // so clicks on them are treated as "outside" clicks
+  const handleOutsideInteraction = (event: Event) => {
+    const target = event.target as HTMLElement;
+    // Check if the interaction is on a JSONEditor modal or its children
+    if (target.closest('.jsoneditor-modal')) {
+      event.preventDefault();
+    }
+  };
+
   return (
     <RadixDialog.Root defaultOpen={true} onOpenChange={onClose}>
       <RadixDialog.Portal>
@@ -83,6 +97,8 @@ const Popup: FC<PropsWithChildren<DialogProps>> = ({
         <RadixDialog.Content
           className="popup"
           aria-describedby={description ? 'dialog-description' : undefined}
+          onPointerDownOutside={handleOutsideInteraction}
+          onInteractOutside={handleOutsideInteraction}
           {...rest}
         >
           <div className="popup__header">

@@ -14,6 +14,7 @@ import Dialog from './Dialog';
 import Drawer from './Drawer';
 import Dropdown from './Dropdown';
 import ExclamationBadge from './ExclamationBadge';
+import ExportServicesModal from './ExportServicesModal';
 import FlowBuilder from './FlowBuilder/FlowBuilder';
 import FlowElementsPopup from './FlowElementsPopup';
 import {
@@ -90,4 +91,5 @@ export {
   Dropdown,
   ThemeToggle,
   Markdownify,
+  ExportServicesModal,
 };

@@ -3,6 +3,7 @@ import { createColumnHelper } from '@tanstack/react-table';
 import Label from 'components/Label';
 import Tooltip from 'components/Tooltip';
 import i18n from 'i18n';
+import { AiOutlineExport } from 'react-icons/ai';
 import { IoCopyOutline } from 'react-icons/io5';
 import { MdDeleteOutline, MdOutlineArrowForward, MdOutlineDescription, MdOutlineEdit } from 'react-icons/md';
 import { NavigateFunction } from 'react-router-dom';
@@ -11,6 +12,7 @@ import useServiceListStore from 'store/services.store';
 import useStore from 'store/store';
 import useToastStore from 'store/toasts.store';
 import { Service, ServiceState } from 'types';
+import { exportServices } from 'utils/service-export';
 
 interface GetColumnsConfig {
   isCommon: boolean;
@@ -157,6 +159,25 @@ export const getColumns = ({
           >
             <Icon icon={<MdOutlineEdit />} size="medium" />
             {i18n.t('overview.edit')}
+          </Button>
+        </Track>
+      ),
+    }),
+    columnHelper.display({
+      id: 'export',
+      meta: {
+        size: 90,
+      },
+      cell: (props) => (
+        <Track align="right" justify="start">
+          <Button
+            appearance="text"
+            onClick={async () => {
+              await exportServices([props.row.original]);
+            }}
+          >
+            <Icon icon={<AiOutlineExport />} size="medium" />
+            {i18n.t('overview.export')}
           </Button>
         </Track>
       ),

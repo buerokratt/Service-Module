@@ -1,10 +1,10 @@
 import withAuthorization, { ROLES } from 'hoc/with-authorization';
-import React, { useCallback, useRef } from 'react';
+import React, { useCallback, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { importServices } from 'utils/service-import';
 
-import { Button, Track } from '../components';
+import { Button, ExportServicesModal, Track } from '../components';
 import ServicesTable from '../components/ServicesTable';
 import { trainingModuleTraining } from '../resources/api-constants';
 import { ROUTES } from '../resources/routes-constants';
@@ -13,6 +13,7 @@ const OverviewPage: React.FC = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isExportModalVisible, setIsExportModalVisible] = useState(false);
 
   const triggerFileInput = useCallback(() => {
     if (fileInputRef.current) {
@@ -34,6 +35,7 @@ const OverviewPage: React.FC = () => {
             multiple
           />
           <Button onClick={triggerFileInput}>{t('overview.importMany')}</Button>
+          <Button onClick={() => setIsExportModalVisible(true)}>{t('overview.exportMany')}</Button>
           <Button onClick={() => navigate(ROUTES.NEWSERVICE_ROUTE)}>{t('overview.create')}</Button>
         </Track>
       </Track>
@@ -46,6 +48,7 @@ const OverviewPage: React.FC = () => {
         {t('overview.trainingModuleLink.text')}{' '}
         <a href={trainingModuleTraining()}>{t('overview.trainingModuleLink.train')}</a>.
       </p>
+      <ExportServicesModal isVisible={isExportModalVisible} onClose={() => setIsExportModalVisible(false)} />
     </>
   );
 };
