@@ -14,7 +14,7 @@ const isValidFlowData = (data: any): data is FlowData =>
 const handleImportServices = async (
   event: ChangeEvent<HTMLInputElement>,
 ): Promise<{
-  validFiles: Array<{ fileName: string; flowData: string }>;
+  validFiles: Array<{ fileName: string; flowData: string; content: any }>;
   corruptedFiles: string[];
 }> => {
   const files = event.target.files;
