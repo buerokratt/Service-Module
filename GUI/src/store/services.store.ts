@@ -1,9 +1,5 @@
 import { PaginationState, SortingState } from '@tanstack/react-table';
-import {
-  changeServiceStatus,
-  deleteService as deleteServiceApi,
-  getServicesList,
-} from 'resources/api-constants';
+import { changeServiceStatus, deleteService as deleteServiceApi, getServicesList } from 'resources/api-constants';
 import { Service, ServiceState } from 'types';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
