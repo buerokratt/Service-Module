@@ -26,6 +26,7 @@ const OverviewPage: React.FC = () => {
         <h1>{t('overview.commonServices')}</h1>
       </Track>
       <ServicesTable isCommon />
+      <ExportServicesModal isVisible={isExportModalVisible} onClose={() => setIsExportModalVisible(false)} />
     </>
   );
 };

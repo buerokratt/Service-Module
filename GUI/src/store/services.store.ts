@@ -2,8 +2,6 @@ import { PaginationState, SortingState } from '@tanstack/react-table';
 import {
   changeServiceStatus,
   deleteService as deleteServiceApi,
-  getAvailableIntents,
-  getConnectionRequests,
   getServicesList,
 } from 'resources/api-constants';
 import { Service, ServiceState } from 'types';
