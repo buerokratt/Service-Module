@@ -5,7 +5,6 @@ import { useNavigate } from 'react-router-dom';
 
 import { Button, ExportServicesModal, Track } from '../components';
 import ServicesTable from '../components/ServicesTable';
-import { trainingModuleTraining } from '../resources/api-constants';
 import { ROUTES } from '../resources/routes-constants';
 
 const OverviewPage: React.FC = () => {
@@ -27,11 +26,6 @@ const OverviewPage: React.FC = () => {
         <h1>{t('overview.commonServices')}</h1>
       </Track>
       <ServicesTable isCommon />
-      <p>
-        {t('overview.trainingModuleLink.text')}{' '}
-        <a href={trainingModuleTraining()}>{t('overview.trainingModuleLink.train')}</a>.
-      </p>
-      <ExportServicesModal isVisible={isExportModalVisible} onClose={() => setIsExportModalVisible(false)} />
     </>
   );
 };
