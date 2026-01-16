@@ -146,10 +146,15 @@
     "edit": "Edit",
     "delete": "Delete",
     "cancel": "Cancel",
+    "importMany": "Import many",
+    "import": {
+      "importSuccess": "{{count}} service{{lengthCheck}} imported successfully",
+      "importFailure": "Could not import the following files (Wrong format or corrupted): {{files}}",
+      "failedToImport": "Failed to import services"
+    },
     "exportMany": "Export many",
     "exportAll": "Export All",
     "export": "Export",
-    "exportManyTitle": "Export many",
     "exportAllConfirmation": "Are you sure you want to export all services?",
     "noServicesFound": "No services found",
     "error": {
@@ -531,6 +536,9 @@
     "ROLE_UNAUTHENTICATED": "Unauthenticated"
   },
   "chat": {
+    "unanswered": "Unanswered",
+    "forwarded": "Forwarded",
+    "pending": "Pending",
     "service-test-error": {
       "title": "Service test error",
       "dslName": "Service file",

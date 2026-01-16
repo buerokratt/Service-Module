@@ -288,7 +288,7 @@ export const validateCondition = (node: NodeDataProps | undefined) => {
   return isInvalid ? (i18next.t('toast.missing-condition-rules') ?? 'Error') : null;
 };
 
-function getYamlContent(
+export function getYamlContent(
   nodes: Node<NodeDataProps>[],
   edges: Edge[],
   name: string,
@@ -353,7 +353,8 @@ function getYamlContent(
   finishedFlow.set('declaration', {
     call: 'declare',
     version: 0.1,
-    description: description ?? `Description placeholder for '${name ?? ''}'`,
+    description:
+      description && description.trim().length > 0 ? description : `Description placeholder for '${name ?? ''}'`,
     method: 'post',
     accepts: 'json',
     returns: 'json',

@@ -147,7 +147,7 @@ const ExportServicesModal: FC<ExportServicesModalProps> = ({ isVisible, onClose 
   if (!isVisible) return null;
 
   return (
-    <Modal title={t('overview.exportManyTitle')} onClose={handleCancel}>
+    <Modal title={t('overview.exportMany')} onClose={handleCancel}>
       <div className="export-services-modal">
         <Track
           direction="vertical"

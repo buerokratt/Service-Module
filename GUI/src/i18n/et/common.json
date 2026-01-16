@@ -146,10 +146,15 @@
     "edit": "Muuda",
     "delete": "Kustuta",
     "cancel": "Tühista",
+    "importMany": "Impordi mitu",
+    "import": {
+      "importSuccess": "{{count}} teenus{{lengthCheck}} edukalt imporditud",
+      "importFailure": "Järgmisi faile ei õnnestunud importida (vale vorming või rikutud): {{files}}",
+      "failedToImport": "Teenuste importimine ebaõnnestus"
+    },
     "exportMany": "Ekspordi mitu",
     "exportAll": "Ekspordi kõik",
     "export": "Ekspordi",
-    "exportManyTitle": "Ekspordi mitu",
     "exportAllConfirmation": "Kas olete kindel, et soovite eksportida kõik teenused?",
     "noServicesFound": "Ühtegi teenust ei leitud",
     "error": {
@@ -532,6 +537,9 @@
     "ROLE_UNAUTHENTICATED": "Autentimata"
   },
   "chat": {
+    "unanswered": "Vastamata",
+    "forwarded": "Suunatud",
+    "pending": "Ootel",
     "service-test-error": {
       "title": "Teenuse testimise viga",
       "dslName": "Teenuse fail",
