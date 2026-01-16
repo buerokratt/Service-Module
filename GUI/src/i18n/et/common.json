@@ -161,7 +161,7 @@
     },
     "service": {
       "name": "Nimetus",
-      "linkedIntent": "Ühendatud teema",
+      "description": "Kirjeldus",
       "state": "Olek",
       "states": {
         "active": "Aktiivne",
