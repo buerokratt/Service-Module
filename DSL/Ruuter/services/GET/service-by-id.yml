@@ -65,6 +65,8 @@ prepare_results:
       name: ${service_results.response.body[0].name}
       description: ${service_results.response.body[0].description}
       slot: ${service_results.response.body[0].slot}
+      examples: ${service_results.response.body[0].examples}
+      entities: ${service_results.response.body[0].entities}
       state: ${service_results.response.body[0].state}
       type: ${service_results.response.body[0].type}
       isCommon: ${service_results.response.body[0].isCommon}

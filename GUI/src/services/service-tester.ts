@@ -13,10 +13,10 @@ import { fromSnakeCase, removeTrailingUnderscores } from 'utils/string-util';
 import api, { createApiInstance } from './api';
 
 interface ServiceResponse {
-  response: { content: string }[];
+  response: { content: string; buttons?: string }[];
 }
 
-export const runServiceTest = async (input: string) => {
+export const runServiceTest = async (input: string, serviceName?: string) => {
   const headerValue = validateTestEnvironment();
   if (!headerValue) {
     return;
@@ -35,12 +35,14 @@ export const runServiceTest = async (input: string) => {
     return true;
   }
 
+  const nameToUse = serviceName ?? name;
+
   clearPreviousTestStates(serviceStore);
 
   try {
-    await executeServiceTest(headerValue, state, name, input);
+    await executeServiceTest(headerValue, state, nameToUse, input.split(','));
 
-    const response = await executeService(state, name, input);
+    const response = await executeService(state, nameToUse, input.split(','));
 
     addSuccessMessages(response.data);
   } catch (error) {
@@ -117,7 +119,7 @@ export const clearPreviousTestStates = (serviceStore: ServiceStoreState) => {
   );
 };
 
-export const executeServiceTest = async (headerValue: string, state: ServiceState, name: string, input: string) => {
+export const executeServiceTest = async (headerValue: string, state: ServiceState, name: string, input: string[]) => {
   const testApi = createApiInstance({
     'x-ruuter-testing': headerValue,
   });
@@ -176,11 +178,11 @@ export function isErrorResponse(response: unknown): response is ServiceTestError
 export function hasResponseData(error: unknown): error is { response: { data: unknown } } {
   return Boolean(
     error &&
-      typeof error === 'object' &&
-      'response' in error &&
-      error.response &&
-      typeof error.response === 'object' &&
-      'data' in error.response,
+    typeof error === 'object' &&
+    'response' in error &&
+    error.response &&
+    typeof error.response === 'object' &&
+    'data' in error.response,
   );
 }
 
@@ -208,12 +210,13 @@ export function translateError(error: ServiceTestError, nodeLabel: string): Reco
   return translateObjectKeys(translatedError, 'chat.service-test-error');
 }
 
-export const executeService = async (state: ServiceState, name: string, input: string) => {
+export const executeService = async (state: ServiceState, name: string, input: string[]) => {
   return api.post<ServiceResponse>(testService(state, name), { input });
 };
 
 export const addSuccessMessages = (responseData: ServiceResponse): void => {
+  const res = responseData.response[0];
   const store = useTestServiceStore.getState();
-  store.addBotMessage(responseData.response[0].content);
+  store.addBotMessage(res.content, res.buttons);
   store.addSuccess('chat.service-test-success');
 };

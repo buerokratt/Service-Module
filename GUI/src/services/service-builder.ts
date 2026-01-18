@@ -34,6 +34,7 @@ export async function saveEndpoints(endpoints: EndpointData[], onSuccess?: () =>
   }
 
   endpoints.forEach((endpoint) => {
+    filterOutEndpointsTrailingUnderscores(endpoint);
     if (endpoint.isNew) {
       tasks.push(createEndpointAndUpdateState(endpoint));
     } else {
@@ -48,6 +49,20 @@ export async function saveEndpoints(endpoints: EndpointData[], onSuccess?: () =>
   });
 
   await Promise.all(tasks).then(onSuccess).catch(onError);
+}
+
+function filterOutEndpointsTrailingUnderscores(endpoint: EndpointData) {
+  if (endpoint.definitions) {
+    for (const definition of endpoint.definitions) {
+      for (const section of ['body', 'headers', 'params'] as const) {
+        if (definition[section]?.variables) {
+          for (const v of definition[section].variables) {
+            v.name = removeTrailingUnderscores(v.name);
+          }
+        }
+      }
+    }
+  }
 }
 
 async function createEndpointAndUpdateState(endpoint: EndpointData): Promise<any> {
@@ -68,6 +83,8 @@ interface SaveFlowConfig {
   onError: (e: any) => void;
   description: string;
   slot: string;
+  examples: string[];
+  entities: string[];
   isCommon: boolean;
   serviceId: string;
   isNewService: boolean;
@@ -76,6 +93,7 @@ interface SaveFlowConfig {
 }
 
 const hasInvalidRules = (elements: any[]): boolean => {
+  if (!Array.isArray(elements)) return true;
   return elements.some((e) => {
     if ('children' in e) {
       const group = e as Group;
@@ -134,6 +152,8 @@ export const saveFlow = async ({
   onError,
   description,
   slot,
+  examples,
+  entities,
   isCommon,
   serviceId,
   isNewService,
@@ -157,7 +177,18 @@ export const saveFlow = async ({
 
     await saveService(
       yamlContent,
-      { name, serviceId, description, slot, isCommon, nodes, edges, isNewService } as SaveFlowConfig,
+      {
+        name,
+        serviceId,
+        description,
+        slot,
+        examples,
+        entities,
+        isCommon,
+        nodes,
+        edges,
+        isNewService,
+      } as SaveFlowConfig,
       true,
       status,
       onSuccess,
@@ -181,7 +212,18 @@ export const saveFlow = async ({
 
         await saveService(
           getYamlContent(branchNodes, branchEdges, serviceName, description, showError),
-          { name: serviceName, serviceId, description, slot, isCommon, nodes, edges, isNewService } as SaveFlowConfig,
+          {
+            name: serviceName,
+            serviceId,
+            description,
+            slot,
+            examples,
+            entities,
+            isCommon,
+            nodes,
+            edges,
+            isNewService,
+          } as SaveFlowConfig,
           false,
           status,
         );
@@ -200,7 +242,7 @@ async function saveService(
   onSuccess?: (e: any) => void,
   onError?: (e: any) => void,
 ) {
-  const { isNewService, serviceId, name, description, slot, isCommon, edges, nodes } = config;
+  const { isNewService, serviceId, name, description, slot, examples, entities, isCommon, edges, nodes } = config;
   if (updateServiceDb) {
     useServiceStore.getState().changeServiceName(removeTrailingUnderscores(name));
   }
@@ -212,6 +254,8 @@ async function saveService(
         serviceId,
         description,
         slot,
+        examples,
+        entities,
         type: 'POST',
         content: content,
         isCommon,
@@ -238,12 +282,13 @@ const validateMCQ = (node: NodeDataProps | undefined) => {
 };
 
 export const validateCondition = (node: NodeDataProps | undefined) => {
-  const invalidRulesExist = hasInvalidRules(node?.rules?.children ?? []);
-  const isInvalid = node?.rules?.children === undefined || invalidRulesExist || node?.rules?.children.length === 0;
+  const rulesChildren = Array.isArray(node?.rules?.children) ? node.rules.children : [];
+  const invalidRulesExist = hasInvalidRules(rulesChildren);
+  const isInvalid = !Array.isArray(node?.rules?.children) || invalidRulesExist || node.rules.children.length === 0;
   return isInvalid ? (i18next.t('toast.missing-condition-rules') ?? 'Error') : null;
 };
 
-function getYamlContent(
+export function getYamlContent(
   nodes: Node<NodeDataProps>[],
   edges: Edge[],
   name: string,
@@ -308,7 +353,8 @@ function getYamlContent(
   finishedFlow.set('declaration', {
     call: 'declare',
     version: 0.1,
-    description: description ?? `Description placeholder for '${name ?? ''}'`,
+    description:
+      description && description.trim().length > 0 ? description : `Description placeholder for '${name ?? ''}'`,
     method: 'post',
     accepts: 'json',
     returns: 'json',
@@ -561,9 +607,10 @@ function handleConditionStep(
   const firstChild = nodes.find((node) => node.id === firstChildNode) as Node<NodeDataProps> | undefined;
   const secondChild = nodes.find((node) => node.id === secondChildNode) as Node<NodeDataProps> | undefined;
 
-  const invalidRulesExist = hasInvalidRules(parentNode.data.rules?.children ?? []);
+  const rulesChildren = Array.isArray(parentNode.data.rules?.children) ? parentNode.data.rules.children : [];
+  const invalidRulesExist = hasInvalidRules(rulesChildren);
   const isInvalid =
-    parentNode.data.rules?.children === undefined || invalidRulesExist || parentNode.data.rules?.children.length === 0;
+    !Array.isArray(parentNode.data.rules?.children) || invalidRulesExist || parentNode.data.rules.children.length === 0;
   if (isInvalid) {
     throw new Error(i18next.t('toast.missing-condition-rules') ?? 'Error');
   }
@@ -613,7 +660,7 @@ function handleEndpointStep(
   const endpointDefinition = parentNode.data.endpoint?.definitions[0];
   const paramsVariables = endpointDefinition?.params?.variables;
   const bodyVariables = endpointDefinition?.body?.variables;
-  const isRawBodySelected = endpointDefinition?.body?.isRowSelected ?? false;
+  const isRawBodySelected = endpointDefinition?.body?.isRawSelected ?? false;
   const rawBody = endpointDefinition?.body?.rawData ?? {};
   const headersVariables = endpointDefinition?.headers?.variables;
   const methodType = endpointDefinition?.methodType?.toLowerCase();
@@ -783,6 +830,8 @@ export const saveFlowClick = async (status: 'draft' | 'ready' = 'ready', showErr
   const serviceId = useServiceStore.getState().serviceId;
   const description = useServiceStore.getState().description;
   const slot = useServiceStore.getState().slot;
+  const examples = useServiceStore.getState().examples;
+  const entities = useServiceStore.getState().entities;
   const isCommon = useServiceStore.getState().isCommon;
   const isNewService = useServiceStore.getState().isNewService;
   const edges = useServiceStore.getState().edges;
@@ -812,6 +861,8 @@ export const saveFlowClick = async (status: 'draft' | 'ready' = 'ready', showErr
     },
     description,
     slot,
+    examples,
+    entities,
     isCommon,
     serviceId,
     isNewService,

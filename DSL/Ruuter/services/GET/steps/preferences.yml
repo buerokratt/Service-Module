@@ -48,6 +48,7 @@ seed_default_user_preferences:
     body:
       user_id_code: ${idCode}
   result: seed_preferences_res
+  next: refetch_user_step_preferences
 
 refetch_user_step_preferences:
   call: http.post

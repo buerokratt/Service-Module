@@ -5,17 +5,6 @@ import DateSettings from './DateSettings';
 import { DateTimeBuilderProvider } from './DateTimeBuilderProvider';
 
 // Mock dependencies
-vi.mock('utils/object-util', () => ({
-  getTypeColor: () => ({ color: '#000000' }),
-}));
-
-vi.mock('utils/string-util', () => ({
-  stringToTemplate: (str: string) => `template(${str})`,
-}));
-
-vi.mock('uuid', () => ({
-  v4: () => 'test-uuid-123',
-}));
 
 vi.mock('i18next', () => {
   const mockI18n = {

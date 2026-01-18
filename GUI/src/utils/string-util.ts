@@ -9,6 +9,10 @@ export const stringToTemplate = (value: string | number) => {
   return value ? '${' + value + '}' : '${""}';
 };
 
+export const stringToEscapedTemplate = (value: string | number) => {
+  return value ? '$= ' + value + ' =' : '$= "" =';
+};
+
 export const templateToString = (value: string | number) => {
   const valueString = String(value);
   if (!isTemplate(value)) {

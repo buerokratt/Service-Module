@@ -1,0 +1,42 @@
+.export-services-modal {
+  .data-table {
+    tbody {
+      tr {
+        transition: background-color 0.2s ease;
+
+        &:hover {
+          background-color: rgba(0, 0, 0, 0.03) !important;
+        }
+
+        &[style*='background-color']:hover {
+          background-color: rgba(48, 134, 83, 0.15) !important;
+        }
+
+        td {
+          padding: 12px 8px;
+          vertical-align: middle;
+          text-align: left;
+        }
+      }
+    }
+
+    thead {
+      tr {
+        th {
+          padding: 12px 8px;
+          font-weight: 600;
+          text-align: left;
+        }
+      }
+    }
+
+    td {
+      input[type='checkbox'] {
+        cursor: pointer;
+        width: 18px;
+        height: 18px;
+        margin: 0;
+      }
+    }
+  }
+}

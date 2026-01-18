@@ -29,6 +29,7 @@ const FormRichText: FC<FormRichTextProps> = ({ defaultValue, onChange, quill }) 
       }}
       modules={modules}
       style={{ width: '100%' }}
+      preserveWhitespace
     />
   );
 };

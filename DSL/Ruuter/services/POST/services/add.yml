@@ -7,6 +7,10 @@ declaration:
   returns: json
   namespace: service
   allowlist:
+    header:
+      - field: cookie
+        type: string
+        description: "Cookie field"
     body:
       - field: content
         type: string
@@ -14,9 +18,12 @@ declaration:
       - field: description
         type: string
         description: "Body field 'description'"
-      - field: slot
-        type: string
-        description: "Slot input"
+      - field: entities
+        type: object
+        description: "Body field 'Entities'"
+      - field: examples
+        type: object
+        description: "Body field 'Examples'"
       - field: isCommon
         type: boolean
         description: "Body field 'isCommon'"
@@ -49,7 +56,9 @@ extract_request_data:
   assign:
     name: ${incoming.body.name}
     description: ${incoming.body.description}
-    slot: ${incoming.body.slot}
+    slot: ${""}
+    entities: ${incoming.body.entities}
+    examples: ${incoming.body.examples}
     type: ${incoming.body.type.toUpperCase()}
     content: ${incoming.body.content}
     serviceId: ${incoming.body.serviceId}
@@ -87,6 +96,8 @@ service_add:
       name: ${name}
       description: ${description}
       slot: ${slot}
+      entities: ${entities}
+      examples: ${examples}
       ruuter_type: ${type}
       service_id: ${serviceId}
       is_common: ${isCommon}

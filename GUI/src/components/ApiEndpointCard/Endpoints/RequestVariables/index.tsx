@@ -297,13 +297,13 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
       endpoint.definitions[0].body = {
         variables: variables,
         rawData: {},
-        isRowSelected: false,
+        isRawSelected: false,
       };
     } else if (requestTab.tab === 'headers') {
       endpoint.definitions[0].headers = {
         variables: variables,
         rawData: {},
-        isRowSelected: false,
+        isRawSelected: false,
       };
     }
   };
@@ -395,14 +395,14 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
               style={{ width: 'fit-content' }}
               label={''}
               name={'raw-data'}
-              checked={endpoint.definitions[0][requestTab.tab]?.isRowSelected ?? requestTab.showRawData}
+              checked={endpoint.definitions[0][requestTab.tab]?.isRawSelected ?? requestTab.showRawData}
               onCheckedChange={(checked) => {
                 setRequestTab((rt) => {
                   rt.showRawData = checked;
                   return rt;
                 });
                 if (endpoint.definitions[0][requestTab.tab]) {
-                  endpoint.definitions[0][requestTab.tab]!.isRowSelected = checked;
+                  endpoint.definitions[0][requestTab.tab]!.isRawSelected = checked;
                 }
                 setKey(key + 1);
               }}
@@ -413,7 +413,7 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
       </Track>
       {Object.keys(rowsData).map((tab) => (
         <Tabs.Content className="endpoint-tab-group__tab-content" value={tab} key={tab}>
-          {(requestTab.showRawData || endpoint.definitions[0][requestTab.tab]?.isRowSelected) &&
+          {(requestTab.showRawData || endpoint.definitions[0][requestTab.tab]?.isRawSelected) &&
           requestTab.tab === 'body' ? (
             buildRawDataView()
           ) : (

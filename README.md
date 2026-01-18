@@ -152,3 +152,7 @@ The repository uses [SQLFluff](https://sqlfluff.com/) for linting and formatting
 | Ruuter Variable                    | GUI Variable                               | Description                                          | Required | Default Value       |
 | ---------------------------------- | ------------------------------------------ | ---------------------------------------------------- | -------- | ------------------- |
 | `application.apiRequestTestingKey` | `REACT_APP_RUUTER_SERVICES_TESTING_HEADER` | `x-ruuter-testing` header value for testing services |          | `voorshpellhappilo` |
+
+## Intent Classification 
+
+Flow is desribed in [INTENT CLASSIFICATION README](./docs/INTENT_CLASSIFICATION.MD)
