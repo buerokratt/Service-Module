@@ -42,6 +42,30 @@ const LinkPreview: React.FC<{
 
 const hasSpecialFormat = (m: string) => m.includes('\n\n') && m.indexOf('.') > 0 && m.indexOf(':') > m.indexOf('.');
 
+function formatMessage(message?: string): string {
+  if (!message) return '';
+
+  const filteredMessage = message
+    .replaceAll(/\\?\$b\w*/g, '')
+    .replaceAll(/\\?\$v\w*/g, '')
+    .replaceAll(/\\?\$g\w*/g, '');
+
+  return filteredMessage
+    .replaceAll(/&#x([0-9A-Fa-f]+);/g, (_, hex: string) => String.fromCharCode(parseInt(hex, 16)))
+    .replaceAll(/(^|\n)(\d{4})\.\s/g, (match, prefix, year) => {
+      const remainingText = filteredMessage.substring(filteredMessage.indexOf(match) + match.length);
+      const sentenceEnd = remainingText.indexOf('\n\n');
+      if (sentenceEnd !== -1) {
+        const currentSentence = remainingText.substring(0, sentenceEnd);
+        if (currentSentence.trim().endsWith(':')) {
+          return `${prefix}${year}. `;
+        }
+      }
+      return `${prefix}${year}\\. `;
+    })
+    .replace(/(?<=\n)\d+\.\s/g, hasSpecialFormat(filteredMessage) ? '\n\n$&' : '$&');
+}
+
 const Markdownify: React.FC<MarkdownifyProps> = ({ message, sanitizeLinks = false }) => (
   <div className={'reset'}>
     <Markdown
@@ -58,9 +82,7 @@ const Markdownify: React.FC<MarkdownifyProps> = ({ message, sanitizeLinks = fals
         disableParsingRawHTML: true,
       }}
     >
-      {message
-        ?.replaceAll(/&#x([0-9A-Fa-f]+);/g, (_, hex: string) => String.fromCodePoint(Number.parseInt(hex, 16)))
-        ?.replaceAll(/(?<=\n)\d+\.\s/g, hasSpecialFormat(message) ? '\n\n$&' : '$&') ?? ''}
+      {formatMessage(message)}
     </Markdown>
   </div>
 );
