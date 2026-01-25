@@ -426,7 +426,7 @@ export function getYamlContent(
       }
 
       if (parentNode.data.stepType === StepType.MultiChoiceQuestion) {
-        return handleMultiChoiceQuestion(finishedFlow, parentStepName, parentNode, childNode);
+        return handleMultiChoiceQuestion(finishedFlow, parentStepName, parentNode, childNode, name);
       }
 
       if (parentNode.data.stepType === StepType.DynamicChoices) {
@@ -711,7 +711,13 @@ function handleMultiChoiceQuestion(
   parentStepName: string,
   parentNode: Node<NodeDataProps>,
   childNode: Node<NodeDataProps> | undefined,
+  serviceName: string,
 ) {
+
+  parentNode.data.multiChoiceQuestion?.buttons.forEach(
+    (b) => (b.payload = b.payload.replaceAll('/_mcq_', `/${serviceName}_mcq_`)),
+  );
+
   return finishedFlow.set(parentStepName, {
     assign: {
       buttons: parentNode?.data?.multiChoiceQuestion?.buttons ?? [],
