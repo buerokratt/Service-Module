@@ -713,7 +713,6 @@ function handleMultiChoiceQuestion(
   childNode: Node<NodeDataProps> | undefined,
   serviceName: string,
 ) {
-
   parentNode.data.multiChoiceQuestion?.buttons.forEach(
     (b) => (b.payload = b.payload.replaceAll('/_mcq_', `/${serviceName}_mcq_`)),
   );
