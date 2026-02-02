@@ -121,10 +121,17 @@ function useEdgeAdd(id: string) {
 
       return newNodes;
     });
-
-    setTimeout(() => {
-      useServiceStore.getState().saveToHistory();
-    }, 0);
+    
+    const isFinishingStep = [
+      StepType.DynamicChoices,
+      StepType.FinishingStepEnd,
+      StepType.FinishingStepRedirect,
+    ].includes(stepType);
+    if (!isFinishingStep) {
+      setTimeout(() => {
+        useServiceStore.getState().saveToHistory();
+      }, 0);
+    }
   };
   return handleEdgeClick;
 }
