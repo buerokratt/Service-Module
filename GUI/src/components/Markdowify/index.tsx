@@ -63,7 +63,8 @@ function formatMessage(message?: string): string {
       }
       return `${prefix}${year}\\. `;
     })
-    .replace(/(?<=\n)\d+\.\s/g, hasSpecialFormat(filteredMessage) ? '\n\n$&' : '$&');
+    .replaceAll(/(?<=\n)\d+\.\s/g, hasSpecialFormat(filteredMessage) ? '\n\n$&' : '$&')
+    .replaceAll(/^(\s+)/g, (match) => match.replaceAll(' ', '&nbsp;'));
 }
 
 const Markdownify: React.FC<MarkdownifyProps> = ({ message, sanitizeLinks = false }) => (

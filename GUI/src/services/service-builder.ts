@@ -578,14 +578,17 @@ function handleTextField(
     ],
   });
 
+  const spacePlaceholder = '___SPACE___';
+  const markdownMessage = htmlToMarkdown.translate(
+    typeof parentNode.data.message === 'string'
+      ? parentNode.data.message.replace('{{', '${').replace('}}', '}').replaceAll(' ', spacePlaceholder)
+      : '',
+  ).replaceAll(spacePlaceholder, ' ');
+
   finishedFlow.set(parentStepName, {
     assign: {
       res: {
-        result: `${htmlToMarkdown.translate(
-          typeof parentNode.data.message === 'string'
-            ? parentNode.data.message.replace('{{', '${').replace('}}', '}')
-            : '',
-        )}`,
+        result: markdownMessage,
       },
     },
     next: childNode ? toSnakeCase(childNode.data.label ?? 'format_messages') : 'format_messages',
