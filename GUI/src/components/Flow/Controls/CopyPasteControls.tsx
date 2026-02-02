@@ -293,15 +293,18 @@ const CopyPasteControls: FC<CopyPasteControlsProps> = ({ onNodesDelete }) => {
       }
     });
 
-    setNodes((prevNodes) => [...prevNodes, ...newNodes, ...ghostNodes]);
-    setEdges((prevEdges) => [...prevEdges, ...newEdges, ...ghostEdges]);
+    const currentEdges = getEdges();
+    const finalNodes = [...currentNodes, ...newNodes, ...ghostNodes];
+    const finalEdges = [...currentEdges, ...newEdges, ...ghostEdges];
+    setNodes(finalNodes);
+    setEdges(finalEdges);
     setHasUnsavedChanges(true);
-    saveToHistory();
+    saveToHistory({ nodes: finalNodes, edges: finalEdges });
 
     useToastStore
       .getState()
       .success({ title: t('serviceFlow.nodesPasted', { count: newNodes.length, s: newNodes.length > 1 ? 's' : '' }) });
-  }, [fallbackClipboardData, getNodes, setNodes, setEdges, setHasUnsavedChanges, t, saveToHistory]);
+  }, [fallbackClipboardData, getEdges, getNodes, setNodes, setEdges, setHasUnsavedChanges, t, saveToHistory]);
 
   const cutNodes = useCallback(async () => {
     if (selectedNodes.length === 0) {

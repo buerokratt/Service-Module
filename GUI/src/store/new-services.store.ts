@@ -143,7 +143,7 @@ export interface ServiceStoreState {
   handleProgrammaticNavigation: (to: string) => boolean;
   history: { nodes: Node[]; edges: Edge[] }[];
   historyIndex: number;
-  saveToHistory: () => void;
+  saveToHistory: (state?: { nodes: Node[]; edges: Edge[] }) => void;
   undo: () => void;
   redo: () => void;
   canUndo: () => boolean;
@@ -820,13 +820,18 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
         });
       });
   },
-  saveToHistory: () => {
+  saveToHistory: (stateOverride?: { nodes: Node[]; edges: Edge[] }) => {
     const { nodes, edges, history, historyIndex } = get();
 
-    const currentState = {
-      nodes: JSON.parse(JSON.stringify(nodes)),
-      edges: JSON.parse(JSON.stringify(edges)),
-    };
+    const currentState = stateOverride
+      ? {
+          nodes: JSON.parse(JSON.stringify(stateOverride.nodes)),
+          edges: JSON.parse(JSON.stringify(stateOverride.edges)),
+        }
+      : {
+          nodes: JSON.parse(JSON.stringify(nodes)),
+          edges: JSON.parse(JSON.stringify(edges)),
+        };
 
     const lastState = history[historyIndex];
 
