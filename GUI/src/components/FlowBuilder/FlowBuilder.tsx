@@ -72,25 +72,27 @@ const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
         return targetNode?.type === 'ghost';
       });
 
+      let finalNodes = nodes;
+      let finalEdges = edges;
+
       if (ghostEdges.length > 0) {
         const ghostNodeIds = new Set(ghostEdges.map((edge) => edge.target));
-        const updatedEdges = edges.filter((edge) => !ghostEdges.includes(edge));
-        const updatedNodes = nodes.filter((node) => !ghostNodeIds.has(node.id));
-        setNodes(updatedNodes);
-        setEdges(updatedEdges);
+        finalEdges = edges.filter((edge) => !ghostEdges.includes(edge));
+        finalNodes = nodes.filter((node) => !ghostNodeIds.has(node.id));
       }
 
-      setEdges((eds) => [
-        ...eds,
-        {
-          id: `${source}->${target}`,
-          source: source,
-          target: target,
-          type: 'step',
-        },
-      ]);
+      const newEdge = {
+        id: `${source}->${target}`,
+        source: source,
+        target: target,
+        type: 'step',
+      };
+      finalEdges = [...finalEdges, newEdge];
+
+      setNodes(finalNodes);
+      setEdges(finalEdges);
       setHasUnsavedChanges(true);
-      saveToHistory();
+      saveToHistory({ nodes: finalNodes, edges: finalEdges });
     },
     [getEdges, getNodes, setEdges, setHasUnsavedChanges, setNodes, saveToHistory],
   );
