@@ -844,8 +844,7 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
       return;
     }
 
-    const truncatedHistory =
-      historyIndex < history.length - 1 ? history.slice(0, historyIndex + 1) : history;
+    const truncatedHistory = historyIndex < history.length - 1 ? history.slice(0, historyIndex + 1) : history;
 
     truncatedHistory.push(currentState);
 

@@ -121,7 +121,7 @@ function useEdgeAdd(id: string) {
 
       return newNodes;
     });
-    
+
     const isFinishingStep = [
       StepType.DynamicChoices,
       StepType.FinishingStepEnd,
