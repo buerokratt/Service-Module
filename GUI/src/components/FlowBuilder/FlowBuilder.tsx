@@ -178,13 +178,13 @@ const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
         onEdgesDelete={(edges) => {
           onEdgesDelete(edges);
           setHasUnsavedChanges(true);
-          saveToHistory();
+          setTimeout(() => saveToHistory(), 0);
         }}
         onBeforeDelete={onBeforeDelete}
         onNodesDelete={(nodes) => {
           onNodesDelete(nodes);
           setHasUnsavedChanges(true);
-          saveToHistory();
+          setTimeout(() => saveToHistory(), 0);
         }}
         fitView
         fitViewOptions={{ padding: 5 }}
