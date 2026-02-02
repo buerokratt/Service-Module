@@ -20,7 +20,7 @@ interface CopyPasteControlsProps {
 const CopyPasteControls: FC<CopyPasteControlsProps> = ({ onNodesDelete }) => {
   const { getNodes, getEdges, setNodes, setEdges } = useReactFlow();
   const { t } = useTranslation();
-  const { setHasUnsavedChanges, saveToHistory } = useServiceStore();
+  const { setHasUnsavedChanges, saveToHistory, setNodes: setStoreNodes, setEdges: setStoreEdges } = useServiceStore();
   const [hasClipboardData, setHasClipboardData] = useState<boolean>(false);
   const selectedNodes = useServiceStore((state) => state.flowSelectedNodes);
   const reactFlowInstance = useServiceStore.getState().reactFlowInstance;
@@ -147,9 +147,11 @@ const CopyPasteControls: FC<CopyPasteControlsProps> = ({ onNodesDelete }) => {
       const uniqueLabel = generateUniqueLabel(node.data.label as string, allExistingNodes);
       processedLabels.add(uniqueLabel);
 
+      const position = node.position ?? { x: 0, y: 0 };
       return {
         ...node,
         id: newId,
+        position: { x: position.x, y: position.y },
         selected: false,
         data: {
           ...node.data,
@@ -296,6 +298,8 @@ const CopyPasteControls: FC<CopyPasteControlsProps> = ({ onNodesDelete }) => {
     const currentEdges = getEdges();
     const finalNodes = [...currentNodes, ...newNodes, ...ghostNodes];
     const finalEdges = [...currentEdges, ...newEdges, ...ghostEdges];
+    setStoreNodes(finalNodes);
+    setStoreEdges(finalEdges);
     setNodes(finalNodes);
     setEdges(finalEdges);
     setHasUnsavedChanges(true);
@@ -304,7 +308,7 @@ const CopyPasteControls: FC<CopyPasteControlsProps> = ({ onNodesDelete }) => {
     useToastStore
       .getState()
       .success({ title: t('serviceFlow.nodesPasted', { count: newNodes.length, s: newNodes.length > 1 ? 's' : '' }) });
-  }, [fallbackClipboardData, getEdges, getNodes, setNodes, setEdges, setHasUnsavedChanges, t, saveToHistory]);
+  }, [fallbackClipboardData, getEdges, getNodes, setNodes, setEdges, setStoreNodes, setStoreEdges, setHasUnsavedChanges, t, saveToHistory]);
 
   const cutNodes = useCallback(async () => {
     if (selectedNodes.length === 0) {
