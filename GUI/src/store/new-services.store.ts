@@ -143,7 +143,7 @@ export interface ServiceStoreState {
   handleProgrammaticNavigation: (to: string) => boolean;
   history: { nodes: Node[]; edges: Edge[] }[];
   historyIndex: number;
-  saveToHistory: () => void;
+  saveToHistory: (state?: { nodes: Node[]; edges: Edge[] }) => void;
   undo: () => void;
   redo: () => void;
   canUndo: () => boolean;
@@ -820,13 +820,18 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
         });
       });
   },
-  saveToHistory: () => {
+  saveToHistory: (stateOverride?: { nodes: Node[]; edges: Edge[] }) => {
     const { nodes, edges, history, historyIndex } = get();
 
-    const currentState = {
-      nodes: JSON.parse(JSON.stringify(nodes)),
-      edges: JSON.parse(JSON.stringify(edges)),
-    };
+    const currentState = stateOverride
+      ? {
+          nodes: JSON.parse(JSON.stringify(stateOverride.nodes)),
+          edges: JSON.parse(JSON.stringify(stateOverride.edges)),
+        }
+      : {
+          nodes: JSON.parse(JSON.stringify(nodes)),
+          edges: JSON.parse(JSON.stringify(edges)),
+        };
 
     const lastState = history[historyIndex];
 
@@ -839,11 +844,13 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
       return;
     }
 
-    history.push(currentState);
+    const truncatedHistory = historyIndex < history.length - 1 ? history.slice(0, historyIndex + 1) : history;
+
+    truncatedHistory.push(currentState);
 
     set({
-      history,
-      historyIndex: historyIndex + 1,
+      history: truncatedHistory,
+      historyIndex: truncatedHistory.length - 1,
       hasUnsavedChanges: true,
     });
   },
@@ -855,8 +862,10 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
 
       nodes = nodes.map((node: any) => {
         if (node.type !== 'custom') return node;
+        const { stepType, ...restData } = node.data;
         node.data = {
-          ...node.data,
+          ...restData,
+          stepType,
           onDelete: get().onDelete,
           setClickedNode: get().setClickedNode,
           onEdit: get().handleNodeEdit,
@@ -882,8 +891,10 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
 
       nodes = nodes.map((node: any) => {
         if (node.type !== 'custom') return node;
+        const { stepType, ...restData } = node.data;
         node.data = {
-          ...node.data,
+          ...restData,
+          stepType,
           onDelete: get().onDelete,
           setClickedNode: get().setClickedNode,
           onEdit: get().handleNodeEdit,
