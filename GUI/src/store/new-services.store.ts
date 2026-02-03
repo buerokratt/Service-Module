@@ -26,7 +26,13 @@ import { saveFlowClick } from 'services/service-builder';
 import { EndpointDefinitionJson, Service, ServiceState, Step, StepType } from 'types';
 import { Assign } from 'types/assign';
 import { Chip } from 'types/chip';
-import { EndpointData, EndpointDefinition, EndpointEnv, EndpointTab, PreDefinedEndpointEnvVariables } from 'types/endpoint';
+import {
+  EndpointData,
+  EndpointDefinition,
+  EndpointEnv,
+  EndpointTab,
+  PreDefinedEndpointEnvVariables,
+} from 'types/endpoint';
 import { EndpointResponseVariable } from 'types/endpoint/endpoint-response-variables';
 import { EndpointType } from 'types/endpoint/endpoint-type';
 import { RequestVariablesTabsRawData, RequestVariablesTabsRowsData } from 'types/request-variables';
