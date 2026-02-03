@@ -289,6 +289,12 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
         }
 
         chips.push({
+          name: 'Base Response',
+          value: `${endpoint?.name.replaceAll(' ', '_')}_res.response.body`,
+          data: `${endpoint?.name.replaceAll(' ', '_')}_res.response.body`,
+        });
+
+        chips.push({
           name: 'Status Code',
           value: `${endpoint?.name.replaceAll(' ', '_')}_res.response.statusCodeValue`,
           data: `${endpoint?.name.replaceAll(' ', '_')}_res.response.statusCodeValue`,
