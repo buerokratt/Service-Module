@@ -113,7 +113,26 @@ const hasInvalidElements = (elements: any[]): boolean => {
   });
 };
 
-const buildConditionString = (group: any): string => {
+const getAssignedVariableNames = (nodes: Node[]): Set<string> => {
+  const names = new Set(['chatId', 'authorId', 'input', 'buttons', 'res']);
+  for (const node of nodes) {
+    const data = node.data as NodeDataProps | undefined;
+    if (data?.stepType === StepType.Assign && Array.isArray(data.assignElements)) {
+      for (const e of data.assignElements) {
+        const key = e.key?.replaceAll('${', '').replaceAll('}', '').trim();
+        if (key) names.add(key);
+      }
+    }
+  }
+  return names;
+};
+
+const buildConditionString = (group: any, assignedVariableNames: Set<string>): string => {
+  const formatField = (rawField: string): string => {
+    if (assignedVariableNames.has(rawField)) return rawField;
+    return isNumericString(rawField) ? rawField : `"${rawField}"`;
+  };
+
   if ('children' in group) {
     const subgroup = group as Group;
     if (subgroup.children.length === 0) {
@@ -122,12 +141,14 @@ const buildConditionString = (group: any): string => {
 
     const conditions = subgroup.children.map((child) => {
       if ('children' in child) {
-        return `(${buildConditionString(child)})`;
+        return `(${buildConditionString(child, assignedVariableNames)})`;
       } else {
         const rule = child;
+        const rawField = rule.field.replaceAll('${', '').replaceAll('}', '');
         const absoluteValue = removeWrapperQuotes(rule.value.replaceAll('${', '').replaceAll('}', ''));
         const value = isNumericString(absoluteValue) ? absoluteValue : `"${absoluteValue}"`;
-        return `${rule.field.replaceAll('${', '').replaceAll('}', '')} ${rule.operator} ${value}`;
+        const field = formatField(rawField);
+        return `${field} ${rule.operator} ${value}`;
       }
     });
 
@@ -138,9 +159,11 @@ const buildConditionString = (group: any): string => {
     }
   } else {
     const rule = group as Rule;
+    const rawField = rule.field.replaceAll('${', '').replaceAll('}', '');
     const absoluteValue = removeWrapperQuotes(rule.value.replaceAll('${', '').replaceAll('}', ''));
     const value = isNumericString(absoluteValue) ? absoluteValue : `"${absoluteValue}"`;
-    return `${rule.field.replaceAll('${', '').replaceAll('}', '')} ${rule.operator} ${value}`;
+    const field = formatField(rawField);
+    return `${field} ${rule.operator} ${value}`;
   }
 };
 
@@ -426,7 +449,7 @@ export function getYamlContent(
       }
 
       if (parentNode.data.stepType === StepType.MultiChoiceQuestion) {
-        return handleMultiChoiceQuestion(finishedFlow, parentStepName, parentNode, childNode);
+        return handleMultiChoiceQuestion(finishedFlow, parentStepName, parentNode, childNode, name);
       }
 
       if (parentNode.data.stepType === StepType.DynamicChoices) {
@@ -618,10 +641,11 @@ function handleConditionStep(
     throw new Error(i18next.t('toast.missing-condition-rules') ?? 'Error');
   }
 
+  const assignedVariableNames = getAssignedVariableNames(nodes);
   finishedFlow.set(parentStepName, {
     switch: [
       {
-        condition: `\${${buildConditionString(parentNode.data.rules)}}`,
+        condition: `\${${buildConditionString(parentNode.data.rules, assignedVariableNames)}}`,
         next: toSnakeCase(firstChild?.data?.label ?? '') ?? '',
       },
     ],
@@ -714,7 +738,12 @@ function handleMultiChoiceQuestion(
   parentStepName: string,
   parentNode: Node<NodeDataProps>,
   childNode: Node<NodeDataProps> | undefined,
+  serviceName: string,
 ) {
+  parentNode.data.multiChoiceQuestion?.buttons.forEach(
+    (b) => (b.payload = b.payload.replaceAll('/_mcq_', `/${serviceName}_mcq_`)),
+  );
+
   return finishedFlow.set(parentStepName, {
     assign: {
       buttons: parentNode?.data?.multiChoiceQuestion?.buttons ?? [],
@@ -858,9 +887,6 @@ export const saveFlowClick = async (status: 'draft' | 'ready' = 'ready', showErr
         title: i18next.t('newService.toast.failed'),
         message: e.response?.status === 409 ? t('newService.toast.serviceNameAlreadyExists') : e?.message,
       });
-      throw new Error(
-        e.response?.status === 409 ? t('newService.toast.serviceNameAlreadyExists').toString() : e?.message,
-      );
     },
     description,
     slot,
