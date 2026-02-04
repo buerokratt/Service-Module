@@ -30,12 +30,12 @@ const RuleElement: React.FC<RuleElementProps> = ({ rule, onRemove, onChange }) =
 
   const handleFieldDrop = (e: React.DragEvent<HTMLInputElement>) => {
     const data = getDragData(e);
-    onChange({ ...rule, field: data.value });
+    onChange({ ...rule, field: data.key });
   };
 
   const handleValueDrop = (e: React.DragEvent<HTMLInputElement>) => {
     const data = getDragData(e);
-    onChange({ ...rule, value: data.value });
+    onChange({ ...rule, value: data.key });
   };
 
   const handleSelectionChange = (e: { label: string; value: string } | null) => {
@@ -50,7 +50,7 @@ const RuleElement: React.FC<RuleElementProps> = ({ rule, onRemove, onChange }) =
     onChange({
       ...rule,
       fieldDragElement: dragElement,
-      field: dragElement.value,
+      field: dragElement.key,
       isFieldManual: false,
     });
   };
@@ -59,7 +59,7 @@ const RuleElement: React.FC<RuleElementProps> = ({ rule, onRemove, onChange }) =
     onChange({
       ...rule,
       valueDragElement: dragElement,
-      value: dragElement.value,
+      value: dragElement.key,
       isValueManual: false,
     });
   };
