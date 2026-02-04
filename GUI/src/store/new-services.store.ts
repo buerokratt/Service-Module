@@ -26,7 +26,13 @@ import { saveFlowClick } from 'services/service-builder';
 import { EndpointDefinitionJson, Service, ServiceState, Step, StepType } from 'types';
 import { Assign } from 'types/assign';
 import { Chip } from 'types/chip';
-import { EndpointData, EndpointEnv, EndpointTab, PreDefinedEndpointEnvVariables } from 'types/endpoint';
+import {
+  EndpointData,
+  EndpointDefinition,
+  EndpointEnv,
+  EndpointTab,
+  PreDefinedEndpointEnvVariables,
+} from 'types/endpoint';
 import { EndpointResponseVariable } from 'types/endpoint/endpoint-response-variables';
 import { EndpointType } from 'types/endpoint/endpoint-type';
 import { RequestVariablesTabsRawData, RequestVariablesTabsRowsData } from 'types/request-variables';
@@ -259,7 +265,7 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
           url: endpoint.url,
           method: endpoint.methodType,
           headers: extractMapValues(endpoint.headers),
-          body: extractMapValues(endpoint.body),
+          body: getEndpointBody(endpoint),
           params: extractMapValues(endpoint.params),
         })),
       );
@@ -281,6 +287,12 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
             data: value,
           });
         }
+
+        chips.push({
+          name: 'Base Response',
+          value: `${endpoint?.name.replaceAll(' ', '_')}_res.response.body`,
+          data: `${endpoint?.name.replaceAll(' ', '_')}_res.response.body`,
+        });
 
         chips.push({
           name: 'Status Code',
@@ -915,7 +927,24 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
   canRedo: () => get().historyIndex < get().history.length - 1,
 }));
 
-function extractMapValues(element: any) {
+export function getEndpointBody(endpoint: EndpointDefinition): any {
+  const isRawBodySelected = endpoint?.body?.isRawSelected ?? false;
+  const rawBody = endpoint?.body?.rawData ?? {};
+  let body: any = extractMapValues(endpoint.body);
+
+  if (isRawBodySelected) {
+    try {
+      const rawJson = JSON.parse(rawBody?.value ?? '');
+      body = rawJson;
+    } catch (e: any) {
+      body = extractMapValues(endpoint.body);
+      console.log(`Unable to save JSON to Yaml. ${e.message}`);
+    }
+  }
+  return body;
+}
+
+export function extractMapValues(element: any) {
   if (!element) return {};
 
   if (element.rawData && element.rawData.length > 0) {

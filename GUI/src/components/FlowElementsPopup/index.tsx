@@ -4,7 +4,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { useTranslation } from 'react-i18next';
-import useServiceStore from 'store/new-services.store';
+import useServiceStore, { extractMapValues, getEndpointBody } from 'store/new-services.store';
 import useServiceListStore from 'store/services.store';
 import useToastStore from 'store/toasts.store';
 import { DynamicChoices } from 'types/dynamic-choices';
@@ -318,7 +318,7 @@ const FlowElementsPopup: React.FC = () => {
             url: endpoint.url,
             method: endpoint.methodType,
             headers: extractMapValues(endpoint.headers),
-            body: extractMapValues(endpoint.body),
+            body: getEndpointBody(endpoint),
             params: extractMapValues(endpoint.params),
           },
         ],
@@ -329,20 +329,6 @@ const FlowElementsPopup: React.FC = () => {
       console.error('Error: ', error);
     }
   };
-
-  function extractMapValues(element: any) {
-    if (element?.rawData && element?.rawData?.length > 0) {
-      return element.rawData.value;
-    }
-
-    let result: any = {};
-    if (element?.variables) {
-      for (const entry of element.variables) {
-        result = { ...result, [entry.name]: entry.value };
-      }
-    }
-    return result;
-  }
 
   const getJsonRequestButtonTitle = () => {
     if (!isUserDefinedNode || selectedTab === t('serviceFlow.tabs.test')) return '';
