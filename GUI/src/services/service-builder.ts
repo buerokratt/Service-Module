@@ -609,7 +609,7 @@ function handleTextField(
         : '',
     )
     .replaceAll(spacePlaceholder, ' ')
-    .replaceAll(/\\([-~>[\]_*#().!`=<\\])/g, String.raw`\\$1`);;
+    .replaceAll(/\\([-~>[\]_*#().!`=<\\])/g, String.raw`\\$1`);
 
   finishedFlow.set(parentStepName, {
     assign: {
