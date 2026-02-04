@@ -602,11 +602,14 @@ function handleTextField(
   });
 
   const spacePlaceholder = '___SPACE___';
-  const markdownMessage = htmlToMarkdown.translate(
-    typeof parentNode.data.message === 'string'
-      ? parentNode.data.message.replace('{{', '${').replace('}}', '}').replaceAll(' ', spacePlaceholder)
-      : '',
-  ).replaceAll(spacePlaceholder, ' ');
+  const markdownMessage = htmlToMarkdown
+    .translate(
+      typeof parentNode.data.message === 'string'
+        ? parentNode.data.message.replace('{{', '${').replace('}}', '}').replaceAll(' ', spacePlaceholder)
+        : '',
+    )
+    .replaceAll(spacePlaceholder, ' ')
+    .replaceAll(/\\([-~>[\]_*#().!`=<\\])/g, String.raw`\\$1`);;
 
   finishedFlow.set(parentStepName, {
     assign: {

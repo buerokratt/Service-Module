@@ -55,6 +55,12 @@ function formatMessage(message?: string): string {
 
   return filteredMessage
     .replaceAll(/&#x([0-9A-Fa-f]+);/g, (_, hex: string) => String.fromCharCode(parseInt(hex, 16)))
+    .replaceAll('&amp;', '&')
+    .replaceAll('&gt;', '>')
+    .replaceAll('&lt;', '<')
+    .replaceAll('&quot;', '"')
+    .replaceAll('&#39;', "'")
+    .replaceAll('&apos;', "'")
     .replaceAll(/(^|\n)(\d{4})\.\s/g, (match, prefix, year) => {
       const remainingText = filteredMessage.substring(filteredMessage.indexOf(match) + match.length);
       const sentenceEnd = remainingText.indexOf('\n\n');
