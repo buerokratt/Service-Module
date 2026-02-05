@@ -611,10 +611,17 @@ function handleTextField(
     .replaceAll(spacePlaceholder, ' ')
     .replaceAll(/\\([-~>[\]_*#().!`=<\\])/g, String.raw`\\$1`);
 
+  let finalMessage = markdownMessage;
+  const trimmedMessage = markdownMessage.trim().toLowerCase();
+
+  if (trimmedMessage === 'yes' || trimmedMessage === 'no') {
+    finalMessage = `\${"${trimmedMessage}"}`;
+  }
+
   finishedFlow.set(parentStepName, {
     assign: {
       res: {
-        result: markdownMessage,
+        result: finalMessage,
       },
     },
     next: childNode ? toSnakeCase(childNode.data.label ?? 'format_messages') : 'format_messages',
