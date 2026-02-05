@@ -63,8 +63,13 @@
       white-space: nowrap;
       max-width: 318px;
 
-      p {
+      p,
+      div {
         display: inline;
+      }
+
+      br {
+        display: none;
       }
     }
 
