@@ -54,7 +54,24 @@
     max-width: 350px;
     width: 100%;
     min-height: 65px;
+    max-height: 65px;
     align-content: center;
+
+    .step-node-content {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      max-width: 318px;
+
+      p,
+      div {
+        display: inline;
+      }
+
+      br {
+        display: none;
+      }
+    }
 
     &.selected {
       border: dashed 1px get-color(black-coral-1);

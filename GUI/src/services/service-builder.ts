@@ -146,7 +146,7 @@ const buildConditionString = (group: any, assignedVariableNames: Set<string>): s
         const rule = child;
         const rawField = rule.field.replaceAll('${', '').replaceAll('}', '');
         const absoluteValue = removeWrapperQuotes(rule.value.replaceAll('${', '').replaceAll('}', ''));
-        const value = isNumericString(absoluteValue) ? absoluteValue : `"${absoluteValue}"`;
+        const value = formatField(absoluteValue);
         const field = formatField(rawField);
         return `${field} ${rule.operator} ${value}`;
       }
@@ -161,7 +161,7 @@ const buildConditionString = (group: any, assignedVariableNames: Set<string>): s
     const rule = group as Rule;
     const rawField = rule.field.replaceAll('${', '').replaceAll('}', '');
     const absoluteValue = removeWrapperQuotes(rule.value.replaceAll('${', '').replaceAll('}', ''));
-    const value = isNumericString(absoluteValue) ? absoluteValue : `"${absoluteValue}"`;
+    const value = formatField(absoluteValue);
     const field = formatField(rawField);
     return `${field} ${rule.operator} ${value}`;
   }
