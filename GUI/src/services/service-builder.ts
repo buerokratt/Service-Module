@@ -601,14 +601,27 @@ function handleTextField(
     ],
   });
 
+  const spacePlaceholder = '___SPACE___';
+  const markdownMessage = htmlToMarkdown
+    .translate(
+      typeof parentNode.data.message === 'string'
+        ? parentNode.data.message.replace('{{', '${').replace('}}', '}').replaceAll(' ', spacePlaceholder)
+        : '',
+    )
+    .replaceAll(spacePlaceholder, ' ')
+    .replaceAll(/\\([-~>[\]_*#().!`=<\\])/g, String.raw`\\$1`);
+
+  let finalMessage = markdownMessage;
+  const trimmedMessage = markdownMessage.trim().toLowerCase();
+
+  if (trimmedMessage === 'yes' || trimmedMessage === 'no') {
+    finalMessage = `\${"${trimmedMessage}"}`;
+  }
+
   finishedFlow.set(parentStepName, {
     assign: {
       res: {
-        result: `${htmlToMarkdown.translate(
-          typeof parentNode.data.message === 'string'
-            ? parentNode.data.message.replace('{{', '${').replace('}}', '}')
-            : '',
-        )}`,
+        result: finalMessage,
       },
     },
     next: childNode ? toSnakeCase(childNode.data.label ?? 'format_messages') : 'format_messages',
