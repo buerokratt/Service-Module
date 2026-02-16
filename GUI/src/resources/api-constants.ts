@@ -23,7 +23,7 @@ export const getAvailableIntents = (): string => `${baseUrl}/services/available-
 export const jsonToYml = (): string => `${baseUrl}/saveJsonToYml`;
 export const getFaultyServices = (page: number, pageSize: number, sort: string, order: string): string =>
   `${baseUrl}/services/services-detailed/nok?page=${page}&page_size=${pageSize}&sort=${sort}&order=${order}`;
-export const getServiceById = (id: string): string => `${baseUrl}/service-by-id?id=${id}`;
+export const getServiceById = (): string => `${baseUrl}/service-by-id`;
 export const createEndpoint = (): string => `${baseUrl}/services/create-endpoint`;
 export const updateEndpoint = (id: string): string => `${baseUrl}/services/update-endpoint?id=${id}`;
 export const deleteEndpoint = (): string => `${baseUrl}/services/delete-endpoint`;

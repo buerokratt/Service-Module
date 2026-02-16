@@ -100,8 +100,14 @@ export interface ServiceStoreState {
   editEndpoint: (endpoint?: EndpointData) => void;
   loadSecretVariables: () => Promise<void>;
   loadTaraVariables: () => Promise<void>;
-  loadService: (id?: string, resetState?: boolean) => Promise<AxiosResponse<Service, any> | undefined>;
-  loadCommonEndpoints: () => Promise<void>;
+  loadService: (id?: string, resetState?: boolean, search?: string) => Promise<AxiosResponse<Service, any> | undefined>;
+  loadCommonEndpoints: (
+    isPagination: boolean,
+    page?: number,
+    pageSize?: number,
+    sorting?: string,
+    search?: string,
+  ) => Promise<void>;
   loadStepPreferences: () => Promise<void>;
   getAvailableRequestValues: (endpoint: EndpointData) => PreDefinedEndpointEnvVariables;
   onNameChange: (endpointId: string, oldName: string, newName: string) => void;
@@ -408,7 +414,7 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
   },
   resetAssign: () => set({ assignElements: [] }),
   resetRules: () => set({ rules: [], isYesNoQuestion: false }),
-  loadService: async (id, resetState) => {
+  loadService: async (id, resetState, search) => {
     if (resetState === true) {
       get().resetState();
     }
@@ -416,7 +422,7 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
     let serviceResponse: AxiosResponse<Service, any> | undefined;
 
     if (id) {
-      serviceResponse = await api.get<Service>(getServiceById(id));
+      serviceResponse = await api.post<Service>(getServiceById(), { id, search: search ?? '' });
 
       const structure = JSON.parse(serviceResponse.data.structure?.value ?? '{}');
       let endpoints = serviceResponse.data.endpoints.map((endpoint) => {
@@ -487,8 +493,20 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
     get().addProductionVariables(variables);
     return serviceResponse;
   },
-  loadCommonEndpoints: async () => {
-    const response = await api.get(getCommonEndpoints());
+  loadCommonEndpoints: async (
+    isPagination: boolean,
+    page?: number,
+    pageSize?: number,
+    sorting?: string,
+    search?: string,
+  ) => {
+    const response = await api.post(getCommonEndpoints(), {
+      pagination: isPagination,
+      page,
+      pageSize,
+      sorting,
+      search,
+    });
     const endpointsResponse: Array<
       Pick<EndpointData, 'endpointId' | 'name' | 'type' | 'fileName' | 'isCommon'> & {
         definitions: EndpointDefinitionJson;
