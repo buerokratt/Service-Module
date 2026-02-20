@@ -89,6 +89,19 @@
   }
 }
 
+.input-icon {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: red;
+}
+
+.input-error::placeholder {
+  color: red !important;
+  font-style: italic !important;
+}
+
 [data-theme='dark'] .input {
   &__label {
     color: var(--dark-text-primary);

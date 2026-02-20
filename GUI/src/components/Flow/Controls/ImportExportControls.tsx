@@ -7,17 +7,13 @@ import { AiOutlineExport, AiOutlineImport } from 'react-icons/ai';
 import { updateFlowInputRules } from 'services/flow-builder';
 import useServiceStore from 'store/new-services.store';
 import useToastStore from 'store/toasts.store';
+import { FlowData } from 'types/service-flow';
 import { removeTrailingUnderscores } from 'utils/string-util';
 
-interface FlowData {
-  nodes: any[];
-  edges: any[];
-}
-
 const ImportExportControls: FC = () => {
-  const { getNodes, getEdges, setNodes, setEdges } = useReactFlow();
+  const { getNodes, getEdges } = useReactFlow();
   const { t } = useTranslation();
-  const { setHasUnsavedChanges } = useServiceStore();
+  const { setHasUnsavedChanges, saveToHistory, setNodes: setStoreNodes, setEdges: setStoreEdges } = useServiceStore();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const serviceName = useServiceStore((state) => removeTrailingUnderscores(state.serviceNameDashed()));
   const [isConfirmImportModalVisible, setIsConfirmImportModalVisible] = useState(false);
@@ -73,14 +69,16 @@ const ImportExportControls: FC = () => {
           };
           return node;
         });
-        setNodes(nodes);
-        setEdges(flowData.edges);
+        saveToHistory();
+        setStoreNodes(nodes);
+        setStoreEdges(flowData.edges);
+        saveToHistory({ nodes, edges: flowData.edges });
         setHasUnsavedChanges(true);
       } else {
         useToastStore.getState().error({ title: t('global.notificationError'), message: t('serviceFlow.parseError') });
       }
     },
-    [setNodes, setEdges, setHasUnsavedChanges, t],
+    [setStoreNodes, setStoreEdges, setHasUnsavedChanges, saveToHistory, t],
   );
 
   const handleImport = useCallback(

@@ -1,20 +1,8 @@
+import { extractMapValues, getEndpointBody } from 'store/new-services.store';
+
 import { servicesRequestsExplain } from '../resources/api-constants';
 import api from '../services/api-dev';
 import { EndpointDefinition } from '../types/endpoint';
-
-export const extractMapValues = (element: any) => {
-  if (element?.rawData && element?.rawData?.length > 0) {
-    return element.rawData.value;
-  }
-
-  let result: any = {};
-  if (element?.variables) {
-    for (const entry of element.variables) {
-      result = { ...result, [entry.name]: entry.value };
-    }
-  }
-  return result;
-};
 
 export const generateJsonRequest = async (endpoint: EndpointDefinition) => {
   try {
@@ -24,7 +12,7 @@ export const generateJsonRequest = async (endpoint: EndpointDefinition) => {
           url: endpoint.url,
           method: endpoint.methodType,
           headers: extractMapValues(endpoint.headers),
-          body: extractMapValues(endpoint.body),
+          body: getEndpointBody(endpoint),
           params: extractMapValues(endpoint.params),
         },
       ],

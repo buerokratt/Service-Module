@@ -14,6 +14,7 @@ import Dialog from './Dialog';
 import Drawer from './Drawer';
 import Dropdown from './Dropdown';
 import ExclamationBadge from './ExclamationBadge';
+import ExportServicesModal from './ExportServicesModal';
 import FlowBuilder from './FlowBuilder/FlowBuilder';
 import FlowElementsPopup from './FlowElementsPopup';
 import {
@@ -33,6 +34,7 @@ import HeaderStep from './HeaderStepCounter/HeaderStep';
 import Icon from './Icon';
 import Label from './Label';
 import Layout from './Layout';
+import Markdownify from './Markdowify';
 import Modal from './Modal';
 import NewServiceHeader from './NewServiceHeader';
 import OutputElementBox from './OutputElementBox';
@@ -88,4 +90,6 @@ export {
   StepElement,
   Dropdown,
   ThemeToggle,
+  Markdownify,
+  ExportServicesModal,
 };

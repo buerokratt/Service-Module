@@ -17,9 +17,12 @@ declaration:
       - field: isCommon
         type: boolean
         description: "Body field 'isCommon'"  
-      - field: slot
-        type: string
-        description: "Slot input"
+      - field: entities
+        type: object
+        description: "Body field 'Entities'"
+      - field: examples
+        type: object
+        description: "Body field 'Examples'"
       - field: name
         type: string
         description: "Body field 'name'"
@@ -50,7 +53,9 @@ extract_request_data:
     name: ${incoming.body.name}
     description: ${incoming.body.description}
     isCommon: ${incoming.body.isCommon}
-    slot: ${incoming.body.slot}
+    slot: ${""}
+    entities: ${incoming.body.entities}
+    examples: ${incoming.body.examples}
     type: ${incoming.body.type}
     content: ${incoming.body.content}
     structure: ${incoming.body.structure}
@@ -215,6 +220,8 @@ service_edit:
       description: ${description}
       is_common: ${isCommon ?? false}
       slot: ${slot}
+      examples: ${examples}
+      entities: ${entities}
       structure: ${new_structure}
       state: ${state ?? 'draft'}
   result: editedService
@@ -223,6 +230,8 @@ check for_state:
   switch:
     - condition: ${state === 'draft'}
       next: change_state_to_draft
+    - condition: ${state === 'active'}
+      next: check_if_service_data_exists
   next: return_ok
 
 change_state_to_draft:
@@ -236,6 +245,73 @@ change_state_to_draft:
       state: "draft"
       type: ${service_type ?? 'POST'}
   result: changeStateResult
+  next: return_ok
+
+check_if_service_data_exists:
+  switch:
+    - condition: ${old_service_result !== undefined && old_service_result !== null}
+      next: generate_service_json_from_existing
+  next: get_service_data_for_json
+
+get_service_data_for_json:
+  call: http.post
+  args:
+    url: "[#SERVICE_RESQL]/get-service-by-id"
+    body:
+      id: ${id}
+  result: service_data_result
+  next: generate_service_json
+
+generate_service_json_from_existing:
+  assign:
+    service_data_result: ${old_service_result}
+  next: generate_service_json
+
+generate_service_json:
+  call: http.post
+  args:
+    url: "[#SERVICE_DMAPPER_HBS]/service_declaration"
+    headers:
+      type: 'json'
+    body:
+      name: ${name}
+      description: ${service_data_result.response.body[0].description}
+      examples: ${service_data_result.response.body[0].examples}
+      entities: ${service_data_result.response.body[0].entities}
+  result: service_json_result
+  next: replace_in_storage
+
+replace_in_storage:
+  call: http.post
+  args:
+    url: "[#STORAGE_FERRY]/v1/files/create"
+    body:
+      files:
+        - storageAccountId: "[#STORAGE_FERRY_ACCOUNT_ID]"
+          container: "[#STORAGE_FERRY_CONTAINER]"
+          fileName: "${name}.json"
+      content: ${JSON.stringify(service_json_result.response.body)}
+  result: ferry_upload_result
+  next: check_if_azure_configured
+
+check_if_azure_configured:
+  switch:
+    - condition: ${"[#AZURE_SEARCH_SERVICE_NAME]" !== "" && "[#AZURE_SEARCH_INDEXER_NAME]" !== "" && "[#AZURE_SEARCH_API_KEY]" !== ""}
+      next: trigger_azure_indexer
+  next: log_azure_not_configured
+
+log_azure_not_configured:
+  log: "Warning! Azure Search configuration not found. Skipping Azure indexer trigger. Please configure AZURE_SEARCH_SERVICE_NAME, AZURE_SEARCH_INDEXER_NAME, and AZURE_SEARCH_API_KEY in constants.ini"
+  next: return_ok
+
+trigger_azure_indexer:
+  call: http.post
+  args:
+    url: "https://[#AZURE_SEARCH_SERVICE_NAME].search.windows.net/indexers/[#AZURE_SEARCH_INDEXER_NAME]/run?api-version=2024-07-01"
+    headers:
+      api-key: "[#AZURE_SEARCH_API_KEY]"
+      Content-Type: "application/json"
+  result: azure_indexer_result
   next: return_ok
 
 return_ok:

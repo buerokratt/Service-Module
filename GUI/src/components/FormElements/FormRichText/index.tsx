@@ -1,4 +1,4 @@
-import { FC, Ref } from 'react';
+import { FC, Ref, useEffect } from 'react';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import './FormRichText.scss';
@@ -19,6 +19,27 @@ const FormRichText: FC<FormRichTextProps> = ({ defaultValue, onChange, quill }) 
     ],
   };
 
+  useEffect(() => {
+    if (!quill || !('current' in quill) || !quill.current) return;
+
+    const quillInstance = quill.current.getEditor();
+    const editorElement = quillInstance.root;
+
+    const handleTabKey = (e: KeyboardEvent) => {
+      if (e.key === 'Tab' && !e.shiftKey && !e.ctrlKey && !e.metaKey && !e.altKey) {
+        e.preventDefault();
+        const selection = quillInstance.getSelection(true);
+        if (selection) {
+          quillInstance.insertText(selection.index, '    ', 'user');
+          quillInstance.setSelection({ index: selection.index + 4, length: 0 });
+        }
+      }
+    };
+
+    editorElement.addEventListener('keydown', handleTabKey, true);
+    return () => editorElement.removeEventListener('keydown', handleTabKey, true);
+  }, [quill]);
+
   return (
     <ReactQuill
       ref={quill}
@@ -29,6 +50,7 @@ const FormRichText: FC<FormRichTextProps> = ({ defaultValue, onChange, quill }) 
       }}
       modules={modules}
       style={{ width: '100%' }}
+      preserveWhitespace
     />
   );
 };

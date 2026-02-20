@@ -62,6 +62,7 @@ declare module '@tanstack/table-core' {
 declare module '@tanstack/react-table' {
   interface TableMeta<TData extends RowData> {
     getRowStyles: (row: Row<TData>) => CSSProperties;
+    onRowClick?: (row: Row<TData>) => void;
   }
 }
 
@@ -175,7 +176,11 @@ const DataTable: FC<DataTableProps> = ({
         <tbody>
           {tableBodyPrefix}
           {table.getRowModel().rows.map((row) => (
-            <tr key={row.id} style={table.options.meta?.getRowStyles(row)}>
+            <tr
+              key={row.id}
+              style={table.options.meta?.getRowStyles(row)}
+              onClick={() => table.options.meta?.onRowClick?.(row)}
+            >
               {row.getVisibleCells().map((cell) => (
                 <td key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</td>
               ))}

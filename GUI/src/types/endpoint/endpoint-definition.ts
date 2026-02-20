@@ -17,17 +17,17 @@ export type EndpointDefinition = {
   params?: {
     variables: EndpointVariableData[];
     rawData: RawData;
-    isRowSelected?: boolean;
+    isRawSelected?: boolean;
   };
   headers?: {
     variables: EndpointVariableData[];
     rawData: RawData;
-    isRowSelected?: boolean;
+    isRawSelected?: boolean;
   };
   body?: {
     variables: EndpointVariableData[];
     rawData: RawData;
-    isRowSelected?: boolean;
+    isRawSelected?: boolean;
   };
   response?: EndpointVariableData[];
 };

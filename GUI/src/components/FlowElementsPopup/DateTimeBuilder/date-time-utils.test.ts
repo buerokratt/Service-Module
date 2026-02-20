@@ -15,6 +15,7 @@ vi.mock('uuid', () => ({
 // Mock stringToTemplate
 vi.mock('utils/string-util', () => ({
   stringToTemplate: (str: string) => `template(${str})`,
+  stringToEscapedTemplate: (str: string) => `escapedTemplate(${str})`,
 }));
 
 describe('date-time-utils', () => {
@@ -208,7 +209,7 @@ describe('date-time-utils', () => {
       const dateCode = "(function() { return 'test'; })()";
       const dragData = createDateTimeDragData(dateCode);
 
-      expect(dragData.value).toBe(`template(${dateCode})`);
+      expect(dragData.value).toBe(`escapedTemplate(${dateCode})`);
     });
 
     it('should generate unique id for each call', () => {

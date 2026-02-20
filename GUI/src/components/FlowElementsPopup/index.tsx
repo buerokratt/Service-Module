@@ -4,7 +4,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { useTranslation } from 'react-i18next';
-import useServiceStore from 'store/new-services.store';
+import useServiceStore, { extractMapValues, getEndpointBody } from 'store/new-services.store';
 import useServiceListStore from 'store/services.store';
 import useToastStore from 'store/toasts.store';
 import { DynamicChoices } from 'types/dynamic-choices';
@@ -35,7 +35,7 @@ import TextfieldTestContent from './TextfieldTestContent';
 import { servicesRequestsExplain } from '../../resources/api-constants';
 import api from '../../services/api-dev';
 import { StepType } from '../../types';
-import { getInitialGroup } from './RuleBuilder/types';
+import { getInitialGroup, GroupOrRule } from './RuleBuilder/types';
 import './styles.scss';
 
 const FlowElementsPopup: React.FC = () => {
@@ -85,14 +85,6 @@ const FlowElementsPopup: React.FC = () => {
     [],
   );
 
-  useEffect(() => {
-    if (node) {
-      node.data.rules = node.data.rules
-        ? { ...node.data.rules, children: rules }
-        : { ...getInitialGroup(), children: rules };
-    }
-  }, [node, rules]);
-
   // StepType.Textfield
   const [textfieldMessage, setTextfieldMessage] = useState<string | null>(null);
   const [textfieldMessagePlaceholders, setTextfieldMessagePlaceholders] = useState<{ [key: string]: string }>({});
@@ -127,8 +119,10 @@ const FlowElementsPopup: React.FC = () => {
     switch (stepType) {
       case StepType.Input:
       case StepType.Condition:
-        if (node.data?.rules) {
+        if (node.data?.rules && Array.isArray(node.data.rules.children)) {
           useServiceStore.getState().changeRulesNode(node.data.rules.children);
+        } else {
+          useServiceStore.getState().changeRulesNode([]);
         }
         break;
 
@@ -189,20 +183,21 @@ const FlowElementsPopup: React.FC = () => {
         fileName: fileName ?? node.data?.fileName,
         fileContent: fileContent ?? node.data?.fileContent,
         signOption: signOption ?? node.data?.signOption,
-        multiChoiceQuestion: {
-          question: multiChoiceQuestionQuestion,
-          buttons: multiChoiceQuestionButtons,
-        },
-        dynamicChoices: dynamicChoices,
+        multiChoiceQuestion:
+          node.data.stepType === StepType.MultiChoiceQuestion
+            ? {
+                question: multiChoiceQuestionQuestion,
+                buttons: multiChoiceQuestionButtons,
+              }
+            : undefined,
+        dynamicChoices: node.data.stepType === StepType.DynamicChoices ? dynamicChoices : undefined,
         endpoint: nodeEndpoint ?? node.data?.endpoint,
         testingPassed: undefined,
       },
     };
 
     if (stepType === StepType.Input || stepType === StepType.Condition) {
-      updatedNode.data.rules = updatedNode.data.rules
-        ? { ...updatedNode.data.rules, children: rules }
-        : { ...getInitialGroup(), children: rules };
+      prepareRulesForSaving(updatedNode);
     }
 
     if (stepType === StepType.MultiChoiceQuestion) {
@@ -210,56 +205,100 @@ const FlowElementsPopup: React.FC = () => {
     }
 
     if (stepType === StepType.UserDefined) {
-      const newLabel = updatedNode.data.label?.toString().split(' ');
-      if (updatedNode.data.endpoint?.name) {
-        newLabel[0] = updatedNode.data.endpoint?.name ?? node.data.label?.toString().split(' ')[0];
-        const nodeWithSameLabel = instance
-          ?.getNodes()
-          .find((n) => n.data.label === newLabel.join(' ') && n.id !== updatedNode.id);
-        if (nodeWithSameLabel) {
-          useToastStore.getState().error({
-            title: t('newService.toast.elementNameAlreadyExists'),
-            message: t('newService.toast.elementNameAlreadyExistsMessage'),
-          });
-          return;
-        }
-        updatedNode.data.label = newLabel.join(' ');
-      }
-      useServiceStore.getState().loadEndpointsResponseVariables();
+      prepareEndpointsForSaving(updatedNode);
     }
 
     if (stepType === StepType.Assign) {
-      const flatEndpointVariables = endpointsVariables.map((endpoint) => endpoint.chips).flat();
-      assignElements.forEach((element) => {
-        // Convert simple values such as "some input" to simple string
-        if (!isTemplate(element.value)) {
-          element.value = stringToTemplate('"' + element.value + '"');
-          return;
-        }
-
-        const fullPath = templateToString(element.value);
-        const endpointVariable = flatEndpointVariables.find((variable) => fullPath.startsWith(String(variable.value)));
-
-        if (!endpointVariable) {
-          // Element is not an object so no data for ObjectTree
-          return;
-        }
-
-        const value = String(endpointVariable.value);
-        const remainingPath = fullPath.substring(
-          fullPath[value.length] === '['
-            ? // Uses array notation, e.g. endpointVariable[1].something; needed for backwards compatibility
-              value.length
-            : // Uses object notation, e.g. endpointVariable.1.something
-              value.length + 1,
-        );
-        element.data = remainingPath ? getValueByPath(endpointVariable.data, remainingPath) : endpointVariable.data;
-      });
-      updatedNode.data.assignElements = assignElements;
+      prepareAssignForSaving(updatedNode);
     }
 
     useServiceStore.getState().handlePopupSave(updatedNode);
     onClose();
+  };
+
+  const prepareAssignForSaving = (updatedNode: Node<NodeDataProps>) => {
+    const flatEndpointVariables = endpointsVariables.map((endpoint) => endpoint.chips).flat();
+    assignElements.forEach((element) => {
+      const key = removeTrailingUnderscores(element.key);
+      element.key = key;
+
+      // Convert simple values such as "some input" to simple string
+      if (!isTemplate(element.value)) {
+        element.value = stringToTemplate('"' + element.value + '"');
+        return;
+      }
+
+      const fullPath = templateToString(element.value);
+      const endpointVariable = flatEndpointVariables.find((variable) => fullPath.startsWith(String(variable.value)));
+
+      if (!endpointVariable) {
+        // Element is not an object so no data for ObjectTree
+        return;
+      }
+
+      const value = String(endpointVariable.value);
+      const remainingPath = fullPath.substring(
+        fullPath[value.length] === '['
+          ? // Uses array notation, e.g. endpointVariable[1].something; needed for backwards compatibility
+            value.length
+          : // Uses object notation, e.g. endpointVariable.1.something
+            value.length + 1,
+      );
+      element.data = remainingPath ? getValueByPath(endpointVariable.data, remainingPath) : endpointVariable.data;
+    });
+    updatedNode.data.assignElements = assignElements;
+  };
+
+  const prepareEndpointsForSaving = (updatedNode: Node<NodeDataProps>) => {
+    filterOutEndpointsTrailingUnderscores(updatedNode);
+    const newLabel = updatedNode.data.label?.toString().split(' ');
+    if (updatedNode.data.endpoint?.name) {
+      newLabel[0] = updatedNode.data.endpoint?.name ?? node.data.label?.toString().split(' ')[0];
+      const nodeWithSameLabel = instance
+        ?.getNodes()
+        .find((n) => n.data.label === newLabel.join(' ') && n.id !== updatedNode.id);
+      if (nodeWithSameLabel) {
+        useToastStore.getState().error({
+          title: t('newService.toast.elementNameAlreadyExists'),
+          message: t('newService.toast.elementNameAlreadyExistsMessage'),
+        });
+        return;
+      }
+      updatedNode.data.label = newLabel.join(' ');
+    }
+    useServiceStore.getState().loadEndpointsResponseVariables();
+  };
+
+  const filterOutEndpointsTrailingUnderscores = (updatedNode: Node<NodeDataProps>) => {
+    if (updatedNode.data?.endpoint?.definitions) {
+      for (const definition of updatedNode.data.endpoint.definitions) {
+        for (const section of ['body', 'headers', 'params'] as const) {
+          if (definition[section]?.variables) {
+            for (const v of definition[section].variables) {
+              v.name = removeTrailingUnderscores(v.name);
+            }
+          }
+        }
+      }
+    }
+  };
+
+  const prepareRulesForSaving = (updatedNode: Node<NodeDataProps>) => {
+    const rulesArray = Array.isArray(rules) ? rules : [];
+    for (const item of rulesArray) {
+      const processRuleField = (obj: GroupOrRule) => {
+        if ('field' in obj) obj.field = removeTrailingUnderscores(obj.field);
+        else {
+          for (const child of obj.children) {
+            processRuleField(child);
+          }
+        }
+      };
+      processRuleField(item);
+    }
+    updatedNode.data.rules = node.data.rules
+      ? { ...node.data.rules, children: rulesArray }
+      : { ...getInitialGroup(), children: rulesArray };
   };
 
   const handleJsonRequestClick = async () => {
@@ -279,7 +318,7 @@ const FlowElementsPopup: React.FC = () => {
             url: endpoint.url,
             method: endpoint.methodType,
             headers: extractMapValues(endpoint.headers),
-            body: extractMapValues(endpoint.body),
+            body: getEndpointBody(endpoint),
             params: extractMapValues(endpoint.params),
           },
         ],
@@ -290,20 +329,6 @@ const FlowElementsPopup: React.FC = () => {
       console.error('Error: ', error);
     }
   };
-
-  function extractMapValues(element: any) {
-    if (element?.rawData && element?.rawData?.length > 0) {
-      return element.rawData.value;
-    }
-
-    let result: any = {};
-    if (element?.variables) {
-      for (const entry of element.variables) {
-        result = { ...result, [entry.name]: entry.value };
-      }
-    }
-    return result;
-  }
 
   const getJsonRequestButtonTitle = () => {
     if (!isUserDefinedNode || selectedTab === t('serviceFlow.tabs.test')) return '';

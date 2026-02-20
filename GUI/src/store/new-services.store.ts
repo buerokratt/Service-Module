@@ -26,7 +26,13 @@ import { saveFlowClick } from 'services/service-builder';
 import { EndpointDefinitionJson, Service, ServiceState, Step, StepType } from 'types';
 import { Assign } from 'types/assign';
 import { Chip } from 'types/chip';
-import { EndpointData, EndpointEnv, EndpointTab, PreDefinedEndpointEnvVariables } from 'types/endpoint';
+import {
+  EndpointData,
+  EndpointDefinition,
+  EndpointEnv,
+  EndpointTab,
+  PreDefinedEndpointEnvVariables,
+} from 'types/endpoint';
 import { EndpointResponseVariable } from 'types/endpoint/endpoint-response-variables';
 import { EndpointType } from 'types/endpoint/endpoint-type';
 import { RequestVariablesTabsRawData, RequestVariablesTabsRowsData } from 'types/request-variables';
@@ -45,6 +51,8 @@ export interface ServiceStoreState {
   serviceId: string;
   description: string;
   slot: string;
+  examples: string[];
+  entities: string[];
   isCommon: boolean;
   edges: Edge[];
   // In the future, this needs to use a common interface with NodeDataProps and not Node
@@ -80,6 +88,8 @@ export interface ServiceStoreState {
   setIsCommonEndpoint: (id: string, isCommon: boolean) => void;
   setDescription: (description: string) => void;
   setSlot: (slot: string) => void;
+  setExamples: (examples: string[]) => void;
+  setEntities: (entities: string[]) => void;
   setStepPreferences: (stepPreferences: string[]) => void;
   loadEndpointsResponseVariables: () => void;
   setSecrets: (newSecrets: PreDefinedEndpointEnvVariables) => void;
@@ -90,8 +100,14 @@ export interface ServiceStoreState {
   editEndpoint: (endpoint?: EndpointData) => void;
   loadSecretVariables: () => Promise<void>;
   loadTaraVariables: () => Promise<void>;
-  loadService: (id?: string, resetState?: boolean) => Promise<AxiosResponse<Service, any> | undefined>;
-  loadCommonEndpoints: () => Promise<void>;
+  loadService: (id?: string, resetState?: boolean, search?: string) => Promise<AxiosResponse<Service, any> | undefined>;
+  loadCommonEndpoints: (
+    isPagination: boolean,
+    page?: number,
+    pageSize?: number,
+    sorting?: string,
+    search?: string,
+  ) => Promise<void>;
   loadStepPreferences: () => Promise<void>;
   getAvailableRequestValues: (endpoint: EndpointData) => PreDefinedEndpointEnvVariables;
   onNameChange: (endpointId: string, oldName: string, newName: string) => void;
@@ -139,7 +155,7 @@ export interface ServiceStoreState {
   handleProgrammaticNavigation: (to: string) => boolean;
   history: { nodes: Node[]; edges: Edge[] }[];
   historyIndex: number;
-  saveToHistory: () => void;
+  saveToHistory: (state?: { nodes: Node[]; edges: Edge[] }) => void;
   undo: () => void;
   redo: () => void;
   canUndo: () => boolean;
@@ -175,6 +191,8 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
   endpoints: [],
   name: '',
   slot: '',
+  examples: [],
+  entities: [],
   serviceId: uuid(),
   description: '',
   edges: initialEdges,
@@ -253,7 +271,7 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
           url: endpoint.url,
           method: endpoint.methodType,
           headers: extractMapValues(endpoint.headers),
-          body: extractMapValues(endpoint.body),
+          body: getEndpointBody(endpoint),
           params: extractMapValues(endpoint.params),
         })),
       );
@@ -275,6 +293,12 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
             data: value,
           });
         }
+
+        chips.push({
+          name: 'Base Response',
+          value: `${endpoint?.name.replaceAll(' ', '_')}_res.response.body`,
+          data: `${endpoint?.name.replaceAll(' ', '_')}_res.response.body`,
+        });
 
         chips.push({
           name: 'Status Code',
@@ -307,6 +331,8 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
   changeServiceName: (name: string) => set({ name }),
   setDescription: (description: string) => set({ description }),
   setSlot: (slot: string) => set({ slot }),
+  setExamples: (examples: string[]) => set({ examples: examples }),
+  setEntities: (entities: string[]) => set({ entities: entities }),
   setStepPreferences: (stepPreferences: string[]) => set({ stepPreferences }),
   isCommon: false,
   setIsCommon: (isCommon: boolean) => set({ isCommon }),
@@ -388,7 +414,7 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
   },
   resetAssign: () => set({ assignElements: [] }),
   resetRules: () => set({ rules: [], isYesNoQuestion: false }),
-  loadService: async (id, resetState) => {
+  loadService: async (id, resetState, search) => {
     if (resetState === true) {
       get().resetState();
     }
@@ -396,7 +422,7 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
     let serviceResponse: AxiosResponse<Service, any> | undefined;
 
     if (id) {
-      serviceResponse = await api.get<Service>(getServiceById(id));
+      serviceResponse = await api.post<Service>(getServiceById(), { id, search: search ?? '' });
 
       const structure = JSON.parse(serviceResponse.data.structure?.value ?? '{}');
       let endpoints = serviceResponse.data.endpoints.map((endpoint) => {
@@ -437,6 +463,8 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
         isCommon: serviceResponse.data.isCommon,
         description: serviceResponse.data.description,
         slot: serviceResponse.data.slot,
+        examples: serviceResponse.data.examples,
+        entities: serviceResponse.data.entities,
         edges,
         nodes,
         endpoints,
@@ -465,8 +493,20 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
     get().addProductionVariables(variables);
     return serviceResponse;
   },
-  loadCommonEndpoints: async () => {
-    const response = await api.get(getCommonEndpoints());
+  loadCommonEndpoints: async (
+    isPagination: boolean,
+    page?: number,
+    pageSize?: number,
+    sorting?: string,
+    search?: string,
+  ) => {
+    const response = await api.post(getCommonEndpoints(), {
+      pagination: isPagination,
+      page,
+      pageSize,
+      sorting,
+      search,
+    });
     const endpointsResponse: Array<
       Pick<EndpointData, 'endpointId' | 'name' | 'type' | 'fileName' | 'isCommon'> & {
         definitions: EndpointDefinitionJson;
@@ -738,6 +778,7 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
             label: updatedNode.data.label,
             testingPassed: updatedNode.data.testingPassed,
             assignElements: updatedNode.data.assignElements ?? prevNode.data.assignElements,
+            rules: updatedNode.data.rules ?? prevNode.data.rules,
           },
         };
       }),
@@ -809,13 +850,18 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
         });
       });
   },
-  saveToHistory: () => {
+  saveToHistory: (stateOverride?: { nodes: Node[]; edges: Edge[] }) => {
     const { nodes, edges, history, historyIndex } = get();
 
-    const currentState = {
-      nodes: JSON.parse(JSON.stringify(nodes)),
-      edges: JSON.parse(JSON.stringify(edges)),
-    };
+    const currentState = stateOverride
+      ? {
+          nodes: JSON.parse(JSON.stringify(stateOverride.nodes)),
+          edges: JSON.parse(JSON.stringify(stateOverride.edges)),
+        }
+      : {
+          nodes: JSON.parse(JSON.stringify(nodes)),
+          edges: JSON.parse(JSON.stringify(edges)),
+        };
 
     const lastState = history[historyIndex];
 
@@ -828,11 +874,13 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
       return;
     }
 
-    history.push(currentState);
+    const truncatedHistory = historyIndex < history.length - 1 ? history.slice(0, historyIndex + 1) : history;
+
+    truncatedHistory.push(currentState);
 
     set({
-      history,
-      historyIndex: historyIndex + 1,
+      history: truncatedHistory,
+      historyIndex: truncatedHistory.length - 1,
       hasUnsavedChanges: true,
     });
   },
@@ -840,8 +888,24 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
     const { history, historyIndex } = get();
     if (historyIndex > 0) {
       const previousState = history[historyIndex - 1];
+      let nodes = JSON.parse(JSON.stringify(previousState.nodes));
+
+      nodes = nodes.map((node: any) => {
+        if (node.type !== 'custom') return node;
+        const { stepType, ...restData } = node.data;
+        node.data = {
+          ...restData,
+          stepType,
+          onDelete: get().onDelete,
+          setClickedNode: get().setClickedNode,
+          onEdit: get().handleNodeEdit,
+          update: updateFlowInputRules,
+        };
+        return node;
+      });
+
       set({
-        nodes: JSON.parse(JSON.stringify(previousState.nodes)),
+        nodes: nodes,
         edges: JSON.parse(JSON.stringify(previousState.edges)),
         historyIndex: historyIndex - 1,
         hasUnsavedChanges: true,
@@ -853,8 +917,24 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
     const { history, historyIndex } = get();
     if (historyIndex < history.length - 1) {
       const nextState = history[historyIndex + 1];
+      let nodes = JSON.parse(JSON.stringify(nextState.nodes));
+
+      nodes = nodes.map((node: any) => {
+        if (node.type !== 'custom') return node;
+        const { stepType, ...restData } = node.data;
+        node.data = {
+          ...restData,
+          stepType,
+          onDelete: get().onDelete,
+          setClickedNode: get().setClickedNode,
+          onEdit: get().handleNodeEdit,
+          update: updateFlowInputRules,
+        };
+        return node;
+      });
+
       set({
-        nodes: JSON.parse(JSON.stringify(nextState.nodes)),
+        nodes: nodes,
         edges: JSON.parse(JSON.stringify(nextState.edges)),
         historyIndex: historyIndex + 1,
         hasUnsavedChanges: true,
@@ -865,7 +945,24 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
   canRedo: () => get().historyIndex < get().history.length - 1,
 }));
 
-function extractMapValues(element: any) {
+export function getEndpointBody(endpoint: EndpointDefinition): any {
+  const isRawBodySelected = endpoint?.body?.isRawSelected ?? false;
+  const rawBody = endpoint?.body?.rawData ?? {};
+  let body: any = extractMapValues(endpoint.body);
+
+  if (isRawBodySelected) {
+    try {
+      const rawJson = JSON.parse(rawBody?.value ?? '');
+      body = rawJson;
+    } catch (e: any) {
+      body = extractMapValues(endpoint.body);
+      console.log(`Unable to save JSON to Yaml. ${e.message}`);
+    }
+  }
+  return body;
+}
+
+export function extractMapValues(element: any) {
   if (!element) return {};
 
   if (element.rawData && element.rawData.length > 0) {

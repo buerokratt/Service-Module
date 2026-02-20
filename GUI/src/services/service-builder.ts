@@ -34,6 +34,7 @@ export async function saveEndpoints(endpoints: EndpointData[], onSuccess?: () =>
   }
 
   endpoints.forEach((endpoint) => {
+    filterOutEndpointsTrailingUnderscores(endpoint);
     if (endpoint.isNew) {
       tasks.push(createEndpointAndUpdateState(endpoint));
     } else {
@@ -48,6 +49,20 @@ export async function saveEndpoints(endpoints: EndpointData[], onSuccess?: () =>
   });
 
   await Promise.all(tasks).then(onSuccess).catch(onError);
+}
+
+function filterOutEndpointsTrailingUnderscores(endpoint: EndpointData) {
+  if (endpoint.definitions) {
+    for (const definition of endpoint.definitions) {
+      for (const section of ['body', 'headers', 'params'] as const) {
+        if (definition[section]?.variables) {
+          for (const v of definition[section].variables) {
+            v.name = removeTrailingUnderscores(v.name);
+          }
+        }
+      }
+    }
+  }
 }
 
 async function createEndpointAndUpdateState(endpoint: EndpointData): Promise<any> {
@@ -68,6 +83,8 @@ interface SaveFlowConfig {
   onError: (e: any) => void;
   description: string;
   slot: string;
+  examples: string[];
+  entities: string[];
   isCommon: boolean;
   serviceId: string;
   isNewService: boolean;
@@ -76,6 +93,7 @@ interface SaveFlowConfig {
 }
 
 const hasInvalidRules = (elements: any[]): boolean => {
+  if (!Array.isArray(elements)) return true;
   return elements.some((e) => {
     if ('children' in e) {
       const group = e as Group;
@@ -95,7 +113,26 @@ const hasInvalidElements = (elements: any[]): boolean => {
   });
 };
 
-const buildConditionString = (group: any): string => {
+const getAssignedVariableNames = (nodes: Node[]): Set<string> => {
+  const names = new Set(['chatId', 'authorId', 'input', 'buttons', 'res']);
+  for (const node of nodes) {
+    const data = node.data as NodeDataProps | undefined;
+    if (data?.stepType === StepType.Assign && Array.isArray(data.assignElements)) {
+      for (const e of data.assignElements) {
+        const key = e.key?.replaceAll('${', '').replaceAll('}', '').trim();
+        if (key) names.add(key);
+      }
+    }
+  }
+  return names;
+};
+
+const buildConditionString = (group: any, assignedVariableNames: Set<string>): string => {
+  const formatField = (rawField: string): string => {
+    if (assignedVariableNames.has(rawField)) return rawField;
+    return isNumericString(rawField) ? rawField : `"${rawField}"`;
+  };
+
   if ('children' in group) {
     const subgroup = group as Group;
     if (subgroup.children.length === 0) {
@@ -104,12 +141,14 @@ const buildConditionString = (group: any): string => {
 
     const conditions = subgroup.children.map((child) => {
       if ('children' in child) {
-        return `(${buildConditionString(child)})`;
+        return `(${buildConditionString(child, assignedVariableNames)})`;
       } else {
         const rule = child;
+        const rawField = rule.field.replaceAll('${', '').replaceAll('}', '');
         const absoluteValue = removeWrapperQuotes(rule.value.replaceAll('${', '').replaceAll('}', ''));
-        const value = isNumericString(absoluteValue) ? absoluteValue : `"${absoluteValue}"`;
-        return `${rule.field.replaceAll('${', '').replaceAll('}', '')} ${rule.operator} ${value}`;
+        const value = formatField(absoluteValue);
+        const field = formatField(rawField);
+        return `${field} ${rule.operator} ${value}`;
       }
     });
 
@@ -120,9 +159,11 @@ const buildConditionString = (group: any): string => {
     }
   } else {
     const rule = group as Rule;
+    const rawField = rule.field.replaceAll('${', '').replaceAll('}', '');
     const absoluteValue = removeWrapperQuotes(rule.value.replaceAll('${', '').replaceAll('}', ''));
-    const value = isNumericString(absoluteValue) ? absoluteValue : `"${absoluteValue}"`;
-    return `${rule.field.replaceAll('${', '').replaceAll('}', '')} ${rule.operator} ${value}`;
+    const value = formatField(absoluteValue);
+    const field = formatField(rawField);
+    return `${field} ${rule.operator} ${value}`;
   }
 };
 
@@ -134,6 +175,8 @@ export const saveFlow = async ({
   onError,
   description,
   slot,
+  examples,
+  entities,
   isCommon,
   serviceId,
   isNewService,
@@ -157,7 +200,18 @@ export const saveFlow = async ({
 
     await saveService(
       yamlContent,
-      { name, serviceId, description, slot, isCommon, nodes, edges, isNewService } as SaveFlowConfig,
+      {
+        name,
+        serviceId,
+        description,
+        slot,
+        examples,
+        entities,
+        isCommon,
+        nodes,
+        edges,
+        isNewService,
+      } as SaveFlowConfig,
       true,
       status,
       onSuccess,
@@ -181,7 +235,18 @@ export const saveFlow = async ({
 
         await saveService(
           getYamlContent(branchNodes, branchEdges, serviceName, description, showError),
-          { name: serviceName, serviceId, description, slot, isCommon, nodes, edges, isNewService } as SaveFlowConfig,
+          {
+            name: serviceName,
+            serviceId,
+            description,
+            slot,
+            examples,
+            entities,
+            isCommon,
+            nodes,
+            edges,
+            isNewService,
+          } as SaveFlowConfig,
           false,
           status,
         );
@@ -200,7 +265,7 @@ async function saveService(
   onSuccess?: (e: any) => void,
   onError?: (e: any) => void,
 ) {
-  const { isNewService, serviceId, name, description, slot, isCommon, edges, nodes } = config;
+  const { isNewService, serviceId, name, description, slot, examples, entities, isCommon, edges, nodes } = config;
   if (updateServiceDb) {
     useServiceStore.getState().changeServiceName(removeTrailingUnderscores(name));
   }
@@ -212,6 +277,8 @@ async function saveService(
         serviceId,
         description,
         slot,
+        examples,
+        entities,
         type: 'POST',
         content: content,
         isCommon,
@@ -238,12 +305,13 @@ const validateMCQ = (node: NodeDataProps | undefined) => {
 };
 
 export const validateCondition = (node: NodeDataProps | undefined) => {
-  const invalidRulesExist = hasInvalidRules(node?.rules?.children ?? []);
-  const isInvalid = node?.rules?.children === undefined || invalidRulesExist || node?.rules?.children.length === 0;
+  const rulesChildren = Array.isArray(node?.rules?.children) ? node.rules.children : [];
+  const invalidRulesExist = hasInvalidRules(rulesChildren);
+  const isInvalid = !Array.isArray(node?.rules?.children) || invalidRulesExist || node.rules.children.length === 0;
   return isInvalid ? (i18next.t('toast.missing-condition-rules') ?? 'Error') : null;
 };
 
-function getYamlContent(
+export function getYamlContent(
   nodes: Node<NodeDataProps>[],
   edges: Edge[],
   name: string,
@@ -308,7 +376,8 @@ function getYamlContent(
   finishedFlow.set('declaration', {
     call: 'declare',
     version: 0.1,
-    description: description ?? `Description placeholder for '${name ?? ''}'`,
+    description:
+      description && description.trim().length > 0 ? description : `Description placeholder for '${name ?? ''}'`,
     method: 'post',
     accepts: 'json',
     returns: 'json',
@@ -380,7 +449,7 @@ function getYamlContent(
       }
 
       if (parentNode.data.stepType === StepType.MultiChoiceQuestion) {
-        return handleMultiChoiceQuestion(finishedFlow, parentStepName, parentNode, childNode);
+        return handleMultiChoiceQuestion(finishedFlow, parentStepName, parentNode, childNode, name);
       }
 
       if (parentNode.data.stepType === StepType.DynamicChoices) {
@@ -532,14 +601,27 @@ function handleTextField(
     ],
   });
 
+  const spacePlaceholder = '___SPACE___';
+  const markdownMessage = htmlToMarkdown
+    .translate(
+      typeof parentNode.data.message === 'string'
+        ? parentNode.data.message.replace('{{', '${').replace('}}', '}').replaceAll(' ', spacePlaceholder)
+        : '',
+    )
+    .replaceAll(spacePlaceholder, ' ')
+    .replaceAll(/\\([-~>[\]_*#().!`=<\\])/g, String.raw`\\$1`);
+
+  let finalMessage = markdownMessage;
+  const trimmedMessage = markdownMessage.trim().toLowerCase();
+
+  if (trimmedMessage === 'yes' || trimmedMessage === 'no') {
+    finalMessage = `\${"${trimmedMessage}"}`;
+  }
+
   finishedFlow.set(parentStepName, {
     assign: {
       res: {
-        result: `${htmlToMarkdown.translate(
-          typeof parentNode.data.message === 'string'
-            ? parentNode.data.message.replace('{{', '${').replace('}}', '}')
-            : '',
-        )}`,
+        result: finalMessage,
       },
     },
     next: childNode ? toSnakeCase(childNode.data.label ?? 'format_messages') : 'format_messages',
@@ -561,17 +643,19 @@ function handleConditionStep(
   const firstChild = nodes.find((node) => node.id === firstChildNode) as Node<NodeDataProps> | undefined;
   const secondChild = nodes.find((node) => node.id === secondChildNode) as Node<NodeDataProps> | undefined;
 
-  const invalidRulesExist = hasInvalidRules(parentNode.data.rules?.children ?? []);
+  const rulesChildren = Array.isArray(parentNode.data.rules?.children) ? parentNode.data.rules.children : [];
+  const invalidRulesExist = hasInvalidRules(rulesChildren);
   const isInvalid =
-    parentNode.data.rules?.children === undefined || invalidRulesExist || parentNode.data.rules?.children.length === 0;
+    !Array.isArray(parentNode.data.rules?.children) || invalidRulesExist || parentNode.data.rules.children.length === 0;
   if (isInvalid) {
     throw new Error(i18next.t('toast.missing-condition-rules') ?? 'Error');
   }
 
+  const assignedVariableNames = getAssignedVariableNames(nodes);
   finishedFlow.set(parentStepName, {
     switch: [
       {
-        condition: `\${${buildConditionString(parentNode.data.rules)}}`,
+        condition: `\${${buildConditionString(parentNode.data.rules, assignedVariableNames)}}`,
         next: toSnakeCase(firstChild?.data?.label ?? '') ?? '',
       },
     ],
@@ -613,7 +697,7 @@ function handleEndpointStep(
   const endpointDefinition = parentNode.data.endpoint?.definitions[0];
   const paramsVariables = endpointDefinition?.params?.variables;
   const bodyVariables = endpointDefinition?.body?.variables;
-  const isRawBodySelected = endpointDefinition?.body?.isRowSelected ?? false;
+  const isRawBodySelected = endpointDefinition?.body?.isRawSelected ?? false;
   const rawBody = endpointDefinition?.body?.rawData ?? {};
   const headersVariables = endpointDefinition?.headers?.variables;
   const methodType = endpointDefinition?.methodType?.toLowerCase();
@@ -664,7 +748,12 @@ function handleMultiChoiceQuestion(
   parentStepName: string,
   parentNode: Node<NodeDataProps>,
   childNode: Node<NodeDataProps> | undefined,
+  serviceName: string,
 ) {
+  parentNode.data.multiChoiceQuestion?.buttons.forEach(
+    (b) => (b.payload = b.payload.replaceAll('/_mcq_', `/${serviceName}_mcq_`)),
+  );
+
   return finishedFlow.set(parentStepName, {
     assign: {
       buttons: parentNode?.data?.multiChoiceQuestion?.buttons ?? [],
@@ -783,6 +872,8 @@ export const saveFlowClick = async (status: 'draft' | 'ready' = 'ready', showErr
   const serviceId = useServiceStore.getState().serviceId;
   const description = useServiceStore.getState().description;
   const slot = useServiceStore.getState().slot;
+  const examples = useServiceStore.getState().examples;
+  const entities = useServiceStore.getState().entities;
   const isCommon = useServiceStore.getState().isCommon;
   const isNewService = useServiceStore.getState().isNewService;
   const edges = useServiceStore.getState().edges;
@@ -806,12 +897,11 @@ export const saveFlowClick = async (status: 'draft' | 'ready' = 'ready', showErr
         title: i18next.t('newService.toast.failed'),
         message: e.response?.status === 409 ? t('newService.toast.serviceNameAlreadyExists') : e?.message,
       });
-      throw new Error(
-        e.response?.status === 409 ? t('newService.toast.serviceNameAlreadyExists').toString() : e?.message,
-      );
     },
     description,
     slot,
+    examples,
+    entities,
     isCommon,
     serviceId,
     isNewService,
