@@ -21,14 +21,14 @@ Intent files are published to Azure Blob Storage and indexed for LLM-based inten
 
 **In `edit.yml`:**
 
-- Blob storage operations occur **only when the service state is being set to 'active'**
-- When a service is edited and the state is set to 'active', the intent file (JSON format) is uploaded or updated in Azure Blob Storage using Storage Ferry
+- When a service is edited and the state is set to **'active'**, the intent file (JSON format) is uploaded or updated in Azure Blob Storage using Storage Ferry
+- When a service is edited and the state is changed **from active to draft or ready** (or any other non-active status), the intent file is deleted from blob storage
 - The file is stored with the service name as the filename (e.g., `service-name.json`)
 
 **In `status.yml`:**
 
 - When a service is **activated** (state changed to 'active'): the intent file is created in blob storage
-- When a service is **deactivated** (state changed to inactive): the intent file is deleted from blob storage
+- When a service changes **from active to any other status** (e.g. inactive or draft): the intent file is deleted from blob storage
 
 **Blob storage operations:**
 
