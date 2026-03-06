@@ -21,14 +21,14 @@ Intent files are published to Azure Blob Storage and indexed for LLM-based inten
 
 **In `edit.yml`:**
 
-- Blob storage operations occur **only when the service state is being set to 'active'**
-- When a service is edited and the state is set to 'active', the intent file (JSON format) is uploaded or updated in Azure Blob Storage using Storage Ferry
+- When a service is edited and the state is set to **'active'**, the intent file (JSON format) is uploaded or updated in Azure Blob Storage using Storage Ferry
+- When a service is edited and the state is changed **from active to draft or ready** (or any other non-active status), the intent file is deleted from blob storage
 - The file is stored with the service name as the filename (e.g., `service-name.json`)
 
 **In `status.yml`:**
 
 - When a service is **activated** (state changed to 'active'): the intent file is created in blob storage
-- When a service is **deactivated** (state changed to inactive): the intent file is deleted from blob storage
+- When a service changes **from active to any other status** (e.g. inactive or draft): the intent file is deleted from blob storage
 
 **Blob storage operations:**
 
@@ -264,3 +264,50 @@ Currently, we had low test sample size during development making testing results
 ### Follow-up note.
 
 As in its current iteration we have only basic MVP version, some aspects of this procedure are still raw and inconsistent, and with its development this document should be updated accordingly.
+
+
+## 9. Local Development Notes
+
+#### To Access Azrite in Terminal
+
+- Install az cli
+- To view blob list in a container 
+```
+az storage blob list --container-name {CONTAINER_NAME} --connection-string "DefaultEndpointsProtocol=http;AccountName={ACCOUNT_NAME};AccountKey={ACCOUNT_KEY};BlobEndpoint={ENDPOINT}" --auth-mode key --output table
+```
+- To View blob json content
+```
+view_blob_temp() {
+    local container=$1
+    local blob=$2
+    local temp_file="./temp_$blob"
+    
+    # Download
+    echo "📥 Downloading $blob..."
+    az storage blob download --container-name "$container" --name "$blob" --file "$temp_file" --connection-string "DefaultEndpointsProtocol=http;AccountName={ACCOUNT_NAME};AccountKey={ACCOUNT_KEY};BlobEndpoint={ENDPOINT}" --auth-mode key
+    
+    # View
+    echo -e "\n📄 Contents:"
+    cat "$temp_file"
+    
+    # Ask to keep or remove
+    echo -e "\n\nDelete temporary file? (y/n)"
+    read answer
+    if [ "$answer" = "y" ]; then
+        rm "$temp_file"
+        echo "🗑️  Temporary file removed"
+    else
+        echo "💾 File saved as: $temp_file"
+    fi
+}
+
+# Usage
+view_blob_temp {CONTAINER_NAME} "{NAME}.json"
+```
+- To delete blobs list
+```
+az storage blob list --container-name buerokratt --query "[].name" --output tsv --connection-string "DefaultEndpointsProtocol=http;AccountName={ACCOUNT_NAME};AccountKey={ACCOUNT_KEY};BlobEndpoint={ENDPOINT}" --auth-mode key | while read blob; do
+    echo "Deleting $blob..."
+    az storage blob delete --container-name buerokratt --name "$blob" --connection-string "DefaultEndpointsProtocol=http;AccountName={ACCOUNT_NAME};AccountKey={ACCOUNT_KEY};BlobEndpoint={ENDPOINT}" --auth-mode key
+done
+```

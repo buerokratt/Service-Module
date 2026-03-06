@@ -206,7 +206,7 @@ deactivate_service:
   next: delete_from_storage
 
 delete_from_storage:
-  call: http.post
+  call: http.delete
   args:
     url: "[#STORAGE_FERRY]/v1/files/delete"
     body:
