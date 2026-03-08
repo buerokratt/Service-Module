@@ -2,6 +2,7 @@ import { createColumnHelper } from '@tanstack/react-table';
 import { Button, Icon, Tooltip, Track } from 'components';
 import { format } from 'date-fns';
 import { TFunction } from 'i18next';
+import React from 'react';
 import { MdCheck, MdClose } from 'react-icons/md';
 import { VerificationMetadata } from 'store/api-registry.store';
 import { EndpointData } from 'types/endpoint';

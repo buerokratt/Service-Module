@@ -12,7 +12,6 @@ import { create } from 'zustand';
 import useToastStore from './toasts.store';
 import api from '../services/api-dev';
 
-
 export type VerificationStatus = 'verified' | 'failed' | 'unverified';
 
 export interface VerificationMetadata {
@@ -66,7 +65,13 @@ const useApiRegistryStore = create<ApiRegistryState>((set, get) => ({
       const rawList = Array.isArray(data) ? data : (data?.content ?? []);
       endpoints = rawList.map((item: any) => {
         const defs = item.definitions;
-        const parsed = typeof defs?.value === 'string' ? JSON.parse(defs.value) : Array.isArray(defs) ? defs : [];
+        let parsed: unknown[] = [];
+        const value = defs?.value;
+        if (typeof value === 'string') {
+          parsed = JSON.parse(value) as unknown[];
+        } else if (Array.isArray(defs)) {
+          parsed = defs;
+        }
         return {
           ...item,
           definitions: parsed,

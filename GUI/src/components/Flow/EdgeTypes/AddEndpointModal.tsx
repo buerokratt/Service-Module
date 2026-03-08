@@ -66,7 +66,7 @@ const AddEndpointModal: React.FC<AddEndpointModalProps> = ({
       ep.definitions = endpoint.definitions.map((d) => ({ ...d }));
       if (ep.definitions[0]) ep.definitions[0].url = ep.definitions[0].url ?? ep.definitions[0].path ?? '';
       setIsTesting(true);
-      testUrl(
+      void testUrl(
         ep,
         () => {
           setIsTesting(false);

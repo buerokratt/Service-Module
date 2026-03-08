@@ -31,7 +31,7 @@ const ApiRegistryPage: React.FC = () => {
   const updateEndpointInList = useApiRegistryStore((s) => s.updateEndpointInList);
 
   useEffect(() => {
-    loadEndpoints(pagination, sorting, search);
+    void loadEndpoints(pagination, sorting, search);
   }, [loadEndpoints, pagination, sorting, search]);
 
   const handlePageChange = useCallback(
