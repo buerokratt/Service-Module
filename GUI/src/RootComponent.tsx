@@ -6,6 +6,7 @@ import FaultyServicesPage from './pages/FaultyServicesPage';
 import NotFoundPage from './pages/NotFoundPage';
 import OverviewPage from './pages/OverviewPage';
 import ServiceFlowPage from './pages/ServiceFlowPage';
+import ApiRegistryPage from 'pages/ApiRegistryPage';
 import ServiceSettingPage from './pages/ServiceSettingPage';
 import { ROUTES } from './resources/routes-constants';
 
@@ -23,6 +24,7 @@ const RootComponent: React.FC = () => {
       <Route element={<Layout />}>
         <Route path={'/service'} element={<Navigate to="/services/overview" />} />
         <Route path={ROUTES.OVERVIEW_ROUTE} element={<OverviewPage />} />
+        <Route path={ROUTES.API_REGISTRY_ROUTE} element={<ApiRegistryPage />} />
         <Route path={ROUTES.FAULTY_SERVICES_ROUTE} element={<FaultyServicesPage />} />
         <Route path={ROUTES.SERVICE_SETTINGS} element={<ServiceSettingPage />} />
         <Route path={ROUTES.FAULTY_SERVICES_ROUTE} element={<FaultyServicesPage />} />

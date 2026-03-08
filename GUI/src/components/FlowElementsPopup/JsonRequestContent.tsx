@@ -6,15 +6,16 @@ import Track from '../Track';
 
 type JsonRequestContentProps = {
   readonly isVisible: boolean;
+  readonly padding?: number;
   readonly jsonContent?: string | null;
 };
 
-const JsonRequestContent: FC<JsonRequestContentProps> = ({ isVisible, jsonContent }) => {
+const JsonRequestContent: FC<JsonRequestContentProps> = ({ isVisible, jsonContent, padding = 16 }) => {
   const { t } = useTranslation();
   if (!isVisible) return <></>;
 
   return (
-    <Track direction="vertical" align="left" style={{ width: '100%', padding: 16 }}>
+    <Track direction="vertical" align="left" style={{ width: '100%', padding: padding }}>
       <label htmlFor="json">JSON</label>
       <FormTextarea
         label="JSON"

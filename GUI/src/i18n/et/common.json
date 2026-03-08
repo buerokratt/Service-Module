@@ -274,7 +274,11 @@
       "insertName": "Sisesta otspunkti nimetus...",
       "type": "Otspunkti tüüp",
       "nameAlreadyExists": "API pealkiri peab olema unikaalne",
-      "formatJson": "Formateeri JSON"
+      "formatJson": "Formateeri JSON",
+      "global": "Globaalne",
+      "tooltip": {
+        "global": "Globaalne otspunkt salvestatakse API varamusse ja kasutab ühtset andmeallikat. Lisades selle teenuse lõuendile luuakse lokaalne koopia, mida globaalse otspunkti muutmine automaatselt ei uuenda; koopiat saab muuta otse lõuendil."
+      }
     },
     "trainingModuleSetup": "Avaleht",
     "serviceSetup": "Teenuse seadistamine",

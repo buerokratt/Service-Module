@@ -6,12 +6,13 @@ import './Modal.scss';
 
 type ModalProps = {
   title: string | null;
+  titleView?: ReactNode;
   description?: string;
   footer?: ReactNode;
   onClose: () => void;
 };
 
-const Modal: FC<PropsWithChildren<ModalProps>> = ({ title, footer, onClose, children, description }) => {
+const Modal: FC<PropsWithChildren<ModalProps>> = ({ title, titleView, footer, onClose, children, description }) => {
   return (
     <RadixDialog.Root defaultOpen={true} onOpenChange={onClose}>
       <RadixDialog.Portal>
@@ -24,6 +25,7 @@ const Modal: FC<PropsWithChildren<ModalProps>> = ({ title, footer, onClose, chil
           {title && (
             <div className="modal__header">
               <RadixDialog.Title className="h3 modal__title">{title}</RadixDialog.Title>
+              {titleView}
             </div>
           )}
           <div className="modal__body">{children}</div>

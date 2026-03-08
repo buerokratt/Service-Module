@@ -1,0 +1,5 @@
+ALTER TABLE endpoints
+ADD COLUMN last_test_at TIMESTAMPTZ,
+ADD COLUMN verification_status BOOLEAN DEFAULT FALSE,
+ADD COLUMN last_status_code VARChAR(10),
+ADD COLUMN schema_captured BOOLEAN DEFAULT FALSE;

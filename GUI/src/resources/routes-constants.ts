@@ -5,6 +5,7 @@ export const ROUTES = {
   NEWSERVICE_ROUTE_WITH_INTENT_NAME: '/newService/:intentName',
   EDITSERVICE_ROUTE: '/edit/:id',
   AUTOSERVICES_ROUTE: '/auto-services',
+  API_REGISTRY_ROUTE: '/api-registry',
   FAULTY_SERVICES_ROUTE: '/faultyServices',
   SERVICE_SETTINGS: '/services/settings',
 

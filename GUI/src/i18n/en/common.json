@@ -274,7 +274,11 @@
       "insertName": "Insert endpoint name...",
       "type": "Endpoint type",
       "nameAlreadyExists": "API title must be unique",
-      "formatJson": "Format JSON"
+      "formatJson": "Format JSON",
+      "global": "Global",
+      "tooltip": {
+        "global": "The global endpoint is stored in the API Registry and uses a single shared data source. When added to a service canvas, a local copy is created that is not automatically updated when the global endpoint changes; the copy can be edited directly on the canvas."
+      }
     },
     "trainingModuleSetup": "Training module setup",
     "serviceSetup": "Service setup",

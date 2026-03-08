@@ -7,6 +7,8 @@ import { v4 as uuid } from 'uuid';
 
 import { saveEndpoints } from '../../../services/service-builder';
 import { EndpointData } from '../../../types/endpoint/endpoint-data';
+import { InfoTooltip } from 'components/InfoTooltip';
+import JsonRequestContent from 'components/FlowElementsPopup/JsonRequestContent';
 
 interface AddEndpointModalProps {
   onClose: () => void;
@@ -26,7 +28,7 @@ const AddEndpointModal: React.FC<AddEndpointModalProps> = ({ onClose, onUpdatePr
   const [endpointNameExists, setEndpointNameExists] = useState(false);
   const [isCommonEndpoint, setIsCommonEndpoint] = useState(false);
   const [isCreatingEndpoint, setIsCreatingEndpoint] = useState(false);
-  const { setJsonRequestVisible, setJsonRequestContent } = useServiceStore();
+  const { isJsonRequestVisible, jsonRequestContent, setJsonRequestVisible, setJsonRequestContent, triggerJsonRequest } = useServiceStore();
 
   const handleClose = () => {
     setEndpoint({ endpointId: uuid(), name: '', definitions: [], isNew: true });
@@ -64,8 +66,28 @@ const AddEndpointModal: React.FC<AddEndpointModalProps> = ({ onClose, onUpdatePr
     );
   };
 
+   const handleJsonRequestClick = () => {
+     if (endpoint) {
+       const endpointData = {
+         ...endpoint,
+         definitions: endpoint.definitions.map((def) => ({ ...def })),
+       };
+       triggerJsonRequest(endpointData);
+     }
+   };
+
+
   return (
-    <Modal title={t('newService.createNewEndpoint')} onClose={handleClose}>
+    <Modal
+      title={t('newService.createNewEndpoint')}
+      onClose={handleClose}
+      titleView={
+        <Track gap={5} align="center">
+          <label style={{ fontStyle: 'italic' }}>{t('newService.endpoint.global')}</label>
+          <InfoTooltip name={t('newService.endpoint.tooltip.global')} />
+        </Track>
+      }
+    >
       <Track isMultiline gap={16} direction="vertical" align="stretch">
         <ApiEndpointCard
           endpoint={endpoint}
@@ -73,18 +95,22 @@ const AddEndpointModal: React.FC<AddEndpointModalProps> = ({ onClose, onUpdatePr
           onNameChange={setEndpointName}
           onCommonChange={setIsCommonEndpoint}
         />
-        <Track justify="end" gap={16}>
-          <Button appearance="secondary" onClick={handleClose}>
-            {t('overview.cancel')}
-          </Button>
-          <Button
-            appearance={isCreatingEndpoint ? 'loading' : 'primary'}
-            disabled={endpointName === '' || endpointNameExists}
-            onClick={handleCreate}
-          >
-            {t('global.create')}
-          </Button>
+        <Track justify="between" gap={16}>
+          <Button onClick={handleJsonRequestClick}>{t('newService.test')}</Button>
+          <Track justify="end" gap={16}>
+            <Button appearance="secondary" onClick={handleClose}>
+              {t('overview.cancel')}
+            </Button>
+            <Button
+              appearance={isCreatingEndpoint ? 'loading' : 'primary'}
+              disabled={endpointName === '' || endpointNameExists}
+              onClick={handleCreate}
+            >
+              {t('global.create')}
+            </Button>
+          </Track>
         </Track>
+        <JsonRequestContent padding={10} isVisible={isJsonRequestVisible} jsonContent={jsonRequestContent} />
       </Track>
     </Modal>
   );
