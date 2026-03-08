@@ -30,7 +30,7 @@ extract_request_data:
     page: ${incoming.body.page}
     pageSize: ${incoming.body.pageSize}
     sorting: ${incoming.body.sorting}
-    search: ${incoming.body.search}
+    search: ${incoming.body.search ?? ''}
 
 get_common_endpoints:
   call: http.post

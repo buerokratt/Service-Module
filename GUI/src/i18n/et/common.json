@@ -224,6 +224,43 @@
       }
     }
   },
+  "apiRegistry": {
+    "title": "API–Varamu / API Registry",
+    "createEndpoint": "Loo uus otspunkt",
+    "columns": {
+      "name": "Nimi",
+      "lastTest": "Viimane test",
+      "status": "Staatus",
+      "schema": "Skeem",
+      "actions": "Tegevused"
+    },
+    "tooltip": {
+      "fullName": "Täisnimi",
+      "description": "Kirjeldus",
+      "method": "Meetod",
+      "url": "URL"
+    },
+    "status": {
+      "verified": "Kinnitatud",
+      "failed": "Ebaõnnestunud",
+      "unverified": "Kinnitamata"
+    },
+    "actions": {
+      "copy": "Kopeeri",
+      "test": "Testi",
+      "edit": "Muuda",
+      "delete": "Kustuta"
+    },
+    "deleteConfirm": "Kas olete kindel, et soovite selle otspunkti kustutada?",
+    "noSchema": "—",
+    "noLastTest": "—",
+    "copySuccess": "Otspunkt kopeeritud",
+    "copyError": "Otspunkti kopeerimine ebaõnnestus",
+    "deleteSuccess": "Otspunkt kustutatud",
+    "deleteError": "Otspunkti kustutamine ebaõnnestus",
+    "testSuccess": "Test õnnestus",
+    "testError": "Test ebaõnnestus"
+  },
   "newService": {
     "endpoints": "Otspunktid",
     "serviceName": {

@@ -1,6 +1,5 @@
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import ApiEndpointCard from 'components/ApiEndpointCard';
 import Box from 'components/Box';
 import Button from 'components/Button';
 import Icon from 'components/Icon';
@@ -11,17 +10,15 @@ import { useTranslation } from 'react-i18next';
 import { MdDeleteOutline, MdDragIndicator, MdOutlineEdit } from 'react-icons/md';
 import { Link } from 'react-router-dom';
 import { deleteEndpoint } from 'resources/api-constants';
-import { saveEndpoints } from 'services/service-builder';
 import useServiceStore from 'store/new-services.store';
 import useToastStore from 'store/toasts.store';
 import { Step, StepType } from 'types';
 import { EndpointData } from 'types/endpoint';
 import { removeTrailingUnderscores } from 'utils/string-util';
 
+import EditEndpointModal from 'components/Flow/EdgeTypes/EditEndpointModal';
 import styles from './ApiEndpoint.module.scss';
 import api from '../../services/api-dev';
-import { InfoTooltip } from 'components/InfoTooltip';
-import JsonRequestContent from 'components/FlowElementsPopup/JsonRequestContent';
 
 interface RelatedService {
   serviceId: string;
@@ -47,32 +44,14 @@ const ApiEndpoint: FC<ApiEndpointProps> = ({ step, onClick }) => {
   const [relatedServices, setRelatedServices] = useState<RelatedService[]>([]);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [isEditing, setIsEditing] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
-  const [endpointNameExists, setEndpointNameExists] = useState<boolean>(false);
   const serviceName = useServiceStore((state) => removeTrailingUnderscores(state.serviceNameDashed()));
   const nodes = useServiceStore((state) => state.nodes);
-  const [endpointName, setEndpointName] = useState<string>(step.data?.name ?? '');
-  const [isCommonEndpoint, setIsCommonEndpoint] = useState<boolean>(step.data?.isCommon ?? false);
   const originalEndpoint = useMemo(() => {
-    return step.data ? (JSON.parse(JSON.stringify(step.data)) as EndpointData) : undefined;
+    return step.data ? (structuredClone(step.data) as EndpointData) : undefined;
   }, [step.data]);
 
-  const {
-    deleteEndpoint: deleteEndpointFromStore,
-    isJsonRequestVisible,
-    jsonRequestContent,
-    setJsonRequestVisible,
-    setJsonRequestContent,
-    triggerJsonRequest,
-  } = useServiceStore();
-
-  const handleJsonRequestClick = () => {
-    if (originalEndpoint) {
-      const endpointData = { ...originalEndpoint, definitions: originalEndpoint.definitions.map((def) => ({ ...def })) };
-      triggerJsonRequest(endpointData);
-    }
-  };
+  const { deleteEndpoint: deleteEndpointFromStore } = useServiceStore();
 
   const deleteSelectedEndpoint = async (endpoint: EndpointData | undefined) => {
     if (!endpoint) {
@@ -136,77 +115,17 @@ const ApiEndpoint: FC<ApiEndpointProps> = ({ step, onClick }) => {
       )}
 
       {showEditModal && step?.data && (
-        <Modal
-          title={t('newService.editEndpoint')}
-          titleView={
-            <Track gap={5} align="center">
-              <label style={{ fontStyle: 'italic' }}>{t('newService.endpoint.global')}</label>
-              <InfoTooltip name={t('newService.endpoint.tooltip.global')} />
-            </Track>
-          }
+        <EditEndpointModal
+          endpoint={step.data}
           onClose={() => {
             useServiceStore.getState().editEndpoint(originalEndpoint);
             setShowEditModal(false);
-            setJsonRequestVisible(false);
-            setJsonRequestContent(null);
           }}
-        >
-          <Track isMultiline gap={16} direction="vertical" align="stretch">
-            <ApiEndpointCard
-              endpoint={step?.data}
-              onNameExists={setEndpointNameExists}
-              onNameChange={setEndpointName}
-              onCommonChange={setIsCommonEndpoint}
-            />
-            <Track justify="between" gap={16}>
-              <Button onClick={handleJsonRequestClick}>{t('newService.test')}</Button>
-              <Track justify="end" gap={16}>
-                <Button
-                  appearance="secondary"
-                  onClick={(e) => {
-                    useServiceStore.getState().editEndpoint(originalEndpoint);
-                    setShowEditModal(false);
-                    setJsonRequestVisible(false);
-                    setJsonRequestContent(null);
-                    e.stopPropagation();
-                  }}
-                >
-                  {t('overview.cancel')}
-                </Button>
-                <Button
-                  appearance={isEditing ? 'loading' : 'primary'}
-                  disabled={endpointName === '' || endpointNameExists}
-                  onClick={(e) => {
-                    const stepData = step.data!;
-                    stepData.name = endpointName;
-                    stepData.isCommon = isCommonEndpoint;
-                    setIsEditing(true);
-                    void saveEndpoints(
-                      [stepData],
-                      () => {
-                        setShowEditModal(false);
-                        setJsonRequestVisible(false);
-                        setJsonRequestContent(null);
-                        e.stopPropagation();
-                        useServiceStore.getState().editEndpoint(stepData);
-                        setIsEditing(false);
-                        useToastStore.getState().success({ title: t('serviceFlow.apiElements.editSuccess') });
-                      },
-                      (error) => {
-                        console.error(`Error Editing API endpoint: ${error}`);
-                        useToastStore.getState().error({ title: t('serviceFlow.apiElements.editError') });
-                        setIsEditing(false);
-                      },
-                    );
-                  }}
-                >
-                  {t('global.edit')}
-                </Button>
-              </Track>
-            </Track>
-            <JsonRequestContent padding={10} isVisible={isJsonRequestVisible} jsonContent={jsonRequestContent} />
-          </Track>
-        </Modal>
+          onSaved={(updated) => {
+            useServiceStore.getState().editEndpoint(updated);
+            setShowEditModal(false);
+          }}
+        />
       )}
 
       {relatedServices.length > 0 && (

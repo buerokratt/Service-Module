@@ -12,11 +12,21 @@ import JsonRequestContent from 'components/FlowElementsPopup/JsonRequestContent'
 
 interface AddEndpointModalProps {
   onClose: () => void;
-  onUpdatePreferences: (endpointIds: string[]) => void;
-  currentEndpointIds: string[];
+  onUpdatePreferences?: (endpointIds: string[]) => void;
+  currentEndpointIds?: string[];
+  /** When provided, used for API Registry: on save success call this and do not add to service store or preferences. */
+  onCreated?: (endpoint: EndpointData) => void;
+  /** When true, Save is disabled until the user has run Test at least once. */
+  requireTestBeforeSave?: boolean;
 }
 
-const AddEndpointModal: React.FC<AddEndpointModalProps> = ({ onClose, onUpdatePreferences, currentEndpointIds }) => {
+const AddEndpointModal: React.FC<AddEndpointModalProps> = ({
+  onClose,
+  onUpdatePreferences,
+  currentEndpointIds = [],
+  onCreated,
+  requireTestBeforeSave = false,
+}) => {
   const { t } = useTranslation();
   const [endpoint, setEndpoint] = useState<EndpointData>({
     endpointId: uuid(),
@@ -27,17 +37,56 @@ const AddEndpointModal: React.FC<AddEndpointModalProps> = ({ onClose, onUpdatePr
   const [endpointName, setEndpointName] = useState('');
   const [endpointNameExists, setEndpointNameExists] = useState(false);
   const [isCommonEndpoint, setIsCommonEndpoint] = useState(false);
+  const [hasTested, setHasTested] = useState(false);
   const [isCreatingEndpoint, setIsCreatingEndpoint] = useState(false);
-  const { isJsonRequestVisible, jsonRequestContent, setJsonRequestVisible, setJsonRequestContent, triggerJsonRequest } = useServiceStore();
+  const [isTesting, setIsTesting] = useState(false);
+  const {
+    isJsonRequestVisible,
+    jsonRequestContent,
+    setJsonRequestVisible,
+    setJsonRequestContent,
+    triggerJsonRequest,
+    testUrl,
+  } = useServiceStore();
 
   const handleClose = () => {
     setEndpoint({ endpointId: uuid(), name: '', definitions: [], isNew: true });
     setEndpointName('');
     setIsCommonEndpoint(false);
+    setHasTested(false);
     setIsCreatingEndpoint(false);
     setJsonRequestVisible(false);
     setJsonRequestContent(null);
     onClose();
+  };
+
+  const handleTestClick = () => {
+    if (requireTestBeforeSave) {
+      const ep = { ...endpoint, name: endpointName || endpoint.name };
+      ep.definitions = endpoint.definitions.map((d) => ({ ...d }));
+      if (ep.definitions[0]) ep.definitions[0].url = ep.definitions[0].url ?? ep.definitions[0].path ?? '';
+      setIsTesting(true);
+      testUrl(
+        ep,
+        () => {
+          setIsTesting(false);
+          useToastStore.getState().error({ title: t('newService.endpoint.error') });
+        },
+        () => {
+          setHasTested(true);
+          setIsTesting(false);
+          useToastStore.getState().success({ title: t('newService.endpoint.success') });
+        },
+      );
+    } else {
+      if (endpoint) {
+        const endpointData = {
+          ...endpoint,
+          definitions: endpoint.definitions.map((def) => ({ ...def })),
+        };
+        triggerJsonRequest(endpointData);
+      }
+    }
   };
 
   const handleCreate = () => {
@@ -49,11 +98,14 @@ const AddEndpointModal: React.FC<AddEndpointModalProps> = ({ onClose, onUpdatePr
     void saveEndpoints(
       [passedEndpoint],
       () => {
-        useServiceStore.getState().addEndpoint(passedEndpoint);
-        // Add the new endpoint to user preferences
-        const newEndpointIds = [...currentEndpointIds, passedEndpoint.endpointId];
-        onUpdatePreferences(newEndpointIds);
-
+        if (onCreated) {
+          passedEndpoint.isNew = false;
+          onCreated(passedEndpoint);
+        } else {
+          useServiceStore.getState().addEndpoint(passedEndpoint);
+          const newEndpointIds = [...currentEndpointIds, passedEndpoint.endpointId];
+          onUpdatePreferences?.(newEndpointIds);
+        }
         handleClose();
         useToastStore.getState().success({ title: t('serviceFlow.apiElements.createSuccess') });
         setIsCreatingEndpoint(false);
@@ -66,15 +118,10 @@ const AddEndpointModal: React.FC<AddEndpointModalProps> = ({ onClose, onUpdatePr
     );
   };
 
-   const handleJsonRequestClick = () => {
-     if (endpoint) {
-       const endpointData = {
-         ...endpoint,
-         definitions: endpoint.definitions.map((def) => ({ ...def })),
-       };
-       triggerJsonRequest(endpointData);
-     }
-   };
+  const canSave =
+    endpointName !== '' &&
+    !endpointNameExists &&
+    (!requireTestBeforeSave || hasTested);
 
 
   return (
@@ -96,14 +143,20 @@ const AddEndpointModal: React.FC<AddEndpointModalProps> = ({ onClose, onUpdatePr
           onCommonChange={setIsCommonEndpoint}
         />
         <Track justify="between" gap={16}>
-          <Button onClick={handleJsonRequestClick}>{t('newService.test')}</Button>
+          <Button
+            onClick={handleTestClick}
+            appearance={isTesting ? 'loading' : 'secondary'}
+            disabled={requireTestBeforeSave && !endpoint.definitions?.[0]?.url && !endpoint.definitions?.[0]?.path}
+          >
+            {t('newService.test')}
+          </Button>
           <Track justify="end" gap={16}>
             <Button appearance="secondary" onClick={handleClose}>
               {t('overview.cancel')}
             </Button>
             <Button
               appearance={isCreatingEndpoint ? 'loading' : 'primary'}
-              disabled={endpointName === '' || endpointNameExists}
+              disabled={!canSave}
               onClick={handleCreate}
             >
               {t('global.create')}

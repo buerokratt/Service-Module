@@ -1,16 +1,151 @@
-import React from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
-
-import { ROUTES } from '../resources/routes-constants';
+import { PaginationState, SortingState } from '@tanstack/react-table';
+import { Button, Card, Modal, Track } from 'components';
+import AddEndpointModal from 'components/Flow/EdgeTypes/AddEndpointModal';
+import EditEndpointModal from 'components/Flow/EdgeTypes/EditEndpointModal';
+import useApiRegistryStore from 'store/api-registry.store';
+import { EndpointData } from 'types/endpoint';
+import ApiRegistryTable from './ApiRegistryPage/ApiRegistryTable';
 
 const ApiRegistryPage: React.FC = () => {
   const { t } = useTranslation();
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [editEndpoint, setEditEndpoint] = useState<EndpointData | null>(null);
+  const [deleteEndpoint, setDeleteEndpoint] = useState<EndpointData | null>(null);
+  const [search, setSearch] = useState('');
+  const [testingId, setTestingId] = useState<string | null>(null);
+  const [pagination, setPagination] = useState<PaginationState>({ pageIndex: 0, pageSize: 10 });
+  const [sorting, setSorting] = useState<SortingState>([{ id: 'created_at', desc: true }]);
+
+  const endpoints = useApiRegistryStore((s) => s.endpoints);
+  const verificationMap = useApiRegistryStore((s) => s.verificationMap);
+  const totalPages = useApiRegistryStore((s) => s.totalPages);
+  const loading = useApiRegistryStore((s) => s.loading);
+  const loadEndpoints = useApiRegistryStore((s) => s.loadEndpoints);
+  const testEndpoint = useApiRegistryStore((s) => s.testEndpoint);
+  const copyEndpoint = useApiRegistryStore((s) => s.copyEndpoint);
+  const deleteEndpointFromStore = useApiRegistryStore((s) => s.deleteEndpoint);
+  const addEndpointAfterCreate = useApiRegistryStore((s) => s.addEndpointAfterCreate);
+  const updateEndpointInList = useApiRegistryStore((s) => s.updateEndpointInList);
+
+  useEffect(() => {
+    loadEndpoints(pagination, sorting, search);
+  }, [loadEndpoints, pagination, sorting, search]);
+
+  const handlePageChange = useCallback(
+    (state: PaginationState) => {
+      if (state.pageSize === pagination.pageSize) {
+        setPagination(state);
+      } else {
+        setPagination({ pageIndex: 0, pageSize: state.pageSize });
+      }
+    },
+    [pagination.pageSize],
+  );
+
+  const handleTest = useCallback(
+    async (endpoint: EndpointData) => {
+      setTestingId(endpoint.endpointId);
+      await testEndpoint(endpoint);
+      setTestingId(null);
+    },
+    [testEndpoint],
+  );
+
+  const handleCopy = useCallback(
+    (endpoint: EndpointData) => {
+      void copyEndpoint(endpoint);
+    },
+    [copyEndpoint],
+  );
+
+  const handleEdit = useCallback((endpoint: EndpointData) => {
+    setEditEndpoint(endpoint);
+  }, []);
+
+  const handleDeleteClick = useCallback((endpoint: EndpointData) => {
+    setDeleteEndpoint(endpoint);
+  }, []);
+
+  const handleConfirmDelete = useCallback(() => {
+    if (!deleteEndpoint) return;
+    void deleteEndpointFromStore(deleteEndpoint).then(() => setDeleteEndpoint(null));
+  }, [deleteEndpoint, deleteEndpointFromStore]);
 
   return (
     <>
-      <h1>Oops 404!</h1>
-      <Link to={ROUTES.OVERVIEW_ROUTE}>{t('global.backhome')}</Link>
+      <Card>
+        <Track justify="between" align="center" style={{ marginBottom: 16 }}>
+          <h1 style={{ margin: 0 }}>{t('apiRegistry.title')}</h1>
+          <Button appearance="primary" onClick={() => setShowCreateModal(true)}>
+            {t('apiRegistry.createEndpoint')}
+          </Button>
+        </Track>
+        <Track gap={8} style={{ marginBottom: 16 }}>
+          <input
+            type="search"
+            placeholder={`${t('global.search')}...`}
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            style={{ padding: '8px 12px', minWidth: 200 }}
+          />
+        </Track>
+        <ApiRegistryTable
+          t={t}
+          loading={loading}
+          endpoints={endpoints}
+          verificationMap={verificationMap}
+          totalPages={totalPages}
+          pagination={pagination}
+          sorting={sorting}
+          setPagination={handlePageChange}
+          setSorting={setSorting}
+          onEdit={handleEdit}
+          onDelete={handleDeleteClick}
+          onTest={handleTest}
+          onCopy={handleCopy}
+          testingId={testingId}
+        />
+      </Card>
+
+      {showCreateModal && (
+        <AddEndpointModal
+          onClose={() => setShowCreateModal(false)}
+          onCreated={(endpoint) => {
+            addEndpointAfterCreate(endpoint);
+            setShowCreateModal(false);
+          }}
+          requireTestBeforeSave
+        />
+      )}
+
+      {editEndpoint && (
+        <EditEndpointModal
+          endpoint={editEndpoint}
+          onClose={() => setEditEndpoint(null)}
+          onSaved={(updated) => {
+            updateEndpointInList(updated);
+            setEditEndpoint(null);
+          }}
+        />
+      )}
+
+      {deleteEndpoint && (
+        <Modal
+          title={t('apiRegistry.deleteConfirm')}
+          onClose={() => setDeleteEndpoint(null)}
+        >
+          <Track justify="end" gap={16}>
+            <Button appearance="secondary" onClick={() => setDeleteEndpoint(null)}>
+              {t('overview.cancel')}
+            </Button>
+            <Button appearance="error" onClick={handleConfirmDelete}>
+              {t('apiRegistry.actions.delete')}
+            </Button>
+          </Track>
+        </Modal>
+      )}
     </>
   );
 };

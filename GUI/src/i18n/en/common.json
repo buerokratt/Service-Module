@@ -224,6 +224,43 @@
       }
     }
   },
+  "apiRegistry": {
+    "title": "API Registry",
+    "createEndpoint": "Create endpoint",
+    "columns": {
+      "name": "Name",
+      "lastTest": "Last test",
+      "status": "Status",
+      "schema": "Schema",
+      "actions": "Actions"
+    },
+    "tooltip": {
+      "fullName": "Full name",
+      "description": "Description",
+      "method": "Method",
+      "url": "URL"
+    },
+    "status": {
+      "verified": "Verified",
+      "failed": "Failed",
+      "unverified": "Unverified"
+    },
+    "actions": {
+      "copy": "Copy",
+      "test": "Test",
+      "edit": "Edit",
+      "delete": "Delete"
+    },
+    "deleteConfirm": "Are you sure you want to delete this endpoint?",
+    "noSchema": "—",
+    "noLastTest": "—",
+    "copySuccess": "Endpoint copied",
+    "copyError": "Failed to copy endpoint",
+    "deleteSuccess": "Endpoint deleted",
+    "deleteError": "Failed to delete endpoint",
+    "testSuccess": "Test successful",
+    "testError": "Test failed"
+  },
   "newService": {
     "endpoints": "Endpoints",
     "test": "Test URL",
