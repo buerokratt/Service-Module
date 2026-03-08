@@ -2,6 +2,7 @@ import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import Box from 'components/Box';
 import Button from 'components/Button';
+import EditEndpointModal from 'components/Flow/EdgeTypes/EditEndpointModal';
 import Icon from 'components/Icon';
 import Modal from 'components/Modal';
 import Track from 'components/Track';
@@ -16,7 +17,6 @@ import { Step, StepType } from 'types';
 import { EndpointData } from 'types/endpoint';
 import { removeTrailingUnderscores } from 'utils/string-util';
 
-import EditEndpointModal from 'components/Flow/EdgeTypes/EditEndpointModal';
 import styles from './ApiEndpoint.module.scss';
 import api from '../../services/api-dev';
 

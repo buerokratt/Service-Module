@@ -1,11 +1,12 @@
-import React, { useCallback, useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import { PaginationState, SortingState } from '@tanstack/react-table';
 import { Button, Card, Modal, Track } from 'components';
 import AddEndpointModal from 'components/Flow/EdgeTypes/AddEndpointModal';
 import EditEndpointModal from 'components/Flow/EdgeTypes/EditEndpointModal';
+import React, { useCallback, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import useApiRegistryStore from 'store/api-registry.store';
 import { EndpointData } from 'types/endpoint';
+
 import ApiRegistryTable from './ApiRegistryPage/ApiRegistryTable';
 
 const ApiRegistryPage: React.FC = () => {
@@ -132,10 +133,7 @@ const ApiRegistryPage: React.FC = () => {
       )}
 
       {deleteEndpoint && (
-        <Modal
-          title={t('apiRegistry.deleteConfirm')}
-          onClose={() => setDeleteEndpoint(null)}
-        >
+        <Modal title={t('apiRegistry.deleteConfirm')} onClose={() => setDeleteEndpoint(null)}>
           <Track justify="end" gap={16}>
             <Button appearance="secondary" onClick={() => setDeleteEndpoint(null)}>
               {t('overview.cancel')}

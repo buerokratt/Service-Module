@@ -1,3 +1,4 @@
+import ApiRegistryPage from 'pages/ApiRegistryPage';
 import React from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
 
@@ -6,7 +7,6 @@ import FaultyServicesPage from './pages/FaultyServicesPage';
 import NotFoundPage from './pages/NotFoundPage';
 import OverviewPage from './pages/OverviewPage';
 import ServiceFlowPage from './pages/ServiceFlowPage';
-import ApiRegistryPage from 'pages/ApiRegistryPage';
 import ServiceSettingPage from './pages/ServiceSettingPage';
 import { ROUTES } from './resources/routes-constants';
 

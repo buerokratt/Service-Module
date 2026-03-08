@@ -1,4 +1,6 @@
 import { ApiEndpointCard, Button, Modal, Track } from 'components';
+import JsonRequestContent from 'components/FlowElementsPopup/JsonRequestContent';
+import { InfoTooltip } from 'components/InfoTooltip';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import useServiceStore from 'store/new-services.store';
@@ -7,8 +9,6 @@ import { v4 as uuid } from 'uuid';
 
 import { saveEndpoints } from '../../../services/service-builder';
 import { EndpointData } from '../../../types/endpoint/endpoint-data';
-import { InfoTooltip } from 'components/InfoTooltip';
-import JsonRequestContent from 'components/FlowElementsPopup/JsonRequestContent';
 
 interface AddEndpointModalProps {
   onClose: () => void;
@@ -118,11 +118,7 @@ const AddEndpointModal: React.FC<AddEndpointModalProps> = ({
     );
   };
 
-  const canSave =
-    endpointName !== '' &&
-    !endpointNameExists &&
-    (!requireTestBeforeSave || hasTested);
-
+  const canSave = endpointName !== '' && !endpointNameExists && (!requireTestBeforeSave || hasTested);
 
   return (
     <Modal
@@ -154,11 +150,7 @@ const AddEndpointModal: React.FC<AddEndpointModalProps> = ({
             <Button appearance="secondary" onClick={handleClose}>
               {t('overview.cancel')}
             </Button>
-            <Button
-              appearance={isCreatingEndpoint ? 'loading' : 'primary'}
-              disabled={!canSave}
-              onClick={handleCreate}
-            >
+            <Button appearance={isCreatingEndpoint ? 'loading' : 'primary'} disabled={!canSave} onClick={handleCreate}>
               {t('global.create')}
             </Button>
           </Track>

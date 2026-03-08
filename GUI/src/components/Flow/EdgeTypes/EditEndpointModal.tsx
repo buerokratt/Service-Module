@@ -1,12 +1,13 @@
 import { ApiEndpointCard, Button, Modal, Track } from 'components';
+import JsonRequestContent from 'components/FlowElementsPopup/JsonRequestContent';
+import { InfoTooltip } from 'components/InfoTooltip';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import useServiceStore from 'store/new-services.store';
 import useToastStore from 'store/toasts.store';
+
 import { saveEndpoints } from '../../../services/service-builder';
 import { EndpointData } from '../../../types/endpoint/endpoint-data';
-import { InfoTooltip } from 'components/InfoTooltip';
-import JsonRequestContent from 'components/FlowElementsPopup/JsonRequestContent';
 
 interface EditEndpointModalProps {
   endpoint: EndpointData;

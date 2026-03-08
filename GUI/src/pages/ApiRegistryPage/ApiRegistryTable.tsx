@@ -1,15 +1,12 @@
-import React from 'react';
 import { PaginationState, SortingState } from '@tanstack/react-table';
-import { TFunction } from 'i18next';
-import { MdOutlineEast, MdOutlineWest } from 'react-icons/md';
 import { Button, Icon, Tooltip, Track } from 'components';
-import { EndpointData } from 'types/endpoint';
+import { TFunction } from 'i18next';
+import React from 'react';
+import { MdOutlineEast, MdOutlineWest } from 'react-icons/md';
 import { VerificationMetadata } from 'store/api-registry.store';
-import {
-  truncateName,
-  formatLastTest,
-  formatStatus,
-} from './columns';
+import { EndpointData } from 'types/endpoint';
+
+import { formatLastTest, formatStatus, truncateName } from './columns';
 
 type ApiRegistryTableProps = {
   t: TFunction;
@@ -79,10 +76,19 @@ const ApiRegistryTable: React.FC<ApiRegistryTableProps> = ({
                     <Tooltip
                       content={
                         <Track direction="vertical" gap={4}>
-                          <span><strong>{t('apiRegistry.tooltip.fullName')}:</strong> {label}</span>
-                          <span><strong>{t('apiRegistry.tooltip.description')}:</strong> {def?.description ?? '—'}</span>
-                          <span><strong>{t('apiRegistry.tooltip.method')}:</strong> {def?.methodType ?? '—'}</span>
-                          <span><strong>{t('apiRegistry.tooltip.url')}:</strong> {def?.url ?? def?.openApiUrl ?? def?.path ?? '—'}</span>
+                          <span>
+                            <strong>{t('apiRegistry.tooltip.fullName')}:</strong> {label}
+                          </span>
+                          <span>
+                            <strong>{t('apiRegistry.tooltip.description')}:</strong> {def?.description ?? '—'}
+                          </span>
+                          <span>
+                            <strong>{t('apiRegistry.tooltip.method')}:</strong> {def?.methodType ?? '—'}
+                          </span>
+                          <span>
+                            <strong>{t('apiRegistry.tooltip.url')}:</strong>{' '}
+                            {def?.url ?? def?.openApiUrl ?? def?.path ?? '—'}
+                          </span>
                         </Track>
                       }
                     >
@@ -152,9 +158,7 @@ const ApiRegistryTable: React.FC<ApiRegistryTableProps> = ({
             <label>{t('global.resultCount')}</label>
             <select
               value={pagination.pageSize}
-              onChange={(e) =>
-                setPagination({ pageIndex: 0, pageSize: Number(e.target.value) })
-              }
+              onChange={(e) => setPagination({ pageIndex: 0, pageSize: Number(e.target.value) })}
             >
               {[10, 20, 30, 40, 50].map((size) => (
                 <option key={size} value={size}>

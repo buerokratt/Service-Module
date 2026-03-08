@@ -1,5 +1,4 @@
 import { PaginationState, SortingState } from '@tanstack/react-table';
-import { create } from 'zustand';
 import {
   createEndpoint,
   deleteEndpoint as deleteEndpointApi,
@@ -7,9 +6,12 @@ import {
   getEndpointValidation,
 } from 'resources/api-constants';
 import { EndpointData } from 'types/endpoint';
+import { v4 as uuid } from 'uuid';
+import { create } from 'zustand';
+
 import useToastStore from './toasts.store';
 import api from '../services/api-dev';
-import { v4 as uuid } from 'uuid';
+
 
 export type VerificationStatus = 'verified' | 'failed' | 'unverified';
 
@@ -25,11 +27,7 @@ interface ApiRegistryState {
   totalPages: number;
   verificationMap: Record<string, VerificationMetadata>;
   loading: boolean;
-  loadEndpoints: (
-    pagination: PaginationState,
-    sorting: SortingState,
-    search: string,
-  ) => Promise<void>;
+  loadEndpoints: (pagination: PaginationState, sorting: SortingState, search: string) => Promise<void>;
   setVerification: (endpointId: string, data: Partial<VerificationMetadata>) => void;
   testEndpoint: (endpoint: EndpointData) => Promise<{ success: boolean; statusCode?: number }>;
   copyEndpoint: (endpoint: EndpointData) => Promise<void>;
@@ -65,13 +63,10 @@ const useApiRegistryStore = create<ApiRegistryState>((set, get) => ({
       const data = response.data?.response;
       let endpoints: EndpointData[] = [];
       let totalPages = 1;
-      const rawList = Array.isArray(data) ? data : data?.content ?? [];
+      const rawList = Array.isArray(data) ? data : (data?.content ?? []);
       endpoints = rawList.map((item: any) => {
         const defs = item.definitions;
-        const parsed =
-          typeof defs?.value === 'string'
-            ? JSON.parse(defs.value)
-            : Array.isArray(defs) ? defs : [];
+        const parsed = typeof defs?.value === 'string' ? JSON.parse(defs.value) : Array.isArray(defs) ? defs : [];
         return {
           ...item,
           definitions: parsed,
@@ -117,7 +112,10 @@ const useApiRegistryStore = create<ApiRegistryState>((set, get) => ({
         lastTestAt: now,
         verificationStatus: success ? 'verified' : 'failed',
         lastStatusCode: statusCode,
-        schemaCaptured: success && statusCode !== 204 ? hasSchema : (get().verificationMap[endpoint.endpointId]?.schemaCaptured ?? false),
+        schemaCaptured:
+          success && statusCode !== 204
+            ? hasSchema
+            : (get().verificationMap[endpoint.endpointId]?.schemaCaptured ?? false),
       });
       return { success, statusCode };
     } catch (err: any) {
