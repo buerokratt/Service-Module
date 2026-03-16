@@ -92,6 +92,7 @@ assign_values:
   assign:
     name: ${name_res.response.body[0].name}
     service_name: "service_${name_res.response.body[0].name}"
+    storage_file_name: ${'service_' + id + '_' + name_res.response.body[0].name.replace(/[^a-zA-Z0-9._-]/g, '_')}
   next: check_file_exists
 
 check_file_exists:
@@ -158,7 +159,7 @@ create_in_storage:
       files:
         - storageAccountId: "[#STORAGE_FERRY_ACCOUNT_ID]"
           container: "[#STORAGE_FERRY_CONTAINER]"
-          fileName: "${name}.json"
+          fileName: "${storage_file_name}.json"
       content: ${JSON.stringify(service_json_result.response.body)}
   result: ferry_upload_result
   next: check_if_azure_configured_after_create
@@ -213,7 +214,7 @@ delete_from_storage:
       files:
         - storageAccountId: "[#STORAGE_FERRY_ACCOUNT_ID]"
           container: "[#STORAGE_FERRY_CONTAINER]"
-          fileName: "${name}.json"
+          fileName: "${storage_file_name}.json"
   result: ferry_delete_result
   next: check_if_azure_configured_after_delete
 
