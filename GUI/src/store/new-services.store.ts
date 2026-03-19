@@ -229,7 +229,7 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
   unmarkAsNewService: () => set({ isNewService: false }),
   setServiceId: (id) => set({ serviceId: id }),
   setNodes: (nodes) => {
-    if (nodes instanceof Function) {
+    if (typeof nodes === 'function') {
       set((state) => {
         return {
           nodes: nodes(state.nodes),
@@ -240,7 +240,7 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
     }
   },
   setEdges: (edges) => {
-    if (edges instanceof Function) {
+    if (typeof edges === 'function') {
       set((state) => {
         return {
           edges: edges(state.edges),
@@ -294,17 +294,18 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
           });
         }
 
-        chips.push({
-          name: 'Base Response',
-          value: `${endpoint?.name.replaceAll(' ', '_')}_res.response.body`,
-          data: `${endpoint?.name.replaceAll(' ', '_')}_res.response.body`,
-        });
-
-        chips.push({
-          name: 'Status Code',
-          value: `${endpoint?.name.replaceAll(' ', '_')}_res.response.statusCodeValue`,
-          data: `${endpoint?.name.replaceAll(' ', '_')}_res.response.statusCodeValue`,
-        });
+        chips.push(
+          {
+            name: 'Base Response',
+            value: `${endpoint?.name.replaceAll(' ', '_')}_res.response.body`,
+            data: `${endpoint?.name.replaceAll(' ', '_')}_res.response.body`,
+          },
+          {
+            name: 'Status Code',
+            value: `${endpoint?.name.replaceAll(' ', '_')}_res.response.statusCodeValue`,
+            data: `${endpoint?.name.replaceAll(' ', '_')}_res.response.statusCodeValue`,
+          }
+        );
 
         const variable: EndpointResponseVariable = {
           name: endpoint?.name ?? '',
@@ -440,7 +441,7 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
 
       if (!nodes || nodes.length === 0) nodes = initialNodes;
 
-      if (!endpoints || !(endpoints instanceof Array)) endpoints = [];
+      if (!endpoints || !Array.isArray(endpoints)) endpoints = [];
 
       nodes = nodes.map((node: any) => {
         if (node.type !== 'custom') return node;
@@ -679,7 +680,7 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
         title: i18next.t('newService.toast.missingFields'),
         message: i18next.t('newService.toast.serviceMissingFields'),
       });
-      return Promise.reject(new Error(i18next.t('newService.toast.missingFields') ?? 'Error'));
+      throw new Error(i18next.t('newService.toast.missingFields') ?? 'Error');
     }
 
     const { isNewService, onServiceSave } = get();
@@ -687,7 +688,7 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
     try {
       await onServiceSave(ServiceState.Ready);
     } catch (e: any) {
-      return Promise.reject(new Error(i18next.t('toast.cannot-save-flow') ?? (e?.message as string) ?? 'Error'));
+      throw new Error(i18next.t('toast.cannot-save-flow') ?? (e?.message as string) ?? 'Error');
     }
 
     if (isNewService) {

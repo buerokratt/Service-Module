@@ -74,15 +74,15 @@ const ServiceFlowPage: FC = () => {
         }}
         saveOnClick={async () => {
           setHasUnsavedChanges(false);
-          if (!id) {
+          if (id) {
+            await useServiceStore.getState().loadService(id);
+          } else {
             const serviceId = useServiceStore.getState().serviceId;
             const serviceResponse = await useServiceStore.getState().loadService(serviceId);
             if (serviceResponse) {
               useServiceListStore.getState().setSelectedService(serviceResponse?.data);
               navigate(ROUTES.replaceWithId(ROUTES.EDITSERVICE_ROUTE, serviceId));
             }
-          } else {
-            await useServiceStore.getState().loadService(id);
           }
         }}
       />
