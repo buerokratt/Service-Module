@@ -46,6 +46,11 @@ const ServiceFlowPage: FC = () => {
     };
 
     void loadData();
+
+    // Cleanup function to reset state when component unmounts (including browser back button)
+    return () => {
+      useServiceStore.getState().resetState();
+    };
   }, [id]);
 
   const edges = useServiceStore((state) => state.edges);

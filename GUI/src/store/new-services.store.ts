@@ -391,6 +391,8 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
       serviceId: uuid(),
       description: '',
       slot: '',
+      examples: [],
+      entities: [],
       secrets: { prod: [], test: [] },
       availableVariables: { prod: [], test: [] },
       isCommon: false,
