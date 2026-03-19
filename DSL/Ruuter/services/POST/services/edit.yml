@@ -183,6 +183,8 @@ assign_values:
     old_structure: ${old_service_result.response.body[0].structure}
     old_state: ${old_service_result.response.body[0].state}
     service_type: ${old_service_result.response.body[0].type}
+    old_storage_file_name: ${'service_' + id + '_' + old_service_result.response.body[0].name.replace(/[^a-zA-Z0-9._-]/g, '_')}
+    new_storage_file_name: ${'service_' + id + '_' + name.replace(/[^a-zA-Z0-9._-]/g, '_')}
 
 check_new_structure:
   switch:
@@ -254,7 +256,7 @@ delete_from_storage_edit:
       files:
         - storageAccountId: "[#STORAGE_FERRY_ACCOUNT_ID]"
           container: "[#STORAGE_FERRY_CONTAINER]"
-          fileName: "${old_name}.json"
+          fileName: "${old_storage_file_name}.json"
   result: ferry_delete_result
   next: check_if_azure_configured_after_delete_edit
 
@@ -339,7 +341,7 @@ replace_in_storage:
       files:
         - storageAccountId: "[#STORAGE_FERRY_ACCOUNT_ID]"
           container: "[#STORAGE_FERRY_CONTAINER]"
-          fileName: "${name}.json"
+          fileName: "${new_storage_file_name}.json"
       content: ${JSON.stringify(service_json_result.response.body)}
   result: ferry_upload_result
   next: check_if_azure_configured
