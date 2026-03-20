@@ -74,7 +74,7 @@ const hasSpecialFormat = (m: string) => m.includes('\n\n') && m.indexOf('.') > 0
 
 const htmlLinkToMarkdown = (value: string): string =>
   value.replaceAll(
-    /<a\s+[^>]*href\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s>]+))[^>]*>([\s\S]*?)<\/a>/gi,
+    /<a\s+[^>]*href\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s>]+))[^>]*>((?:[^<]|<(?!\/a>))*)<\/a>/gi,
     (_, href1: string, href2: string, href3: string, label: string) => {
       const href = (href1 ?? href2 ?? href3 ?? '').trim();
       const text = sanitizeHtml(label ?? '', { allowedTags: [], allowedAttributes: {} }).trim() || href;
@@ -100,7 +100,7 @@ function formatMessage(message?: string): string {
   const markdownLinksMessage = htmlLinkToMarkdown(finalMessage);
 
   return markdownLinksMessage
-    .replaceAll(/&#x([0-9A-F]+);/gi, (_, hex: string) => String.fromCharCode(parseInt(hex, 16)))
+    .replaceAll(/&#x([0-9A-F]+);/gi, (_, hex: string) => String.fromCodePoint(Number.parseInt(hex, 16)))
     .replaceAll('&amp;', '&')
     .replaceAll('&gt;', '>')
     .replaceAll('&lt;', '<')
@@ -116,7 +116,7 @@ function formatMessage(message?: string): string {
           return `${prefix}${year}. `;
         }
       }
-      return `${prefix}${year}\\. `;
+      return String.raw`${prefix}${year}\. `;
     })
     .replaceAll(/(?<=\n)\d+\.\s/g, hasSpecialFormat(finalMessage) ? '\n\n$&' : '$&')
     .replaceAll(/^(\s+)/g, (match) => match.replaceAll(' ', '&nbsp;'));

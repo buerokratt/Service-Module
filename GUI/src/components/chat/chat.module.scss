@@ -233,7 +233,7 @@
       pointer-events: none;
       user-select: none;
       background-color: #f5f5f5;
-      color: #999;
+      color: #696969;
     }
   }
 
@@ -278,17 +278,17 @@
   font-weight: bold;
 
   &.success {
-    color: rgb(0, 138, 0);
+    color: rgb(0, 100, 0);
     background: #0f02;
   }
 
   &.error {
-    color: rgb(170, 0, 0);
+    color: rgb(153, 0, 0);
     background: #f002;
   }
 
   &.info {
-    color: rgb(0, 0, 203);
+    color: rgb(0, 0, 153);
     background: #00f2;
   }
 
