@@ -151,3 +151,23 @@ export function removeWrapperQuotes(str: string): string {
 
   return str.substring(start, end + 1);
 }
+
+export function decodeHtmlEntities(value: string): string {
+  if (typeof value !== 'string' || value.length === 0) return value;
+
+  if (typeof document !== 'undefined') {
+    const textarea = document.createElement('textarea');
+    textarea.innerHTML = value;
+    return textarea.value;
+  }
+
+  return value
+    .replaceAll(/&#x([0-9A-F]+);/gi, (_, hex: string) => String.fromCharCode(parseInt(hex, 16)))
+    .replaceAll(/&#(\d+);/g, (_, code: string) => String.fromCharCode(parseInt(code, 10)))
+    .replaceAll('&amp;', '&')
+    .replaceAll('&gt;', '>')
+    .replaceAll('&lt;', '<')
+    .replaceAll('&quot;', '"')
+    .replaceAll('&#39;', "'")
+    .replaceAll('&apos;', "'");
+}

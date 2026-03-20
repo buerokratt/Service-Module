@@ -3,10 +3,12 @@ import ExclamationBadge from 'components/ExclamationBadge';
 import Track from 'components/Track';
 import { FC, memo, useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import sanitizeHtml from 'sanitize-html';
 import useServiceStore from 'store/new-services.store';
 import { StepType } from 'types';
 import { NodeDataProps } from 'types/service-flow';
 import { validateStep } from 'utils/flow-utils';
+import { decodeHtmlEntities } from 'utils/string-util';
 
 type StepNodeProps = {
   data: NodeDataProps;
@@ -21,8 +23,17 @@ const StepNode: FC<StepNodeProps> = ({ data }) => {
     fontWeight: 500,
   };
   const createMarkup = (text: string) => {
+    const decodedText = decodeHtmlEntities(text);
+    const sanitizedText = sanitizeHtml(decodedText, {
+      allowedTags: ['a', 'b', 'strong', 'i', 'em', 'u', 'p', 'br', 'ul', 'ol', 'li', 'code'],
+      allowedAttributes: {
+        a: ['href', 'target', 'rel'],
+      },
+      disallowedTagsMode: 'discard',
+    });
+
     return {
-      __html: text,
+      __html: sanitizedText,
     };
   };
 

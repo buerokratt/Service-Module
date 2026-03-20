@@ -12,6 +12,7 @@ import { Assign } from 'types/assign';
 import { EndpointData } from 'types/endpoint';
 import { NodeDataProps } from 'types/service-flow';
 import {
+  decodeHtmlEntities,
   getLastDigits,
   isNumericString,
   removeTrailingUnderscores,
@@ -602,11 +603,10 @@ function handleTextField(
   });
 
   const spacePlaceholder = '___SPACE___';
+  const rawMessage = typeof parentNode.data.message === 'string' ? decodeHtmlEntities(parentNode.data.message) : '';
   const markdownMessage = htmlToMarkdown
     .translate(
-      typeof parentNode.data.message === 'string'
-        ? parentNode.data.message.replace('{{', '${').replace('}}', '}').replaceAll(' ', spacePlaceholder)
-        : '',
+      rawMessage.replace('{{', '${').replace('}}', '}').replaceAll(' ', spacePlaceholder),
     )
     .replaceAll(spacePlaceholder, ' ')
     .replaceAll(/\\([-~>[\]_*#().!`=<\\])/g, String.raw`\\$1`);
