@@ -163,7 +163,7 @@ export function decodeHtmlEntities(value: string): string {
 
   return value
     .replaceAll(/&#x([0-9A-F]+);/gi, (_, hex: string) => String.fromCodePoint(Number.parseInt(hex, 16)))
-    .replaceAll(/&#(\d+);/g, (_, code: string) => String.fromCodePoint(parseInt(code, 10)))
+    .replaceAll(/&#(\d+);/g, (_, code: string) => String.fromCodePoint(Number.parseInt(code, 10)))
     .replaceAll('&amp;', '&')
     .replaceAll('&gt;', '>')
     .replaceAll('&lt;', '<')
