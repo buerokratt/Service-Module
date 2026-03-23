@@ -880,9 +880,7 @@ export const saveFlowClick = async (status: 'draft' | 'ready' = 'ready', showErr
   const nodes = useServiceStore.getState().nodes as Node<NodeDataProps>[];
 
   await saveFlow({
-    name: name
-      ? name
-      : `${t('newService.defaultServiceName').toString()}_${format(new Date(), 'dd_MM_yyyy_HH_mm_ss')}`,
+    name: name || `${t('newService.defaultServiceName').toString()}_${format(new Date(), 'dd_MM_yyyy_HH_mm_ss')}`,
     edges,
     nodes,
     onSuccess: () => {
