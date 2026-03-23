@@ -189,7 +189,7 @@ export const saveFlow = async ({
 
     const mcqNodes = nodes.filter(
       (node) => node.data?.stepType === StepType.MultiChoiceQuestion,
-    ) as Node<NodeDataProps>[];
+    );
 
     if (mcqNodes.length > 0) {
       const nodesUpToFirstMcq = nodes.slice(
@@ -421,7 +421,7 @@ export function getYamlContent(
   try {
     allRelations.forEach((r) => {
       const [parentNodeId, childNodeId] = r.split(',');
-      const parentNode = nodes.findLast((node) => node.id === parentNodeId) as Node<NodeDataProps> | undefined;
+      const parentNode = nodes.findLast((node) => node.id === parentNodeId);
       if (
         !parentNode?.type ||
         parentNode.type !== 'custom' ||
@@ -430,7 +430,7 @@ export function getYamlContent(
         return;
       }
 
-      const childNode = nodes.find((node) => node.id === childNodeId) as Node<NodeDataProps> | undefined;
+      const childNode = nodes.find((node) => node.id === childNodeId);
       const parentStepName = toSnakeCase(parentNode.data.label);
 
       if (parentNode.data.stepType === StepType.Textfield) {
@@ -631,7 +631,7 @@ function handleTextField(
 function handleConditionStep(
   allRelations: any[],
   parentNodeId: any,
-  nodes: Node[],
+  nodes: Node<NodeDataProps>[],
   parentNode: Node<NodeDataProps>,
   finishedFlow: Map<any, any>,
   parentStepName: string,
@@ -640,8 +640,8 @@ function handleConditionStep(
   const firstChildNode = conditionRelations[0].split(',')[1];
   const secondChildNode = conditionRelations[1].split(',')[1];
 
-  const firstChild = nodes.find((node) => node.id === firstChildNode) as Node<NodeDataProps> | undefined;
-  const secondChild = nodes.find((node) => node.id === secondChildNode) as Node<NodeDataProps> | undefined;
+  const firstChild = nodes.find((node) => node.id === firstChildNode);
+  const secondChild = nodes.find((node) => node.id === secondChildNode);
 
   const rulesChildren = Array.isArray(parentNode.data.rules?.children) ? parentNode.data.rules.children : [];
   const invalidRulesExist = hasInvalidRules(rulesChildren);
@@ -880,9 +880,9 @@ export const saveFlowClick = async (status: 'draft' | 'ready' = 'ready', showErr
   const nodes = useServiceStore.getState().nodes as Node<NodeDataProps>[];
 
   await saveFlow({
-    name: !name
-      ? `${t('newService.defaultServiceName').toString()}_${format(new Date(), 'dd_MM_yyyy_HH_mm_ss')}`
-      : name,
+    name: name
+      ? name
+      : `${t('newService.defaultServiceName').toString()}_${format(new Date(), 'dd_MM_yyyy_HH_mm_ss')}`,
     edges,
     nodes,
     onSuccess: () => {
