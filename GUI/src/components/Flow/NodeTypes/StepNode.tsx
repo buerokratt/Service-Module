@@ -63,7 +63,7 @@ const StepNode: FC<StepNodeProps> = ({ data }) => {
   }, [data, endpoints]);
 
   useEffect(() => {
-    updateIsTestedAndPassed();
+    void updateIsTestedAndPassed();
   }, [updateIsTestedAndPassed]);
 
   return (
