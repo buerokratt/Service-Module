@@ -85,6 +85,12 @@ const FlowElementsPopup: React.FC = () => {
     [],
   );
 
+  // Copy buttons to avoid shared object references between popup state and node data.
+  const copyMcqButtons = (buttons: MultiChoiceQuestionButton[]) =>
+    buttons.map((button) => ({
+      ...button,
+    }));
+
   // StepType.Textfield
   const [textfieldMessage, setTextfieldMessage] = useState<string | null>(null);
   const [textfieldMessagePlaceholders, setTextfieldMessagePlaceholders] = useState<{ [key: string]: string }>({});
@@ -101,7 +107,7 @@ const FlowElementsPopup: React.FC = () => {
     node?.data.multiChoiceQuestion?.question ?? '',
   );
   const [multiChoiceQuestionButtons, setMultiChoiceQuestionButtons] = useState<MultiChoiceQuestionButton[]>(
-    node?.data.multiChoiceQuestion?.buttons ?? defaultMultiChoiceQuestionButtons,
+    copyMcqButtons(node?.data.multiChoiceQuestion?.buttons ?? defaultMultiChoiceQuestionButtons),
   );
   const [dynamicChoices, setDynamicChoices] = useState<DynamicChoices>(
     node?.data.dynamicChoices ?? defaultDynamicChoices,
@@ -136,7 +142,9 @@ const FlowElementsPopup: React.FC = () => {
 
       case StepType.MultiChoiceQuestion:
         setMultiChoiceQuestionQuestion(node.data?.multiChoiceQuestion?.question ?? '');
-        setMultiChoiceQuestionButtons(node.data?.multiChoiceQuestion?.buttons ?? defaultMultiChoiceQuestionButtons);
+        setMultiChoiceQuestionButtons(
+          copyMcqButtons(node.data?.multiChoiceQuestion?.buttons ?? defaultMultiChoiceQuestionButtons),
+        );
         break;
 
       case StepType.DynamicChoices:
@@ -163,7 +171,7 @@ const FlowElementsPopup: React.FC = () => {
     setFileContent(null);
     setTextfieldMessagePlaceholders({});
     setMultiChoiceQuestionQuestion('');
-    setMultiChoiceQuestionButtons(defaultMultiChoiceQuestionButtons);
+    setMultiChoiceQuestionButtons(copyMcqButtons(defaultMultiChoiceQuestionButtons));
     setIsSaveEnabled(true);
     setDynamicChoices(defaultDynamicChoices);
     useServiceStore.getState().resetSelectedNode();
@@ -187,7 +195,7 @@ const FlowElementsPopup: React.FC = () => {
           node.data.stepType === StepType.MultiChoiceQuestion
             ? {
                 question: multiChoiceQuestionQuestion,
-                buttons: multiChoiceQuestionButtons,
+                buttons: copyMcqButtons(multiChoiceQuestionButtons),
               }
             : undefined,
         dynamicChoices: node.data.stepType === StepType.DynamicChoices ? dynamicChoices : undefined,
@@ -339,8 +347,10 @@ const FlowElementsPopup: React.FC = () => {
   const saveMultiChoicePopup = (originalNode: Node<NodeDataProps>, updatedNode: Node<NodeDataProps>) => {
     if (!instance) return;
 
-    const currentButtons = originalNode.data.multiChoiceQuestion?.buttons ?? defaultMultiChoiceQuestionButtons;
-    const newButtons = updatedNode.data.multiChoiceQuestion?.buttons ?? [];
+    const currentButtons = copyMcqButtons(
+      originalNode.data.multiChoiceQuestion?.buttons ?? defaultMultiChoiceQuestionButtons,
+    );
+    const newButtons = copyMcqButtons(updatedNode.data.multiChoiceQuestion?.buttons ?? []);
 
     const edges = instance.getEdges();
     const nodes = instance.getNodes();
@@ -362,7 +372,12 @@ const FlowElementsPopup: React.FC = () => {
       }));
 
     const updatedEdges = edges.map((edge) => {
-      if (!edge.label || !connectedEdges.some((ce) => ce.id === edge.id)) return edge;
+      if (
+        !edge.label ||
+        edge.source !== originalNode.id ||
+        !connectedEdges.some((ce) => ce.id === edge.id)
+      )
+        return edge;
       const rename = renamedButtons.find((r) => r.oldTitle === edge.label);
       if (rename) {
         return { ...edge, label: rename.newTitle };
@@ -387,10 +402,11 @@ const FlowElementsPopup: React.FC = () => {
     const buttonsNeedingEdges = addedButtons.filter((btn) => !existingButtonTitles.has(btn.title));
 
     const newEdges = buttonsNeedingEdges.map((button) => {
+      const ghostNodeId = `${originalNode.id}-ghost-${button.id}`;
       const newEdge: Edge = {
         id: `${originalNode.id}->${button.id}`,
         source: originalNode.id,
-        target: `ghost-${button.id}`,
+        target: ghostNodeId,
         type: 'step',
         animated: true,
         deletable: false,
