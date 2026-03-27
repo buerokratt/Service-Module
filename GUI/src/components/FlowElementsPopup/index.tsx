@@ -12,7 +12,7 @@ import { EndpointData } from 'types/endpoint';
 import { MultiChoiceQuestionButton } from 'types/multi-choice-question';
 import { NodeDataProps } from 'types/service-flow';
 import { getValueByPath } from 'utils/object-util';
-import { isTemplate, removeTrailingUnderscores, stringToTemplate, templateToString } from 'utils/string-util';
+import { getLastDigits, isTemplate, removeTrailingUnderscores, stringToTemplate, templateToString } from 'utils/string-util';
 
 import { Button, Track } from '..';
 import Popup from '../Popup';
@@ -54,11 +54,11 @@ const FlowElementsPopup: React.FC = () => {
   const assignElements = useServiceStore((state) => state.assignElements);
   const endpointsVariables = useServiceStore((state) => state.endpointsResponseVariables);
   const stepType = node?.data.stepType;
-  const mcqNodeNumber = useMemo(() => {
-    const label = node?.data.label ?? '';
-    const match = label.match(/(\d+)$/);
-    return match ? match[1] : '1';
-  }, [node?.data.label]);
+
+  const mcqNodeNumber = useMemo(
+    () => String(getLastDigits(node?.data.label ?? '')),
+    [node?.data.label],
+  );
 
   const defaultMultiChoiceQuestionButtons = useMemo(
     () => [
