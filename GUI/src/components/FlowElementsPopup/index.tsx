@@ -54,25 +54,26 @@ const FlowElementsPopup: React.FC = () => {
   const assignElements = useServiceStore((state) => state.assignElements);
   const endpointsVariables = useServiceStore((state) => state.endpointsResponseVariables);
   const stepType = node?.data.stepType;
+  const mcqNodeNumber = useMemo(() => {
+    const label = node?.data.label ?? '';
+    const match = label.match(/(\d+)$/);
+    return match ? match[1] : '1';
+  }, [node?.data.label]);
 
   const defaultMultiChoiceQuestionButtons = useMemo(
     () => [
       {
         id: '1',
         title: 'Jah',
-        payload: `#service, /${selectedService?.type ?? 'POST'}/services/active/${serviceName}_mcq_${
-          node?.data.label[node?.data.label.length - 1]
-        }_0`,
+        payload: `#service, /${selectedService?.type ?? 'POST'}/services/active/${serviceName}_mcq_${mcqNodeNumber}_0`,
       },
       {
         id: '2',
         title: 'Ei',
-        payload: `#service, /${selectedService?.type ?? 'POST'}/services/active/${serviceName}_mcq_${
-          node?.data.label[node?.data.label.length - 1]
-        }_1`,
+        payload: `#service, /${selectedService?.type ?? 'POST'}/services/active/${serviceName}_mcq_${mcqNodeNumber}_1`,
       },
     ],
-    [selectedService?.type, serviceName, node?.data.label],
+    [selectedService?.type, serviceName, mcqNodeNumber],
   );
 
   const defaultDynamicChoices: DynamicChoices = useMemo(

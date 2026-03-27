@@ -38,6 +38,11 @@ const MultiChoiceQuestionContent: FC<MultiChoiceQuestionContentProps> = ({
   const node = useServiceStore((state) => state.selectedNode);
   const serviceName = useServiceStore((state) => removeTrailingUnderscores(state.serviceNameDashed()));
   const selectedService = useServiceListStore((state) => state.selectedService);
+  const mcqNodeNumber = (() => {
+    const label = node?.data.label ?? '';
+    const match = label.match(/(\d+)$/);
+    return match ? match[1] : '1';
+  })();
 
   const handleEdit = (idx: number) => {
     setEditIndex(idx);
@@ -75,9 +80,7 @@ const MultiChoiceQuestionContent: FC<MultiChoiceQuestionContentProps> = ({
       {
         id: generateUniqueId(),
         title: '',
-        payload: `#service, /${selectedService?.type ?? 'POST'}/services/active/${serviceName}_mcq_${
-          node?.data.label[node?.data.label.length - 1]
-        }_${buttons.length}`,
+        payload: `#service, /${selectedService?.type ?? 'POST'}/services/active/${serviceName}_mcq_${mcqNodeNumber}_${buttons.length}`,
       },
     ];
     setButtons(newButtons);
