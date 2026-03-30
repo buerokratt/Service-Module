@@ -750,9 +750,12 @@ function handleMultiChoiceQuestion(
   childNode: Node<NodeDataProps> | undefined,
   serviceName: string,
 ) {
-  parentNode.data.multiChoiceQuestion?.buttons.forEach(
-    (b) => (b.payload = b.payload.replaceAll('/_mcq_', `/${serviceName}_mcq_`)),
-  );
+  const rootServiceName = serviceName.replace(/_mcq_\d+_\d+$/, '');
+  parentNode.data.multiChoiceQuestion?.buttons.forEach((b) => {
+
+    b.payload = b.payload.replace(/\/[^/]*_mcq_/, `/${rootServiceName}_mcq_`);
+
+  });
 
   return finishedFlow.set(parentStepName, {
     assign: {
