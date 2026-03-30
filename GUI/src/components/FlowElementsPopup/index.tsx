@@ -226,7 +226,7 @@ const FlowElementsPopup: React.FC = () => {
   };
 
   const prepareAssignForSaving = (updatedNode: Node<NodeDataProps>) => {
-    const flatEndpointVariables = endpointsVariables.map((endpoint) => endpoint.chips).flat();
+    const flatEndpointVariables = endpointsVariables.flatMap((endpoint) => endpoint.chips);
     assignElements.forEach((element) => {
       const key = removeTrailingUnderscores(element.key);
       element.key = key;
