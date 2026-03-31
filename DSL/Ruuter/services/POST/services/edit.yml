@@ -95,7 +95,17 @@ check_name_exists_result:
   switch:
     - condition: ${name_exists_res.response.body[0].nameExists}
       next: return_name_already_exists
-  next: delete_all_mcq_files   
+  next: delete_old_mcq_files
+
+delete_old_mcq_files:
+  call: http.post
+  args:
+    url: "[#SERVICE_DMAPPER]/file-manager/delete-all-that-starts-with"
+    body:
+      path: "[#RUUTER_SERVICES_PATH]/${type}/services/draft"
+      keyword: "${get_service_result.response.body[0].name}_"
+  result: deleteOldRes
+  next: delete_all_mcq_files
 
 delete_all_mcq_files:
   call: http.post
@@ -196,12 +206,27 @@ check_new_structure:
 use_new_structure:
   assign:
     new_structure: ${structure}
-  next: rename_dsl
+  next: check_rename_or_delete
 
 use_old_structure:
   assign:
     new_structure: ${old_structure.value}
+  next: check_rename_or_delete
+
+check_rename_or_delete:
+  switch:
+    - condition: ${content !== null && old_name !== name}
+      next: delete_old_main_file
   next: rename_dsl
+
+delete_old_main_file:
+  call: http.post
+  args:
+    url: "[#SERVICE_DMAPPER]/file-manager/delete"
+    body:
+      file_path: "[#RUUTER_SERVICES_PATH]/${type}/[#RUUTER_SERVICES_DIR_PATH]/${old_state}/${old_name}.tmp"
+  result: delete_old_main_result
+  next: service_edit
 
 rename_dsl:
   call: http.post
