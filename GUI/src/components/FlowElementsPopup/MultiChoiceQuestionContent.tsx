@@ -5,7 +5,7 @@ import { MdCheck, MdDeleteOutline, MdEdit } from 'react-icons/md';
 import useServiceStore from 'store/new-services.store';
 import useServiceListStore from 'store/services.store';
 import { generateUniqueId } from 'utils/flow-utils';
-import { removeTrailingUnderscores } from 'utils/string-util';
+import { getLastDigits, removeTrailingUnderscores } from 'utils/string-util';
 import { v4 } from 'uuid';
 
 import Button from '../Button';
@@ -15,7 +15,7 @@ import Track from '../Track';
 
 import './styles.scss';
 
-const maxButtons = parseInt((import.meta.env.REACT_APP_MULTI_CHOICE_QUESTION_MAX_BUTTONS as string) ?? '4');
+const maxButtons = Number.parseInt((import.meta.env.REACT_APP_MULTI_CHOICE_QUESTION_MAX_BUTTONS as string) ?? '4');
 
 export interface MultiChoiceQuestionContentProps {
   question: string;
@@ -38,6 +38,8 @@ const MultiChoiceQuestionContent: FC<MultiChoiceQuestionContentProps> = ({
   const node = useServiceStore((state) => state.selectedNode);
   const serviceName = useServiceStore((state) => removeTrailingUnderscores(state.serviceNameDashed()));
   const selectedService = useServiceListStore((state) => state.selectedService);
+
+  const mcqNodeNumber = String(getLastDigits(node?.data.label ?? ''));
 
   const handleEdit = (idx: number) => {
     setEditIndex(idx);
@@ -75,9 +77,7 @@ const MultiChoiceQuestionContent: FC<MultiChoiceQuestionContentProps> = ({
       {
         id: generateUniqueId(),
         title: '',
-        payload: `#service, /${selectedService?.type ?? 'POST'}/services/active/${serviceName}_mcq_${
-          node?.data.label[node?.data.label.length - 1]
-        }_${buttons.length}`,
+        payload: `#service, /${selectedService?.type ?? 'POST'}/services/active/${serviceName}_mcq_${mcqNodeNumber}_${buttons.length}`,
       },
     ];
     setButtons(newButtons);
