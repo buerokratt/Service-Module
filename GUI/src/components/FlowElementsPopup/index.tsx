@@ -12,7 +12,13 @@ import { EndpointData } from 'types/endpoint';
 import { MultiChoiceQuestionButton } from 'types/multi-choice-question';
 import { NodeDataProps } from 'types/service-flow';
 import { getValueByPath } from 'utils/object-util';
-import { getLastDigits, isTemplate, removeTrailingUnderscores, stringToTemplate, templateToString } from 'utils/string-util';
+import {
+  getLastDigits,
+  isTemplate,
+  removeTrailingUnderscores,
+  stringToTemplate,
+  templateToString,
+} from 'utils/string-util';
 
 import { Button, Track } from '..';
 import Popup from '../Popup';
@@ -55,10 +61,7 @@ const FlowElementsPopup: React.FC = () => {
   const endpointsVariables = useServiceStore((state) => state.endpointsResponseVariables);
   const stepType = node?.data.stepType;
 
-  const mcqNodeNumber = useMemo(
-    () => String(getLastDigits(node?.data.label ?? '')),
-    [node?.data.label],
-  );
+  const mcqNodeNumber = useMemo(() => String(getLastDigits(node?.data.label ?? '')), [node?.data.label]);
 
   const defaultMultiChoiceQuestionButtons = useMemo(
     () => [
@@ -373,11 +376,7 @@ const FlowElementsPopup: React.FC = () => {
       }));
 
     const updatedEdges = edges.map((edge) => {
-      if (
-        !edge.label ||
-        edge.source !== originalNode.id ||
-        !connectedEdges.some((ce) => ce.id === edge.id)
-      )
+      if (!edge.label || edge.source !== originalNode.id || !connectedEdges.some((ce) => ce.id === edge.id))
         return edge;
       const rename = renamedButtons.find((r) => r.oldTitle === edge.label);
       if (rename) {

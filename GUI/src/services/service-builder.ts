@@ -187,9 +187,7 @@ export const saveFlow = async ({
   try {
     let yamlContent = getYamlContent(nodes, edges, name, description, showError);
 
-    const mcqNodes = nodes.filter(
-      (node) => node.data?.stepType === StepType.MultiChoiceQuestion,
-    );
+    const mcqNodes = nodes.filter((node) => node.data?.stepType === StepType.MultiChoiceQuestion);
 
     if (mcqNodes.length > 0) {
       const nodesUpToFirstMcq = nodes.slice(
@@ -605,9 +603,7 @@ function handleTextField(
   const spacePlaceholder = '___SPACE___';
   const rawMessage = typeof parentNode.data.message === 'string' ? decodeHtmlEntities(parentNode.data.message) : '';
   const markdownMessage = htmlToMarkdown
-    .translate(
-      rawMessage.replace('{{', '${').replace('}}', '}').replaceAll(' ', spacePlaceholder),
-    )
+    .translate(rawMessage.replace('{{', '${').replace('}}', '}').replaceAll(' ', spacePlaceholder))
     .replaceAll(spacePlaceholder, ' ')
     .replaceAll(/\\([-~>[\]_*#().!`=<\\])/g, String.raw`\\$1`);
 
@@ -752,9 +748,7 @@ function handleMultiChoiceQuestion(
 ) {
   const rootServiceName = serviceName.replace(/_mcq_\d+_\d+$/, '');
   parentNode.data.multiChoiceQuestion?.buttons.forEach((b) => {
-
     b.payload = b.payload.replace(/\/[^/]*_mcq_/, `/${rootServiceName}_mcq_`);
-
   });
 
   return finishedFlow.set(parentStepName, {
