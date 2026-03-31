@@ -22,7 +22,6 @@ interface ChatMessageProps {
 
 const BotMessage = ({ message }: ChatMessageProps) => {
   const renderContent = useCallback(() => {
-    if (message.message.startsWith('<p>')) return message.message.replace('<p>', '').replace('</p>', '');
     return <Markdownify message={message.message} />;
   }, [message.message]);
 
