@@ -141,6 +141,16 @@
       .content {
         border-radius: 6px 48px 48px 29px;
         background-color: blue;
+        color: white;
+
+        a {
+          color: #a8d4ff;
+          text-decoration: underline;
+
+          &:visited {
+            color: #c8a8ff;
+          }
+        }
       }
 
       .icon {
@@ -223,7 +233,7 @@
       pointer-events: none;
       user-select: none;
       background-color: #f5f5f5;
-      color: #999;
+      color: #696969;
     }
   }
 
@@ -268,18 +278,18 @@
   font-weight: bold;
 
   &.success {
-    color: rgb(0, 138, 0);
+    color: rgb(0, 100, 0);
     background: #0f02;
   }
 
   &.error {
-    color: rgb(170, 0, 0);
-    background: #f002;
+    color: rgb(80, 0, 0);
+    background: #ffe3e3;
   }
 
   &.info {
-    color: rgb(0, 0, 203);
-    background: #00f2;
+    color: rgb(0, 0, 80);
+    background: #e3e8ff;
   }
 
   &.normal {
@@ -378,6 +388,16 @@
     .main {
       .content {
         background-color: get-color(sapphire-blue-12);
+        color: var(--dark-bg-extra-light);
+
+        a {
+          color: #a8d4ff;
+          text-decoration: underline;
+
+          &:visited {
+            color: #c8a8ff;
+          }
+        }
       }
     }
   }
