@@ -76,7 +76,7 @@ const htmlLinkToMarkdown = (value: string): string => {
   const tempDiv = document.createElement('div');
   tempDiv.innerHTML = value;
   const links = tempDiv.querySelectorAll('a');
-  
+
   let result = value;
   links.forEach((link) => {
     const href = link.getAttribute('href') || '';
@@ -84,7 +84,7 @@ const htmlLinkToMarkdown = (value: string): string => {
     const markdown = href ? `[${text}](${href})` : text;
     result = result.replace(link.outerHTML, markdown);
   });
-  
+
   return result;
 };
 

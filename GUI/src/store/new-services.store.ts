@@ -304,7 +304,7 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
             name: 'Status Code',
             value: `${endpoint?.name.replaceAll(' ', '_')}_res.response.statusCodeValue`,
             data: `${endpoint?.name.replaceAll(' ', '_')}_res.response.statusCodeValue`,
-          }
+          },
         );
 
         const variable: EndpointResponseVariable = {

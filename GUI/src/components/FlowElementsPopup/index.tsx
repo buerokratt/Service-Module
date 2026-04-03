@@ -12,7 +12,13 @@ import { EndpointData } from 'types/endpoint';
 import { MultiChoiceQuestionButton } from 'types/multi-choice-question';
 import { NodeDataProps } from 'types/service-flow';
 import { getValueByPath } from 'utils/object-util';
-import { isTemplate, removeTrailingUnderscores, stringToTemplate, templateToString } from 'utils/string-util';
+import {
+  getLastDigits,
+  isTemplate,
+  removeTrailingUnderscores,
+  stringToTemplate,
+  templateToString,
+} from 'utils/string-util';
 
 import { Button, Track } from '..';
 import Popup from '../Popup';
@@ -55,24 +61,22 @@ const FlowElementsPopup: React.FC = () => {
   const endpointsVariables = useServiceStore((state) => state.endpointsResponseVariables);
   const stepType = node?.data.stepType;
 
+  const mcqNodeNumber = useMemo(() => String(getLastDigits(node?.data.label ?? '')), [node?.data.label]);
+
   const defaultMultiChoiceQuestionButtons = useMemo(
     () => [
       {
         id: '1',
         title: 'Jah',
-        payload: `#service, /${selectedService?.type ?? 'POST'}/services/active/${serviceName}_mcq_${
-          node?.data.label[node?.data.label.length - 1]
-        }_0`,
+        payload: `#service, /${selectedService?.type ?? 'POST'}/services/active/${serviceName}_mcq_${mcqNodeNumber}_0`,
       },
       {
         id: '2',
         title: 'Ei',
-        payload: `#service, /${selectedService?.type ?? 'POST'}/services/active/${serviceName}_mcq_${
-          node?.data.label[node?.data.label.length - 1]
-        }_1`,
+        payload: `#service, /${selectedService?.type ?? 'POST'}/services/active/${serviceName}_mcq_${mcqNodeNumber}_1`,
       },
     ],
-    [selectedService?.type, serviceName, node?.data.label],
+    [selectedService?.type, serviceName, mcqNodeNumber],
   );
 
   const defaultDynamicChoices: DynamicChoices = useMemo(
@@ -225,7 +229,7 @@ const FlowElementsPopup: React.FC = () => {
   };
 
   const prepareAssignForSaving = (updatedNode: Node<NodeDataProps>) => {
-    const flatEndpointVariables = endpointsVariables.flatMap((endpoint) => endpoint.chips);    
+    const flatEndpointVariables = endpointsVariables.flatMap((endpoint) => endpoint.chips);
     assignElements.forEach((element) => {
       const key = removeTrailingUnderscores(element.key);
       element.key = key;
@@ -372,11 +376,7 @@ const FlowElementsPopup: React.FC = () => {
       }));
 
     const updatedEdges = edges.map((edge) => {
-      if (
-        !edge.label ||
-        edge.source !== originalNode.id ||
-        !connectedEdges.some((ce) => ce.id === edge.id)
-      )
+      if (!edge.label || edge.source !== originalNode.id || !connectedEdges.some((ce) => ce.id === edge.id))
         return edge;
       const rename = renamedButtons.find((r) => r.oldTitle === edge.label);
       if (rename) {
