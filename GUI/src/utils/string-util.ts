@@ -171,3 +171,10 @@ export function decodeHtmlEntities(value: string): string {
     .replaceAll('&#39;', "'")
     .replaceAll('&apos;', "'");
 }
+
+export const ensureAbsoluteUrl = (href: string): string => {
+  if (/^[a-zA-Z][a-zA-Z\d+\-.]*:\/\//i.test(href) || href.startsWith('//')) {
+    return href;
+  }
+  return `https://${href}`;
+};
