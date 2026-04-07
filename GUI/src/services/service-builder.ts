@@ -23,6 +23,114 @@ import {
 
 import api from '../services/api-dev';
 
+/**
+ * Normalises MCQ button payloads on all MultiChoiceQuestion nodes.
+ *
+ * Imported services may reference the wrong service name (the original export
+ * name) and stale button indices.  This function rebuilds every button's
+ * payload so it matches:
+ *   #service, /<type>/services/active/<serviceName>_mcq_<nodeId>_<buttonIndex>
+ *
+ * Safe to call on any flow: nodes that have no MCQ data are left untouched.
+ */
+export function normalizeMcqPayloads(nodes: Node<NodeDataProps>[], serviceName: string): Node<NodeDataProps>[] {
+  return nodes.map((node) => {
+    if (node.data?.stepType !== StepType.MultiChoiceQuestion) return node;
+
+    const buttons = node.data.multiChoiceQuestion?.buttons;
+    if (!Array.isArray(buttons) || buttons.length === 0) return node;
+
+    const mcqNodeId = getLastDigits(toSnakeCase(node.data.label ?? ''));
+
+    const normalizedButtons = buttons.map((btn, idx) => {
+      // Only rewrite payloads that already follow the MCQ payload convention.
+      // Payloads that don't match are left unchanged to avoid corrupting custom data.
+      const mcqPayloadPattern = /^(#service,\s*\/[^/]+\/services\/active\/)([^/]+_mcq_\d+_)(\d+)$/;
+      const match = btn.payload?.match(mcqPayloadPattern);
+      if (!match) return btn;
+
+      const prefix = match[1]; // e.g. "#service, /POST/services/active/"
+      return {
+        ...btn,
+        payload: `${prefix}${serviceName}_mcq_${mcqNodeId}_${idx}`,
+      };
+    });
+
+    return {
+      ...node,
+      data: {
+        ...node.data,
+        multiChoiceQuestion: {
+          ...node.data.multiChoiceQuestion!,
+          buttons: normalizedButtons,
+        },
+      },
+    };
+  });
+}
+
+/**
+ * Builds YAML content for the main service and all MCQ branch sub-services.
+ *
+ * Sub-services are embedded inside the returned object so that each JSON file
+ * is self-contained when sent to the import-services endpoint. The server
+ * resolves the final main service name (adding a timestamp on conflict) and
+ * then prepends that resolved name to each sub-service suffix.
+ */
+export function buildAllServiceContents(
+  rawNodes: Node<NodeDataProps>[],
+  edges: Edge[],
+  name: string,
+  description: string = '',
+): {
+  name: string;
+  content: any;
+  flowData: string;
+  subServices: Array<{ suffix: string; content: any }>;
+} {
+  const nodes = normalizeMcqPayloads(rawNodes, name);
+  const mcqNodes = nodes.filter((n) => n.data?.stepType === StepType.MultiChoiceQuestion);
+  const fullFlowData = JSON.stringify({ nodes: rawNodes, edges });
+
+  // Main service – truncated at the first MCQ node (same as saveFlow)
+  const mainNodes =
+    mcqNodes.length > 0
+      ? nodes.slice(0, nodes.findIndex((n) => n.data?.stepType === StepType.MultiChoiceQuestion) + 1)
+      : nodes;
+
+  const subServices: Array<{ suffix: string; content: any }> = [];
+
+  for (const mcqNode of mcqNodes) {
+    const mcqEdges = edges.filter((e) => e.source === mcqNode.id);
+    for (const [edgeIdx, edge] of mcqEdges.entries()) {
+      const nextNode = nodes.find((n) => n.id === edge.target);
+      if (!nextNode) continue;
+
+      const foundIndex =
+        mcqNode.data?.multiChoiceQuestion?.buttons.findIndex((b: any) => b.title === edge.label) ?? -1;
+      const buttonIndex = foundIndex !== -1 ? foundIndex : edgeIdx;
+      const mcqNodeId = getLastDigits(toSnakeCase(mcqNode.data.label ?? ''));
+      const suffix = `_mcq_${mcqNodeId}_${buttonIndex}`;
+      const subServiceName = `${name}${suffix}`;
+
+      const branchNodes = getBranchNodes(nodes, edges, nextNode);
+      const branchEdges = edges.filter((e) => branchNodes.some((n) => n.id === e.source || n.id === e.target));
+
+      subServices.push({
+        suffix,
+        content: getYamlContent(branchNodes, branchEdges, subServiceName, description, false),
+      });
+    }
+  }
+
+  return {
+    name,
+    content: getYamlContent(mainNodes, edges, name, description, false),
+    flowData: fullFlowData,
+    subServices,
+  };
+}
+
 export async function saveEndpoints(endpoints: EndpointData[], onSuccess?: () => void, onError?: (e: any) => void) {
   const tasks: Promise<any>[] = [];
   const serviceId = useServiceStore.getState().serviceId;
@@ -171,7 +279,7 @@ const buildConditionString = (group: any, assignedVariableNames: Set<string>): s
 export const saveFlow = async ({
   name,
   edges,
-  nodes,
+  nodes: rawNodes,
   onSuccess,
   onError,
   description,
@@ -185,6 +293,7 @@ export const saveFlow = async ({
   showError = true,
 }: SaveFlowConfig) => {
   try {
+    const nodes = normalizeMcqPayloads(rawNodes, name);
     let yamlContent = getYamlContent(nodes, edges, name, description, showError);
 
     const mcqNodes = nodes.filter((node) => node.data?.stepType === StepType.MultiChoiceQuestion);
@@ -220,11 +329,12 @@ export const saveFlow = async ({
     for (const mcqNode of mcqNodes) {
       const mcqEdges = edges.filter((edge) => edge.source === mcqNode.id);
 
-      for (const edge of mcqEdges) {
+      for (const [edgeIdx, edge] of mcqEdges.entries()) {
         const nextNode = nodes.find((n) => n.id === edge.target);
         if (!nextNode) continue;
 
-        const buttonIndex = mcqNode?.data?.multiChoiceQuestion?.buttons.findIndex((e: any) => e.title === edge.label);
+        const foundIndex = mcqNode?.data?.multiChoiceQuestion?.buttons.findIndex((e: any) => e.title === edge.label);
+        const buttonIndex = foundIndex !== -1 ? foundIndex : edgeIdx;
         const mcqNodeId = getLastDigits(toSnakeCase(mcqNode.data.label ?? ''));
         const serviceName = `${name}_mcq_${mcqNodeId}_${buttonIndex}`;
         const branchNodes = getBranchNodes(nodes, edges, nextNode);
