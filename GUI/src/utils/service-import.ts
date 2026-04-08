@@ -14,13 +14,23 @@ const isValidFlowData = (data: any): data is FlowData =>
 const handleImportServices = async (
   event: ChangeEvent<HTMLInputElement>,
 ): Promise<{
-  validFiles: Array<{ fileName: string; flowData: string; content: any; subServices: Array<{ suffix: string; content: any }> }>;
+  validFiles: Array<{
+    fileName: string;
+    flowData: string;
+    content: any;
+    subServices: Array<{ suffix: string; content: any }>;
+  }>;
   corruptedFiles: string[];
 }> => {
   const files = event.target.files;
   if (!files) return { validFiles: [], corruptedFiles: [] };
 
-  const validFiles: Array<{ fileName: string; flowData: string; content: any; subServices: Array<{ suffix: string; content: any }> }> = [];
+  const validFiles: Array<{
+    fileName: string;
+    flowData: string;
+    content: any;
+    subServices: Array<{ suffix: string; content: any }>;
+  }> = [];
   const corruptedFiles: string[] = [];
 
   const fileProcessingPromises = Array.from(files).map(async (file) => {

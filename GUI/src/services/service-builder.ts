@@ -145,8 +145,7 @@ export function buildAllServiceContents(
       const nextNode = nodes.find((n) => n.id === edge.target);
       if (!nextNode) continue;
 
-      const foundIndex =
-        mcqNode.data?.multiChoiceQuestion?.buttons.findIndex((b: any) => b.title === edge.label) ?? -1;
+      const foundIndex = mcqNode.data?.multiChoiceQuestion?.buttons.findIndex((b: any) => b.title === edge.label) ?? -1;
       const buttonIndex = foundIndex !== -1 ? foundIndex : edgeIdx;
       const mcqNodeId = getLastDigits(toSnakeCase(mcqNode.data.label ?? ''));
       const suffix = `_mcq_${mcqNodeId}_${buttonIndex}`;
