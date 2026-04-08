@@ -34,7 +34,8 @@ const handleImportServices = async (
   const corruptedFiles: string[] = [];
 
   const fileProcessingPromises = Array.from(files).map(async (file) => {
-    const name = file.name.replaceAll(/\s+/g, '_').replace(/\.[^/.]+$/, '');
+    const rawName = file.name.replaceAll(/\s+/g, '_').replace(/\.[^/.]+$/, '');
+    const name = rawName.replace(/(_\d{4}_\d{2}_\d{2}_\d{2}_\d{2}_\d{2})+$/, '');
     try {
       const content = await file.text();
       const flowData = JSON.parse(content) as FlowData;
