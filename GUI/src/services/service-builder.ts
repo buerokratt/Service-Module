@@ -69,6 +69,45 @@ export function normalizeMcqPayloads(nodes: Node<NodeDataProps>[], serviceName: 
   });
 }
 
+export function normalizeEdgeLabels(edges: Edge[], nodes: Node<NodeDataProps>[]): Edge[] {
+  const mcqNodes = nodes.filter((n) => n.data?.stepType === StepType.MultiChoiceQuestion);
+  if (mcqNodes.length === 0) return edges;
+
+  const edgeMap = new Map(edges.map((e) => [e.id, { ...e }]));
+
+  for (const mcqNode of mcqNodes) {
+    const buttons = mcqNode.data?.multiChoiceQuestion?.buttons;
+    if (!Array.isArray(buttons)) continue;
+
+    const mcqEdges = edges.filter((e) => e.source === mcqNode.id);
+
+    // Find button indices already claimed by correctly-labeled edges
+    const claimedIndices = new Set<number>();
+    const unclaimedEdges: Edge[] = [];
+
+    mcqEdges.forEach((edge) => {
+      const idx = buttons.findIndex((b: any) => b.title === edge.label);
+      if (idx !== -1) {
+        claimedIndices.add(idx);
+      } else {
+        unclaimedEdges.push(edge);
+      }
+    });
+
+    // Assign remaining button titles only to edges with broken/missing labels
+    const unclaimedButtonIndices = buttons.map((_, i) => i).filter((i) => !claimedIndices.has(i));
+
+    unclaimedEdges.forEach((edge, i) => {
+      if (i < unclaimedButtonIndices.length) {
+        const copy = edgeMap.get(edge.id);
+        if (copy) copy.label = buttons[unclaimedButtonIndices[i]].title;
+      }
+    });
+  }
+
+  return edges.map((e) => edgeMap.get(e.id) ?? e);
+}
+
 /**
  * Builds YAML content for the main service and all MCQ branch sub-services.
  *
@@ -278,7 +317,7 @@ const buildConditionString = (group: any, assignedVariableNames: Set<string>): s
 
 export const saveFlow = async ({
   name,
-  edges,
+  edges: rawEdges,
   nodes: rawNodes,
   onSuccess,
   onError,
@@ -294,6 +333,7 @@ export const saveFlow = async ({
 }: SaveFlowConfig) => {
   try {
     const nodes = normalizeMcqPayloads(rawNodes, name);
+    const edges = normalizeEdgeLabels(rawEdges, nodes);
     let yamlContent = getYamlContent(nodes, edges, name, description, showError);
 
     const mcqNodes = nodes.filter((node) => node.data?.stepType === StepType.MultiChoiceQuestion);
