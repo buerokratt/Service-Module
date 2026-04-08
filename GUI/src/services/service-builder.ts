@@ -46,7 +46,7 @@ export function normalizeMcqPayloads(nodes: Node<NodeDataProps>[], serviceName: 
       // Only rewrite payloads that already follow the MCQ payload convention.
       // Payloads that don't match are left unchanged to avoid corrupting custom data.
       const mcqPayloadPattern = /^(#service,\s*\/[^/]+\/services\/active\/)([^/]+_mcq_\d+_)(\d+)$/;
-      const match = btn.payload?.match(mcqPayloadPattern);
+      const match = mcqPayloadPattern.exec(btn.payload ?? '');
       if (!match) return btn;
 
       const prefix = match[1]; // e.g. "#service, /POST/services/active/"
@@ -87,10 +87,10 @@ export function normalizeEdgeLabels(edges: Edge[], nodes: Node<NodeDataProps>[])
 
     mcqEdges.forEach((edge) => {
       const idx = buttons.findIndex((b: any) => b.title === edge.label);
-      if (idx !== -1) {
-        claimedIndices.add(idx);
-      } else {
+      if (idx === -1) {
         unclaimedEdges.push(edge);
+      } else {
+        claimedIndices.add(idx);
       }
     });
 
@@ -146,7 +146,7 @@ export function buildAllServiceContents(
       if (!nextNode) continue;
 
       const foundIndex = mcqNode.data?.multiChoiceQuestion?.buttons.findIndex((b: any) => b.title === edge.label) ?? -1;
-      const buttonIndex = foundIndex !== -1 ? foundIndex : edgeIdx;
+      const buttonIndex = foundIndex === -1 ? edgeIdx : foundIndex;
       const mcqNodeId = getLastDigits(toSnakeCase(mcqNode.data.label ?? ''));
       const suffix = `_mcq_${mcqNodeId}_${buttonIndex}`;
       const subServiceName = `${name}${suffix}`;
@@ -373,7 +373,7 @@ export const saveFlow = async ({
         if (!nextNode) continue;
 
         const foundIndex = mcqNode?.data?.multiChoiceQuestion?.buttons.findIndex((e: any) => e.title === edge.label);
-        const buttonIndex = foundIndex !== -1 ? foundIndex : edgeIdx;
+        const buttonIndex = foundIndex === -1 ? edgeIdx : foundIndex;
         const mcqNodeId = getLastDigits(toSnakeCase(mcqNode.data.label ?? ''));
         const serviceName = `${name}_mcq_${mcqNodeId}_${buttonIndex}`;
         const branchNodes = getBranchNodes(nodes, edges, nextNode);
