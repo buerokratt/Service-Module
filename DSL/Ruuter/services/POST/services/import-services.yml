@@ -35,6 +35,8 @@ assign_imported_names:
     imported_names: ${import_names_res.response.body[0].names.split(",")}
     services: "$=services.map((s, i) => ({ ...s, fileName: imported_names[i] }))="
     file_names: ${services.map(s => s.fileName)}
+    all_sub_services: "$=services.flatMap(s => (s.subServices ?? []).map(sub => ({ fileName: s.fileName + sub.suffix, content: sub.content })))="
+    all_file_names: "$=[...file_names, ...all_sub_services.map(s => s.fileName)]="
 
 insert_services:
   call: http.post
@@ -50,12 +52,12 @@ convert_json_content_to_yml:
   args:
     url: "[#SERVICE_DMAPPER]/conversion/json_to_yaml_data_multiple"
     body:
-      data: ${services.map(s => s.content)}
+      data: "$=[...services.map(s => s.content), ...all_sub_services.map(s => s.content)]="
   result: ymls_res
 
 prepare_files:
   assign:
-    file_paths: "$=file_names.map(name => `[#RUUTER_SERVICES_POST_PATH]/draft/${name}.tmp`)="
+    file_paths: "$=all_file_names.map(name => `[#RUUTER_SERVICES_POST_PATH]/draft/${name}.tmp`)="
     yaml_contents: ${ymls_res.response.body.yamls}
 
 add_dsls:
@@ -68,4 +70,5 @@ add_dsls:
   result: add_dsls_res
 
 return_result:
+  reloadDsl: true
   return: "Services imported successfully"
