@@ -1,6 +1,7 @@
 import Markdown from 'markdown-to-jsx';
 import React, { useState } from 'react';
 import sanitizeHtml from 'sanitize-html';
+import { ensureAbsoluteUrl } from 'utils/string-util';
 
 interface MarkdownifyProps {
   message: string | undefined;
@@ -42,7 +43,7 @@ const LinkPreview: React.FC<{
 
   if (sanitizeLinks) {
     return (
-      <a href={href} target="_blank" rel="noopener noreferrer">
+      <a href={ensureAbsoluteUrl(href)} target="_blank" rel="noopener noreferrer">
         {href}
       </a>
     );
@@ -50,7 +51,7 @@ const LinkPreview: React.FC<{
 
   if (!isValidImageUrl(href)) {
     return (
-      <a href={href} target="_blank" rel="noopener noreferrer">
+      <a href={ensureAbsoluteUrl(href)} target="_blank" rel="noopener noreferrer">
         {children}
       </a>
     );
@@ -75,17 +76,15 @@ const hasSpecialFormat = (m: string) => m.includes('\n\n') && m.indexOf('.') > 0
 const htmlLinkToMarkdown = (value: string): string => {
   const tempDiv = document.createElement('div');
   tempDiv.innerHTML = value;
-  const links = tempDiv.querySelectorAll('a');
 
-  let result = value;
-  links.forEach((link) => {
-    const href = link.getAttribute('href') || '';
-    const text = link.textContent || href;
-    const markdown = href ? `[${text}](${href})` : text;
-    result = result.replace(link.outerHTML, markdown);
+  tempDiv.querySelectorAll('a').forEach((link) => {
+    const href = link.getAttribute('href') ?? '';
+    const text = link.textContent ?? href;
+    const replacement = href ? `[${text || href}](${ensureAbsoluteUrl(href)})` : text;
+    link.replaceWith(document.createTextNode(replacement));
   });
 
-  return result;
+  return tempDiv.innerHTML;
 };
 
 function formatMessage(message?: string): string {

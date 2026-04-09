@@ -8,7 +8,7 @@ import useServiceStore from 'store/new-services.store';
 import { StepType } from 'types';
 import { NodeDataProps } from 'types/service-flow';
 import { validateStep } from 'utils/flow-utils';
-import { decodeHtmlEntities } from 'utils/string-util';
+import { decodeHtmlEntities, ensureAbsoluteUrl } from 'utils/string-util';
 
 type StepNodeProps = {
   data: NodeDataProps;
@@ -30,6 +30,17 @@ const StepNode: FC<StepNodeProps> = ({ data }) => {
         a: ['href', 'target', 'rel'],
       },
       disallowedTagsMode: 'discard',
+      transformTags: {
+        a: (_tagName, attribs) => ({
+          tagName: 'a',
+          attribs: {
+            ...attribs,
+            href: ensureAbsoluteUrl(attribs.href ?? ''),
+            target: '_blank',
+            rel: 'noopener noreferrer',
+          },
+        }),
+      },
     });
 
     return {
