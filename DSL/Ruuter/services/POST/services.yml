@@ -30,7 +30,7 @@ get_services_list:
       page_size: ${incoming.body.page_size}
       sorting: ${incoming.body.sorting}
       is_common: ${incoming.body.is_common}
-  limit: 400
+  limit: 600
   result: services_res
 
 assign_services_result:
