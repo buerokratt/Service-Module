@@ -11,6 +11,10 @@ interface ServiceStoreState {
   services: Service[];
   commonServices: Service[];
   notCommonServices: Service[];
+  servicesPagination: PaginationState;
+  servicesSorting: SortingState;
+  commonServicesPagination: PaginationState;
+  commonServicesSorting: SortingState;
   orientation: 'horizontal' | 'vertical';
   toggleOrientation: () => void;
   autoView: boolean;
@@ -44,6 +48,10 @@ const useServiceListStore = create<ServiceStoreState>()(
       services: [],
       commonServices: [],
       notCommonServices: [],
+      servicesPagination: { pageIndex: 0, pageSize: 10 },
+      servicesSorting: [{ id: 'name', desc: false }],
+      commonServicesPagination: { pageIndex: 0, pageSize: 10 },
+      commonServicesSorting: [{ id: 'name', desc: false }],
       orientation: 'vertical',
       autoView: false,
       toggleAutoView: () =>
@@ -80,6 +88,8 @@ const useServiceListStore = create<ServiceStoreState>()(
           })) ?? [];
         set({
           notCommonServices: services,
+          servicesPagination: pagination,
+          servicesSorting: sorting,
         });
       },
       loadCommonServicesList: async (pagination, sorting) => {
@@ -109,6 +119,8 @@ const useServiceListStore = create<ServiceStoreState>()(
 
         set({
           commonServices: services,
+          commonServicesPagination: pagination,
+          commonServicesSorting: sorting,
         });
       },
       deleteService: (id) => {
