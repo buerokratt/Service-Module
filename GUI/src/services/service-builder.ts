@@ -361,7 +361,6 @@ export const saveFlow = async ({
       } as SaveFlowConfig,
       true,
       status,
-      onSuccess,
       onError,
     );
 
@@ -400,6 +399,8 @@ export const saveFlow = async ({
         );
       }
     }
+
+    onSuccess?.(undefined);
   } catch (e: any) {
     onError(e);
   }
@@ -410,7 +411,6 @@ async function saveService(
   config: SaveFlowConfig,
   updateServiceDb: boolean,
   status: 'draft' | 'ready' = 'ready',
-  onSuccess?: (e: any) => void,
   onError?: (e: any) => void,
 ) {
   const { isNewService, serviceId, name, description, slot, examples, entities, isCommon, edges, nodes } = config;
@@ -440,7 +440,6 @@ async function saveService(
         },
       },
     )
-    .then(onSuccess)
     .catch(onError);
 }
 
