@@ -36,7 +36,7 @@ export const runServiceTest = async (input: string, serviceName?: string) => {
   }
 
   const nameToUse = serviceName ?? name;
-  const stateToUse = state == ServiceState.Ready ? ServiceState.Draft: state;
+  const stateToUse = state == ServiceState.Ready ? ServiceState.Draft : state;
 
   clearPreviousTestStates(serviceStore);
 
