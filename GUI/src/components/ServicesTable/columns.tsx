@@ -13,6 +13,8 @@ import useServiceListStore from 'store/services.store';
 import useStore from 'store/store';
 import useToastStore from 'store/toasts.store';
 import { Service, ServiceState } from 'types';
+import { getServiceById } from 'resources/api-constants';
+import api from 'services/api-dev';
 import { exportServices } from 'utils/service-export';
 
 interface GetColumnsConfig {
@@ -183,7 +185,8 @@ export const getColumns = ({ isCommon, navigate, hideDeletePopup, showReadyPopup
           <Button
             appearance="text"
             onClick={async () => {
-              await exportServices([props.row.original]);
+              const response = await api.post(getServiceById(), { id: props.row.original.serviceId });
+              await exportServices([{ ...props.row.original, structure: response.data.structure }]);
             }}
           >
             <Icon icon={<AiOutlineExport />} size="medium" />

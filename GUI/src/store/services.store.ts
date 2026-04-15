@@ -84,7 +84,6 @@ const useServiceListStore = create<ServiceStoreState>()(
             usedCount: 0,
             totalPages: item.totalPages,
             endpoints: [],
-            structure: item.structure,
           })) ?? [];
         set({
           notCommonServices: services,
@@ -114,7 +113,6 @@ const useServiceListStore = create<ServiceStoreState>()(
             usedCount: 0,
             endpoints: [],
             slot: '',
-            structure: item.structure,
           })) ?? [];
 
         set({
