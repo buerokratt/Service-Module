@@ -402,6 +402,7 @@ export const saveFlow = async ({
     }
   } catch (e: any) {
     onError(e);
+    throw e;
   }
 };
 
