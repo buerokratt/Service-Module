@@ -36,13 +36,14 @@ export const runServiceTest = async (input: string, serviceName?: string) => {
   }
 
   const nameToUse = serviceName ?? name;
+  const stateToUse = state == ServiceState.Ready ? ServiceState.Draft: state;
 
   clearPreviousTestStates(serviceStore);
 
   try {
-    await executeServiceTest(headerValue, state, nameToUse, input.split(','));
+    await executeServiceTest(headerValue, stateToUse, nameToUse, input.split(','));
 
-    const response = await executeService(state, nameToUse, input.split(','));
+    const response = await executeService(stateToUse, nameToUse, input.split(','));
 
     addSuccessMessages(response.data);
   } catch (error) {
