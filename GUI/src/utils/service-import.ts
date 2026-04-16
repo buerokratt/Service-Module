@@ -88,10 +88,9 @@ export const importServices = async (event: ChangeEvent<HTMLInputElement>) => {
             lengthCheck: validFiles.length === 1 ? '' : lengthCheck,
           }),
         });
-        const pagination = { pageIndex: 0, pageSize: 10 };
-        const sorting = [{ id: 'name', desc: false }];
-        await useServiceListStore.getState().loadServicesList(pagination, sorting);
-        await useServiceListStore.getState().loadCommonServicesList(pagination, sorting);
+        const store = useServiceListStore.getState();
+        await store.loadServicesList(store.servicesPagination, store.servicesSorting);
+        await store.loadCommonServicesList(store.commonServicesPagination, store.commonServicesSorting);
       })
       .catch((error) => {
         console.error('Error importing services:', error);

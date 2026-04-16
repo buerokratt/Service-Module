@@ -5,7 +5,6 @@ SELECT
   current_state AS state,
   ruuter_type AS type,
   slot,
-  structure,
   CEIL((SELECT COUNT(DISTINCT service_id) FROM services WHERE NOT deleted AND (:is_common::TEXT = '' OR is_common = (:is_common::TEXT)::BOOLEAN)) / :page_size::DECIMAL) AS total_pages
 FROM services
 WHERE NOT deleted 
