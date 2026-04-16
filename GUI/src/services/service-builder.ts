@@ -403,6 +403,7 @@ export const saveFlow = async ({
     onSuccess?.(undefined);
   } catch (e: any) {
     onError(e);
+    throw e;
   }
 };
 
