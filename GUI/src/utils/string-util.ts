@@ -31,7 +31,7 @@ export const fromSnakeCase = (value: string) => {
   const parts = value.split('_');
 
   // Check if the last part is a number
-  const lastPart = parts[parts.length - 1];
+  const lastPart = parts.at(-1) ?? '';
   const isLastPartNumber = /^\d+$/.test(lastPart);
 
   if (isLastPartNumber && parts.length > 1) {
@@ -171,3 +171,10 @@ export function decodeHtmlEntities(value: string): string {
     .replaceAll('&#39;', "'")
     .replaceAll('&apos;', "'");
 }
+
+export const ensureAbsoluteUrl = (href: string): string => {
+  if (/^[a-z][a-z\d+\-.]*:\/\//i.test(href) || href.startsWith('//')) {
+    return href;
+  }
+  return `https://${href}`;
+};

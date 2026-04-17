@@ -1,7 +1,7 @@
 import { CellContext, createColumnHelper, PaginationState, SortingState } from '@tanstack/react-table';
 import { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { getServicesList } from 'resources/api-constants';
+import { getServiceById, getServicesList } from 'resources/api-constants';
 import api from 'services/api-dev';
 import { Service } from 'types';
 import { exportServices } from 'utils/service-export';
@@ -50,7 +50,6 @@ const ExportServicesModal: FC<ExportServicesModalProps> = ({ isVisible, onClose 
         const fetchedServices: Service[] = servicesData.map((item: Service) => ({
           name: item.name,
           serviceId: item.serviceId,
-          structure: item.structure,
           totalPages: item.totalPages,
         }));
 
@@ -96,10 +95,19 @@ const ExportServicesModal: FC<ExportServicesModalProps> = ({ isVisible, onClose 
     if (selectedServices.length === 0) return;
 
     setIsExporting(true);
-    const success = await exportServices(selectedServices);
-    setIsExporting(false);
-    if (success) {
-      onClose();
+    try {
+      const servicesWithStructure = await Promise.all(
+        selectedServices.map(async (service) => {
+          const response = await api.post(getServiceById(), { id: service.serviceId });
+          return { ...service, structure: response.data.structure };
+        }),
+      );
+      const success = await exportServices(servicesWithStructure);
+      if (success) {
+        onClose();
+      }
+    } finally {
+      setIsExporting(false);
     }
   }, [selectedServices, onClose]);
 

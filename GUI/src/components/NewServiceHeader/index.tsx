@@ -86,9 +86,14 @@ const NewServiceHeader: FC<NewServiceHeaderProps> = ({ backOnClick, continueOnCl
                 showEmptyNameError();
               } else {
                 setIsSaving(true);
-                await useServiceStore.getState().onServiceSave(ServiceState.Draft, false);
-                setIsSaving(false);
-                saveOnClick();
+                try {
+                  await useServiceStore.getState().onServiceSave(ServiceState.Draft, false);
+                  saveOnClick();
+                } catch (error) {
+                  console.error(error);
+                } finally {
+                  setIsSaving(false);
+                }
               }
             }}
           >

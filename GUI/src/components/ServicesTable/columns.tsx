@@ -8,7 +8,9 @@ import { AiOutlineInfoCircle } from 'react-icons/ai';
 import { IoCopyOutline } from 'react-icons/io5';
 import { MdDeleteOutline, MdOutlineDescription, MdOutlineEdit } from 'react-icons/md';
 import { NavigateFunction } from 'react-router-dom';
+import { getServiceById } from 'resources/api-constants';
 import { ROUTES } from 'resources/routes-constants';
+import api from 'services/api-dev';
 import useServiceListStore from 'store/services.store';
 import useStore from 'store/store';
 import useToastStore from 'store/toasts.store';
@@ -183,7 +185,8 @@ export const getColumns = ({ isCommon, navigate, hideDeletePopup, showReadyPopup
           <Button
             appearance="text"
             onClick={async () => {
-              await exportServices([props.row.original]);
+              const response = await api.post(getServiceById(), { id: props.row.original.serviceId });
+              await exportServices([{ ...props.row.original, structure: response.data.structure }]);
             }}
           >
             <Icon icon={<AiOutlineExport />} size="medium" />
