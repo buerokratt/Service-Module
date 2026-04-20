@@ -4,6 +4,10 @@ SELECT
   type,
   is_common,
   definitions,
+  last_test_at,
+  verification_status,
+  response_schema_captured,
+  response_schema,
   CASE WHEN :pagination THEN CEIL(COUNT(*) OVER() / :page_size::DECIMAL) ELSE 1 END AS total_pages
 FROM endpoints
 WHERE is_common = true
