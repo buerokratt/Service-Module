@@ -49,14 +49,11 @@ const useApiRegistryStore = create<ApiRegistryState>((set, get) => ({
       const sortFieldMap: Record<string, string> = {
         name: 'name',
         lastTest: 'lastTestAt',
-        status: 'verificationStatus',
+        status: 'lastStatusCode',
         schema: 'schemaCaptured',
       };
       const primaryField = colId ? (sortFieldMap[colId] ?? colId) : null;
-      const secondarySortMap: Record<string, string> = {
-        status: ', name asc',
-        schema: ', name asc',
-      };
+      const secondarySortMap: Record<string, string> = {};
       const secondarySort = colId ? (secondarySortMap[colId] ?? '') : '';
       const sort = primaryField ? `${primaryField} ${order}${secondarySort}` : 'created_at desc';
       const result = await api.post(getCommonEndpoints(), {
@@ -112,6 +109,7 @@ const useApiRegistryStore = create<ApiRegistryState>((set, get) => ({
     const url = def.url || def.openApiUrl || def.path || '';
     if (!url) return;
 
+    let networkError = false;
     try {
       await api.post(testEndpointUrl(), {
         endpointId: endpoint.endpointId,
@@ -123,13 +121,23 @@ const useApiRegistryStore = create<ApiRegistryState>((set, get) => ({
           body: getEndpointBody(def),
         },
       });
-
-      useToastStore.getState().success({ title: t('apiRegistry.testSuccess') });
     } catch {
-      useToastStore.getState().error({ title: t('apiRegistry.testError') });
+      networkError = true;
     } finally {
       const { pagination, sorting, search } = get();
       await get().loadEndpoints(pagination, sorting, search);
+    }
+
+    if (networkError) {
+      useToastStore.getState().error({ title: t('apiRegistry.testError') });
+      return;
+    }
+
+    const meta = get().verificationMap[endpoint.endpointId];
+    if (meta?.verificationStatus === 'verified') {
+      useToastStore.getState().success({ title: t('apiRegistry.testSuccess') });
+    } else {
+      useToastStore.getState().error({ title: t('apiRegistry.testError') });
     }
   },
 
@@ -139,7 +147,10 @@ const useApiRegistryStore = create<ApiRegistryState>((set, get) => ({
     const now = new Date();
     const pad = (n: number, len = 2) => String(n).padStart(len, '0');
     const ts = `${now.getFullYear()}_${pad(now.getMonth() + 1)}_${pad(now.getDate())}_${pad(now.getHours())}_${pad(now.getMinutes())}_${pad(now.getSeconds())}`;
-    const defaultName = `${endpoint.name}_${ts}`;
+
+    // Strip any previously appended timestamp (_YYYY_MM_DD_HH_MM_SS or _YYYY_MM_DD_HH_MM_SS_MMM)
+    const baseName = endpoint.name.replace(/_\d{4}_\d{2}_\d{2}_\d{2}_\d{2}_\d{2}(_\d{3})?$/, '');
+    const defaultName = `${baseName}_${ts}`;
     const { endpoints } = get();
     const nameExists = endpoints.some((e) => e.name === defaultName);
     const copyName = nameExists

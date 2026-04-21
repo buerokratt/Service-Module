@@ -21,10 +21,14 @@ ORDER BY
   CASE WHEN :sorting = 'name desc' THEN name END DESC NULLS LAST,
   CASE WHEN :sorting = 'lastTestAt asc' THEN last_test_at END ASC NULLS LAST,
   CASE WHEN :sorting = 'lastTestAt desc' THEN last_test_at END DESC NULLS LAST,
-  CASE WHEN :sorting = 'verificationStatus asc' THEN verification_status END ASC NULLS LAST,
-  CASE WHEN :sorting = 'verificationStatus desc' THEN verification_status END DESC NULLS LAST,
+  CASE WHEN :sorting = 'lastStatusCode asc' THEN last_status_code END ASC NULLS LAST,
+  CASE WHEN :sorting = 'lastStatusCode asc' THEN name END ASC NULLS LAST,
+  CASE WHEN :sorting = 'lastStatusCode desc' THEN last_status_code END DESC NULLS LAST,
+  CASE WHEN :sorting = 'lastStatusCode desc' THEN name END ASC NULLS LAST,
   CASE WHEN :sorting = 'schemaCaptured asc' THEN response_schema_captured END ASC NULLS LAST,
+  CASE WHEN :sorting = 'schemaCaptured asc' THEN name END ASC NULLS LAST,
   CASE WHEN :sorting = 'schemaCaptured desc' THEN response_schema_captured END DESC NULLS LAST,
+  CASE WHEN :sorting = 'schemaCaptured desc' THEN name END ASC NULLS LAST,
   created_at DESC
 OFFSET (CASE WHEN :pagination THEN (GREATEST(:page, 1) - 1) * :page_size ELSE 0 END)
 LIMIT (CASE WHEN :pagination THEN :page_size END);

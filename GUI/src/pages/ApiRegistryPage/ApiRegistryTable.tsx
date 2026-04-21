@@ -140,10 +140,11 @@ const ApiRegistryTable: React.FC<ApiRegistryTableProps> = ({
   const currentDesc = sorting[0]?.desc ?? false;
 
   const handleSort = (colId: SortableCol) => {
+    const defaultDesc: Partial<Record<SortableCol, boolean>> = { lastTest: true, schema: true };
     if (currentSortId === colId) {
       setSorting([{ id: colId, desc: !currentDesc }]);
     } else {
-      setSorting([{ id: colId, desc: false }]);
+      setSorting([{ id: colId, desc: defaultDesc[colId] ?? false }]);
     }
   };
 
@@ -164,27 +165,27 @@ const ApiRegistryTable: React.FC<ApiRegistryTableProps> = ({
                 onClick={() => handleSort('name')}
                 style={{ cursor: 'pointer', userSelect: 'none', whiteSpace: 'nowrap' }}
               >
-                {String(t('apiRegistry.columns.name'))} <SortIcon colId="name" />
+                <SortIcon colId="name" /> {String(t('apiRegistry.columns.name'))}
               </th>
               <th
                 onClick={() => handleSort('lastTest')}
-                style={{ cursor: 'pointer', userSelect: 'none', whiteSpace: 'nowrap' }}
+                style={{ cursor: 'pointer', userSelect: 'none', whiteSpace: 'nowrap', textAlign: 'center' }}
               >
-                {String(t('apiRegistry.columns.lastTest'))} <SortIcon colId="lastTest" />
+                <SortIcon colId="lastTest" /> {String(t('apiRegistry.columns.lastTest'))}
               </th>
               <th
                 onClick={() => handleSort('status')}
                 style={{ cursor: 'pointer', userSelect: 'none', whiteSpace: 'nowrap' }}
               >
-                {String(t('apiRegistry.columns.status'))} <SortIcon colId="status" />
+                <SortIcon colId="status" /> {String(t('apiRegistry.columns.status'))}
               </th>
               <th
                 onClick={() => handleSort('schema')}
                 style={{ cursor: 'pointer', userSelect: 'none', textAlign: 'center', whiteSpace: 'nowrap' }}
               >
-                {String(t('apiRegistry.columns.schema'))} <SortIcon colId="schema" />
+                <SortIcon colId="schema" /> {String(t('apiRegistry.columns.schema'))}
               </th>
-              <th>{String(t('apiRegistry.columns.actions'))}</th>
+              <th></th>
             </tr>
           </thead>
           <tbody>
@@ -208,7 +209,7 @@ const ApiRegistryTable: React.FC<ApiRegistryTableProps> = ({
                     {(() => {
                       const val = formatLastTest(meta?.lastTestAt ?? null);
                       return val === '---'
-                        ? <span style={{ color: '#e74c3c', fontWeight: 600 }}>{val}</span>
+                        ? <span style={{ color: '#e74c3c', fontWeight: 600, display: 'block', textAlign: 'center' }}>{val}</span>
                         : val;
                     })()}
                   </td>
