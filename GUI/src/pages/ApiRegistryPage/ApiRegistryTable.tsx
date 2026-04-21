@@ -217,7 +217,8 @@ const ApiRegistryTable: React.FC<ApiRegistryTableProps> = ({
                 onClick={() => handleSort('name')}
                 style={{ cursor: 'pointer', userSelect: 'none', whiteSpace: 'nowrap', width: '30%' }}
               >
-                <SortIcon colId="name" currentSortId={currentSortId} currentDesc={currentDesc} /> {String(t('apiRegistry.columns.name'))}
+                <SortIcon colId="name" currentSortId={currentSortId} currentDesc={currentDesc} />{' '}
+                {String(t('apiRegistry.columns.name'))}
               </th>
               <th
                 onClick={() => handleSort('lastTest')}
@@ -229,13 +230,15 @@ const ApiRegistryTable: React.FC<ApiRegistryTableProps> = ({
                   width: '160px',
                 }}
               >
-                <SortIcon colId="lastTest" currentSortId={currentSortId} currentDesc={currentDesc} /> {String(t('apiRegistry.columns.lastTest'))}
+                <SortIcon colId="lastTest" currentSortId={currentSortId} currentDesc={currentDesc} />{' '}
+                {String(t('apiRegistry.columns.lastTest'))}
               </th>
               <th
                 onClick={() => handleSort('status')}
                 style={{ cursor: 'pointer', userSelect: 'none', whiteSpace: 'nowrap', width: '100px' }}
               >
-                <SortIcon colId="status" currentSortId={currentSortId} currentDesc={currentDesc} /> {String(t('apiRegistry.columns.status'))}
+                <SortIcon colId="status" currentSortId={currentSortId} currentDesc={currentDesc} />{' '}
+                {String(t('apiRegistry.columns.status'))}
               </th>
               <th
                 onClick={() => handleSort('schema')}
@@ -247,7 +250,8 @@ const ApiRegistryTable: React.FC<ApiRegistryTableProps> = ({
                   width: '80px',
                 }}
               >
-                <SortIcon colId="schema" currentSortId={currentSortId} currentDesc={currentDesc} /> {String(t('apiRegistry.columns.schema'))}
+                <SortIcon colId="schema" currentSortId={currentSortId} currentDesc={currentDesc} />{' '}
+                {String(t('apiRegistry.columns.schema'))}
               </th>
               <th style={{ width: '320px' }}></th>
             </tr>
