@@ -170,7 +170,7 @@ const useApiRegistryStore = create<ApiRegistryState>((set, get) => ({
         type: endpoint.type ?? 'custom',
         isCommon: endpoint.isCommon ?? true,
         serviceId: endpoint.serviceId || '',
-        definitions: cleanDefinitions,
+        definitions: JSON.stringify(cleanDefinitions),
       });
 
       const newEndpoint: EndpointData = {
