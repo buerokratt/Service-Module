@@ -19,7 +19,7 @@ import {
 import { VerificationMetadata } from 'store/api-registry.store';
 import { EndpointData } from 'types/endpoint';
 
-import { formatLastTest, truncateName } from './columns';
+import { formatLastTest } from './columns';
 
 type ApiRegistryTableProps = {
   t: TFunction;
@@ -61,6 +61,7 @@ const EndpointTooltipContent: React.FC<{ def: import('types/endpoint').EndpointD
 
   return (
     <div style={{ fontFamily: 'monospace', fontSize: 12, lineHeight: 1.7, maxWidth: 420 }}>
+      <div style={{ ...S, marginBottom: 6 }}><strong>NAME:</strong> {name || '—'}</div>
       <div style={S}><strong>ENDPOINT TYPE:</strong> {def.type === 'openApi' ? 'OpenAPI' : 'Custom'}</div>
       {url && <div style={S}><strong>URL:</strong> {url}</div>}
       {def.methodType && <div style={S}><strong>METHOD:</strong> {def.methodType}</div>}
@@ -158,34 +159,34 @@ const ApiRegistryTable: React.FC<ApiRegistryTableProps> = ({
   return (
     <>
       <div className="data-table__scrollWrapper">
-        <table className="data-table">
+        <table className="data-table" style={{ tableLayout: 'fixed', width: '100%' }}>
           <thead>
             <tr>
               <th
                 onClick={() => handleSort('name')}
-                style={{ cursor: 'pointer', userSelect: 'none', whiteSpace: 'nowrap' }}
+                style={{ cursor: 'pointer', userSelect: 'none', whiteSpace: 'nowrap', width: '30%' }}
               >
                 <SortIcon colId="name" /> {String(t('apiRegistry.columns.name'))}
               </th>
               <th
                 onClick={() => handleSort('lastTest')}
-                style={{ cursor: 'pointer', userSelect: 'none', whiteSpace: 'nowrap', textAlign: 'center' }}
+                style={{ cursor: 'pointer', userSelect: 'none', whiteSpace: 'nowrap', textAlign: 'center', width: '160px' }}
               >
                 <SortIcon colId="lastTest" /> {String(t('apiRegistry.columns.lastTest'))}
               </th>
               <th
                 onClick={() => handleSort('status')}
-                style={{ cursor: 'pointer', userSelect: 'none', whiteSpace: 'nowrap' }}
+                style={{ cursor: 'pointer', userSelect: 'none', whiteSpace: 'nowrap', width: '100px' }}
               >
                 <SortIcon colId="status" /> {String(t('apiRegistry.columns.status'))}
               </th>
               <th
                 onClick={() => handleSort('schema')}
-                style={{ cursor: 'pointer', userSelect: 'none', textAlign: 'center', whiteSpace: 'nowrap' }}
+                style={{ cursor: 'pointer', userSelect: 'none', textAlign: 'center', whiteSpace: 'nowrap', width: '80px' }}
               >
                 <SortIcon colId="schema" /> {String(t('apiRegistry.columns.schema'))}
               </th>
-              <th></th>
+              <th style={{ width: '320px' }}></th>
             </tr>
           </thead>
           <tbody>
@@ -197,11 +198,11 @@ const ApiRegistryTable: React.FC<ApiRegistryTableProps> = ({
               const isTesting = testingId === endpoint.endpointId;
               return (
                 <tr key={endpoint.endpointId}>
-                  <td>
+                  <td style={{ overflow: 'hidden' }}>
                     <Tooltip content={<EndpointTooltipContent def={def} name={label} />}>
-                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, cursor: 'pointer' }}>
-                        <span>{truncateName(label)}</span>
-                        <Icon icon={<MdInfoOutline />} size="small" style={{ color: '#3f82ff' }} />
+                      <span style={{ display: 'flex', alignItems: 'center', gap: 4, cursor: 'pointer', overflow: 'hidden' }}>
+                        <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{label}</span>
+                        <Icon icon={<MdInfoOutline />} size="small" style={{ color: '#3f82ff', flexShrink: 0 }} />
                       </span>
                     </Tooltip>
                   </td>
