@@ -55,7 +55,7 @@ const EndpointTooltipContent: React.FC<{
   const url = def.url || def.openApiUrl || def.path || null;
   const params = def.params?.variables?.filter((v) => v.name) ?? [];
   const headers = def.headers?.variables?.filter((v) => v.name) ?? [];
-  const bodyVars = !def.body?.isRawSelected ? (def.body?.variables?.filter((v) => v.name) ?? []) : [];
+  const bodyVars = def.body?.isRawSelected ? [] : (def.body?.variables?.filter((v) => v.name) ?? []);
   const bodyRaw = def.body?.isRawSelected ? def.body?.rawData?.value : undefined;
   const prettyBody = bodyRaw
     ? (() => {

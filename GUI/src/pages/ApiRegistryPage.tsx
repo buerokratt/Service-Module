@@ -1,18 +1,14 @@
 import { PaginationState, SortingState } from '@tanstack/react-table';
 import { Button, Card, Modal, Track } from 'components';
-// import AddEndpointModal from 'components/Flow/EdgeTypes/AddEndpointModal';
-// import EditEndpointModal from 'components/Flow/EdgeTypes/EditEndpointModal';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import useApiRegistryStore from '../store/api-registry.store';
 import { EndpointData } from 'types/endpoint';
 
+import useApiRegistryStore from '../store/api-registry.store';
 import ApiRegistryTable from './ApiRegistryPage/ApiRegistryTable';
 
 const ApiRegistryPage: React.FC = () => {
   const { t } = useTranslation();
-  const [showCreateModal, setShowCreateModal] = useState(false);
-  const [editEndpoint, setEditEndpoint] = useState<EndpointData | null>(null);
   const [deleteEndpoint, setDeleteEndpoint] = useState<EndpointData | null>(null);
   const [search, setSearch] = useState('');
   const [testingId, setTestingId] = useState<string | null>(null);
@@ -27,8 +23,6 @@ const ApiRegistryPage: React.FC = () => {
   const testEndpoint = useApiRegistryStore((s) => s.testEndpoint);
   const copyEndpoint = useApiRegistryStore((s) => s.copyEndpoint);
   const deleteEndpointFromStore = useApiRegistryStore((s) => s.deleteEndpoint);
-  const addEndpointAfterCreate = useApiRegistryStore((s) => s.addEndpointAfterCreate);
-  const updateEndpointInList = useApiRegistryStore((s) => s.updateEndpointInList);
 
   useEffect(() => {
     void loadEndpoints(pagination, sorting, search);
@@ -61,8 +55,8 @@ const ApiRegistryPage: React.FC = () => {
     [copyEndpoint],
   );
 
-  const handleEdit = useCallback((endpoint: EndpointData) => {
-    setEditEndpoint(endpoint);
+  const handleEdit = useCallback((_endpoint: EndpointData) => {
+    // Edit modal not yet implemented
   }, []);
 
   const handleDeleteClick = useCallback((endpoint: EndpointData) => {
@@ -78,9 +72,7 @@ const ApiRegistryPage: React.FC = () => {
     <>
       <Track justify="between" align="center" style={{ marginBottom: 16 }}>
         <h1 style={{ margin: 0 }}>{t('apiRegistry.title')}</h1>
-        <Button appearance="primary" onClick={() => setShowCreateModal(true)}>
-          {t('apiRegistry.createEndpoint')}
-        </Button>
+        <Button appearance="primary">{t('apiRegistry.createEndpoint')}</Button>
       </Track>
       <input
         type="search"
@@ -117,28 +109,6 @@ const ApiRegistryPage: React.FC = () => {
           testingId={testingId}
         />
       </Card>
-
-      {/* {showCreateModal && (
-        <AddEndpointModal
-          onClose={() => setShowCreateModal(false)}
-          onCreated={(endpoint) => {
-            addEndpointAfterCreate(endpoint);
-            setShowCreateModal(false);
-          }}
-          requireTestBeforeSave
-        />
-      )} */}
-
-      {/* {editEndpoint && (
-        <EditEndpointModal
-          endpoint={editEndpoint}
-          onClose={() => setEditEndpoint(null)}
-          onSaved={(updated) => {
-            updateEndpointInList(updated);
-            setEditEndpoint(null);
-          }}
-        />
-      )} */}
 
       {deleteEndpoint && (
         <Modal title={t('apiRegistry.deleteConfirm')} onClose={() => setDeleteEndpoint(null)}>

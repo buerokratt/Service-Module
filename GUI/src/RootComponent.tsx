@@ -2,13 +2,13 @@ import React from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
 
 import { Layout } from './components';
+import ApiRegistryPage from './pages/ApiRegistryPage';
 import FaultyServicesPage from './pages/FaultyServicesPage';
 import NotFoundPage from './pages/NotFoundPage';
 import OverviewPage from './pages/OverviewPage';
 import ServiceFlowPage from './pages/ServiceFlowPage';
 import ServiceSettingPage from './pages/ServiceSettingPage';
 import { ROUTES } from './resources/routes-constants';
-import ApiRegistryPage from './pages/ApiRegistryPage';
 
 import './styles/main.scss';
 

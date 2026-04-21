@@ -8,8 +8,8 @@ import {
 } from 'resources/api-constants';
 import api from 'services/api-dev';
 import { extractMapValues, getEndpointBody } from 'store/new-services.store';
-import { v4 as uuid } from 'uuid';
 import { EndpointData } from 'types/endpoint';
+import { v4 as uuid } from 'uuid';
 import { create } from 'zustand';
 
 import useToastStore from './toasts.store';
@@ -74,7 +74,8 @@ const useApiRegistryStore = create<ApiRegistryState>((set, get) => ({
         let definitions: EndpointData['definitions'] = [];
         try {
           const raw = row.definitions?.value ?? row.definitions;
-          definitions = typeof raw === 'string' ? JSON.parse(raw) : Array.isArray(raw) ? raw : [];
+          if (typeof raw === 'string') definitions = JSON.parse(raw);
+          else if (Array.isArray(raw)) definitions = raw;
         } catch {
           /* leave empty */
         }
@@ -92,12 +93,11 @@ const useApiRegistryStore = create<ApiRegistryState>((set, get) => ({
         if (row.endpointId) {
           verificationMap[row.endpointId] = {
             lastTestAt: row.lastTestAt ?? null,
-            verificationStatus:
-              row.verificationStatus === true
-                ? 'verified'
-                : row.lastStatusCode || row.lastTestAt
-                  ? 'failed'
-                  : 'unverified',
+            verificationStatus: ((): VerificationMetadata['verificationStatus'] => {
+              if (row.verificationStatus === true) return 'verified';
+              if (row.lastStatusCode || row.lastTestAt) return 'failed';
+              return 'unverified';
+            })(),
             lastStatusCode: row.lastStatusCode ?? null,
             schemaCaptured: row.responseSchemaCaptured ?? row.schemaCaptured ?? false,
           };
