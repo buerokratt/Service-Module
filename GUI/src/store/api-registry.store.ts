@@ -1,6 +1,11 @@
 import { PaginationState, SortingState } from '@tanstack/react-table';
 import { t } from 'i18next';
-import { createEndpoint, deleteEndpoint as deleteEndpointUrl, getCommonEndpoints, testEndpointUrl } from 'resources/api-constants';
+import {
+  createEndpoint,
+  deleteEndpoint as deleteEndpointUrl,
+  getCommonEndpoints,
+  testEndpointUrl,
+} from 'resources/api-constants';
 import api from 'services/api-dev';
 import { extractMapValues, getEndpointBody } from 'store/new-services.store';
 import { v4 as uuid } from 'uuid';
@@ -69,8 +74,10 @@ const useApiRegistryStore = create<ApiRegistryState>((set, get) => ({
         let definitions: EndpointData['definitions'] = [];
         try {
           const raw = row.definitions?.value ?? row.definitions;
-          definitions = typeof raw === 'string' ? JSON.parse(raw) : (Array.isArray(raw) ? raw : []);
-        } catch { /* leave empty */ }
+          definitions = typeof raw === 'string' ? JSON.parse(raw) : Array.isArray(raw) ? raw : [];
+        } catch {
+          /* leave empty */
+        }
         return {
           endpointId: row.endpointId,
           name: row.name,
@@ -85,11 +92,12 @@ const useApiRegistryStore = create<ApiRegistryState>((set, get) => ({
         if (row.endpointId) {
           verificationMap[row.endpointId] = {
             lastTestAt: row.lastTestAt ?? null,
-            verificationStatus: row.verificationStatus === true
-              ? 'verified'
-              : (row.lastStatusCode || row.lastTestAt)
-                ? 'failed'
-                : 'unverified',
+            verificationStatus:
+              row.verificationStatus === true
+                ? 'verified'
+                : row.lastStatusCode || row.lastTestAt
+                  ? 'failed'
+                  : 'unverified',
             lastStatusCode: row.lastStatusCode ?? null,
             schemaCaptured: row.responseSchemaCaptured ?? row.schemaCaptured ?? false,
           };
@@ -153,25 +161,29 @@ const useApiRegistryStore = create<ApiRegistryState>((set, get) => ({
     const defaultName = `${baseName}_${ts}`;
     const { endpoints } = get();
     const nameExists = endpoints.some((e) => e.name === defaultName);
-    const copyName = nameExists
-      ? `${defaultName}_${pad(now.getMilliseconds(), 3)}`
-      : defaultName;
+    const copyName = nameExists ? `${defaultName}_${pad(now.getMilliseconds(), 3)}` : defaultName;
 
     // Strip testValue from definitions so copy starts clean
     const cleanDefinitions = endpoint.definitions.map((def) => ({
       ...def,
-      params: def.params ? {
-        ...def.params,
-        variables: def.params.variables.map(({ testValue: _, ...v }) => v),
-      } : def.params,
-      headers: def.headers ? {
-        ...def.headers,
-        variables: def.headers.variables.map(({ testValue: _, ...v }) => v),
-      } : def.headers,
-      body: def.body ? {
-        ...def.body,
-        variables: def.body.variables.map(({ testValue: _, ...v }) => v),
-      } : def.body,
+      params: def.params
+        ? {
+            ...def.params,
+            variables: def.params.variables.map(({ testValue: _, ...v }) => v),
+          }
+        : def.params,
+      headers: def.headers
+        ? {
+            ...def.headers,
+            variables: def.headers.variables.map(({ testValue: _, ...v }) => v),
+          }
+        : def.headers,
+      body: def.body
+        ? {
+            ...def.body,
+            variables: def.body.variables.map(({ testValue: _, ...v }) => v),
+          }
+        : def.body,
     }));
 
     try {

@@ -76,7 +76,6 @@ const ApiRegistryPage: React.FC = () => {
 
   return (
     <>
-
       <Track justify="between" align="center" style={{ marginBottom: 16 }}>
         <h1 style={{ margin: 0 }}>{t('apiRegistry.title')}</h1>
         <Button appearance="primary" onClick={() => setShowCreateModal(true)}>
