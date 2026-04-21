@@ -68,12 +68,16 @@ const EndpointTooltipContent: React.FC<{ def: import('types/endpoint').EndpointD
       {params.length > 0 && (
         <>
           <div style={{ ...S, marginTop: 4 }}><strong>PARAMETERS:</strong></div>
-          {params.map((v) => (
-            <React.Fragment key={v.id}>
-              <div style={IND}>{v.name} : {v.value ?? v.testValue ?? '—'}</div>
-              <div style={IND2}>{v.type}</div>
-            </React.Fragment>
-          ))}
+          {params.map((v) => {
+            const rawType = v.type ?? '';
+            const displayType = rawType.toLowerCase() === 'custom' ? 'STRING' : rawType.toUpperCase();
+            return (
+              <React.Fragment key={v.id}>
+                <div style={IND}>{v.name} : {v.value ?? v.testValue ?? '—'}</div>
+                <div style={IND2}>{v.name}_type : {displayType}</div>
+              </React.Fragment>
+            );
+          })}
         </>
       )}
 
