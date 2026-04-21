@@ -77,7 +77,7 @@ const useApiRegistryStore = create<ApiRegistryState>((set, get) => ({
           if (typeof raw === 'string') definitions = JSON.parse(raw);
           else if (Array.isArray(raw)) definitions = raw;
         } catch {
-          /* leave empty */
+          definitions = []; // malformed JSON — fall back to empty definitions
         }
         return {
           endpointId: row.endpointId,

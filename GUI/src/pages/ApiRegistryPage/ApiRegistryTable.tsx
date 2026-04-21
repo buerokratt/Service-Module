@@ -3,18 +3,18 @@ import { Button, Icon, Tooltip, Track } from 'components';
 import { TFunction } from 'i18next';
 import React from 'react';
 import {
+  MdArrowDownward,
+  MdArrowUpward,
+  MdCancel,
+  MdCheckCircle,
+  MdContentCopy,
+  MdDeleteOutline,
+  MdEdit,
+  MdFormatListBulleted,
+  MdInfoOutline,
   MdOutlineEast,
   MdOutlineWest,
-  MdInfoOutline,
-  MdCheckCircle,
-  MdCancel,
-  MdContentCopy,
-  MdFormatListBulleted,
-  MdEdit,
-  MdDeleteOutline,
   MdUnfoldMore,
-  MdArrowUpward,
-  MdArrowDownward,
 } from 'react-icons/md';
 import { VerificationMetadata } from 'store/api-registry.store';
 import { EndpointData } from 'types/endpoint';
@@ -152,6 +152,25 @@ const EndpointTooltipContent: React.FC<{
   );
 };
 
+type SortableCol = 'name' | 'lastTest' | 'status' | 'schema';
+
+const SortIcon = ({
+  colId,
+  currentSortId,
+  currentDesc,
+}: {
+  colId: SortableCol;
+  currentSortId: SortableCol | undefined;
+  currentDesc: boolean;
+}) => {
+  if (currentSortId !== colId) return <MdUnfoldMore style={{ verticalAlign: 'middle', opacity: 0.4 }} />;
+  return currentDesc ? (
+    <MdArrowDownward style={{ verticalAlign: 'middle' }} />
+  ) : (
+    <MdArrowUpward style={{ verticalAlign: 'middle' }} />
+  );
+};
+
 const ApiRegistryTable: React.FC<ApiRegistryTableProps> = ({
   t,
   loading,
@@ -176,9 +195,6 @@ const ApiRegistryTable: React.FC<ApiRegistryTableProps> = ({
   const canPrev = pagination.pageIndex > 0;
   const canNext = pagination.pageIndex < pageCount - 1;
 
-  const SORTABLE_COLUMNS = ['name', 'lastTest', 'status', 'schema'] as const;
-  type SortableCol = (typeof SORTABLE_COLUMNS)[number];
-
   const currentSortId = sorting[0]?.id as SortableCol | undefined;
   const currentDesc = sorting[0]?.desc ?? false;
 
@@ -191,15 +207,6 @@ const ApiRegistryTable: React.FC<ApiRegistryTableProps> = ({
     }
   };
 
-  const SortIcon = ({ colId }: { colId: SortableCol }) => {
-    if (currentSortId !== colId) return <MdUnfoldMore style={{ verticalAlign: 'middle', opacity: 0.4 }} />;
-    return currentDesc ? (
-      <MdArrowDownward style={{ verticalAlign: 'middle' }} />
-    ) : (
-      <MdArrowUpward style={{ verticalAlign: 'middle' }} />
-    );
-  };
-
   return (
     <>
       <div className="data-table__scrollWrapper">
@@ -210,7 +217,7 @@ const ApiRegistryTable: React.FC<ApiRegistryTableProps> = ({
                 onClick={() => handleSort('name')}
                 style={{ cursor: 'pointer', userSelect: 'none', whiteSpace: 'nowrap', width: '30%' }}
               >
-                <SortIcon colId="name" /> {String(t('apiRegistry.columns.name'))}
+                <SortIcon colId="name" currentSortId={currentSortId} currentDesc={currentDesc} /> {String(t('apiRegistry.columns.name'))}
               </th>
               <th
                 onClick={() => handleSort('lastTest')}
@@ -222,13 +229,13 @@ const ApiRegistryTable: React.FC<ApiRegistryTableProps> = ({
                   width: '160px',
                 }}
               >
-                <SortIcon colId="lastTest" /> {String(t('apiRegistry.columns.lastTest'))}
+                <SortIcon colId="lastTest" currentSortId={currentSortId} currentDesc={currentDesc} /> {String(t('apiRegistry.columns.lastTest'))}
               </th>
               <th
                 onClick={() => handleSort('status')}
                 style={{ cursor: 'pointer', userSelect: 'none', whiteSpace: 'nowrap', width: '100px' }}
               >
-                <SortIcon colId="status" /> {String(t('apiRegistry.columns.status'))}
+                <SortIcon colId="status" currentSortId={currentSortId} currentDesc={currentDesc} /> {String(t('apiRegistry.columns.status'))}
               </th>
               <th
                 onClick={() => handleSort('schema')}
@@ -240,7 +247,7 @@ const ApiRegistryTable: React.FC<ApiRegistryTableProps> = ({
                   width: '80px',
                 }}
               >
-                <SortIcon colId="schema" /> {String(t('apiRegistry.columns.schema'))}
+                <SortIcon colId="schema" currentSortId={currentSortId} currentDesc={currentDesc} /> {String(t('apiRegistry.columns.schema'))}
               </th>
               <th style={{ width: '320px' }}></th>
             </tr>
@@ -283,7 +290,8 @@ const ApiRegistryTable: React.FC<ApiRegistryTableProps> = ({
                       const status = meta?.verificationStatus ?? 'unverified';
                       const isVerified = status === 'verified';
                       const isUntested = status === 'unverified';
-                      const code = isUntested ? '---' : meta?.lastStatusCode ? String(meta.lastStatusCode) : '---';
+                      const rawCode = meta?.lastStatusCode ? String(meta.lastStatusCode) : '---';
+                      const code = isUntested ? '---' : rawCode;
                       const color = isVerified ? '#27ae60' : '#e74c3c';
                       return (
                         <Track gap={6} align="center">
@@ -361,13 +369,13 @@ const ApiRegistryTable: React.FC<ApiRegistryTableProps> = ({
           <ul className="links">
             {Array.from({ length: pageCount }, (_, i) => (
               <li key={i} className={i === pagination.pageIndex ? 'active' : ''}>
-                <span
-                  role="button"
-                  style={{ cursor: 'pointer' }}
+                <button
+                  type="button"
+                  style={{ cursor: 'pointer', background: 'none', border: 'none', padding: 0 }}
                   onClick={() => setPagination({ ...pagination, pageIndex: i })}
                 >
                   {i + 1}
-                </span>
+                </button>
               </li>
             ))}
           </ul>

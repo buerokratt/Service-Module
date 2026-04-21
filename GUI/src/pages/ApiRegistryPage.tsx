@@ -50,7 +50,9 @@ const ApiRegistryPage: React.FC = () => {
 
   const handleCopy = useCallback(
     (endpoint: EndpointData) => {
-      void copyEndpoint(endpoint);
+      copyEndpoint(endpoint).catch(() => {
+        // error handled in store (toast notification shown)
+      });
     },
     [copyEndpoint],
   );
@@ -65,7 +67,11 @@ const ApiRegistryPage: React.FC = () => {
 
   const handleConfirmDelete = useCallback(() => {
     if (!deleteEndpoint) return;
-    void deleteEndpointFromStore(deleteEndpoint).then(() => setDeleteEndpoint(null));
+    deleteEndpointFromStore(deleteEndpoint)
+      .then(() => setDeleteEndpoint(null))
+      .catch(() => {
+        // error handled in store (toast notification shown)
+      });
   }, [deleteEndpoint, deleteEndpointFromStore]);
 
   return (
