@@ -8,7 +8,7 @@ INSERT INTO endpoints (
 )
 VALUES (
     :endpointId::uuid,
-    :serviceId::uuid,
+    NULLIF(:serviceId, '')::uuid,
     :name,
     :type::endpoint_type,
     :isCommon,

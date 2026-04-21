@@ -701,6 +701,7 @@
     "noLastTest": "—",
     "copySuccess": "Otspunkt kopeeritud",
     "copyError": "Otspunkti kopeerimine ebaõnnestus",
+    "loadError": "Otspunktide laadimine ebaõnnestus",
     "deleteSuccess": "Otspunkt kustutatud",
     "deleteError": "Otspunkti kustutamine ebaõnnestus",
     "testSuccess": "Test õnnestus",

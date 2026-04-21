@@ -12,6 +12,9 @@ import {
   MdFormatListBulleted,
   MdEdit,
   MdDeleteOutline,
+  MdUnfoldMore,
+  MdArrowUpward,
+  MdArrowDownward,
 } from 'react-icons/md';
 import { VerificationMetadata } from 'store/api-registry.store';
 import { EndpointData } from 'types/endpoint';
@@ -35,6 +38,73 @@ type ApiRegistryTableProps = {
   testingId: string | null;
 };
 
+const EndpointTooltipContent: React.FC<{ def: import('types/endpoint').EndpointDefinition | undefined; name: string }> = ({ def, name }) => {
+  if (!def) return (
+    <div style={{ fontFamily: 'monospace', fontSize: 12, lineHeight: 1.6 }}>
+      <div><strong>NAME:</strong> {name || '—'}</div>
+      <div style={{ opacity: 0.6, marginTop: 4, fontSize: 11 }}>No definition available</div>
+    </div>
+  );
+
+  const url = def.url || def.openApiUrl || def.path || null;
+  const params = def.params?.variables?.filter((v) => v.name) ?? [];
+  const headers = def.headers?.variables?.filter((v) => v.name) ?? [];
+  const bodyVars = !def.body?.isRawSelected ? (def.body?.variables?.filter((v) => v.name) ?? []) : [];
+  const bodyRaw = def.body?.isRawSelected ? def.body?.rawData?.value : undefined;
+  const prettyBody = bodyRaw
+    ? (() => { try { return JSON.stringify(JSON.parse(bodyRaw), null, 2); } catch { return bodyRaw; } })()
+    : undefined;
+
+  const S: React.CSSProperties = { display: 'block', marginBottom: 2 };
+  const IND: React.CSSProperties = { paddingLeft: 16 };
+  const IND2: React.CSSProperties = { paddingLeft: 32, opacity: 0.75, fontSize: 11 };
+
+  return (
+    <div style={{ fontFamily: 'monospace', fontSize: 12, lineHeight: 1.7, maxWidth: 420 }}>
+      <div style={S}><strong>ENDPOINT TYPE:</strong> {def.type === 'openApi' ? 'OpenAPI' : 'Custom'}</div>
+      {url && <div style={S}><strong>URL:</strong> {url}</div>}
+      {def.methodType && <div style={S}><strong>METHOD:</strong> {def.methodType}</div>}
+
+      {params.length > 0 && (
+        <>
+          <div style={{ ...S, marginTop: 4 }}><strong>PARAMETERS:</strong></div>
+          {params.map((v) => (
+            <React.Fragment key={v.id}>
+              <div style={IND}>{v.name} : {v.value ?? v.testValue ?? '—'}</div>
+              <div style={IND2}>{v.type}</div>
+            </React.Fragment>
+          ))}
+        </>
+      )}
+
+      {headers.length > 0 && (
+        <>
+          <div style={{ ...S, marginTop: 4 }}><strong>HEADERS:</strong></div>
+          {headers.map((v) => (
+            <div key={v.id} style={IND}>{v.name} : {v.value ?? v.testValue ?? '—'}</div>
+          ))}
+        </>
+      )}
+
+      {prettyBody && (
+        <>
+          <div style={{ ...S, marginTop: 4 }}><strong>BODY:</strong></div>
+          <pre style={{ margin: 0, ...IND, fontSize: 11, whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>{prettyBody}</pre>
+        </>
+      )}
+
+      {!prettyBody && bodyVars.length > 0 && (
+        <>
+          <div style={{ ...S, marginTop: 4 }}><strong>BODY:</strong></div>
+          {bodyVars.map((v) => (
+            <div key={v.id} style={IND}>{v.name} : {v.value ?? v.testValue ?? '—'}</div>
+          ))}
+        </>
+      )}
+    </div>
+  );
+};
+
 const ApiRegistryTable: React.FC<ApiRegistryTableProps> = ({
   t,
   loading,
@@ -43,8 +113,8 @@ const ApiRegistryTable: React.FC<ApiRegistryTableProps> = ({
   totalPages,
   pagination,
   setPagination,
-  sorting: _sorting,
-  setSorting: _setSorting,
+  sorting,
+  setSorting,
   onEdit,
   onDelete,
   onTest,
@@ -59,52 +129,75 @@ const ApiRegistryTable: React.FC<ApiRegistryTableProps> = ({
   const canPrev = pagination.pageIndex > 0;
   const canNext = pagination.pageIndex < pageCount - 1;
 
+  const SORTABLE_COLUMNS = ['name', 'lastTest', 'status', 'schema'] as const;
+  type SortableCol = typeof SORTABLE_COLUMNS[number];
+
+  const currentSortId = sorting[0]?.id as SortableCol | undefined;
+  const currentDesc = sorting[0]?.desc ?? false;
+
+  const handleSort = (colId: SortableCol) => {
+    if (currentSortId === colId) {
+      setSorting([{ id: colId, desc: !currentDesc }]);
+    } else {
+      setSorting([{ id: colId, desc: false }]);
+    }
+  };
+
+  const SortIcon = ({ colId }: { colId: SortableCol }) => {
+    if (currentSortId !== colId) return <MdUnfoldMore style={{ verticalAlign: 'middle', opacity: 0.4 }} />;
+    return currentDesc
+      ? <MdArrowDownward style={{ verticalAlign: 'middle' }} />
+      : <MdArrowUpward style={{ verticalAlign: 'middle' }} />;
+  };
+
   return (
     <>
       <div className="data-table__scrollWrapper">
         <table className="data-table">
           <thead>
             <tr>
-              <th>{String(t('apiRegistry.columns.name'))}</th>
-              <th>{String(t('apiRegistry.columns.lastTest'))}</th>
-              <th>{String(t('apiRegistry.columns.status'))}</th>
-              <th style={{ textAlign: 'center' }}>{String(t('apiRegistry.columns.schema'))}</th>
+              <th
+                onClick={() => handleSort('name')}
+                style={{ cursor: 'pointer', userSelect: 'none', whiteSpace: 'nowrap' }}
+              >
+                {String(t('apiRegistry.columns.name'))} <SortIcon colId="name" />
+              </th>
+              <th
+                onClick={() => handleSort('lastTest')}
+                style={{ cursor: 'pointer', userSelect: 'none', whiteSpace: 'nowrap' }}
+              >
+                {String(t('apiRegistry.columns.lastTest'))} <SortIcon colId="lastTest" />
+              </th>
+              <th
+                onClick={() => handleSort('status')}
+                style={{ cursor: 'pointer', userSelect: 'none', whiteSpace: 'nowrap' }}
+              >
+                {String(t('apiRegistry.columns.status'))} <SortIcon colId="status" />
+              </th>
+              <th
+                onClick={() => handleSort('schema')}
+                style={{ cursor: 'pointer', userSelect: 'none', textAlign: 'center', whiteSpace: 'nowrap' }}
+              >
+                {String(t('apiRegistry.columns.schema'))} <SortIcon colId="schema" />
+              </th>
               <th>{String(t('apiRegistry.columns.actions'))}</th>
             </tr>
           </thead>
           <tbody>
             {endpoints.map((endpoint) => {
               const def = endpoint.definitions?.[0];
-              const label = def?.label ?? endpoint.name ?? '';
+              const label = def?.label || endpoint.name || '';
               const meta = verificationMap[endpoint.endpointId];
               const schemaCaptured = meta?.schemaCaptured ?? false;
               const isTesting = testingId === endpoint.endpointId;
               return (
                 <tr key={endpoint.endpointId}>
                   <td>
-                    <Tooltip
-                      content={
-                        <Track direction="vertical" gap={4}>
-                          <span>
-                            <strong>{t('apiRegistry.tooltip.fullName')}:</strong> {label}
-                          </span>
-                          <span>
-                            <strong>{t('apiRegistry.tooltip.description')}:</strong> {def?.description ?? '—'}
-                          </span>
-                          <span>
-                            <strong>{t('apiRegistry.tooltip.method')}:</strong> {def?.methodType ?? '—'}
-                          </span>
-                          <span>
-                            <strong>{t('apiRegistry.tooltip.url')}:</strong>{' '}
-                            {def?.url ?? def?.openApiUrl ?? def?.path ?? '—'}
-                          </span>
-                        </Track>
-                      }
-                    >
-                      <Track gap={4} align="center" style={{ display: 'inline-flex', cursor: 'pointer' }}>
+                    <Tooltip content={<EndpointTooltipContent def={def} name={label} />}>
+                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, cursor: 'pointer' }}>
                         <span>{truncateName(label)}</span>
                         <Icon icon={<MdInfoOutline />} size="small" style={{ color: '#3f82ff' }} />
-                      </Track>
+                      </span>
                     </Tooltip>
                   </td>
                   <td>
@@ -117,8 +210,10 @@ const ApiRegistryTable: React.FC<ApiRegistryTableProps> = ({
                   </td>
                   <td>
                     {(() => {
-                      const isVerified = meta?.verificationStatus === 'verified';
-                      const code = meta?.lastStatusCode ? String(meta.lastStatusCode) : '---';
+                      const status = meta?.verificationStatus ?? 'unverified';
+                      const isVerified = status === 'verified';
+                      const isUntested = status === 'unverified';
+                      const code = isUntested ? '---' : (meta?.lastStatusCode ? String(meta.lastStatusCode) : '---');
                       const color = isVerified ? '#27ae60' : '#e74c3c';
                       return (
                         <Track gap={6} align="center">

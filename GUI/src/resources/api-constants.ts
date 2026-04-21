@@ -30,4 +30,5 @@ export const deleteEndpoint = (): string => `${baseUrl}/services/delete-endpoint
 export const getSlots = (): string => `${baseUrl}/slots`;
 export const userStepPreferences = (): string => `${baseUrl}/steps/preferences`;
 export const getCommonEndpoints = (): string => `${baseUrl}/endpoints/common`;
+export const testEndpointUrl = (): string => `${baseUrl}/services/test-endpoint`;
 export const importMultipleServices = (): string => `${baseUrl}/services/import-services`;

@@ -700,6 +700,7 @@
     "noLastTest": "—",
     "copySuccess": "Endpoint copied",
     "copyError": "Failed to copy endpoint",
+    "loadError": "Error loading endpoints",
     "deleteSuccess": "Endpoint deleted",
     "deleteError": "Failed to delete endpoint",
     "testSuccess": "Test successful",

@@ -1,6 +1,9 @@
 import { PaginationState, SortingState } from '@tanstack/react-table';
-import { deleteEndpoint as deleteEndpointUrl, getCommonEndpoints } from 'resources/api-constants';
+import { t } from 'i18next';
+import { createEndpoint, deleteEndpoint as deleteEndpointUrl, getCommonEndpoints, testEndpointUrl } from 'resources/api-constants';
 import api from 'services/api-dev';
+import { extractMapValues, getEndpointBody } from 'store/new-services.store';
+import { v4 as uuid } from 'uuid';
 import { EndpointData } from 'types/endpoint';
 import { create } from 'zustand';
 
@@ -18,6 +21,9 @@ interface ApiRegistryState {
   verificationMap: Record<string, VerificationMetadata>;
   totalPages: number;
   loading: boolean;
+  pagination: PaginationState;
+  sorting: SortingState;
+  search: string;
   loadEndpoints: (pagination: PaginationState, sorting: SortingState, search: string) => Promise<void>;
   testEndpoint: (endpoint: EndpointData) => Promise<void>;
   copyEndpoint: (endpoint: EndpointData) => Promise<void>;
@@ -26,17 +32,33 @@ interface ApiRegistryState {
   updateEndpointInList: (endpoint: EndpointData) => void;
 }
 
-const useApiRegistryStore = create<ApiRegistryState>((set) => ({
+const useApiRegistryStore = create<ApiRegistryState>((set, get) => ({
   endpoints: [],
   verificationMap: {},
   totalPages: 0,
   loading: false,
+  pagination: { pageIndex: 0, pageSize: 10 },
+  sorting: [{ id: 'created_at', desc: true }],
+  search: '',
 
   loadEndpoints: async (pagination, sorting, search) => {
-    set({ loading: true });
+    set({ loading: true, pagination, sorting, search });
     try {
       const order = sorting[0]?.desc ? 'desc' : 'asc';
-      const sort = sorting.length === 0 ? 'created_at desc' : `${sorting[0]?.id} ${order}`;
+      const colId = sorting[0]?.id;
+      const sortFieldMap: Record<string, string> = {
+        name: 'name',
+        lastTest: 'lastTestAt',
+        status: 'verificationStatus',
+        schema: 'schemaCaptured',
+      };
+      const primaryField = colId ? (sortFieldMap[colId] ?? colId) : null;
+      const secondarySortMap: Record<string, string> = {
+        status: ', name asc',
+        schema: ', name asc',
+      };
+      const secondarySort = colId ? (secondarySortMap[colId] ?? '') : '';
+      const sort = primaryField ? `${primaryField} ${order}${secondarySort}` : 'created_at desc';
       const result = await api.post(getCommonEndpoints(), {
         page: pagination.pageIndex + 1,
         page_size: pagination.pageSize,
@@ -46,14 +68,21 @@ const useApiRegistryStore = create<ApiRegistryState>((set) => ({
       });
       const rows: any[] = result.data?.response ?? [];
       const totalPages: number = rows[0]?.totalPages ?? 0;
-      const endpoints: EndpointData[] = rows.map((row) => ({
-        endpointId: row.endpointId,
-        name: row.name,
-        type: row.type,
-        isCommon: row.isCommon,
-        serviceId: row.serviceId,
-        definitions: row.definitions ?? [],
-      }));
+      const endpoints: EndpointData[] = rows.map((row) => {
+        let definitions: EndpointData['definitions'] = [];
+        try {
+          const raw = row.definitions?.value ?? row.definitions;
+          definitions = typeof raw === 'string' ? JSON.parse(raw) : (Array.isArray(raw) ? raw : []);
+        } catch { /* leave empty */ }
+        return {
+          endpointId: row.endpointId,
+          name: row.name,
+          type: row.type,
+          isCommon: row.isCommon,
+          serviceId: row.serviceId,
+          definitions,
+        };
+      });
       const verificationMap: Record<string, VerificationMetadata> = {};
       rows.forEach((row) => {
         if (row.endpointId) {
@@ -61,34 +90,124 @@ const useApiRegistryStore = create<ApiRegistryState>((set) => ({
             lastTestAt: row.lastTestAt ?? null,
             verificationStatus: row.verificationStatus === true
               ? 'verified'
-              : row.lastTestAt
+              : (row.lastStatusCode || row.lastTestAt)
                 ? 'failed'
                 : 'unverified',
             lastStatusCode: row.lastStatusCode ?? null,
-            schemaCaptured: row.schemaCaptured ?? false,
+            schemaCaptured: row.responseSchemaCaptured ?? row.schemaCaptured ?? false,
           };
         }
       });
       set({ endpoints, verificationMap, totalPages, loading: false });
     } catch {
       set({ loading: false });
-      useToastStore.getState().error({ title: 'Error loading endpoints' });
+      useToastStore.getState().error({ title: t('apiRegistry.loadError') });
     }
   },
 
-  testEndpoint: async (_endpoint) => {
-    // TODO: implement test logic
+  testEndpoint: async (endpoint) => {
+    const def = endpoint.definitions?.[0];
+    if (!def) return;
+
+    const url = def.url || def.openApiUrl || def.path || '';
+    if (!url) return;
+
+    try {
+      await api.post(testEndpointUrl(), {
+        endpointId: endpoint.endpointId,
+        request: {
+          url,
+          method: def.methodType ?? 'GET',
+          headers: extractMapValues(def.headers),
+          params: extractMapValues(def.params),
+          body: getEndpointBody(def),
+        },
+      });
+
+      useToastStore.getState().success({ title: t('apiRegistry.testSuccess') });
+    } catch {
+      useToastStore.getState().error({ title: t('apiRegistry.testError') });
+    } finally {
+      const { pagination, sorting, search } = get();
+      await get().loadEndpoints(pagination, sorting, search);
+    }
   },
 
-  copyEndpoint: async (_endpoint) => {
-    // TODO: implement copy logic
+  copyEndpoint: async (endpoint) => {
+    const newId = uuid();
+
+    const now = new Date();
+    const pad = (n: number, len = 2) => String(n).padStart(len, '0');
+    const ts = `${now.getFullYear()}_${pad(now.getMonth() + 1)}_${pad(now.getDate())}_${pad(now.getHours())}_${pad(now.getMinutes())}_${pad(now.getSeconds())}`;
+    const defaultName = `${endpoint.name}_${ts}`;
+    const { endpoints } = get();
+    const nameExists = endpoints.some((e) => e.name === defaultName);
+    const copyName = nameExists
+      ? `${defaultName}_${pad(now.getMilliseconds(), 3)}`
+      : defaultName;
+
+    // Strip testValue from definitions so copy starts clean
+    const cleanDefinitions = endpoint.definitions.map((def) => ({
+      ...def,
+      params: def.params ? {
+        ...def.params,
+        variables: def.params.variables.map(({ testValue: _, ...v }) => v),
+      } : def.params,
+      headers: def.headers ? {
+        ...def.headers,
+        variables: def.headers.variables.map(({ testValue: _, ...v }) => v),
+      } : def.headers,
+      body: def.body ? {
+        ...def.body,
+        variables: def.body.variables.map(({ testValue: _, ...v }) => v),
+      } : def.body,
+    }));
+
+    try {
+      await api.post(createEndpoint(), {
+        endpointId: newId,
+        name: copyName,
+        type: endpoint.type ?? 'custom',
+        isCommon: endpoint.isCommon ?? true,
+        serviceId: endpoint.serviceId || '',
+        definitions: cleanDefinitions,
+      });
+
+      const newEndpoint: EndpointData = {
+        ...endpoint,
+        endpointId: newId,
+        name: copyName,
+        definitions: cleanDefinitions,
+      };
+
+      set((state) => ({
+        endpoints: [newEndpoint, ...state.endpoints],
+        verificationMap: {
+          ...state.verificationMap,
+          [newId]: {
+            lastTestAt: null,
+            verificationStatus: 'unverified',
+            lastStatusCode: null,
+            schemaCaptured: false,
+          },
+        },
+      }));
+      useToastStore.getState().success({ title: t('apiRegistry.copySuccess') });
+    } catch {
+      useToastStore.getState().error({ title: t('apiRegistry.copyError') });
+    }
   },
 
   deleteEndpoint: async (endpoint) => {
-    await api.post(deleteEndpointUrl(), { endpointId: endpoint.endpointId });
-    set((state) => ({
-      endpoints: state.endpoints.filter((e) => e.endpointId !== endpoint.endpointId),
-    }));
+    try {
+      await api.post(deleteEndpointUrl(), { id: endpoint.endpointId });
+      set((state) => ({
+        endpoints: state.endpoints.filter((e) => e.endpointId !== endpoint.endpointId),
+      }));
+      useToastStore.getState().success({ title: t('apiRegistry.deleteSuccess') });
+    } catch {
+      useToastStore.getState().error({ title: t('apiRegistry.deleteError') });
+    }
   },
 
   addEndpointAfterCreate: (endpoint) => {
