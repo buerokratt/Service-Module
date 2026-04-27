@@ -9,39 +9,31 @@ declaration:
   allowlist:
     body:
       - field: pagination
-        type: string
+        type: boolean
         description: "Body field 'pagination'"
       - field: page
-        type: string
+        type: number
         description: "Body field 'page'"
-      - field: pageSize
-        type: string
-        description: "Body field 'pageSize'"
+      - field: page_size
+        type: number
+        description: "Body field 'page_size'"
       - field: sorting
         type: string
-        description: "Body field 'sorting'"  
+        description: "Body field 'sorting'"
       - field: search
         type: string
         description: "Body field 'search'"
-
-extract_request_data:
-  assign:
-    pagination: ${incoming.body.pagination}
-    page: ${incoming.body.page}
-    pageSize: ${incoming.body.pageSize}
-    sorting: ${incoming.body.sorting}
-    search: ${incoming.body.search}
 
 get_common_endpoints:
   call: http.post
   args:
     url: "[#SERVICE_RESQL]/endpoints/get_common_endpoints"
     body:
-      pagination: ${pagination}
-      page: ${page}
-      page_size: ${pageSize}
-      sorting: ${sorting}
-      search: ${search}
+      pagination: ${incoming.body.pagination}
+      page: ${incoming.body.page}
+      page_size: ${incoming.body.page_size}
+      sorting: ${incoming.body.sorting}
+      search: ${incoming.body.search}
   result: res
 
 return_result:

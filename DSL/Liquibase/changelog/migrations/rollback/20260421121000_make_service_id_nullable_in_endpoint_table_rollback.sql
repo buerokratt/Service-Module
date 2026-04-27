@@ -1,0 +1,1 @@
+ALTER TABLE endpoints ALTER COLUMN service_id SET NOT NULL;
