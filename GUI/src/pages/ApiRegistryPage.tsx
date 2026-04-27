@@ -1,5 +1,6 @@
 import { PaginationState, SortingState } from '@tanstack/react-table';
 import { Button, Card, Modal, Track } from 'components';
+import AddEndpointModal from 'components/Flow/EdgeTypes/AddEndpointModal';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { EndpointData } from 'types/endpoint';
@@ -10,6 +11,8 @@ import ApiRegistryTable from './ApiRegistryPage/ApiRegistryTable';
 const ApiRegistryPage: React.FC = () => {
   const { t } = useTranslation();
   const [deleteEndpoint, setDeleteEndpoint] = useState<EndpointData | null>(null);
+  const [isCreateModalVisible, setIsCreateModalVisible] = useState(false);
+  const [editingEndpoint, setEditingEndpoint] = useState<EndpointData | null>(null);
   const [search, setSearch] = useState('');
   const [testingId, setTestingId] = useState<string | null>(null);
   const [pagination, setPagination] = useState<PaginationState>({ pageIndex: 0, pageSize: 10 });
@@ -57,8 +60,8 @@ const ApiRegistryPage: React.FC = () => {
     [copyEndpoint],
   );
 
-  const handleEdit = useCallback((_endpoint: EndpointData) => {
-    // Edit modal not yet implemented
+  const handleEdit = useCallback((endpoint: EndpointData) => {
+    setEditingEndpoint(endpoint);
   }, []);
 
   const handleDeleteClick = useCallback((endpoint: EndpointData) => {
@@ -78,7 +81,7 @@ const ApiRegistryPage: React.FC = () => {
     <>
       <Track justify="between" align="center" style={{ marginBottom: 16 }}>
         <h1 style={{ margin: 0 }}>{t('apiRegistry.title')}</h1>
-        <Button appearance="primary">{t('apiRegistry.createEndpoint')}</Button>
+        <Button appearance="primary" onClick={() => setIsCreateModalVisible(true)}>{t('apiRegistry.createEndpoint')}</Button>
       </Track>
       <input
         type="search"
@@ -127,6 +130,23 @@ const ApiRegistryPage: React.FC = () => {
             </Button>
           </Track>
         </Modal>
+      )}
+
+      {isCreateModalVisible && (
+        <AddEndpointModal
+          context="registry"
+          mode="create"
+          onClose={() => setIsCreateModalVisible(false)}
+        />
+      )}
+
+      {editingEndpoint && (
+        <AddEndpointModal
+          context="registry"
+          mode="edit"
+          initialEndpoint={editingEndpoint}
+          onClose={() => setEditingEndpoint(null)}
+        />
       )}
     </>
   );

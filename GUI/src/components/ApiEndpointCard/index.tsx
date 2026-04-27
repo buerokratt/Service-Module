@@ -19,6 +19,8 @@ type EndpointCardProps = {
   onNameChange?: (name: string) => void;
   onNameExists?: (exists: boolean) => void;
   onCommonChange?: (isCommon: boolean) => void;
+  /** When provided (e.g. API Registry async check), overrides the internal duplicate-name check. */
+  overrideNameExists?: boolean;
 };
 
 const ApiEndpointCard: FC<EndpointCardProps> = ({
@@ -28,6 +30,7 @@ const ApiEndpointCard: FC<EndpointCardProps> = ({
   onNameExists,
   onNameChange,
   onCommonChange,
+  overrideNameExists,
 }) => {
   const { changeServiceEndpointType, getAvailableRequestValues } = useServiceStore();
   const [selectedTab, setSelectedTab] = useState<EndpointEnv>(EndpointEnv.Live);
@@ -108,13 +111,14 @@ const ApiEndpointCard: FC<EndpointCardProps> = ({
                         .getState()
                         .endpoints.map((ep) => ep.name)
                         .filter((name) => name !== endpoint.name);
-                      const isNameExist = endpointsNames.includes(e.target.value);
+                      const normalizedInput = removeTrailingUnderscores(sanitizedValue);
+                      const isNameExist = endpointsNames.includes(normalizedInput);
                       setNameExists(isNameExist);
                       onNameExists?.(isNameExist);
-                      onNameChange?.(removeTrailingUnderscores(sanitizedValue));
+                      onNameChange?.(normalizedInput);
                     }}
                   />
-                  {nameExists && (
+                  {(overrideNameExists ?? nameExists) && (
                     <span style={{ color: 'red', fontSize: '13px' }}>{t('newService.endpoint.nameAlreadyExists')}</span>
                   )}
                 </div>

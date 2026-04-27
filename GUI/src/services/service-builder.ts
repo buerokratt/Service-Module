@@ -169,59 +169,6 @@ export function buildAllServiceContents(
   };
 }
 
-export async function saveEndpoints(endpoints: EndpointData[], onSuccess?: () => void, onError?: (e: any) => void) {
-  const tasks: Promise<any>[] = [];
-  const serviceId = useServiceStore.getState().serviceId;
-
-  for (const endpoint of endpoints) {
-    const selectedEndpointType = endpoint.definitions.find((e) => e.isSelected);
-    if (!selectedEndpointType) continue;
-    endpoint.serviceId = serviceId;
-    endpoint.isCommon = endpoint.isCommon ?? false;
-  }
-
-  endpoints.forEach((endpoint) => {
-    filterOutEndpointsTrailingUnderscores(endpoint);
-    if (endpoint.isNew) {
-      tasks.push(createEndpointAndUpdateState(endpoint));
-    } else {
-      tasks.push(
-        api.post(updateEndpoint(endpoint.endpointId), {
-          ...endpoint,
-          // Stringify needed for Resql to save nested data in a proper parsable format
-          definitions: JSON.stringify(endpoint.definitions),
-        }),
-      );
-    }
-  });
-
-  await Promise.all(tasks).then(onSuccess).catch(onError);
-}
-
-function filterOutEndpointsTrailingUnderscores(endpoint: EndpointData) {
-  if (endpoint.definitions) {
-    for (const definition of endpoint.definitions) {
-      for (const section of ['body', 'headers', 'params'] as const) {
-        if (definition[section]?.variables) {
-          for (const v of definition[section].variables) {
-            v.name = removeTrailingUnderscores(v.name);
-          }
-        }
-      }
-    }
-  }
-}
-
-async function createEndpointAndUpdateState(endpoint: EndpointData): Promise<any> {
-  const response = await api.post(createEndpoint(), {
-    ...endpoint,
-    // Stringify needed for Resql to save nested data in a proper parsable format
-    definitions: JSON.stringify(endpoint.definitions),
-  });
-  endpoint.isNew = false;
-  return response;
-}
-
 interface SaveFlowConfig {
   name: string;
   edges: Edge[];
