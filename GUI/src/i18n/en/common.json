@@ -274,7 +274,11 @@
       "insertName": "Insert endpoint name...",
       "type": "Endpoint type",
       "nameAlreadyExists": "API title must be unique",
-      "formatJson": "Format JSON"
+      "formatJson": "Format JSON",
+      "global": "Global",
+      "tooltip": {
+        "global": "The global endpoint is stored in the API Registry and uses a single shared data source. When added to a service canvas, a local copy is created that is not automatically updated when the global endpoint changes; the copy can be edited directly on the canvas."
+      }
     },
     "trainingModuleSetup": "Training module setup",
     "serviceSetup": "Service setup",
@@ -663,5 +667,43 @@
     "containsInvalidProperties": "Contains invalid properties",
     "containsInvalidItems": "Contains invalid items",
     "editor": "Object Editor"
+  },
+  "apiRegistry": {
+    "title": "API Registry",
+    "createEndpoint": "Create endpoint",
+    "columns": {
+      "name": "Name",
+      "lastTest": "Last test",
+      "status": "Status",
+      "schema": "Schema",
+      "actions": "Actions"
+    },
+    "tooltip": {
+      "fullName": "Full name",
+      "description": "Description",
+      "method": "Method",
+      "url": "URL"
+    },
+    "status": {
+      "verified": "Verified",
+      "failed": "Failed",
+      "unverified": "Unverified"
+    },
+    "actions": {
+      "copy": "Copy",
+      "test": "Test",
+      "edit": "Edit",
+      "delete": "Delete"
+    },
+    "deleteConfirm": "Are you sure you want to delete this endpoint?",
+    "noSchema": "—",
+    "noLastTest": "—",
+    "copySuccess": "Endpoint copied",
+    "copyError": "Failed to copy endpoint",
+    "loadError": "Error loading endpoints",
+    "deleteSuccess": "Endpoint deleted",
+    "deleteError": "Failed to delete endpoint",
+    "testSuccess": "Test successful",
+    "testError": "Test failed"
   }
 }

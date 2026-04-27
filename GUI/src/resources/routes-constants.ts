@@ -7,9 +7,9 @@ export const ROUTES = {
   AUTOSERVICES_ROUTE: '/auto-services',
   FAULTY_SERVICES_ROUTE: '/faultyServices',
   SERVICE_SETTINGS: '/services/settings',
+  API_REGISTRY_ROUTE: '/api-registry',
 
-  replaceWithId(route: string, id: string | number | undefined) {
-    id = id ?? '';
+  replaceWithId(route: string, id: string | number = '') {
     return route.replace(':id', id.toString());
   },
 };
