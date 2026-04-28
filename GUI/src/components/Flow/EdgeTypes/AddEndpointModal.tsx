@@ -191,7 +191,7 @@ const AddEndpointModal: React.FC<AddEndpointModalProps> = ({
           </Button>
           <Button
             appearance={isSaving ? 'loading' : 'primary'}
-            disabled={endpointName === '' || effectiveNameExists || registryNameChecking || (endpointType === 'custom' && !hasTestedUrl) || (endpointType === 'custom' && endpointDescription === '')}
+            disabled={endpointName === '' || effectiveNameExists || registryNameChecking || ((endpointType === 'custom' || endpointType === 'openApi') && !hasTestedUrl) || ((endpointType === 'custom' || endpointType === 'openApi') && endpointDescription === '')}
             onClick={handleSave}
           >
             {t('global.save')}

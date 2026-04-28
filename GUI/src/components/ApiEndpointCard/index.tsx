@@ -138,6 +138,8 @@ const ApiEndpointCard: FC<EndpointCardProps> = ({
                   requestTab={requestTab}
                   setRequestTab={setRequestTab}
                   requestValues={requestValues}
+                  onTestSuccess={onTestSuccess}
+                  onDescriptionChange={onDescriptionChange}
                 />
               )}
               {option?.value === 'custom' && (

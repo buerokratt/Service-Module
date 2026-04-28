@@ -280,6 +280,8 @@
       "response": "Vastus",
       "testUrlFirst": "Enne salvestamist käivita Testi URLi",
       "type": "Otspunkti tüüp",
+      "endpoints": "Otspunktid",
+      "fetchEndpointsSuccess": "Otspunktid edukalt laaditud",
       "nameAlreadyExists": "API pealkiri peab olema unikaalne",
       "formatJson": "Formateeri JSON",
       "global": "Globaalne",

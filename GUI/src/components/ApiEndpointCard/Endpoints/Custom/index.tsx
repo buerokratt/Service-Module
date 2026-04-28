@@ -183,7 +183,6 @@ const EndpointCustom: React.FC<EndpointCustomProps> = ({
               placeholder={t('newService.endpoint.insert') ?? ''}
             />
           </Track>
-          <Button appearance={isTesting ? 'loading' : 'primary'} onClick={handleJsonRequestClick}>{t('newService.test')}</Button>
         </Track>
       </div>
       <RequestVariables
@@ -217,6 +216,11 @@ const EndpointCustom: React.FC<EndpointCustomProps> = ({
           }
         }}
       />
+      <Track justify="end">
+        <Button appearance={isTesting ? 'loading' : 'primary'} onClick={handleJsonRequestClick}>
+          {t('newService.test')}
+        </Button>
+      </Track>
       <div>
         <button
           type="button"
