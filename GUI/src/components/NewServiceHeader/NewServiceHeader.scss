@@ -2,7 +2,7 @@
 @import 'src/styles/tools/color';
 @import 'src/styles/settings/variables/_colors';
 
-.header {
+.new-service-header {
   height: 100px;
   padding: 24px 24px 24px 24px;
   box-shadow:
@@ -38,7 +38,7 @@
   padding: 8px 25px;
 }
 
-[data-theme='dark'] .header {
+[data-theme='dark'] .new-service-header {
   background-color: var(--dark-bg-main);
 
   h1 {
