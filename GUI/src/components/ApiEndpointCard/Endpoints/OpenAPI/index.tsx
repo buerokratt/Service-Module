@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import api from 'services/api';
+import useToastStore from 'store/toasts.store';
 import { v4 as uuid } from 'uuid';
 
 import { Button, FormInput, FormSelect, RequestVariables, Track } from '../../..';
@@ -163,8 +164,18 @@ const EndpointOpenAPI: React.FC<EndpointOpenAPIProps> = ({
   };
 
   const fetchOpenApiSpecMock = async () => {
-    const result = await api.post<{ response: ApiSpecProperty }>(getOpenApiSpec(), { url: openApiUrl });
+    let result;
+    try {
+      result = await api.post<{ response: ApiSpecProperty }>(getOpenApiSpec(), { url: openApiUrl });
+    } catch {
+      useToastStore.getState().error({ title: t('newService.endpoint.error') });
+      return;
+    }
     const apiSpec = result.data.response;
+    if (!apiSpec?.paths) {
+      useToastStore.getState().error({ title: t('newService.endpoint.error') });
+      return;
+    }
     const url = new URL(openApiUrl).origin + (apiSpec.basePath ?? '');
     const paths: EndpointDefinition[] = [];
 

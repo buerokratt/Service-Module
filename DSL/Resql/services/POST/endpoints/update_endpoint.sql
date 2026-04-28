@@ -4,5 +4,6 @@ SET
     name = :name,
     type = :type::endpoint_type,
     is_common = :isCommon,
-    definitions = :definitions::jsonb
+    definitions = :definitions::jsonb,
+    description = :description
 WHERE endpoint_id = :endpointId::uuid;

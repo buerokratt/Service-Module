@@ -4,7 +4,8 @@ INSERT INTO endpoints (
     name,
     type,
     is_common,
-    definitions
+    definitions,
+    description
 )
 VALUES (
     :endpointId::uuid,
@@ -12,5 +13,6 @@ VALUES (
     :name,
     :type::endpoint_type,
     :isCommon,
-    :definitions::jsonb
+    :definitions::jsonb,
+    :description
 ); 

@@ -650,9 +650,10 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
           keyedDefEndpoint?.variables.push({
             id: uuid(),
             name: row.variable,
-            type: 'custom',
+            type: row.type ?? 'STRING',
             required: false,
             value: row.value,
+            description: row.description,
           });
         }
       }
@@ -661,6 +662,8 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
         const updatedVariable = data[key as EndpointTab]!.find((updated) => updated.endpointVariableId === variable.id);
         variable.name = updatedVariable?.variable ?? variable.name;
         variable.value = updatedVariable?.value ?? variable.value;
+        if (updatedVariable?.type !== undefined) variable.type = updatedVariable.type;
+        if (updatedVariable?.description !== undefined) variable.description = updatedVariable.description;
       }
     }
 

@@ -7,6 +7,7 @@ import { EndpointType } from 'types/endpoint/endpoint-type';
 import { removeTrailingUnderscores } from 'utils/string-util';
 
 import { EndpointCustom, EndpointOpenAPI, FormInput, FormSelect, Switch, Track } from '..';
+import { TestPayload } from './Endpoints/Custom';
 import { RequestTab } from '../../types';
 import { EndpointData, EndpointEnv, EndpointTab } from '../../types/endpoint';
 import { Option } from '../../types/option';
@@ -21,6 +22,9 @@ type EndpointCardProps = {
   onCommonChange?: (isCommon: boolean) => void;
   /** When provided (e.g. API Registry async check), overrides the internal duplicate-name check. */
   overrideNameExists?: boolean;
+  onTestSuccess?: (payload: TestPayload) => void;
+  onTypeChange?: (type: string) => void;
+  onDescriptionChange?: (description: string) => void;
 };
 
 const ApiEndpointCard: FC<EndpointCardProps> = ({
@@ -31,6 +35,9 @@ const ApiEndpointCard: FC<EndpointCardProps> = ({
   onNameChange,
   onCommonChange,
   overrideNameExists,
+  onTestSuccess,
+  onTypeChange,
+  onDescriptionChange,
 }) => {
   const { changeServiceEndpointType, getAvailableRequestValues } = useServiceStore();
   const [selectedTab, setSelectedTab] = useState<EndpointEnv>(EndpointEnv.Live);
@@ -84,6 +91,7 @@ const ApiEndpointCard: FC<EndpointCardProps> = ({
                     setOption(selection);
                     endpoint.type = selection?.value as EndpointType;
                     changeServiceEndpointType(endpoint, (selection?.value ?? 'custom') as EndpointType);
+                    onTypeChange?.(selection?.value ?? '');
                   }}
                   defaultValue={option?.value}
                 />
@@ -139,6 +147,8 @@ const ApiEndpointCard: FC<EndpointCardProps> = ({
                   requestTab={requestTab}
                   setRequestTab={setRequestTab}
                   requestValues={requestValues}
+                  onTestSuccess={onTestSuccess}
+                  onDescriptionChange={onDescriptionChange}
                 />
               )}
               {showCommonSwitch && option?.value && (

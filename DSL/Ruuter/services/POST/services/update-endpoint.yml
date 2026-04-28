@@ -23,6 +23,9 @@ declaration:
       - field: definitions
         type: object
         description: "Endpoint definitions"
+      - field: description
+        type: string
+        description: "Endpoint description"
     params:
       - field: id
         type: string
@@ -48,6 +51,7 @@ update_endpoint:
       isCommon: ${incoming.body.isCommon}
       serviceId: ${incoming.body.serviceId ?? ''}
       definitions: ${incoming.body.definitions}
+      description: ${incoming.body.description ?? ''}
   result: res
 
 return_ok:

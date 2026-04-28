@@ -1,13 +1,14 @@
 import { ApiEndpointCard, Button, Modal, Track } from 'components';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { getCommonEndpoints } from 'resources/api-constants';
+import { getCommonEndpoints, testEndpointUrl } from 'resources/api-constants';
 import api from 'services/api-dev';
 import { persistEndpoints } from 'services/endpoint.service';
 import useApiRegistryStore from 'store/api-registry.store';
 import useServiceStore from 'store/new-services.store';
 import useToastStore from 'store/toasts.store';
 import { v4 as uuid } from 'uuid';
+import { TestPayload } from 'components/ApiEndpointCard/Endpoints/Custom';
 
 import { EndpointData } from '../../../types/endpoint/endpoint-data';
 
@@ -50,6 +51,14 @@ const AddEndpointModal: React.FC<AddEndpointModalProps> = ({
     mode === 'edit' && initialEndpoint ? (initialEndpoint.isCommon ?? false) : false,
   );
   const [isSaving, setIsSaving] = useState(false);
+  const [hasTestedUrl, setHasTestedUrl] = useState(
+    mode === 'edit' && initialEndpoint?.type === 'custom' ? true : false,
+  );
+  const [endpointType, setEndpointType] = useState<string>(initialEndpoint?.type ?? '');
+  const [endpointDescription, setEndpointDescription] = useState(
+    mode === 'edit' && initialEndpoint ? (initialEndpoint.description ?? '') : '',
+  );
+  const lastTestPayload = useRef<TestPayload | null>(null);
 
   // Registry-specific: async debounced name check (paginated store can't do this synchronously)
   const [registryNameExists, setRegistryNameExists] = useState(false);
@@ -101,6 +110,13 @@ const AddEndpointModal: React.FC<AddEndpointModalProps> = ({
     const passedEndpoint = endpoint;
     passedEndpoint.name = endpointName;
     passedEndpoint.isCommon = isCommonEndpoint;
+
+    const hasSelectedDefinition = passedEndpoint.definitions.some((d) => d.isSelected);
+    if (!hasSelectedDefinition) {
+      useToastStore.getState().error({ title: t('newService.endpoint.noEndpointSelected') });
+      return;
+    }
+
     setIsSaving(true);
 
     // Resolve serviceId: service-flow gets it from the store; registry preserves the
@@ -111,7 +127,18 @@ const AddEndpointModal: React.FC<AddEndpointModalProps> = ({
         : passedEndpoint.serviceId ?? '';
 
     persistEndpoints([passedEndpoint], serviceId)
-      .then(() => {
+      .then(async () => {
+        // For custom endpoints, call testEndpointUrl to persist response_schema to DB
+        if (passedEndpoint.type === 'custom' && lastTestPayload.current) {
+          try {
+            await api.post(testEndpointUrl(), {
+              endpointId: passedEndpoint.endpointId,
+              request: lastTestPayload.current.request,
+            });
+          } catch {
+            // Non-fatal: schema capture failure should not block save success
+          }
+        }
         // Update local store state after successful persist
         if (context === 'registry') {
           if (mode === 'create') {
@@ -154,6 +181,9 @@ const AddEndpointModal: React.FC<AddEndpointModalProps> = ({
           onNameChange={setEndpointName}
           onCommonChange={setIsCommonEndpoint}
           overrideNameExists={context === 'registry' ? registryNameExists : undefined}
+          onTestSuccess={(payload) => { setHasTestedUrl(true); lastTestPayload.current = payload; }}
+          onTypeChange={(type) => { setEndpointType(type); setHasTestedUrl(false); lastTestPayload.current = null; }}
+          onDescriptionChange={setEndpointDescription}
         />
         <Track justify="end" gap={16}>
           <Button appearance="secondary" onClick={handleClose}>
@@ -161,7 +191,7 @@ const AddEndpointModal: React.FC<AddEndpointModalProps> = ({
           </Button>
           <Button
             appearance={isSaving ? 'loading' : 'primary'}
-            disabled={endpointName === '' || effectiveNameExists || registryNameChecking}
+            disabled={endpointName === '' || effectiveNameExists || registryNameChecking || (endpointType === 'custom' && !hasTestedUrl) || (endpointType === 'custom' && endpointDescription === '')}
             onClick={handleSave}
           >
             {t('global.save')}

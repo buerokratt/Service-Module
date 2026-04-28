@@ -46,6 +46,7 @@ export async function persistEndpoints(endpoints: EndpointData[], serviceId: str
         api
           .post(createEndpoint(), {
             ...endpoint,
+            description: endpoint.description ?? '',
             definitions: JSON.stringify(endpoint.definitions),
           })
           .then(() => {
@@ -56,6 +57,7 @@ export async function persistEndpoints(endpoints: EndpointData[], serviceId: str
       tasks.push(
         api.post(updateEndpoint(endpoint.endpointId), {
           ...endpoint,
+          description: endpoint.description ?? '',
           definitions: JSON.stringify(endpoint.definitions),
         }),
       );
