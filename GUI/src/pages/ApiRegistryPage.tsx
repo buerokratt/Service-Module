@@ -81,7 +81,9 @@ const ApiRegistryPage: React.FC = () => {
     <>
       <Track justify="between" align="center" style={{ marginBottom: 16 }}>
         <h1 style={{ margin: 0 }}>{t('apiRegistry.title')}</h1>
-        <Button appearance="primary" onClick={() => setIsCreateModalVisible(true)}>{t('apiRegistry.createEndpoint')}</Button>
+        <Button appearance="primary" onClick={() => setIsCreateModalVisible(true)}>
+          {t('apiRegistry.createEndpoint')}
+        </Button>
       </Track>
       <input
         type="search"

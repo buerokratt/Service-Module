@@ -184,10 +184,7 @@ const DataTable: FC<DataTableProps> = ({
           {tableBodyPrefix}
           {table.getRowModel().rows.map((row) => (
             <React.Fragment key={row.id}>
-              <tr
-                style={table.options.meta?.getRowStyles(row)}
-                onClick={() => table.options.meta?.onRowClick?.(row)}
-              >
+              <tr style={table.options.meta?.getRowStyles(row)} onClick={() => table.options.meta?.onRowClick?.(row)}>
                 {row.getVisibleCells().map((cell) => (
                   <td key={cell.id} style={renderSubRow ? { borderBottom: 'none' } : undefined}>
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
@@ -196,7 +193,10 @@ const DataTable: FC<DataTableProps> = ({
               </tr>
               {renderSubRow && (
                 <tr>
-                  <td colSpan={row.getVisibleCells().length} style={{ padding: '0 16px 8px 16px', borderBottom: '1px solid #D2D3D8' }}>
+                  <td
+                    colSpan={row.getVisibleCells().length}
+                    style={{ padding: '0 16px 8px 16px', borderBottom: '1px solid #D2D3D8' }}
+                  >
                     {renderSubRow(row)}
                   </td>
                 </tr>
@@ -207,7 +207,8 @@ const DataTable: FC<DataTableProps> = ({
       </table>
       {tablePagination && (
         <div className="data-table__pagination-wrapper">
-          {(alwaysShowPagination || table.getPageCount() * table.getState().pagination.pageSize > table.getState().pagination.pageSize) && (
+          {(alwaysShowPagination ||
+            table.getPageCount() * table.getState().pagination.pageSize > table.getState().pagination.pageSize) && (
             <div className="data-table__pagination">
               <button className="previous" onClick={() => table.previousPage()} disabled={!table.getCanPreviousPage()}>
                 <MdOutlineWest />

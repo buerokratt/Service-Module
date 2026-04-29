@@ -43,7 +43,11 @@ const EndpointOpenAPI: React.FC<EndpointOpenAPIProps> = ({
   onMandatoryViolationChange,
 }) => {
   const [openApiUrl, setOpenApiUrl] = useState<string>(endpoint?.definitions[0]?.openApiUrl ?? '');
-  const [description, setDescription] = useState<string>(endpoint.description ?? '');
+  const [description, setDescription] = useState<string>(() => {
+    const initial = endpoint.description ?? '';
+    if (initial) onDescriptionChange?.(initial);
+    return initial;
+  });
   const [selectedEndpoint, setSelectedEndpoint] = useState<EndpointDefinition | undefined>(
     endpoint.definitions.find((e) => e.isSelected),
   );
@@ -58,12 +62,6 @@ const EndpointOpenAPI: React.FC<EndpointOpenAPIProps> = ({
   // Adding "key" dependency breaks focus in variable inputs
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => setKey((prevKey) => prevKey + 1), [isLive]);
-
-  // Notify parent of initial description value so Save button disabled state is correct
-  useEffect(() => {
-    if (endpoint.description) onDescriptionChange?.(endpoint.description);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   const handleTestClick = () => {
     if (!selectedEndpoint) return;
@@ -352,8 +350,8 @@ const EndpointOpenAPI: React.FC<EndpointOpenAPIProps> = ({
       </div>
 
       {/* Params / Header / Body + Test URL + Response */}
-      {selectedEndpoint && (
-        selectedEndpoint.supported ? (
+      {selectedEndpoint &&
+        (selectedEndpoint.supported ? (
           <>
             {selectedEndpoint.description && (
               <p style={{ margin: 0, fontSize: 13, color: theme === 'dark' ? '#ccc' : '#666' }}>
@@ -421,8 +419,7 @@ const EndpointOpenAPI: React.FC<EndpointOpenAPIProps> = ({
           </>
         ) : (
           <p>{t('newService.endpoint.unsupported')}</p>
-        )
-      )}
+        ))}
     </Track>
   );
 };

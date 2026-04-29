@@ -7,7 +7,7 @@ import { MdInfoOutline } from 'react-icons/md';
 import { RequestVariablesTableColumns } from 'types/request-variables';
 
 export const PARAM_TYPES = ['STRING', 'NUMBER', 'BOOLEAN', 'DATE'] as const;
-export type ParamType = typeof PARAM_TYPES[number];
+export type ParamType = (typeof PARAM_TYPES)[number];
 
 const typeOptions = PARAM_TYPES.map((t) => ({ label: t, value: t }));
 
@@ -44,11 +44,9 @@ const TypeCell: React.FC<TypeCellProps> = ({ row, type, updateRowType }) => {
         }}
         placeholder="STRING"
       />
-      <Tooltip content={
-        <span style={{ whiteSpace: 'pre-line' }}>
-          {i18n.t('newService.endpoint.paramTypeTooltip')}
-        </span>
-      }>
+      <Tooltip
+        content={<span style={{ whiteSpace: 'pre-line' }}>{i18n.t('newService.endpoint.paramTypeTooltip')}</span>}
+      >
         <span style={{ cursor: 'pointer', color: '#3f82ff', flexShrink: 0, lineHeight: 1 }}>
           <MdInfoOutline size={16} />
         </span>

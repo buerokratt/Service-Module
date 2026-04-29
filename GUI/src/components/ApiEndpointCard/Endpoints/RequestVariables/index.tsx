@@ -188,23 +188,22 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
       updateEndpointData(newRowsData, endpoint);
 
       if (requestTab.tab === 'params') {
-        const params = newRowsData[requestTab.tab]
-          ?.filter((row) => row.variable)
-          .map((row) => ({
-            id: row.endpointVariableId ?? row.id,
-            name: row.variable!,
-            type: row.type ?? 'STRING',
-            required: row.required ?? false,
-            mandatory: row.mandatory ?? false,
-            value: row.value!,
-            description: row.description,
-            operator: row.operator as RequestOperator,
-          })) ?? [];
+        const params =
+          newRowsData[requestTab.tab]
+            ?.filter((row) => row.variable)
+            .map((row) => ({
+              id: row.endpointVariableId ?? row.id,
+              name: row.variable!,
+              type: row.type ?? 'STRING',
+              required: row.required ?? false,
+              mandatory: row.mandatory ?? false,
+              value: row.value!,
+              description: row.description,
+              operator: row.operator as RequestOperator,
+            })) ?? [];
         onParametersChange(params);
         // All named params need description; mandatory params also need a value
-        const hasViolation =
-          params.some((p) => !p.description) ||
-          params.some((p) => p.mandatory && !p.value);
+        const hasViolation = params.some((p) => !p.description) || params.some((p) => p.mandatory && !p.value);
         onMandatoryViolationChange?.(hasViolation);
       }
       return newRowsData;
@@ -227,8 +226,7 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
       if (requestTab.tab === 'params') {
         const namedRows = (newRowsData[requestTab.tab] ?? []).filter((row) => row.variable);
         const hasViolation =
-          namedRows.some((row) => !row.description) ||
-          namedRows.some((row) => row.mandatory && !row.value);
+          namedRows.some((row) => !row.description) || namedRows.some((row) => row.mandatory && !row.value);
         onMandatoryViolationChange?.(hasViolation);
       }
       return newRowsData;

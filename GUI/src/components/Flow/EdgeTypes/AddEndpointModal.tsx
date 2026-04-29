@@ -46,9 +46,7 @@ const AddEndpointModal: React.FC<AddEndpointModalProps> = ({
     return { endpointId: uuid(), name: '', definitions: [], isNew: true };
   });
 
-  const [endpointName, setEndpointName] = useState(
-    mode === 'edit' && initialEndpoint ? initialEndpoint.name : '',
-  );
+  const [endpointName, setEndpointName] = useState(mode === 'edit' && initialEndpoint ? initialEndpoint.name : '');
   const [endpointNameExists, setEndpointNameExists] = useState(false);
   const [isCommonEndpoint, setIsCommonEndpoint] = useState(
     mode === 'edit' && initialEndpoint ? (initialEndpoint.isCommon ?? false) : false,
@@ -88,9 +86,7 @@ const AddEndpointModal: React.FC<AddEndpointModalProps> = ({
         });
         const rows: any[] = result.data?.response ?? [];
         // Exact-match check; exclude self when editing
-        const exists = rows.some(
-          (row) => row.name === endpointName && row.endpointId !== endpoint.endpointId,
-        );
+        const exists = rows.some((row) => row.name === endpointName && row.endpointId !== endpoint.endpointId);
         setRegistryNameExists(exists);
       } catch {
         setRegistryNameExists(false);
@@ -140,10 +136,7 @@ const AddEndpointModal: React.FC<AddEndpointModalProps> = ({
 
     // Resolve serviceId: service-flow gets it from the store; registry preserves the
     // endpoint's own serviceId (edit) or uses empty string (create).
-    const serviceId =
-      context === 'service'
-        ? useServiceStore.getState().serviceId
-        : passedEndpoint.serviceId ?? '';
+    const serviceId = context === 'service' ? useServiceStore.getState().serviceId : (passedEndpoint.serviceId ?? '');
 
     persistEndpoints([passedEndpoint], serviceId)
       .then(async () => {
@@ -174,7 +167,8 @@ const AddEndpointModal: React.FC<AddEndpointModalProps> = ({
             useServiceStore.getState().editEndpoint(passedEndpoint);
           }
         }
-        const successKey = mode === 'create' ? 'serviceFlow.apiElements.createSuccess' : 'serviceFlow.apiElements.editSuccess';
+        const successKey =
+          mode === 'create' ? 'serviceFlow.apiElements.createSuccess' : 'serviceFlow.apiElements.editSuccess';
         useToastStore.getState().success({ title: t(successKey) });
         setIsSaving(false);
         setJsonRequestVisible(false);
@@ -184,7 +178,8 @@ const AddEndpointModal: React.FC<AddEndpointModalProps> = ({
       })
       .catch((error) => {
         console.error(`Error saving API endpoint: ${error}`);
-        const errorKey = mode === 'create' ? 'serviceFlow.apiElements.createError' : 'serviceFlow.apiElements.editError';
+        const errorKey =
+          mode === 'create' ? 'serviceFlow.apiElements.createError' : 'serviceFlow.apiElements.editError';
         useToastStore.getState().error({ title: t(errorKey) });
         setIsSaving(false);
       });
@@ -201,8 +196,15 @@ const AddEndpointModal: React.FC<AddEndpointModalProps> = ({
           onNameChange={setEndpointName}
           onCommonChange={setIsCommonEndpoint}
           overrideNameExists={context === 'registry' ? registryNameExists : undefined}
-          onTestSuccess={(payload) => { setHasTestedUrl(true); lastTestPayload.current = payload; }}
-          onTypeChange={(type) => { setEndpointType(type); setHasTestedUrl(false); lastTestPayload.current = null; }}
+          onTestSuccess={(payload) => {
+            setHasTestedUrl(true);
+            lastTestPayload.current = payload;
+          }}
+          onTypeChange={(type) => {
+            setEndpointType(type);
+            setHasTestedUrl(false);
+            lastTestPayload.current = null;
+          }}
           onDescriptionChange={setEndpointDescription}
           onMandatoryViolationChange={setHasMandatoryViolation}
         />
@@ -212,7 +214,14 @@ const AddEndpointModal: React.FC<AddEndpointModalProps> = ({
           </Button>
           <Button
             appearance={isSaving ? 'loading' : 'primary'}
-            disabled={endpointName === '' || effectiveNameExists || registryNameChecking || hasMandatoryViolation || ((endpointType === 'custom' || endpointType === 'openApi') && !hasTestedUrl) || ((endpointType === 'custom' || endpointType === 'openApi') && endpointDescription === '')}
+            disabled={
+              endpointName === '' ||
+              effectiveNameExists ||
+              registryNameChecking ||
+              hasMandatoryViolation ||
+              ((endpointType === 'custom' || endpointType === 'openApi') && !hasTestedUrl) ||
+              ((endpointType === 'custom' || endpointType === 'openApi') && endpointDescription === '')
+            }
             onClick={handleSave}
           >
             {t('global.save')}
@@ -224,4 +233,3 @@ const AddEndpointModal: React.FC<AddEndpointModalProps> = ({
 };
 
 export default AddEndpointModal;
-

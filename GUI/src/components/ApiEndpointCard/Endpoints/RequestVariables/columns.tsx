@@ -156,7 +156,7 @@ export const getColumns = ({
           const isSpecParam = !props.row.original.isNameEditable;
           if (isSpecParam) {
             const rawType = props.row.original.type ?? '';
-            const displayType = rawType.toLowerCase() === 'custom' ? 'STRING' : (rawType.toUpperCase() || 'STRING');
+            const displayType = rawType.toLowerCase() === 'custom' ? 'STRING' : rawType.toUpperCase() || 'STRING';
             return <span style={{ fontSize: 12, color: '#5d6071', paddingLeft: 4 }}>{displayType}</span>;
           }
           return (
