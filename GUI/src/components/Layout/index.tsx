@@ -14,9 +14,10 @@ type LayoutProps = {
 
 const Layout: FC<PropsWithChildren<LayoutProps>> = ({ disableMenu, customHeader, children }) => {
   const menuCountConf = useMenuCountConf();
+  const domainBarShowing = import.meta.env.REACT_APP_ENABLE_MULTI_DOMAIN?.toLowerCase() === 'true';
 
   return (
-    <div className="layout">
+    <div className={`layout${domainBarShowing ? ' layout--multi-domain' : ''}`}>
       {!disableMenu && <MainNavigation countConf={menuCountConf} />}
       <div className="layout__wrapper">
         {customHeader ?? (

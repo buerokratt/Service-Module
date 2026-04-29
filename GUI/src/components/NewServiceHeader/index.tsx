@@ -48,7 +48,7 @@ const NewServiceHeader: FC<NewServiceHeaderProps> = ({ backOnClick, continueOnCl
 
   return (
     <>
-      <header className="header">
+      <header className="new-service-header">
         {showServiceConfig && (
           <Dialog
             title={t('serviceFlow.serviceConfiguration')}
