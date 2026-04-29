@@ -55,9 +55,8 @@ get_service_by_id:
 get_endpoints_by_service_id:
   call: http.post
   args:
-    url: "[#SERVICE_RESQL]/endpoints/get_endpoints_by_service_id"
+    url: "[#SERVICE_RESQL]/endpoints/get_all_endpoints"
     body:
-      id: ${id}
       user_id_code: ${idCode}
       search: ${search}
   result: endpoints_results
