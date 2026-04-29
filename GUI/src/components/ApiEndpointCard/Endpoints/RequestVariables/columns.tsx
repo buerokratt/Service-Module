@@ -13,6 +13,7 @@ import {
   RequestVariablesTabsRowsData,
 } from 'types/request-variables';
 
+import MandatoryCell from './MandatoryCell';
 import OperatorCell from './OperatorCell';
 import TypeCell from './TypeCell';
 import ValueCell from './ValueCell';
@@ -28,12 +29,14 @@ interface GetColumnsConfig {
   requestValues: PreDefinedEndpointEnvVariables;
   isLive: boolean;
   updateRowField: (id: string, field: FieldType, value: string) => void;
+  updateRowMandatory: (id: string, mandatory: boolean) => void;
   getTabsRowsData: () => RequestVariablesTabsRowsData;
 }
 const getSortValue = (rowData: RequestVariablesRowData | undefined, type: FieldType): string => {
   if (!rowData) return '';
-
-  return rowData[type] ?? '';
+  const val = rowData[type as keyof RequestVariablesRowData];
+  if (val === undefined || val === null) return '';
+  return String(val);
 };
 
 export const getColumns = ({
@@ -44,6 +47,7 @@ export const getColumns = ({
   deleteVariable,
   setRowsData,
   updateRowField,
+  updateRowMandatory,
   getTabsRowsData,
 }: GetColumnsConfig) => {
   const columnHelper = createColumnHelper<RequestVariablesTableColumns>();
@@ -154,6 +158,26 @@ export const getColumns = ({
             type={props.row.original.type}
             updateRowType={(id, type) => {
               updateRowField(id, 'type', type);
+            }}
+          />
+        ),
+      }),
+    );
+  }
+
+  if (requestTab.tab === EndpointTab.Params) {
+    columns.push(
+      columnHelper.accessor('mandatory', {
+        header: i18n.t('newService.endpoint.paramMandatory') ?? 'Mandatory',
+        meta: {
+          size: '13%',
+        },
+        cell: (props) => (
+          <MandatoryCell
+            row={props.row}
+            mandatory={props.row.original.mandatory}
+            updateRowMandatory={(id, mandatory) => {
+              updateRowMandatory(id, mandatory);
             }}
           />
         ),

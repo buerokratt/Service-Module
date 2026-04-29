@@ -31,6 +31,7 @@ type EndpointCustomProps = {
   setRequestTab: React.Dispatch<React.SetStateAction<RequestTab>>;
   onTestSuccess?: (payload: TestPayload) => void;
   onDescriptionChange?: (description: string) => void;
+  onMandatoryViolationChange?: (hasViolation: boolean) => void;
 };
 
 const EndpointCustom: React.FC<EndpointCustomProps> = ({
@@ -41,6 +42,7 @@ const EndpointCustom: React.FC<EndpointCustomProps> = ({
   setRequestTab,
   onTestSuccess,
   onDescriptionChange,
+  onMandatoryViolationChange,
 }) => {
   const { t } = useTranslation();
   const [key, setKey] = useState<number>(0);
@@ -193,6 +195,7 @@ const EndpointCustom: React.FC<EndpointCustomProps> = ({
         requestTab={requestTab}
         setRequestTab={setRequestTab}
         parentEndpointId={endpoint.endpointId}
+        onMandatoryViolationChange={onMandatoryViolationChange}
         onParametersChange={(parameters) => {
           const url = new URL(endpoint.definitions[0].url ?? '');
           const baseUrl = `${url.origin}${url.pathname}`;

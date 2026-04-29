@@ -27,6 +27,7 @@ type EndpointOpenAPIProps = {
   setRequestTab: React.Dispatch<React.SetStateAction<RequestTab>>;
   onTestSuccess?: (payload: TestPayload) => void;
   onDescriptionChange?: (description: string) => void;
+  onMandatoryViolationChange?: (hasViolation: boolean) => void;
 };
 
 const EndpointOpenAPI: React.FC<EndpointOpenAPIProps> = ({
@@ -39,6 +40,7 @@ const EndpointOpenAPI: React.FC<EndpointOpenAPIProps> = ({
   setRequestTab,
   onTestSuccess,
   onDescriptionChange,
+  onMandatoryViolationChange,
 }) => {
   const [openApiUrl, setOpenApiUrl] = useState<string>(endpoint?.definitions[0]?.openApiUrl ?? '');
   const [selectedEndpoint, setSelectedEndpoint] = useState<EndpointDefinition | undefined>(
@@ -359,6 +361,7 @@ const EndpointOpenAPI: React.FC<EndpointOpenAPIProps> = ({
               requestTab={requestTab}
               setRequestTab={setRequestTab}
               onParametersChange={() => {}}
+              onMandatoryViolationChange={onMandatoryViolationChange}
             />
             <Track justify="end">
               <Button appearance={isTesting ? 'loading' : 'primary'} onClick={handleTestClick}>

@@ -32,6 +32,8 @@ type RequestVariablesProps = {
   requestTab: RequestTab;
   setRequestTab: React.Dispatch<React.SetStateAction<RequestTab>>;
   onParametersChange: (params: EndpointVariableData[]) => void;
+  /** Called whenever mandatory-param validation state changes */
+  onMandatoryViolationChange?: (hasViolation: boolean) => void;
 };
 
 const RequestVariables: React.FC<RequestVariablesProps> = ({
@@ -42,6 +44,7 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
   requestTab,
   setRequestTab,
   onParametersChange,
+  onMandatoryViolationChange,
 }) => {
   const { t } = useTranslation();
   const tabs: EndpointTab[] = [EndpointTab.Params, EndpointTab.Headers, EndpointTab.Body];
@@ -66,6 +69,7 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
       id: `${id}`,
       endpointVariableId: data.id,
       required: data.required ?? false,
+      mandatory: data.mandatory ?? data.required ?? false,
       variable: data.name,
       value,
       operator: data.operator ?? '=',
@@ -184,19 +188,45 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
       updateEndpointData(newRowsData, endpoint);
 
       if (requestTab.tab === 'params') {
-        onParametersChange(
-          newRowsData[requestTab.tab]
-            ?.filter((row) => row.variable)
-            .map((row) => ({
-              id: row.endpointVariableId ?? row.id,
-              name: row.variable!,
-              type: row.type ?? 'STRING',
-              required: row.required ?? false,
-              value: row.value!,
-              description: row.description,
-              operator: row.operator as RequestOperator,
-            })) ?? [],
-        );
+        const params = newRowsData[requestTab.tab]
+          ?.filter((row) => row.variable)
+          .map((row) => ({
+            id: row.endpointVariableId ?? row.id,
+            name: row.variable!,
+            type: row.type ?? 'STRING',
+            required: row.required ?? false,
+            mandatory: row.mandatory ?? false,
+            value: row.value!,
+            description: row.description,
+            operator: row.operator as RequestOperator,
+          })) ?? [];
+        onParametersChange(params);
+          // Check violations: all named params need description; mandatory params also need value
+          const hasViolation = params.some((p) => !p.description || (p.mandatory && !p.value));
+        onMandatoryViolationChange?.(hasViolation);
+      }
+      return newRowsData;
+    });
+  };
+
+  const updateRowMandatory = (id: string, mandatory: boolean) => {
+    setRowsData((prevRowsData) => {
+      const newRowsData = { ...prevRowsData };
+      newRowsData[requestTab.tab] = [...(newRowsData[requestTab.tab] || [])];
+      newRowsData[requestTab.tab]!.forEach((row) => {
+        if (row.id !== id) return;
+        row.mandatory = mandatory;
+      });
+      if (endpoint.type === 'custom') {
+        newRowsData[requestTab.tab] = maintainSingleEmptyRow(newRowsData[requestTab.tab] || []);
+      }
+      updateEndpointData(newRowsData, endpoint);
+      // Re-evaluate violations: all named params need description; mandatory params also need value
+      if (requestTab.tab === 'params') {
+        const hasViolation = (newRowsData[requestTab.tab] ?? [])
+          .filter((row) => row.variable)
+          .some((row) => !row.description || (row.mandatory && !row.value));
+        onMandatoryViolationChange?.(hasViolation);
       }
       return newRowsData;
     });
@@ -328,6 +358,7 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
         setRowsData,
         updateRowField,
         updateOperator,
+        updateRowMandatory,
         requestValues,
         isLive,
         getTabsRowsData,

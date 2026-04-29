@@ -58,6 +58,7 @@ const AddEndpointModal: React.FC<AddEndpointModalProps> = ({
   const [endpointDescription, setEndpointDescription] = useState(
     mode === 'edit' && initialEndpoint ? (initialEndpoint.description ?? '') : '',
   );
+  const [hasMandatoryViolation, setHasMandatoryViolation] = useState(false);
   const lastTestPayload = useRef<TestPayload | null>(null);
 
   // Registry-specific: async debounced name check (paginated store can't do this synchronously)
@@ -118,6 +119,21 @@ const AddEndpointModal: React.FC<AddEndpointModalProps> = ({
     }
 
     setIsSaving(true);
+
+    // Validate params before saving
+    const allParams = passedEndpoint.definitions.flatMap((d) => d.params?.variables ?? []);
+    const descriptionViolation = allParams.filter((p) => p.name).some((p) => !p.description);
+    if (descriptionViolation) {
+      useToastStore.getState().error({ title: t('newService.endpoint.nameTypeDescriptionRequired') });
+      setIsSaving(false);
+      return;
+    }
+    const mandatoryViolation = allParams.some((p) => p.mandatory && (!p.name || !p.value));
+    if (mandatoryViolation) {
+      useToastStore.getState().error({ title: t('newService.endpoint.mandatoryNameValueRequired') });
+      setIsSaving(false);
+      return;
+    }
 
     // Resolve serviceId: service-flow gets it from the store; registry preserves the
     // endpoint's own serviceId (edit) or uses empty string (create).
@@ -184,6 +200,7 @@ const AddEndpointModal: React.FC<AddEndpointModalProps> = ({
           onTestSuccess={(payload) => { setHasTestedUrl(true); lastTestPayload.current = payload; }}
           onTypeChange={(type) => { setEndpointType(type); setHasTestedUrl(false); lastTestPayload.current = null; }}
           onDescriptionChange={setEndpointDescription}
+          onMandatoryViolationChange={setHasMandatoryViolation}
         />
         <Track justify="end" gap={16}>
           <Button appearance="secondary" onClick={handleClose}>
@@ -191,7 +208,7 @@ const AddEndpointModal: React.FC<AddEndpointModalProps> = ({
           </Button>
           <Button
             appearance={isSaving ? 'loading' : 'primary'}
-            disabled={endpointName === '' || effectiveNameExists || registryNameChecking || ((endpointType === 'custom' || endpointType === 'openApi') && !hasTestedUrl) || ((endpointType === 'custom' || endpointType === 'openApi') && endpointDescription === '')}
+            disabled={endpointName === '' || effectiveNameExists || registryNameChecking || hasMandatoryViolation || ((endpointType === 'custom' || endpointType === 'openApi') && !hasTestedUrl) || ((endpointType === 'custom' || endpointType === 'openApi') && endpointDescription === '')}
             onClick={handleSave}
           >
             {t('global.save')}

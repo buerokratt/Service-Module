@@ -25,6 +25,7 @@ type EndpointCardProps = {
   onTestSuccess?: (payload: TestPayload) => void;
   onTypeChange?: (type: string) => void;
   onDescriptionChange?: (description: string) => void;
+  onMandatoryViolationChange?: (hasViolation: boolean) => void;
 };
 
 const ApiEndpointCard: FC<EndpointCardProps> = ({
@@ -38,6 +39,7 @@ const ApiEndpointCard: FC<EndpointCardProps> = ({
   onTestSuccess,
   onTypeChange,
   onDescriptionChange,
+  onMandatoryViolationChange,
 }) => {
   const { changeServiceEndpointType, getAvailableRequestValues } = useServiceStore();
   const [selectedTab, setSelectedTab] = useState<EndpointEnv>(EndpointEnv.Live);
@@ -140,6 +142,7 @@ const ApiEndpointCard: FC<EndpointCardProps> = ({
                   requestValues={requestValues}
                   onTestSuccess={onTestSuccess}
                   onDescriptionChange={onDescriptionChange}
+                  onMandatoryViolationChange={onMandatoryViolationChange}
                 />
               )}
               {option?.value === 'custom' && (
@@ -151,6 +154,7 @@ const ApiEndpointCard: FC<EndpointCardProps> = ({
                   requestValues={requestValues}
                   onTestSuccess={onTestSuccess}
                   onDescriptionChange={onDescriptionChange}
+                  onMandatoryViolationChange={onMandatoryViolationChange}
                 />
               )}
               {showCommonSwitch && option?.value && (
