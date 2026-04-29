@@ -152,15 +152,23 @@ export const getColumns = ({
         sortingFn: (rowA: Row<RequestVariablesTableColumns>, rowB: Row<RequestVariablesTableColumns>) => {
           return sortRows(rowA, rowB, 'type');
         },
-        cell: (props) => (
-          <TypeCell
-            row={props.row}
-            type={props.row.original.type}
-            updateRowType={(id, type) => {
-              updateRowField(id, 'type', type);
-            }}
-          />
-        ),
+        cell: (props) => {
+          const isSpecParam = !props.row.original.isNameEditable;
+          if (isSpecParam) {
+            const rawType = props.row.original.type ?? '';
+            const displayType = rawType.toLowerCase() === 'custom' ? 'STRING' : (rawType.toUpperCase() || 'STRING');
+            return <span style={{ fontSize: 12, color: '#5d6071', paddingLeft: 4 }}>{displayType}</span>;
+          }
+          return (
+            <TypeCell
+              row={props.row}
+              type={props.row.original.type}
+              updateRowType={(id, type) => {
+                updateRowField(id, 'type', type);
+              }}
+            />
+          );
+        },
       }),
     );
   }
@@ -198,6 +206,8 @@ export const getColumns = ({
               <Tooltip content={i18n.t('newService.endpoint.required')}>
                 <span className="variable-required">!</span>
               </Tooltip>
+            ) : !props.row.original.isNameEditable ? (
+              <Icon icon={<MdDeleteOutline />} size="medium" style={{ opacity: 0.25, cursor: 'not-allowed' }} />
             ) : (
               <Button
                 appearance="text"

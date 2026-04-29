@@ -82,6 +82,7 @@ const useApiRegistryStore = create<ApiRegistryState>((set, get) => ({
         return {
           endpointId: row.endpointId,
           name: row.name,
+          description: row.description ?? '',
           type: row.type,
           isCommon: row.isCommon,
           serviceId: row.serviceId,

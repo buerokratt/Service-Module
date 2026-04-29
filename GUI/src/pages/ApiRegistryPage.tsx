@@ -137,6 +137,7 @@ const ApiRegistryPage: React.FC = () => {
           context="registry"
           mode="create"
           onClose={() => setIsCreateModalVisible(false)}
+          onSaveSuccess={() => void loadEndpoints(pagination, sorting, search)}
         />
       )}
 

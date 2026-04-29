@@ -43,6 +43,7 @@ const EndpointOpenAPI: React.FC<EndpointOpenAPIProps> = ({
   onMandatoryViolationChange,
 }) => {
   const [openApiUrl, setOpenApiUrl] = useState<string>(endpoint?.definitions[0]?.openApiUrl ?? '');
+  const [description, setDescription] = useState<string>(endpoint.description ?? '');
   const [selectedEndpoint, setSelectedEndpoint] = useState<EndpointDefinition | undefined>(
     endpoint.definitions.find((e) => e.isSelected),
   );
@@ -57,6 +58,12 @@ const EndpointOpenAPI: React.FC<EndpointOpenAPIProps> = ({
   // Adding "key" dependency breaks focus in variable inputs
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => setKey((prevKey) => prevKey + 1), [isLive]);
+
+  // Notify parent of initial description value so Save button disabled state is correct
+  useEffect(() => {
+    if (endpoint.description) onDescriptionChange?.(endpoint.description);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleTestClick = () => {
     if (!selectedEndpoint) return;
@@ -185,7 +192,7 @@ const EndpointOpenAPI: React.FC<EndpointOpenAPIProps> = ({
         required: param.required,
         description: param.description,
         in: param.in,
-        type: param.type,
+        type: param.type ?? param.schema?.type,
         enum: param.enum,
         default: param.default,
         format: param.format,
@@ -297,8 +304,9 @@ const EndpointOpenAPI: React.FC<EndpointOpenAPIProps> = ({
           name="endpointDescription"
           label=""
           placeholder={t('newService.endpoint.insertDescription') ?? ''}
-          defaultValue={endpoint.description ?? ''}
+          value={description}
           onChange={(e) => {
+            setDescription(e.target.value);
             endpoint.description = e.target.value;
             onDescriptionChange?.(e.target.value);
           }}

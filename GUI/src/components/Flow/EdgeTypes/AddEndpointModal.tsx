@@ -14,6 +14,8 @@ import { EndpointData } from '../../../types/endpoint/endpoint-data';
 
 interface AddEndpointModalProps {
   onClose: () => void;
+  /** Called after a successful save (create or edit) */
+  onSaveSuccess?: () => void;
   /** Service-flow create: update the edge's endpoint preference list */
   onUpdatePreferences?: (endpointIds: string[]) => void;
   /** Service-flow create: current endpoint ids on this edge */
@@ -22,12 +24,13 @@ interface AddEndpointModalProps {
   mode?: 'create' | 'edit';
   /** 'service' (default) or 'registry' */
   context?: 'service' | 'registry';
-  /** Edit mode: the endpoint to pre-fill (will be deep-cloned internally) */
+  /** Edit mode: the endpoint to pre-fill*/
   initialEndpoint?: EndpointData;
 }
 
 const AddEndpointModal: React.FC<AddEndpointModalProps> = ({
   onClose,
+  onSaveSuccess,
   onUpdatePreferences,
   currentEndpointIds,
   mode = 'create',
@@ -52,7 +55,7 @@ const AddEndpointModal: React.FC<AddEndpointModalProps> = ({
   );
   const [isSaving, setIsSaving] = useState(false);
   const [hasTestedUrl, setHasTestedUrl] = useState(
-    mode === 'edit' && initialEndpoint?.type === 'custom' ? true : false,
+    mode === 'edit' && (initialEndpoint?.type === 'custom' || initialEndpoint?.type === 'openApi') ? true : false,
   );
   const [endpointType, setEndpointType] = useState<string>(initialEndpoint?.type ?? '');
   const [endpointDescription, setEndpointDescription] = useState(
@@ -145,7 +148,7 @@ const AddEndpointModal: React.FC<AddEndpointModalProps> = ({
     persistEndpoints([passedEndpoint], serviceId)
       .then(async () => {
         // For custom endpoints, call testEndpointUrl to persist response_schema to DB
-        if (passedEndpoint.type === 'custom' && lastTestPayload.current) {
+        if ((passedEndpoint.type === 'custom' || passedEndpoint.type === 'openApi') && lastTestPayload.current) {
           try {
             await api.post(testEndpointUrl(), {
               endpointId: passedEndpoint.endpointId,
@@ -176,6 +179,7 @@ const AddEndpointModal: React.FC<AddEndpointModalProps> = ({
         setIsSaving(false);
         setJsonRequestVisible(false);
         setJsonRequestContent(null);
+        onSaveSuccess?.();
         onClose();
       })
       .catch((error) => {

@@ -177,8 +177,8 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
         if (row.id !== id) return;
         if (field === 'operator') {
           row[field] = newValue as RequestOperator;
-        } else {
-          row[field] = newValue;
+        } else if (field !== 'mandatory') {
+          (row as any)[field] = newValue;
         }
       });
 
@@ -201,8 +201,10 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
             operator: row.operator as RequestOperator,
           })) ?? [];
         onParametersChange(params);
-          // Check violations: all named params need description; mandatory params also need value
-          const hasViolation = params.some((p) => !p.description || (p.mandatory && !p.value));
+        // All named params need description; mandatory params also need a value
+        const hasViolation =
+          params.some((p) => !p.description) ||
+          params.some((p) => p.mandatory && !p.value);
         onMandatoryViolationChange?.(hasViolation);
       }
       return newRowsData;
@@ -221,11 +223,12 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
         newRowsData[requestTab.tab] = maintainSingleEmptyRow(newRowsData[requestTab.tab] || []);
       }
       updateEndpointData(newRowsData, endpoint);
-      // Re-evaluate violations: all named params need description; mandatory params also need value
+      // All named params need description; mandatory params also need a value
       if (requestTab.tab === 'params') {
-        const hasViolation = (newRowsData[requestTab.tab] ?? [])
-          .filter((row) => row.variable)
-          .some((row) => !row.description || (row.mandatory && !row.value));
+        const namedRows = (newRowsData[requestTab.tab] ?? []).filter((row) => row.variable);
+        const hasViolation =
+          namedRows.some((row) => !row.description) ||
+          namedRows.some((row) => row.mandatory && !row.value);
         onMandatoryViolationChange?.(hasViolation);
       }
       return newRowsData;
