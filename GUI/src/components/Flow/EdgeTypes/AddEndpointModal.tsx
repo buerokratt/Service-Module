@@ -1,4 +1,5 @@
 import { ApiEndpointCard, Button, Modal, Track } from 'components';
+import { TestPayload } from 'components/ApiEndpointCard/Endpoints/Custom';
 import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { getCommonEndpoints, testEndpointUrl } from 'resources/api-constants';
@@ -8,7 +9,6 @@ import useApiRegistryStore from 'store/api-registry.store';
 import useServiceStore from 'store/new-services.store';
 import useToastStore from 'store/toasts.store';
 import { v4 as uuid } from 'uuid';
-import { TestPayload } from 'components/ApiEndpointCard/Endpoints/Custom';
 
 import { EndpointData } from '../../../types/endpoint/endpoint-data';
 

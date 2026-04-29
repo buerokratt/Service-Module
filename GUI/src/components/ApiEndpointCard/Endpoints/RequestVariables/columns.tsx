@@ -35,7 +35,7 @@ interface GetColumnsConfig {
 const getSortValue = (rowData: RequestVariablesRowData | undefined, type: FieldType): string => {
   if (!rowData) return '';
   const val = rowData[type as keyof RequestVariablesRowData];
-  if (val === undefined || val === null) return '';
+  if (val == null) return '';
   return String(val);
 };
 
@@ -200,25 +200,29 @@ export const getColumns = ({
         size: '10%',
       },
       cell: (props) => {
+        const { required, isNameEditable } = props.row.original;
+        const deleteAction = isNameEditable ? (
+          <Button
+            appearance="text"
+            onClick={() => {
+              const rowData = props.row.original;
+              deleteVariable(rowData);
+              setRowsData(getTabsRowsData());
+            }}
+          >
+            <Icon icon={<MdDeleteOutline />} size="medium" />
+          </Button>
+        ) : (
+          <Icon icon={<MdDeleteOutline />} size="medium" style={{ opacity: 0.25, cursor: 'not-allowed' }} />
+        );
         return (
           <Track justify="center" style={{ paddingRight: 8 }}>
-            {props.row.original.required ? (
+            {required ? (
               <Tooltip content={i18n.t('newService.endpoint.required')}>
                 <span className="variable-required">!</span>
               </Tooltip>
-            ) : !props.row.original.isNameEditable ? (
-              <Icon icon={<MdDeleteOutline />} size="medium" style={{ opacity: 0.25, cursor: 'not-allowed' }} />
             ) : (
-              <Button
-                appearance="text"
-                onClick={() => {
-                  const rowData = props.row.original;
-                  deleteVariable(rowData);
-                  setRowsData(getTabsRowsData());
-                }}
-              >
-                <Icon icon={<MdDeleteOutline />} size="medium" />
-              </Button>
+              deleteAction
             )}
           </Track>
         );

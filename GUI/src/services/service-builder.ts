@@ -4,12 +4,12 @@ import { Group, Rule } from 'components/FlowElementsPopup/RuleBuilder/types';
 import { format } from 'date-fns';
 import i18next, { t } from 'i18next';
 import { NodeHtmlMarkdown } from 'node-html-markdown';
-import { createEndpoint, createNewService, editService, updateEndpoint } from 'resources/api-constants';
+import { createNewService, editService } from 'resources/api-constants';
 import useServiceStore from 'store/new-services.store';
 import useToastStore from 'store/toasts.store';
 import { StepType } from 'types';
 import { Assign } from 'types/assign';
-import { EndpointData } from 'types/endpoint';
+
 import { NodeDataProps } from 'types/service-flow';
 import {
   decodeHtmlEntities,

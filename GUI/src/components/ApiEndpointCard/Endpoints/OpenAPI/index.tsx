@@ -15,8 +15,8 @@ import {
   EndpointVariableData,
   PreDefinedEndpointEnvVariables,
 } from '../../../../types/endpoint';
-import { useTheme } from '../../../../utils/useTheme';
 import { generateJsonRequest } from '../../../../utils/json-request-utils';
+import { useTheme } from '../../../../utils/useTheme';
 import { TestPayload } from '../Custom';
 
 type EndpointOpenAPIProps = {
