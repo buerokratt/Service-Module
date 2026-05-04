@@ -9,7 +9,6 @@ import useServiceStore from 'store/new-services.store';
 import useToastStore from 'store/toasts.store';
 import { StepType } from 'types';
 import { Assign } from 'types/assign';
-
 import { NodeDataProps } from 'types/service-flow';
 import {
   decodeHtmlEntities,

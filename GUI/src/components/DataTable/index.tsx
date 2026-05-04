@@ -215,7 +215,7 @@ const DataTable: FC<DataTableProps> = ({
               </button>
               <nav role="navigation" aria-label={t('global.paginationNavigation') ?? ''}>
                 <ul className="links">
-                  {[...new Array(table.getPageCount())].map((_, index) => (
+                  {Array.from({ length: table.getPageCount() }).map((_, index) => (
                     <li
                       key={`${id}-${index}`}
                       className={clsx({ active: table.getState().pagination.pageIndex === index })}

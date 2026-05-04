@@ -35,7 +35,11 @@ import {
 } from 'types/endpoint';
 import { EndpointResponseVariable } from 'types/endpoint/endpoint-response-variables';
 import { EndpointType } from 'types/endpoint/endpoint-type';
-import { RequestVariablesTabsRawData, RequestVariablesTabsRowsData } from 'types/request-variables';
+import {
+  RequestVariablesRowData,
+  RequestVariablesTabsRawData,
+  RequestVariablesTabsRowsData,
+} from 'types/request-variables';
 import { initialEdges, initialNodes, NodeDataProps } from 'types/service-flow';
 import { generateJsonRequest } from 'utils/json-request-utils';
 import { v4 as uuid } from 'uuid';
@@ -185,6 +189,37 @@ const cloneAssignElement = (element: Assign): Assign => {
     slots: clonedSlots as Assign['slots'],
     data: deepCloneValue(element.data),
   };
+};
+
+const addMissingVariables = (
+  keyedDefEndpoint: EndpointDefinition[EndpointTab] | undefined,
+  rows: RequestVariablesRowData[],
+) => {
+  for (const row of rows) {
+    if (row.endpointVariableId || !row.variable) continue;
+    if (keyedDefEndpoint?.variables.map((e) => e.name).includes(row.variable)) continue;
+    keyedDefEndpoint?.variables.push({
+      id: uuid(),
+      name: row.variable,
+      type: row.type ?? 'STRING',
+      required: false,
+      value: row.value,
+      description: row.description,
+    });
+  }
+};
+
+const syncExistingVariables = (
+  keyedDefEndpoint: EndpointDefinition[EndpointTab] | undefined,
+  rows: RequestVariablesRowData[],
+) => {
+  for (const variable of keyedDefEndpoint?.variables ?? []) {
+    const updated = rows.find((r) => r.endpointVariableId === variable.id);
+    variable.name = updated?.variable ?? variable.name;
+    variable.value = updated?.value ?? variable.value;
+    if (updated?.type !== undefined) variable.type = updated.type;
+    if (updated?.description !== undefined) variable.description = updated.description;
+  }
 };
 
 const useServiceStore = create<ServiceStoreState>((set, get) => ({
@@ -455,6 +490,13 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
         return node;
       });
 
+      /*The structuredClone approach failed with DataCloneError because flow nodes contain function references 
+      (onDelete, onEdit, setClickedNode, update), 
+      which cannot be cloned by the structured clone algorithm. 
+      The JSON.parse(JSON.stringify()) method is used here to strip functions from nodes before saving to history, 
+      which are then manually re-attached during undo/redo operations.
+      Therefore ignore sonar issue warning in PR */
+
       const initialHistoryState = {
         nodes: JSON.parse(JSON.stringify(nodes)),
         edges: JSON.parse(JSON.stringify(edges)),
@@ -641,30 +683,9 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
 
     for (const key in data) {
       const keyedDefEndpoint = defEndpoint[key as EndpointTab];
-      for (const row of data[key as EndpointTab] ?? []) {
-        if (
-          !row.endpointVariableId &&
-          row.variable &&
-          !keyedDefEndpoint?.variables.map((e) => e.name).includes(row.variable)
-        ) {
-          keyedDefEndpoint?.variables.push({
-            id: uuid(),
-            name: row.variable,
-            type: row.type ?? 'STRING',
-            required: false,
-            value: row.value,
-            description: row.description,
-          });
-        }
-      }
-
-      for (const variable of keyedDefEndpoint?.variables ?? []) {
-        const updatedVariable = data[key as EndpointTab]!.find((updated) => updated.endpointVariableId === variable.id);
-        variable.name = updatedVariable?.variable ?? variable.name;
-        variable.value = updatedVariable?.value ?? variable.value;
-        if (updatedVariable?.type !== undefined) variable.type = updatedVariable.type;
-        if (updatedVariable?.description !== undefined) variable.description = updatedVariable.description;
-      }
+      const rows = data[key as EndpointTab] ?? [];
+      addMissingVariables(keyedDefEndpoint, rows);
+      syncExistingVariables(keyedDefEndpoint, rows);
     }
 
     endpoint.definitions[0] = defEndpoint;

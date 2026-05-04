@@ -28,7 +28,10 @@ const ApiRegistryPage: React.FC = () => {
   const deleteEndpointFromStore = useApiRegistryStore((s) => s.deleteEndpoint);
 
   useEffect(() => {
-    void loadEndpoints(pagination, sorting, search);
+    const load = async () => {
+      await loadEndpoints(pagination, sorting, search);
+    };
+    void load();
   }, [loadEndpoints, pagination, sorting, search]);
 
   const handlePageChange = useCallback(
@@ -139,7 +142,12 @@ const ApiRegistryPage: React.FC = () => {
           context="registry"
           mode="create"
           onClose={() => setIsCreateModalVisible(false)}
-          onSaveSuccess={() => void loadEndpoints(pagination, sorting, search)}
+          onSaveSuccess={() => {
+            const reload = async () => {
+              await loadEndpoints(pagination, sorting, search);
+            };
+            void reload();
+          }}
         />
       )}
 
