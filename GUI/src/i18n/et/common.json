@@ -261,7 +261,6 @@
       "insert": "Sisesta API otspunkt..",
       "live": "Toodangukeskkonna otspunkt",
       "name": "Otspunkti nimetus",
-      "publicEndpoint": "Avalik otspunkt",
       "params": "Parameetrid",
       "required": "Muutuja on kohustuslik",
       "single": "Otspunkt",

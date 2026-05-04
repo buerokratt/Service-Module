@@ -13,7 +13,7 @@ import { AxiosResponse } from 'axios';
 import { GroupOrRule } from 'components/FlowElementsPopup/RuleBuilder/types';
 import i18next, { t } from 'i18next';
 import {
-  getCommonEndpoints,
+  getAllEndpoints,
   getEndpointValidation,
   getSecretVariables,
   getServiceById,
@@ -88,8 +88,6 @@ export interface ServiceStoreState {
   getFlatVariables: () => string[];
   serviceNameDashed: () => string;
   deleteEndpoint: (id: string) => void;
-  isCommonEndpoint: (id: string) => boolean;
-  setIsCommonEndpoint: (id: string, isCommon: boolean) => void;
   setDescription: (description: string) => void;
   setSlot: (slot: string) => void;
   setExamples: (examples: string[]) => void;
@@ -105,7 +103,7 @@ export interface ServiceStoreState {
   loadSecretVariables: () => Promise<void>;
   loadTaraVariables: () => Promise<void>;
   loadService: (id?: string, resetState?: boolean, search?: string) => Promise<AxiosResponse<Service, any> | undefined>;
-  loadCommonEndpoints: (
+  loadAllEndpoints: (
     isPagination: boolean,
     page?: number,
     pageSize?: number,
@@ -234,6 +232,7 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
   nodes: initialNodes,
   flowSelectedNodes: [],
   isNewService: true,
+  isCommon: false,
   serviceState: undefined,
   isTestButtonVisible: false,
   isTestButtonEnabled: true,
@@ -260,6 +259,7 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
       isTestButtonVisible: true,
     }),
   isSaveButtonEnabled: () => get().endpoints.length > 0,
+  setIsCommon: (value: boolean) => set({ isCommon: value }),
   markAsNewService: () => set({ isNewService: true }),
   unmarkAsNewService: () => set({ isNewService: false }),
   setServiceId: (id) => set({ serviceId: id }),
@@ -370,22 +370,6 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
   setExamples: (examples: string[]) => set({ examples: examples }),
   setEntities: (entities: string[]) => set({ entities: entities }),
   setStepPreferences: (stepPreferences: string[]) => set({ stepPreferences }),
-  isCommon: false,
-  setIsCommon: (isCommon: boolean) => set({ isCommon }),
-  isCommonEndpoint: (id: string) => {
-    const endpoint = get().endpoints.find((x) => x.endpointId === id);
-    return endpoint?.isCommon ?? false;
-  },
-  setIsCommonEndpoint: (id: string, isCommon: boolean) => {
-    const endpoints = get().endpoints.map((x) => {
-      if (x.endpointId !== id) return x;
-      return {
-        ...x,
-        isCommon,
-      };
-    });
-    set({ endpoints });
-  },
   setSecrets: (newSecrets: PreDefinedEndpointEnvVariables) => set({ secrets: newSecrets }),
   addProductionVariables: (variables: any) => {
     set((state) => ({
@@ -538,22 +522,22 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
     get().addProductionVariables(variables);
     return serviceResponse;
   },
-  loadCommonEndpoints: async (
+  loadAllEndpoints: async (
     isPagination: boolean,
     page?: number,
     pageSize?: number,
     sorting?: string,
     search?: string,
   ) => {
-    const response = await api.post(getCommonEndpoints(), {
+    const response = await api.post(getAllEndpoints(), {
       pagination: isPagination,
       page,
-      pageSize,
+      page_size: pageSize,
       sorting,
       search,
     });
     const endpointsResponse: Array<
-      Pick<EndpointData, 'endpointId' | 'name' | 'type' | 'fileName' | 'isCommon'> & {
+      Pick<EndpointData, 'endpointId' | 'name' | 'type' | 'fileName'> & {
         definitions: EndpointDefinitionJson;
       }
     > = response.data.response;

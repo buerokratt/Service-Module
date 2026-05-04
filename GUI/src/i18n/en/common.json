@@ -262,7 +262,6 @@
       "live": "Live endpoint",
       "name": "Endpoint name",
       "params": "Params",
-      "publicEndpoint": "Public endpoint",
       "required": "Variable is required",
       "single": "Endpoint",
       "testEnv": "Test environment",

@@ -10,7 +10,6 @@ SELECT
   e.name,
   e.description,
   e.type,
-  e.is_common,
   e.definitions
 FROM endpoints AS e
 CROSS JOIN UserPreferences AS up

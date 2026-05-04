@@ -1,7 +1,7 @@
 declaration:
   call: declare
   version: 0.1
-  description: "Decription placeholder for 'Common'"
+  description: "Returns all endpoints with pagination, sorting and search support"
   method: post
   accepts: json
   returns: json
@@ -24,10 +24,10 @@ declaration:
         type: string
         description: "Body field 'search'"
 
-get_common_endpoints:
+get_paginated_endpoints:
   call: http.post
   args:
-    url: "[#SERVICE_RESQL]/endpoints/get_common_endpoints"
+    url: "[#SERVICE_RESQL]/endpoints/get_paginated_endpoints"
     body:
       pagination: ${incoming.body.pagination}
       page: ${incoming.body.page}

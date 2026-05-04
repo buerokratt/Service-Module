@@ -29,12 +29,12 @@ const ServiceFlowPage: FC = () => {
       if (!id) {
         await Promise.all([
           useServiceStore.getState().loadStepPreferences(),
-          useServiceStore.getState().loadCommonEndpoints(
+          useServiceStore.getState().loadAllEndpoints(
             false,
             1,
             10,
             'created_at asc',
-            '', // To be added: search functionality in common endpoints
+            '', // To be added: search functionality in endpoints
           ),
         ]);
         return;
