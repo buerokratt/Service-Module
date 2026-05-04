@@ -41,7 +41,7 @@ const AddEndpointModal: React.FC<AddEndpointModalProps> = ({
 
   const [endpoint] = useState<EndpointData>(() => {
     if (mode === 'edit' && initialEndpoint) {
-      return JSON.parse(JSON.stringify(initialEndpoint)) as EndpointData;
+      return structuredClone(initialEndpoint);
     }
     return { endpointId: uuid(), name: '', definitions: [], isNew: true };
   });
@@ -53,7 +53,7 @@ const AddEndpointModal: React.FC<AddEndpointModalProps> = ({
   );
   const [isSaving, setIsSaving] = useState(false);
   const [hasTestedUrl, setHasTestedUrl] = useState(
-    mode === 'edit' && (initialEndpoint?.type === 'custom' || initialEndpoint?.type === 'openApi') ? true : false,
+    mode === 'edit' && (initialEndpoint?.type === 'custom' || initialEndpoint?.type === 'openApi'),
   );
   const [endpointType, setEndpointType] = useState<string>(initialEndpoint?.type ?? '');
   const [endpointDescription, setEndpointDescription] = useState(
@@ -158,14 +158,12 @@ const AddEndpointModal: React.FC<AddEndpointModalProps> = ({
           } else {
             useApiRegistryStore.getState().updateEndpointInList(passedEndpoint);
           }
+        } else if (mode === 'create') {
+          useServiceStore.getState().addEndpoint(passedEndpoint);
+          const newEndpointIds = [...(currentEndpointIds ?? []), passedEndpoint.endpointId];
+          onUpdatePreferences?.(newEndpointIds);
         } else {
-          if (mode === 'create') {
-            useServiceStore.getState().addEndpoint(passedEndpoint);
-            const newEndpointIds = [...(currentEndpointIds ?? []), passedEndpoint.endpointId];
-            onUpdatePreferences?.(newEndpointIds);
-          } else {
-            useServiceStore.getState().editEndpoint(passedEndpoint);
-          }
+          useServiceStore.getState().editEndpoint(passedEndpoint);
         }
         const successKey =
           mode === 'create' ? 'serviceFlow.apiElements.createSuccess' : 'serviceFlow.apiElements.editSuccess';

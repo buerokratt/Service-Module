@@ -117,8 +117,8 @@ const DataTable: FC<DataTableProps> = ({
       sorting,
       globalFilter,
       columnVisibility,
-      ...{ pagination: tablePagination },
-      ...{ columnFilters },
+      pagination: tablePagination,
+      columnFilters,
     },
     meta,
     onColumnFiltersChange: (updater) => {
@@ -149,7 +149,7 @@ const DataTable: FC<DataTableProps> = ({
   return (
     <div
       className={`data-table${withScrollWrapper ? '__scrollWrapper' : ''}`}
-      style={!withScrollWrapper ? { overflowX: 'hidden' } : undefined}
+      style={withScrollWrapper ? undefined : { overflowX: 'hidden' }}
     >
       <table className="data-table">
         {!disableHead && (
@@ -215,7 +215,7 @@ const DataTable: FC<DataTableProps> = ({
               </button>
               <nav role="navigation" aria-label={t('global.paginationNavigation') ?? ''}>
                 <ul className="links">
-                  {[...Array(table.getPageCount())].map((_, index) => (
+                  {[...new Array(table.getPageCount())].map((_, index) => (
                     <li
                       key={`${id}-${index}`}
                       className={clsx({ active: table.getState().pagination.pageIndex === index })}

@@ -1,9 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import useServiceStore from 'store/new-services.store';
+import useServiceStore, { extractMapValues, getEndpointBody } from 'store/new-services.store';
 import useToastStore from 'store/toasts.store';
 import { RequestOperator } from 'types/endpoint/request-operator';
-import { extractMapValues, getEndpointBody } from 'store/new-services.store';
 import { generateJsonRequest } from 'utils/json-request-utils';
 import { v4 as uuid } from 'uuid';
 
@@ -194,7 +193,6 @@ const EndpointCustom: React.FC<EndpointCustomProps> = ({
         endpoint={endpoint}
         requestTab={requestTab}
         setRequestTab={setRequestTab}
-        parentEndpointId={endpoint.endpointId}
         onMandatoryViolationChange={onMandatoryViolationChange}
         onParametersChange={(parameters) => {
           const url = new URL(endpoint.definitions[0].url ?? '');
@@ -281,9 +279,9 @@ function parseURL(url: string) {
       .filter(Boolean)
       .forEach((segment) => {
         const { index, token } = findOperators(segment);
-        const name = decodeURIComponent(index !== -1 ? segment.slice(0, index) : segment);
-        const value = decodeURIComponent(index !== -1 ? segment.slice(index + token.length) : '');
-        const operator = index !== -1 ? token : '=';
+        const name = decodeURIComponent(index === -1 ? segment : segment.slice(0, index));
+        const value = decodeURIComponent(index === -1 ? '' : segment.slice(index + token.length));
+        const operator = index === -1 ? '=' : token;
         if (name) {
           params[name] = value;
           operators[name] = operator;

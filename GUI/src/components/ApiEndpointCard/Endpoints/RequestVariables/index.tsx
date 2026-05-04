@@ -26,7 +26,6 @@ import DataTable from '../../../DataTable';
 type RequestVariablesProps = {
   disableRawData?: boolean;
   endpoint: EndpointData;
-  parentEndpointId?: string;
   isLive: boolean;
   requestValues: PreDefinedEndpointEnvVariables;
   requestTab: RequestTab;
@@ -178,7 +177,7 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
         if (field === 'operator') {
           row[field] = newValue as RequestOperator;
         } else if (field !== 'mandatory') {
-          (row as any)[field] = newValue;
+          row[field] = newValue;
         }
       });
 

@@ -148,11 +148,11 @@ const EndpointOpenAPI: React.FC<EndpointOpenAPIProps> = ({
         variableData.schemaData = parsedSubSchema;
       }
       if (data.type === 'array') {
-        if (!Object.keys(data.items).includes('$ref')) {
-          variableData.arrayType = data.items.type;
-        } else {
+        if (Object.keys(data.items).includes('$ref')) {
           variableData.arrayType = 'schema';
           variableData.arrayData = parseSchemaProperty(apiSpec, getPropertySchema(apiSpec, data.items.$ref));
+        } else {
+          variableData.arrayType = data.items.type;
         }
       }
       if (Object.keys(data).includes('enum')) variableData.enum = data.enum;

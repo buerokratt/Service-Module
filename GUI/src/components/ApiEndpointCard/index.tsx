@@ -14,7 +14,6 @@ import { Option } from '../../types/option';
 
 type EndpointCardProps = {
   endpoint: EndpointData;
-  isDeletable?: boolean;
   isNameDisabled?: boolean;
   showCommonSwitch?: boolean;
   onNameChange?: (name: string) => void;
@@ -112,9 +111,9 @@ const ApiEndpointCard: FC<EndpointCardProps> = ({
                     disabled={isNameDisabled || selectedTab === EndpointEnv.Test}
                     onChange={(e) => {
                       const sanitizedValue = e.target.value
-                        .replace(/[^a-zA-Z0-9_\s]/g, '')
-                        .replace(/\s+/g, '_')
-                        .replace(/_+/g, '_');
+                        .replaceAll(/[^a-zA-Z0-9_\s]/g, '')
+                        .replaceAll(/\s+/g, '_')
+                        .replaceAll(/_+/g, '_');
 
                       setEndpointName(sanitizedValue);
                       const endpointsNames = useServiceStore
