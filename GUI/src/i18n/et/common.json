@@ -89,6 +89,11 @@
     "openMenuIcon": "Ava menüü ikoon",
     "closeMenuIcon": "Sulge menüü ikoon"
   },
+  "multiDomains": {
+    "chooseDomain": "Vali domeen:",
+    "allDomains": "Kõik",
+    "noDomains": "Domeene ei ole saadaval. Palun võtke ühendust süsteemiadministraatoriga."
+  },
   "intents": {
     "entities": "Olemid",
     "regex": "Regulaaravaldis",
