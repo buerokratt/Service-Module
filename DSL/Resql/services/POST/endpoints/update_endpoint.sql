@@ -1,6 +1,6 @@
 UPDATE endpoints
 SET
-    service_id = :serviceId::uuid,
+    service_id = NULLIF(:serviceId, '')::uuid,
     name = :name,
     type = :type::endpoint_type,
     is_common = :isCommon,
