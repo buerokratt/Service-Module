@@ -4,6 +4,7 @@ import AddEndpointModal from 'components/Flow/EdgeTypes/AddEndpointModal';
 import { EndpointTooltipContent } from 'pages/ApiRegistryPage/ApiRegistryTable';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import useToastStore from 'store/toasts.store';
 import './ApiElementsPanel.scss';
 import {
   MdArrowDownward,
@@ -72,24 +73,24 @@ const ApiElementsPanel: React.FC<ApiElementsPanelProps> = ({ onAddToCanvas }) =>
   const loadEndpoints = useApiRegistryStore((s) => s.loadEndpoints);
   const testEndpoint = useApiRegistryStore((s) => s.testEndpoint);
   const deleteEndpointFromStore = useApiRegistryStore((s) => s.deleteEndpoint);
+  const loadEndpointsRef = useRef(loadEndpoints);
+  loadEndpointsRef.current = loadEndpoints;
 
   useEffect(() => {
-    void loadEndpoints(pagination, sorting, search);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pagination, sorting]);
+    loadEndpointsRef.current(pagination, sorting, search).catch(() => {
+      useToastStore.getState().error({ title: t('global.notificationError') });
+    });
+  }, [pagination, sorting, search]);
 
-  // Debounced search
+  // Debounced search reset — resets pageIndex to 0 when search changes
   useEffect(() => {
     if (searchTimerRef.current) clearTimeout(searchTimerRef.current);
     searchTimerRef.current = setTimeout(() => {
-      const resetPagination: PaginationState = { ...pagination, pageIndex: 0 };
-      setPagination(resetPagination);
-      void loadEndpoints(resetPagination, sorting, search);
+      setPagination((prev) => ({ ...prev, pageIndex: 0 }));
     }, 300);
     return () => {
       if (searchTimerRef.current) clearTimeout(searchTimerRef.current);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [search]);
 
   const handleSort = (colId: SortCol) => {
@@ -125,10 +126,13 @@ const ApiElementsPanel: React.FC<ApiElementsPanelProps> = ({ onAddToCanvas }) =>
     if (!deletingEndpoint) return;
     deleteEndpointFromStore(deletingEndpoint)
       .then(() => setDeletingEndpoint(null))
-      .catch(() => {});
+      .catch(() => {
+        useToastStore.getState().error({ title: t('global.notificationError') });
+      });
+    loadEndpointsRef.current(pagination, sorting, search).catch(() => {
+      useToastStore.getState().error({ title: t('global.notificationError') });
+    });
   };
-
-  const handleReload = () => void loadEndpoints(pagination, sorting, search);
 
   const currentSortId = sorting[0]?.id as SortCol | undefined;
   const currentDesc = sorting[0]?.desc ?? false;
@@ -311,7 +315,9 @@ const ApiElementsPanel: React.FC<ApiElementsPanelProps> = ({ onAddToCanvas }) =>
                               disabled={isTesting}
                               onClick={(e) => {
                                 e.stopPropagation();
-                                void handleTest(endpoint);
+                                handleTest(endpoint).catch(() => {
+                                  useToastStore.getState().error({ title: t('global.notificationError') });
+                                });
                               }}
                               style={{
                                 background: 'none',
@@ -397,15 +403,14 @@ const ApiElementsPanel: React.FC<ApiElementsPanelProps> = ({ onAddToCanvas }) =>
               <ul className="links">
                 {Array.from({ length: pageCount }, (_, i) => (
                   <li key={i} className={i === pagination.pageIndex ? 'active' : ''}>
-                    <span
-                      role="button"
+                    <button
+                      type="button"
                       tabIndex={0}
-                      style={{ cursor: 'pointer' }}
+                      style={{ cursor: 'pointer', background: 'none', border: 'none', padding: 0 }}
                       onClick={() => setPagination((p) => ({ ...p, pageIndex: i }))}
-                      onKeyDown={(e) => e.key === 'Enter' && setPagination((p) => ({ ...p, pageIndex: i }))}
                     >
                       {i + 1}
-                    </span>
+                    </button>
                   </li>
                 ))}
               </ul>

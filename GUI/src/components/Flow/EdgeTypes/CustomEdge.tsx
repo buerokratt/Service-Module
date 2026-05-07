@@ -22,6 +22,7 @@ import { useTranslation } from 'react-i18next';
 import { userStepPreferences } from 'resources/api-constants';
 import api from 'services/api';
 import useServiceStore from 'store/new-services.store';
+import useToastStore from 'store/toasts.store';
 import { Step, stepsLabels, StepType } from 'types';
 
 import ApiElementsPanel from './ApiElementsPanel';
@@ -111,9 +112,13 @@ function CustomEdge({
   );
 
   function updateStepPreference(steps: Step[]) {
-    void api.post(userStepPreferences(), {
-      steps: steps.map((e) => e.type),
-    });
+    api
+      .post(userStepPreferences(), {
+        steps: steps.map((e) => e.type),
+      })
+      .catch(() => {
+        useToastStore.getState().error({ title: t('global.notificationError') });
+      });
   }
 
   return (
