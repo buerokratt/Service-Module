@@ -475,6 +475,8 @@
     "autoFocus": "Automaatvaade: SEES/VÄLJAS",
     "apiElements": {
       "title": "API elemendid",
+      "searchPlaceholder": "Otsi...",
+      "newApi": "+ Uus API",
       "delete": "Kustuta",
       "deletionImpossible": "Kustutamine ei ole võimalik",
       "deletionImpossibleMessage": "Kustutamine ei ole võimalik. API element on kasutusel järgmistes teenustes. Kustutage API element nendes teenustes enne teenuste kustutamist.",

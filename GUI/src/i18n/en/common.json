@@ -475,6 +475,8 @@
     "autoFocus": "Auto-View: ON/OFF",
     "apiElements": {
       "title": "API elements",
+      "searchPlaceholder": "Search...",
+      "newApi": "+ New API",
       "delete": "Delete",
       "deletionImpossible": "Deletion impossible",
       "deletionImpossibleMessage": "Deletion is impossible. This API element is used in the following services. Please remove the API element from these services first.",

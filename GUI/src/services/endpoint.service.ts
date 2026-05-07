@@ -37,7 +37,6 @@ export async function persistEndpoints(endpoints: EndpointData[], serviceId: str
     const hasSelectedDefinition = endpoint.definitions.some((d) => d.isSelected);
     if (!hasSelectedDefinition) continue;
 
-    endpoint.serviceId = serviceId;
     filterTrailingUnderscores(endpoint);
 
     if (endpoint.isNew) {
@@ -45,6 +44,7 @@ export async function persistEndpoints(endpoints: EndpointData[], serviceId: str
         api
           .post(createEndpoint(), {
             ...endpoint,
+            serviceId,
             description: endpoint.description ?? '',
             definitions: JSON.stringify(endpoint.definitions),
           })
@@ -56,6 +56,7 @@ export async function persistEndpoints(endpoints: EndpointData[], serviceId: str
       tasks.push(
         api.post(updateEndpoint(endpoint.endpointId), {
           ...endpoint,
+          serviceId,
           description: endpoint.description ?? '',
           definitions: JSON.stringify(endpoint.definitions),
         }),

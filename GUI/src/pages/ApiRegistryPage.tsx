@@ -157,6 +157,10 @@ const ApiRegistryPage: React.FC = () => {
           mode="edit"
           initialEndpoint={editingEndpoint}
           onClose={() => setEditingEndpoint(null)}
+          onSaveSuccess={() => {
+            setEditingEndpoint(null);
+            void loadEndpoints(pagination, sorting, search);
+          }}
         />
       )}
     </>
