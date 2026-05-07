@@ -4,7 +4,6 @@ import AddEndpointModal from 'components/Flow/EdgeTypes/AddEndpointModal';
 import { EndpointTooltipContent } from 'pages/ApiRegistryPage/ApiRegistryTable';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import useToastStore from 'store/toasts.store';
 import './ApiElementsPanel.scss';
 import {
   MdArrowDownward,
@@ -22,6 +21,7 @@ import {
   MdUnfoldMore,
 } from 'react-icons/md';
 import useApiRegistryStore from 'store/api-registry.store';
+import useToastStore from 'store/toasts.store';
 import { Step, StepType } from 'types';
 import { EndpointData } from 'types/endpoint';
 
@@ -80,7 +80,7 @@ const ApiElementsPanel: React.FC<ApiElementsPanelProps> = ({ onAddToCanvas }) =>
     loadEndpointsRef.current(pagination, sorting, search).catch(() => {
       useToastStore.getState().error({ title: t('global.notificationError') });
     });
-  }, [pagination, sorting, search]);
+  }, [pagination, sorting, search, t]);
 
   // Debounced search reset — resets pageIndex to 0 when search changes
   useEffect(() => {
@@ -120,6 +120,12 @@ const ApiElementsPanel: React.FC<ApiElementsPanelProps> = ({ onAddToCanvas }) =>
     };
 
     onAddToCanvas(step);
+  };
+
+  const handleReload = () => {
+    loadEndpointsRef.current(pagination, sorting, search).catch(() => {
+      useToastStore.getState().error({ title: t('global.notificationError') });
+    });
   };
 
   const handleDeleteConfirm = () => {
@@ -262,7 +268,12 @@ const ApiElementsPanel: React.FC<ApiElementsPanelProps> = ({ onAddToCanvas }) =>
                     const isVerified = status === 'verified';
                     const isUntested = status === 'unverified';
                     const statusColor = isVerified ? '#27ae60' : '#e74c3c';
-                    const statusCode = isUntested ? '---' : meta?.lastStatusCode ? String(meta.lastStatusCode) : '---';
+                    let statusCode: string;
+                    if (isUntested) {
+                      statusCode = '---';
+                    } else {
+                      statusCode = meta?.lastStatusCode ? String(meta.lastStatusCode) : '---';
+                    }
                     const schemaCaptured = meta?.schemaCaptured ?? false;
                     const isTesting = testingId === endpoint.endpointId;
                     const def = endpoint.definitions?.[0];
@@ -406,7 +417,7 @@ const ApiElementsPanel: React.FC<ApiElementsPanelProps> = ({ onAddToCanvas }) =>
                     <button
                       type="button"
                       tabIndex={0}
-                      style={{ cursor: 'pointer', background: 'none', border: 'none', padding: 0 }}
+                      style={{ cursor: 'pointer', border: 'none', padding: 0 }}
                       onClick={() => setPagination((p) => ({ ...p, pageIndex: i }))}
                     >
                       {i + 1}

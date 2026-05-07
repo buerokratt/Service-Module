@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { EndpointData } from 'types/endpoint';
 
 import useApiRegistryStore from '../store/api-registry.store';
+import useToastStore from '../store/toasts.store';
 import ApiRegistryTable from './ApiRegistryPage/ApiRegistryTable';
 
 const ApiRegistryPage: React.FC = () => {
@@ -159,7 +160,9 @@ const ApiRegistryPage: React.FC = () => {
           onClose={() => setEditingEndpoint(null)}
           onSaveSuccess={() => {
             setEditingEndpoint(null);
-            void loadEndpoints(pagination, sorting, search);
+            loadEndpoints(pagination, sorting, search).catch(() => {
+              useToastStore.getState().error({ title: t('global.notificationError') });
+            });
           }}
         />
       )}
