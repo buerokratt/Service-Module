@@ -106,7 +106,6 @@ const AddEndpointModal: React.FC<AddEndpointModalProps> = ({
   const handleSave = () => {
     const passedEndpoint = endpoint;
     passedEndpoint.name = endpointName;
-    passedEndpoint.description = endpointDescription;
 
     const hasSelectedDefinition = passedEndpoint.definitions.some((d) => d.isSelected);
     if (!hasSelectedDefinition) {

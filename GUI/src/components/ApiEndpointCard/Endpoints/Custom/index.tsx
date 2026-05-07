@@ -48,17 +48,8 @@ const EndpointCustom: React.FC<EndpointCustomProps> = ({
   const { setEndpoints } = useServiceStore();
   const ref = useRef<HTMLInputElement>(null);
   const [isTesting, setIsTesting] = useState(false);
-  const [description, setDescription] = useState<string>(endpoint.description ?? '');
-  const initialDescriptionRef = useRef(endpoint.description ?? '');
-  const onDescriptionChangeRef = useRef(onDescriptionChange);
   const [responseContent, setResponseContent] = useState<string | null>(null);
   const [isResponseOpen, setIsResponseOpen] = useState(false);
-
-  useEffect(() => {
-    if (initialDescriptionRef.current) {
-      onDescriptionChangeRef.current?.(initialDescriptionRef.current);
-    }
-  }, []);
 
   // initial endpoint data
   if (endpoint.definitions.length === 0) {
@@ -133,9 +124,8 @@ const EndpointCustom: React.FC<EndpointCustomProps> = ({
           name="endpointDescription"
           label=""
           placeholder={t('newService.endpoint.insertDescription') ?? ''}
-          value={description}
+          defaultValue={endpoint.description ?? ''}
           onChange={(e) => {
-            setDescription(e.target.value);
             endpoint.description = e.target.value;
             onDescriptionChange?.(e.target.value);
           }}
