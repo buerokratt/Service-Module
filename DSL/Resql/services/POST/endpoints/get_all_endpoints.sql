@@ -10,7 +10,8 @@ SELECT
   e.name,
   e.description,
   e.type,
-  e.definitions
+  e.definitions,
+  e.response_schema
 FROM endpoints AS e
 CROSS JOIN UserPreferences AS up
 WHERE e.deleted IS FALSE

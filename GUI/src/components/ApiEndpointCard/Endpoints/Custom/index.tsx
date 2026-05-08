@@ -48,8 +48,8 @@ const EndpointCustom: React.FC<EndpointCustomProps> = ({
   const { setEndpoints } = useServiceStore();
   const ref = useRef<HTMLInputElement>(null);
   const [isTesting, setIsTesting] = useState(false);
-  const [responseContent, setResponseContent] = useState<string | null>(null);
-  const [isResponseOpen, setIsResponseOpen] = useState(false);
+  const [responseContent, setResponseContent] = useState<string | null>(endpoint.responseSchema ?? null);
+  const [isResponseOpen, setIsResponseOpen] = useState(!!endpoint.responseSchema);
 
   // initial endpoint data
   if (endpoint.definitions.length === 0) {
@@ -98,7 +98,9 @@ const EndpointCustom: React.FC<EndpointCustomProps> = ({
     };
     generateJsonRequest(def)
       .then((content) => {
-        setResponseContent(JSON.stringify(content, undefined, 4));
+        const schema = JSON.stringify(content, undefined, 4);
+        setResponseContent(schema);
+        endpoint.responseSchema = schema;
         setIsResponseOpen(true);
         useToastStore.getState().success({ title: t('newService.endpoint.success') });
         onTestSuccess?.({ request, responseBody: content });
