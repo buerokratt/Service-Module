@@ -12,4 +12,5 @@ export type EndpointData = {
   serviceId?: string;
   description?: string;
   definitions: EndpointDefinition[];
+  responseSchema?: string;
 };

@@ -66,8 +66,6 @@ const AddEndpointModal: React.FC<AddEndpointModalProps> = ({
   const [registryNameExists, setRegistryNameExists] = useState(false);
   const [registryNameChecking, setRegistryNameChecking] = useState(false);
 
-  const { setJsonRequestVisible, setJsonRequestContent } = useServiceStore();
-
   useEffect(() => {
     if (context !== 'registry' || !endpointName) {
       setRegistryNameExists(false);
@@ -100,9 +98,6 @@ const AddEndpointModal: React.FC<AddEndpointModalProps> = ({
   const effectiveNameExists = context === 'registry' ? registryNameExists : endpointNameExists;
 
   const handleClose = () => {
-    // Service edit: the store was never mutated (we worked on a clone), nothing to revert
-    setJsonRequestVisible(false);
-    setJsonRequestContent(null);
     onClose();
   };
 
@@ -140,8 +135,12 @@ const AddEndpointModal: React.FC<AddEndpointModalProps> = ({
 
     persistEndpoints([passedEndpoint], serviceId)
       .then(async () => {
-        // For custom endpoints, call testEndpointUrl to persist response_schema to DB
-        if ((passedEndpoint.type === 'custom' || passedEndpoint.type === 'openApi') && lastTestPayload.current) {
+        // For custom and openApi endpoints in registry context, call testEndpointUrl to persist response_schema to DB
+        if (
+          context === 'registry' &&
+          (passedEndpoint.type === 'custom' || passedEndpoint.type === 'openApi') &&
+          lastTestPayload.current
+        ) {
           try {
             await api.post(testEndpointUrl(), {
               endpointId: passedEndpoint.endpointId,
@@ -169,8 +168,6 @@ const AddEndpointModal: React.FC<AddEndpointModalProps> = ({
           mode === 'create' ? 'serviceFlow.apiElements.createSuccess' : 'serviceFlow.apiElements.editSuccess';
         useToastStore.getState().success({ title: t(successKey) });
         setIsSaving(false);
-        setJsonRequestVisible(false);
-        setJsonRequestContent(null);
         onSaveSuccess?.();
         onClose();
       })

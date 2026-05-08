@@ -54,8 +54,8 @@ const EndpointOpenAPI: React.FC<EndpointOpenAPIProps> = ({
   const [openApiEndpoints, setOpenApiEndpoints] = useState<EndpointDefinition[]>(endpoint.definitions ?? []);
   const [key, setKey] = useState<number>(0);
   const [isTesting, setIsTesting] = useState(false);
-  const [responseContent, setResponseContent] = useState<string | null>(null);
-  const [isResponseOpen, setIsResponseOpen] = useState(false);
+  const [responseContent, setResponseContent] = useState<string | null>(endpoint.responseSchema ?? null);
+  const [isResponseOpen, setIsResponseOpen] = useState(!!endpoint.responseSchema);
   const { t } = useTranslation();
   const theme = useTheme();
 
@@ -75,7 +75,9 @@ const EndpointOpenAPI: React.FC<EndpointOpenAPIProps> = ({
     };
     generateJsonRequest(selectedEndpoint)
       .then((content) => {
-        setResponseContent(JSON.stringify(content, undefined, 4));
+        const schema = JSON.stringify(content, undefined, 4);
+        setResponseContent(schema);
+        endpoint.responseSchema = schema;
         setIsResponseOpen(true);
         useToastStore.getState().success({ title: t('newService.endpoint.success') });
         onTestSuccess?.({ request, responseBody: content });

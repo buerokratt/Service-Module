@@ -12,6 +12,8 @@ import {
 import { AxiosResponse } from 'axios';
 import { GroupOrRule } from 'components/FlowElementsPopup/RuleBuilder/types';
 import i18next, { t } from 'i18next';
+import { formatSchema } from 'utils/json-request-utils';
+
 import {
   getCommonEndpoints,
   getEndpointValidation,
@@ -142,11 +144,6 @@ export interface ServiceStoreState {
   enableTestButton: () => void;
   handlePopupSave: (updatedNode: Node<NodeDataProps>) => void;
   testUrl: (endpoint: EndpointData, onError: () => void, onSuccess: () => void) => Promise<void>;
-  isJsonRequestVisible: boolean;
-  jsonRequestContent: any;
-  setJsonRequestVisible: (visible: boolean) => void;
-  setJsonRequestContent: (content: any) => void;
-  triggerJsonRequest: (endpoint: EndpointData) => void;
   setEndpoints: (callback: (prev: EndpointData[]) => EndpointData[]) => void;
   reactFlowInstance: ReactFlowInstance | null;
   setReactFlowInstance: (reactFlowInstance: ReactFlowInstance | null) => void;
@@ -467,6 +464,7 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
         return {
           ...endpoint,
           definitions: JSON.parse(endpoint.definitions.value),
+          responseSchema: formatSchema((endpoint as any).responseSchema),
         };
       });
       let edges = structure?.edges;
@@ -561,6 +559,7 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
       return {
         ...endpoint,
         definitions: JSON.parse(endpoint.definitions.value),
+        responseSchema: formatSchema((endpoint as any).responseSchema),
       };
     });
 
@@ -859,24 +858,7 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
   cancelNavigation: () => {
     set({ nextLocation: null });
   },
-  isJsonRequestVisible: false,
-  jsonRequestContent: null,
-  setJsonRequestVisible: (visible: boolean) => set({ isJsonRequestVisible: visible }),
-  setJsonRequestContent: (content: any) => set({ jsonRequestContent: content }),
-  triggerJsonRequest: (endpoint: EndpointData) => {
-    generateJsonRequest(endpoint.definitions[0])
-      .then((content) => {
-        set({ jsonRequestContent: content, isJsonRequestVisible: true });
-        useToastStore.getState().success({
-          title: t('newService.endpoint.success'),
-        });
-      })
-      .catch((error) => {
-        useToastStore.getState().error({
-          title: error.message ?? t('newService.endpoint.error'),
-        });
-      });
-  },
+
   saveToHistory: (stateOverride?: { nodes: Node[]; edges: Edge[] }) => {
     const { nodes, edges, history, historyIndex } = get();
 
