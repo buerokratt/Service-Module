@@ -11,8 +11,7 @@ import {
 } from '@xyflow/react';
 import { AxiosResponse } from 'axios';
 import { GroupOrRule } from 'components/FlowElementsPopup/RuleBuilder/types';
-import i18next, { t } from 'i18next';
-import { formatSchema } from 'utils/json-request-utils';
+import i18next from 'i18next';
 
 import {
   getCommonEndpoints,
@@ -43,7 +42,7 @@ import {
   RequestVariablesTabsRowsData,
 } from 'types/request-variables';
 import { initialEdges, initialNodes, NodeDataProps } from 'types/service-flow';
-import { generateJsonRequest } from 'utils/json-request-utils';
+import { formatSchema, generateJsonRequest } from 'utils/json-request-utils';
 import { v4 as uuid } from 'uuid';
 import { create } from 'zustand';
 
@@ -460,13 +459,20 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
       serviceResponse = await api.post<Service>(getServiceById(), { id, search: search ?? '' });
 
       const structure = JSON.parse(serviceResponse.data.structure?.value ?? '{}');
-      let endpoints = serviceResponse.data.endpoints.map((endpoint) => {
-        return {
-          ...endpoint,
-          definitions: JSON.parse(endpoint.definitions.value),
-          responseSchema: formatSchema((endpoint as any).responseSchema),
-        };
-      });
+      let endpoints = serviceResponse.data.endpoints.map(
+        (
+          endpoint: Pick<
+            EndpointData,
+            'endpointId' | 'name' | 'type' | 'isCommon' | 'fileName' | 'description' | 'serviceId'
+          > & { definitions: EndpointDefinitionJson; responseSchema?: unknown },
+        ) => {
+          return {
+            ...endpoint,
+            definitions: JSON.parse(endpoint.definitions.value),
+            responseSchema: formatSchema(endpoint.responseSchema),
+          };
+        },
+      );
       let edges = structure?.edges;
       nodes = structure?.nodes;
 
@@ -546,20 +552,21 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
     const response = await api.post(getCommonEndpoints(), {
       pagination: isPagination,
       page,
-      pageSize,
+      page_size: pageSize,
       sorting,
       search,
     });
     const endpointsResponse: Array<
       Pick<EndpointData, 'endpointId' | 'name' | 'type' | 'fileName' | 'isCommon'> & {
         definitions: EndpointDefinitionJson;
+        responseSchema?: unknown;
       }
     > = response.data.response;
     let endpoints = endpointsResponse.map((endpoint) => {
       return {
         ...endpoint,
         definitions: JSON.parse(endpoint.definitions.value),
-        responseSchema: formatSchema((endpoint as any).responseSchema),
+        responseSchema: formatSchema(endpoint.responseSchema),
       };
     });
 
