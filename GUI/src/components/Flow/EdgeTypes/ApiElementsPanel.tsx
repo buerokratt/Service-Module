@@ -4,6 +4,7 @@ import AddEndpointModal from 'components/Flow/EdgeTypes/AddEndpointModal';
 import { EndpointTooltipContent } from 'pages/ApiRegistryPage/ApiRegistryTable';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useParams } from 'react-router-dom';
 import './ApiElementsPanel.scss';
 import {
   MdArrowDownward,
@@ -56,6 +57,7 @@ interface ApiElementsPanelProps {
 
 const ApiElementsPanel: React.FC<ApiElementsPanelProps> = ({ onAddToCanvas }) => {
   const { t } = useTranslation();
+  const { id: idParam } = useParams();
   const [tableOpen, setTableOpen] = useState(true);
   const [search, setSearch] = useState('');
   const [pagination, setPagination] = useState<PaginationState>({ pageIndex: 0, pageSize: 5 });
@@ -193,6 +195,13 @@ const ApiElementsPanel: React.FC<ApiElementsPanelProps> = ({ onAddToCanvas }) =>
           appearance="primary"
           onClick={(e) => {
             e.stopPropagation();
+            if (!idParam) {
+              useToastStore.getState().error({
+                title: t('newService.toast.serviceNotFound'),
+                message: t('newService.toast.serviceNotFoundEndpointsMessage'),
+              });
+              return;
+            }
             setIsCreateOpen(true);
           }}
           style={{ whiteSpace: 'nowrap', borderRadius: 20, height: 40, padding: '8px 18px' }}
