@@ -96,9 +96,11 @@ const EndpointCustom: React.FC<EndpointCustomProps> = ({
     // endpoints loaded from the DB (where paramType may not be persisted) work correctly.
     const allParams = def.params?.variables ?? [];
     const urlPathPart = (def.url ?? '').split('?')[0];
-    const pathPlaceholderNames = [...urlPathPart.matchAll(/(?<!\$)\{([^}]+)\}/g)].map((m) => m[1]);
-    const pathParams = allParams.filter((v) => pathPlaceholderNames.includes(v.name));
-    const queryParams = allParams.filter((v) => !pathPlaceholderNames.includes(v.name));
+    const pathPlaceholderNames = new Set(
+      [...urlPathPart.matchAll(/(?<!\$)\{(\w+)\}/g)].map((m) => m[1]),
+    );
+    const pathParams = allParams.filter((v) => pathPlaceholderNames.has(v.name));
+    const queryParams = allParams.filter((v) => !pathPlaceholderNames.has(v.name));
 
     // Validate path params have values
     for (const param of pathParams) {
@@ -121,14 +123,14 @@ const EndpointCustom: React.FC<EndpointCustomProps> = ({
     // Replace {name} placeholders in the URL path
     let testUrl = def.url ?? '';
     for (const param of pathParams) {
-      testUrl = testUrl.split(`{${param.name}}`).join(encodeURIComponent(param.value!));
+      testUrl = testUrl.split(`{${param.name}}`).join(encodeURIComponent(param.value ?? ''));
     }
 
     // Strip query string — query params are sent separately via the params map
     const testUrlBase = testUrl.includes('?') ? testUrl.split('?')[0] : testUrl;
 
     // Check for any remaining unresolved {name} in the path (excluding ${var} runtime vars)
-    const unresolvedRegex = /(?<!\$)\{([^}]+)\}/;
+    const unresolvedRegex = /(?<!\$)\{(\w+)\}/;
     const remaining = unresolvedRegex.exec(testUrlBase);
     if (remaining) {
       useToastStore.getState().error({ title: t('newService.endpoint.unresolvedPlaceholder', { name: remaining[1] }) });
@@ -363,7 +365,7 @@ function parseURLWithPlaceholders(url: string): {
 
     // Detect {name} placeholders in the path portion
     const pathParams: string[] = [];
-    const pathPlaceholderRegex = /\{([^}]+)\}/g;
+    const pathPlaceholderRegex = /\{(\w+)\}/g;
     let match;
     while ((match = pathPlaceholderRegex.exec(pathPart)) !== null) {
       if (!pathParams.includes(match[1])) {
