@@ -751,8 +751,12 @@ function handleTextField(
 
   const spacePlaceholder = '___SPACE___';
   const rawMessage = typeof parentNode.data.message === 'string' ? decodeHtmlEntities(parentNode.data.message) : '';
+  const rawMessageWithSpaceholders = rawMessage
+    .replaceAll('{{', '${')
+    .replaceAll('}}', '}')
+    .replaceAll(/(<[^>]+>)|( )/g, (_match, tag) => (tag === undefined ? spacePlaceholder : tag));
   const markdownMessage = htmlToMarkdown
-    .translate(rawMessage.replace('{{', '${').replace('}}', '}').replaceAll(' ', spacePlaceholder))
+    .translate(rawMessageWithSpaceholders)
     .replaceAll(spacePlaceholder, ' ')
     .replaceAll(/\\([-~>[\]_*#().!`=<\\])/g, String.raw`\\$1`);
 
