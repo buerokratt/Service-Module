@@ -375,7 +375,7 @@ const ApiRegistryTable: React.FC<ApiRegistryTableProps> = ({
               <li key={i} className={i === pagination.pageIndex ? 'active' : ''}>
                 <button
                   type="button"
-                  style={{ cursor: 'pointer', background: 'none', border: 'none', padding: 0 }}
+                  style={{ cursor: 'pointer', border: 'none', padding: 0 }}
                   onClick={() => setPagination({ ...pagination, pageIndex: i })}
                 >
                   {i + 1}

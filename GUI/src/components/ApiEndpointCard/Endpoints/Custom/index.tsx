@@ -89,14 +89,63 @@ const EndpointCustom: React.FC<EndpointCustomProps> = ({
   const handleJsonRequestClick = () => {
     setIsTesting(true);
     const def = endpoint.definitions[0];
+
+    // Build the test URL by resolving {param} placeholders.
+    // PATH params must have values; any remaining unresolved {name} blocks the test.
+    // Derive path param names directly from {name} placeholders in the URL path so that
+    // endpoints loaded from the DB (where paramType may not be persisted) work correctly.
+    const allParams = def.params?.variables ?? [];
+    const urlPathPart = (def.url ?? '').split('?')[0];
+    const pathPlaceholderNames = [...urlPathPart.matchAll(/(?<!\$)\{([^}]+)\}/g)].map((m) => m[1]);
+    const pathParams = allParams.filter((v) => pathPlaceholderNames.includes(v.name));
+    const queryParams = allParams.filter((v) => !pathPlaceholderNames.includes(v.name));
+
+    // Validate path params have values
+    for (const param of pathParams) {
+      if (!param.value?.trim()) {
+        useToastStore.getState().error({ title: t('newService.endpoint.missingPathParam', { name: param.name }) });
+        setIsTesting(false);
+        return;
+      }
+    }
+
+    // Validate named query params have values (dynamic placeholders must be filled)
+    for (const param of queryParams) {
+      if (param.name && !param.value?.trim()) {
+        useToastStore.getState().error({ title: t('newService.endpoint.missingPathParam', { name: param.name }) });
+        setIsTesting(false);
+        return;
+      }
+    }
+
+    // Replace {name} placeholders in the URL path
+    let testUrl = def.url ?? '';
+    for (const param of pathParams) {
+      testUrl = testUrl.split(`{${param.name}}`).join(encodeURIComponent(param.value!));
+    }
+
+    // Strip query string — query params are sent separately via the params map
+    const testUrlBase = testUrl.includes('?') ? testUrl.split('?')[0] : testUrl;
+
+    // Check for any remaining unresolved {name} in the path (excluding ${var} runtime vars)
+    const unresolvedRegex = /(?<!\$)\{([^}]+)\}/;
+    const remaining = unresolvedRegex.exec(testUrlBase);
+    if (remaining) {
+      useToastStore.getState().error({ title: t('newService.endpoint.unresolvedPlaceholder', { name: remaining[1] }) });
+      setIsTesting(false);
+      return;
+    }
+
+    const queryOnlyParams = def.params ? { ...def.params, variables: queryParams } : undefined;
+
     const request = {
-      url: def.url,
+      url: testUrlBase,
       method: def.methodType,
       headers: extractMapValues(def.headers) as Record<string, string>,
-      params: extractMapValues(def.params) as Record<string, string>,
+      params: extractMapValues(queryOnlyParams) as Record<string, string>,
       body: getEndpointBody(def),
     };
-    generateJsonRequest(def)
+    generateJsonRequest({ ...def, url: testUrlBase, params: queryOnlyParams })
       .then((content) => {
         const schema = JSON.stringify(content, undefined, 4);
         setResponseContent(schema);
@@ -161,10 +210,26 @@ const EndpointCustom: React.FC<EndpointCustomProps> = ({
               label=""
               defaultValue={endpoint.definitions[0]?.url ?? ''}
               onChange={(event) => {
-                const parsedUrl = parseURL(event.target.value);
+                const parsedUrl = parseURLWithPlaceholders(event.target.value);
                 endpoint.definitions[0].url = parsedUrl.url;
 
+                const existingVars = endpoint.definitions[0].params?.variables ?? [];
                 const parameters: EndpointVariableData[] = [];
+
+                // Add path params first (preserve existing values entered by the user)
+                parsedUrl.pathParams.forEach((name) => {
+                  const existing = existingVars.find((v) => v.name === name && v.paramType === 'path');
+                  parameters.push({
+                    id: existing?.id ?? uuid(),
+                    name,
+                    type: 'custom',
+                    required: false,
+                    value: existing?.value ?? '',
+                    paramType: 'path',
+                  });
+                });
+
+                // Add query params
                 Object.keys(parsedUrl.params).forEach((key) => {
                   parameters.push({
                     id: uuid(),
@@ -173,6 +238,7 @@ const EndpointCustom: React.FC<EndpointCustomProps> = ({
                     required: false,
                     value: parsedUrl.params[key],
                     operator: (parsedUrl.operators[key] as RequestOperator) || '=',
+                    paramType: 'query',
                   });
                 });
 
@@ -197,18 +263,34 @@ const EndpointCustom: React.FC<EndpointCustomProps> = ({
         setRequestTab={setRequestTab}
         onMandatoryViolationChange={onMandatoryViolationChange}
         onParametersChange={(parameters) => {
-          const url = new URL(endpoint.definitions[0].url ?? '');
-          const baseUrl = `${url.origin}${url.pathname}`;
+          // Preserve the path template (including {name} placeholders) from stored URL.
+          // Use string split instead of URL constructor to avoid encoding {braces}.
+          const storedUrl = endpoint.definitions[0].url ?? '';
+          let pathTemplate = storedUrl.includes('?') ? storedUrl.split('?')[0] : storedUrl;
 
+          // When a path param is renamed, update the {oldName} placeholder in the URL path.
+          const oldPathParams = endpoint.definitions[0].params?.variables?.filter((p) => p.paramType === 'path') ?? [];
+          const newPathParams = parameters.filter((p) => p.paramType === 'path');
+          for (const newParam of newPathParams) {
+            const oldParam = oldPathParams.find((p) => p.id === newParam.id);
+            if (oldParam && oldParam.name !== newParam.name && newParam.name) {
+              pathTemplate = pathTemplate.split(`{${oldParam.name}}`).join(`{${newParam.name}}`);
+            }
+          }
+
+          // Rebuild query string from non-path params.
+          // Empty values restore the {paramName} placeholder so the URL stays as a template.
+          // Renaming a query param key here updates the corresponding key in the URL.
           const queryString = parameters
-            .filter((param) => param.value && param.name)
+            .filter((param) => param.paramType !== 'path' && param.name)
             .map((param) => {
-              const operator = param.operator ? param.operator : '=';
-              return `${param.name}${operator}${encodeURIComponent(param.value ?? '')}`;
+              const operator = param.operator ?? '=';
+              const val = param.value?.trim() ? encodeURIComponent(param.value) : `{${param.name}}`;
+              return `${param.name}${operator}${val}`;
             })
             .join('&');
 
-          endpoint.definitions[0].url = queryString ? `${baseUrl}?${queryString}` : baseUrl;
+          endpoint.definitions[0].url = queryString ? `${pathTemplate}?${queryString}` : pathTemplate;
           endpoint.definitions[0].params = {
             variables: parameters,
             rawData: {},
@@ -270,19 +352,37 @@ const EndpointCustom: React.FC<EndpointCustomProps> = ({
   );
 };
 
-function parseURL(url: string) {
+function parseURLWithPlaceholders(url: string): {
+  url: string;
+  pathParams: string[];
+  params: Record<string, string>;
+  operators: Record<string, string>;
+} {
   try {
-    const queryString = url.split('?')[1] ?? '';
-    const params: Record<string, any> = {};
-    const operators: Record<string, string> = {};
+    const [pathPart, queryPart = ''] = url.split('?');
 
-    queryString
+    // Detect {name} placeholders in the path portion
+    const pathParams: string[] = [];
+    const pathPlaceholderRegex = /\{([^}]+)\}/g;
+    let match;
+    while ((match = pathPlaceholderRegex.exec(pathPart)) !== null) {
+      if (!pathParams.includes(match[1])) {
+        pathParams.push(match[1]);
+      }
+    }
+
+    // Parse query params
+    const params: Record<string, string> = {};
+    const operators: Record<string, string> = {};
+    queryPart
       .split('&')
       .filter(Boolean)
       .forEach((segment) => {
         const { index, token } = findOperators(segment);
         const name = decodeURIComponent(index === -1 ? segment : segment.slice(0, index));
-        const value = decodeURIComponent(index === -1 ? '' : segment.slice(index + token.length));
+        const rawValue = decodeURIComponent(index === -1 ? '' : segment.slice(index + token.length));
+        // If the value is itself a {placeholder}, treat it as empty (dynamic param — user fills in Params tab)
+        const value = /^\{[^}]+\}$/.test(rawValue) ? '' : rawValue;
         const operator = index === -1 ? '=' : token;
         if (name) {
           params[name] = value;
@@ -290,10 +390,10 @@ function parseURL(url: string) {
         }
       });
 
-    return { url, params, operators };
+    return { url, pathParams, params, operators };
   } catch (e) {
     console.error('Invalid URL format:', e);
-    return { url, params: {}, operators: {} };
+    return { url, pathParams: [], params: {}, operators: {} };
   }
 }
 

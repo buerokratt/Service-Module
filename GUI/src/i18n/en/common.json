@@ -285,6 +285,8 @@
       "mandatoryNo": "No",
       "mandatoryNameValueRequired": "Name and value are mandatory",
       "nameTypeDescriptionRequired": "Name, type and description are required for all parameters",
+      "missingPathParam": "Missing value for '{{name}}'",
+      "unresolvedPlaceholder": "Unresolved placeholder '{{name}}'",
       "paramTypeTooltip": "Type defines what data a parameter accepts.\n\nSTRING (default) – text (e.g. \"Tallinn\", \"ABC123\")\nNUMBER – numbers (e.g. 10, 10.5)\nBOOLEAN – true or false\nDATE – date or datetime (e.g. 2025-01-01, ISO 8601)",
       "response": "Response",
       "testUrlFirst": "Execute Test URL before saving",

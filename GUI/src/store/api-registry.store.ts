@@ -116,18 +116,34 @@ const useApiRegistryStore = create<ApiRegistryState>((set, get) => ({
     const def = endpoint.definitions?.[0];
     if (!def) return;
 
-    const url = def.url || def.openApiUrl || def.path || '';
+    let url = def.url || def.openApiUrl || def.path || '';
     if (!url) return;
+
+    // Resolve {paramName} path variable placeholders using stored param values
+    const allParams = def.params?.variables ?? [];
+    const pathParams = allParams.filter((p) => p.paramType === 'path');
+    const queryParams = allParams.filter((p) => p.paramType !== 'path');
+    for (const param of pathParams) {
+      if (param.value?.trim()) {
+        url = url.split(`{${param.name}}`).join(encodeURIComponent(param.value));
+      }
+    }
+    // Skip test if any path variable placeholder is still unresolved
+    if (/(?<!\$)\{([^}]+)\}/.test(url)) return;
+
+    // Strip any inline query string — query params are sent separately
+    const urlBase = url.includes('?') ? url.split('?')[0] : url;
+    const queryOnlyParams = def.params ? { ...def.params, variables: queryParams } : undefined;
 
     let networkError = false;
     try {
       await api.post(testEndpointUrl(), {
         endpointId: endpoint.endpointId,
         request: {
-          url,
+          url: urlBase,
           method: def.methodType ?? 'GET',
           headers: extractMapValues(def.headers),
-          params: extractMapValues(def.params),
+          params: extractMapValues(queryOnlyParams),
           body: getEndpointBody(def),
         },
       });
