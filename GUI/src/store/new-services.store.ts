@@ -955,7 +955,8 @@ export function getEndpointBody(endpoint: EndpointDefinition): any {
 
   if (isRawBodySelected) {
     try {
-      const rawJson = JSON.parse(rawBody?.value ?? '');
+      const rawJsonStr = (rawBody?.value ?? '').replace(/(?<!")(\$\{[^}]+\})(?!")/g, '"$1"');
+      const rawJson = JSON.parse(rawJsonStr);
       body = rawJson;
     } catch (e: any) {
       body = extractMapValues(endpoint.body);
