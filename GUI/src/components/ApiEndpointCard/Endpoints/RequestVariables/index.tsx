@@ -7,6 +7,7 @@ import { FieldType } from 'types/endpoint/field-type';
 import { RequestOperator } from 'types/endpoint/request-operator';
 
 import { getColumns } from './columns';
+import DescriptionCell from './DescriptionCell';
 import { Button, FormTextarea, SwitchBox, Track } from '../../..';
 import { RequestTab } from '../../../../types';
 import {
@@ -25,12 +26,13 @@ import DataTable from '../../../DataTable';
 type RequestVariablesProps = {
   disableRawData?: boolean;
   endpoint: EndpointData;
-  parentEndpointId?: string;
   isLive: boolean;
   requestValues: PreDefinedEndpointEnvVariables;
   requestTab: RequestTab;
   setRequestTab: React.Dispatch<React.SetStateAction<RequestTab>>;
   onParametersChange: (params: EndpointVariableData[]) => void;
+  /** Called whenever mandatory-param validation state changes */
+  onMandatoryViolationChange?: (hasViolation: boolean) => void;
 };
 
 const RequestVariables: React.FC<RequestVariablesProps> = ({
@@ -41,6 +43,7 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
   requestTab,
   setRequestTab,
   onParametersChange,
+  onMandatoryViolationChange,
 }) => {
   const { t } = useTranslation();
   const tabs: EndpointTab[] = [EndpointTab.Params, EndpointTab.Headers, EndpointTab.Body];
@@ -52,6 +55,10 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
     pageSize: 5,
   });
 
+  /** Params-tab rows always have editable names on custom endpoints. */
+  const isRowNameEditable = (data: EndpointVariableData): boolean =>
+    endpoint.type === 'custom' || data.type === 'custom';
+
   const [sorting, setSorting] = useState<SortingState>([]);
   const [deletedVariable, setDeletedVariable] = useState<RequestVariablesRowData | undefined>(undefined);
 
@@ -61,10 +68,11 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
       id: `${id}`,
       endpointVariableId: data.id,
       required: data.required ?? false,
+      mandatory: data.mandatory ?? data.required ?? false,
       variable: data.name,
       value,
       operator: data.operator ?? '=',
-      isNameEditable: data.type === 'custom',
+      isNameEditable: isRowNameEditable(data),
       type: data.type,
       description: data.description,
       arrayType: data.arrayType,
@@ -168,7 +176,7 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
         if (row.id !== id) return;
         if (field === 'operator') {
           row[field] = newValue as RequestOperator;
-        } else {
+        } else if (field !== 'mandatory') {
           row[field] = newValue;
         }
       });
@@ -179,18 +187,46 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
       updateEndpointData(newRowsData, endpoint);
 
       if (requestTab.tab === 'params') {
-        onParametersChange(
+        const params =
           newRowsData[requestTab.tab]
             ?.filter((row) => row.variable)
             .map((row) => ({
               id: row.endpointVariableId ?? row.id,
               name: row.variable!,
-              type: row.type ?? 'custom',
+              type: row.type ?? 'STRING',
               required: row.required ?? false,
+              mandatory: row.mandatory ?? false,
               value: row.value!,
+              description: row.description,
               operator: row.operator as RequestOperator,
-            })) ?? [],
-        );
+            })) ?? [];
+        onParametersChange(params);
+        // All named params need description; mandatory params also need a value
+        const hasViolation = params.some((p) => !p.description) || params.some((p) => p.mandatory && !p.value);
+        onMandatoryViolationChange?.(hasViolation);
+      }
+      return newRowsData;
+    });
+  };
+
+  const updateRowMandatory = (id: string, mandatory: boolean) => {
+    setRowsData((prevRowsData) => {
+      const newRowsData = { ...prevRowsData };
+      newRowsData[requestTab.tab] = [...(newRowsData[requestTab.tab] || [])];
+      newRowsData[requestTab.tab]!.forEach((row) => {
+        if (row.id !== id) return;
+        row.mandatory = mandatory;
+      });
+      if (endpoint.type === 'custom') {
+        newRowsData[requestTab.tab] = maintainSingleEmptyRow(newRowsData[requestTab.tab] || []);
+      }
+      updateEndpointData(newRowsData, endpoint);
+      // All named params need description; mandatory params also need a value
+      if (requestTab.tab === 'params') {
+        const namedRows = (newRowsData[requestTab.tab] ?? []).filter((row) => row.variable);
+        const hasViolation =
+          namedRows.some((row) => !row.description) || namedRows.some((row) => row.mandatory && !row.value);
+        onMandatoryViolationChange?.(hasViolation);
       }
       return newRowsData;
     });
@@ -212,9 +248,10 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
       const newVariable: EndpointVariableData = {
         id: row.endpointVariableId ?? row.id,
         name: row.variable ?? '',
-        type: row.type ?? 'custom',
+        type: row.type ?? 'STRING',
         required: row.required ?? false,
         value: row.value,
+        description: row.description,
         operator: requestTab.tab === EndpointTab.Params ? (row.operator as RequestOperator) || '=' : undefined,
       };
       variables.push(newVariable);
@@ -243,7 +280,7 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
   };
 
   const deleteVariable = (rowData: RequestVariablesRowData) => {
-    if (rowData.variable === undefined || rowData.value === undefined) return;
+    if (rowData.variable === undefined && rowData.value === undefined) return;
     const endpointData = endpoint.definitions[0];
     const defEndpoint = endpoint.definitions.find((x) => x.id === endpointData.id);
     const endpointTab = defEndpoint?.[requestTab.tab];
@@ -251,6 +288,8 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
     if (defEndpoint && endpointTab) {
       if (rowData.endpointVariableId && endpointTab.variables.map((v) => v.id).includes(rowData.endpointVariableId)) {
         endpointTab.variables = endpointTab.variables.filter((v) => v.id !== rowData.endpointVariableId);
+      } else if (rowData.variable) {
+        endpointTab.variables = endpointTab.variables.filter((v) => v.name !== rowData.variable);
       } else {
         endpointTab.variables
           .filter((variable) => ['schema', 'array'].includes(variable.type))
@@ -283,9 +322,10 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
       const newVariable: EndpointVariableData = {
         id: row.endpointVariableId ?? row.id,
         name: row.variable ?? '',
-        type: row.type ?? 'custom',
+        type: row.type ?? 'STRING',
         required: row.required ?? false,
         value: row.value,
+        description: row.description,
         operator: requestTab.tab === EndpointTab.Params ? (row.operator as RequestOperator) || '=' : undefined,
       };
       variables.push(newVariable);
@@ -318,6 +358,7 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
         setRowsData,
         updateRowField,
         updateOperator,
+        updateRowMandatory,
         requestValues,
         isLive,
         getTabsRowsData,
@@ -427,6 +468,20 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
                 pagination={pagination}
                 sorting={sorting}
                 withScrollWrapper={false}
+                alwaysShowPagination
+                renderSubRow={
+                  tab === EndpointTab.Params
+                    ? (row) => {
+                        return (
+                          <DescriptionCell
+                            row={row}
+                            description={row.original.description}
+                            updateRowDescription={(id, description) => updateRowField(id, 'description', description)}
+                          />
+                        );
+                      }
+                    : undefined
+                }
               />
               <hr style={{ margin: 0, borderTop: '1px solid #D2D3D8' }} />
             </>

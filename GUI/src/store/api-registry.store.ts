@@ -9,6 +9,7 @@ import {
 import api from 'services/api-dev';
 import { extractMapValues, getEndpointBody } from 'store/new-services.store';
 import { EndpointData } from 'types/endpoint';
+import { formatSchema } from 'utils/json-request-utils';
 import { v4 as uuid } from 'uuid';
 import { create } from 'zustand';
 
@@ -82,10 +83,12 @@ const useApiRegistryStore = create<ApiRegistryState>((set, get) => ({
         return {
           endpointId: row.endpointId,
           name: row.name,
+          description: row.description ?? '',
           type: row.type,
           isCommon: row.isCommon,
           serviceId: row.serviceId,
           definitions,
+          responseSchema: formatSchema(row.responseSchema),
         };
       });
       const verificationMap: Record<string, VerificationMetadata> = {};

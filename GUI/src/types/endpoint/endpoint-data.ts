@@ -10,5 +10,7 @@ export type EndpointData = {
   isNew?: boolean;
   hasTestEnv?: boolean;
   serviceId?: string;
+  description?: string;
   definitions: EndpointDefinition[];
+  responseSchema?: string;
 };
