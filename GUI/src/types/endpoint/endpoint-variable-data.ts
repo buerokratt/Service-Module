@@ -4,6 +4,7 @@ export type EndpointVariableData = {
   id: string;
   name: string;
   required?: boolean;
+  mandatory?: boolean;
   description?: string;
   type: string;
   operator?: RequestOperator;

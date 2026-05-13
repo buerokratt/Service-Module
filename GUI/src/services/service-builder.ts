@@ -4,12 +4,11 @@ import { Group, Rule } from 'components/FlowElementsPopup/RuleBuilder/types';
 import { format } from 'date-fns';
 import i18next, { t } from 'i18next';
 import { NodeHtmlMarkdown } from 'node-html-markdown';
-import { createEndpoint, createNewService, editService, updateEndpoint } from 'resources/api-constants';
+import { createNewService, editService } from 'resources/api-constants';
 import useServiceStore from 'store/new-services.store';
 import useToastStore from 'store/toasts.store';
 import { StepType } from 'types';
 import { Assign } from 'types/assign';
-import { EndpointData } from 'types/endpoint';
 import { NodeDataProps } from 'types/service-flow';
 import {
   decodeHtmlEntities,
@@ -167,59 +166,6 @@ export function buildAllServiceContents(
     flowData: fullFlowData,
     subServices,
   };
-}
-
-export async function saveEndpoints(endpoints: EndpointData[], onSuccess?: () => void, onError?: (e: any) => void) {
-  const tasks: Promise<any>[] = [];
-  const serviceId = useServiceStore.getState().serviceId;
-
-  for (const endpoint of endpoints) {
-    const selectedEndpointType = endpoint.definitions.find((e) => e.isSelected);
-    if (!selectedEndpointType) continue;
-    endpoint.serviceId = serviceId;
-    endpoint.isCommon = endpoint.isCommon ?? false;
-  }
-
-  endpoints.forEach((endpoint) => {
-    filterOutEndpointsTrailingUnderscores(endpoint);
-    if (endpoint.isNew) {
-      tasks.push(createEndpointAndUpdateState(endpoint));
-    } else {
-      tasks.push(
-        api.post(updateEndpoint(endpoint.endpointId), {
-          ...endpoint,
-          // Stringify needed for Resql to save nested data in a proper parsable format
-          definitions: JSON.stringify(endpoint.definitions),
-        }),
-      );
-    }
-  });
-
-  await Promise.all(tasks).then(onSuccess).catch(onError);
-}
-
-function filterOutEndpointsTrailingUnderscores(endpoint: EndpointData) {
-  if (endpoint.definitions) {
-    for (const definition of endpoint.definitions) {
-      for (const section of ['body', 'headers', 'params'] as const) {
-        if (definition[section]?.variables) {
-          for (const v of definition[section].variables) {
-            v.name = removeTrailingUnderscores(v.name);
-          }
-        }
-      }
-    }
-  }
-}
-
-async function createEndpointAndUpdateState(endpoint: EndpointData): Promise<any> {
-  const response = await api.post(createEndpoint(), {
-    ...endpoint,
-    // Stringify needed for Resql to save nested data in a proper parsable format
-    definitions: JSON.stringify(endpoint.definitions),
-  });
-  endpoint.isNew = false;
-  return response;
 }
 
 interface SaveFlowConfig {
@@ -735,6 +681,25 @@ function getBranchNodes(
   return branchNodes;
 }
 
+function replaceSpacesOutsideTags(input: string, placeholder: string): string {
+  let result = '';
+  let i = 0;
+  while (i < input.length) {
+    const ch = input[i];
+    if (ch === '<') {
+      const closingIndex = input.indexOf('>', i + 1);
+      if (closingIndex > i + 1) {
+        result += input.slice(i, closingIndex + 1);
+        i = closingIndex + 1;
+        continue;
+      }
+    }
+    result += ch === ' ' ? placeholder : ch;
+    i++;
+  }
+  return result;
+}
+
 function handleTextField(
   finishedFlow: Map<any, any>,
   parentStepName: string,
@@ -751,8 +716,12 @@ function handleTextField(
 
   const spacePlaceholder = '___SPACE___';
   const rawMessage = typeof parentNode.data.message === 'string' ? decodeHtmlEntities(parentNode.data.message) : '';
+  const rawMessageWithSpaceholders = replaceSpacesOutsideTags(
+    rawMessage.replaceAll('{{', '${').replaceAll('}}', '}'),
+    spacePlaceholder,
+  );
   const markdownMessage = htmlToMarkdown
-    .translate(rawMessage.replace('{{', '${').replace('}}', '}').replaceAll(' ', spacePlaceholder))
+    .translate(rawMessageWithSpaceholders)
     .replaceAll(spacePlaceholder, ' ')
     .replaceAll(/\\([-~>[\]_*#().!`=<\\])/g, String.raw`\\$1`);
 

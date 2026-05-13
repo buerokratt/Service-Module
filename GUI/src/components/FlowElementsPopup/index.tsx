@@ -4,7 +4,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { useTranslation } from 'react-i18next';
-import useServiceStore, { extractMapValues, getEndpointBody } from 'store/new-services.store';
+import useServiceStore from 'store/new-services.store';
 import useServiceListStore from 'store/services.store';
 import useToastStore from 'store/toasts.store';
 import { DynamicChoices } from 'types/dynamic-choices';
@@ -31,15 +31,12 @@ import DynamicChoicesContent from './DynamicChoicesContent';
 import EndConversationContent from './EndConversationContent';
 import FileGenerateContent from './FileGenerateContent';
 import FileSignContent from './FileSignContent';
-import JsonRequestContent from './JsonRequestContent';
 import MultiChoiceQuestionContent from './MultiChoiceQuestionContent';
 import OpenWebPageContent from './OpenWebPageContent';
 import OpenWebPageTestContent from './OpenWebPageTestContent';
 import RasaRulesContent from './RasaRulesContent';
 import TextfieldContent from './TextfieldContent';
 import TextfieldTestContent from './TextfieldTestContent';
-import { servicesRequestsExplain } from '../../resources/api-constants';
-import api from '../../services/api-dev';
 import { StepType } from '../../types';
 import { getInitialGroup, GroupOrRule } from './RuleBuilder/types';
 import './styles.scss';
@@ -48,17 +45,23 @@ const FlowElementsPopup: React.FC = () => {
   const { t } = useTranslation();
   const [selectedTab, setSelectedTab] = useState<string | null>(null);
   const [isSaveEnabled, setIsSaveEnabled] = useState(true);
-  const { isJsonRequestVisible, jsonRequestContent, setJsonRequestVisible, setJsonRequestContent } = useServiceStore();
   const node = useServiceStore((state) => state.selectedNode);
   const selectedService = useServiceListStore((state) => state.selectedService);
   const instance = useServiceStore.getState().reactFlowInstance;
-
-  const isUserDefinedNode = node?.data?.stepType === StepType.UserDefined;
 
   const serviceName = useServiceStore((state) => removeTrailingUnderscores(state.serviceNameDashed()));
   const rules = useServiceStore((state) => state.rules);
   const assignElements = useServiceStore((state) => state.assignElements);
   const endpointsVariables = useServiceStore((state) => state.endpointsResponseVariables);
+  const storeEndpoints = useServiceStore((state) => state.endpoints);
+
+  const enrichedNodeEndpoint = useMemo(() => {
+    const ep = node?.data?.endpoint;
+    if (!ep) return ep;
+    const storeEp = storeEndpoints.find((e) => e.endpointId === ep.endpointId);
+    const responseSchema = ep.responseSchema ?? storeEp?.responseSchema;
+    return responseSchema ? { ...ep, responseSchema } : ep;
+  }, [node?.data?.endpoint, storeEndpoints]);
   const stepType = node?.data.stepType;
 
   const mcqNodeNumber = useMemo(() => String(getLastDigits(node?.data.label ?? '')), [node?.data.label]);
@@ -166,8 +169,6 @@ const FlowElementsPopup: React.FC = () => {
 
   const onClose = () => {
     setSelectedTab(null);
-    setJsonRequestVisible(false);
-    setJsonRequestContent(null);
     setTextfieldMessage(null);
     setWebpageName(null);
     setWebpageUrl(null);
@@ -313,41 +314,6 @@ const FlowElementsPopup: React.FC = () => {
       : { ...getInitialGroup(), children: rulesArray };
   };
 
-  const handleJsonRequestClick = async () => {
-    if (isJsonRequestVisible) {
-      setJsonRequestVisible(false);
-      return;
-    }
-
-    try {
-      const endpoint = node.data.endpoint?.definitions[0];
-
-      if (!endpoint) return;
-
-      const response = await api.post(servicesRequestsExplain(), {
-        requests: [
-          {
-            url: endpoint.url,
-            method: endpoint.methodType,
-            headers: extractMapValues(endpoint.headers),
-            body: getEndpointBody(endpoint),
-            params: extractMapValues(endpoint.params),
-          },
-        ],
-      });
-      setJsonRequestContent(response.data.response);
-      setJsonRequestVisible(true);
-    } catch (error) {
-      console.error('Error: ', error);
-    }
-  };
-
-  const getJsonRequestButtonTitle = () => {
-    if (!isUserDefinedNode || selectedTab === t('serviceFlow.tabs.test')) return '';
-    if (isJsonRequestVisible) return t('serviceFlow.popup.hideJsonRequest');
-    return t('serviceFlow.popup.showJsonRequest');
-  };
-
   const saveMultiChoicePopup = (originalNode: Node<NodeDataProps>, updatedNode: Node<NodeDataProps>) => {
     if (!instance) return;
 
@@ -449,9 +415,6 @@ const FlowElementsPopup: React.FC = () => {
       onClose={onClose}
       footer={
         <Track direction="horizontal" gap={16} justify="between" style={{ width: '100%' }}>
-          <Button appearance="text" onClick={handleJsonRequestClick}>
-            {getJsonRequestButtonTitle()}
-          </Button>
           <Track gap={16}>
             {!isReadonly && (
               <Button appearance="secondary" onClick={onClose}>
@@ -548,7 +511,7 @@ const FlowElementsPopup: React.FC = () => {
             {stepType === StepType.UserDefined && (
               <ApiContent
                 node={node}
-                endpoint={node.data.endpoint}
+                endpoint={enrichedNodeEndpoint}
                 onEndpointChange={(endpoint) => {
                   if (!endpoint) return;
                   setNodeEndpoint(endpoint);
@@ -564,7 +527,6 @@ const FlowElementsPopup: React.FC = () => {
                 setIsSaveEnabled={setIsSaveEnabled}
               />
             )}
-            <JsonRequestContent isVisible={isJsonRequestVisible} jsonContent={jsonRequestContent} />
           </Tabs.Content>
           {!isReadonly && (
             <Tabs.Content value={t('serviceFlow.tabs.test')} className="vertical-tabs__body">

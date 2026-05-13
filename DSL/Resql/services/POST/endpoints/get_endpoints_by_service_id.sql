@@ -8,6 +8,7 @@ WITH UserPreferences AS (
 SELECT
   e.endpoint_id,
   e.name,
+  e.description,
   e.type,
   e.is_common,
   e.definitions
