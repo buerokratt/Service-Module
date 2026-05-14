@@ -71,7 +71,7 @@ mark_indexed:
     url: "[#SERVICE_RESQL]/endpoints/update_endpoint_llm_sync_status"
     body:
       endpointId: ${endpointId}
-      status: true
+      status: SUCCESS
   result: update_res
   next: return_ok
 
@@ -81,7 +81,7 @@ mark_failed_llm_call:
     url: "[#SERVICE_RESQL]/endpoints/update_endpoint_llm_sync_status"
     body:
       endpointId: ${endpointId}
-      status: false
+      status: FAILED
   result: update_res
   next: log_llm_failure
 
@@ -95,7 +95,7 @@ mark_failed_not_found:
     url: "[#SERVICE_RESQL]/endpoints/update_endpoint_llm_sync_status"
     body:
       endpointId: ${endpointId}
-      status: false
+      status: FAILED
   result: update_res
   next: return_not_found
 

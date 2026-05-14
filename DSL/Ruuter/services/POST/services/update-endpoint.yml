@@ -76,7 +76,7 @@ mark_llm_sync_failed:
     url: "[#SERVICE_RESQL]/endpoints/update_endpoint_llm_sync_status"
     body:
       endpointId: ${id}
-      status: false
+      status: FAILED
   result: update_sync_res
   next: log_index_llm_failure
 

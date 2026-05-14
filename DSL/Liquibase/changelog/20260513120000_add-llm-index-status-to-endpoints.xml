@@ -6,9 +6,9 @@
     http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
 
     <changeSet id="20260513120000" author="ruwiniRathnamalala">
-        <sqlFile path="changelog/migrations/20260513120000_add-is-llm-synced-to-endpoints.sql" />
+        <sqlFile path="changelog/migrations/20260513120000_add-llm-index-status-to-endpoints.sql" splitStatements="false" />
         <rollback>
-            <sqlFile path="changelog/migrations/rollback/20260513120000_add-is-llm-synced-to-endpoints_rollback.sql" />
+            <sqlFile path="changelog/migrations/rollback/20260513120000_add-llm-index-status-to-endpoints_rollback.sql" />
         </rollback>
     </changeSet>
 
