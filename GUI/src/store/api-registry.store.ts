@@ -4,6 +4,7 @@ import {
   createEndpoint,
   deleteEndpoint as deleteEndpointUrl,
   getAllEndpoints,
+  reindexEndpointUrl,
   testEndpointUrl,
 } from 'resources/api-constants';
 import api from 'services/api-dev';
@@ -34,6 +35,7 @@ interface ApiRegistryState {
   testEndpoint: (endpoint: EndpointData) => Promise<void>;
   copyEndpoint: (endpoint: EndpointData) => Promise<void>;
   deleteEndpoint: (endpoint: EndpointData) => Promise<void>;
+  reIndexEndpoint: (endpointId: string) => Promise<void>;
   addEndpointAfterCreate: (endpoint: EndpointData) => void;
   updateEndpointInList: (endpoint: EndpointData) => void;
 }
@@ -257,6 +259,17 @@ const useApiRegistryStore = create<ApiRegistryState>((set, get) => ({
       useToastStore.getState().success({ title: t('apiRegistry.deleteSuccess') });
     } catch {
       useToastStore.getState().error({ title: t('apiRegistry.deleteError') });
+    }
+  },
+
+  reIndexEndpoint: async (endpointId) => {
+    try {
+      await api.post(reindexEndpointUrl(), { endpointId });
+      const { pagination, sorting, search } = get();
+      await get().loadEndpoints(pagination, sorting, search);
+      useToastStore.getState().success({ title: t('global.notificationSuccess') });
+    } catch {
+      useToastStore.getState().error({ title: t('global.notificationError') });
     }
   },
 

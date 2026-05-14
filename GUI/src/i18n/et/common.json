@@ -699,6 +699,7 @@
       "lastTest": "Viimane test",
       "status": "Staatus",
       "schema": "Skeem",
+      "llmIndexStatus": "LLM indekseerimise staatus",
       "actions": "Tegevused"
     },
     "tooltip": {
@@ -716,9 +717,12 @@
       "copy": "Kopeeri",
       "test": "Testi",
       "edit": "Muuda",
-      "delete": "Kustuta"
+      "delete": "Kustuta",
+      "retryIndexing": "Proovi indekseerimist uuesti",
+      "reIndex": "Indeks"
     },
     "deleteConfirm": "Kas olete kindel, et soovite selle otspunkti kustutada?",
+    "reIndexConfirm": "Indekseerida see otspunkt uuesti?",
     "noSchema": "—",
     "noLastTest": "—",
     "copySuccess": "Otspunkt kopeeritud",

@@ -188,6 +188,7 @@ const ApiRegistryTable: React.FC<ApiRegistryTableProps> = ({
   onTest,
   onCopy,
   testingId,
+  onReIndex
 }) => {
   if (loading) {
     return <p>{t('global.loading')}</p>;
@@ -266,6 +267,7 @@ const ApiRegistryTable: React.FC<ApiRegistryTableProps> = ({
               const meta = verificationMap[endpoint.endpointId];
               const schemaCaptured = meta?.schemaCaptured ?? false;
               const isTesting = testingId === endpoint.endpointId;
+
               return (
                 <tr key={endpoint.endpointId}>
                   <td style={{ overflow: 'hidden' }}>
