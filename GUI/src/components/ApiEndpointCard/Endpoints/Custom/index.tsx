@@ -1,7 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import useServiceStore from 'store/new-services.store';
+import useServiceStore, { extractMapValues, getEndpointBody } from 'store/new-services.store';
+import useToastStore from 'store/toasts.store';
 import { RequestOperator } from 'types/endpoint/request-operator';
+import { generateJsonRequest } from 'utils/json-request-utils';
 import { v4 as uuid } from 'uuid';
 
 import { Button, FormInput, FormSelect, RequestVariables, Track } from '../../..';
@@ -9,12 +11,26 @@ import { RequestTab } from '../../../../types';
 import { EndpointData, EndpointVariableData, PreDefinedEndpointEnvVariables } from '../../../../types/endpoint';
 import { useTheme } from '../../../../utils/useTheme';
 
+export type TestPayload = {
+  request: {
+    url: string | undefined;
+    method: string;
+    headers: Record<string, string>;
+    params: Record<string, string>;
+    body: unknown;
+  };
+  responseBody: unknown;
+};
+
 type EndpointCustomProps = {
   endpoint: EndpointData;
   isLive: boolean;
   requestValues: PreDefinedEndpointEnvVariables;
   requestTab: RequestTab;
   setRequestTab: React.Dispatch<React.SetStateAction<RequestTab>>;
+  onTestSuccess?: (payload: TestPayload) => void;
+  onDescriptionChange?: (description: string) => void;
+  onMandatoryViolationChange?: (hasViolation: boolean) => void;
 };
 
 const EndpointCustom: React.FC<EndpointCustomProps> = ({
@@ -23,11 +39,17 @@ const EndpointCustom: React.FC<EndpointCustomProps> = ({
   requestValues,
   requestTab,
   setRequestTab,
+  onTestSuccess,
+  onDescriptionChange,
+  onMandatoryViolationChange,
 }) => {
   const { t } = useTranslation();
   const [key, setKey] = useState<number>(0);
-  const { setEndpoints, triggerJsonRequest } = useServiceStore();
+  const { setEndpoints } = useServiceStore();
   const ref = useRef<HTMLInputElement>(null);
+  const [isTesting, setIsTesting] = useState(false);
+  const [responseContent, setResponseContent] = useState<string | null>(endpoint.responseSchema ?? null);
+  const [isResponseOpen, setIsResponseOpen] = useState(!!endpoint.responseSchema);
 
   // initial endpoint data
   if (endpoint.definitions.length === 0) {
@@ -65,7 +87,28 @@ const EndpointCustom: React.FC<EndpointCustomProps> = ({
   const theme = useTheme();
 
   const handleJsonRequestClick = () => {
-    triggerJsonRequest(endpoint);
+    setIsTesting(true);
+    const def = endpoint.definitions[0];
+    const request = {
+      url: def.url,
+      method: def.methodType,
+      headers: extractMapValues(def.headers) as Record<string, string>,
+      params: extractMapValues(def.params) as Record<string, string>,
+      body: getEndpointBody(def),
+    };
+    generateJsonRequest(def)
+      .then((content) => {
+        const schema = JSON.stringify(content, undefined, 4);
+        setResponseContent(schema);
+        endpoint.responseSchema = schema;
+        setIsResponseOpen(true);
+        useToastStore.getState().success({ title: t('newService.endpoint.success') });
+        onTestSuccess?.({ request, responseBody: content });
+      })
+      .catch((error) => {
+        useToastStore.getState().error({ title: error.message ?? t('newService.endpoint.error') });
+      })
+      .finally(() => setIsTesting(false));
   };
 
   const refereshEndpoint = () => {
@@ -75,6 +118,21 @@ const EndpointCustom: React.FC<EndpointCustomProps> = ({
 
   return (
     <Track direction="vertical" align="stretch" gap={16}>
+      <div>
+        <label htmlFor="endpointDescription" style={{ color: `${theme === 'dark' ? 'white' : 'black'}` }}>
+          {t('newService.description')}
+        </label>
+        <FormInput
+          name="endpointDescription"
+          label=""
+          placeholder={t('newService.endpoint.insertDescription') ?? ''}
+          defaultValue={endpoint.description ?? ''}
+          onChange={(e) => {
+            endpoint.description = e.target.value;
+            onDescriptionChange?.(e.target.value);
+          }}
+        />
+      </div>
       <div>
         <label htmlFor="endpointUrl" style={{ color: `${theme === 'dark' ? 'white' : 'black'}` }}>
           {t('newService.endpoint.url')}
@@ -128,7 +186,6 @@ const EndpointCustom: React.FC<EndpointCustomProps> = ({
               placeholder={t('newService.endpoint.insert') ?? ''}
             />
           </Track>
-          <Button onClick={handleJsonRequestClick}>{t('newService.test')}</Button>
         </Track>
       </div>
       <RequestVariables
@@ -138,7 +195,7 @@ const EndpointCustom: React.FC<EndpointCustomProps> = ({
         endpoint={endpoint}
         requestTab={requestTab}
         setRequestTab={setRequestTab}
-        parentEndpointId={endpoint.endpointId}
+        onMandatoryViolationChange={onMandatoryViolationChange}
         onParametersChange={(parameters) => {
           const url = new URL(endpoint.definitions[0].url ?? '');
           const baseUrl = `${url.origin}${url.pathname}`;
@@ -162,6 +219,53 @@ const EndpointCustom: React.FC<EndpointCustomProps> = ({
           }
         }}
       />
+      <Track justify="end">
+        <Button appearance={isTesting ? 'loading' : 'primary'} onClick={handleJsonRequestClick}>
+          {t('newService.test')}
+        </Button>
+      </Track>
+      <div>
+        <button
+          type="button"
+          onClick={() => setIsResponseOpen((o) => !o)}
+          style={{
+            width: '100%',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            background: 'none',
+            border: 'none',
+            borderTop: '1px solid #D2D3D8',
+            padding: '8px 4px',
+            cursor: 'pointer',
+            fontWeight: 600,
+            fontSize: 14,
+            color: theme === 'dark' ? 'white' : '#34394C',
+          }}
+        >
+          <span>{t('newService.endpoint.response')}</span>
+          <span>{isResponseOpen ? '▲' : '▼'}</span>
+        </button>
+        {isResponseOpen && (
+          <textarea
+            readOnly
+            value={responseContent ?? ''}
+            placeholder="{...}"
+            style={{
+              width: '100%',
+              minHeight: 100,
+              resize: 'vertical',
+              fontFamily: 'monospace',
+              fontSize: 13,
+              padding: '8px',
+              border: '1px solid #D2D3D8',
+              borderRadius: 4,
+              backgroundColor: '#F0F0F2',
+              boxSizing: 'border-box',
+            }}
+          />
+        )}
+      </div>
     </Track>
   );
 };
@@ -177,9 +281,9 @@ function parseURL(url: string) {
       .filter(Boolean)
       .forEach((segment) => {
         const { index, token } = findOperators(segment);
-        const name = decodeURIComponent(index !== -1 ? segment.slice(0, index) : segment);
-        const value = decodeURIComponent(index !== -1 ? segment.slice(index + token.length) : '');
-        const operator = index !== -1 ? token : '=';
+        const name = decodeURIComponent(index === -1 ? segment : segment.slice(0, index));
+        const value = decodeURIComponent(index === -1 ? '' : segment.slice(index + token.length));
+        const operator = index === -1 ? '=' : token;
         if (name) {
           params[name] = value;
           operators[name] = operator;

@@ -2,7 +2,7 @@
 {{#each data.botMessages}}
   {
    "chatId": "{{../data.chatId}}",
-  "content": "{{{filterControlCharacters (escapeQuotes result)}}}",
+   "content": "{{#if (isType 'string' result)}}{{{filterControlCharacters (escapeQuotes result)}}}{{else}}{{result}}{{/if}}",
    "buttons": "[{{#each ../data.buttons}}{\"title\": \"{{#if (eq title true)}}Yes{{else if (eq title false)}}No{{else}}{{{title}}}{{/if}}\",\"payload\": \"{{{payload}}}\"}{{#unless @last}},{{/unless}}{{/each}}]",
    "authorTimestamp": "{{../data.authorTimestamp}}",
    "authorId": "{{../data.authorId}}",

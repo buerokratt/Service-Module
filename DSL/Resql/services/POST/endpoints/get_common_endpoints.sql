@@ -2,6 +2,7 @@ SELECT
   endpoint_id,
   service_id,
   name,
+  description,
   type,
   is_common,
   definitions,

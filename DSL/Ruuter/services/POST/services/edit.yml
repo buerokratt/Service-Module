@@ -195,6 +195,9 @@ assign_values:
     service_type: ${old_service_result.response.body[0].type}
     old_storage_file_name: ${'service_' + id + '_' + old_service_result.response.body[0].name.replace(/[^a-zA-Z0-9._-]/g, '_')}
     new_storage_file_name: ${'service_' + id + '_' + name.replace(/[^a-zA-Z0-9._-]/g, '_')}
+    old_ext: "${old_service_result.response.body[0].state === 'active' ? 'yml' : 'tmp'}"
+    new_state_dir: "${(state ?? old_service_result.response.body[0].state) === 'active' ? 'active' : 'draft'}"
+    new_ext: "${(state ?? old_service_result.response.body[0].state) === 'active' ? 'yml' : 'tmp'}"
 
 check_new_structure:
   switch:
@@ -224,7 +227,7 @@ delete_old_main_file:
   args:
     url: "[#SERVICE_DMAPPER]/file-manager/delete"
     body:
-      file_path: "[#RUUTER_SERVICES_PATH]/${type}/[#RUUTER_SERVICES_DIR_PATH]/${old_state}/${old_name}.tmp"
+      file_path: "[#RUUTER_SERVICES_PATH]/${type}/[#RUUTER_SERVICES_DIR_PATH]/${old_state}/${old_name}.${old_ext}"
   result: delete_old_main_result
   next: service_edit
 
@@ -233,8 +236,8 @@ rename_dsl:
   args:
     url: "[#SERVICE_DMAPPER]/file-manager/move"
     body:
-      file_path: "[#RUUTER_SERVICES_PATH]/${type}/[#RUUTER_SERVICES_DIR_PATH]/${old_state}/${old_name}.tmp"
-      new_path: "[#RUUTER_SERVICES_PATH]/${type}/[#RUUTER_SERVICES_DIR_PATH]/${old_state}/${name}.tmp"
+      file_path: "[#RUUTER_SERVICES_PATH]/${type}/[#RUUTER_SERVICES_DIR_PATH]/${old_state}/${old_name}.${old_ext}"
+      new_path: "[#RUUTER_SERVICES_PATH]/${type}/[#RUUTER_SERVICES_DIR_PATH]/${new_state_dir}/${name}.${new_ext}"
   result: results
 
 service_edit:

@@ -259,19 +259,19 @@ const ApiRegistryTable: React.FC<ApiRegistryTableProps> = ({
           <tbody>
             {endpoints.map((endpoint) => {
               const def = endpoint.definitions?.[0];
-              const label = def?.label || endpoint.name || '';
+              const displayName = endpoint.name;
               const meta = verificationMap[endpoint.endpointId];
               const schemaCaptured = meta?.schemaCaptured ?? false;
               const isTesting = testingId === endpoint.endpointId;
               return (
                 <tr key={endpoint.endpointId}>
                   <td style={{ overflow: 'hidden' }}>
-                    <Tooltip content={<EndpointTooltipContent def={def} name={label} />}>
+                    <Tooltip content={<EndpointTooltipContent def={def} name={displayName} />}>
                       <span
                         style={{ display: 'flex', alignItems: 'center', gap: 4, cursor: 'pointer', overflow: 'hidden' }}
                       >
                         <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                          {label}
+                          {displayName}
                         </span>
                         <Icon icon={<MdInfoOutline />} size="small" style={{ color: '#3f82ff', flexShrink: 0 }} />
                       </span>

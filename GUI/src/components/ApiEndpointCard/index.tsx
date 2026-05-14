@@ -7,18 +7,24 @@ import { EndpointType } from 'types/endpoint/endpoint-type';
 import { removeTrailingUnderscores } from 'utils/string-util';
 
 import { EndpointCustom, EndpointOpenAPI, FormInput, FormSelect, Switch, Track } from '..';
+import { TestPayload } from './Endpoints/Custom';
 import { RequestTab } from '../../types';
 import { EndpointData, EndpointEnv, EndpointTab } from '../../types/endpoint';
 import { Option } from '../../types/option';
 
 type EndpointCardProps = {
   endpoint: EndpointData;
-  isDeletable?: boolean;
   isNameDisabled?: boolean;
   showCommonSwitch?: boolean;
   onNameChange?: (name: string) => void;
   onNameExists?: (exists: boolean) => void;
   onCommonChange?: (isCommon: boolean) => void;
+  /** When provided (e.g. API Registry async check), overrides the internal duplicate-name check. */
+  overrideNameExists?: boolean;
+  onTestSuccess?: (payload: TestPayload) => void;
+  onTypeChange?: (type: string) => void;
+  onDescriptionChange?: (description: string) => void;
+  onMandatoryViolationChange?: (hasViolation: boolean) => void;
 };
 
 const ApiEndpointCard: FC<EndpointCardProps> = ({
@@ -28,6 +34,11 @@ const ApiEndpointCard: FC<EndpointCardProps> = ({
   onNameExists,
   onNameChange,
   onCommonChange,
+  overrideNameExists,
+  onTestSuccess,
+  onTypeChange,
+  onDescriptionChange,
+  onMandatoryViolationChange,
 }) => {
   const { changeServiceEndpointType, getAvailableRequestValues } = useServiceStore();
   const [selectedTab, setSelectedTab] = useState<EndpointEnv>(EndpointEnv.Live);
@@ -81,6 +92,7 @@ const ApiEndpointCard: FC<EndpointCardProps> = ({
                     setOption(selection);
                     endpoint.type = selection?.value as EndpointType;
                     changeServiceEndpointType(endpoint, (selection?.value ?? 'custom') as EndpointType);
+                    onTypeChange?.(selection?.value ?? '');
                   }}
                   defaultValue={option?.value}
                 />
@@ -99,22 +111,23 @@ const ApiEndpointCard: FC<EndpointCardProps> = ({
                     disabled={isNameDisabled || selectedTab === EndpointEnv.Test}
                     onChange={(e) => {
                       const sanitizedValue = e.target.value
-                        .replace(/[^a-zA-Z0-9_\s]/g, '')
-                        .replace(/\s+/g, '_')
-                        .replace(/_+/g, '_');
+                        .replaceAll(/[^a-zA-Z0-9_\s]/g, '')
+                        .replaceAll(/\s+/g, '_')
+                        .replaceAll(/_+/g, '_');
 
                       setEndpointName(sanitizedValue);
                       const endpointsNames = useServiceStore
                         .getState()
                         .endpoints.map((ep) => ep.name)
                         .filter((name) => name !== endpoint.name);
-                      const isNameExist = endpointsNames.includes(e.target.value);
+                      const normalizedInput = removeTrailingUnderscores(sanitizedValue);
+                      const isNameExist = endpointsNames.includes(normalizedInput);
                       setNameExists(isNameExist);
                       onNameExists?.(isNameExist);
-                      onNameChange?.(removeTrailingUnderscores(sanitizedValue));
+                      onNameChange?.(normalizedInput);
                     }}
                   />
-                  {nameExists && (
+                  {(overrideNameExists ?? nameExists) && (
                     <span style={{ color: 'red', fontSize: '13px' }}>{t('newService.endpoint.nameAlreadyExists')}</span>
                   )}
                 </div>
@@ -126,6 +139,9 @@ const ApiEndpointCard: FC<EndpointCardProps> = ({
                   requestTab={requestTab}
                   setRequestTab={setRequestTab}
                   requestValues={requestValues}
+                  onTestSuccess={onTestSuccess}
+                  onDescriptionChange={onDescriptionChange}
+                  onMandatoryViolationChange={onMandatoryViolationChange}
                 />
               )}
               {option?.value === 'custom' && (
@@ -135,6 +151,9 @@ const ApiEndpointCard: FC<EndpointCardProps> = ({
                   requestTab={requestTab}
                   setRequestTab={setRequestTab}
                   requestValues={requestValues}
+                  onTestSuccess={onTestSuccess}
+                  onDescriptionChange={onDescriptionChange}
+                  onMandatoryViolationChange={onMandatoryViolationChange}
                 />
               )}
               {showCommonSwitch && option?.value && (
