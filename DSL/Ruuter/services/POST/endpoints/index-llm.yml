@@ -61,7 +61,7 @@ call_llm_index:
 
 check_llm_result:
   switch:
-    - condition: ${200 <= llm_result.response.statusCodeValue && llm_result.response.statusCodeValue < 300 && llm_result.response.body.response.success === true}
+    - condition: ${llm_result != null && llm_result.response != null && 200 <= llm_result.response.statusCodeValue && llm_result.response.statusCodeValue < 300 && llm_result.response.body.response.success === true}
       next: mark_indexed
   next: mark_failed_llm_call
 
@@ -105,13 +105,13 @@ return_ok:
   next: end
 
 return_failed:
-  status: 502
-  return: "LLM indexing failed"
+  status: 200
+  return: "LLM indexing failed (non-fatal)"
   next: end
 
 return_not_found:
-  status: 404
-  return: "Endpoint not found"
+  status: 200
+  return: "Endpoint not found, LLM indexing skipped (non-fatal)"
   next: end
 
 return_bad_request:

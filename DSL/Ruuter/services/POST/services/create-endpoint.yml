@@ -57,7 +57,7 @@ call_index_llm:
 
 check_index_llm_result:
   switch:
-    - condition: ${200 <= index_llm_result.response.statusCodeValue && index_llm_result.response.statusCodeValue < 300}
+    - condition: ${index_llm_result != null && index_llm_result.response != null && 200 <= index_llm_result.response.statusCodeValue && index_llm_result.response.statusCodeValue < 300}
       next: return_ok
   next: mark_llm_sync_failed
 
