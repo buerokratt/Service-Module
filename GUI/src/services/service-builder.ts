@@ -681,6 +681,25 @@ function getBranchNodes(
   return branchNodes;
 }
 
+function replaceSpacesOutsideTags(input: string, placeholder: string): string {
+  let result = '';
+  let i = 0;
+  while (i < input.length) {
+    const ch = input[i];
+    if (ch === '<') {
+      const closingIndex = input.indexOf('>', i + 1);
+      if (closingIndex > i + 1) {
+        result += input.slice(i, closingIndex + 1);
+        i = closingIndex + 1;
+        continue;
+      }
+    }
+    result += ch === ' ' ? placeholder : ch;
+    i++;
+  }
+  return result;
+}
+
 function handleTextField(
   finishedFlow: Map<any, any>,
   parentStepName: string,
@@ -697,8 +716,12 @@ function handleTextField(
 
   const spacePlaceholder = '___SPACE___';
   const rawMessage = typeof parentNode.data.message === 'string' ? decodeHtmlEntities(parentNode.data.message) : '';
+  const rawMessageWithSpaceholders = replaceSpacesOutsideTags(
+    rawMessage.replaceAll('{{', '${').replaceAll('}}', '}'),
+    spacePlaceholder,
+  );
   const markdownMessage = htmlToMarkdown
-    .translate(rawMessage.replace('{{', '${').replace('}}', '}').replaceAll(' ', spacePlaceholder))
+    .translate(rawMessageWithSpaceholders)
     .replaceAll(spacePlaceholder, ' ')
     .replaceAll(/\\([-~>[\]_*#().!`=<\\])/g, String.raw`\\$1`);
 
