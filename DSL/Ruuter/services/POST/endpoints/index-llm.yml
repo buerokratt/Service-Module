@@ -49,7 +49,7 @@ assign_params:
 call_llm_index:
   call: http.post
   args:
-    url: "[#LLM_RAG_URL]/api-tools/index"
+    url: "[#LLM_RUUTER_PUBLIC]/api-tools/index"
     body:
       endpointId: ${endpoint.endpointId ?? endpointId}
       name: ${endpoint.name}
