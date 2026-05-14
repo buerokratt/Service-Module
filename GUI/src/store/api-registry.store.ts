@@ -80,6 +80,15 @@ const useApiRegistryStore = create<ApiRegistryState>((set, get) => ({
         } catch {
           definitions = []; // malformed JSON — fall back to empty definitions
         }
+        // Normalize llm index status from various API shapes (snake_case or camelCase)
+        const rawLlm = row.llm_index_status ?? row.llmIndexStatus ?? row.llmIndexstatus ?? null;
+        const normalizedLlm = rawLlm && typeof rawLlm !== 'object'
+          ? String(rawLlm).trim().toUpperCase()
+          : null;
+        const allowed = normalizedLlm === 'SUCCESS' || normalizedLlm === 'FAILED' || normalizedLlm === 'IN_PROGRESS'
+          ? normalizedLlm
+          : null;
+
         return {
           endpointId: row.endpointId,
           name: row.name,
@@ -88,6 +97,7 @@ const useApiRegistryStore = create<ApiRegistryState>((set, get) => ({
           serviceId: row.serviceId,
           definitions,
           responseSchema: formatSchema(row.responseSchema),
+          llm_index_status: allowed,
         };
       });
       const verificationMap: Record<string, VerificationMetadata> = {};
