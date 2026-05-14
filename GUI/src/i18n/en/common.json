@@ -89,6 +89,11 @@
     "openIcon": "Open menu icon",
     "closeIcon": "Close menu icon"
   },
+  "multiDomains": {
+    "chooseDomain": "Select domain:",
+    "allDomains": "All",
+    "noDomains": "No domains available. Please contact your system administrator."
+  },
   "intents": {
     "entities": "Entities",
     "regex": "Regex",
