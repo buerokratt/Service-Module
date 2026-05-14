@@ -11,7 +11,8 @@ import {
 } from '@xyflow/react';
 import { AxiosResponse } from 'axios';
 import { GroupOrRule } from 'components/FlowElementsPopup/RuleBuilder/types';
-import i18next, { t } from 'i18next';
+import i18next from 'i18next';
+
 import {
   getCommonEndpoints,
   getEndpointValidation,
@@ -35,9 +36,13 @@ import {
 } from 'types/endpoint';
 import { EndpointResponseVariable } from 'types/endpoint/endpoint-response-variables';
 import { EndpointType } from 'types/endpoint/endpoint-type';
-import { RequestVariablesTabsRawData, RequestVariablesTabsRowsData } from 'types/request-variables';
+import {
+  RequestVariablesRowData,
+  RequestVariablesTabsRawData,
+  RequestVariablesTabsRowsData,
+} from 'types/request-variables';
 import { initialEdges, initialNodes, NodeDataProps } from 'types/service-flow';
-import { generateJsonRequest } from 'utils/json-request-utils';
+import { formatSchema, generateJsonRequest } from 'utils/json-request-utils';
 import { v4 as uuid } from 'uuid';
 import { create } from 'zustand';
 
@@ -138,11 +143,6 @@ export interface ServiceStoreState {
   enableTestButton: () => void;
   handlePopupSave: (updatedNode: Node<NodeDataProps>) => void;
   testUrl: (endpoint: EndpointData, onError: () => void, onSuccess: () => void) => Promise<void>;
-  isJsonRequestVisible: boolean;
-  jsonRequestContent: any;
-  setJsonRequestVisible: (visible: boolean) => void;
-  setJsonRequestContent: (content: any) => void;
-  triggerJsonRequest: (endpoint: EndpointData) => void;
   setEndpoints: (callback: (prev: EndpointData[]) => EndpointData[]) => void;
   reactFlowInstance: ReactFlowInstance | null;
   setReactFlowInstance: (reactFlowInstance: ReactFlowInstance | null) => void;
@@ -185,6 +185,37 @@ const cloneAssignElement = (element: Assign): Assign => {
     slots: clonedSlots as Assign['slots'],
     data: deepCloneValue(element.data),
   };
+};
+
+const addMissingVariables = (
+  keyedDefEndpoint: EndpointDefinition[EndpointTab] | undefined,
+  rows: RequestVariablesRowData[],
+) => {
+  for (const row of rows) {
+    if (row.endpointVariableId || !row.variable) continue;
+    if (keyedDefEndpoint?.variables.map((e) => e.name).includes(row.variable)) continue;
+    keyedDefEndpoint?.variables.push({
+      id: uuid(),
+      name: row.variable,
+      type: row.type ?? 'STRING',
+      required: false,
+      value: row.value,
+      description: row.description,
+    });
+  }
+};
+
+const syncExistingVariables = (
+  keyedDefEndpoint: EndpointDefinition[EndpointTab] | undefined,
+  rows: RequestVariablesRowData[],
+) => {
+  for (const variable of keyedDefEndpoint?.variables ?? []) {
+    const updated = rows.find((r) => r.endpointVariableId === variable.id);
+    variable.name = updated?.variable ?? variable.name;
+    variable.value = updated?.value ?? variable.value;
+    if (updated?.type !== undefined) variable.type = updated.type;
+    if (updated?.description !== undefined) variable.description = updated.description;
+  }
 };
 
 const useServiceStore = create<ServiceStoreState>((set, get) => ({
@@ -428,12 +459,20 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
       serviceResponse = await api.post<Service>(getServiceById(), { id, search: search ?? '' });
 
       const structure = JSON.parse(serviceResponse.data.structure?.value ?? '{}');
-      let endpoints = serviceResponse.data.endpoints.map((endpoint) => {
-        return {
-          ...endpoint,
-          definitions: JSON.parse(endpoint.definitions.value),
-        };
-      });
+      let endpoints = serviceResponse.data.endpoints.map(
+        (
+          endpoint: Pick<
+            EndpointData,
+            'endpointId' | 'name' | 'type' | 'isCommon' | 'fileName' | 'description' | 'serviceId'
+          > & { definitions: EndpointDefinitionJson; responseSchema?: unknown },
+        ) => {
+          return {
+            ...endpoint,
+            definitions: JSON.parse(endpoint.definitions.value),
+            responseSchema: formatSchema(endpoint.responseSchema),
+          };
+        },
+      );
       let edges = structure?.edges;
       nodes = structure?.nodes;
 
@@ -454,6 +493,13 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
         };
         return node;
       });
+
+      /*The structuredClone approach failed with DataCloneError because flow nodes contain function references 
+      (onDelete, onEdit, setClickedNode, update), 
+      which cannot be cloned by the structured clone algorithm. 
+      The JSON.parse(JSON.stringify()) method is used here to strip functions from nodes before saving to history, 
+      which are then manually re-attached during undo/redo operations.
+      Therefore ignore sonar issue warning in PR */
 
       const initialHistoryState = {
         nodes: JSON.parse(JSON.stringify(nodes)),
@@ -506,19 +552,21 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
     const response = await api.post(getCommonEndpoints(), {
       pagination: isPagination,
       page,
-      pageSize,
+      page_size: pageSize,
       sorting,
       search,
     });
     const endpointsResponse: Array<
       Pick<EndpointData, 'endpointId' | 'name' | 'type' | 'fileName' | 'isCommon'> & {
         definitions: EndpointDefinitionJson;
+        responseSchema?: unknown;
       }
     > = response.data.response;
     let endpoints = endpointsResponse.map((endpoint) => {
       return {
         ...endpoint,
         definitions: JSON.parse(endpoint.definitions.value),
+        responseSchema: formatSchema(endpoint.responseSchema),
       };
     });
 
@@ -641,27 +689,9 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
 
     for (const key in data) {
       const keyedDefEndpoint = defEndpoint[key as EndpointTab];
-      for (const row of data[key as EndpointTab] ?? []) {
-        if (
-          !row.endpointVariableId &&
-          row.variable &&
-          !keyedDefEndpoint?.variables.map((e) => e.name).includes(row.variable)
-        ) {
-          keyedDefEndpoint?.variables.push({
-            id: uuid(),
-            name: row.variable,
-            type: 'custom',
-            required: false,
-            value: row.value,
-          });
-        }
-      }
-
-      for (const variable of keyedDefEndpoint?.variables ?? []) {
-        const updatedVariable = data[key as EndpointTab]!.find((updated) => updated.endpointVariableId === variable.id);
-        variable.name = updatedVariable?.variable ?? variable.name;
-        variable.value = updatedVariable?.value ?? variable.value;
-      }
+      const rows = data[key as EndpointTab] ?? [];
+      addMissingVariables(keyedDefEndpoint, rows);
+      syncExistingVariables(keyedDefEndpoint, rows);
     }
 
     endpoint.definitions[0] = defEndpoint;
@@ -835,24 +865,7 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
   cancelNavigation: () => {
     set({ nextLocation: null });
   },
-  isJsonRequestVisible: false,
-  jsonRequestContent: null,
-  setJsonRequestVisible: (visible: boolean) => set({ isJsonRequestVisible: visible }),
-  setJsonRequestContent: (content: any) => set({ jsonRequestContent: content }),
-  triggerJsonRequest: (endpoint: EndpointData) => {
-    generateJsonRequest(endpoint.definitions[0])
-      .then((content) => {
-        set({ jsonRequestContent: content, isJsonRequestVisible: true });
-        useToastStore.getState().success({
-          title: t('newService.endpoint.success'),
-        });
-      })
-      .catch((error) => {
-        useToastStore.getState().error({
-          title: error.message ?? t('newService.endpoint.error'),
-        });
-      });
-  },
+
   saveToHistory: (stateOverride?: { nodes: Node[]; edges: Edge[] }) => {
     const { nodes, edges, history, historyIndex } = get();
 
