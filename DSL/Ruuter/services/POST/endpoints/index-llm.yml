@@ -106,12 +106,12 @@ return_ok:
 
 return_failed:
   status: 200
-  return: "LLM indexing failed (non-fatal)"
+  return: "LLM indexing failed"
   next: end
 
 return_not_found:
   status: 200
-  return: "Endpoint not found, LLM indexing skipped (non-fatal)"
+  return: "Endpoint not found, LLM indexing skipped"
   next: end
 
 return_bad_request:
