@@ -60,7 +60,7 @@ const EndpointOpenAPI: React.FC<EndpointOpenAPIProps> = ({
   const theme = useTheme();
 
   // Adding "key" dependency breaks focus in variable inputs
-   
+
   useEffect(() => setKey((prevKey) => prevKey + 1), [isLive]);
 
   const handleTestClick = () => {
