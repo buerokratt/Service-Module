@@ -521,6 +521,7 @@ const FlowElementsPopup: React.FC = () => {
             {stepType === StepType.MultiChoiceQuestion && (
               <MultiChoiceQuestionContent
                 question={multiChoiceQuestionQuestion}
+                defaultQuestion={node.data.multiChoiceQuestion?.question ?? multiChoiceQuestionQuestion}
                 buttons={multiChoiceQuestionButtons}
                 setQuestion={setMultiChoiceQuestionQuestion}
                 setButtons={setMultiChoiceQuestionButtons}
