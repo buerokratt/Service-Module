@@ -698,7 +698,7 @@
       "lastTest": "Last test",
       "status": "Status",
       "schema": "Schema",
-      "llmIndexStatus": "LLM Index Status",
+      "llmIndexStatus": "Index",
       "actions": "Actions"
     },
     "tooltip": {
@@ -730,6 +730,8 @@
     "deleteSuccess": "Endpoint deleted",
     "deleteError": "Failed to delete endpoint",
     "testSuccess": "Test successful",
-    "testError": "Test failed"
+    "testError": "Test failed",
+    "reIndexSuccess": "Re-index started",
+    "reIndexError": "Re-index failed"
   }
 }

@@ -46,6 +46,15 @@ assign_params:
   assign:
     llm_params: ${JSON.parse(endpoint.selectedParams ?? '[]')}
 
+mark_in_progress:
+  call: http.post
+  args:
+    url: "[#SERVICE_RESQL]/endpoints/update_endpoint_llm_sync_status"
+    body:
+      endpointId: ${endpointId}
+      status: IN_PROGRESS
+  result: in_progress_res
+
 call_llm_index:
   call: http.post
   args:
@@ -86,7 +95,7 @@ mark_failed_llm_call:
   next: log_llm_failure
 
 log_llm_failure:
-  log: "LLM indexing failed for endpoint ${endpointId}. HTTP status: ${llm_result.response.status}"
+  log: "LLM indexing failed for endpoint ${endpointId}"
   next: return_failed
 
 mark_failed_not_found:
@@ -105,12 +114,12 @@ return_ok:
   next: end
 
 return_failed:
-  status: 200
+  status: 500
   return: "LLM indexing failed"
   next: end
 
 return_not_found:
-  status: 200
+  status: 404
   return: "Endpoint not found, LLM indexing skipped"
   next: end
 

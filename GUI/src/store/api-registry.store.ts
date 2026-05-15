@@ -84,12 +84,11 @@ const useApiRegistryStore = create<ApiRegistryState>((set, get) => ({
         }
         // Normalize llm index status from various API shapes (snake_case or camelCase)
         const rawLlm = row.llm_index_status ?? row.llmIndexStatus ?? row.llmIndexstatus ?? null;
-        const normalizedLlm = rawLlm && typeof rawLlm !== 'object'
-          ? String(rawLlm).trim().toUpperCase()
-          : null;
-        const allowed = normalizedLlm === 'SUCCESS' || normalizedLlm === 'FAILED' || normalizedLlm === 'IN_PROGRESS'
-          ? normalizedLlm
-          : null;
+        const normalizedLlm = rawLlm && typeof rawLlm !== 'object' ? String(rawLlm).trim().toUpperCase() : null;
+        const allowed =
+          normalizedLlm === 'SUCCESS' || normalizedLlm === 'FAILED' || normalizedLlm === 'IN_PROGRESS'
+            ? normalizedLlm
+            : null;
 
         return {
           endpointId: row.endpointId,
@@ -263,13 +262,33 @@ const useApiRegistryStore = create<ApiRegistryState>((set, get) => ({
   },
 
   reIndexEndpoint: async (endpointId) => {
+    // Optimistically show IN_PROGRESS immediately while request is in-flight
+    set((state) => ({
+      endpoints: state.endpoints.map((e) =>
+        e.endpointId === endpointId ? { ...e, llm_index_status: 'IN_PROGRESS' } : e,
+      ),
+    }));
+
+    let failed = false;
+    let serverMsg = '';
     try {
       await api.post(reindexEndpointUrl(), { endpointId });
+    } catch (err: any) {
+      failed = true;
+      serverMsg = err?.response?.data?.message || err?.response?.data?.response || err?.message || '';
+    } finally {
+      // Always reload — backend is the source of truth for the final status
       const { pagination, sorting, search } = get();
       await get().loadEndpoints(pagination, sorting, search);
-      useToastStore.getState().success({ title: t('global.notificationSuccess') });
-    } catch {
-      useToastStore.getState().error({ title: t('global.notificationError') });
+    }
+
+    if (failed) {
+      useToastStore.getState().error({
+        title: t('apiRegistry.reIndexError'),
+        message: serverMsg || undefined,
+      });
+    } else {
+      useToastStore.getState().success({ title: t('apiRegistry.reIndexSuccess') });
     }
   },
 

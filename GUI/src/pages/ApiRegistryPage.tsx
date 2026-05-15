@@ -83,7 +83,6 @@ const ApiRegistryPage: React.FC = () => {
       });
   }, [deleteEndpoint, deleteEndpointFromStore]);
 
-
   const handleReindex = useCallback(
     async (endpoint: EndpointData) => {
       await reIndexEndpoint(endpoint.endpointId);
@@ -117,7 +116,7 @@ const ApiRegistryPage: React.FC = () => {
         }}
       />
       <Card>
-          <ApiRegistryTable
+        <ApiRegistryTable
           t={t}
           loading={loading}
           endpoints={endpoints}

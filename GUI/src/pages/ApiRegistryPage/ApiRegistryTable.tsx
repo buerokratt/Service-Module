@@ -188,7 +188,7 @@ const ApiRegistryTable: React.FC<ApiRegistryTableProps> = ({
   onTest,
   onCopy,
   testingId,
-  onReIndex
+  onReIndex,
 }) => {
   if (loading) {
     return <p>{t('global.loading')}</p>;
@@ -256,7 +256,9 @@ const ApiRegistryTable: React.FC<ApiRegistryTableProps> = ({
                 <SortIcon colId="schema" currentSortId={currentSortId} currentDesc={currentDesc} />{' '}
                 {String(t('apiRegistry.columns.schema'))}
               </th>
-              <th style={{ width: '120px', whiteSpace: 'nowrap', textAlign: 'center' }}>{t('apiRegistry.columns.llmIndexStatus') ?? 'LLM Index Status'}</th>
+              <th style={{ width: '120px', whiteSpace: 'nowrap', textAlign: 'center' }}>
+                {t('apiRegistry.columns.llmIndexStatus') ?? 'LLM Index Status'}
+              </th>
               <th style={{ width: '320px' }}></th>
             </tr>
           </thead>
@@ -319,13 +321,13 @@ const ApiRegistryTable: React.FC<ApiRegistryTableProps> = ({
                   </td>
                   <td style={{ textAlign: 'center' }}>
                     {(() => {
-                      const status = endpoint.llm_index_status;
-                      if (status === 'SUCCESS')
-                        return <Icon icon={<MdCheckCircle />} size="small" style={{ color: '#27ae60' }} title="Success" />;
-                      if (status === 'FAILED')
-                        return <Icon icon={<MdCancel />} size="small" style={{ color: '#e74c3c' }} title="Failed" />;
-                      if (status === 'IN_PROGRESS')
-                        return <Icon icon={<MdInfoOutline />} size="small" style={{ color: '#f1c40f' }} title="In Progress" />;
+                      const llm_index_status = endpoint.llm_index_status;
+                      if (llm_index_status === 'SUCCESS')
+                        return <Icon icon={<MdCheckCircle />} size="small" style={{ color: '#27ae60' }} />;
+                      if (llm_index_status === 'FAILED')
+                        return <Icon icon={<MdCancel />} size="small" style={{ color: '#e74c3c' }} />;
+                      if (llm_index_status === 'IN_PROGRESS')
+                        return <Icon icon={<MdInfoOutline />} size="small" style={{ color: '#f1c40f' }} />;
                       return <span style={{ color: '#aaa' }}>—</span>;
                     })()}
                   </td>
