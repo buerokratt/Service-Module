@@ -11,6 +11,7 @@ import { DynamicChoices } from 'types/dynamic-choices';
 import { EndpointData } from 'types/endpoint';
 import { MultiChoiceQuestionButton } from 'types/multi-choice-question';
 import { NodeDataProps } from 'types/service-flow';
+import { generateUniqueId } from 'utils/flow-utils';
 import { getValueByPath } from 'utils/object-util';
 import {
   getLastDigits,
@@ -69,12 +70,12 @@ const FlowElementsPopup: React.FC = () => {
   const defaultMultiChoiceQuestionButtons = useMemo(
     () => [
       {
-        id: '1',
+        id: generateUniqueId(),
         title: 'Jah',
         payload: `#service, /${selectedService?.type ?? 'POST'}/services/active/${serviceName}_mcq_${mcqNodeNumber}_0`,
       },
       {
-        id: '2',
+        id: generateUniqueId(),
         title: 'Ei',
         payload: `#service, /${selectedService?.type ?? 'POST'}/services/active/${serviceName}_mcq_${mcqNodeNumber}_1`,
       },

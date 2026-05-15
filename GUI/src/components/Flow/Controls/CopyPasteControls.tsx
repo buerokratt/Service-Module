@@ -228,8 +228,8 @@ const CopyPasteControls: FC<CopyPasteControlsProps> = ({ onNodesDelete }) => {
     const createMultiChoiceBranches = (node: Node, newId: string) => {
       const multiChoiceData = node.data?.multiChoiceQuestion as any;
       const buttons = multiChoiceData?.buttons || [
-        { id: '1', title: 'Jah' },
-        { id: '2', title: 'Ei' },
+        { id: generateUniqueId(), title: 'Jah' },
+        { id: generateUniqueId(), title: 'Ei' },
       ];
       buttons.forEach((button: any, index: number) => processMultiChoiceButton(node, newId, button, index));
     };
