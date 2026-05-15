@@ -7,8 +7,8 @@ import { EndpointData } from 'types/endpoint';
 
 import useApiRegistryStore from '../store/api-registry.store';
 import useToastStore from '../store/toasts.store';
+
 import ApiRegistryTable from './ApiRegistryPage/ApiRegistryTable';
-import api from 'services/api-dev';
 
 const ApiRegistryPage: React.FC = () => {
   const { t } = useTranslation();

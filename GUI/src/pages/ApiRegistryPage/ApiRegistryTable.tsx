@@ -13,8 +13,8 @@ import {
   MdFormatListBulleted,
   MdInfoOutline,
   MdOutlineEast,
-  MdRefresh,
   MdOutlineWest,
+  MdRefresh,
   MdUnfoldMore,
 } from 'react-icons/md';
 import { VerificationMetadata } from 'store/api-registry.store';
