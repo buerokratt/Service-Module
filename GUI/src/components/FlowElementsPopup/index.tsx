@@ -70,12 +70,12 @@ const FlowElementsPopup: React.FC = () => {
   const defaultMultiChoiceQuestionButtons = useMemo(
     () => [
       {
-        id: generateUniqueId(),
+        id: '1',
         title: 'Jah',
         payload: `#service, /${selectedService?.type ?? 'POST'}/services/active/${serviceName}_mcq_${mcqNodeNumber}_0`,
       },
       {
-        id: generateUniqueId(),
+        id: '2',
         title: 'Ei',
         payload: `#service, /${selectedService?.type ?? 'POST'}/services/active/${serviceName}_mcq_${mcqNodeNumber}_1`,
       },
