@@ -222,7 +222,7 @@ const EndpointCustom: React.FC<EndpointCustomProps> = ({
                   parameters.push({
                     id: existing?.id ?? uuid(),
                     name,
-                    type: 'custom',
+                    type: existing?.type && existing.type !== 'custom' ? existing.type : 'STRING',
                     required: false,
                     value: existing?.value ?? '',
                     paramType: 'path',
@@ -231,10 +231,11 @@ const EndpointCustom: React.FC<EndpointCustomProps> = ({
 
                 // Add query params
                 Object.keys(parsedUrl.params).forEach((key) => {
+                  const existingQuery = existingVars.find((v) => v.name === key);
                   parameters.push({
-                    id: uuid(),
+                    id: existingQuery?.id ?? uuid(),
                     name: key,
-                    type: 'custom',
+                    type: existingQuery?.type && existingQuery.type !== 'custom' ? existingQuery.type : 'STRING',
                     required: false,
                     value: parsedUrl.params[key],
                     operator: (parsedUrl.operators[key] as RequestOperator) || '=',
