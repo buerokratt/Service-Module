@@ -7,7 +7,6 @@ import { EndpointData } from 'types/endpoint';
 
 import useApiRegistryStore from '../store/api-registry.store';
 import useToastStore from '../store/toasts.store';
-
 import ApiRegistryTable from './ApiRegistryPage/ApiRegistryTable';
 
 const ApiRegistryPage: React.FC = () => {
