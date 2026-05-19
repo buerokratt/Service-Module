@@ -185,7 +185,10 @@ export const getColumns = ({ isCommon, navigate, hideDeletePopup, showReadyPopup
           <Button
             appearance="text"
             onClick={async () => {
-              const response = await api.post<Service>(getServiceById(), { id: props.row.original.serviceId, search: '' });
+              const response = await api.post<Service>(getServiceById(), {
+                id: props.row.original.serviceId,
+                search: '',
+              });
               await exportServices([response.data]);
             }}
           >

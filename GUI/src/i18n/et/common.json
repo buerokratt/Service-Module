@@ -405,7 +405,8 @@
       "removeValueAssignment": "Eemalda element, mis on määratud väärtuseks",
       "assignManualEdit": "Muutke muutuja määramist käsitsi",
       "openObjectEditor": "Ava objekti redaktor",
-      "confirmImport": "Teenus kirjutatakse üle!"
+      "confirmImport": "Teenus kirjutatakse üle!",
+      "importFlowOnly": "Ainult voo import"
     },
     "previousVariables": {
       "assignElements": "Määra elemendid",
