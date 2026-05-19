@@ -14,9 +14,6 @@ declaration:
       - field: type
         type: string
         description: "Endpoint type"
-      - field: isCommon
-        type: boolean
-        description: "Endpoint common status"
       - field: serviceId
         type: string
         description: "Service UUID"
@@ -30,6 +27,10 @@ declaration:
       - field: id
         type: string
         description: "Endpoint UUID"
+    headers:
+      - field: cookie
+        type: string
+        description: "Cookie field"
 
 extract_request_data:
   assign:
@@ -48,11 +49,40 @@ update_endpoint:
       endpointId: ${id}
       name: ${incoming.body.name}
       type: ${incoming.body.type}
-      isCommon: ${incoming.body.isCommon}
       serviceId: ${incoming.body.serviceId ?? ''}
       definitions: ${incoming.body.definitions}
       description: ${incoming.body.description ?? ''}
   result: res
+
+call_index_llm:
+  call: http.post
+  args:
+    url: "[#SERVICE_RUUTER]/endpoints/index-llm"
+    headers:
+      cookie: ${incoming.headers.cookie}
+    body:
+      endpointId: ${id}
+  result: index_llm_result
+
+check_index_llm_result:
+  switch:
+    - condition: ${index_llm_result != null && index_llm_result.response != null && 200 <= index_llm_result.response.statusCodeValue && index_llm_result.response.statusCodeValue < 300}
+      next: return_ok
+  next: mark_llm_sync_failed
+
+mark_llm_sync_failed:
+  call: http.post
+  args:
+    url: "[#SERVICE_RESQL]/endpoints/update_endpoint_llm_sync_status"
+    body:
+      endpointId: ${id}
+      status: FAILED
+  result: update_sync_res
+  next: log_index_llm_failure
+
+log_index_llm_failure:
+  log: "Warning: LLM indexing failed for endpoint ${id}"
+  next: return_ok
 
 return_ok:
   status: 200

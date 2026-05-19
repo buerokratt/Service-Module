@@ -18,6 +18,7 @@ function filterTrailingUnderscores(endpoint: EndpointData): void {
       if (definition[section]?.variables) {
         for (const v of definition[section].variables) {
           v.name = removeTrailingUnderscores(v.name);
+          if (!v.type || v.type === 'custom') v.type = 'STRING';
         }
       }
     }
@@ -37,8 +38,6 @@ export async function persistEndpoints(endpoints: EndpointData[], serviceId: str
     const hasSelectedDefinition = endpoint.definitions.some((d) => d.isSelected);
     if (!hasSelectedDefinition) continue;
 
-    endpoint.serviceId = serviceId;
-    endpoint.isCommon = endpoint.isCommon ?? false;
     filterTrailingUnderscores(endpoint);
 
     if (endpoint.isNew) {
@@ -46,6 +45,7 @@ export async function persistEndpoints(endpoints: EndpointData[], serviceId: str
         api
           .post(createEndpoint(), {
             ...endpoint,
+            serviceId,
             description: endpoint.description ?? '',
             definitions: JSON.stringify(endpoint.definitions),
           })
@@ -57,6 +57,7 @@ export async function persistEndpoints(endpoints: EndpointData[], serviceId: str
       tasks.push(
         api.post(updateEndpoint(endpoint.endpointId), {
           ...endpoint,
+          serviceId,
           description: endpoint.description ?? '',
           definitions: JSON.stringify(endpoint.definitions),
         }),

@@ -142,7 +142,8 @@
         display: block;
 
         a,
-        span {
+        span,
+        button {
           display: flex;
           align-items: center;
           justify-content: center;
@@ -157,7 +158,8 @@
 
         &.active {
           a,
-          span {
+          span,
+          button {
             color: get-color(white);
             background-color: get-color(sapphire-blue-10);
           }

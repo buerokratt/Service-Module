@@ -266,7 +266,6 @@
       "insert": "Sisesta API otspunkt..",
       "live": "Toodangukeskkonna otspunkt",
       "name": "Otspunkti nimetus",
-      "publicEndpoint": "Avalik otspunkt",
       "params": "Parameetrid",
       "required": "Muutuja on kohustuslik",
       "single": "Otspunkt",
@@ -286,6 +285,8 @@
       "mandatoryNo": "Ei",
       "mandatoryNameValueRequired": "Nimi ja väärtus on kohustuslikud",
       "nameTypeDescriptionRequired": "Nimi, tüüp ja kirjeldus on kõigi parameetrite jaoks kohustuslikud",
+      "missingPathParam": "Puudub väärtus parameetrile '{{name}}'",
+      "unresolvedPlaceholder": "Lahendamata kohatäitja '{{name}}'",
       "paramTypeTooltip": "Tüüp määrab, millist andmetüüpi parameeter aktsepteerib.\n\nSTRING (vaikimisi) – tekst (nt \"Tallinn\", \"ABC123\")\nNUMBER – arvud (nt 10, 10.5)\nBOOLEAN – true või false\nDATE – kuupäev või kuupäev-kellaaeg (nt 2025-01-01, ISO 8601)",
       "response": "Vastus",
       "testUrlFirst": "Enne salvestamist käivita Testi URLi",
@@ -476,6 +477,8 @@
     "autoFocus": "Automaatvaade: SEES/VÄLJAS",
     "apiElements": {
       "title": "API elemendid",
+      "searchPlaceholder": "Otsi...",
+      "newApi": "+ Uus API",
       "delete": "Kustuta",
       "deletionImpossible": "Kustutamine ei ole võimalik",
       "deletionImpossibleMessage": "Kustutamine ei ole võimalik. API element on kasutusel järgmistes teenustes. Kustutage API element nendes teenustes enne teenuste kustutamist.",
@@ -696,6 +699,7 @@
       "lastTest": "Viimane test",
       "status": "Staatus",
       "schema": "Skeem",
+      "llmIndexStatus": "Indeks",
       "actions": "Tegevused"
     },
     "tooltip": {
@@ -713,9 +717,12 @@
       "copy": "Kopeeri",
       "test": "Testi",
       "edit": "Muuda",
-      "delete": "Kustuta"
+      "delete": "Kustuta",
+      "retryIndexing": "Proovi indekseerimist uuesti",
+      "reIndex": "Indekseeri"
     },
     "deleteConfirm": "Kas olete kindel, et soovite selle otspunkti kustutada?",
+    "reIndexConfirm": "Indekseerida see otspunkt uuesti?",
     "noSchema": "—",
     "noLastTest": "—",
     "copySuccess": "Otspunkt kopeeritud",
@@ -724,6 +731,8 @@
     "deleteSuccess": "Otspunkt kustutatud",
     "deleteError": "Otspunkti kustutamine ebaõnnestus",
     "testSuccess": "Test õnnestus",
-    "testError": "Test ebaõnnestus"
+    "testError": "Test ebaõnnestus",
+    "reIndexSuccess": "Indekseerimine algas",
+    "reIndexError": "Indekseerimine ebaõnnestus"
   }
 }

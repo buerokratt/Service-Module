@@ -2,7 +2,7 @@ import { ApiEndpointCard, Button, Modal, Track } from 'components';
 import { TestPayload } from 'components/ApiEndpointCard/Endpoints/Custom';
 import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { getCommonEndpoints, testEndpointUrl } from 'resources/api-constants';
+import { getAllEndpoints, testEndpointUrl } from 'resources/api-constants';
 import api from 'services/api-dev';
 import { persistEndpoints } from 'services/endpoint.service';
 import useApiRegistryStore from 'store/api-registry.store';
@@ -48,9 +48,6 @@ const AddEndpointModal: React.FC<AddEndpointModalProps> = ({
 
   const [endpointName, setEndpointName] = useState(mode === 'edit' && initialEndpoint ? initialEndpoint.name : '');
   const [endpointNameExists, setEndpointNameExists] = useState(false);
-  const [isCommonEndpoint, setIsCommonEndpoint] = useState(
-    mode === 'edit' && initialEndpoint ? (initialEndpoint.isCommon ?? false) : false,
-  );
   const [isSaving, setIsSaving] = useState(false);
   const [hasTestedUrl, setHasTestedUrl] = useState(
     mode === 'edit' && (initialEndpoint?.type === 'custom' || initialEndpoint?.type === 'openApi'),
@@ -75,7 +72,7 @@ const AddEndpointModal: React.FC<AddEndpointModalProps> = ({
     setRegistryNameChecking(true);
     const timer = setTimeout(async () => {
       try {
-        const result = await api.post(getCommonEndpoints(), {
+        const result = await api.post(getAllEndpoints(), {
           page: 1,
           page_size: 50,
           sorting: 'name asc',
@@ -104,7 +101,6 @@ const AddEndpointModal: React.FC<AddEndpointModalProps> = ({
   const handleSave = () => {
     const passedEndpoint = endpoint;
     passedEndpoint.name = endpointName;
-    passedEndpoint.isCommon = isCommonEndpoint;
 
     const hasSelectedDefinition = passedEndpoint.definitions.some((d) => d.isSelected);
     if (!hasSelectedDefinition) {
@@ -125,6 +121,15 @@ const AddEndpointModal: React.FC<AddEndpointModalProps> = ({
     const mandatoryViolation = allParams.some((p) => p.mandatory && (!p.name || !p.value));
     if (mandatoryViolation) {
       useToastStore.getState().error({ title: t('newService.endpoint.mandatoryNameValueRequired') });
+      setIsSaving(false);
+      return;
+    }
+    // Block save if any PATH parameter has no value
+    const missingPathParam = allParams.find((p) => p.paramType === 'path' && !p.value?.trim());
+    if (missingPathParam) {
+      useToastStore
+        .getState()
+        .error({ title: t('newService.endpoint.missingPathParam', { name: missingPathParam.name }) });
       setIsSaving(false);
       return;
     }
@@ -189,7 +194,6 @@ const AddEndpointModal: React.FC<AddEndpointModalProps> = ({
           endpoint={endpoint}
           onNameExists={context === 'registry' ? undefined : setEndpointNameExists}
           onNameChange={setEndpointName}
-          onCommonChange={setIsCommonEndpoint}
           overrideNameExists={context === 'registry' ? registryNameExists : undefined}
           onTestSuccess={(payload) => {
             setHasTestedUrl(true);

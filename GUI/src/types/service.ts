@@ -19,7 +19,7 @@ export interface Service {
   readonly entities: string[];
   readonly structure?: { value: string };
   readonly endpoints: Array<
-    Pick<EndpointData, 'endpointId' | 'name' | 'type' | 'fileName' | 'isCommon'> & {
+    Pick<EndpointData, 'endpointId' | 'name' | 'type' | 'fileName'> & {
       // Passing as JSON from Resql because ruuter cannot handle parsing properly
       definitions: EndpointDefinitionJson;
     }

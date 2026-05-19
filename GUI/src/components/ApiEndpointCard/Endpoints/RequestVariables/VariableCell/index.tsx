@@ -36,11 +36,16 @@ const VariableCell: React.FC<VariableCellProps> = ({ row, updateRowVariable, var
       placeholder={t('newService.endpoint.variable') + '..'}
     />
   ) : (
-    <p style={{ paddingLeft: 40 * row.original.nestedLevel }}>
-      {row.original.variable}
-      {row.original.type && `, (${row.original.type})`}
-      {row.original.description && `, (${row.original.description})`}
-    </p>
+    <div style={{ paddingLeft: 40 * row.original.nestedLevel }}>
+      <FormInput
+        style={{ borderRadius: '4px', backgroundColor: '#f5f5f7', cursor: 'default' }}
+        name={`endpoint-variable-readonly-${row.id}`}
+        label=""
+        value={row.original.variable ?? ''}
+        readOnly
+        onChange={() => {}}
+      />
+    </div>
   );
 };
 

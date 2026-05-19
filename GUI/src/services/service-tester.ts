@@ -29,7 +29,11 @@ export const runServiceTest = async (input: string, serviceName?: string) => {
 
   const { state, name, serviceStore } = serviceData;
 
-  const invalidNodes = getInvalidNodes(serviceStore.nodes);
+  // Clear previous test states first so stale testingPassed:false doesn't block re-runs
+  clearPreviousTestStates(serviceStore);
+
+  // Re-read fresh nodes from store after clearing (serviceStore.nodes is a stale snapshot)
+  const invalidNodes = getInvalidNodes(useServiceStore.getState().nodes);
   if (invalidNodes.length > 0) {
     reportInvalidNodes(invalidNodes);
     return true;
@@ -37,8 +41,6 @@ export const runServiceTest = async (input: string, serviceName?: string) => {
 
   const nameToUse = serviceName ?? name;
   const stateToUse = state == ServiceState.Ready ? ServiceState.Draft : state;
-
-  clearPreviousTestStates(serviceStore);
 
   try {
     await executeServiceTest(headerValue, stateToUse, nameToUse, input.split(','));

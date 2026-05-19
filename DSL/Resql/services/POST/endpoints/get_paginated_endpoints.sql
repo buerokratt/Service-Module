@@ -4,13 +4,13 @@ SELECT
   name,
   description,
   type,
-  is_common,
   definitions,
   last_test_at,
   verification_status,
   last_status_code,
   response_schema_captured AS schema_captured,
   response_schema,
+  llm_index_status,
   CASE WHEN :pagination THEN CEIL(COUNT(*) OVER() / :page_size::DECIMAL) ELSE 1 END AS total_pages
 FROM endpoints
 WHERE deleted IS FALSE

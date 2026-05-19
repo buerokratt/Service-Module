@@ -6,7 +6,7 @@ import useServiceStore from 'store/new-services.store';
 import { EndpointType } from 'types/endpoint/endpoint-type';
 import { removeTrailingUnderscores } from 'utils/string-util';
 
-import { EndpointCustom, EndpointOpenAPI, FormInput, FormSelect, Switch, Track } from '..';
+import { EndpointCustom, EndpointOpenAPI, FormInput, FormSelect, Track } from '..';
 import { TestPayload } from './Endpoints/Custom';
 import { RequestTab } from '../../types';
 import { EndpointData, EndpointEnv, EndpointTab } from '../../types/endpoint';
@@ -15,10 +15,8 @@ import { Option } from '../../types/option';
 type EndpointCardProps = {
   endpoint: EndpointData;
   isNameDisabled?: boolean;
-  showCommonSwitch?: boolean;
   onNameChange?: (name: string) => void;
   onNameExists?: (exists: boolean) => void;
-  onCommonChange?: (isCommon: boolean) => void;
   /** When provided (e.g. API Registry async check), overrides the internal duplicate-name check. */
   overrideNameExists?: boolean;
   onTestSuccess?: (payload: TestPayload) => void;
@@ -30,10 +28,8 @@ type EndpointCardProps = {
 const ApiEndpointCard: FC<EndpointCardProps> = ({
   endpoint,
   isNameDisabled = false,
-  showCommonSwitch = true,
   onNameExists,
   onNameChange,
-  onCommonChange,
   overrideNameExists,
   onTestSuccess,
   onTypeChange,
@@ -41,9 +37,9 @@ const ApiEndpointCard: FC<EndpointCardProps> = ({
   onMandatoryViolationChange,
 }) => {
   const { changeServiceEndpointType, getAvailableRequestValues } = useServiceStore();
+  const { t } = useTranslation();
   const [selectedTab, setSelectedTab] = useState<EndpointEnv>(EndpointEnv.Live);
   const [endpointName, setEndpointName] = useState<string>(endpoint.name);
-  const [isCommonEndpoint, setIsCommonEndpoint] = useState<boolean>(endpoint.isCommon ?? false);
   const options: { label: string; value: EndpointType; name: string }[] = [
     { label: 'Open API', value: 'openApi', name: '' },
     { label: 'Custom endpoint', value: 'custom', name: '' },
@@ -51,7 +47,6 @@ const ApiEndpointCard: FC<EndpointCardProps> = ({
   const [option, setOption] = useState<Option | null>(options.find((o) => o.value === endpoint.type) ?? null);
   const [requestTab, setRequestTab] = useState<RequestTab>({ tab: EndpointTab.Params, showRawData: false });
   const [nameExists, setNameExists] = useState<boolean>(false);
-  const { t } = useTranslation();
 
   const getTabTriggerClasses = (tab: EndpointEnv) => `tab-group__tab-btn ${selectedTab === tab ? 'active' : ''}`;
 
@@ -155,25 +150,6 @@ const ApiEndpointCard: FC<EndpointCardProps> = ({
                   onDescriptionChange={onDescriptionChange}
                   onMandatoryViolationChange={onMandatoryViolationChange}
                 />
-              )}
-              {showCommonSwitch && option?.value && (
-                <Track gap={16}>
-                  <label htmlFor="isCommon" className={'default_label'}>
-                    {t('newService.endpoint.publicEndpoint')}
-                  </label>
-                  <Switch
-                    name="isCommon"
-                    label=""
-                    onLabel={t('global.yes').toString()}
-                    offLabel={t('global.no').toString()}
-                    value={isCommonEndpoint}
-                    checked={isCommonEndpoint}
-                    onCheckedChange={(value) => {
-                      setIsCommonEndpoint(value);
-                      onCommonChange?.(value);
-                    }}
-                  />
-                </Track>
               )}
             </Track>
           </Tabs.Content>
