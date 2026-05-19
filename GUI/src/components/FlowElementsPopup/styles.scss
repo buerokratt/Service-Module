@@ -194,6 +194,15 @@ li:not(:has(> div > div)) .object-tree-chip {
   background-color: get-color(sapphire-blue-10) !important;
   height: 36px !important;
   cursor: default !important;
+  max-width: 100%;
+  overflow: hidden !important;
+}
+
+.multiple-choice-question-button__text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
 }
 
 [data-theme='dark'] .assign-blue,

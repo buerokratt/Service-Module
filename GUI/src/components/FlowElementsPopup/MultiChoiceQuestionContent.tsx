@@ -6,7 +6,6 @@ import useServiceStore from 'store/new-services.store';
 import useServiceListStore from 'store/services.store';
 import { generateUniqueId } from 'utils/flow-utils';
 import { getLastDigits, removeTrailingUnderscores } from 'utils/string-util';
-import { v4 } from 'uuid';
 
 import Button from '../Button';
 import { FormInput, FormTextarea } from '../FormElements';
@@ -108,7 +107,7 @@ const MultiChoiceQuestionContent: FC<MultiChoiceQuestionContentProps> = ({
         <div style={{ fontWeight: 500 }}>{t('serviceFlow.multiChoiceQuestion.userChoices')}</div>
         <Track direction="vertical" gap={8} style={{ marginTop: 8 }}>
           {buttons.map((btn, idx) => (
-            <Track key={v4()} gap={8} align="center" style={{ width: '100%' }}>
+            <Track key={btn.id} gap={8} align="center" style={{ width: '100%' }}>
               {editIndex === idx ? (
                 <>
                   <FormInput
@@ -138,7 +137,9 @@ const MultiChoiceQuestionContent: FC<MultiChoiceQuestionContentProps> = ({
                     }}
                   >
                     <Button disabled className="multiple-choice-question-button">
-                      {btn.title.length > 0 ? btn.title : t('serviceFlow.multiChoiceQuestion.ellipsis')}
+                      <span className="multiple-choice-question-button__text">
+                        {btn.title.length > 0 ? btn.title : t('serviceFlow.multiChoiceQuestion.ellipsis')}
+                      </span>
                     </Button>
                   </div>
                   <Button
