@@ -13,4 +13,5 @@ export type RequestVariablesTableColumns = {
   value?: string;
   variable?: string;
   operator?: RequestOperator;
+  paramType?: 'path' | 'query';
 };

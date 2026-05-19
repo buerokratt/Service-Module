@@ -49,12 +49,43 @@ request_explain_get:
     headers: $! current_request.headers !
     query: $! current_request.params !
   result: res
+  next: check_get_redirect
+
+check_get_redirect:
+  switch:
+    - condition: ${res.response.statusCodeValue == 301 || res.response.statusCodeValue == 302}
+      next: retry_get_with_slash
+  next: assign_result
+
+retry_get_with_slash:
+  call: http.get
+  args:
+    url: ${current_request.url + '/'}
+    headers: $! current_request.headers !
+    query: $! current_request.params !
+  result: res
   next: assign_result
 
 request_explain_post:
   call: http.post
   args:
     url: ${current_request.url}
+    headers: $! current_request.headers !
+    query: $! current_request.params !
+    body: $! current_request.body !
+  result: res
+  next: check_post_redirect
+
+check_post_redirect:
+  switch:
+    - condition: ${res.response.statusCodeValue == 301 || res.response.statusCodeValue == 302}
+      next: retry_post_with_slash
+  next: assign_result
+
+retry_post_with_slash:
+  call: http.post
+  args:
+    url: ${current_request.url + '/'}
     headers: $! current_request.headers !
     query: $! current_request.params !
     body: $! current_request.body !

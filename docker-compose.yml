@@ -5,7 +5,7 @@ services:
     image: ruuter
     environment:
       - application.cors.allowedOrigins=http://localhost:3006,http://localhost:3001,http://localhost:8086
-      - application.httpCodesAllowList=200,201,202,204,400,401,403,500
+      - application.httpCodesAllowList=200,201,202,204,301,302,400,401,403,500
       - application.logging.displayRequestContent=true
       - application.logging.displayResponseContent=true
       - server.port=8086

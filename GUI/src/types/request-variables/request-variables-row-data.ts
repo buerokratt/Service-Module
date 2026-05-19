@@ -13,4 +13,5 @@ export type RequestVariablesRowData = {
   type?: string;
   value?: string;
   variable?: string;
+  paramType?: 'path' | 'query';
 };
