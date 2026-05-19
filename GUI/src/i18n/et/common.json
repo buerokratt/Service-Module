@@ -406,6 +406,10 @@
       "openObjectEditor": "Ava objekti redaktor",
       "confirmImport": "Teenus kirjutatakse üle!"
     },
+    "mcq": {
+      "selectBranchTitle": "Vali haru",
+      "emptyBranchesMessage": "Sellel valikvastuse küsimusel on {{count}} tühja haru. Millisele harule soovid ühendada?"
+    },
     "previousVariables": {
       "assignElements": "Määra elemendid",
       "noName": "<Nimeta>",

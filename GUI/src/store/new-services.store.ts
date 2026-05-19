@@ -811,6 +811,7 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
             testingPassed: updatedNode.data.testingPassed,
             assignElements: updatedNode.data.assignElements ?? prevNode.data.assignElements,
             rules: updatedNode.data.rules ?? prevNode.data.rules,
+            childrenCount: updatedNode.data.childrenCount ?? prevNode.data.childrenCount,
           },
         };
       }),
