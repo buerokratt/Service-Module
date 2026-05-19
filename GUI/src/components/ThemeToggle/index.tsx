@@ -8,10 +8,16 @@ export default function ThemeToggle({ onChange }) {
   });
 
   useEffect(() => {
-    document.documentElement.setAttribute('data-theme', theme);
+    document.documentElement.dataset.theme = theme;
     localStorage.setItem('color-theme', theme);
     if (onChange) onChange({ target: { value: theme } });
   }, [theme, onChange]);
+
+  useEffect(() => {
+    return () => {
+      document.documentElement.dataset.theme = 'light';
+    };
+  }, []);
 
   const toggleTheme = (newTheme: SetStateAction<string>) => setTheme(newTheme);
 
