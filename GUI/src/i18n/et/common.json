@@ -699,6 +699,7 @@
       "lastTest": "Viimane test",
       "status": "Staatus",
       "schema": "Skeem",
+      "llmIndexStatus": "Indeks",
       "actions": "Tegevused"
     },
     "tooltip": {
@@ -716,9 +717,12 @@
       "copy": "Kopeeri",
       "test": "Testi",
       "edit": "Muuda",
-      "delete": "Kustuta"
+      "delete": "Kustuta",
+      "retryIndexing": "Proovi indekseerimist uuesti",
+      "reIndex": "Indekseeri"
     },
     "deleteConfirm": "Kas olete kindel, et soovite selle otspunkti kustutada?",
+    "reIndexConfirm": "Indekseerida see otspunkt uuesti?",
     "noSchema": "—",
     "noLastTest": "—",
     "copySuccess": "Otspunkt kopeeritud",
@@ -727,6 +731,8 @@
     "deleteSuccess": "Otspunkt kustutatud",
     "deleteError": "Otspunkti kustutamine ebaõnnestus",
     "testSuccess": "Test õnnestus",
-    "testError": "Test ebaõnnestus"
+    "testError": "Test ebaõnnestus",
+    "reIndexSuccess": "Indekseerimine algas",
+    "reIndexError": "Indekseerimine ebaõnnestus"
   }
 }

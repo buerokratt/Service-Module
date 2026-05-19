@@ -31,4 +31,5 @@ export const getSlots = (): string => `${baseUrl}/slots`;
 export const userStepPreferences = (): string => `${baseUrl}/steps/preferences`;
 export const getAllEndpoints = (): string => `${baseUrl}/endpoints/all`;
 export const testEndpointUrl = (): string => `${baseUrl}/services/test-endpoint`;
+export const reindexEndpointUrl = (): string => `${baseUrl}/endpoints/reindex-endpoint`;
 export const importMultipleServices = (): string => `${baseUrl}/services/import-services`;
