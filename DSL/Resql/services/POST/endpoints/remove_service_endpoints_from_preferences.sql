@@ -9,7 +9,6 @@ SET endpoints = COALESCE((
         SELECT endpoint_id
         FROM endpoints
         WHERE service_id = :serviceId::uuid
-          AND is_common = FALSE
           AND deleted = FALSE
     )
 ), ARRAY[]::uuid[])
@@ -20,7 +19,6 @@ WHERE EXISTS (
         SELECT endpoint_id
         FROM endpoints
         WHERE service_id = :serviceId::uuid
-          AND is_common = FALSE
           AND deleted = FALSE
     )
 ); 

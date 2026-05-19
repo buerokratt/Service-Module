@@ -3,7 +3,7 @@ import { t } from 'i18next';
 import {
   createEndpoint,
   deleteEndpoint as deleteEndpointUrl,
-  getCommonEndpoints,
+  getAllEndpoints,
   testEndpointUrl,
 } from 'resources/api-constants';
 import api from 'services/api-dev';
@@ -62,7 +62,7 @@ const useApiRegistryStore = create<ApiRegistryState>((set, get) => ({
       const secondarySortMap: Record<string, string> = {};
       const secondarySort = colId ? (secondarySortMap[colId] ?? '') : '';
       const sort = primaryField ? `${primaryField} ${order}${secondarySort}` : 'created_at desc';
-      const result = await api.post(getCommonEndpoints(), {
+      const result = await api.post(getAllEndpoints(), {
         page: pagination.pageIndex + 1,
         page_size: pagination.pageSize,
         sorting: sort,
@@ -85,7 +85,6 @@ const useApiRegistryStore = create<ApiRegistryState>((set, get) => ({
           name: row.name,
           description: row.description ?? '',
           type: row.type,
-          isCommon: row.isCommon,
           serviceId: row.serviceId,
           definitions,
           responseSchema: formatSchema(row.responseSchema),
@@ -194,7 +193,6 @@ const useApiRegistryStore = create<ApiRegistryState>((set, get) => ({
         endpointId: newId,
         name: copyName,
         type: endpoint.type ?? 'custom',
-        isCommon: endpoint.isCommon ?? true,
         serviceId: endpoint.serviceId || '',
         definitions: JSON.stringify(cleanDefinitions),
       });

@@ -12,9 +12,8 @@ import {
 import { AxiosResponse } from 'axios';
 import { GroupOrRule } from 'components/FlowElementsPopup/RuleBuilder/types';
 import i18next from 'i18next';
-
 import {
-  getCommonEndpoints,
+  getAllEndpoints,
   getEndpointValidation,
   getSecretVariables,
   getServiceById,
@@ -42,7 +41,7 @@ import {
   RequestVariablesTabsRowsData,
 } from 'types/request-variables';
 import { initialEdges, initialNodes, NodeDataProps } from 'types/service-flow';
-import { formatSchema, generateJsonRequest } from 'utils/json-request-utils';
+import { formatSchema } from 'utils/json-request-utils';
 import { v4 as uuid } from 'uuid';
 import { create } from 'zustand';
 
@@ -89,8 +88,6 @@ export interface ServiceStoreState {
   getFlatVariables: () => string[];
   serviceNameDashed: () => string;
   deleteEndpoint: (id: string) => void;
-  isCommonEndpoint: (id: string) => boolean;
-  setIsCommonEndpoint: (id: string, isCommon: boolean) => void;
   setDescription: (description: string) => void;
   setSlot: (slot: string) => void;
   setExamples: (examples: string[]) => void;
@@ -106,7 +103,7 @@ export interface ServiceStoreState {
   loadSecretVariables: () => Promise<void>;
   loadTaraVariables: () => Promise<void>;
   loadService: (id?: string, resetState?: boolean, search?: string) => Promise<AxiosResponse<Service, any> | undefined>;
-  loadCommonEndpoints: (
+  loadAllEndpoints: (
     isPagination: boolean,
     page?: number,
     pageSize?: number,
@@ -230,6 +227,7 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
   nodes: initialNodes,
   flowSelectedNodes: [],
   isNewService: true,
+  isCommon: false,
   serviceState: undefined,
   isTestButtonVisible: false,
   isTestButtonEnabled: true,
@@ -256,6 +254,7 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
       isTestButtonVisible: true,
     }),
   isSaveButtonEnabled: () => get().endpoints.length > 0,
+  setIsCommon: (value: boolean) => set({ isCommon: value }),
   markAsNewService: () => set({ isNewService: true }),
   unmarkAsNewService: () => set({ isNewService: false }),
   setServiceId: (id) => set({ serviceId: id }),
@@ -366,22 +365,6 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
   setExamples: (examples: string[]) => set({ examples: examples }),
   setEntities: (entities: string[]) => set({ entities: entities }),
   setStepPreferences: (stepPreferences: string[]) => set({ stepPreferences }),
-  isCommon: false,
-  setIsCommon: (isCommon: boolean) => set({ isCommon }),
-  isCommonEndpoint: (id: string) => {
-    const endpoint = get().endpoints.find((x) => x.endpointId === id);
-    return endpoint?.isCommon ?? false;
-  },
-  setIsCommonEndpoint: (id: string, isCommon: boolean) => {
-    const endpoints = get().endpoints.map((x) => {
-      if (x.endpointId !== id) return x;
-      return {
-        ...x,
-        isCommon,
-      };
-    });
-    set({ endpoints });
-  },
   setSecrets: (newSecrets: PreDefinedEndpointEnvVariables) => set({ secrets: newSecrets }),
   addProductionVariables: (variables: any) => {
     set((state) => ({
@@ -461,10 +444,10 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
       const structure = JSON.parse(serviceResponse.data.structure?.value ?? '{}');
       let endpoints = serviceResponse.data.endpoints.map(
         (
-          endpoint: Pick<
-            EndpointData,
-            'endpointId' | 'name' | 'type' | 'isCommon' | 'fileName' | 'description' | 'serviceId'
-          > & { definitions: EndpointDefinitionJson; responseSchema?: unknown },
+          endpoint: Pick<EndpointData, 'endpointId' | 'name' | 'type' | 'fileName'> & {
+            definitions: EndpointDefinitionJson;
+            responseSchema?: unknown;
+          },
         ) => {
           return {
             ...endpoint,
@@ -542,14 +525,14 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
     get().addProductionVariables(variables);
     return serviceResponse;
   },
-  loadCommonEndpoints: async (
+  loadAllEndpoints: async (
     isPagination: boolean,
     page?: number,
     pageSize?: number,
     sorting?: string,
     search?: string,
   ) => {
-    const response = await api.post(getCommonEndpoints(), {
+    const response = await api.post(getAllEndpoints(), {
       pagination: isPagination,
       page,
       page_size: pageSize,
@@ -557,7 +540,7 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
       search,
     });
     const endpointsResponse: Array<
-      Pick<EndpointData, 'endpointId' | 'name' | 'type' | 'fileName' | 'isCommon'> & {
+      Pick<EndpointData, 'endpointId' | 'name' | 'type' | 'fileName'> & {
         definitions: EndpointDefinitionJson;
         responseSchema?: unknown;
       }
@@ -968,7 +951,8 @@ export function getEndpointBody(endpoint: EndpointDefinition): any {
 
   if (isRawBodySelected) {
     try {
-      const rawJson = JSON.parse(rawBody?.value ?? '');
+      const rawJsonStr = (rawBody?.value ?? '').replace(/(?<!")(\$\{[^}]+\})(?!")/g, '"$1"');
+      const rawJson = JSON.parse(rawJsonStr);
       body = rawJson;
     } catch (e: any) {
       body = extractMapValues(endpoint.body);

@@ -3,7 +3,6 @@ INSERT INTO endpoints (
     service_id,
     name,
     type,
-    is_common,
     definitions,
     description
 )
@@ -12,7 +11,6 @@ VALUES (
     NULLIF(:serviceId, '')::uuid,
     :name,
     :type::endpoint_type,
-    :isCommon,
     :definitions::jsonb,
     :description
 ); 
