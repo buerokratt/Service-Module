@@ -64,7 +64,7 @@ const DynamicList: FC<DynamicListProps> = ({ label, labelWidth = 120, value, onC
           <div className="input__wrapper">
             <FormInput
               name={value + index}
-              defaultValue={value}
+              value={value}
               onChange={(e) => {
                 updateItem(index, e.target.value);
               }}
