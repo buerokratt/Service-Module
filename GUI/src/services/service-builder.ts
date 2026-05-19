@@ -795,11 +795,25 @@ function handleAssignStep(
 
   finishedFlow.set(parentStepName, {
     assign: parentNode.data.assignElements?.reduce((acc: Record<string, any>, e: Assign) => {
-      acc[e.key] = e.value;
+      acc[e.key] = normalizeAssignValue(e.value);
       return acc;
     }, {}),
     next: childNode ? toSnakeCase(childNode.data.label ?? 'format_messages') : 'format_messages',
   });
+}
+
+/**
+ * Ruuter injects JSON.parse() around *_res variables when they appear inside function calls
+ * (e.g. String(testAPI_res.response.body[...])), causing failures because _res variables
+ * are already parsed objects. Strip String() wrappers from API response variable expressions
+ * so Ruuter handles them via direct property access (which works correctly).
+ */
+function normalizeAssignValue(value: string): string {
+  const match = /^\$\{String\(([\s\S]*)\)\}$/.exec(value);
+  if (match && /\b\w+_res\b/.test(match[1])) {
+    return '${' + match[1] + '}';
+  }
+  return value;
 }
 
 function handleEndpointStep(
@@ -835,7 +849,8 @@ function handleEndpointStep(
 
   if (isRawBodySelected) {
     try {
-      const rawJson = JSON.parse(rawBody?.value ?? '');
+      const rawJsonStr = (rawBody?.value ?? '').replace(/(?<!")(\$\{[^}]+\})(?!")/g, '"$1"');
+      const rawJson = JSON.parse(rawJsonStr);
       stepConfig.args.body = rawJson;
     } catch (e: any) {
       console.log(`Unable to save JSON to Yaml. ${e.message}`);

@@ -11,6 +11,7 @@ import { DynamicChoices } from 'types/dynamic-choices';
 import { EndpointData } from 'types/endpoint';
 import { MultiChoiceQuestionButton } from 'types/multi-choice-question';
 import { NodeDataProps } from 'types/service-flow';
+import { generateUniqueId } from 'utils/flow-utils';
 import { getValueByPath } from 'utils/object-util';
 import {
   getLastDigits,
