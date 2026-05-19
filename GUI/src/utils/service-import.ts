@@ -6,11 +6,7 @@ import api from 'services/api';
 import { buildAllServiceContents } from 'services/service-builder';
 import useServiceListStore from 'store/services.store';
 import useToastStore from 'store/toasts.store';
-import {
-  isValidFlowData,
-  parseFlowArtifact,
-  serializeFlowArtifact,
-} from 'utils/service-flow-artifact';
+import { isValidFlowData, parseFlowArtifact, serializeFlowArtifact } from 'utils/service-flow-artifact';
 
 const handleImportServices = async (
   event: ChangeEvent<HTMLInputElement>,
