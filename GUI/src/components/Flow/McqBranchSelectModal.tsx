@@ -3,6 +3,9 @@ import { FC } from 'react';
 import { useTranslation } from 'react-i18next';
 import { McqEmptyBranch } from 'utils/mcq-flow-utils';
 
+import '../FlowElementsPopup/styles.scss';
+import './McqBranchSelectModal.scss';
+
 type McqBranchSelectModalProps = {
   emptyBranches: McqEmptyBranch[];
   onSelect: (branch: McqEmptyBranch) => void;
@@ -15,10 +18,10 @@ const McqBranchSelectModal: FC<McqBranchSelectModalProps> = ({ emptyBranches, on
   return (
     <Modal title={t('serviceFlow.mcq.selectBranchTitle')} onClose={onClose}>
       <p>{t('serviceFlow.mcq.emptyBranchesMessage', { count: emptyBranches.length })}</p>
-      <Track direction="vertical" gap={8} style={{ marginTop: 16 }}>
+      <Track direction="vertical" gap={8} align="left" style={{ marginTop: 16, width: '100%' }}>
         {emptyBranches.map((branch) => (
-          <Button key={branch.edgeId} onClick={() => onSelect(branch)}>
-            {branch.label}
+          <Button key={branch.edgeId} className="mcq-branch-select-modal__button" onClick={() => onSelect(branch)}>
+            <span className="multiple-choice-question-button__text">{branch.label}</span>
           </Button>
         ))}
       </Track>
