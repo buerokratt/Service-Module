@@ -38,7 +38,7 @@ type ApiRegistryTableProps = {
   testingId: string | null;
 };
 
-const EndpointTooltipContent: React.FC<{
+export const EndpointTooltipContent: React.FC<{
   def: import('types/endpoint').EndpointDefinition | undefined;
   name: string;
 }> = ({ def, name }) => {
