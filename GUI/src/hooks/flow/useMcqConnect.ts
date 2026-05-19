@@ -10,8 +10,8 @@ import {
 } from 'utils/mcq-flow-utils';
 
 export type PendingMcqConnection = {
-  connection: Connection;
-  emptyBranches: McqEmptyBranch[];
+  readonly connection: Connection;
+  readonly emptyBranches: McqEmptyBranch[];
 };
 
 function useMcqConnect() {

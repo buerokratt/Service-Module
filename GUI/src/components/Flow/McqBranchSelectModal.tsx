@@ -7,9 +7,9 @@ import '../FlowElementsPopup/styles.scss';
 import './McqBranchSelectModal.scss';
 
 type McqBranchSelectModalProps = {
-  emptyBranches: McqEmptyBranch[];
-  onSelect: (branch: McqEmptyBranch) => void;
-  onClose: () => void;
+  readonly emptyBranches: McqEmptyBranch[];
+  readonly onSelect: (branch: McqEmptyBranch) => void;
+  readonly onClose: () => void;
 };
 
 const McqBranchSelectModal: FC<McqBranchSelectModalProps> = ({ emptyBranches, onSelect, onClose }) => {

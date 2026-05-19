@@ -5,10 +5,10 @@ import { MultiChoiceQuestionButton } from 'types/multi-choice-question';
 export const MCQ_SOURCE_HANDLE_ID = 'mcq-out';
 
 export type McqEmptyBranch = {
-  edgeId: string;
-  label: string;
-  ghostNodeId: string;
-  handleIndex: number;
+  readonly edgeId: string;
+  readonly label: string;
+  readonly ghostNodeId: string;
+  readonly handleIndex: number;
 };
 
 export const getMcqNodeIdFromConnection = (
