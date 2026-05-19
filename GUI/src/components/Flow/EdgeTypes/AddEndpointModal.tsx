@@ -124,6 +124,15 @@ const AddEndpointModal: React.FC<AddEndpointModalProps> = ({
       setIsSaving(false);
       return;
     }
+    // Block save if any PATH parameter has no value
+    const missingPathParam = allParams.find((p) => p.paramType === 'path' && !p.value?.trim());
+    if (missingPathParam) {
+      useToastStore
+        .getState()
+        .error({ title: t('newService.endpoint.missingPathParam', { name: missingPathParam.name }) });
+      setIsSaving(false);
+      return;
+    }
 
     // Resolve serviceId: service-flow gets it from the store; registry preserves the
     // endpoint's own serviceId (edit) or uses empty string (create).

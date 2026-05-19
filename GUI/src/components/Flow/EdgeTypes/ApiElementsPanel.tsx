@@ -4,8 +4,6 @@ import AddEndpointModal from 'components/Flow/EdgeTypes/AddEndpointModal';
 import { EndpointTooltipContent } from 'pages/ApiRegistryPage/ApiRegistryTable';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useParams } from 'react-router-dom';
-import './ApiElementsPanel.scss';
 import {
   MdArrowDownward,
   MdArrowUpward,
@@ -21,6 +19,8 @@ import {
   MdOutlineWest,
   MdUnfoldMore,
 } from 'react-icons/md';
+import { useParams } from 'react-router-dom';
+import './ApiElementsPanel.scss';
 import useApiRegistryStore from 'store/api-registry.store';
 import useToastStore from 'store/toasts.store';
 import { Step, StepType } from 'types';

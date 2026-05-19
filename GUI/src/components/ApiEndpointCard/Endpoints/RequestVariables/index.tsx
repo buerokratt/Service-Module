@@ -77,6 +77,7 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
       description: data.description,
       arrayType: data.arrayType,
       nestedLevel,
+      paramType: data.paramType,
     };
   };
 
@@ -199,6 +200,7 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
               value: row.value!,
               description: row.description,
               operator: row.operator as RequestOperator,
+              paramType: row.paramType,
             })) ?? [];
         onParametersChange(params);
         // All named params need description; mandatory params also need a value
@@ -253,6 +255,7 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
         value: row.value,
         description: row.description,
         operator: requestTab.tab === EndpointTab.Params ? (row.operator as RequestOperator) || '=' : undefined,
+        paramType: row.paramType,
       };
       variables.push(newVariable);
     });
@@ -317,7 +320,11 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
 
     const variables: EndpointVariableData[] = [];
     newData.forEach((row) => {
-      if (!row.value || !row.variable) return;
+      // Always include path params (value may be empty while user fills it in);
+      // for regular params, require both name and value.
+      const isPathParam = row.paramType === 'path';
+      if (!isPathParam && (!row.value || !row.variable)) return;
+      if (isPathParam && !row.variable) return;
 
       const newVariable: EndpointVariableData = {
         id: row.endpointVariableId ?? row.id,
@@ -327,6 +334,7 @@ const RequestVariables: React.FC<RequestVariablesProps> = ({
         value: row.value,
         description: row.description,
         operator: requestTab.tab === EndpointTab.Params ? (row.operator as RequestOperator) || '=' : undefined,
+        paramType: row.paramType,
       };
       variables.push(newVariable);
     });
