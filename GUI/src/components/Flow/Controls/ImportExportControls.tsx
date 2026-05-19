@@ -191,9 +191,7 @@ const ImportExportControls: FC = () => {
             <Button appearance="primary" onClick={handleConfirmImport}>
               {t('global.proceed')}
             </Button>
-            <Button onClick={handleImportFlowOnly}>
-              {t('serviceFlow.popup.importFlowOnly')}
-            </Button>
+            <Button onClick={handleImportFlowOnly}>{t('serviceFlow.popup.importFlowOnly')}</Button>
             <Button appearance="secondary" onClick={closeImportModal}>
               {t('global.cancel')}
             </Button>
