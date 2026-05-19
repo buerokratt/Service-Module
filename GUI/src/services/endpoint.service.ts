@@ -18,6 +18,7 @@ function filterTrailingUnderscores(endpoint: EndpointData): void {
       if (definition[section]?.variables) {
         for (const v of definition[section].variables) {
           v.name = removeTrailingUnderscores(v.name);
+          if (!v.type || v.type === 'custom') v.type = 'STRING';
         }
       }
     }
