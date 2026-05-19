@@ -186,7 +186,7 @@ export const getColumns = ({ isCommon, navigate, hideDeletePopup, showReadyPopup
             appearance="text"
             onClick={async () => {
               const response = await api.post(getServiceById(), { id: props.row.original.serviceId, search: '' });
-              await exportServices([{ ...props.row.original, structure: response.data.structure }]);
+              await exportServices([{ ...response.data, structure: response.data.structure }]);
             }}
           >
             <Icon icon={<AiOutlineExport />} size="medium" />

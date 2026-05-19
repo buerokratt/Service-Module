@@ -99,7 +99,7 @@ const ExportServicesModal: FC<ExportServicesModalProps> = ({ isVisible, onClose 
       const servicesWithStructure = await Promise.all(
         selectedServices.map(async (service) => {
           const response = await api.post(getServiceById(), { id: service.serviceId, search: '' });
-          return { ...service, structure: response.data.structure };
+          return { ...response.data, structure: response.data.structure };
         }),
       );
       const success = await exportServices(servicesWithStructure);
