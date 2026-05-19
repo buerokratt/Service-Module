@@ -12,7 +12,6 @@ import {
 import { AxiosResponse } from 'axios';
 import { GroupOrRule } from 'components/FlowElementsPopup/RuleBuilder/types';
 import i18next from 'i18next';
-
 import {
   getCommonEndpoints,
   getEndpointValidation,
@@ -42,7 +41,7 @@ import {
   RequestVariablesTabsRowsData,
 } from 'types/request-variables';
 import { initialEdges, initialNodes, NodeDataProps } from 'types/service-flow';
-import { formatSchema, generateJsonRequest } from 'utils/json-request-utils';
+import { formatSchema } from 'utils/json-request-utils';
 import { v4 as uuid } from 'uuid';
 import { create } from 'zustand';
 
