@@ -38,7 +38,6 @@ export async function persistEndpoints(endpoints: EndpointData[], serviceId: str
     if (!hasSelectedDefinition) continue;
 
     endpoint.serviceId = serviceId;
-    endpoint.isCommon = endpoint.isCommon ?? false;
     filterTrailingUnderscores(endpoint);
 
     if (endpoint.isNew) {

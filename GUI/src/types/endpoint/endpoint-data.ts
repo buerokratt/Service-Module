@@ -6,7 +6,6 @@ export type EndpointData = {
   name: string;
   fileName?: string;
   type?: EndpointType;
-  isCommon?: boolean;
   isNew?: boolean;
   hasTestEnv?: boolean;
   serviceId?: string;

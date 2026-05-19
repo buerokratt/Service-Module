@@ -17,9 +17,7 @@ declaration:
       - field: type
         type: string
         description: "Endpoint type"
-      - field: isCommon
-        type: boolean
-        description: "Endpoint common status"
+
       - field: serviceId
         type: string
         description: "Service UUID"
@@ -38,7 +36,6 @@ create_endpoint:
       endpointId: ${incoming.body.endpointId}
       name: ${incoming.body.name}
       type: ${incoming.body.type}
-      isCommon: ${incoming.body.isCommon}
       serviceId: ${incoming.body.serviceId ?? ''}
       definitions: ${incoming.body.definitions}
       description: ${incoming.body.description ?? ''}

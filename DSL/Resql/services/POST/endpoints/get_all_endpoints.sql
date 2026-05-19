@@ -10,7 +10,6 @@ SELECT
   e.name,
   e.description,
   e.type,
-  e.is_common,
   e.definitions,
   e.response_schema
 FROM endpoints AS e

@@ -4,7 +4,6 @@ SELECT
   name,
   description,
   type,
-  is_common,
   definitions,
   last_test_at,
   verification_status,
