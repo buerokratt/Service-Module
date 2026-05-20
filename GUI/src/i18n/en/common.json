@@ -247,7 +247,7 @@
     "examples": {
       "title": "Examples",
       "placeholder": "Add examples of what the user could ask to start the service",
-      "tooltip": "Enter sample user questions that trigger this service (e.g., ‘When is Midsummer festival?’), It is recommended to include at least 5 examples."
+      "tooltip": "Enter sample user questions that trigger this service (e.g. ‘When is Midsummer festival?’). It is recommended to include at least 5 examples"
     },
     "keywords": {
       "title": "Keywords",

@@ -244,7 +244,7 @@
     "examples": {
       "title": "Näidisküsimused",
       "placeholder": "Lisa näiteid, mida kasutaja võiks küsida, et teenus käivituks",
-      "tooltip": "Sisesta näidisküsimused, mille kaudu teenus käivitub (nt. ‘Millal on Jaanipäev?’), Soovituslik on lisada vähemalt 5 näidet."
+      "tooltip": "Sisesta näidisküsimused, mille kaudu teenus käivitub (nt. ‘Millal on Jaanipäev?’). Soovituslik on lisada vähemalt 5 näidet."
     },
     "keywords": {
       "title": "Märksõnad",
