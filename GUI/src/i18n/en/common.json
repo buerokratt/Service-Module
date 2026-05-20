@@ -151,13 +151,13 @@
     "edit": "Edit",
     "delete": "Delete",
     "cancel": "Cancel",
-    "importMany": "Import many",
+    "importMany": "Import",
     "import": {
       "importSuccess": "{{count}} service{{lengthCheck}} imported successfully",
       "importFailure": "Could not import the following files (Wrong format or corrupted): {{files}}",
       "failedToImport": "Failed to import services"
     },
-    "exportMany": "Export many",
+    "exportMany": "Export",
     "exportAll": "Export All",
     "export": "Export",
     "exportAllConfirmation": "Are you sure you want to export all services?",
@@ -247,7 +247,7 @@
     "examples": {
       "title": "Examples",
       "placeholder": "Add examples of what the user could ask to start the service",
-      "tooltip": "Enter sample user questions that trigger this service (e.g., ‘When is Midsummer festival?’)"
+      "tooltip": "Enter sample user questions that trigger this service (e.g., ‘When is Midsummer festival?’), It is recommended to include at least 5 examples."
     },
     "keywords": {
       "title": "Keywords",
@@ -336,7 +336,7 @@
     "chooseMemorySlots": "Choose memory slots"
   },
   "serviceFlow": {
-    "serviceConfiguration": "Service Configuration",
+    "serviceConfiguration": "Settings",
     "element": {
       "taraAuthentication": "Tara authorization",
       "textfield": "Send message to client",
@@ -394,7 +394,7 @@
       "or": "OR",
       "not": "NOT",
       "addRule": "+ Rule",
-      "addElement": "+ Element",
+      "addElement": "+ New variable",
       "addGroup": "+ Group",
       "remove": "Remove",
       "signType": "Sign Type",
@@ -408,7 +408,7 @@
       "confirmImport": "The current service will be rewritten!"
     },
     "previousVariables": {
-      "assignElements": "Assign Elements",
+      "assignElements": "Assigned Variables",
       "dateAndTime": {
         "title": "Date and time",
         "base": "Base",

@@ -450,7 +450,7 @@ const FlowElementsPopup: React.FC = () => {
             <Tabs.Trigger className="vertical-tabs__trigger" value={t('serviceFlow.tabs.setup')}>
               {t('serviceFlow.tabs.setup')}
             </Tabs.Trigger>
-            {!isReadonly && (
+            {!isReadonly && (stepType === StepType.Textfield || stepType === StepType.OpenWebpage) && (
               <Tabs.Trigger className="vertical-tabs__trigger" value={t('serviceFlow.tabs.test')}>
                 {t('serviceFlow.tabs.test')}
               </Tabs.Trigger>

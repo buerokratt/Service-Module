@@ -151,13 +151,13 @@
     "edit": "Muuda",
     "delete": "Kustuta",
     "cancel": "Tühista",
-    "importMany": "Impordi mitu",
+    "importMany": "Impordi",
     "import": {
       "importSuccess": "{{count}} teenus{{lengthCheck}} edukalt imporditud",
       "importFailure": "Järgmisi faile ei õnnestunud importida (vale vorming või rikutud): {{files}}",
       "failedToImport": "Teenuste importimine ebaõnnestus"
     },
-    "exportMany": "Ekspordi mitu",
+    "exportMany": "Ekspordi",
     "exportAll": "Ekspordi kõik",
     "export": "Ekspordi",
     "exportAllConfirmation": "Kas olete kindel, et soovite eksportida kõik teenused?",
@@ -244,7 +244,7 @@
     "examples": {
       "title": "Näidisküsimused",
       "placeholder": "Lisa näiteid, mida kasutaja võiks küsida, et teenus käivituks",
-      "tooltip": "Sisesta näidisküsimused, mille kaudu teenus käivitub (nt. ‘Millal on Jaanipäev?’)"
+      "tooltip": "Sisesta näidisküsimused, mille kaudu teenus käivitub (nt. ‘Millal on Jaanipäev?’), Soovituslik on lisada vähemalt 5 näidet."
     },
     "keywords": {
       "title": "Märksõnad",
@@ -336,7 +336,7 @@
     "chooseMemorySlots": "Vali mälukohad"
   },
   "serviceFlow": {
-    "serviceConfiguration": "Teenuse seaded",
+    "serviceConfiguration": "Seaded",
     "element": {
       "taraAuthentication": "TARA autentimine",
       "textfield": "Sõnum kliendile",
@@ -394,7 +394,7 @@
       "or": "VÕI",
       "not": "MITTE",
       "addRule": "+ Reegel",
-      "addElement": "+ Element",
+      "addElement": "+ Uus väärtus",
       "addGroup": "+ Grupp",
       "remove": "Eemalda",
       "signType": "Märgi tüüp",
@@ -408,7 +408,7 @@
       "confirmImport": "Teenus kirjutatakse üle!"
     },
     "previousVariables": {
-      "assignElements": "Määra elemendid",
+      "assignElements": "Määratud Väärtused",
       "noName": "<Nimeta>",
       "environmentVariables": {
         "title": "Keskkonnamuutujad"
