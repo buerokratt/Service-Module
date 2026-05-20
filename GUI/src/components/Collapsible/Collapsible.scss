@@ -39,6 +39,10 @@
     background-color: get-color(white);
     border-radius: 0 0 4px 4px;
     overflow: hidden;
+
+    &[data-state='open'] {
+      overflow: visible;
+    }
   }
 }
 
