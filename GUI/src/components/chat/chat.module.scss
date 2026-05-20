@@ -381,6 +381,7 @@
   &.client {
     .content {
       background-color: #764ca0;
+      color: white;
     }
   }
 
@@ -388,7 +389,7 @@
     .main {
       .content {
         background-color: get-color(sapphire-blue-12);
-        color: var(--dark-bg-extra-light);
+        color: white;
 
         a {
           color: #a8d4ff;
@@ -404,18 +405,17 @@
 }
 
 [data-theme='dark'] .system {
+  color: white;
+
   &.success {
-    color: get-color(sea-green-11);
     background: get-color(sea-green-6);
   }
 
-  &.error {
-    color: get-color(jasper-11);
+  &.error { 
     background: get-color(jasper-6);
   }
 
   &.info {
-    color: get-color(sapphire-blue-11);
     background: get-color(sapphire-blue-6);
   }
 
