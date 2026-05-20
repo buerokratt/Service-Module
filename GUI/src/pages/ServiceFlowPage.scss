@@ -190,6 +190,19 @@
     stroke: get-color(black-coral-10);
     stroke-width: 1.5px;
   }
+
+}
+
+[data-theme='light'] .react-flow {
+  &__edge {
+    &.selected {
+      .react-flow__edge-path {
+        stroke: get-color(sapphire-blue-9);
+        stroke-width: 2.5px;
+        filter: drop-shadow(0 0 4px rgba(23, 105, 171, 0.2));
+      }
+    }
+  }
 }
 
 .edge-button {
@@ -289,8 +302,18 @@
   }
 
   &__edge-path {
-    stroke: get-color(black-coral-10);
+    stroke: get-color(black-coral-6);
     stroke-width: 1.5px;
+  }
+
+  &__edge {
+    &.selected {
+      .react-flow__edge-path {
+        stroke: get-color(sapphire-blue-4);
+        stroke-width: 2.5px;
+        filter: drop-shadow(0 0 5px rgba(139, 180, 213, 0.2));
+      }
+    }
   }
 }
 
