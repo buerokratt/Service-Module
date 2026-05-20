@@ -15,16 +15,16 @@ const startNodeId = generateUniqueId();
 const ghostNodeId = generateUniqueId();
 
 export interface ServiceExportSettings {
-  title?: string;
-  description?: string;
-  examples?: string[];
-  keywords?: string[];
+  readonly title?: string;
+  readonly description?: string;
+  readonly examples?: string[];
+  readonly keywords?: string[];
 }
 
 export interface FlowData {
   nodes: Node<NodeDataProps>[];
   edges: Edge[];
-  settings?: ServiceExportSettings;
+  readonly settings?: ServiceExportSettings;
 }
 
 export type NodeDataProps = {
