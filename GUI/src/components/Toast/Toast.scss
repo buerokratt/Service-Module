@@ -80,7 +80,7 @@
     color: var(--dark-text-secondary);
   }
 
-  &__list {
+  &__list:not(:empty) {
     background-color: var(--dark-bg-extra-light);
   }
 
