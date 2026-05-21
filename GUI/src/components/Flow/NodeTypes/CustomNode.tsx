@@ -1,12 +1,14 @@
-import { Handle, NodeProps, Position, useUpdateNodeInternals } from '@xyflow/react';
+import { Handle, NodeProps, Position, useStore, useUpdateNodeInternals } from '@xyflow/react';
 import './Node.scss';
 import Button from 'components/Button';
 import Icon from 'components/Icon';
 import Track from 'components/Track';
-import React, { FC, useEffect } from 'react';
+import React, { FC, useEffect, useMemo } from 'react';
 import { MdDeleteOutline, MdOutlineEdit, MdOutlineRemoveRedEye } from 'react-icons/md';
 import useServiceStore from 'store/services.store';
+import { StepType } from 'types';
 import { NodeDataProps } from 'types/service-flow';
+import { MCQ_SOURCE_HANDLE_ID, mcqHasEmptyBranches } from 'utils/mcq-flow-utils';
 
 import StepNode from './StepNode';
 
@@ -17,13 +19,21 @@ type CustomNodeProps = {
 const CustomNode: FC<NodeProps & CustomNodeProps> = (props) => {
   const { data, isConnectable, id } = props;
   const orientation = useServiceStore((state) => state.orientation);
-  const shouldOffsetHandles = data.childrenCount > 1;
+  const isMcq = data.stepType === StepType.MultiChoiceQuestion;
+  const shouldOffsetHandles = !isMcq && data.childrenCount > 1;
+
+  const edges = useStore((state) => state.edges);
+  const nodes = useStore((state) => state.nodes);
+
+  const mcqCanConnect = useMemo(() => !isMcq || mcqHasEmptyBranches(id, nodes, edges), [edges, id, isMcq, nodes]);
+
+  const canConnect = isConnectable && mcqCanConnect;
 
   const updateNodeInternals = useUpdateNodeInternals();
 
   useEffect(() => {
     updateNodeInternals(id);
-  }, [data.childrenCount, id, updateNodeInternals, orientation]);
+  }, [data.childrenCount, id, isMcq, mcqCanConnect, updateNodeInternals, orientation]);
 
   const isFinishingStep = () => {
     return data.type === 'finishing-step';
@@ -38,6 +48,18 @@ const CustomNode: FC<NodeProps & CustomNodeProps> = (props) => {
   };
 
   const bottomHandles = (): React.JSX.Element => {
+    if (isMcq) {
+      return (
+        <Handle
+          id={MCQ_SOURCE_HANDLE_ID}
+          type="source"
+          position={getSourcePosition()}
+          isConnectable={canConnect}
+          hidden={isFinishingStep()}
+        />
+      );
+    }
+
     return (
       <>
         {new Array(data.childrenCount).fill(0).map((_, i) => (
@@ -64,7 +86,7 @@ const CustomNode: FC<NodeProps & CustomNodeProps> = (props) => {
 
   return (
     <>
-      <Handle type="target" position={getTargetPosition()} isConnectable={isConnectable} />
+      <Handle type="target" position={getTargetPosition()} isConnectable={canConnect} />
       <StepNode data={data} />
       {data.stepType !== 'rule' && (
         <Track style={{ position: 'fixed', top: 8, right: 8 }}>

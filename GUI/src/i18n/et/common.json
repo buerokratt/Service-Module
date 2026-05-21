@@ -408,6 +408,10 @@
       "confirmImport": "Teenus kirjutatakse üle!",
       "importFlowOnly": "Ainult voo import"
     },
+    "mcq": {
+      "selectBranchTitle": "Vali haru",
+      "emptyBranchesMessage": "Sellel valikvastuse küsimusel on {{count}} tühja haru. Millisele harule soovid ühendada?"
+    },
     "previousVariables": {
       "assignElements": "Määra elemendid",
       "noName": "<Nimeta>",

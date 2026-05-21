@@ -206,6 +206,7 @@ const FlowElementsPopup: React.FC = () => {
         dynamicChoices: node.data.stepType === StepType.DynamicChoices ? dynamicChoices : undefined,
         endpoint: nodeEndpoint ?? node.data?.endpoint,
         testingPassed: undefined,
+        childrenCount: node.data.stepType === StepType.MultiChoiceQuestion ? 1 : node.data.childrenCount,
       },
     };
 
@@ -393,6 +394,8 @@ const FlowElementsPopup: React.FC = () => {
       selectable: false,
       draggable: false,
     }));
+
+    updatedNode.data.childrenCount = 1;
 
     let finalNodes = [...nodes.filter((n) => n.id !== updatedNode.id), updatedNode, ...newGhostNodes];
     let finalEdges = [...filteredEdges, ...newEdges];

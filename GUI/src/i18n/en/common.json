@@ -408,6 +408,10 @@
       "confirmImport": "The current service will be rewritten!",
       "importFlowOnly": "Import Flow Only"
     },
+    "mcq": {
+      "selectBranchTitle": "Select branch",
+      "emptyBranchesMessage": "This multi-choice question has {{count}} empty branches. Which branch do you want to connect?"
+    },
     "previousVariables": {
       "assignElements": "Assign Elements",
       "dateAndTime": {
