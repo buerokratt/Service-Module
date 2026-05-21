@@ -8,10 +8,18 @@ import { updateFlowInputRules } from 'services/flow-builder';
 import useServiceStore from 'store/new-services.store';
 import useToastStore from 'store/toasts.store';
 import { FlowData } from 'types/service-flow';
+import { appendFlowNodes } from 'utils/append-flow-nodes';
+import {
+  applyServiceSettings,
+  buildServiceSettingsFromStore,
+  isValidFlowData,
+  parseFlowArtifact,
+  serializeFlowArtifact,
+} from 'utils/service-flow-artifact';
 import { removeTrailingUnderscores } from 'utils/string-util';
 
 const ImportExportControls: FC = () => {
-  const { getNodes, getEdges } = useReactFlow();
+  const { getNodes, getEdges, setNodes, setEdges } = useReactFlow();
   const { t } = useTranslation();
   const { setHasUnsavedChanges, saveToHistory, setNodes: setStoreNodes, setEdges: setStoreEdges } = useServiceStore();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -21,7 +29,7 @@ const ImportExportControls: FC = () => {
 
   const handleExport = useCallback(async () => {
     try {
-      const dataString = JSON.stringify({ nodes: getNodes(), edges: getEdges() });
+      const dataString = serializeFlowArtifact(getNodes(), getEdges(), buildServiceSettingsFromStore());
       const fileName = `${serviceName != undefined && serviceName != '' ? serviceName : 'flow'}_${format(new Date(), 'yyyy_MM_dd_HH_mm_ss')}.json`;
 
       if ('showSaveFilePicker' in window) {
@@ -56,8 +64,9 @@ const ImportExportControls: FC = () => {
   }, [getNodes, getEdges, serviceName, t]);
 
   const applyImportedFlow = useCallback(
-    (flowData: FlowData) => {
+    (flowData: FlowData, settings?: FlowData['settings']) => {
       if (isValidFlowData(flowData)) {
+        applyServiceSettings(settings);
         const nodes = flowData.nodes.map((node: any) => {
           if (node.type !== 'custom') return node;
           node.data = {
@@ -90,13 +99,14 @@ const ImportExportControls: FC = () => {
       reader.onload = (e) => {
         try {
           const content = e.target?.result as string;
-          const flowData = JSON.parse(content) as FlowData;
+          const { nodes, edges, settings } = parseFlowArtifact(content);
+          const flowData = { nodes, edges } as FlowData;
           const currentNodes = getNodes().filter((node) => node.type !== 'ghost');
 
           if (currentNodes.length === 1 && currentNodes[0].type === 'start') {
-            applyImportedFlow(flowData);
+            applyImportedFlow(flowData, settings);
           } else {
-            setImportedFlowData(flowData);
+            setImportedFlowData({ ...flowData, settings });
             setIsConfirmImportModalVisible(true);
           }
         } catch (error) {
@@ -115,28 +125,46 @@ const ImportExportControls: FC = () => {
     [getNodes, applyImportedFlow, t],
   );
 
-  const handleConfirmImport = useCallback(() => {
-    if (importedFlowData) {
-      applyImportedFlow(importedFlowData);
-    }
-    setIsConfirmImportModalVisible(false);
-    setImportedFlowData(null);
-  }, [importedFlowData, applyImportedFlow]);
-
-  const handleCancelImport = useCallback(() => {
+  const closeImportModal = useCallback(() => {
     setIsConfirmImportModalVisible(false);
     setImportedFlowData(null);
   }, []);
 
-  const isValidFlowData = (data: any): data is FlowData => {
-    return (
-      data &&
-      Array.isArray(data.nodes) &&
-      Array.isArray(data.edges) &&
-      data.nodes.every((node: any) => node.id && node.type) &&
-      data.edges.every((edge: any) => edge.id && edge.source && edge.target)
-    );
-  };
+  const handleConfirmImport = useCallback(() => {
+    if (importedFlowData) {
+      const { settings, ...flowData } = importedFlowData;
+      applyImportedFlow(flowData, settings);
+    }
+    closeImportModal();
+  }, [importedFlowData, applyImportedFlow, closeImportModal]);
+
+  const handleImportFlowOnly = useCallback(() => {
+    if (!importedFlowData) {
+      closeImportModal();
+      return;
+    }
+
+    const { nodes, edges } = appendFlowNodes(getNodes(), getEdges(), importedFlowData.nodes, importedFlowData.edges);
+    saveToHistory();
+    setStoreNodes(nodes);
+    setStoreEdges(edges);
+    setNodes(nodes);
+    setEdges(edges);
+    saveToHistory({ nodes, edges });
+    setHasUnsavedChanges(true);
+    closeImportModal();
+  }, [
+    importedFlowData,
+    getNodes,
+    getEdges,
+    setNodes,
+    setEdges,
+    setStoreNodes,
+    setStoreEdges,
+    setHasUnsavedChanges,
+    saveToHistory,
+    closeImportModal,
+  ]);
 
   const triggerFileInput = useCallback(() => {
     if (fileInputRef.current) {
@@ -158,12 +186,13 @@ const ImportExportControls: FC = () => {
         </Button>
       </Track>
       {isConfirmImportModalVisible && (
-        <Modal title={t('serviceFlow.popup.confirmImport')} onClose={handleCancelImport}>
+        <Modal title={t('serviceFlow.popup.confirmImport')} onClose={closeImportModal}>
           <Track justify="end" gap={16}>
             <Button appearance="primary" onClick={handleConfirmImport}>
               {t('global.proceed')}
             </Button>
-            <Button appearance="secondary" onClick={handleCancelImport}>
+            <Button onClick={handleImportFlowOnly}>{t('serviceFlow.popup.importFlowOnly')}</Button>
+            <Button appearance="secondary" onClick={closeImportModal}>
               {t('global.cancel')}
             </Button>
           </Track>

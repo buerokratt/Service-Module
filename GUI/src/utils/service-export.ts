@@ -3,6 +3,7 @@ import i18n from 'i18n';
 import JSZip from 'jszip';
 import useToastStore from 'store/toasts.store';
 import { Service } from 'types';
+import { buildExportPayloadFromService } from 'utils/service-flow-artifact';
 
 const sanitizeFileName = (name: string): string => name.replaceAll(/[^a-z0-9]/gi, '_');
 const getTimestamp = (): string => format(new Date(), 'yyyy_MM_dd_HH_mm_ss');
@@ -53,7 +54,7 @@ export const exportServices = async (services: Service[]): Promise<boolean> => {
 
     if (services.length === 1) {
       const service = services[0];
-      const dataString = service?.structure?.value ?? '{}';
+      const dataString = buildExportPayloadFromService(service);
       const fileName = `${sanitizeFileName(service.name)}_${timestamp}.json`;
       const blob = new Blob([dataString], { type: 'application/json' });
       const success = await downloadBlob(blob, fileName, 'application/json', 'json');
@@ -61,7 +62,7 @@ export const exportServices = async (services: Service[]): Promise<boolean> => {
     } else {
       const zip = new JSZip();
       services.forEach((service) => {
-        const dataString = service?.structure?.value ?? '{}';
+        const dataString = buildExportPayloadFromService(service);
         const fileName = `${sanitizeFileName(service.name)}_${timestamp}.json`;
         zip.file(fileName, dataString);
       });

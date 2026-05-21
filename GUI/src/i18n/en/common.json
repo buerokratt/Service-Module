@@ -405,7 +405,8 @@
       "removeValueAssignment": "Remove element assigned as value",
       "assignManualEdit": "Manually edit variable assignment",
       "openObjectEditor": "Open object editor",
-      "confirmImport": "The current service will be rewritten!"
+      "confirmImport": "The current service will be rewritten!",
+      "importFlowOnly": "Import Flow Only"
     },
     "previousVariables": {
       "assignElements": "Assign Elements",
