@@ -6,10 +6,7 @@ import api from 'services/api';
 import { buildAllServiceContents } from 'services/service-builder';
 import useServiceListStore from 'store/services.store';
 import useToastStore from 'store/toasts.store';
-import { FlowData } from 'types/service-flow';
-
-const isValidFlowData = (data: any): data is FlowData =>
-  data?.nodes && data?.edges && Array.isArray(data.nodes) && Array.isArray(data.edges);
+import { isValidFlowData, parseFlowArtifact, serializeFlowArtifact } from 'utils/service-flow-artifact';
 
 const handleImportServices = async (
   event: ChangeEvent<HTMLInputElement>,
@@ -38,17 +35,22 @@ const handleImportServices = async (
     const name = rawName.replace(/(_\d{4}_\d{2}_\d{2}_\d{2}_\d{2}_\d{2})+$/, '');
     try {
       const content = await file.text();
-      const flowData = JSON.parse(content) as FlowData;
+      const { nodes, edges, settings } = parseFlowArtifact(content);
 
-      if (!isValidFlowData(flowData)) {
+      if (!isValidFlowData({ nodes, edges })) {
         throw new Error('Invalid flow data structure');
       }
 
-      const result = buildAllServiceContents(flowData.nodes, flowData.edges, name);
+      const result = buildAllServiceContents(
+        nodes as Parameters<typeof buildAllServiceContents>[0],
+        edges,
+        name,
+        settings?.description ?? '',
+      );
 
       validFiles.push({
         fileName: result.name,
-        flowData: result.flowData,
+        flowData: serializeFlowArtifact(nodes, edges, settings),
         content: result.content,
         subServices: result.subServices,
       });

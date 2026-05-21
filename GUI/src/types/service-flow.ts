@@ -14,9 +14,17 @@ export const EDGE_LENGTH = 5 * GRID_UNIT;
 const startNodeId = generateUniqueId();
 const ghostNodeId = generateUniqueId();
 
+export interface ServiceExportSettings {
+  readonly title?: string;
+  readonly description?: string;
+  readonly examples?: string[];
+  readonly keywords?: string[];
+}
+
 export interface FlowData {
   nodes: Node<NodeDataProps>[];
   edges: Edge[];
+  readonly settings?: ServiceExportSettings;
 }
 
 export type NodeDataProps = {

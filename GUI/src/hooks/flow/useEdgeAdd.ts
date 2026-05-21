@@ -18,6 +18,14 @@ function useEdgeAdd(id: string) {
 
     const newNodeId = generateUniqueId();
 
+    const defaultMcqButtons = [
+      { id: '1', title: 'Jah', payload: '' },
+      { id: '2', title: 'Ei', payload: '' },
+    ];
+
+    const multiChoiceQuestion =
+      stepType === StepType.MultiChoiceQuestion ? { question: '', buttons: defaultMcqButtons } : undefined;
+
     const insertNode = {
       id: newNodeId,
       position: { x: targetNode.position.x, y: targetNode.position.y },
@@ -31,6 +39,7 @@ function useEdgeAdd(id: string) {
         stepType: stepType,
         readonly: [StepType.Auth, StepType.FinishingStepEnd, StepType.FinishingStepRedirect].includes(stepType),
         endpoint: step.data,
+        multiChoiceQuestion,
         setClickedNode: useServiceStore.getState().setClickedNode,
       },
       className: (() => {

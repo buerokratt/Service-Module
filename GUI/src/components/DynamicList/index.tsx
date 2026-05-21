@@ -15,7 +15,7 @@ type DynamicListProps = {
   tooltipText?: string;
 };
 
-const DynamicList: FC<DynamicListProps> = ({ label, labelWidth = 120, value, onChange, placeholder, tooltipText }) => {
+const DynamicList: FC<DynamicListProps> = ({ label, labelWidth = 170, value, onChange, placeholder, tooltipText }) => {
   const { t } = useTranslation();
   const items = value?.length > 0 ? value : [''];
 

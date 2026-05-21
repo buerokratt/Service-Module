@@ -1,0 +1,10 @@
+.mcq-branch-select-modal__button {
+  display: inline-flex;
+  width: fit-content;
+  max-width: 100%;
+  overflow: hidden;
+
+  .multiple-choice-question-button__text {
+    max-width: 100%;
+  }
+}
