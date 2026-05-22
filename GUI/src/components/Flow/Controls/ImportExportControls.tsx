@@ -4,6 +4,7 @@ import { format } from 'date-fns';
 import { ChangeEvent, FC, useCallback, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { AiOutlineExport, AiOutlineImport } from 'react-icons/ai';
+import api from 'services/api';
 import { updateFlowInputRules } from 'services/flow-builder';
 import useServiceStore from 'store/new-services.store';
 import useToastStore from 'store/toasts.store';
@@ -17,6 +18,7 @@ import {
   serializeFlowArtifact,
 } from 'utils/service-flow-artifact';
 import { removeTrailingUnderscores } from 'utils/string-util';
+import { checkImportNames } from 'resources/api-constants';
 
 const ImportExportControls: FC = () => {
   const { getNodes, getEdges, setNodes, setEdges } = useReactFlow();
@@ -90,23 +92,38 @@ const ImportExportControls: FC = () => {
     [setStoreNodes, setStoreEdges, setHasUnsavedChanges, saveToHistory, t],
   );
 
+  const resolveImportedName = useCallback(async (title: string): Promise<string> => {
+    try {
+      const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+      const res = await api.post(checkImportNames(), { names: title, timezone });
+      return (res.data as { names?: string })?.names ?? title;
+    } catch {
+      return title;
+    }
+  }, []);
+
   const handleImport = useCallback(
     (event: ChangeEvent<HTMLInputElement>) => {
       const file = event.target.files?.[0];
       if (!file) return;
 
       const reader = new FileReader();
-      reader.onload = (e) => {
+      reader.onload = async (e) => {
         try {
           const content = e.target?.result as string;
           const { nodes, edges, settings } = parseFlowArtifact(content);
           const flowData = { nodes, edges } as FlowData;
+
+          const resolvedSettings = settings?.title
+            ? { ...settings, title: await resolveImportedName(settings.title) }
+            : settings;
+
           const currentNodes = getNodes().filter((node) => node.type !== 'ghost');
 
           if (currentNodes.length === 1 && currentNodes[0].type === 'start') {
-            applyImportedFlow(flowData, settings);
+            applyImportedFlow(flowData, resolvedSettings);
           } else {
-            setImportedFlowData({ ...flowData, settings });
+            setImportedFlowData({ ...flowData, settings: resolvedSettings });
             setIsConfirmImportModalVisible(true);
           }
         } catch (error) {
@@ -122,7 +139,7 @@ const ImportExportControls: FC = () => {
         fileInputRef.current.value = '';
       }
     },
-    [getNodes, applyImportedFlow, t],
+    [getNodes, applyImportedFlow, resolveImportedName, t],
   );
 
   const closeImportModal = useCallback(() => {
