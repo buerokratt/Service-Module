@@ -74,7 +74,16 @@ export const EndpointTooltipContent: React.FC<{
   const IND2: React.CSSProperties = { paddingLeft: 32, opacity: 0.75, fontSize: 11 };
 
   return (
-    <div style={{ fontFamily: 'monospace', fontSize: 12, lineHeight: 1.7, maxWidth: 420, maxHeight: '50vh', overflowY: 'auto' }}>
+    <div
+      style={{
+        fontFamily: 'monospace',
+        fontSize: 12,
+        lineHeight: 1.7,
+        maxWidth: 420,
+        maxHeight: '50vh',
+        overflowY: 'auto',
+      }}
+    >
       <div style={{ ...S, marginBottom: 6 }}>
         <strong>NAME:</strong> {name || '—'}
       </div>
