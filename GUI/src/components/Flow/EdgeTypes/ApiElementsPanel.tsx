@@ -219,7 +219,7 @@ const ApiElementsPanel: React.FC<ApiElementsPanelProps> = ({ onAddToCanvas }) =>
             >
               <table
                 className="data-table"
-                style={{ tableLayout: 'fixed', width: '100%', borderCollapse: 'separate', borderSpacing: '0 4px' }}
+                style={{ tableLayout: 'fixed', width: '100%', borderCollapse: 'separate', borderSpacing: '0 6px' }}
               >
                 <thead>
                   <tr style={{ height: 36 }}>
