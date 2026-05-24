@@ -179,14 +179,11 @@ const ApiElementsPanel: React.FC<ApiElementsPanelProps> = ({ onAddToCanvas }) =>
             minWidth: 0,
             height: 40,
             padding: '4px 8px',
-            background: '#FFFFFF',
-            border: '1px solid #9799A4',
             borderRadius: 4,
             fontFamily: "'Roboto', sans-serif",
             fontSize: 16,
             fontWeight: 400,
             lineHeight: '24px',
-            color: '#09090b',
             outline: 'none',
             boxSizing: 'border-box',
           }}
@@ -225,14 +222,12 @@ const ApiElementsPanel: React.FC<ApiElementsPanelProps> = ({ onAddToCanvas }) =>
                 style={{ tableLayout: 'fixed', width: '100%', borderCollapse: 'separate', borderSpacing: '0 4px' }}
               >
                 <thead>
-                  <tr style={{ background: '#F0F0F2', borderBottom: '1px solid #D2D3D8', height: 36 }}>
+                  <tr style={{ height: 36 }}>
                     <th
                       onClick={() => handleSort('name')}
                       style={{
                         cursor: 'pointer',
                         userSelect: 'none',
-                        background: '#F0F0F2',
-                        borderBottom: '1px solid #D2D3D8',
                       }}
                     >
                       <SortIcon colId="name" currentSortId={currentSortId} currentDesc={currentDesc} />{' '}
@@ -245,8 +240,6 @@ const ApiElementsPanel: React.FC<ApiElementsPanelProps> = ({ onAddToCanvas }) =>
                         userSelect: 'none',
                         width: 90,
                         textAlign: 'center',
-                        background: '#F0F0F2',
-                        borderBottom: '1px solid #D2D3D8',
                       }}
                     >
                       <SortIcon colId="status" currentSortId={currentSortId} currentDesc={currentDesc} />{' '}
@@ -259,15 +252,13 @@ const ApiElementsPanel: React.FC<ApiElementsPanelProps> = ({ onAddToCanvas }) =>
                         userSelect: 'none',
                         width: 100,
                         textAlign: 'center',
-                        background: '#F0F0F2',
-                        borderBottom: '1px solid #D2D3D8',
                         whiteSpace: 'nowrap',
                       }}
                     >
                       <SortIcon colId="schema" currentSortId={currentSortId} currentDesc={currentDesc} />{' '}
                       {t('apiRegistry.columns.schema')}
                     </th>
-                    <th style={{ width: 112, background: '#F0F0F2', borderBottom: '1px solid #D2D3D8' }} />
+                    <th style={{ width: 112 }} />
                   </tr>
                 </thead>
                 <tbody>
@@ -339,6 +330,7 @@ const ApiElementsPanel: React.FC<ApiElementsPanelProps> = ({ onAddToCanvas }) =>
                                   useToastStore.getState().error({ title: t('global.notificationError') });
                                 });
                               }}
+                              className="api-elements-panel__action-btn"
                               style={{
                                 background: 'none',
                                 border: 'none',
@@ -346,7 +338,6 @@ const ApiElementsPanel: React.FC<ApiElementsPanelProps> = ({ onAddToCanvas }) =>
                                 padding: 6,
                                 opacity: isTesting ? 0.4 : 1,
                                 lineHeight: 1,
-                                color: '#555867',
                                 fontSize: 18,
                                 display: 'flex',
                               }}
@@ -360,13 +351,13 @@ const ApiElementsPanel: React.FC<ApiElementsPanelProps> = ({ onAddToCanvas }) =>
                                 e.stopPropagation();
                                 setEditingEndpoint(endpoint);
                               }}
+                              className="api-elements-panel__action-btn"
                               style={{
                                 background: 'none',
                                 border: 'none',
                                 cursor: 'pointer',
                                 padding: 6,
                                 lineHeight: 1,
-                                color: '#555867',
                                 fontSize: 18,
                                 display: 'flex',
                               }}
@@ -380,13 +371,13 @@ const ApiElementsPanel: React.FC<ApiElementsPanelProps> = ({ onAddToCanvas }) =>
                                 e.stopPropagation();
                                 setDeletingEndpoint(endpoint);
                               }}
+                              className="api-elements-panel__action-btn"
                               style={{
                                 background: 'none',
                                 border: 'none',
                                 cursor: 'pointer',
                                 padding: 6,
                                 lineHeight: 1,
-                                color: '#555867',
                                 fontSize: 18,
                                 display: 'flex',
                               }}
@@ -405,8 +396,6 @@ const ApiElementsPanel: React.FC<ApiElementsPanelProps> = ({ onAddToCanvas }) =>
           <div
             className="data-table__pagination-wrapper"
             style={{
-              background: '#FFFFFF',
-              boxShadow: '0px -1px 0px #5D6071',
               borderRadius: '0px 0px 5px 5px',
               minHeight: 40,
             }}
