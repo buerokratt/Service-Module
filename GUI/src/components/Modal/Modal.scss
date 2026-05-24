@@ -21,6 +21,11 @@
   max-width: 650px;
   z-index: 1000;
 
+  &--large {
+    min-width: 800px;
+    max-width: 900px;
+  }
+
   &__overlay {
     position: fixed;
     inset: 0;
