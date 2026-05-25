@@ -188,7 +188,7 @@ const AddEndpointModal: React.FC<AddEndpointModalProps> = ({
   const modalTitle = mode === 'edit' ? t('newService.editEndpoint') : t('newService.createNewEndpoint');
 
   return (
-    <Modal title={modalTitle} onClose={handleClose}>
+    <Modal title={modalTitle} onClose={handleClose} size="large">
       <Track isMultiline gap={16} direction="vertical" align="stretch">
         <ApiEndpointCard
           endpoint={endpoint}
