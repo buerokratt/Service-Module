@@ -74,7 +74,16 @@ export const EndpointTooltipContent: React.FC<{
   const IND2: React.CSSProperties = { paddingLeft: 32, opacity: 0.75, fontSize: 11 };
 
   return (
-    <div style={{ fontFamily: 'monospace', fontSize: 12, lineHeight: 1.7, maxWidth: 420 }}>
+    <div
+      style={{
+        fontFamily: 'monospace',
+        fontSize: 12,
+        lineHeight: 1.7,
+        maxWidth: 420,
+        maxHeight: '50vh',
+        overflowY: 'auto',
+      }}
+    >
       <div style={{ ...S, marginBottom: 6 }}>
         <strong>NAME:</strong> {name || '—'}
       </div>
@@ -218,7 +227,7 @@ const ApiRegistryTable: React.FC<ApiRegistryTableProps> = ({
             <tr>
               <th
                 onClick={() => handleSort('name')}
-                style={{ cursor: 'pointer', userSelect: 'none', whiteSpace: 'nowrap', width: '30%' }}
+                style={{ cursor: 'pointer', userSelect: 'none', whiteSpace: 'nowrap', width: '20%' }}
               >
                 <SortIcon colId="name" currentSortId={currentSortId} currentDesc={currentDesc} />{' '}
                 {String(t('apiRegistry.columns.name'))}
@@ -230,7 +239,7 @@ const ApiRegistryTable: React.FC<ApiRegistryTableProps> = ({
                   userSelect: 'none',
                   whiteSpace: 'nowrap',
                   textAlign: 'center',
-                  width: '160px',
+                  width: '200px',
                 }}
               >
                 <SortIcon colId="lastTest" currentSortId={currentSortId} currentDesc={currentDesc} />{' '}
@@ -259,7 +268,7 @@ const ApiRegistryTable: React.FC<ApiRegistryTableProps> = ({
               <th style={{ width: '120px', whiteSpace: 'nowrap', textAlign: 'center' }}>
                 {t('apiRegistry.columns.llmIndexStatus') ?? 'LLM Index Status'}
               </th>
-              <th style={{ width: '320px' }}></th>
+              <th></th>
             </tr>
           </thead>
           <tbody>
@@ -355,6 +364,14 @@ const ApiRegistryTable: React.FC<ApiRegistryTableProps> = ({
                           {isTesting ? t('global.loading') : t('apiRegistry.actions.test')}
                         </Track>
                       </Button>
+                      <Button appearance="text" size="s" onClick={() => onReIndex?.(endpoint)}>
+                        <Track gap={4} align="center">
+                          <span style={{ color: '#000' }}>
+                            <MdRefresh />
+                          </span>
+                          {t('apiRegistry.actions.reIndex') ?? 'Re-Index'}
+                        </Track>
+                      </Button>
                       <Button appearance="text" size="s" onClick={() => onEdit(endpoint)}>
                         <Track gap={4} align="center">
                           <span style={{ color: '#000' }}>
@@ -369,14 +386,6 @@ const ApiRegistryTable: React.FC<ApiRegistryTableProps> = ({
                             <MdDeleteOutline />
                           </span>
                           {t('apiRegistry.actions.delete')}
-                        </Track>
-                      </Button>
-                      <Button appearance="text" size="s" onClick={() => onReIndex?.(endpoint)}>
-                        <Track gap={4} align="center">
-                          <span style={{ color: '#000' }}>
-                            <MdRefresh />
-                          </span>
-                          {t('apiRegistry.actions.reIndex') ?? 'Re-Index'}
                         </Track>
                       </Button>
                     </Track>
