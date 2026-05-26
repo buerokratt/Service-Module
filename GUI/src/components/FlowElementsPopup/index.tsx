@@ -122,7 +122,7 @@ const FlowElementsPopup: React.FC = () => {
     node?.data.dynamicChoices ?? defaultDynamicChoices,
   );
 
-  const defaultJumpToService: JumpToService = useMemo(() => ({ serviceName: '', parameters: [] }), []);
+  const defaultJumpToService: JumpToService = useMemo(() => ({ serviceName: '', input: [] }), []);
   const [jumpToService, setJumpToService] = useState<JumpToService>(node?.data.jumpToService ?? defaultJumpToService);
 
   const [nodeEndpoint, setNodeEndpoint] = useState<EndpointData | undefined>(node?.data.endpoint);

@@ -51,8 +51,8 @@ const JumpToServiceContent: FC<JumpToServiceContentProps> = ({ node, jumpToServi
     });
   };
 
-  const handleParametersChange = (parameters: Assign[]) => {
-    onChange({ ...jumpToService, parameters });
+  const handleParametersChange = (input: Assign[]) => {
+    onChange({ ...jumpToService, input });
   };
 
   return (
@@ -80,7 +80,7 @@ const JumpToServiceContent: FC<JumpToServiceContentProps> = ({ node, jumpToServi
           </>
         )}
       </Track>
-      <AssignBuilder seedGroup={jumpToService.parameters} onChange={handleParametersChange} />
+      <AssignBuilder seedGroup={jumpToService.input} onChange={handleParametersChange} />
       <PreviousVariables node={node} />
     </Track>
   );
