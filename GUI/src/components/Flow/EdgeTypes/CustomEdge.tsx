@@ -79,6 +79,7 @@ function CustomEdge({
         StepType.MultiChoiceQuestion,
         StepType.DynamicChoices,
         StepType.FinishingStepEnd,
+        StepType.JumpToService,
       ];
 
       if (allowedSteps.includes(preference as StepType)) {

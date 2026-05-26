@@ -973,6 +973,15 @@ const getTemplateDataFromNode = (node: Node): { templateName: string; body?: any
       resultName: 'SiGa',
     };
   }
+  if (node.data.stepType === StepType.JumpToService) {
+    return {
+      templateName: '[#SERVICE_PROJECT_LAYER]/jump-to-service',
+      body: {
+        serviceName: node.data.jumpToService?.serviceName ?? '',
+        parameters: node.data.jumpToService?.parameters ?? [],
+      },
+    };
+  }
   if (node.data.stepType === StepType.FinishingStepRedirect) {
     return {
       templateName: '[#SERVICE_PROJECT_LAYER]/direct-to-cs',

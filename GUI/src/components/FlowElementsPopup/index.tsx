@@ -9,6 +9,7 @@ import useServiceListStore from 'store/services.store';
 import useToastStore from 'store/toasts.store';
 import { DynamicChoices } from 'types/dynamic-choices';
 import { EndpointData } from 'types/endpoint';
+import { JumpToService } from 'types/jump-to-service';
 import { MultiChoiceQuestionButton } from 'types/multi-choice-question';
 import { NodeDataProps } from 'types/service-flow';
 import { getValueByPath } from 'utils/object-util';
@@ -23,6 +24,7 @@ import {
 import { Button, Track } from '..';
 import Popup from '../Popup';
 import ApiContent from './ApiContent';
+import JumpToServiceContent from './JumpToServiceContent';
 import AssignContent from './AssignContent';
 import ConditionBuilderContent from './ConditionBuilderContent';
 import ConditionContent from './ConditionContent';
@@ -120,6 +122,11 @@ const FlowElementsPopup: React.FC = () => {
     node?.data.dynamicChoices ?? defaultDynamicChoices,
   );
 
+  const defaultJumpToService: JumpToService = useMemo(() => ({ serviceName: '', parameters: [] }), []);
+  const [jumpToService, setJumpToService] = useState<JumpToService>(
+    node?.data.jumpToService ?? defaultJumpToService,
+  );
+
   const [nodeEndpoint, setNodeEndpoint] = useState<EndpointData | undefined>(node?.data.endpoint);
   const [title, setTitle] = useState(node?.data.label ?? '');
   const [titleError, setTitleError] = useState<string | undefined>(undefined);
@@ -158,6 +165,10 @@ const FlowElementsPopup: React.FC = () => {
         setDynamicChoices(node.data?.dynamicChoices ?? defaultDynamicChoices);
         break;
 
+      case StepType.JumpToService:
+        setJumpToService(node.data?.jumpToService ?? defaultJumpToService);
+        break;
+
       default:
         break;
     }
@@ -179,6 +190,7 @@ const FlowElementsPopup: React.FC = () => {
     setMultiChoiceQuestionButtons(copyMcqButtons(defaultMultiChoiceQuestionButtons));
     setIsSaveEnabled(true);
     setDynamicChoices(defaultDynamicChoices);
+    setJumpToService(defaultJumpToService);
     useServiceStore.getState().resetSelectedNode();
     useServiceStore.getState().resetRules();
     useServiceStore.getState().resetAssign();
@@ -204,6 +216,7 @@ const FlowElementsPopup: React.FC = () => {
               }
             : undefined,
         dynamicChoices: node.data.stepType === StepType.DynamicChoices ? dynamicChoices : undefined,
+        jumpToService: node.data.stepType === StepType.JumpToService ? jumpToService : undefined,
         endpoint: nodeEndpoint ?? node.data?.endpoint,
         testingPassed: undefined,
         childrenCount: node.data.stepType === StepType.MultiChoiceQuestion ? 1 : node.data.childrenCount,
@@ -505,6 +518,11 @@ const FlowElementsPopup: React.FC = () => {
                 dynamicChoices={dynamicChoices}
                 onDynamicChoicesChange={setDynamicChoices}
               />
+            )}
+            {stepType === StepType.JumpToService && (
+              <DndProvider backend={HTML5Backend}>
+                <JumpToServiceContent node={node} jumpToService={jumpToService} onChange={setJumpToService} />
+              </DndProvider>
             )}
             {stepType === StepType.UserDefined && (
               <ApiContent

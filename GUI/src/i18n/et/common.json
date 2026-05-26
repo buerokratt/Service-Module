@@ -362,6 +362,13 @@
         "serviceNameTooltip": "Teenuse nimi, mis valiku tegemisel käivitatakse\nNäide: test_service",
         "keyTooltip": "Võtit kasutatakse iga valiku pealkirjana\nNäide: name for the above list",
         "payloadKeysTooltip": "Komadega eraldatud võtmed peavad olema andmed, mis saadetakse teenusele valiku tegemisel\nNäide: name,price"
+      },
+      "jumpToService": {
+        "title": "Järgmine teenus",
+        "targetService": "Sihtteenус",
+        "selectService": "Vali teenus...",
+        "noActiveServices": "Aktiivseid teenuseid pole saadaval",
+        "parameters": "Parameetrid"
       }
     },
     "popup": {

@@ -5,6 +5,7 @@ import { generateUniqueId } from 'utils/flow-utils';
 
 import { Assign } from './assign';
 import { DynamicChoices } from './dynamic-choices';
+import { JumpToService } from './jump-to-service';
 import { EndpointData } from './endpoint';
 import { MultiChoiceQuestion } from './multi-choice-question';
 import { StepType } from './step-type.enum';
@@ -48,6 +49,7 @@ export type NodeDataProps = {
   assignElements?: Assign[];
   multiChoiceQuestion?: MultiChoiceQuestion;
   dynamicChoices?: DynamicChoices;
+  jumpToService?: JumpToService;
   childrenCount: number;
   clientInputId?: number;
   endpoint?: EndpointData;

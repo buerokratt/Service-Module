@@ -138,7 +138,11 @@ const ApiEndpoint: FC<ApiEndpointProps> = ({ step, onClick }) => {
         style={style}
         className={styles.box}
         key={step.id}
-        color={[StepType.FinishingStepEnd, StepType.FinishingStepRedirect].includes(step.type) ? 'red' : 'blue'}
+        color={
+          [StepType.FinishingStepEnd, StepType.FinishingStepRedirect].includes(step.type)
+            ? 'red'
+            : 'blue'
+        }
         onClick={() => onClick(step)}
       >
         <Track gap={8} style={{ justifyContent: 'space-between', overflow: 'hidden' }}>
