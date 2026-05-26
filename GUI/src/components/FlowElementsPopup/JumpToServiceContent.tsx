@@ -1,4 +1,5 @@
 import { Node } from '@xyflow/react';
+import { FormSelect } from 'components/FormElements';
 import { FC, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { getActiveServicesList } from 'resources/api-constants';
@@ -7,7 +8,6 @@ import { Assign } from 'types/assign';
 import { JumpToService } from 'types/jump-to-service';
 import { NodeDataProps } from 'types/service-flow';
 
-import { FormSelect } from 'components/FormElements';
 import Track from '../Track';
 import AssignBuilder from './AssignBuilder';
 import PreviousVariables from './PreviousVariables';

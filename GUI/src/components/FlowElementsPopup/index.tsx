@@ -24,7 +24,6 @@ import {
 import { Button, Track } from '..';
 import Popup from '../Popup';
 import ApiContent from './ApiContent';
-import JumpToServiceContent from './JumpToServiceContent';
 import AssignContent from './AssignContent';
 import ConditionBuilderContent from './ConditionBuilderContent';
 import ConditionContent from './ConditionContent';
@@ -33,14 +32,15 @@ import DynamicChoicesContent from './DynamicChoicesContent';
 import EndConversationContent from './EndConversationContent';
 import FileGenerateContent from './FileGenerateContent';
 import FileSignContent from './FileSignContent';
+import JumpToServiceContent from './JumpToServiceContent';
 import MultiChoiceQuestionContent from './MultiChoiceQuestionContent';
 import OpenWebPageContent from './OpenWebPageContent';
 import OpenWebPageTestContent from './OpenWebPageTestContent';
 import RasaRulesContent from './RasaRulesContent';
-import TextfieldContent from './TextfieldContent';
 import TextfieldTestContent from './TextfieldTestContent';
 import { StepType } from '../../types';
 import { getInitialGroup, GroupOrRule } from './RuleBuilder/types';
+import TextfieldContent from './TextfieldContent';
 import './styles.scss';
 
 const FlowElementsPopup: React.FC = () => {
@@ -170,7 +170,7 @@ const FlowElementsPopup: React.FC = () => {
       default:
         break;
     }
-  }, [defaultDynamicChoices, defaultMultiChoiceQuestionButtons, node, stepType]);
+  }, [defaultDynamicChoices, defaultJumpToService, defaultMultiChoiceQuestionButtons, node, stepType]);
 
   if (!node) return <></>;
 
