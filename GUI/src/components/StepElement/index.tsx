@@ -24,11 +24,7 @@ const StepElement: FC<StepElementProps> = ({ step, onClick }) => {
         {...attributes}
         key={step.id}
         style={{ cursor: 'pointer' }}
-        color={
-          [StepType.FinishingStepEnd, StepType.FinishingStepRedirect].includes(step.type)
-            ? 'red'
-            : 'blue'
-        }
+        color={[StepType.FinishingStepEnd, StepType.FinishingStepRedirect].includes(step.type) ? 'red' : 'blue'}
         onClick={() => onClick(step)}
         draggable={false}
       >
