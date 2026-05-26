@@ -1,8 +1,8 @@
 import { Node } from '@xyflow/react';
 import { FC, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import useServiceListStore from 'store/services.store';
-import { Service, ServiceState } from 'types';
+import { getActiveServicesList } from 'resources/api-constants';
+import api from 'services/api-dev';
 import { Assign } from 'types/assign';
 import { JumpToService } from 'types/jump-to-service';
 import { NodeDataProps } from 'types/service-flow';
@@ -12,6 +12,8 @@ import Track from '../Track';
 import AssignBuilder from './AssignBuilder';
 import PreviousVariables from './PreviousVariables';
 
+type ServiceOption = { name: string; serviceId: string };
+
 type JumpToServiceContentProps = {
   readonly node: Node<NodeDataProps>;
   readonly jumpToService: JumpToService;
@@ -20,29 +22,28 @@ type JumpToServiceContentProps = {
 
 const JumpToServiceContent: FC<JumpToServiceContentProps> = ({ node, jumpToService, onChange }) => {
   const { t } = useTranslation();
-  const [activeServices, setActiveServices] = useState<Service[]>([]);
+  const [services, setServices] = useState<ServiceOption[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    useServiceListStore
-      .getState()
-      .loadServicesList({ pageIndex: 0, pageSize: 100 }, [{ id: 'name', desc: false }])
-      .then(() => {
-        const services = useServiceListStore.getState().notCommonServices;
-        setActiveServices(services.filter((s) => s.state === ServiceState.Active));
-      });
+    api
+      .get(getActiveServicesList())
+      .then((res) => {
+        const data: { service_id: string; name: string }[] = Array.isArray(res.data) ? res.data : [];
+        setServices(data.map((s) => ({ serviceId: s.service_id, name: s.name })));
+      })
+      .catch(console.error)
+      .finally(() => setIsLoading(false));
   }, []);
 
-  const serviceOptions = activeServices.map((s) => ({
-    label: s.name,
-    value: s.serviceId ?? s.name,
-  }));
+  const serviceOptions = services.map((s) => ({ label: s.name, value: s.serviceId }));
 
   const selectedServiceId =
-    activeServices.find((s) => s.name === jumpToService.serviceName)?.serviceId ?? jumpToService.serviceId ?? '';
+    services.find((s) => s.name === jumpToService.serviceName)?.serviceId ?? jumpToService.serviceId ?? '';
 
   const handleServiceChange = (selection: { label: string; value: string } | null) => {
     if (!selection) return;
-    const service = activeServices.find((s) => s.serviceId === selection.value);
+    const service = services.find((s) => s.serviceId === selection.value);
     onChange({
       ...jumpToService,
       serviceName: service?.name ?? selection.label,
@@ -57,18 +58,26 @@ const JumpToServiceContent: FC<JumpToServiceContentProps> = ({ node, jumpToServi
   return (
     <Track direction="vertical" align="stretch" gap={16}>
       <Track direction="vertical" align="stretch" gap={16} style={{ padding: '16px 16px 0' }}>
-        <FormSelect
-          label={t('serviceFlow.element.jumpToService.targetService')}
-          name="targetService"
-          placeholder={t('serviceFlow.element.jumpToService.selectService')}
-          options={serviceOptions}
-          defaultValue={selectedServiceId}
-          onSelectionChange={handleServiceChange}
-        />
-        {activeServices.length === 0 && (
-          <p style={{ color: '#888', fontSize: '13px' }}>
-            {t('serviceFlow.element.jumpToService.noActiveServices')}
-          </p>
+        {isLoading ? (
+          <Track justify="center">
+            <div className="loader" />
+          </Track>
+        ) : (
+          <>
+            <FormSelect
+              label={t('serviceFlow.element.jumpToService.targetService')}
+              name="targetService"
+              placeholder={t('serviceFlow.element.jumpToService.selectService')}
+              options={serviceOptions}
+              defaultValue={selectedServiceId}
+              onSelectionChange={handleServiceChange}
+            />
+            {services.length === 0 && (
+              <p style={{ color: '#888', fontSize: '13px' }}>
+                {t('serviceFlow.element.jumpToService.noActiveServices')}
+              </p>
+            )}
+          </>
         )}
       </Track>
       <AssignBuilder seedGroup={jumpToService.parameters} onChange={handleParametersChange} />

@@ -1,7 +1,7 @@
 declaration:
   call: declare
   version: 0.1
-  description: "Jump to another active service and pass parameters to it"
+  description: "Jump to another active service and pass input to it"
   method: post
   accepts: json
   returns: json
@@ -11,9 +11,9 @@ declaration:
       - field: serviceName
         type: string
         description: "Name of the target active service to trigger"
-      - field: parameters
-        type: array
-        description: "Key-value parameters to pass to the target service"
+      - field: input
+        type: object
+        description: "Key-value inputs to pass to the target service"
 
 check_for_body:
   switch:
@@ -24,8 +24,9 @@ check_for_body:
 trigger_service:
   call: http.post
   args:
-    url: "[#RUUTER_PRIVATE_URL]/POST/services/active/${incoming.body.serviceName}"
-    body: ${incoming.body.parameters}
+    url: "[#SERVICE_RUUTER]/services/active/${incoming.body.serviceName}"
+    body: 
+      input: ${incoming.body.input}
   result: trigger_result
 
 return_value:

@@ -978,7 +978,7 @@ const getTemplateDataFromNode = (node: Node): { templateName: string; body?: any
       templateName: '[#SERVICE_PROJECT_LAYER]/jump-to-service',
       body: {
         serviceName: node.data.jumpToService?.serviceName ?? '',
-        parameters: node.data.jumpToService?.parameters ?? [],
+        input: node.data.jumpToService?.input ?? [],
       },
     };
   }
