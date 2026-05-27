@@ -30,20 +30,22 @@ const JumpToServiceContent: FC<JumpToServiceContentProps> = ({ node, jumpToServi
       .get(getActiveServicesList())
       .then((res) => {
         const data: { serviceId: string; name: string }[] = Array.isArray(res.data) ? res.data : [];
-        setServices(data.map((s) => ({ serviceId: s.serviceId, name: s.name })));
+        setServices(data.map((s) => ({ name: s.name, serviceId: s.serviceId })));
       })
       .catch(console.error)
       .finally(() => setIsLoading(false));
   }, []);
 
-  const serviceOptions = services.map((s) => ({ label: s.name, value: s.serviceId }));
+  const serviceOptions = services.map((s) => ({ label: s.name, value: { name: s.name, serviceId: s.serviceId } }));
 
-  const selectedServiceId =
-    services.find((s) => s.name === jumpToService.serviceName)?.serviceId ?? jumpToService.serviceId ?? '';
+  const defaultServiceValue =
+    services.find(
+      (s) => s.serviceId === jumpToService.serviceId || s.name === jumpToService.serviceName,
+    ) ?? null;
 
-  const handleServiceChange = (selection: { label: string; value: string } | null) => {
+  const handleServiceChange = (selection: { label: string; value: { name: string; serviceId: string } } | null) => {
     if (!selection) return;
-    const service = services.find((s) => s.serviceId === selection.value);
+    const service = services.find((s) => s.serviceId === selection.value.serviceId);
     onChange({
       ...jumpToService,
       serviceName: service?.name ?? selection.label,
@@ -69,7 +71,7 @@ const JumpToServiceContent: FC<JumpToServiceContentProps> = ({ node, jumpToServi
               name="targetService"
               placeholder={t('serviceFlow.element.jumpToService.selectService')}
               options={serviceOptions}
-              defaultValue={selectedServiceId}
+              defaultValue={defaultServiceValue ?? undefined}
               onSelectionChange={handleServiceChange}
             />
             {services.length === 0 && (

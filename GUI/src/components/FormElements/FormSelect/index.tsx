@@ -1,31 +1,35 @@
 import clsx from 'clsx';
 import { useSelect } from 'downshift';
-import { FC, SelectHTMLAttributes, useEffect, useId, useState } from 'react';
+import { SelectHTMLAttributes, useEffect, useId, useState } from 'react';
 import { MdArrowDropDown } from 'react-icons/md';
 
 import { Icon } from '../../../components';
 
 import './FormSelect.scss';
 
-type FormSelectProps = SelectHTMLAttributes<HTMLSelectElement> & {
+type SelectOption<T = string> = {
+  label: string;
+  value: T;
+};
+
+type FormSelectProps<T = string> = Omit<SelectHTMLAttributes<HTMLSelectElement>, 'defaultValue'> & {
   label: string;
   name: string;
   hideLabel?: boolean;
   placeholder?: string;
-  options: {
-    label: string;
-    value: string;
-  }[];
-  onSelectionChange?: (selection: { label: string; value: string } | null) => void;
+  options: SelectOption<T>[];
+  onSelectionChange?: (selection: SelectOption<T> | null) => void;
+  defaultValue?: T;
   isOpen?: boolean;
   menuPosition?: 'absolute' | 'relative';
 };
 
-const itemToString = (item: { label: string; value: string } | null) => {
-  return item ? item.value : '';
+const itemToString = <T,>(item: SelectOption<T> | null) => {
+  if (!item) return '';
+  return typeof item.value === 'string' ? item.value : item.label;
 };
 
-const FormSelect: FC<FormSelectProps> = ({
+const FormSelect = <T = string,>({
   label,
   hideLabel,
   options,
@@ -36,10 +40,15 @@ const FormSelect: FC<FormSelectProps> = ({
   isOpen: isMenuOpen = false,
   menuPosition = 'absolute',
   ...rest
-}) => {
+}: FormSelectProps<T>) => {
   const id = useId();
-  const defaultSelected = options.find((o) => o.value === defaultValue) ?? null;
-  const [selectedItem, setSelectedItem] = useState<{ label: string; value: string } | null>(defaultSelected);
+  const defaultSelected =
+    options.find((o) =>
+      typeof o.value === 'string' && typeof defaultValue === 'string'
+        ? o.value === defaultValue
+        : JSON.stringify(o.value) === JSON.stringify(defaultValue),
+    ) ?? null;
+  const [selectedItem, setSelectedItem] = useState<SelectOption<T> | null>(defaultSelected);
   const { isOpen, getToggleButtonProps, getLabelProps, getMenuProps, highlightedIndex, getItemProps } = useSelect({
     id,
     items: options,
@@ -53,8 +62,14 @@ const FormSelect: FC<FormSelectProps> = ({
   });
 
   useEffect(() => {
-    if (defaultValue) {
-      setSelectedItem(options.find((o) => o.value === defaultValue) ?? null);
+    if (defaultValue !== undefined && defaultValue !== null) {
+      setSelectedItem(
+        options.find((o) =>
+          typeof o.value === 'string' && typeof defaultValue === 'string'
+            ? o.value === defaultValue
+            : JSON.stringify(o.value) === JSON.stringify(defaultValue),
+        ) ?? null,
+      );
     }
   }, [defaultValue, options]);
 
