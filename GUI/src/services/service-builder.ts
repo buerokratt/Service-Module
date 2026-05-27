@@ -915,7 +915,7 @@ function handleJumpToServiceStep(
     requestType: 'templates',
     body: {
       serviceName: parentNode.data.jumpToService?.serviceName ?? '',
-      input: parentNode.data.jumpToService?.input ?? [],
+      input: (parentNode.data.jumpToService?.input ?? []).map((e: Assign) => normalizeAssignValue(e.value)),
     },
     result: resultName,
     next: returnStepName,
@@ -1007,7 +1007,7 @@ const getTemplateDataFromNode = (node: Node): { templateName: string; body?: any
       templateName: '[#SERVICE_PROJECT_LAYER]/jump-to-service',
       body: {
         serviceName: node.data.jumpToService?.serviceName ?? '',
-        input: node.data.jumpToService?.input ?? [],
+        input: (node.data.jumpToService?.input ?? []).map((e: Assign) => normalizeAssignValue(e.value)),
       },
     };
   }
