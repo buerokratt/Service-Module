@@ -29,8 +29,8 @@ const JumpToServiceContent: FC<JumpToServiceContentProps> = ({ node, jumpToServi
     api
       .get(getActiveServicesList())
       .then((res) => {
-        const data: { service_id: string; name: string }[] = Array.isArray(res.data) ? res.data : [];
-        setServices(data.map((s) => ({ serviceId: s.service_id, name: s.name })));
+        const data: { serviceId: string; name: string }[] = Array.isArray(res.data) ? res.data : [];
+        setServices(data.map((s) => ({ serviceId: s.serviceId, name: s.name })));
       })
       .catch(console.error)
       .finally(() => setIsLoading(false));
