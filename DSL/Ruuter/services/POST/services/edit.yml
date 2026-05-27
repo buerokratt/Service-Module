@@ -102,7 +102,7 @@ delete_old_mcq_files:
   args:
     url: "[#SERVICE_DMAPPER]/file-manager/delete-all-that-starts-with"
     body:
-      path: "[#RUUTER_SERVICES_PATH]/${type}/services/draft"
+      path: "[#RUUTER_SERVICES_PATH]/${type}/services/active"
       keyword: "${get_service_result.response.body[0].name}_"
   result: deleteOldRes
   next: delete_all_mcq_files
@@ -112,7 +112,7 @@ delete_all_mcq_files:
   args:
     url: "[#SERVICE_DMAPPER]/file-manager/delete-all-that-starts-with"
     body:
-      path: "[#RUUTER_SERVICES_PATH]/${type}/services/draft"
+      path: "[#RUUTER_SERVICES_PATH]/${type}/services/active"
       keyword: "${name}_"
   result: deleteRes
   next: check_for_content
