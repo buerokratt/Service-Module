@@ -708,29 +708,28 @@ function replaceSpacesOutsideTags(input: string, placeholder: string): string {
   return result;
 }
 
+function toMarkdownMessage(raw: string): string {
+  const spacePlaceholder = '___SPACE___';
+  const withPlaceholders = replaceSpacesOutsideTags(
+    decodeHtmlEntities(raw).replaceAll('{{', '${').replaceAll('}}', '}'),
+    spacePlaceholder,
+  );
+  const markdown = htmlToMarkdown
+    .translate(withPlaceholders)
+    .replaceAll(spacePlaceholder, ' ')
+    .replaceAll(/\\([-~>[\]_*#().!`=<\\])/g, String.raw`\\$1`);
+
+  const trimmed = markdown.trim().toLowerCase();
+  return trimmed === 'yes' || trimmed === 'no' ? `\${"${trimmed}"}` : markdown;
+}
+
 function handleTextField(
   finishedFlow: Map<any, any>,
   parentStepName: string,
   parentNode: Node,
   childNode: Node<NodeDataProps> | undefined,
 ) {
-  const spacePlaceholder = '___SPACE___';
-  const rawMessage = typeof parentNode.data.message === 'string' ? decodeHtmlEntities(parentNode.data.message) : '';
-  const rawMessageWithSpaceholders = replaceSpacesOutsideTags(
-    rawMessage.replaceAll('{{', '${').replaceAll('}}', '}'),
-    spacePlaceholder,
-  );
-  const markdownMessage = htmlToMarkdown
-    .translate(rawMessageWithSpaceholders)
-    .replaceAll(spacePlaceholder, ' ')
-    .replaceAll(/\\([-~>[\]_*#().!`=<\\])/g, String.raw`\\$1`);
-
-  let finalMessage = markdownMessage;
-  const trimmedMessage = markdownMessage.trim().toLowerCase();
-
-  if (trimmedMessage === 'yes' || trimmedMessage === 'no') {
-    finalMessage = `\${"${trimmedMessage}"}`;
-  }
+  const finalMessage = toMarkdownMessage(typeof parentNode.data.message === 'string' ? parentNode.data.message : '');
 
   finishedFlow.set(parentStepName, {
     assign: {
@@ -884,14 +883,13 @@ function handleMultiChoiceQuestion(
     b.payload = b.payload.replace(/\/[^/]*_mcq_/, `/${rootServiceName}_mcq_`);
   });
 
-  const rawQuestion = decodeHtmlEntities(parentNode?.data?.multiChoiceQuestion?.question ?? '');
-  const markdownQuestion = htmlToMarkdown.translate(rawQuestion);
+  const finalQuestion = toMarkdownMessage(parentNode?.data?.multiChoiceQuestion?.question ?? '');
 
   return finishedFlow.set(parentStepName, {
     assign: {
       buttons: parentNode?.data?.multiChoiceQuestion?.buttons ?? [],
       res: {
-        result: markdownQuestion,
+        result: finalQuestion,
       },
     },
     next: childNode ? toSnakeCase(childNode.data.label ?? 'format_messages') : 'format_messages',
