@@ -39,9 +39,7 @@ const JumpToServiceContent: FC<JumpToServiceContentProps> = ({ node, jumpToServi
   const serviceOptions = services.map((s) => ({ label: s.name, value: { name: s.name, serviceId: s.serviceId } }));
 
   const defaultServiceValue =
-    services.find(
-      (s) => s.serviceId === jumpToService.serviceId || s.name === jumpToService.serviceName,
-    ) ?? null;
+    services.find((s) => s.serviceId === jumpToService.serviceId || s.name === jumpToService.serviceName) ?? null;
 
   const handleServiceChange = (selection: { label: string; value: { name: string; serviceId: string } } | null) => {
     if (!selection) return;

@@ -902,11 +902,7 @@ function handleMultiChoiceQuestion(
   });
 }
 
-function handleJumpToServiceStep(
-  parentNode: Node<NodeDataProps>,
-  finishedFlow: Map<any, any>,
-  parentStepName: string,
-) {
+function handleJumpToServiceStep(parentNode: Node<NodeDataProps>, finishedFlow: Map<any, any>, parentStepName: string) {
   const resultName = `${parentStepName}_result`;
   const returnStepName = 'return_next_service_res';
 
