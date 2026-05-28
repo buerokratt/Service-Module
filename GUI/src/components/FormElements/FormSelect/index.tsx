@@ -62,7 +62,7 @@ const FormSelect = <T = string,>({
   });
 
   useEffect(() => {
-    if (defaultValue !== undefined && defaultValue !== null) {
+    if (defaultValue != null) {
       setSelectedItem(
         options.find((o) =>
           typeof o.value === 'string' && typeof defaultValue === 'string'
