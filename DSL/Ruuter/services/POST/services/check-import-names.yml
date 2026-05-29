@@ -1,0 +1,36 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Check which service names already exist and return them with timestamps appended where needed"
+  method: post
+  accepts: json
+  returns: json
+  namespace: service
+  allowlist:
+    body:
+      - field: names
+        type: string
+        description: "Comma-separated service names to check"
+      - field: timezone
+        type: string
+        description: "Timezone for timestamp generation"
+
+extract_request_data:
+  assign:
+    names: ${incoming.body.names}
+    timezone: ${incoming.body.timezone}
+
+check_names:
+  call: http.post
+  args:
+    url: "[#SERVICE_RESQL]/get-import-names"
+    body:
+      names: ${names}
+      timezone: ${timezone}
+  result: check_names_res
+
+return_result:
+  status: 200
+  wrapper: false
+  return: ${check_names_res.response.body[0]}
+  next: end

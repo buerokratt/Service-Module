@@ -11,7 +11,6 @@ import { DynamicChoices } from 'types/dynamic-choices';
 import { EndpointData } from 'types/endpoint';
 import { MultiChoiceQuestionButton } from 'types/multi-choice-question';
 import { NodeDataProps } from 'types/service-flow';
-import { generateUniqueId } from 'utils/flow-utils';
 import { getValueByPath } from 'utils/object-util';
 import {
   getLastDigits,
@@ -207,6 +206,7 @@ const FlowElementsPopup: React.FC = () => {
         dynamicChoices: node.data.stepType === StepType.DynamicChoices ? dynamicChoices : undefined,
         endpoint: nodeEndpoint ?? node.data?.endpoint,
         testingPassed: undefined,
+        childrenCount: node.data.stepType === StepType.MultiChoiceQuestion ? 1 : node.data.childrenCount,
       },
     };
 
@@ -395,6 +395,8 @@ const FlowElementsPopup: React.FC = () => {
       draggable: false,
     }));
 
+    updatedNode.data.childrenCount = 1;
+
     let finalNodes = [...nodes.filter((n) => n.id !== updatedNode.id), updatedNode, ...newGhostNodes];
     let finalEdges = [...filteredEdges, ...newEdges];
 
@@ -451,11 +453,6 @@ const FlowElementsPopup: React.FC = () => {
             <Tabs.Trigger className="vertical-tabs__trigger" value={t('serviceFlow.tabs.setup')}>
               {t('serviceFlow.tabs.setup')}
             </Tabs.Trigger>
-            {!isReadonly && (
-              <Tabs.Trigger className="vertical-tabs__trigger" value={t('serviceFlow.tabs.test')}>
-                {t('serviceFlow.tabs.test')}
-              </Tabs.Trigger>
-            )}
           </Tabs.List>
           <Tabs.Content value={t('serviceFlow.tabs.setup')} className="vertical-tabs__body">
             {stepType === StepType.Textfield && (
@@ -522,6 +519,7 @@ const FlowElementsPopup: React.FC = () => {
             {stepType === StepType.MultiChoiceQuestion && (
               <MultiChoiceQuestionContent
                 question={multiChoiceQuestionQuestion}
+                defaultQuestion={node.data.multiChoiceQuestion?.question ?? multiChoiceQuestionQuestion}
                 buttons={multiChoiceQuestionButtons}
                 setQuestion={setMultiChoiceQuestionQuestion}
                 setButtons={setMultiChoiceQuestionButtons}

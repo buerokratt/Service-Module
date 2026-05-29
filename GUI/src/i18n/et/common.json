@@ -151,13 +151,13 @@
     "edit": "Muuda",
     "delete": "Kustuta",
     "cancel": "Tühista",
-    "importMany": "Impordi mitu",
+    "importMany": "Impordi",
     "import": {
       "importSuccess": "{{count}} teenus{{lengthCheck}} edukalt imporditud",
       "importFailure": "Järgmisi faile ei õnnestunud importida (vale vorming või rikutud): {{files}}",
       "failedToImport": "Teenuste importimine ebaõnnestus"
     },
-    "exportMany": "Ekspordi mitu",
+    "exportMany": "Ekspordi",
     "exportAll": "Ekspordi kõik",
     "export": "Ekspordi",
     "exportAllConfirmation": "Kas olete kindel, et soovite eksportida kõik teenused?",
@@ -244,7 +244,7 @@
     "examples": {
       "title": "Näidisküsimused",
       "placeholder": "Lisa näiteid, mida kasutaja võiks küsida, et teenus käivituks",
-      "tooltip": "Sisesta näidisküsimused, mille kaudu teenus käivitub (nt. ‘Millal on Jaanipäev?’)"
+      "tooltip": "Sisesta näidisküsimused, mille kaudu teenus käivitub (nt. ‘Millal on Jaanipäev?’). Soovituslik on lisada vähemalt 5 näidet."
     },
     "keywords": {
       "title": "Märksõnad",
@@ -336,7 +336,7 @@
     "chooseMemorySlots": "Vali mälukohad"
   },
   "serviceFlow": {
-    "serviceConfiguration": "Teenuse seaded",
+    "serviceConfiguration": "Seaded",
     "element": {
       "taraAuthentication": "TARA autentimine",
       "textfield": "Sõnum kliendile",
@@ -394,7 +394,7 @@
       "or": "VÕI",
       "not": "MITTE",
       "addRule": "+ Reegel",
-      "addElement": "+ Element",
+      "addElement": "+ Uus väärtus",
       "addGroup": "+ Grupp",
       "remove": "Eemalda",
       "signType": "Märgi tüüp",
@@ -405,10 +405,15 @@
       "removeValueAssignment": "Eemalda element, mis on määratud väärtuseks",
       "assignManualEdit": "Muutke muutuja määramist käsitsi",
       "openObjectEditor": "Ava objekti redaktor",
-      "confirmImport": "Teenus kirjutatakse üle!"
+      "confirmImport": "Teenus kirjutatakse üle!",
+      "importFlowOnly": "Ainult voo import"
+    },
+    "mcq": {
+      "selectBranchTitle": "Vali haru",
+      "emptyBranchesMessage": "Sellel valikvastuse küsimusel on {{count}} tühja haru. Millisele harule soovid ühendada?"
     },
     "previousVariables": {
-      "assignElements": "Määra elemendid",
+      "assignElements": "Määratud Väärtused",
       "noName": "<Nimeta>",
       "environmentVariables": {
         "title": "Keskkonnamuutujad"
@@ -699,6 +704,7 @@
       "lastTest": "Viimane test",
       "status": "Staatus",
       "schema": "Skeem",
+      "llmIndexStatus": "Indeks",
       "actions": "Tegevused"
     },
     "tooltip": {
@@ -716,9 +722,12 @@
       "copy": "Kopeeri",
       "test": "Testi",
       "edit": "Muuda",
-      "delete": "Kustuta"
+      "delete": "Kustuta",
+      "retryIndexing": "Proovi indekseerimist uuesti",
+      "reIndex": "Indekseeri"
     },
     "deleteConfirm": "Kas olete kindel, et soovite selle otspunkti kustutada?",
+    "reIndexConfirm": "Indekseerida see otspunkt uuesti?",
     "noSchema": "—",
     "noLastTest": "—",
     "copySuccess": "Otspunkt kopeeritud",
@@ -727,6 +736,8 @@
     "deleteSuccess": "Otspunkt kustutatud",
     "deleteError": "Otspunkti kustutamine ebaõnnestus",
     "testSuccess": "Test õnnestus",
-    "testError": "Test ebaõnnestus"
+    "testError": "Test ebaõnnestus",
+    "reIndexSuccess": "Indekseerimine algas",
+    "reIndexError": "Indekseerimine ebaõnnestus"
   }
 }

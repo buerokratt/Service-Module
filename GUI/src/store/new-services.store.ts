@@ -442,6 +442,7 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
       serviceResponse = await api.post<Service>(getServiceById(), { id, search: search ?? '' });
 
       const structure = JSON.parse(serviceResponse.data.structure?.value ?? '{}');
+      const settings = structure?.settings;
       let endpoints = serviceResponse.data.endpoints.map(
         (
           endpoint: Pick<EndpointData, 'endpointId' | 'name' | 'type' | 'fileName'> & {
@@ -491,12 +492,12 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
 
       set({
         serviceId: id,
-        name: serviceResponse.data.name,
+        name: settings?.title ?? serviceResponse.data.name,
         isCommon: serviceResponse.data.isCommon,
-        description: serviceResponse.data.description,
+        description: settings?.description ?? serviceResponse.data.description,
         slot: serviceResponse.data.slot,
-        examples: serviceResponse.data.examples,
-        entities: serviceResponse.data.entities,
+        examples: settings?.examples ?? serviceResponse.data.examples,
+        entities: settings?.keywords ?? serviceResponse.data.entities,
         edges,
         nodes,
         endpoints,
@@ -795,6 +796,7 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
             testingPassed: updatedNode.data.testingPassed,
             assignElements: updatedNode.data.assignElements ?? prevNode.data.assignElements,
             rules: updatedNode.data.rules ?? prevNode.data.rules,
+            childrenCount: updatedNode.data.childrenCount ?? prevNode.data.childrenCount,
           },
         };
       }),

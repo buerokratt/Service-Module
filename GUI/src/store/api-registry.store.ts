@@ -4,6 +4,7 @@ import {
   createEndpoint,
   deleteEndpoint as deleteEndpointUrl,
   getAllEndpoints,
+  reindexEndpointUrl,
   testEndpointUrl,
 } from 'resources/api-constants';
 import api from 'services/api-dev';
@@ -34,6 +35,7 @@ interface ApiRegistryState {
   testEndpoint: (endpoint: EndpointData) => Promise<void>;
   copyEndpoint: (endpoint: EndpointData) => Promise<void>;
   deleteEndpoint: (endpoint: EndpointData) => Promise<void>;
+  reIndexEndpoint: (endpointId: string) => Promise<void>;
   addEndpointAfterCreate: (endpoint: EndpointData) => void;
   updateEndpointInList: (endpoint: EndpointData) => void;
 }
@@ -80,6 +82,14 @@ const useApiRegistryStore = create<ApiRegistryState>((set, get) => ({
         } catch {
           definitions = []; // malformed JSON — fall back to empty definitions
         }
+        // Normalize llm index status from various API shapes (snake_case or camelCase)
+        const rawLlm = row.llm_index_status ?? row.llmIndexStatus ?? row.llmIndexstatus ?? null;
+        const normalizedLlm = rawLlm && typeof rawLlm !== 'object' ? String(rawLlm).trim().toUpperCase() : null;
+        const allowed =
+          normalizedLlm === 'SUCCESS' || normalizedLlm === 'FAILED' || normalizedLlm === 'IN_PROGRESS'
+            ? normalizedLlm
+            : null;
+
         return {
           endpointId: row.endpointId,
           name: row.name,
@@ -88,6 +98,7 @@ const useApiRegistryStore = create<ApiRegistryState>((set, get) => ({
           serviceId: row.serviceId,
           definitions,
           responseSchema: formatSchema(row.responseSchema),
+          llm_index_status: allowed,
         };
       });
       const verificationMap: Record<string, VerificationMetadata> = {};
@@ -247,6 +258,37 @@ const useApiRegistryStore = create<ApiRegistryState>((set, get) => ({
       useToastStore.getState().success({ title: t('apiRegistry.deleteSuccess') });
     } catch {
       useToastStore.getState().error({ title: t('apiRegistry.deleteError') });
+    }
+  },
+
+  reIndexEndpoint: async (endpointId) => {
+    // Optimistically show IN_PROGRESS immediately while request is in-flight
+    set((state) => ({
+      endpoints: state.endpoints.map((e) =>
+        e.endpointId === endpointId ? { ...e, llm_index_status: 'IN_PROGRESS' } : e,
+      ),
+    }));
+
+    let failed = false;
+    let serverMsg = '';
+    try {
+      await api.post(reindexEndpointUrl(), { endpointId });
+    } catch (err: any) {
+      failed = true;
+      serverMsg = err?.response?.data?.message || err?.response?.data?.response || err?.message || '';
+    } finally {
+      // Always reload — backend is the source of truth for the final status
+      const { pagination, sorting, search } = get();
+      await get().loadEndpoints(pagination, sorting, search);
+    }
+
+    if (failed) {
+      useToastStore.getState().error({
+        title: t('apiRegistry.reIndexError'),
+        message: serverMsg || undefined,
+      });
+    } else {
+      useToastStore.getState().success({ title: t('apiRegistry.reIndexSuccess') });
     }
   },
 

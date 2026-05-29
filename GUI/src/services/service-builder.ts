@@ -22,6 +22,14 @@ import {
 
 import api from '../services/api-dev';
 
+const htmlToMarkdown = new NodeHtmlMarkdown({
+  textReplace: [
+    [/\\_/g, '_'],
+    [/\\\[/g, '['],
+    [/\\\]/g, ']'],
+  ],
+});
+
 /**
  * Normalises MCQ button payloads on all MultiChoiceQuestion nodes.
  *
@@ -706,14 +714,6 @@ function handleTextField(
   parentNode: Node,
   childNode: Node<NodeDataProps> | undefined,
 ) {
-  const htmlToMarkdown = new NodeHtmlMarkdown({
-    textReplace: [
-      [/\\_/g, '_'],
-      [/\\\[/g, '['],
-      [/\\\]/g, ']'],
-    ],
-  });
-
   const spacePlaceholder = '___SPACE___';
   const rawMessage = typeof parentNode.data.message === 'string' ? decodeHtmlEntities(parentNode.data.message) : '';
   const rawMessageWithSpaceholders = replaceSpacesOutsideTags(
@@ -884,11 +884,14 @@ function handleMultiChoiceQuestion(
     b.payload = b.payload.replace(/\/[^/]*_mcq_/, `/${rootServiceName}_mcq_`);
   });
 
+  const rawQuestion = decodeHtmlEntities(parentNode?.data?.multiChoiceQuestion?.question ?? '');
+  const markdownQuestion = htmlToMarkdown.translate(rawQuestion);
+
   return finishedFlow.set(parentStepName, {
     assign: {
       buttons: parentNode?.data?.multiChoiceQuestion?.buttons ?? [],
       res: {
-        result: parentNode?.data?.multiChoiceQuestion?.question ?? '',
+        result: markdownQuestion,
       },
     },
     next: childNode ? toSnakeCase(childNode.data.label ?? 'format_messages') : 'format_messages',

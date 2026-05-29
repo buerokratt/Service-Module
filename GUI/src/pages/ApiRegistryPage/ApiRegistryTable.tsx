@@ -14,6 +14,7 @@ import {
   MdInfoOutline,
   MdOutlineEast,
   MdOutlineWest,
+  MdRefresh,
   MdUnfoldMore,
 } from 'react-icons/md';
 import { VerificationMetadata } from 'store/api-registry.store';
@@ -33,6 +34,7 @@ type ApiRegistryTableProps = {
   setSorting: (state: SortingState) => void;
   onEdit: (endpoint: EndpointData) => void;
   onDelete: (endpoint: EndpointData) => void;
+  onReIndex?: (endpoint: EndpointData) => void;
   onTest: (endpoint: EndpointData) => void;
   onCopy: (endpoint: EndpointData) => void;
   testingId: string | null;
@@ -72,7 +74,16 @@ export const EndpointTooltipContent: React.FC<{
   const IND2: React.CSSProperties = { paddingLeft: 32, opacity: 0.75, fontSize: 11 };
 
   return (
-    <div style={{ fontFamily: 'monospace', fontSize: 12, lineHeight: 1.7, maxWidth: 420 }}>
+    <div
+      style={{
+        fontFamily: 'monospace',
+        fontSize: 12,
+        lineHeight: 1.7,
+        maxWidth: 420,
+        maxHeight: '50vh',
+        overflowY: 'auto',
+      }}
+    >
       <div style={{ ...S, marginBottom: 6 }}>
         <strong>NAME:</strong> {name || '—'}
       </div>
@@ -186,6 +197,7 @@ const ApiRegistryTable: React.FC<ApiRegistryTableProps> = ({
   onTest,
   onCopy,
   testingId,
+  onReIndex,
 }) => {
   if (loading) {
     return <p>{t('global.loading')}</p>;
@@ -215,7 +227,7 @@ const ApiRegistryTable: React.FC<ApiRegistryTableProps> = ({
             <tr>
               <th
                 onClick={() => handleSort('name')}
-                style={{ cursor: 'pointer', userSelect: 'none', whiteSpace: 'nowrap', width: '30%' }}
+                style={{ cursor: 'pointer', userSelect: 'none', whiteSpace: 'nowrap', width: '20%' }}
               >
                 <SortIcon colId="name" currentSortId={currentSortId} currentDesc={currentDesc} />{' '}
                 {String(t('apiRegistry.columns.name'))}
@@ -227,7 +239,7 @@ const ApiRegistryTable: React.FC<ApiRegistryTableProps> = ({
                   userSelect: 'none',
                   whiteSpace: 'nowrap',
                   textAlign: 'center',
-                  width: '160px',
+                  width: '200px',
                 }}
               >
                 <SortIcon colId="lastTest" currentSortId={currentSortId} currentDesc={currentDesc} />{' '}
@@ -253,7 +265,10 @@ const ApiRegistryTable: React.FC<ApiRegistryTableProps> = ({
                 <SortIcon colId="schema" currentSortId={currentSortId} currentDesc={currentDesc} />{' '}
                 {String(t('apiRegistry.columns.schema'))}
               </th>
-              <th style={{ width: '320px' }}></th>
+              <th style={{ width: '120px', whiteSpace: 'nowrap', textAlign: 'center' }}>
+                {t('apiRegistry.columns.llmIndexStatus') ?? 'LLM Index Status'}
+              </th>
+              <th></th>
             </tr>
           </thead>
           <tbody>
@@ -263,6 +278,7 @@ const ApiRegistryTable: React.FC<ApiRegistryTableProps> = ({
               const meta = verificationMap[endpoint.endpointId];
               const schemaCaptured = meta?.schemaCaptured ?? false;
               const isTesting = testingId === endpoint.endpointId;
+
               return (
                 <tr key={endpoint.endpointId}>
                   <td style={{ overflow: 'hidden' }}>
@@ -312,6 +328,18 @@ const ApiRegistryTable: React.FC<ApiRegistryTableProps> = ({
                       style={{ color: schemaCaptured ? '#27ae60' : '#e74c3c' }}
                     />
                   </td>
+                  <td style={{ textAlign: 'center' }}>
+                    {(() => {
+                      const llm_index_status = endpoint.llm_index_status;
+                      if (llm_index_status === 'SUCCESS')
+                        return <Icon icon={<MdCheckCircle />} size="small" style={{ color: '#27ae60' }} />;
+                      if (llm_index_status === 'FAILED')
+                        return <Icon icon={<MdCancel />} size="small" style={{ color: '#e74c3c' }} />;
+                      if (llm_index_status === 'IN_PROGRESS')
+                        return <Icon icon={<MdInfoOutline />} size="small" style={{ color: '#f1c40f' }} />;
+                      return <span style={{ color: '#aaa' }}>—</span>;
+                    })()}
+                  </td>
                   <td>
                     <Track gap={8}>
                       <Button appearance="text" size="s" onClick={() => onCopy(endpoint)}>
@@ -334,6 +362,14 @@ const ApiRegistryTable: React.FC<ApiRegistryTableProps> = ({
                             <MdFormatListBulleted />
                           </span>
                           {isTesting ? t('global.loading') : t('apiRegistry.actions.test')}
+                        </Track>
+                      </Button>
+                      <Button appearance="text" size="s" onClick={() => onReIndex?.(endpoint)}>
+                        <Track gap={4} align="center">
+                          <span style={{ color: '#000' }}>
+                            <MdRefresh />
+                          </span>
+                          {t('apiRegistry.actions.reIndex') ?? 'Re-Index'}
                         </Track>
                       </Button>
                       <Button appearance="text" size="s" onClick={() => onEdit(endpoint)}>

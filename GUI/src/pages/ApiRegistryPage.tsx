@@ -27,6 +27,7 @@ const ApiRegistryPage: React.FC = () => {
   const testEndpoint = useApiRegistryStore((s) => s.testEndpoint);
   const copyEndpoint = useApiRegistryStore((s) => s.copyEndpoint);
   const deleteEndpointFromStore = useApiRegistryStore((s) => s.deleteEndpoint);
+  const reIndexEndpoint = useApiRegistryStore((s) => s.reIndexEndpoint);
 
   useEffect(() => {
     const load = async () => {
@@ -81,6 +82,13 @@ const ApiRegistryPage: React.FC = () => {
       });
   }, [deleteEndpoint, deleteEndpointFromStore]);
 
+  const handleReindex = useCallback(
+    async (endpoint: EndpointData) => {
+      await reIndexEndpoint(endpoint.endpointId);
+    },
+    [reIndexEndpoint],
+  );
+
   return (
     <>
       <Track justify="between" align="center" style={{ marginBottom: 16 }}>
@@ -119,6 +127,7 @@ const ApiRegistryPage: React.FC = () => {
           setSorting={setSorting}
           onEdit={handleEdit}
           onDelete={handleDeleteClick}
+          onReIndex={handleReindex}
           onTest={handleTest}
           onCopy={handleCopy}
           testingId={testingId}
