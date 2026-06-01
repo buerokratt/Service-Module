@@ -9,7 +9,7 @@ import { JumpToService } from 'types/jump-to-service';
 import { NodeDataProps } from 'types/service-flow';
 
 import Track from '../Track';
-import AssignBuilder from './AssignBuilder';
+import JumpToServiceInputBuilder from './JumpToServiceInputBuilder';
 import PreviousVariables from './PreviousVariables';
 
 type ServiceOption = { name: string; serviceId: string };
@@ -80,7 +80,7 @@ const JumpToServiceContent: FC<JumpToServiceContentProps> = ({ node, jumpToServi
           </>
         )}
       </Track>
-      <AssignBuilder seedGroup={jumpToService.input} onChange={handleInputChange} />
+      <JumpToServiceInputBuilder seedGroup={jumpToService.input} onChange={handleInputChange} />
       <PreviousVariables node={node} />
     </Track>
   );
