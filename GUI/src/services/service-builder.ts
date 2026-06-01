@@ -831,20 +831,40 @@ function handleEndpointStep(
   const methodType = endpointDefinition?.methodType?.toLowerCase();
   const hasNonEqualOperator = paramsVariables?.some((param: any) => param.operator && param.operator !== '=');
 
+  // Resolve path param placeholders ({name}) directly into the URL so Ruuter does not
+  // attempt Spring-style URI template expansion at runtime and fail with
+  // "Not enough variable values available to expand '<name>'".
+  const baseUrl = hasNonEqualOperator
+    ? (endpointDefinition?.url ?? '')
+    : (endpointDefinition?.url?.split('?')[0] ?? '');
+  const urlPathPart = baseUrl.split('?')[0];
+  const pathPlaceholderNames = new Set([...urlPathPart.matchAll(/(?<!\$)\{(\w+)\}/g)].map((m) => m[1]));
+  let resolvedUrl = baseUrl;
+  if (Array.isArray(paramsVariables)) {
+    for (const param of paramsVariables) {
+      if (pathPlaceholderNames.has(param.name) && param.value != null) {
+        resolvedUrl = resolvedUrl.split(`{${param.name}}`).join(String(param.value));
+      }
+    }
+  }
+
   const stepConfig: any = {
     call: `http.${methodType ?? 'post'}`,
     args: {
-      url: hasNonEqualOperator ? (endpointDefinition?.url ?? '') : (endpointDefinition?.url?.split('?')[0] ?? ''),
+      url: resolvedUrl,
     },
     result: `${parentNode.data.endpoint?.name.replaceAll(' ', '_')}_res`,
     next: childNode ? toSnakeCase(childNode.data.label ?? 'format_messages') : 'format_messages',
   };
 
   if (Array.isArray(paramsVariables) && paramsVariables.length > 0 && !hasNonEqualOperator) {
-    stepConfig.args.query = paramsVariables.reduce((acc: any, e: any) => {
-      acc[e.name] = e.value;
-      return acc;
-    }, {});
+    const queryOnlyParams = paramsVariables.filter((e: any) => !pathPlaceholderNames.has(e.name));
+    if (queryOnlyParams.length > 0) {
+      stepConfig.args.query = queryOnlyParams.reduce((acc: any, e: any) => {
+        acc[e.name] = e.value;
+        return acc;
+      }, {});
+    }
   }
 
   if (isRawBodySelected) {
