@@ -23,15 +23,29 @@ const JumpToServiceInputBuilder: React.FC<JumpToServiceInputBuilderProps> = ({ s
   const [elements, setElements] = useState<Assign[]>(seedGroup ?? []);
 
   useEffect(() => {
-    onChange(elements);
-  }, [elements, onChange]);
+    setElements(seedGroup ?? []);
+  }, [seedGroup]);
 
-  const addElement = () => setElements((prev) => [...prev, createNewElement()]);
+  const addElement = () =>
+    setElements((prev) => {
+      const next = [...prev, createNewElement()];
+      onChange(next);
+      return next;
+    });
 
-  const remove = (id: string) => setElements((prev) => prev.filter((x) => x.id !== id));
+  const remove = (id: string) =>
+    setElements((prev) => {
+      const next = prev.filter((x) => x.id !== id);
+      onChange(next);
+      return next;
+    });
 
   const changeElement = (element: Assign) =>
-    setElements((prev) => prev.map((x) => (x.id === element.id ? element : x)));
+    setElements((prev) => {
+      const next = prev.map((x) => (x.id === element.id ? element : x));
+      onChange(next);
+      return next;
+    });
 
   return (
     <Track direction="vertical" align="stretch" className="assign-action-container">
