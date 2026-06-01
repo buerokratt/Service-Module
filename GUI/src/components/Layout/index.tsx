@@ -25,6 +25,7 @@ const Layout: FC<PropsWithChildren<LayoutProps>> = ({ disableMenu, customHeader,
             toastContext={{ open: useToastStore.getState().open }}
             user={useStore.getState().userInfo}
             setUserDomains={useStore.getState().setUserDomains}
+            isDomainSelectorVisible={domainBarShowing}
           />
         )}
         <main className="layout__main">{children ?? <Outlet />}</main>
