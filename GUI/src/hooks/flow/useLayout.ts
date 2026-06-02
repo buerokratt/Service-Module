@@ -31,7 +31,12 @@ function addVirtualRoot(filteredNodes: Node[], filteredEdges: Edge[]): void {
   }
 }
 
-function repositionTerminalNodes(resultNodes: Node[], multiParentNodes: Node[], terminalMultiParentIds: Set<string>, edges: Edge[]): void {
+function repositionTerminalNodes(
+  resultNodes: Node[],
+  multiParentNodes: Node[],
+  terminalMultiParentIds: Set<string>,
+  edges: Edge[],
+): void {
   for (const node of multiParentNodes) {
     if (!terminalMultiParentIds.has(node.id)) continue;
     const parentEdges = edges.filter((e) => e.target === node.id);
@@ -67,9 +72,7 @@ function layoutNodes(nodes: Node[], edges: Edge[], orientation: 'horizontal' | '
   const extraParentEdgeIds = getExtraParentEdgeIds(multiParentNodes, terminalMultiParentIds, edgesCopy);
 
   const filteredNodes = nodesCopy.filter((n) => !terminalMultiParentIds.has(n.id));
-  const filteredEdges = edgesCopy.filter(
-    (e) => !terminalMultiParentIds.has(e.target) && !extraParentEdgeIds.has(e.id),
-  );
+  const filteredEdges = edgesCopy.filter((e) => !terminalMultiParentIds.has(e.target) && !extraParentEdgeIds.has(e.id));
 
   addVirtualRoot(filteredNodes, filteredEdges);
 
