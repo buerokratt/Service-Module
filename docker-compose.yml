@@ -5,7 +5,7 @@ services:
     image: ruuter
     environment:
       - application.cors.allowedOrigins=http://localhost:3006,http://localhost:3001,http://localhost:8086
-      - application.httpCodesAllowList=200,201,202,204,400,401,403,500
+      - application.httpCodesAllowList=200,201,202,204,301,302,400,401,403,500
       - application.logging.displayRequestContent=true
       - application.logging.displayResponseContent=true
       - server.port=8086
@@ -232,7 +232,23 @@ services:
     environment:
       - API_CORS_ORIGIN=*
       - API_DOCUMENTATION_ENABLED=true
+      - S3_DEFAULT_REGION=us-east-1
+      - S3_DEFAULT_ENDPOINT_URL=http://s3.localhost:4566
+      - S3_DEFAULT_ACCESS_KEY_ID=accesskey
+      - S3_DEFAULT_SECRET_ACCESS_KEY=secretkey
+      - S3_DEFAULT_DATA_BUCKET_NAME=buerokratt
+      - S3_DEFAULT_DATA_BUCKET_PATH=
+      - S3_DEFAULT_FS_DATA_DIRECTORY_PATH=/data
+      - S3_CHATS_REGION=us-east-1
+      - S3_CHATS_ENDPOINT_URL=http://s3.localhost:4566
+      - S3_CHATS_ACCESS_KEY_ID=accesskey
+      - S3_CHATS_SECRET_ACCESS_KEY=secretkey
+      - S3_CHATS_DATA_BUCKET_NAME=chats
+      - S3_CHATS_DATA_BUCKET_PATH=
+      - S3_CHATS_FS_DATA_DIRECTORY_PATH=/chats
       - AZURE_ACCOUNT_1_CONNECTION_STRING=DefaultEndpointsProtocol=http;AccountName=testaccount1;AccountKey=dGVzdGtleTE9PQ==;BlobEndpoint=http://azurite:10000/testaccount1;QueueEndpoint=http://azurite:10001/testaccount1;TableEndpoint=http://azurite:10002/testaccount1;
+      - AZURE_ACCOUNT_2_CONNECTION_STRING=DefaultEndpointsProtocol=http;AccountName=testaccount2;AccountKey=dGVzdGtleTI9PQ==;BlobEndpoint=http://azurite:10000/testaccount2;QueueEndpoint=http://azurite:10001/testaccount2;TableEndpoint=http://azurite:10002/testaccount2;
+      - AZURE_ACCOUNT_3_CONNECTION_STRING=DefaultEndpointsProtocol=http;AccountName=testaccount3;AccountKey=dGVzdGtleTM9PQ==;BlobEndpoint=http://azurite:10000/testaccount3;QueueEndpoint=http://azurite:10001/testaccount3;TableEndpoint=http://azurite:10002/testaccount3;
     ports:
       - 3007:3000
     networks:
@@ -248,6 +264,7 @@ services:
       - AZURITE_ACCOUNTS=testaccount1:dGVzdGtleTE9PQ==;
     volumes:
       - azurite-data:/data
+    command: ["azurite", "-l", "/data", "--blobHost", "0.0.0.0", "--queueHost", "0.0.0.0", "--tableHost", "0.0.0.0", "--skipApiVersionCheck"]  
     networks:
       - bykstack
 

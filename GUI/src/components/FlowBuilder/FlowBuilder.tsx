@@ -7,8 +7,10 @@ import LassoSelectionControls from 'components/Flow/Controls/LassoSelectionContr
 import UndoRedoControls from 'components/Flow/Controls/UndoRedoControls';
 import edgeTypes from 'components/Flow/EdgeTypes';
 import { Lasso } from 'components/Flow/LassoSelection/Lasso';
+import McqBranchSelectModal from 'components/Flow/McqBranchSelectModal';
 import nodeTypes from 'components/Flow/NodeTypes';
 import useLayout from 'hooks/flow/useLayout';
+import useMcqConnect from 'hooks/flow/useMcqConnect';
 import { useOnNodesDelete } from 'hooks/flow/useOnNodeDelete';
 import { ChangeEventHandler, FC, useCallback, useEffect, useState } from 'react';
 import '@xyflow/react/dist/style.css';
@@ -17,6 +19,7 @@ import { MdCenterFocusStrong, MdOutlineCenterFocusStrong } from 'react-icons/md'
 import useNewServiceStore from 'store/new-services.store';
 import useServiceStore from 'store/services.store';
 import { StepType } from 'types';
+import { applySimpleConnection } from 'utils/mcq-flow-utils';
 import '../Flow/LassoSelection/Lasso.css';
 import './FlowBuilder.scss';
 
@@ -59,42 +62,26 @@ const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
   const { fitView } = useReactFlow();
 
   const { runLayout } = useLayout();
+  const { pendingConnection, handleConnect, isValidConnection, confirmBranch, cancelBranchSelection } = useMcqConnect();
 
   const onConnect = useCallback(
-    ({ source, target }: any) => {
+    (connection: { source?: string | null; target?: string | null; sourceHandle?: string | null }) => {
+      if (handleConnect(connection)) return;
+
       const nodes = getNodes();
       const edges = getEdges();
-
-      const parentOutgoingEdges = edges.filter((edge) => edge.source === source);
-
-      const ghostEdges = parentOutgoingEdges.filter((edge) => {
-        const targetNode = nodes.find((n) => n.id === edge.target);
-        return targetNode?.type === 'ghost';
+      const { nodes: finalNodes, edges: finalEdges } = applySimpleConnection({
+        nodes,
+        edges,
+        connection,
       });
-
-      let finalNodes = nodes;
-      let finalEdges = edges;
-
-      if (ghostEdges.length > 0) {
-        const ghostNodeIds = new Set(ghostEdges.map((edge) => edge.target));
-        finalEdges = edges.filter((edge) => !ghostEdges.includes(edge));
-        finalNodes = nodes.filter((node) => !ghostNodeIds.has(node.id));
-      }
-
-      const newEdge = {
-        id: `${source}->${target}`,
-        source: source,
-        target: target,
-        type: 'step',
-      };
-      finalEdges = [...finalEdges, newEdge];
 
       setNodes(finalNodes);
       setEdges(finalEdges);
       setHasUnsavedChanges(true);
       saveToHistory({ nodes: finalNodes, edges: finalEdges });
     },
-    [getEdges, getNodes, setEdges, setHasUnsavedChanges, setNodes, saveToHistory],
+    [getEdges, getNodes, handleConnect, setEdges, setHasUnsavedChanges, setNodes, saveToHistory],
   );
 
   const zIndexStyle = { zIndex: 20 };
@@ -102,10 +89,6 @@ const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
   const onChange: ChangeEventHandler<HTMLSelectElement> = (evt) => {
     setColorMode(evt.target.value as ColorMode);
   };
-
-  const isValidConnection = useCallback((connection: any) => {
-    return connection.source !== connection.target;
-  }, []);
 
   const onSelectionChange = useCallback(
     ({ nodes: selectedNodes }: { nodes: Node[] }) => {
@@ -261,6 +244,13 @@ const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
             </Button>
           </Track>
         </Modal>
+      )}
+      {pendingConnection && (
+        <McqBranchSelectModal
+          emptyBranches={pendingConnection.emptyBranches}
+          onSelect={confirmBranch}
+          onClose={cancelBranchSelection}
+        />
       )}
     </>
   );

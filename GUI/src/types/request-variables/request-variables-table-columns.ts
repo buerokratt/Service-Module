@@ -7,9 +7,11 @@ export type RequestVariablesTableColumns = {
   nestedLevel: number;
   arrayType?: string;
   description?: string;
+  mandatory?: boolean;
   endpointVariableId?: string;
   type?: string;
   value?: string;
   variable?: string;
   operator?: RequestOperator;
+  paramType?: 'path' | 'query';
 };

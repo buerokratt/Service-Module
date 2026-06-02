@@ -151,13 +151,13 @@
     "edit": "Muuda",
     "delete": "Kustuta",
     "cancel": "Tühista",
-    "importMany": "Impordi mitu",
+    "importMany": "Impordi",
     "import": {
       "importSuccess": "{{count}} teenus{{lengthCheck}} edukalt imporditud",
       "importFailure": "Järgmisi faile ei õnnestunud importida (vale vorming või rikutud): {{files}}",
       "failedToImport": "Teenuste importimine ebaõnnestus"
     },
-    "exportMany": "Ekspordi mitu",
+    "exportMany": "Ekspordi",
     "exportAll": "Ekspordi kõik",
     "export": "Ekspordi",
     "exportAllConfirmation": "Kas olete kindel, et soovite eksportida kõik teenused?",
@@ -244,7 +244,7 @@
     "examples": {
       "title": "Näidisküsimused",
       "placeholder": "Lisa näiteid, mida kasutaja võiks küsida, et teenus käivituks",
-      "tooltip": "Sisesta näidisküsimused, mille kaudu teenus käivitub (nt. ‘Millal on Jaanipäev?’)"
+      "tooltip": "Sisesta näidisküsimused, mille kaudu teenus käivitub (nt. ‘Millal on Jaanipäev?’). Soovituslik on lisada vähemalt 5 näidet."
     },
     "keywords": {
       "title": "Märksõnad",
@@ -266,7 +266,6 @@
       "insert": "Sisesta API otspunkt..",
       "live": "Toodangukeskkonna otspunkt",
       "name": "Otspunkti nimetus",
-      "publicEndpoint": "Avalik otspunkt",
       "params": "Parameetrid",
       "required": "Muutuja on kohustuslik",
       "single": "Otspunkt",
@@ -276,8 +275,24 @@
       "variable": "Muutuja",
       "operator": "Operaator",
       "unsupported": "Vabandust, praegu toetame ainult GET ja POST päringud",
+      "noEndpointSelected": "Palun hangi ja vali otspunkt enne salvestamist",
       "insertName": "Sisesta otspunkti nimetus...",
+      "insertDescription": "Sisesta otspunkti kirjeldus...",
+      "paramType": "Tüüp",
+      "paramDescription": "Kirjeldus",
+      "paramMandatory": "Kohustuslik",
+      "mandatoryYes": "Jah",
+      "mandatoryNo": "Ei",
+      "mandatoryNameValueRequired": "Nimi ja väärtus on kohustuslikud",
+      "nameTypeDescriptionRequired": "Nimi, tüüp ja kirjeldus on kõigi parameetrite jaoks kohustuslikud",
+      "missingPathParam": "Puudub väärtus parameetrile '{{name}}'",
+      "unresolvedPlaceholder": "Lahendamata kohatäitja '{{name}}'",
+      "paramTypeTooltip": "Tüüp määrab, millist andmetüüpi parameeter aktsepteerib.\n\nSTRING (vaikimisi) – tekst (nt \"Tallinn\", \"ABC123\")\nNUMBER – arvud (nt 10, 10.5)\nBOOLEAN – true või false\nDATE – kuupäev või kuupäev-kellaaeg (nt 2025-01-01, ISO 8601)",
+      "response": "Vastus",
+      "testUrlFirst": "Enne salvestamist käivita Testi URLi",
       "type": "Otspunkti tüüp",
+      "endpoints": "Otspunktid",
+      "fetchEndpointsSuccess": "Otspunktid edukalt laaditud",
       "nameAlreadyExists": "API pealkiri peab olema unikaalne",
       "formatJson": "Formateeri JSON",
       "global": "Globaalne",
@@ -295,7 +310,7 @@
     "uses": "Teenus kasutab",
     "defaultServiceName": "nimetu_teenus",
     "noElementsAvailable": "Ühtegi elementi pole saadaval",
-    "createNewEndpoint": "Loo uus otspunkt",
+    "createNewEndpoint": "Uus otspunkt",
     "editEndpoint": "Muuda otspunkti",
     "toast": {
       "serviceMissingFields": "Nõutav on teenuse nimi ja kirjeldus",
@@ -321,7 +336,7 @@
     "chooseMemorySlots": "Vali mälukohad"
   },
   "serviceFlow": {
-    "serviceConfiguration": "Teenuse seaded",
+    "serviceConfiguration": "Seaded",
     "element": {
       "taraAuthentication": "TARA autentimine",
       "textfield": "Sõnum kliendile",
@@ -379,7 +394,7 @@
       "or": "VÕI",
       "not": "MITTE",
       "addRule": "+ Reegel",
-      "addElement": "+ Element",
+      "addElement": "+ Uus väärtus",
       "addGroup": "+ Grupp",
       "remove": "Eemalda",
       "signType": "Märgi tüüp",
@@ -390,10 +405,15 @@
       "removeValueAssignment": "Eemalda element, mis on määratud väärtuseks",
       "assignManualEdit": "Muutke muutuja määramist käsitsi",
       "openObjectEditor": "Ava objekti redaktor",
-      "confirmImport": "Teenus kirjutatakse üle!"
+      "confirmImport": "Teenus kirjutatakse üle!",
+      "importFlowOnly": "Ainult voo import"
+    },
+    "mcq": {
+      "selectBranchTitle": "Vali haru",
+      "emptyBranchesMessage": "Sellel valikvastuse küsimusel on {{count}} tühja haru. Millisele harule soovid ühendada?"
     },
     "previousVariables": {
-      "assignElements": "Määra elemendid",
+      "assignElements": "Määratud Väärtused",
       "noName": "<Nimeta>",
       "environmentVariables": {
         "title": "Keskkonnamuutujad"
@@ -462,6 +482,8 @@
     "autoFocus": "Automaatvaade: SEES/VÄLJAS",
     "apiElements": {
       "title": "API elemendid",
+      "searchPlaceholder": "Otsi...",
+      "newApi": "+ Uus API",
       "delete": "Kustuta",
       "deletionImpossible": "Kustutamine ei ole võimalik",
       "deletionImpossibleMessage": "Kustutamine ei ole võimalik. API element on kasutusel järgmistes teenustes. Kustutage API element nendes teenustes enne teenuste kustutamist.",
@@ -682,6 +704,7 @@
       "lastTest": "Viimane test",
       "status": "Staatus",
       "schema": "Skeem",
+      "llmIndexStatus": "Indeks",
       "actions": "Tegevused"
     },
     "tooltip": {
@@ -699,9 +722,12 @@
       "copy": "Kopeeri",
       "test": "Testi",
       "edit": "Muuda",
-      "delete": "Kustuta"
+      "delete": "Kustuta",
+      "retryIndexing": "Proovi indekseerimist uuesti",
+      "reIndex": "Indekseeri"
     },
     "deleteConfirm": "Kas olete kindel, et soovite selle otspunkti kustutada?",
+    "reIndexConfirm": "Indekseerida see otspunkt uuesti?",
     "noSchema": "—",
     "noLastTest": "—",
     "copySuccess": "Otspunkt kopeeritud",
@@ -710,6 +736,8 @@
     "deleteSuccess": "Otspunkt kustutatud",
     "deleteError": "Otspunkti kustutamine ebaõnnestus",
     "testSuccess": "Test õnnestus",
-    "testError": "Test ebaõnnestus"
+    "testError": "Test ebaõnnestus",
+    "reIndexSuccess": "Indekseerimine algas",
+    "reIndexError": "Indekseerimine ebaõnnestus"
   }
 }

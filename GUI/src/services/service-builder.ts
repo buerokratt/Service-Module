@@ -4,12 +4,11 @@ import { Group, Rule } from 'components/FlowElementsPopup/RuleBuilder/types';
 import { format } from 'date-fns';
 import i18next, { t } from 'i18next';
 import { NodeHtmlMarkdown } from 'node-html-markdown';
-import { createEndpoint, createNewService, editService, updateEndpoint } from 'resources/api-constants';
+import { createNewService, editService } from 'resources/api-constants';
 import useServiceStore from 'store/new-services.store';
 import useToastStore from 'store/toasts.store';
 import { StepType } from 'types';
 import { Assign } from 'types/assign';
-import { EndpointData } from 'types/endpoint';
 import { NodeDataProps } from 'types/service-flow';
 import {
   decodeHtmlEntities,
@@ -22,6 +21,14 @@ import {
 } from 'utils/string-util';
 
 import api from '../services/api-dev';
+
+const htmlToMarkdown = new NodeHtmlMarkdown({
+  textReplace: [
+    [/\\_/g, '_'],
+    [/\\\[/g, '['],
+    [/\\\]/g, ']'],
+  ],
+});
 
 /**
  * Normalises MCQ button payloads on all MultiChoiceQuestion nodes.
@@ -167,59 +174,6 @@ export function buildAllServiceContents(
     flowData: fullFlowData,
     subServices,
   };
-}
-
-export async function saveEndpoints(endpoints: EndpointData[], onSuccess?: () => void, onError?: (e: any) => void) {
-  const tasks: Promise<any>[] = [];
-  const serviceId = useServiceStore.getState().serviceId;
-
-  for (const endpoint of endpoints) {
-    const selectedEndpointType = endpoint.definitions.find((e) => e.isSelected);
-    if (!selectedEndpointType) continue;
-    endpoint.serviceId = serviceId;
-    endpoint.isCommon = endpoint.isCommon ?? false;
-  }
-
-  endpoints.forEach((endpoint) => {
-    filterOutEndpointsTrailingUnderscores(endpoint);
-    if (endpoint.isNew) {
-      tasks.push(createEndpointAndUpdateState(endpoint));
-    } else {
-      tasks.push(
-        api.post(updateEndpoint(endpoint.endpointId), {
-          ...endpoint,
-          // Stringify needed for Resql to save nested data in a proper parsable format
-          definitions: JSON.stringify(endpoint.definitions),
-        }),
-      );
-    }
-  });
-
-  await Promise.all(tasks).then(onSuccess).catch(onError);
-}
-
-function filterOutEndpointsTrailingUnderscores(endpoint: EndpointData) {
-  if (endpoint.definitions) {
-    for (const definition of endpoint.definitions) {
-      for (const section of ['body', 'headers', 'params'] as const) {
-        if (definition[section]?.variables) {
-          for (const v of definition[section].variables) {
-            v.name = removeTrailingUnderscores(v.name);
-          }
-        }
-      }
-    }
-  }
-}
-
-async function createEndpointAndUpdateState(endpoint: EndpointData): Promise<any> {
-  const response = await api.post(createEndpoint(), {
-    ...endpoint,
-    // Stringify needed for Resql to save nested data in a proper parsable format
-    definitions: JSON.stringify(endpoint.definitions),
-  });
-  endpoint.isNew = false;
-  return response;
 }
 
 interface SaveFlowConfig {
@@ -735,33 +689,47 @@ function getBranchNodes(
   return branchNodes;
 }
 
+function replaceSpacesOutsideTags(input: string, placeholder: string): string {
+  let result = '';
+  let i = 0;
+  while (i < input.length) {
+    const ch = input[i];
+    if (ch === '<') {
+      const closingIndex = input.indexOf('>', i + 1);
+      if (closingIndex > i + 1) {
+        result += input.slice(i, closingIndex + 1);
+        i = closingIndex + 1;
+        continue;
+      }
+    }
+    result += ch === ' ' ? placeholder : ch;
+    i++;
+  }
+  return result;
+}
+
+function toMarkdownMessage(raw: string): string {
+  const spacePlaceholder = '___SPACE___';
+  const withPlaceholders = replaceSpacesOutsideTags(
+    decodeHtmlEntities(raw).replaceAll('{{', '${').replaceAll('}}', '}'),
+    spacePlaceholder,
+  );
+  const markdown = htmlToMarkdown
+    .translate(withPlaceholders)
+    .replaceAll(spacePlaceholder, ' ')
+    .replaceAll(/\\([-~>[\]_*#().!`=<\\])/g, String.raw`\\$1`);
+
+  const trimmed = markdown.trim().toLowerCase();
+  return trimmed === 'yes' || trimmed === 'no' ? `\${"${trimmed}"}` : markdown;
+}
+
 function handleTextField(
   finishedFlow: Map<any, any>,
   parentStepName: string,
   parentNode: Node,
   childNode: Node<NodeDataProps> | undefined,
 ) {
-  const htmlToMarkdown = new NodeHtmlMarkdown({
-    textReplace: [
-      [/\\_/g, '_'],
-      [/\\\[/g, '['],
-      [/\\\]/g, ']'],
-    ],
-  });
-
-  const spacePlaceholder = '___SPACE___';
-  const rawMessage = typeof parentNode.data.message === 'string' ? decodeHtmlEntities(parentNode.data.message) : '';
-  const markdownMessage = htmlToMarkdown
-    .translate(rawMessage.replace('{{', '${').replace('}}', '}').replaceAll(' ', spacePlaceholder))
-    .replaceAll(spacePlaceholder, ' ')
-    .replaceAll(/\\([-~>[\]_*#().!`=<\\])/g, String.raw`\\$1`);
-
-  let finalMessage = markdownMessage;
-  const trimmedMessage = markdownMessage.trim().toLowerCase();
-
-  if (trimmedMessage === 'yes' || trimmedMessage === 'no') {
-    finalMessage = `\${"${trimmedMessage}"}`;
-  }
+  const finalMessage = toMarkdownMessage(typeof parentNode.data.message === 'string' ? parentNode.data.message : '');
 
   finishedFlow.set(parentStepName, {
     assign: {
@@ -826,11 +794,25 @@ function handleAssignStep(
 
   finishedFlow.set(parentStepName, {
     assign: parentNode.data.assignElements?.reduce((acc: Record<string, any>, e: Assign) => {
-      acc[e.key] = e.value;
+      acc[e.key] = normalizeAssignValue(e.value);
       return acc;
     }, {}),
     next: childNode ? toSnakeCase(childNode.data.label ?? 'format_messages') : 'format_messages',
   });
+}
+
+/**
+ * Ruuter injects JSON.parse() around *_res variables when they appear inside function calls
+ * (e.g. String(testAPI_res.response.body[...])), causing failures because _res variables
+ * are already parsed objects. Strip String() wrappers from API response variable expressions
+ * so Ruuter handles them via direct property access (which works correctly).
+ */
+function normalizeAssignValue(value: string): string {
+  const match = /^\$\{String\(([\s\S]*)\)\}$/.exec(value);
+  if (match && /\b\w+_res\b/.test(match[1])) {
+    return '${' + match[1] + '}';
+  }
+  return value;
 }
 
 function handleEndpointStep(
@@ -866,7 +848,8 @@ function handleEndpointStep(
 
   if (isRawBodySelected) {
     try {
-      const rawJson = JSON.parse(rawBody?.value ?? '');
+      const rawJsonStr = (rawBody?.value ?? '').replace(/(?<!")(\$\{[^}]+\})(?!")/g, '"$1"');
+      const rawJson = JSON.parse(rawJsonStr);
       stepConfig.args.body = rawJson;
     } catch (e: any) {
       console.log(`Unable to save JSON to Yaml. ${e.message}`);
@@ -900,11 +883,13 @@ function handleMultiChoiceQuestion(
     b.payload = b.payload.replace(/\/[^/]*_mcq_/, `/${rootServiceName}_mcq_`);
   });
 
+  const finalQuestion = toMarkdownMessage(parentNode?.data?.multiChoiceQuestion?.question ?? '');
+
   return finishedFlow.set(parentStepName, {
     assign: {
       buttons: parentNode?.data?.multiChoiceQuestion?.buttons ?? [],
       res: {
-        result: parentNode?.data?.multiChoiceQuestion?.question ?? '',
+        result: finalQuestion,
       },
     },
     next: childNode ? toSnakeCase(childNode.data.label ?? 'format_messages') : 'format_messages',

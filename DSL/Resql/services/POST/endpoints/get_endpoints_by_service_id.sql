@@ -8,12 +8,12 @@ WITH UserPreferences AS (
 SELECT
   e.endpoint_id,
   e.name,
+  e.description,
   e.type,
-  e.is_common,
   e.definitions
 FROM endpoints AS e
 CROSS JOIN UserPreferences AS up
-WHERE (e.service_id = :id::uuid OR e.is_common = true)
+WHERE (e.service_id = :id::uuid OR e.deleted = false)
   AND e.deleted IS FALSE
   AND (:search IS NULL OR :search = '' OR LOWER(e.name) LIKE LOWER('%' || :search || '%'))
 ORDER BY 
