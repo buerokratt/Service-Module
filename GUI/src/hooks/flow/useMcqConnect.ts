@@ -22,8 +22,8 @@ function useMcqConnect() {
 
   const commitConnection = useCallback(
     (nodes: ReturnType<typeof getNodes>, edges: ReturnType<typeof getEdges>) => {
-      setNodes(nodes);
-      setEdges(edges);
+      useServiceStore.getState().setNodes(nodes);
+      useServiceStore.getState().setEdges(edges);
       setHasUnsavedChanges(true);
       saveToHistory({ nodes, edges });
     },
