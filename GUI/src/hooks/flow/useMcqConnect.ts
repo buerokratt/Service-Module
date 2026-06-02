@@ -15,7 +15,7 @@ export type PendingMcqConnection = {
 };
 
 function useMcqConnect() {
-  const { getNodes, getEdges, setNodes, setEdges, getNode } = useReactFlow();
+  const { getNodes, getEdges, getNode } = useReactFlow();
   const saveToHistory = useServiceStore((state) => state.saveToHistory);
   const setHasUnsavedChanges = useServiceStore((state) => state.setHasUnsavedChanges);
   const [pendingConnection, setPendingConnection] = useState<PendingMcqConnection | null>(null);
@@ -27,7 +27,7 @@ function useMcqConnect() {
       setHasUnsavedChanges(true);
       saveToHistory({ nodes, edges });
     },
-    [saveToHistory, setEdges, setHasUnsavedChanges, setNodes],
+    [saveToHistory, setHasUnsavedChanges],
   );
 
   const applyMcqOutgoingConnection = useCallback(
