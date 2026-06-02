@@ -413,7 +413,7 @@ const FlowElementsPopup: React.FC = () => {
 
   return (
     <Popup
-      style={{ maxWidth: 700 }}
+      style={{ maxWidth: stepType === StepType.UserDefined ? 900 : 700 }}
       title={title}
       onClose={onClose}
       footer={
