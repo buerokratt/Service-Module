@@ -869,7 +869,7 @@ function resolveUrlWithPathParams(
   // attempt Spring-style URI template expansion at runtime and fail with
   // "Not enough variable values available to expand '<name>'".
   const urlPathPart = baseUrl.split('?')[0];
-  const pathPlaceholderNames = new Set([...urlPathPart.matchAll(/(?<!\$)\{(\w+)\}/g)].map((m) => m[1]));
+  const pathPlaceholderNames = new Set([...urlPathPart.matchAll(/(?<!\$)\{([^{}]+)\}/g)].map((m) => m[1]));
 
   let resolvedUrl = baseUrl;
   if (!Array.isArray(paramsVariables) || pathPlaceholderNames.size === 0) {
