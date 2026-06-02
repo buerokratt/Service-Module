@@ -8,9 +8,9 @@ import { getDragData } from 'utils/component-util';
 import '../styles.scss';
 
 interface JumpToServiceInputElementProps {
-  element: Assign;
-  onRemove?: (id: string) => void;
-  onChange: (element: Assign) => void;
+  readonly element: Assign;
+  readonly onRemove?: (id: string) => void;
+  readonly onChange: (element: Assign) => void;
 }
 
 const JumpToServiceInputElement: React.FC<JumpToServiceInputElementProps> = ({ element, onRemove, onChange }) => {

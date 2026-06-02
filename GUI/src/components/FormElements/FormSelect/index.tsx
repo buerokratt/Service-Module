@@ -8,8 +8,8 @@ import { Icon } from '../../../components';
 import './FormSelect.scss';
 
 type SelectOption<T = string> = {
-  label: string;
-  value: T;
+  readonly label: string;
+  readonly value: T;
 };
 
 type FormSelectProps<T = string> = Omit<SelectHTMLAttributes<HTMLSelectElement>, 'defaultValue'> & {

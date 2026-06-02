@@ -8,8 +8,8 @@ import JumpToServiceInputElement from './JumpToServiceInputElement';
 import '../styles.scss';
 
 interface JumpToServiceInputBuilderProps {
-  seedGroup: Assign[];
-  onChange: (group: Assign[]) => void;
+  readonly seedGroup: Assign[];
+  readonly onChange: (group: Assign[]) => void;
 }
 
 const createNewElement = (): Assign => ({

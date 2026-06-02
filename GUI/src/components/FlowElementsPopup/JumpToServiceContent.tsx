@@ -12,7 +12,7 @@ import Track from '../Track';
 import JumpToServiceInputBuilder from './JumpToServiceInputBuilder';
 import PreviousVariables from './PreviousVariables';
 
-type ServiceOption = { name: string; serviceId: string };
+type ServiceOption = { readonly name: string; readonly serviceId: string };
 
 type JumpToServiceContentProps = {
   readonly node: Node<NodeDataProps>;

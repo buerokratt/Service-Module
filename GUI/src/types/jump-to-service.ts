@@ -1,7 +1,7 @@
 import { Assign } from './assign';
 
 export interface JumpToService {
-  serviceName: string;
-  serviceId?: string;
-  input: Assign[];
+  readonly serviceName: string;
+  readonly serviceId?: string;
+  readonly input: Assign[];
 }
