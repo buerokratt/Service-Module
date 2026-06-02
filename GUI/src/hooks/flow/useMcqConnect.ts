@@ -64,21 +64,21 @@ function useMcqConnect() {
       const mcqId = getMcqNodeIdFromConnection(connection, getNode);
       if (!mcqId) return false;
 
+      if (connection.target === mcqId) {
+        applyMcqIncomingConnection(connection);
+        return true;
+      }
+
       const nodes = getNodes();
       const edges = getEdges();
       const emptyBranches = getEmptyMcqBranches(mcqId, nodes, edges);
       if (emptyBranches.length === 0) return true;
 
-      if (connection.source === mcqId) {
-        if (emptyBranches.length === 1) {
-          applyMcqOutgoingConnection(connection, emptyBranches[0]);
-        } else {
-          setPendingConnection({ connection, emptyBranches });
-        }
-        return true;
+      if (emptyBranches.length === 1) {
+        applyMcqOutgoingConnection(connection, emptyBranches[0]);
+      } else {
+        setPendingConnection({ connection, emptyBranches });
       }
-
-      applyMcqIncomingConnection(connection);
       return true;
     },
     [applyMcqIncomingConnection, applyMcqOutgoingConnection, getEdges, getNode, getNodes],
@@ -104,7 +104,11 @@ function useMcqConnect() {
       const mcqId = getMcqNodeIdFromConnection(connection, getNode);
       if (!mcqId) return true;
 
-      return getEmptyMcqBranches(mcqId, getNodes(), getEdges()).length > 0;
+      if (connection.source === mcqId) {
+        return getEmptyMcqBranches(mcqId, getNodes(), getEdges()).length > 0;
+      }
+
+      return true;
     },
     [getEdges, getNode, getNodes],
   );
