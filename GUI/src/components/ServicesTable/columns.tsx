@@ -3,19 +3,15 @@ import { createColumnHelper } from '@tanstack/react-table';
 import Label from 'components/Label';
 import Tooltip from 'components/Tooltip';
 import i18n from 'i18n';
-import { AiOutlineExport } from 'react-icons/ai';
 import { AiOutlineInfoCircle } from 'react-icons/ai';
 import { IoCopyOutline } from 'react-icons/io5';
 import { MdDeleteOutline, MdOutlineDescription, MdOutlineEdit } from 'react-icons/md';
 import { NavigateFunction } from 'react-router-dom';
-import { getServiceById } from 'resources/api-constants';
 import { ROUTES } from 'resources/routes-constants';
-import api from 'services/api-dev';
 import useServiceListStore from 'store/services.store';
 import useStore from 'store/store';
 import useToastStore from 'store/toasts.store';
 import { Service, ServiceState } from 'types';
-import { exportServices } from 'utils/service-export';
 
 interface GetColumnsConfig {
   isCommon: boolean;
@@ -36,15 +32,23 @@ export const getColumns = ({ isCommon, navigate, hideDeletePopup, showReadyPopup
       },
       cell: (props) => (
         <Track align="right" justify="start">
-          <label
-            style={{ paddingRight: 3, cursor: 'pointer', color: '#005aa3' }}
+          <button
+            style={{
+              paddingRight: 3,
+              cursor: 'pointer',
+              color: '#005aa3',
+              background: 'none',
+              border: 'none',
+              padding: 0,
+              font: 'inherit',
+            }}
             onClick={() => {
               useServiceListStore.getState().setSelectedService(props.row.original);
               navigate(ROUTES.replaceWithId(ROUTES.EDITSERVICE_ROUTE, props.row.original.serviceId));
             }}
           >
             {props.cell.getValue()}
-          </label>
+          </button>
           <Tooltip
             content={
               <Track isMultiline={true}>
