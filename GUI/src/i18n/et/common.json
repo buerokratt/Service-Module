@@ -697,7 +697,7 @@
     "editor": "Objektiredaktor"
   },
   "apiRegistry": {
-    "title": "API–Varamu / API Registry",
+    "title": "API–Varamu",
     "createEndpoint": "Loo uus otspunkt",
     "columns": {
       "name": "Nimi",
