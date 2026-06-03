@@ -10,14 +10,12 @@
 import { createEndpoint, updateEndpoint } from 'resources/api-constants';
 import api from 'services/api-dev';
 import { EndpointData } from 'types/endpoint';
-import { removeTrailingUnderscores } from 'utils/string-util';
 
-function filterTrailingUnderscores(endpoint: EndpointData): void {
+function normalizeEndpointVariableTypes(endpoint: EndpointData): void {
   for (const definition of endpoint.definitions ?? []) {
     for (const section of ['body', 'headers', 'params'] as const) {
       if (definition[section]?.variables) {
         for (const v of definition[section].variables) {
-          v.name = removeTrailingUnderscores(v.name);
           if (!v.type || v.type === 'custom') v.type = 'STRING';
         }
       }
@@ -38,7 +36,7 @@ export async function persistEndpoints(endpoints: EndpointData[], serviceId: str
     const hasSelectedDefinition = endpoint.definitions.some((d) => d.isSelected);
     if (!hasSelectedDefinition) continue;
 
-    filterTrailingUnderscores(endpoint);
+    normalizeEndpointVariableTypes(endpoint);
 
     if (endpoint.isNew) {
       tasks.push(

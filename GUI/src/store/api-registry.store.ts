@@ -140,7 +140,7 @@ const useApiRegistryStore = create<ApiRegistryState>((set, get) => ({
       }
     }
     // Skip test if any path variable placeholder is still unresolved
-    if (/(?<!\$)\{(\w+)\}/.test(url)) return;
+    if (/(?<!\$)\{([^{}]+)\}/.test(url)) return;
 
     // Strip any inline query string — query params are sent separately
     const urlBase = url.includes('?') ? url.split('?')[0] : url;
