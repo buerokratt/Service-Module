@@ -3,7 +3,6 @@ import { t } from 'i18next';
 import { CSSProperties, FC, useRef, useState } from 'react';
 import ReactQuill from 'react-quill';
 import { NodeDataProps } from 'types/service-flow';
-import { removeNestedTemplates } from 'utils/string-util';
 
 import { FormRichText, Track } from '..';
 import PreviousVariables from './PreviousVariables';
