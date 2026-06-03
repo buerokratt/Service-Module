@@ -708,29 +708,28 @@ function replaceSpacesOutsideTags(input: string, placeholder: string): string {
   return result;
 }
 
+function toMarkdownMessage(raw: string): string {
+  const spacePlaceholder = '___SPACE___';
+  const withPlaceholders = replaceSpacesOutsideTags(
+    decodeHtmlEntities(raw).replaceAll('{{', '${').replaceAll('}}', '}'),
+    spacePlaceholder,
+  );
+  const markdown = htmlToMarkdown
+    .translate(withPlaceholders)
+    .replaceAll(spacePlaceholder, ' ')
+    .replaceAll(/\\([-~>[\]_*#().!`=<\\])/g, String.raw`\\$1`);
+
+  const trimmed = markdown.trim().toLowerCase();
+  return trimmed === 'yes' || trimmed === 'no' ? `\${"${trimmed}"}` : markdown;
+}
+
 function handleTextField(
   finishedFlow: Map<any, any>,
   parentStepName: string,
   parentNode: Node,
   childNode: Node<NodeDataProps> | undefined,
 ) {
-  const spacePlaceholder = '___SPACE___';
-  const rawMessage = typeof parentNode.data.message === 'string' ? decodeHtmlEntities(parentNode.data.message) : '';
-  const rawMessageWithSpaceholders = replaceSpacesOutsideTags(
-    rawMessage.replaceAll('{{', '${').replaceAll('}}', '}'),
-    spacePlaceholder,
-  );
-  const markdownMessage = htmlToMarkdown
-    .translate(rawMessageWithSpaceholders)
-    .replaceAll(spacePlaceholder, ' ')
-    .replaceAll(/\\([-~>[\]_*#().!`=<\\])/g, String.raw`\\$1`);
-
-  let finalMessage = markdownMessage;
-  const trimmedMessage = markdownMessage.trim().toLowerCase();
-
-  if (trimmedMessage === 'yes' || trimmedMessage === 'no') {
-    finalMessage = `\${"${trimmedMessage}"}`;
-  }
+  const finalMessage = toMarkdownMessage(typeof parentNode.data.message === 'string' ? parentNode.data.message : '');
 
   finishedFlow.set(parentStepName, {
     assign: {
@@ -829,47 +828,119 @@ function handleEndpointStep(
   const rawBody = endpointDefinition?.body?.rawData ?? {};
   const headersVariables = endpointDefinition?.headers?.variables;
   const methodType = endpointDefinition?.methodType?.toLowerCase();
-  const hasNonEqualOperator = paramsVariables?.some((param: any) => param.operator && param.operator !== '=');
+  const hasNonEqualOperator = Array.isArray(paramsVariables) && paramsVariables.some(hasNonEqualOperatorParam);
+
+  const baseUrl = getEndpointBaseUrl(endpointDefinition?.url, hasNonEqualOperator);
+  const { resolvedUrl, pathPlaceholderNames } = resolveUrlWithPathParams(baseUrl, paramsVariables);
 
   const stepConfig: any = {
     call: `http.${methodType ?? 'post'}`,
     args: {
-      url: hasNonEqualOperator ? (endpointDefinition?.url ?? '') : (endpointDefinition?.url?.split('?')[0] ?? ''),
+      url: resolvedUrl,
     },
     result: `${parentNode.data.endpoint?.name.replaceAll(' ', '_')}_res`,
     next: childNode ? toSnakeCase(childNode.data.label ?? 'format_messages') : 'format_messages',
   };
 
-  if (Array.isArray(paramsVariables) && paramsVariables.length > 0 && !hasNonEqualOperator) {
-    stepConfig.args.query = paramsVariables.reduce((acc: any, e: any) => {
-      acc[e.name] = e.value;
-      return acc;
-    }, {});
+  applyEndpointQuery(stepConfig, paramsVariables, pathPlaceholderNames, hasNonEqualOperator);
+  applyEndpointBody(stepConfig, isRawBodySelected, rawBody, bodyVariables);
+  applyEndpointHeaders(stepConfig, headersVariables);
+
+  finishedFlow.set(parentStepName, stepConfig);
+}
+
+function hasNonEqualOperatorParam(param: any): boolean {
+  return Boolean(param?.operator && param.operator !== '=');
+}
+
+function getEndpointBaseUrl(url: unknown, hasNonEqualOperator: boolean): string {
+  const urlString = typeof url === 'string' ? url : '';
+  // Preserve existing behavior: if a non-equal operator is used, keep the full URL
+  // (including any inline query string); otherwise strip the inline query string.
+  return hasNonEqualOperator ? urlString : (urlString.split('?')[0] ?? '');
+}
+
+function resolveUrlWithPathParams(
+  baseUrl: string,
+  paramsVariables: any[] | undefined,
+): { resolvedUrl: string; pathPlaceholderNames: Set<string> } {
+  // Resolve path param placeholders ({name}) directly into the URL so Ruuter does not
+  // attempt Spring-style URI template expansion at runtime and fail with
+  // "Not enough variable values available to expand '<name>'".
+  const urlPathPart = baseUrl.split('?')[0];
+  const pathPlaceholderNames = new Set([...urlPathPart.matchAll(/(?<!\$)\{([^{}]+)\}/g)].map((m) => m[1]));
+
+  let resolvedUrl = baseUrl;
+  if (!Array.isArray(paramsVariables) || pathPlaceholderNames.size === 0) {
+    return { resolvedUrl, pathPlaceholderNames };
   }
 
+  for (const param of paramsVariables) {
+    const name = String(param?.name ?? '');
+    if (!name) continue;
+    if (!pathPlaceholderNames.has(name)) continue;
+    if (param?.value == null) continue;
+    resolvedUrl = resolvedUrl.split(`{${name}}`).join(String(param.value));
+  }
+
+  return { resolvedUrl, pathPlaceholderNames };
+}
+
+function applyEndpointQuery(
+  stepConfig: any,
+  paramsVariables: any[] | undefined,
+  pathPlaceholderNames: Set<string>,
+  hasNonEqualOperator: boolean,
+) {
+  if (!Array.isArray(paramsVariables) || paramsVariables.length === 0 || hasNonEqualOperator) return;
+
+  const queryOnlyParams = paramsVariables.filter((e: any) => {
+    const name = String(e?.name ?? '');
+    return !pathPlaceholderNames.has(name);
+  });
+
+  if (queryOnlyParams.length === 0) return;
+
+  stepConfig.args.query = queryOnlyParams.reduce((acc: any, e: any) => {
+    const name = String(e?.name ?? '');
+    if (!name) return acc;
+    acc[name] = e?.value;
+    return acc;
+  }, {});
+}
+
+function applyEndpointBody(
+  stepConfig: any,
+  isRawBodySelected: boolean,
+  rawBody: any,
+  bodyVariables: any[] | undefined,
+) {
   if (isRawBodySelected) {
     try {
-      const rawJsonStr = (rawBody?.value ?? '').replace(/(?<!")(\$\{[^}]+\})(?!")/g, '"$1"');
+      const rawJsonStr = String(rawBody?.value ?? '').replace(/(?<!")(\$\{[^}]+\})(?!")/g, '"$1"');
       const rawJson = JSON.parse(rawJsonStr);
       stepConfig.args.body = rawJson;
     } catch (e: any) {
       console.log(`Unable to save JSON to Yaml. ${e.message}`);
     }
-  } else if (Array.isArray(bodyVariables) && bodyVariables.length > 0) {
+    return;
+  }
+
+  if (Array.isArray(bodyVariables) && bodyVariables.length > 0) {
     stepConfig.args.body = bodyVariables.reduce((acc: any, e: any) => {
       acc[e.name] = e.value;
       return acc;
     }, {});
   }
+}
 
+function applyEndpointHeaders(stepConfig: any, headersVariables: any[] | undefined) {
   if (Array.isArray(headersVariables) && headersVariables.length > 0) {
     stepConfig.args.headers = headersVariables.reduce((acc: any, e: any) => {
       acc[e.name] = e.value;
       return acc;
     }, {});
   }
-
-  finishedFlow.set(parentStepName, stepConfig);
 }
 
 function handleMultiChoiceQuestion(
@@ -884,14 +955,13 @@ function handleMultiChoiceQuestion(
     b.payload = b.payload.replace(/\/[^/]*_mcq_/, `/${rootServiceName}_mcq_`);
   });
 
-  const rawQuestion = decodeHtmlEntities(parentNode?.data?.multiChoiceQuestion?.question ?? '');
-  const markdownQuestion = htmlToMarkdown.translate(rawQuestion);
+  const finalQuestion = toMarkdownMessage(parentNode?.data?.multiChoiceQuestion?.question ?? '');
 
   return finishedFlow.set(parentStepName, {
     assign: {
       buttons: parentNode?.data?.multiChoiceQuestion?.buttons ?? [],
       res: {
-        result: markdownQuestion,
+        result: finalQuestion,
       },
     },
     next: childNode ? toSnakeCase(childNode.data.label ?? 'format_messages') : 'format_messages',

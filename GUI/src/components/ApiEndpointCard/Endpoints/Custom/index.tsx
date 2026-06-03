@@ -96,7 +96,7 @@ const EndpointCustom: React.FC<EndpointCustomProps> = ({
     // endpoints loaded from the DB (where paramType may not be persisted) work correctly.
     const allParams = def.params?.variables ?? [];
     const urlPathPart = (def.url ?? '').split('?')[0];
-    const pathPlaceholderNames = new Set([...urlPathPart.matchAll(/(?<!\$)\{(\w+)\}/g)].map((m) => m[1]));
+    const pathPlaceholderNames = new Set([...urlPathPart.matchAll(/(?<!\$)\{([^{}]+)\}/g)].map((m) => m[1]));
     const pathParams = allParams.filter((v) => pathPlaceholderNames.has(v.name));
     const queryParams = allParams.filter((v) => !pathPlaceholderNames.has(v.name));
 
@@ -128,7 +128,7 @@ const EndpointCustom: React.FC<EndpointCustomProps> = ({
     const testUrlBase = testUrl.includes('?') ? testUrl.split('?')[0] : testUrl;
 
     // Check for any remaining unresolved {name} in the path (excluding ${var} runtime vars)
-    const unresolvedRegex = /(?<!\$)\{(\w+)\}/;
+    const unresolvedRegex = /(?<!\$)\{([^{}]+)\}/;
     const remaining = unresolvedRegex.exec(testUrlBase);
     if (remaining) {
       useToastStore.getState().error({ title: t('newService.endpoint.unresolvedPlaceholder', { name: remaining[1] }) });
