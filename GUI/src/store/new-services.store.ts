@@ -297,13 +297,25 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
 
       const endpointsFromNodes = endpointNodes.map((node) => node.data.endpoint);
       const requests = endpointsFromNodes.flatMap((e) =>
-        e?.definitions.map((endpoint) => ({
-          url: endpoint.url,
-          method: endpoint.methodType,
-          headers: extractMapValues(endpoint.headers),
-          body: getEndpointBody(endpoint),
-          params: extractMapValues(endpoint.params),
-        })),
+        e?.definitions.map((endpoint) => {
+          let url = endpoint.url || '';
+          const allParams = endpoint.params?.variables ?? [];
+          const pathParams = allParams.filter((p) => p.paramType === 'path');
+          const queryParams = allParams.filter((p) => p.paramType !== 'path');
+          for (const param of pathParams) {
+            if (param.value?.trim()) {
+              url = url.split(`{${param.name}}`).join(encodeURIComponent(param.value));
+            }
+          }
+          const queryOnlyParams = endpoint.params ? { ...endpoint.params, variables: queryParams } : undefined;
+          return {
+            url,
+            method: endpoint.methodType,
+            headers: extractMapValues(endpoint.headers),
+            body: getEndpointBody(endpoint),
+            params: extractMapValues(queryOnlyParams),
+          };
+        }),
       );
 
       const response = await api.post<{ response: Record<string, unknown>[] }>(servicesRequestsExplain(), {
