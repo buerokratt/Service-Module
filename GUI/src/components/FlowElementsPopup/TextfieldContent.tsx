@@ -3,7 +3,6 @@ import { t } from 'i18next';
 import { CSSProperties, FC, useRef, useState } from 'react';
 import ReactQuill from 'react-quill';
 import { NodeDataProps } from 'types/service-flow';
-import { removeNestedTemplates } from 'utils/string-util';
 
 import { FormRichText, Track } from '..';
 import PreviousVariables from './PreviousVariables';
@@ -37,15 +36,9 @@ const TextfieldContent: FC<TextfieldContentProps> = ({ defaultMessage, onChange,
   const handleEditorChange = (value: string | null) => {
     if (!onChange) return;
 
-    const formattedValue = removeNestedTemplates(value ?? '');
-    if (value !== formattedValue && quillRef.current) {
-      const editor = quillRef.current.getEditor();
-      editor.setText(formattedValue.replaceAll(/<\/?p>/g, '') || '');
-    }
-
-    const placeholders = findMessagePlaceholders(formattedValue);
-    onChange(formattedValue, placeholders);
-    setEditorValue(formattedValue);
+    const placeholders = findMessagePlaceholders(value ?? '');
+    onChange(value, placeholders);
+    setEditorValue(value);
   };
 
   return (

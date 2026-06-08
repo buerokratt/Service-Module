@@ -562,6 +562,10 @@ export function getYamlContent(
         return handleEndpointStep(parentNode, finishedFlow, parentStepName, childNode);
       }
 
+      if (parentNode.data.stepType === StepType.JumpToService) {
+        return handleJumpToServiceStep(parentNode, finishedFlow, parentStepName);
+      }
+
       const nextStep = childNode ? toSnakeCase(childNode.data.label ?? 'format_messages') : 'format_messages';
       const template = getTemplate(parentNode, parentStepName, nextStep);
 
@@ -968,6 +972,27 @@ function handleMultiChoiceQuestion(
   });
 }
 
+function handleJumpToServiceStep(parentNode: Node<NodeDataProps>, finishedFlow: Map<any, any>, parentStepName: string) {
+  const resultName = `${parentStepName}_result`;
+  const returnStepName = 'return_next_service_res';
+
+  finishedFlow.set(parentStepName, {
+    template: '[#SERVICE_PROJECT_LAYER]/jump-to-service',
+    requestType: 'templates',
+    body: {
+      serviceName: parentNode.data.jumpToService?.serviceName ?? '',
+      input: (parentNode.data.jumpToService?.input ?? []).map((e: Assign) => normalizeAssignValue(e.value)),
+    },
+    result: resultName,
+    next: returnStepName,
+  });
+
+  finishedFlow.set(returnStepName, {
+    return: `\${${resultName}.response ?? ''}`,
+    next: 'end',
+  });
+}
+
 function handleDynamicChoices(
   finishedFlow: Map<any, any>,
   parentStepName: string,
@@ -1041,6 +1066,15 @@ const getTemplateDataFromNode = (node: Node): { templateName: string; body?: any
         country: 'EE',
       },
       resultName: 'SiGa',
+    };
+  }
+  if (node.data.stepType === StepType.JumpToService) {
+    return {
+      templateName: '[#SERVICE_PROJECT_LAYER]/jump-to-service',
+      body: {
+        serviceName: node.data.jumpToService?.serviceName ?? '',
+        input: (node.data.jumpToService?.input ?? []).map((e: Assign) => normalizeAssignValue(e.value)),
+      },
     };
   }
   if (node.data.stepType === StepType.FinishingStepRedirect) {

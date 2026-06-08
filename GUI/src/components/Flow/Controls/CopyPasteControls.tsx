@@ -259,6 +259,7 @@ const CopyPasteControls: FC<CopyPasteControlsProps> = ({ onNodesDelete }) => {
         if (
           stepType === StepType.FinishingStepEnd ||
           stepType === StepType.FinishingStepRedirect ||
+          stepType === StepType.JumpToService ||
           stepType === StepType.DynamicChoices ||
           stepType === StepType.Condition ||
           stepType === StepType.Input ||
