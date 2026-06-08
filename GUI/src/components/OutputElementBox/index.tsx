@@ -39,7 +39,8 @@ const OutputElementBox = forwardRef<HTMLDivElement, OutputElementBoxProps>(
         // Need to check for StepType.Assign here since ReactQuill does not support custom onDrop events
         node?.data.stepType === StepType.Assign ||
           node?.data.stepType === StepType.DynamicChoices ||
-          node?.data.stepType === StepType.Condition
+          node?.data.stepType === StepType.Condition ||
+          node?.data.stepType === StepType.JumpToService
           ? JSON.stringify(dragData)
           : dragValue,
       );

@@ -25,7 +25,12 @@ function useEdgeAdd(id: string) {
         label: nodeLabel,
         onDelete: useServiceStore.getState().onDelete,
         onEdit: useServiceStore.getState().handleNodeEdit,
-        type: [StepType.DynamicChoices, StepType.FinishingStepEnd, StepType.FinishingStepRedirect].includes(stepType)
+        type: [
+          StepType.DynamicChoices,
+          StepType.FinishingStepEnd,
+          StepType.FinishingStepRedirect,
+          StepType.JumpToService,
+        ].includes(stepType)
           ? 'finishing-step'
           : 'step',
         stepType: stepType,
@@ -37,7 +42,7 @@ function useEdgeAdd(id: string) {
         if ([StepType.FinishingStepEnd, StepType.FinishingStepRedirect].includes(stepType)) {
           return 'finishing-step';
         }
-        if ([StepType.DynamicChoices].includes(stepType)) {
+        if ([StepType.DynamicChoices, StepType.JumpToService].includes(stepType)) {
           return 'dynamic-choices';
         }
         return 'step';
@@ -58,7 +63,8 @@ function useEdgeAdd(id: string) {
     if (
       stepType != StepType.DynamicChoices &&
       stepType != StepType.FinishingStepEnd &&
-      stepType != StepType.FinishingStepRedirect
+      stepType != StepType.FinishingStepRedirect &&
+      stepType != StepType.JumpToService
     ) {
       targetEdge = {
         id: `${newNodeId}->${edge.target}`,
@@ -126,6 +132,7 @@ function useEdgeAdd(id: string) {
       StepType.DynamicChoices,
       StepType.FinishingStepEnd,
       StepType.FinishingStepRedirect,
+      StepType.JumpToService,
     ].includes(stepType);
     if (!isFinishingStep) {
       setTimeout(() => {

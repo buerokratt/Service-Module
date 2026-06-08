@@ -1,0 +1,39 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Jump to another active service and pass input to it"
+  method: post
+  accepts: json
+  returns: json
+  namespace: service
+  allowlist:
+    body:
+      - field: serviceName
+        type: string
+        description: "Name of the target active service to trigger"
+      - field: input
+        type: object
+        description: "Key-value inputs to pass to the target service"
+
+check_for_body:
+  switch:
+    - condition: ${incoming.body == null || incoming.body.serviceName == null || incoming.body.serviceName == ""}
+      next: missing_service_name
+  next: trigger_service
+
+trigger_service:
+  call: http.post
+  args:
+    url: "[#SERVICE_RUUTER]/services/active/${incoming.body.serviceName}"
+    body: 
+      input: ${incoming.body.input}
+  result: trigger_result
+
+return_value:
+  return: ${trigger_result.response.body}
+  next: end
+
+missing_service_name:
+  status: 400
+  return: 'serviceName - missing'
+  next: end

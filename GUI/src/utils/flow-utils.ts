@@ -106,6 +106,9 @@ export const validateStep = (node: NodeDataProps): ValidationResult => {
     case StepType.FileSign:
       return validateFileSignStep(node);
 
+    case StepType.JumpToService:
+      return validateJumpToServiceStep(node);
+
     default:
       return { isValid: true };
   }
@@ -219,4 +222,10 @@ export const validateFileGenerateStep = (node: NodeDataProps): ValidationResult 
 
 export const validateFileSignStep = (node: NodeDataProps): ValidationResult => {
   return { isValid: Boolean(node.signOption) };
+};
+
+export const validateJumpToServiceStep = (node: NodeDataProps): ValidationResult => {
+  return node.jumpToService?.serviceName
+    ? { isValid: true }
+    : { isValid: false, error: t('chat.service-flow-error.service-name-required') as string };
 };

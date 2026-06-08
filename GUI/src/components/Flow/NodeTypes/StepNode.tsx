@@ -135,6 +135,9 @@ const StepNode: FC<StepNodeProps> = ({ data }) => {
       {data.stepType === StepType.FinishingStepRedirect && (
         <p style={boldText}>{t('serviceFlow.popup.redirectToCustomerSupport')}</p>
       )}
+      {data.stepType === StepType.JumpToService && data.jumpToService?.serviceName && (
+        <p style={boldText}>&rarr; {data.jumpToService.serviceName}</p>
+      )}
       {data.stepType === StepType.Rule && (
         <p>
           {data.name && (

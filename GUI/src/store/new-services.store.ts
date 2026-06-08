@@ -775,7 +775,8 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
           prevNode.data.fileContent != updatedNode.data.fileContent ||
           prevNode.data.signOption != updatedNode.data.signOption ||
           prevNode.data.multiChoiceQuestion != updatedNode.data.multiChoiceQuestion ||
-          prevNode.data.dynamicChoices != updatedNode.data.dynamicChoices
+          prevNode.data.dynamicChoices != updatedNode.data.dynamicChoices ||
+          prevNode.data.jumpToService != updatedNode.data.jumpToService
         ) {
           useServiceStore.getState().disableTestButton();
         }
@@ -791,6 +792,7 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
             signOption: updatedNode.data.signOption,
             multiChoiceQuestion: updatedNode.data.multiChoiceQuestion,
             dynamicChoices: updatedNode.data.dynamicChoices,
+            jumpToService: updatedNode.data.jumpToService,
             endpoint: updatedNode.data.endpoint,
             label: updatedNode.data.label,
             testingPassed: updatedNode.data.testingPassed,
