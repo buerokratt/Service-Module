@@ -109,6 +109,7 @@ export const appendFlowNodes = (
   const skipEndGhost = new Set([
     StepType.FinishingStepEnd,
     StepType.FinishingStepRedirect,
+    StepType.JumpToService,
     StepType.DynamicChoices,
     StepType.Condition,
     StepType.Input,

@@ -286,9 +286,25 @@ const ApiRegistryTable: React.FC<ApiRegistryTableProps> = ({
                       <span
                         style={{ display: 'flex', alignItems: 'center', gap: 4, cursor: 'pointer', overflow: 'hidden' }}
                       >
-                        <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        <button
+                          style={{
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap',
+                            cursor: 'pointer',
+                            color: '#005aa3',
+                            background: 'none',
+                            border: 'none',
+                            padding: 0,
+                            font: 'inherit',
+                          }}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onEdit(endpoint);
+                          }}
+                        >
                           {displayName}
-                        </span>
+                        </button>
                         <Icon icon={<MdInfoOutline />} size="small" style={{ color: '#3f82ff', flexShrink: 0 }} />
                       </span>
                     </Tooltip>

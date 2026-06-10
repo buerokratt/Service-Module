@@ -17,4 +17,5 @@ export enum StepType {
   RasaRules = 'rasa-rules',
   SiGa = 'siga',
   DynamicChoices = 'dynamic-choices',
+  JumpToService = 'jump-to-service',
 }

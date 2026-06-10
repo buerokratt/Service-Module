@@ -362,6 +362,13 @@
         "serviceNameTooltip": "The name of the service that will be executed when a choice is made\nExample: test_service",
         "keyTooltip": "The key will be used as the title for each choice\nExample: name for the above list",
         "payloadKeysTooltip": "Comma-separated keys to be the data sent to the service when a choice is made\nExample: name,price"
+      },
+      "jumpToService": {
+        "title": "Next service",
+        "targetService": "Target service",
+        "selectService": "Select a service...",
+        "noActiveServices": "No active services available",
+        "parameters": "Parameters"
       }
     },
     "popup": {
