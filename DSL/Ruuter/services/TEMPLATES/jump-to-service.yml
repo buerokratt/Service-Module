@@ -8,6 +8,12 @@ declaration:
   namespace: service
   allowlist:
     body:
+      - field: chatId
+        type: string
+        description: "The chat ID for the message"
+      - field: authorId
+        type: string
+        description: "The author ID for the message"
       - field: serviceName
         type: string
         description: "Name of the target active service to trigger"
@@ -25,7 +31,9 @@ trigger_service:
   call: http.post
   args:
     url: "[#SERVICE_RUUTER]/services/active/${incoming.body.serviceName}"
-    body: 
+    body:
+      chatId: ${incoming.body.chatId}
+      authorId: ${incoming.body.authorId} 
       input: ${incoming.body.input}
   result: trigger_result
 
