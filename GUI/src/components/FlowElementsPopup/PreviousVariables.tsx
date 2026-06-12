@@ -109,6 +109,11 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ node }) => {
         key: 'Empty Content Type',
         value: stringToTemplate(''),
       },
+      {
+        id: predefinedInputKeys[1],
+        key: 'Chat Id',
+        value: stringToTemplate('chatId'),
+      },
     ];
 
     setAssignedVariables([...assignElements, ...predefinedInputElements, ...newAssignElements]);
