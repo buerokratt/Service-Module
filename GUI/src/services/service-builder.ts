@@ -980,6 +980,8 @@ function handleJumpToServiceStep(parentNode: Node<NodeDataProps>, finishedFlow: 
     template: '[#SERVICE_PROJECT_LAYER]/jump-to-service',
     requestType: 'templates',
     body: {
+      chatId: "${chatId ?? ''}",
+      authorId: "${authorId ?? ''}",
       serviceName: parentNode.data.jumpToService?.serviceName ?? '',
       input: (parentNode.data.jumpToService?.input ?? []).map((e: Assign) => normalizeAssignValue(e.value)),
     },
@@ -1072,6 +1074,8 @@ const getTemplateDataFromNode = (node: Node): { templateName: string; body?: any
     return {
       templateName: '[#SERVICE_PROJECT_LAYER]/jump-to-service',
       body: {
+        chatId: "${chatId ?? ''}",
+        authorId: "${authorId ?? ''}",
         serviceName: node.data.jumpToService?.serviceName ?? '',
         input: (node.data.jumpToService?.input ?? []).map((e: Assign) => normalizeAssignValue(e.value)),
       },
