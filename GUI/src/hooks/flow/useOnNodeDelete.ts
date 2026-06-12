@@ -78,7 +78,11 @@ const processDeletedNodes = (
       updatedEdges = [...getRemainingEdges(updatedEdges, getConnectedEdges([node], updatedEdges)), ...newEdges];
     } else {
       const edgesWithoutDeleted = getRemainingEdges(updatedEdges, getConnectedEdges([node], updatedEdges));
-      if (outgoers.length === 0 || outgoers.length > 1 || (outgoers.length === 1 && getIncomers(outgoers[0], updatedNodes, edgesWithoutDeleted).length > 0)) {
+      if (
+        outgoers.length === 0 ||
+        outgoers.length > 1 ||
+        (outgoers.length === 1 && getIncomers(outgoers[0], updatedNodes, edgesWithoutDeleted).length > 0)
+      ) {
         const ghostNode: Node = {
           id: generateUniqueId(),
           type: 'ghost',
