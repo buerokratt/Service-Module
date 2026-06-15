@@ -114,7 +114,16 @@ function useEdgeAdd(id: string) {
     let newEdges: Edge[] = [];
 
     setEdges((edges) => {
-      newEdges = edges.filter((e) => e.id !== id).concat([sourceEdge], targetEdge ?? [], ghostEdges);
+      const edgeIndex = edges.findIndex((e) => e.id === id);
+      const remainingEdges = edges.filter((e) => e.id !== id);
+      const insertIndex = edgeIndex === -1 ? remainingEdges.length : edgeIndex;
+      newEdges = [
+        ...remainingEdges.slice(0, insertIndex),
+        sourceEdge,
+        ...(targetEdge ? [targetEdge] : []),
+        ...ghostEdges,
+        ...remainingEdges.slice(insertIndex),
+      ];
       return newEdges;
     });
 
