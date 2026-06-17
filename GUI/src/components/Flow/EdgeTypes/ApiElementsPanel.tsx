@@ -35,7 +35,6 @@ import { EndpointData } from 'types/endpoint';
 
 type SortCol = 'name' | 'status' | 'schema';
 
-
 const SortIcon: React.FC<{ colId: SortCol; currentSortId: SortCol | undefined; currentDesc: boolean }> = ({
   colId,
   currentSortId,
@@ -211,10 +210,7 @@ const ApiElementsPanel: React.FC<ApiElementsPanelProps> = ({ onAddToCanvas }) =>
           {loading ? (
             <p style={{ padding: '8px 16px', margin: 0 }}>{t('global.loading')}</p>
           ) : (
-            <div
-              className="data-table__scrollWrapper"
-              style={{ overflowX: 'hidden' }}
-            >
+            <div className="data-table__scrollWrapper" style={{ overflowX: 'hidden' }}>
               <table
                 className="data-table"
                 style={{ tableLayout: 'fixed', width: '100%', borderCollapse: 'separate', borderSpacing: '0 6px' }}
