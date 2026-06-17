@@ -11,6 +11,7 @@ import McqBranchSelectModal from 'components/Flow/McqBranchSelectModal';
 import nodeTypes from 'components/Flow/NodeTypes';
 import useLayout from 'hooks/flow/useLayout';
 import useMcqConnect from 'hooks/flow/useMcqConnect';
+import { useNodeHighlight } from 'hooks/flow/useNodeHighlight';
 import { useOnNodesDelete } from 'hooks/flow/useOnNodeDelete';
 import { ChangeEventHandler, FC, useCallback, useEffect, useState } from 'react';
 import '@xyflow/react/dist/style.css';
@@ -63,6 +64,7 @@ const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
 
   const { runLayout } = useLayout();
   const { pendingConnection, handleConnect, isValidConnection, confirmBranch, cancelBranchSelection } = useMcqConnect();
+  const { displayNodes, displayEdges, handleNodeClick, handlePaneClick } = useNodeHighlight(nodes, edges);
 
   const onConnect = useCallback(
     (connection: { source?: string | null; target?: string | null; sourceHandle?: string | null }) => {
@@ -141,8 +143,8 @@ const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
   return (
     <>
       <ReactFlow
-        nodes={nodes}
-        edges={edges}
+        nodes={displayNodes}
+        edges={displayEdges}
         onNodesChange={useNewServiceStore.getState().onNodesChange}
         onEdgesChange={useNewServiceStore.getState().onEdgesChange}
         snapToGrid
@@ -156,6 +158,8 @@ const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
           await fitView({ duration: 200, padding: 5 });
         }}
         nodesDraggable={false}
+        onNodeClick={handleNodeClick}
+        onPaneClick={handlePaneClick}
         onSelectionChange={onSelectionChange}
         onConnect={onConnect}
         onEdgesDelete={(edges) => {

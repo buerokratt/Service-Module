@@ -33,6 +33,8 @@ function reorderElements<T>(elements: T[], activeId: string | number, overId: st
   return arrayMove(elements, oldIndex, newIndex);
 }
 
+type HighlightData = { isHighlighted?: boolean; isDimmed?: boolean };
+
 function CustomEdge({
   id,
   label,
@@ -44,7 +46,9 @@ function CustomEdge({
   targetPosition,
   style,
   markerEnd,
+  data,
 }: EdgeProps) {
+  const highlightData = data as HighlightData | undefined;
   const [edgePath, edgeCenterX, edgeCenterY] = getBezierPath({
     sourceX,
     sourceY,
@@ -138,7 +142,7 @@ function CustomEdge({
                 transform: `translate(${edgeCenterX}px, ${edgeCenterY}px) translate(-50%, -50%)`,
               }}
               onClick={() => {}}
-              className="edge-button nodrag nopan"
+              className={`edge-button nodrag nopan${highlightData?.isDimmed ? ' edge-button--dimmed' : ''}${highlightData?.isHighlighted ? ' edge-button--highlighted' : ''}`}
             >
               {label ?? '+'}
             </button>
