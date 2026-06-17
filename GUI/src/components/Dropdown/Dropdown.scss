@@ -9,14 +9,11 @@
   border-radius: 6px;
   box-shadow: 0px 10px 38px -10px rgba(22, 23, 24, 0.35);
   z-index: 1000;
-  resize: both;
-  overflow: auto;
+  overflow: hidden;
   width: 600px;
   min-width: 400px;
   max-width: 600px;
-  min-height: 235px;
-  max-height: 75vh;
-  height: auto;
+  max-height: 90vh;
   display: flex;
   flex-direction: column;
 
@@ -39,7 +36,6 @@
     width: 600px;
     padding: 10px;
     flex: 1;
-    overflow-y: auto;
     min-height: 0;
     display: flex;
     flex-direction: column;
@@ -48,10 +44,10 @@
 
 .dropdown--center {
   position: fixed;
-  top: 50%;
+  top: 5vh;
   left: 50%;
-  transform: translate(-50%, -50%);
-  max-height: 75vh;
+  transform: translateX(-50%);
+  max-height: 90vh;
   max-width: 800px;
   width: 600px;
   background: white;

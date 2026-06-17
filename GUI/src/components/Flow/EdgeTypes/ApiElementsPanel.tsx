@@ -35,8 +35,6 @@ import { EndpointData } from 'types/endpoint';
 
 type SortCol = 'name' | 'status' | 'schema';
 
-/** Height of the collapsible trigger header (search bar row) in pixels */
-const HEADER_HEIGHT_PX = 42;
 
 const SortIcon: React.FC<{ colId: SortCol; currentSortId: SortCol | undefined; currentDesc: boolean }> = ({
   colId,
@@ -215,7 +213,7 @@ const ApiElementsPanel: React.FC<ApiElementsPanelProps> = ({ onAddToCanvas }) =>
           ) : (
             <div
               className="data-table__scrollWrapper"
-              style={{ overflowX: 'hidden', maxHeight: `calc(50vh - ${HEADER_HEIGHT_PX}px)`, overflowY: 'auto' }}
+              style={{ overflowX: 'hidden' }}
             >
               <table
                 className="data-table"
