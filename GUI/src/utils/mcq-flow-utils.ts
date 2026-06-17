@@ -114,10 +114,15 @@ export const applySimpleConnection = ({
   let finalNodes = nodes;
   let finalEdges = edges;
 
+  let preservedLabel: string | undefined;
   if (ghostEdges.length > 0) {
     const ghostNodeIds = new Set(ghostEdges.map((edge) => edge.target));
     finalEdges = edges.filter((edge) => !ghostEdges.includes(edge));
     finalNodes = nodes.filter((node) => !ghostNodeIds.has(node.id));
+    if (ghostEdges.length === 1) {
+      const label = ghostEdges[0].label;
+      if (typeof label === 'string' && label !== '+') preservedLabel = label;
+    }
   }
 
   finalEdges = [
@@ -127,6 +132,7 @@ export const applySimpleConnection = ({
       source,
       target,
       type: 'step',
+      ...(preservedLabel === undefined ? {} : { label: preservedLabel }),
     },
   ];
 
