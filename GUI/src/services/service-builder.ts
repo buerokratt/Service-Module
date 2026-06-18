@@ -484,7 +484,7 @@ export function getYamlContent(
     accepts: 'json',
     returns: 'json',
     namespace: 'service',
-    allowList: {
+    allowlist: {
       body: [
         {
           field: 'chatId',
