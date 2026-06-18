@@ -10,14 +10,15 @@ type McqBranchSelectModalProps = {
   readonly emptyBranches: McqEmptyBranch[];
   readonly onSelect: (branch: McqEmptyBranch) => void;
   readonly onClose: () => void;
+  readonly description?: string;
 };
 
-const McqBranchSelectModal: FC<McqBranchSelectModalProps> = ({ emptyBranches, onSelect, onClose }) => {
+const McqBranchSelectModal: FC<McqBranchSelectModalProps> = ({ emptyBranches, onSelect, onClose, description }) => {
   const { t } = useTranslation();
 
   return (
     <Modal title={t('serviceFlow.mcq.selectBranchTitle')} onClose={onClose}>
-      <p>{t('serviceFlow.mcq.emptyBranchesMessage', { count: emptyBranches.length })}</p>
+      <p>{description ?? t('serviceFlow.mcq.emptyBranchesMessage', { count: emptyBranches.length })}</p>
       <Track direction="vertical" gap={8} align="left" style={{ marginTop: 16, width: '100%' }}>
         {emptyBranches.map((branch) => (
           <Button key={branch.edgeId} className="mcq-branch-select-modal__button" onClick={() => onSelect(branch)}>

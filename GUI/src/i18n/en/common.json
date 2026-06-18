@@ -419,6 +419,9 @@
       "selectBranchTitle": "Select branch",
       "emptyBranchesMessage": "This multi-choice question has {{count}} empty branches. Which branch do you want to connect?"
     },
+    "condition": {
+      "emptyPathsMessage": "This conditional node has {{count}} empty paths. Which path do you want to connect?"
+    },
     "previousVariables": {
       "assignElements": "Assigned Variables",
       "dateAndTime": {

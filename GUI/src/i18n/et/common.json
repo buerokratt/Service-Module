@@ -419,6 +419,9 @@
       "selectBranchTitle": "Vali haru",
       "emptyBranchesMessage": "Sellel valikvastuse küsimusel on {{count}} tühja haru. Millisele harule soovid ühendada?"
     },
+    "condition": {
+      "emptyPathsMessage": "Sellel tingimusliku sõlmel on {{count}} tühja teed. Millisele teele soovid ühendada?"
+    },
     "previousVariables": {
       "assignElements": "Määratud Väärtused",
       "noName": "<Nimeta>",
