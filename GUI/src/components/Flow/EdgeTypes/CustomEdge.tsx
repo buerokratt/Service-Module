@@ -14,7 +14,7 @@ import {
   sortableKeyboardCoordinates,
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
-import { BaseEdge, EdgeLabelRenderer, EdgeProps, getBezierPath } from '@xyflow/react';
+import { BaseEdge, Edge, EdgeLabelRenderer, EdgeProps, getBezierPath } from '@xyflow/react';
 import { Collapsible, Dropdown, StepElement, Track } from 'components';
 import useEdgeAdd from 'hooks/flow/useEdgeAdd';
 import { CSSProperties, memo, useEffect, useState } from 'react';
@@ -33,7 +33,7 @@ function reorderElements<T>(elements: T[], activeId: string | number, overId: st
   return arrayMove(elements, oldIndex, newIndex);
 }
 
-type HighlightData = { isHighlighted?: boolean; isDimmed?: boolean };
+type HighlightData = { readonly isHighlighted?: boolean; readonly isDimmed?: boolean };
 
 function CustomEdge({
   id,
@@ -46,9 +46,8 @@ function CustomEdge({
   targetPosition,
   style,
   markerEnd,
-  data,
-}: EdgeProps) {
-  const highlightData = data as HighlightData | undefined;
+  data: highlightData,
+}: EdgeProps<Edge<HighlightData>>) {
   const [edgePath, edgeCenterX, edgeCenterY] = getBezierPath({
     sourceX,
     sourceY,
