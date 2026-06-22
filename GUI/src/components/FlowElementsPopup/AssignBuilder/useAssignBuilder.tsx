@@ -17,7 +17,7 @@ export const createNewElement = () => {
 };
 
 export const useAssignBuilder = ({ seedGroup, onChange }: UseAssignBuilderProps) => {
-  const [elements, setElements] = useState<Assign[]>(seedGroup);
+  const [elements, setElements] = useState<Assign[]>(seedGroup ?? []);
 
   useEffect(() => {
     onChange(elements);

@@ -11,9 +11,9 @@ import {
 } from '@xyflow/react';
 import { AxiosResponse } from 'axios';
 import { GroupOrRule } from 'components/FlowElementsPopup/RuleBuilder/types';
-import i18next, { t } from 'i18next';
+import i18next from 'i18next';
 import {
-  getCommonEndpoints,
+  getAllEndpoints,
   getEndpointValidation,
   getSecretVariables,
   getServiceById,
@@ -26,12 +26,22 @@ import { saveFlowClick } from 'services/service-builder';
 import { EndpointDefinitionJson, Service, ServiceState, Step, StepType } from 'types';
 import { Assign } from 'types/assign';
 import { Chip } from 'types/chip';
-import { EndpointData, EndpointEnv, EndpointTab, PreDefinedEndpointEnvVariables } from 'types/endpoint';
+import {
+  EndpointData,
+  EndpointDefinition,
+  EndpointEnv,
+  EndpointTab,
+  PreDefinedEndpointEnvVariables,
+} from 'types/endpoint';
 import { EndpointResponseVariable } from 'types/endpoint/endpoint-response-variables';
 import { EndpointType } from 'types/endpoint/endpoint-type';
-import { RequestVariablesTabsRawData, RequestVariablesTabsRowsData } from 'types/request-variables';
+import {
+  RequestVariablesRowData,
+  RequestVariablesTabsRawData,
+  RequestVariablesTabsRowsData,
+} from 'types/request-variables';
 import { initialEdges, initialNodes, NodeDataProps } from 'types/service-flow';
-import { generateJsonRequest } from 'utils/json-request-utils';
+import { formatSchema } from 'utils/json-request-utils';
 import { v4 as uuid } from 'uuid';
 import { create } from 'zustand';
 
@@ -45,6 +55,8 @@ export interface ServiceStoreState {
   serviceId: string;
   description: string;
   slot: string;
+  examples: string[];
+  entities: string[];
   isCommon: boolean;
   edges: Edge[];
   // In the future, this needs to use a common interface with NodeDataProps and not Node
@@ -76,10 +88,10 @@ export interface ServiceStoreState {
   getFlatVariables: () => string[];
   serviceNameDashed: () => string;
   deleteEndpoint: (id: string) => void;
-  isCommonEndpoint: (id: string) => boolean;
-  setIsCommonEndpoint: (id: string, isCommon: boolean) => void;
   setDescription: (description: string) => void;
   setSlot: (slot: string) => void;
+  setExamples: (examples: string[]) => void;
+  setEntities: (entities: string[]) => void;
   setStepPreferences: (stepPreferences: string[]) => void;
   loadEndpointsResponseVariables: () => void;
   setSecrets: (newSecrets: PreDefinedEndpointEnvVariables) => void;
@@ -90,8 +102,14 @@ export interface ServiceStoreState {
   editEndpoint: (endpoint?: EndpointData) => void;
   loadSecretVariables: () => Promise<void>;
   loadTaraVariables: () => Promise<void>;
-  loadService: (id?: string, resetState?: boolean) => Promise<AxiosResponse<Service, any> | undefined>;
-  loadCommonEndpoints: () => Promise<void>;
+  loadService: (id?: string, resetState?: boolean, search?: string) => Promise<AxiosResponse<Service, any> | undefined>;
+  loadAllEndpoints: (
+    isPagination: boolean,
+    page?: number,
+    pageSize?: number,
+    sorting?: string,
+    search?: string,
+  ) => Promise<void>;
   loadStepPreferences: () => Promise<void>;
   getAvailableRequestValues: (endpoint: EndpointData) => PreDefinedEndpointEnvVariables;
   onNameChange: (endpointId: string, oldName: string, newName: string) => void;
@@ -122,11 +140,6 @@ export interface ServiceStoreState {
   enableTestButton: () => void;
   handlePopupSave: (updatedNode: Node<NodeDataProps>) => void;
   testUrl: (endpoint: EndpointData, onError: () => void, onSuccess: () => void) => Promise<void>;
-  isJsonRequestVisible: boolean;
-  jsonRequestContent: any;
-  setJsonRequestVisible: (visible: boolean) => void;
-  setJsonRequestContent: (content: any) => void;
-  triggerJsonRequest: (endpoint: EndpointData) => void;
   setEndpoints: (callback: (prev: EndpointData[]) => EndpointData[]) => void;
   reactFlowInstance: ReactFlowInstance | null;
   setReactFlowInstance: (reactFlowInstance: ReactFlowInstance | null) => void;
@@ -139,7 +152,7 @@ export interface ServiceStoreState {
   handleProgrammaticNavigation: (to: string) => boolean;
   history: { nodes: Node[]; edges: Edge[] }[];
   historyIndex: number;
-  saveToHistory: () => void;
+  saveToHistory: (state?: { nodes: Node[]; edges: Edge[] }) => void;
   undo: () => void;
   redo: () => void;
   canUndo: () => boolean;
@@ -171,16 +184,50 @@ const cloneAssignElement = (element: Assign): Assign => {
   };
 };
 
+const addMissingVariables = (
+  keyedDefEndpoint: EndpointDefinition[EndpointTab] | undefined,
+  rows: RequestVariablesRowData[],
+) => {
+  for (const row of rows) {
+    if (row.endpointVariableId || !row.variable) continue;
+    if (keyedDefEndpoint?.variables.map((e) => e.name).includes(row.variable)) continue;
+    keyedDefEndpoint?.variables.push({
+      id: uuid(),
+      name: row.variable,
+      type: row.type ?? 'STRING',
+      required: false,
+      value: row.value,
+      description: row.description,
+    });
+  }
+};
+
+const syncExistingVariables = (
+  keyedDefEndpoint: EndpointDefinition[EndpointTab] | undefined,
+  rows: RequestVariablesRowData[],
+) => {
+  for (const variable of keyedDefEndpoint?.variables ?? []) {
+    const updated = rows.find((r) => r.endpointVariableId === variable.id);
+    variable.name = updated?.variable ?? variable.name;
+    variable.value = updated?.value ?? variable.value;
+    if (updated?.type !== undefined) variable.type = updated.type;
+    if (updated?.description !== undefined) variable.description = updated.description;
+  }
+};
+
 const useServiceStore = create<ServiceStoreState>((set, get) => ({
   endpoints: [],
   name: '',
   slot: '',
+  examples: [],
+  entities: [],
   serviceId: uuid(),
   description: '',
   edges: initialEdges,
   nodes: initialNodes,
   flowSelectedNodes: [],
   isNewService: true,
+  isCommon: false,
   serviceState: undefined,
   isTestButtonVisible: false,
   isTestButtonEnabled: true,
@@ -207,11 +254,12 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
       isTestButtonVisible: true,
     }),
   isSaveButtonEnabled: () => get().endpoints.length > 0,
+  setIsCommon: (value: boolean) => set({ isCommon: value }),
   markAsNewService: () => set({ isNewService: true }),
   unmarkAsNewService: () => set({ isNewService: false }),
   setServiceId: (id) => set({ serviceId: id }),
   setNodes: (nodes) => {
-    if (nodes instanceof Function) {
+    if (typeof nodes === 'function') {
       set((state) => {
         return {
           nodes: nodes(state.nodes),
@@ -222,7 +270,7 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
     }
   },
   setEdges: (edges) => {
-    if (edges instanceof Function) {
+    if (typeof edges === 'function') {
       set((state) => {
         return {
           edges: edges(state.edges),
@@ -248,15 +296,7 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
       }
 
       const endpointsFromNodes = endpointNodes.map((node) => node.data.endpoint);
-      const requests = endpointsFromNodes.flatMap((e) =>
-        e?.definitions.map((endpoint) => ({
-          url: endpoint.url,
-          method: endpoint.methodType,
-          headers: extractMapValues(endpoint.headers),
-          body: extractMapValues(endpoint.body),
-          params: extractMapValues(endpoint.params),
-        })),
-      );
+      const requests = endpointsFromNodes.flatMap((e) => e?.definitions.map(buildExplainRequest));
 
       const response = await api.post<{ response: Record<string, unknown>[] }>(servicesRequestsExplain(), {
         requests: requests,
@@ -276,11 +316,18 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
           });
         }
 
-        chips.push({
-          name: 'Status Code',
-          value: `${endpoint?.name.replaceAll(' ', '_')}_res.response.statusCodeValue`,
-          data: `${endpoint?.name.replaceAll(' ', '_')}_res.response.statusCodeValue`,
-        });
+        chips.push(
+          {
+            name: 'Base Response',
+            value: `${endpoint?.name.replaceAll(' ', '_')}_res.response.body`,
+            data: `${endpoint?.name.replaceAll(' ', '_')}_res.response.body`,
+          },
+          {
+            name: 'Status Code',
+            value: `${endpoint?.name.replaceAll(' ', '_')}_res.response.statusCodeValue`,
+            data: `${endpoint?.name.replaceAll(' ', '_')}_res.response.statusCodeValue`,
+          },
+        );
 
         const variable: EndpointResponseVariable = {
           name: endpoint?.name ?? '',
@@ -307,23 +354,9 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
   changeServiceName: (name: string) => set({ name }),
   setDescription: (description: string) => set({ description }),
   setSlot: (slot: string) => set({ slot }),
+  setExamples: (examples: string[]) => set({ examples: examples }),
+  setEntities: (entities: string[]) => set({ entities: entities }),
   setStepPreferences: (stepPreferences: string[]) => set({ stepPreferences }),
-  isCommon: false,
-  setIsCommon: (isCommon: boolean) => set({ isCommon }),
-  isCommonEndpoint: (id: string) => {
-    const endpoint = get().endpoints.find((x) => x.endpointId === id);
-    return endpoint?.isCommon ?? false;
-  },
-  setIsCommonEndpoint: (id: string, isCommon: boolean) => {
-    const endpoints = get().endpoints.map((x) => {
-      if (x.endpointId !== id) return x;
-      return {
-        ...x,
-        isCommon,
-      };
-    });
-    set({ endpoints });
-  },
   setSecrets: (newSecrets: PreDefinedEndpointEnvVariables) => set({ secrets: newSecrets }),
   addProductionVariables: (variables: any) => {
     set((state) => ({
@@ -365,6 +398,8 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
       serviceId: uuid(),
       description: '',
       slot: '',
+      examples: [],
+      entities: [],
       secrets: { prod: [], test: [] },
       availableVariables: { prod: [], test: [] },
       isCommon: false,
@@ -388,7 +423,7 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
   },
   resetAssign: () => set({ assignElements: [] }),
   resetRules: () => set({ rules: [], isYesNoQuestion: false }),
-  loadService: async (id, resetState) => {
+  loadService: async (id, resetState, search) => {
     if (resetState === true) {
       get().resetState();
     }
@@ -396,15 +431,24 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
     let serviceResponse: AxiosResponse<Service, any> | undefined;
 
     if (id) {
-      serviceResponse = await api.get<Service>(getServiceById(id));
+      serviceResponse = await api.post<Service>(getServiceById(), { id, search: search ?? '' });
 
       const structure = JSON.parse(serviceResponse.data.structure?.value ?? '{}');
-      let endpoints = serviceResponse.data.endpoints.map((endpoint) => {
-        return {
-          ...endpoint,
-          definitions: JSON.parse(endpoint.definitions.value),
-        };
-      });
+      const settings = structure?.settings;
+      let endpoints = serviceResponse.data.endpoints.map(
+        (
+          endpoint: Pick<EndpointData, 'endpointId' | 'name' | 'type' | 'fileName'> & {
+            definitions: EndpointDefinitionJson;
+            responseSchema?: unknown;
+          },
+        ) => {
+          return {
+            ...endpoint,
+            definitions: JSON.parse(endpoint.definitions.value),
+            responseSchema: formatSchema(endpoint.responseSchema),
+          };
+        },
+      );
       let edges = structure?.edges;
       nodes = structure?.nodes;
 
@@ -412,7 +456,7 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
 
       if (!nodes || nodes.length === 0) nodes = initialNodes;
 
-      if (!endpoints || !(endpoints instanceof Array)) endpoints = [];
+      if (!endpoints || !Array.isArray(endpoints)) endpoints = [];
 
       nodes = nodes.map((node: any) => {
         if (node.type !== 'custom') return node;
@@ -426,6 +470,13 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
         return node;
       });
 
+      /*The structuredClone approach failed with DataCloneError because flow nodes contain function references 
+      (onDelete, onEdit, setClickedNode, update), 
+      which cannot be cloned by the structured clone algorithm. 
+      The JSON.parse(JSON.stringify()) method is used here to strip functions from nodes before saving to history, 
+      which are then manually re-attached during undo/redo operations.
+      Therefore ignore sonar issue warning in PR */
+
       const initialHistoryState = {
         nodes: JSON.parse(JSON.stringify(nodes)),
         edges: JSON.parse(JSON.stringify(edges)),
@@ -433,10 +484,12 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
 
       set({
         serviceId: id,
-        name: serviceResponse.data.name,
+        name: settings?.title ?? serviceResponse.data.name,
         isCommon: serviceResponse.data.isCommon,
-        description: serviceResponse.data.description,
+        description: settings?.description ?? serviceResponse.data.description,
         slot: serviceResponse.data.slot,
+        examples: settings?.examples ?? serviceResponse.data.examples,
+        entities: settings?.keywords ?? serviceResponse.data.entities,
         edges,
         nodes,
         endpoints,
@@ -465,17 +518,31 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
     get().addProductionVariables(variables);
     return serviceResponse;
   },
-  loadCommonEndpoints: async () => {
-    const response = await api.get(getCommonEndpoints());
+  loadAllEndpoints: async (
+    isPagination: boolean,
+    page?: number,
+    pageSize?: number,
+    sorting?: string,
+    search?: string,
+  ) => {
+    const response = await api.post(getAllEndpoints(), {
+      pagination: isPagination,
+      page,
+      page_size: pageSize,
+      sorting,
+      search,
+    });
     const endpointsResponse: Array<
-      Pick<EndpointData, 'endpointId' | 'name' | 'type' | 'fileName' | 'isCommon'> & {
+      Pick<EndpointData, 'endpointId' | 'name' | 'type' | 'fileName'> & {
         definitions: EndpointDefinitionJson;
+        responseSchema?: unknown;
       }
     > = response.data.response;
     let endpoints = endpointsResponse.map((endpoint) => {
       return {
         ...endpoint,
         definitions: JSON.parse(endpoint.definitions.value),
+        responseSchema: formatSchema(endpoint.responseSchema),
       };
     });
 
@@ -598,27 +665,9 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
 
     for (const key in data) {
       const keyedDefEndpoint = defEndpoint[key as EndpointTab];
-      for (const row of data[key as EndpointTab] ?? []) {
-        if (
-          !row.endpointVariableId &&
-          row.variable &&
-          !keyedDefEndpoint?.variables.map((e) => e.name).includes(row.variable)
-        ) {
-          keyedDefEndpoint?.variables.push({
-            id: uuid(),
-            name: row.variable,
-            type: 'custom',
-            required: false,
-            value: row.value,
-          });
-        }
-      }
-
-      for (const variable of keyedDefEndpoint?.variables ?? []) {
-        const updatedVariable = data[key as EndpointTab]!.find((updated) => updated.endpointVariableId === variable.id);
-        variable.name = updatedVariable?.variable ?? variable.name;
-        variable.value = updatedVariable?.value ?? variable.value;
-      }
+      const rows = data[key as EndpointTab] ?? [];
+      addMissingVariables(keyedDefEndpoint, rows);
+      syncExistingVariables(keyedDefEndpoint, rows);
     }
 
     endpoint.definitions[0] = defEndpoint;
@@ -637,7 +686,7 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
         title: i18next.t('newService.toast.missingFields'),
         message: i18next.t('newService.toast.serviceMissingFields'),
       });
-      return Promise.reject(new Error(i18next.t('newService.toast.missingFields') ?? 'Error'));
+      throw new Error(i18next.t('newService.toast.missingFields') ?? 'Error');
     }
 
     const { isNewService, onServiceSave } = get();
@@ -645,7 +694,7 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
     try {
       await onServiceSave(ServiceState.Ready);
     } catch (e: any) {
-      return Promise.reject(new Error(i18next.t('toast.cannot-save-flow') ?? (e?.message as string) ?? 'Error'));
+      throw new Error(i18next.t('toast.cannot-save-flow') ?? (e?.message as string) ?? 'Error');
     }
 
     if (isNewService) {
@@ -718,7 +767,8 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
           prevNode.data.fileContent != updatedNode.data.fileContent ||
           prevNode.data.signOption != updatedNode.data.signOption ||
           prevNode.data.multiChoiceQuestion != updatedNode.data.multiChoiceQuestion ||
-          prevNode.data.dynamicChoices != updatedNode.data.dynamicChoices
+          prevNode.data.dynamicChoices != updatedNode.data.dynamicChoices ||
+          prevNode.data.jumpToService != updatedNode.data.jumpToService
         ) {
           useServiceStore.getState().disableTestButton();
         }
@@ -734,10 +784,13 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
             signOption: updatedNode.data.signOption,
             multiChoiceQuestion: updatedNode.data.multiChoiceQuestion,
             dynamicChoices: updatedNode.data.dynamicChoices,
+            jumpToService: updatedNode.data.jumpToService,
             endpoint: updatedNode.data.endpoint,
             label: updatedNode.data.label,
             testingPassed: updatedNode.data.testingPassed,
             assignElements: updatedNode.data.assignElements ?? prevNode.data.assignElements,
+            rules: updatedNode.data.rules ?? prevNode.data.rules,
+            childrenCount: updatedNode.data.childrenCount ?? prevNode.data.childrenCount,
           },
         };
       }),
@@ -791,31 +844,19 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
   cancelNavigation: () => {
     set({ nextLocation: null });
   },
-  isJsonRequestVisible: false,
-  jsonRequestContent: null,
-  setJsonRequestVisible: (visible: boolean) => set({ isJsonRequestVisible: visible }),
-  setJsonRequestContent: (content: any) => set({ jsonRequestContent: content }),
-  triggerJsonRequest: (endpoint: EndpointData) => {
-    generateJsonRequest(endpoint.definitions[0])
-      .then((content) => {
-        set({ jsonRequestContent: content, isJsonRequestVisible: true });
-        useToastStore.getState().success({
-          title: t('newService.endpoint.success'),
-        });
-      })
-      .catch((error) => {
-        useToastStore.getState().error({
-          title: error.message ?? t('newService.endpoint.error'),
-        });
-      });
-  },
-  saveToHistory: () => {
+
+  saveToHistory: (stateOverride?: { nodes: Node[]; edges: Edge[] }) => {
     const { nodes, edges, history, historyIndex } = get();
 
-    const currentState = {
-      nodes: JSON.parse(JSON.stringify(nodes)),
-      edges: JSON.parse(JSON.stringify(edges)),
-    };
+    const currentState = stateOverride
+      ? {
+          nodes: JSON.parse(JSON.stringify(stateOverride.nodes)),
+          edges: JSON.parse(JSON.stringify(stateOverride.edges)),
+        }
+      : {
+          nodes: JSON.parse(JSON.stringify(nodes)),
+          edges: JSON.parse(JSON.stringify(edges)),
+        };
 
     const lastState = history[historyIndex];
 
@@ -828,11 +869,13 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
       return;
     }
 
-    history.push(currentState);
+    const truncatedHistory = historyIndex < history.length - 1 ? history.slice(0, historyIndex + 1) : history;
+
+    truncatedHistory.push(currentState);
 
     set({
-      history,
-      historyIndex: historyIndex + 1,
+      history: truncatedHistory,
+      historyIndex: truncatedHistory.length - 1,
       hasUnsavedChanges: true,
     });
   },
@@ -840,8 +883,24 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
     const { history, historyIndex } = get();
     if (historyIndex > 0) {
       const previousState = history[historyIndex - 1];
+      let nodes = JSON.parse(JSON.stringify(previousState.nodes));
+
+      nodes = nodes.map((node: any) => {
+        if (node.type !== 'custom') return node;
+        const { stepType, ...restData } = node.data;
+        node.data = {
+          ...restData,
+          stepType,
+          onDelete: get().onDelete,
+          setClickedNode: get().setClickedNode,
+          onEdit: get().handleNodeEdit,
+          update: updateFlowInputRules,
+        };
+        return node;
+      });
+
       set({
-        nodes: JSON.parse(JSON.stringify(previousState.nodes)),
+        nodes: nodes,
         edges: JSON.parse(JSON.stringify(previousState.edges)),
         historyIndex: historyIndex - 1,
         hasUnsavedChanges: true,
@@ -853,8 +912,24 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
     const { history, historyIndex } = get();
     if (historyIndex < history.length - 1) {
       const nextState = history[historyIndex + 1];
+      let nodes = JSON.parse(JSON.stringify(nextState.nodes));
+
+      nodes = nodes.map((node: any) => {
+        if (node.type !== 'custom') return node;
+        const { stepType, ...restData } = node.data;
+        node.data = {
+          ...restData,
+          stepType,
+          onDelete: get().onDelete,
+          setClickedNode: get().setClickedNode,
+          onEdit: get().handleNodeEdit,
+          update: updateFlowInputRules,
+        };
+        return node;
+      });
+
       set({
-        nodes: JSON.parse(JSON.stringify(nextState.nodes)),
+        nodes: nodes,
         edges: JSON.parse(JSON.stringify(nextState.edges)),
         historyIndex: historyIndex + 1,
         hasUnsavedChanges: true,
@@ -865,7 +940,45 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
   canRedo: () => get().historyIndex < get().history.length - 1,
 }));
 
-function extractMapValues(element: any) {
+export function buildExplainRequest(endpoint: EndpointDefinition) {
+  let url = endpoint.url || '';
+  const allParams = endpoint.params?.variables ?? [];
+  const pathParams = allParams.filter((p) => p.paramType === 'path');
+  const queryParams = allParams.filter((p) => p.paramType !== 'path');
+  for (const param of pathParams) {
+    if (param.value?.trim()) {
+      url = url.split(`{${param.name}}`).join(encodeURIComponent(param.value));
+    }
+  }
+  const queryOnlyParams = endpoint.params ? { ...endpoint.params, variables: queryParams } : undefined;
+  return {
+    url,
+    method: endpoint.methodType,
+    headers: extractMapValues(endpoint.headers),
+    body: getEndpointBody(endpoint),
+    params: extractMapValues(queryOnlyParams),
+  };
+}
+
+export function getEndpointBody(endpoint: EndpointDefinition): any {
+  const isRawBodySelected = endpoint?.body?.isRawSelected ?? false;
+  const rawBody = endpoint?.body?.rawData ?? {};
+  let body: any = extractMapValues(endpoint.body);
+
+  if (isRawBodySelected) {
+    try {
+      const rawJsonStr = (rawBody?.value ?? '').replace(/(?<!")(\$\{[^}]+\})(?!")/g, '"$1"');
+      const rawJson = JSON.parse(rawJsonStr);
+      body = rawJson;
+    } catch (e: any) {
+      body = extractMapValues(endpoint.body);
+      console.log(`Unable to save JSON to Yaml. ${e.message}`);
+    }
+  }
+  return body;
+}
+
+export function extractMapValues(element: any) {
   if (!element) return {};
 
   if (element.rawData && element.rawData.length > 0) {

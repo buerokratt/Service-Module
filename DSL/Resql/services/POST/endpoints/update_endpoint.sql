@@ -1,9 +1,8 @@
-INSERT INTO endpoints (endpoint_id, service_id, name, type, is_common, definitions)
-VALUES (
-  :endpointId::uuid,
-  :serviceId::uuid,
-  :name,
-  :type::endpoint_type,
-  :isCommon,
-  :definitions::jsonb
-);
+UPDATE endpoints
+SET
+    service_id = NULLIF(:serviceId, '')::uuid,
+    name = :name,
+    type = :type::endpoint_type,
+    definitions = :definitions::jsonb,
+    description = :description
+WHERE endpoint_id = :endpointId::uuid;

@@ -131,34 +131,7 @@ delete_mcq_files:
     body:
       path: "[#RUUTER_SERVICES_PATH]/${ruuter_type}/[#RUUTER_SERVICES_DIR_PATH]/${old_file_status_path}"
       keyword: "${name_res.response.body[0].name}_"
-  result: check_for_intent_connection
-
-check_for_intent_connection:
-  call: http.post
-  args:
-    url: "[#SERVICE_TRAINING_RESQL]/get-service-trigger"
-    body:
-      serviceId: ${id}
-  result: connection_res
-  next: check_is_connected_to_intents_or_has_requests
-
-check_is_connected_to_intents_or_has_requests:
-  switch:
-    - condition: ${connection_res.response.body.length > 0}
-      next: delete_intent_connection
-  next: return_ok
-
-delete_intent_connection:
-  call: http.post
-  args:
-    url: "[#SERVICE_TRAINING_RESQL]/add-service-trigger"
-    body:
-      serviceId: ${id}
-      intent: ${connection_res.response.body[0].intent}
-      status: "deleted"
-      authorRole: ${connection_res.response.body[0].authorRole}
-      serviceName: ${connection_res.response.body[0].serviceName}
-  result: return_ok
+  result: deleted_mcq
 
 return_ok:
   reloadDsl: true

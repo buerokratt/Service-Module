@@ -1,0 +1,71 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Wrapper for manual re-index triggered from the UI. Calls index-llm as a sub-flow and handles crashes (e.g. LLM service unreachable) by writing FAILED to the DB — same pattern as update-endpoint."
+  method: post
+  accepts: json
+  returns: json
+  namespace: service
+  allowlist:
+    body:
+      - field: endpointId
+        type: string
+        description: "Endpoint UUID to re-index"
+    headers:
+      - field: cookie
+        type: string
+        description: "Cookie field"
+
+assign_id:
+  assign:
+    endpointId: ${incoming.body.endpointId}
+
+check_required:
+  switch:
+    - condition: ${endpointId == null || endpointId === ''}
+      next: return_bad_request
+
+call_index_llm:
+  call: http.post
+  args:
+    url: "[#SERVICE_RUUTER]/endpoints/index-llm"
+    headers:
+      cookie: ${incoming.headers.cookie}
+    body:
+      endpointId: ${endpointId}
+  result: index_llm_result
+
+check_index_llm_result:
+  switch:
+    - condition: ${index_llm_result != null && index_llm_result.response != null && 200 <= index_llm_result.response.statusCodeValue && index_llm_result.response.statusCodeValue < 300}
+      next: return_ok
+  next: mark_llm_sync_failed
+
+mark_llm_sync_failed:
+  call: http.post
+  args:
+    url: "[#SERVICE_RESQL]/endpoints/update_endpoint_llm_sync_status"
+    body:
+      endpointId: ${endpointId}
+      status: FAILED
+  result: update_sync_res
+  next: log_reindex_failure
+
+log_reindex_failure:
+  log: "Re-index failed for endpoint ${endpointId}"
+  next: return_failed
+
+return_ok:
+  status: 200
+  return: "Endpoint re-indexed successfully"
+  next: end
+
+return_failed:
+  status: 500
+  return: "Re-index failed"
+  next: end
+
+return_bad_request:
+  status: 400
+  return: "endpointId is required"
+  next: end

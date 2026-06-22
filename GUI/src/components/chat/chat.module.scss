@@ -5,8 +5,8 @@
   z-index: 99;
   position: fixed;
   margin: 1em;
-  right: 250px;
-  bottom: 30px;
+  right: 0;
+  bottom: 95px;
   width: 650px;
   height: 500px;
 }
@@ -79,7 +79,6 @@
   overflow-y: auto;
   overflow-x: hidden;
   margin-bottom: auto;
-  height: 20em;
 }
 
 .message {
@@ -141,12 +140,49 @@
       .content {
         border-radius: 6px 48px 48px 29px;
         background-color: blue;
+        color: white;
+
+        a {
+          color: #a8d4ff;
+          text-decoration: underline;
+
+          &:visited {
+            color: #c8a8ff;
+          }
+        }
       }
 
       .icon {
         padding-right: 0.5em;
       }
     }
+  }
+}
+
+.actionButton {
+  cursor: pointer;
+  font-size: 1em;
+  margin: 0.7rem 0.3rem 0.3rem 0.3rem;
+  padding: 0.3rem 1.5rem;
+  background-color: get-color(sapphire-blue-10);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  box-shadow: 2px 1px 4px grey;
+
+  &:hover {
+    filter: brightness(0.95);
+  }
+
+  &:active:not(:disabled) {
+    filter: brightness(0.75);
+    box-shadow: none;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    box-shadow: none;
+    cursor: default;
   }
 }
 
@@ -196,7 +232,7 @@
       pointer-events: none;
       user-select: none;
       background-color: #f5f5f5;
-      color: #999;
+      color: #696969;
     }
   }
 
@@ -241,18 +277,18 @@
   font-weight: bold;
 
   &.success {
-    color: rgb(0, 138, 0);
+    color: rgb(0, 100, 0);
     background: #0f02;
   }
 
   &.error {
-    color: rgb(170, 0, 0);
-    background: #f002;
+    color: rgb(80, 0, 0);
+    background: #ffe3e3;
   }
 
   &.info {
-    color: rgb(0, 0, 203);
-    background: #00f2;
+    color: rgb(0, 0, 80);
+    background: #e3e8ff;
   }
 
   &.normal {
@@ -284,8 +320,8 @@
 
 .profile {
   position: fixed;
-  bottom: 0px;
-  right: 250px;
+  bottom: 95px;
+  right: 0;
 
   display: flex;
   align-items: center;
@@ -344,6 +380,7 @@
   &.client {
     .content {
       background-color: #764ca0;
+      color: white;
     }
   }
 
@@ -351,24 +388,33 @@
     .main {
       .content {
         background-color: get-color(sapphire-blue-12);
+        color: white;
+
+        a {
+          color: #a8d4ff;
+          text-decoration: underline;
+
+          &:visited {
+            color: #c8a8ff;
+          }
+        }
       }
     }
   }
 }
 
 [data-theme='dark'] .system {
+  color: white;
+
   &.success {
-    color: get-color(sea-green-11);
     background: get-color(sea-green-6);
   }
 
   &.error {
-    color: get-color(jasper-11);
     background: get-color(jasper-6);
   }
 
   &.info {
-    color: get-color(sapphire-blue-11);
     background: get-color(sapphire-blue-6);
   }
 

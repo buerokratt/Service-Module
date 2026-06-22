@@ -1,0 +1,8 @@
+{
+    "id": "{{ name }}",
+    "name": {{{ snakeToString name }}},
+    "description": "{{ description }}",
+    "examples": [{{#each examples}}"{{{this}}}"{{#unless @last}},{{/unless}}{{/each}}],
+    "entities": [{{#each entities}}"{{{this}}}"{{#unless @last}},{{/unless}}{{/each}}],
+    "text_for_embedding": "{{description}}\n{{#each examples}}{{this}}{{#unless @last}}\n{{/unless}}{{/each}}\nAllowed entity keys for this intent:[{{#each entities}}\"{{{this}}}\"{{#unless @last}},{{/unless}}{{/each}}]"
+}

@@ -47,6 +47,8 @@ type DataTableProps = {
   pagesCount?: number;
   meta?: TableMeta<any>;
   withScrollWrapper?: boolean;
+  renderSubRow?: (row: Row<any>) => ReactNode;
+  alwaysShowPagination?: boolean;
 };
 
 declare module '@tanstack/table-core' {
@@ -62,6 +64,7 @@ declare module '@tanstack/table-core' {
 declare module '@tanstack/react-table' {
   interface TableMeta<TData extends RowData> {
     getRowStyles: (row: Row<TData>) => CSSProperties;
+    onRowClick?: (row: Row<TData>) => void;
   }
 }
 
@@ -94,6 +97,8 @@ const DataTable: FC<DataTableProps> = ({
   pagesCount,
   meta,
   withScrollWrapper = true,
+  renderSubRow,
+  alwaysShowPagination = false,
 }) => {
   const id = useId();
   const { t } = useTranslation();
@@ -112,8 +117,8 @@ const DataTable: FC<DataTableProps> = ({
       sorting,
       globalFilter,
       columnVisibility,
-      ...{ pagination: tablePagination },
-      ...{ columnFilters },
+      pagination: tablePagination,
+      columnFilters,
     },
     meta,
     onColumnFiltersChange: (updater) => {
@@ -142,7 +147,10 @@ const DataTable: FC<DataTableProps> = ({
   });
 
   return (
-    <div className={`data-table${withScrollWrapper ? '__scrollWrapper' : ''}`}>
+    <div
+      className={`data-table${withScrollWrapper ? '__scrollWrapper' : ''}`}
+      style={withScrollWrapper ? undefined : { overflowX: 'hidden' }}
+    >
       <table className="data-table">
         {!disableHead && (
           <thead>
@@ -175,24 +183,39 @@ const DataTable: FC<DataTableProps> = ({
         <tbody>
           {tableBodyPrefix}
           {table.getRowModel().rows.map((row) => (
-            <tr key={row.id} style={table.options.meta?.getRowStyles(row)}>
-              {row.getVisibleCells().map((cell) => (
-                <td key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</td>
-              ))}
-            </tr>
+            <React.Fragment key={row.id}>
+              <tr style={table.options.meta?.getRowStyles(row)} onClick={() => table.options.meta?.onRowClick?.(row)}>
+                {row.getVisibleCells().map((cell) => (
+                  <td key={cell.id} style={renderSubRow ? { borderBottom: 'none' } : undefined}>
+                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                  </td>
+                ))}
+              </tr>
+              {renderSubRow && (
+                <tr>
+                  <td
+                    colSpan={row.getVisibleCells().length}
+                    style={{ padding: '0 16px 8px 16px', borderBottom: '1px solid #D2D3D8' }}
+                  >
+                    {renderSubRow(row)}
+                  </td>
+                </tr>
+              )}
+            </React.Fragment>
           ))}
         </tbody>
       </table>
       {tablePagination && (
         <div className="data-table__pagination-wrapper">
-          {table.getPageCount() * table.getState().pagination.pageSize > table.getState().pagination.pageSize && (
+          {(alwaysShowPagination ||
+            table.getPageCount() * table.getState().pagination.pageSize > table.getState().pagination.pageSize) && (
             <div className="data-table__pagination">
               <button className="previous" onClick={() => table.previousPage()} disabled={!table.getCanPreviousPage()}>
                 <MdOutlineWest />
               </button>
               <nav role="navigation" aria-label={t('global.paginationNavigation') ?? ''}>
                 <ul className="links">
-                  {[...Array(table.getPageCount())].map((_, index) => (
+                  {Array.from({ length: table.getPageCount() }).map((_, index) => (
                     <li
                       key={`${id}-${index}`}
                       className={clsx({ active: table.getState().pagination.pageIndex === index })}
@@ -229,7 +252,7 @@ const DataTable: FC<DataTableProps> = ({
                 table.setPageSize(Number(e.target.value));
               }}
             >
-              {[10, 20, 30, 40, 50].map((pageSize) => (
+              {[5, 10, 20, 30, 50].map((pageSize) => (
                 <option key={pageSize} value={pageSize}>
                   {pageSize}
                 </option>

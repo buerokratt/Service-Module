@@ -6,6 +6,7 @@ import { generateUniqueId } from 'utils/flow-utils';
 import { Assign } from './assign';
 import { DynamicChoices } from './dynamic-choices';
 import { EndpointData } from './endpoint';
+import { JumpToService } from './jump-to-service';
 import { MultiChoiceQuestion } from './multi-choice-question';
 import { StepType } from './step-type.enum';
 
@@ -13,6 +14,19 @@ export const GRID_UNIT = 16;
 export const EDGE_LENGTH = 5 * GRID_UNIT;
 const startNodeId = generateUniqueId();
 const ghostNodeId = generateUniqueId();
+
+export interface ServiceExportSettings {
+  readonly title?: string;
+  readonly description?: string;
+  readonly examples?: string[];
+  readonly keywords?: string[];
+}
+
+export interface FlowData {
+  nodes: Node<NodeDataProps>[];
+  edges: Edge[];
+  readonly settings?: ServiceExportSettings;
+}
 
 export type NodeDataProps = {
   label: string;
@@ -35,6 +49,7 @@ export type NodeDataProps = {
   assignElements?: Assign[];
   multiChoiceQuestion?: MultiChoiceQuestion;
   dynamicChoices?: DynamicChoices;
+  jumpToService?: JumpToService;
   childrenCount: number;
   clientInputId?: number;
   endpoint?: EndpointData;

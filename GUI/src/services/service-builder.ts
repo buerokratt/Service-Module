@@ -4,14 +4,14 @@ import { Group, Rule } from 'components/FlowElementsPopup/RuleBuilder/types';
 import { format } from 'date-fns';
 import i18next, { t } from 'i18next';
 import { NodeHtmlMarkdown } from 'node-html-markdown';
-import { createEndpoint, createNewService, editService, updateEndpoint } from 'resources/api-constants';
+import { createNewService, editService } from 'resources/api-constants';
 import useServiceStore from 'store/new-services.store';
 import useToastStore from 'store/toasts.store';
 import { StepType } from 'types';
 import { Assign } from 'types/assign';
-import { EndpointData } from 'types/endpoint';
 import { NodeDataProps } from 'types/service-flow';
 import {
+  decodeHtmlEntities,
   getLastDigits,
   isNumericString,
   removeTrailingUnderscores,
@@ -22,42 +22,158 @@ import {
 
 import api from '../services/api-dev';
 
-export async function saveEndpoints(endpoints: EndpointData[], onSuccess?: () => void, onError?: (e: any) => void) {
-  const tasks: Promise<any>[] = [];
-  const serviceId = useServiceStore.getState().serviceId;
+const htmlToMarkdown = new NodeHtmlMarkdown({
+  textReplace: [
+    [/\\_/g, '_'],
+    [/\\\[/g, '['],
+    [/\\\]/g, ']'],
+  ],
+});
 
-  for (const endpoint of endpoints) {
-    const selectedEndpointType = endpoint.definitions.find((e) => e.isSelected);
-    if (!selectedEndpointType) continue;
-    endpoint.serviceId = serviceId;
-    endpoint.isCommon = endpoint.isCommon ?? false;
-  }
+/**
+ * Normalises MCQ button payloads on all MultiChoiceQuestion nodes.
+ *
+ * Imported services may reference the wrong service name (the original export
+ * name) and stale button indices.  This function rebuilds every button's
+ * payload so it matches:
+ *   #service, /<type>/services/active/<serviceName>_mcq_<nodeId>_<buttonIndex>
+ *
+ * Safe to call on any flow: nodes that have no MCQ data are left untouched.
+ */
+export function normalizeMcqPayloads(nodes: Node<NodeDataProps>[], serviceName: string): Node<NodeDataProps>[] {
+  return nodes.map((node) => {
+    if (node.data?.stepType !== StepType.MultiChoiceQuestion) return node;
 
-  endpoints.forEach((endpoint) => {
-    if (endpoint.isNew) {
-      tasks.push(createEndpointAndUpdateState(endpoint));
-    } else {
-      tasks.push(
-        api.post(updateEndpoint(endpoint.endpointId), {
-          ...endpoint,
-          // Stringify needed for Resql to save nested data in a proper parsable format
-          definitions: JSON.stringify(endpoint.definitions),
-        }),
-      );
-    }
+    const buttons = node.data.multiChoiceQuestion?.buttons;
+    if (!Array.isArray(buttons) || buttons.length === 0) return node;
+
+    const mcqNodeId = getLastDigits(toSnakeCase(node.data.label ?? ''));
+
+    const normalizedButtons = buttons.map((btn, idx) => {
+      // Only rewrite payloads that already follow the MCQ payload convention.
+      // Payloads that don't match are left unchanged to avoid corrupting custom data.
+      const mcqPayloadPattern = /^(#service,\s*\/[^/]+\/services\/active\/)([^/]+_mcq_\d+_)(\d+)$/;
+      const match = mcqPayloadPattern.exec(btn.payload ?? '');
+      if (!match) return btn;
+
+      const prefix = match[1]; // e.g. "#service, /POST/services/active/"
+      return {
+        ...btn,
+        payload: `${prefix}${serviceName}_mcq_${mcqNodeId}_${idx}`,
+      };
+    });
+
+    return {
+      ...node,
+      data: {
+        ...node.data,
+        multiChoiceQuestion: {
+          ...node.data.multiChoiceQuestion!,
+          buttons: normalizedButtons,
+        },
+      },
+    };
   });
-
-  await Promise.all(tasks).then(onSuccess).catch(onError);
 }
 
-async function createEndpointAndUpdateState(endpoint: EndpointData): Promise<any> {
-  const response = await api.post(createEndpoint(), {
-    ...endpoint,
-    // Stringify needed for Resql to save nested data in a proper parsable format
-    definitions: JSON.stringify(endpoint.definitions),
-  });
-  endpoint.isNew = false;
-  return response;
+export function normalizeEdgeLabels(edges: Edge[], nodes: Node<NodeDataProps>[]): Edge[] {
+  const mcqNodes = nodes.filter((n) => n.data?.stepType === StepType.MultiChoiceQuestion);
+  if (mcqNodes.length === 0) return edges;
+
+  const edgeMap = new Map(edges.map((e) => [e.id, { ...e }]));
+
+  for (const mcqNode of mcqNodes) {
+    const buttons = mcqNode.data?.multiChoiceQuestion?.buttons;
+    if (!Array.isArray(buttons)) continue;
+
+    const mcqEdges = edges.filter((e) => e.source === mcqNode.id);
+
+    // Find button indices already claimed by correctly-labeled edges
+    const claimedIndices = new Set<number>();
+    const unclaimedEdges: Edge[] = [];
+
+    mcqEdges.forEach((edge) => {
+      const idx = buttons.findIndex((b: any) => b.title === edge.label);
+      if (idx === -1) {
+        unclaimedEdges.push(edge);
+      } else {
+        claimedIndices.add(idx);
+      }
+    });
+
+    // Assign remaining button titles only to edges with broken/missing labels
+    const unclaimedButtonIndices = buttons.map((_, i) => i).filter((i) => !claimedIndices.has(i));
+
+    unclaimedEdges.forEach((edge, i) => {
+      if (i < unclaimedButtonIndices.length) {
+        const copy = edgeMap.get(edge.id);
+        if (copy) copy.label = buttons[unclaimedButtonIndices[i]].title;
+      }
+    });
+  }
+
+  return edges.map((e) => edgeMap.get(e.id) ?? e);
+}
+
+/**
+ * Builds YAML content for the main service and all MCQ branch sub-services.
+ *
+ * Sub-services are embedded inside the returned object so that each JSON file
+ * is self-contained when sent to the import-services endpoint. The server
+ * resolves the final main service name (adding a timestamp on conflict) and
+ * then prepends that resolved name to each sub-service suffix.
+ */
+export function buildAllServiceContents(
+  rawNodes: Node<NodeDataProps>[],
+  edges: Edge[],
+  name: string,
+  description: string = '',
+): {
+  name: string;
+  content: any;
+  flowData: string;
+  subServices: Array<{ suffix: string; content: any }>;
+} {
+  const nodes = normalizeMcqPayloads(rawNodes, name);
+  const mcqNodes = nodes.filter((n) => n.data?.stepType === StepType.MultiChoiceQuestion);
+  const fullFlowData = JSON.stringify({ nodes: rawNodes, edges });
+
+  // Main service – truncated at the first MCQ node (same as saveFlow)
+  const mainNodes =
+    mcqNodes.length > 0
+      ? nodes.slice(0, nodes.findIndex((n) => n.data?.stepType === StepType.MultiChoiceQuestion) + 1)
+      : nodes;
+
+  const subServices: Array<{ suffix: string; content: any }> = [];
+
+  for (const mcqNode of mcqNodes) {
+    const mcqEdges = edges.filter((e) => e.source === mcqNode.id);
+    for (const [edgeIdx, edge] of mcqEdges.entries()) {
+      const nextNode = nodes.find((n) => n.id === edge.target);
+      if (!nextNode) continue;
+
+      const foundIndex = mcqNode.data?.multiChoiceQuestion?.buttons.findIndex((b: any) => b.title === edge.label) ?? -1;
+      const buttonIndex = foundIndex === -1 ? edgeIdx : foundIndex;
+      const mcqNodeId = getLastDigits(toSnakeCase(mcqNode.data.label ?? ''));
+      const suffix = `_mcq_${mcqNodeId}_${buttonIndex}`;
+      const subServiceName = `${name}${suffix}`;
+
+      const branchNodes = getBranchNodes(nodes, edges, nextNode);
+      const branchEdges = edges.filter((e) => branchNodes.some((n) => n.id === e.source || n.id === e.target));
+
+      subServices.push({
+        suffix,
+        content: getYamlContent(branchNodes, branchEdges, subServiceName, description, false),
+      });
+    }
+  }
+
+  return {
+    name,
+    content: getYamlContent(mainNodes, edges, name, description, false),
+    flowData: fullFlowData,
+    subServices,
+  };
 }
 
 interface SaveFlowConfig {
@@ -68,6 +184,8 @@ interface SaveFlowConfig {
   onError: (e: any) => void;
   description: string;
   slot: string;
+  examples: string[];
+  entities: string[];
   isCommon: boolean;
   serviceId: string;
   isNewService: boolean;
@@ -76,6 +194,7 @@ interface SaveFlowConfig {
 }
 
 const hasInvalidRules = (elements: any[]): boolean => {
+  if (!Array.isArray(elements)) return true;
   return elements.some((e) => {
     if ('children' in e) {
       const group = e as Group;
@@ -95,7 +214,26 @@ const hasInvalidElements = (elements: any[]): boolean => {
   });
 };
 
-const buildConditionString = (group: any): string => {
+const getAssignedVariableNames = (nodes: Node[]): Set<string> => {
+  const names = new Set(['chatId', 'authorId', 'input', 'buttons', 'res']);
+  for (const node of nodes) {
+    const data = node.data as NodeDataProps | undefined;
+    if (data?.stepType === StepType.Assign && Array.isArray(data.assignElements)) {
+      for (const e of data.assignElements) {
+        const key = e.key?.replaceAll('${', '').replaceAll('}', '').trim();
+        if (key) names.add(key);
+      }
+    }
+  }
+  return names;
+};
+
+const buildConditionString = (group: any, assignedVariableNames: Set<string>): string => {
+  const formatField = (rawField: string): string => {
+    if (assignedVariableNames.has(rawField)) return rawField;
+    return isNumericString(rawField) ? rawField : `"${rawField}"`;
+  };
+
   if ('children' in group) {
     const subgroup = group as Group;
     if (subgroup.children.length === 0) {
@@ -104,12 +242,14 @@ const buildConditionString = (group: any): string => {
 
     const conditions = subgroup.children.map((child) => {
       if ('children' in child) {
-        return `(${buildConditionString(child)})`;
+        return `(${buildConditionString(child, assignedVariableNames)})`;
       } else {
         const rule = child;
+        const rawField = rule.field.replaceAll('${', '').replaceAll('}', '');
         const absoluteValue = removeWrapperQuotes(rule.value.replaceAll('${', '').replaceAll('}', ''));
-        const value = isNumericString(absoluteValue) ? absoluteValue : `"${absoluteValue}"`;
-        return `${rule.field.replaceAll('${', '').replaceAll('}', '')} ${rule.operator} ${value}`;
+        const value = formatField(absoluteValue);
+        const field = formatField(rawField);
+        return `${field} ${rule.operator} ${value}`;
       }
     });
 
@@ -120,20 +260,24 @@ const buildConditionString = (group: any): string => {
     }
   } else {
     const rule = group as Rule;
+    const rawField = rule.field.replaceAll('${', '').replaceAll('}', '');
     const absoluteValue = removeWrapperQuotes(rule.value.replaceAll('${', '').replaceAll('}', ''));
-    const value = isNumericString(absoluteValue) ? absoluteValue : `"${absoluteValue}"`;
-    return `${rule.field.replaceAll('${', '').replaceAll('}', '')} ${rule.operator} ${value}`;
+    const value = formatField(absoluteValue);
+    const field = formatField(rawField);
+    return `${field} ${rule.operator} ${value}`;
   }
 };
 
 export const saveFlow = async ({
   name,
-  edges,
-  nodes,
+  edges: rawEdges,
+  nodes: rawNodes,
   onSuccess,
   onError,
   description,
   slot,
+  examples,
+  entities,
   isCommon,
   serviceId,
   isNewService,
@@ -141,11 +285,11 @@ export const saveFlow = async ({
   showError = true,
 }: SaveFlowConfig) => {
   try {
+    const nodes = normalizeMcqPayloads(rawNodes, name);
+    const edges = normalizeEdgeLabels(rawEdges, nodes);
     let yamlContent = getYamlContent(nodes, edges, name, description, showError);
 
-    const mcqNodes = nodes.filter(
-      (node) => node.data?.stepType === StepType.MultiChoiceQuestion,
-    ) as Node<NodeDataProps>[];
+    const mcqNodes = nodes.filter((node) => node.data?.stepType === StepType.MultiChoiceQuestion);
 
     if (mcqNodes.length > 0) {
       const nodesUpToFirstMcq = nodes.slice(
@@ -157,21 +301,32 @@ export const saveFlow = async ({
 
     await saveService(
       yamlContent,
-      { name, serviceId, description, slot, isCommon, nodes, edges, isNewService } as SaveFlowConfig,
+      {
+        name,
+        serviceId,
+        description,
+        slot,
+        examples,
+        entities,
+        isCommon,
+        nodes,
+        edges,
+        isNewService,
+      } as SaveFlowConfig,
       true,
       status,
-      onSuccess,
       onError,
     );
 
     for (const mcqNode of mcqNodes) {
       const mcqEdges = edges.filter((edge) => edge.source === mcqNode.id);
 
-      for (const edge of mcqEdges) {
+      for (const [edgeIdx, edge] of mcqEdges.entries()) {
         const nextNode = nodes.find((n) => n.id === edge.target);
         if (!nextNode) continue;
 
-        const buttonIndex = mcqNode?.data?.multiChoiceQuestion?.buttons.findIndex((e: any) => e.title === edge.label);
+        const foundIndex = mcqNode?.data?.multiChoiceQuestion?.buttons.findIndex((e: any) => e.title === edge.label);
+        const buttonIndex = foundIndex === -1 ? edgeIdx : foundIndex;
         const mcqNodeId = getLastDigits(toSnakeCase(mcqNode.data.label ?? ''));
         const serviceName = `${name}_mcq_${mcqNodeId}_${buttonIndex}`;
         const branchNodes = getBranchNodes(nodes, edges, nextNode);
@@ -181,14 +336,28 @@ export const saveFlow = async ({
 
         await saveService(
           getYamlContent(branchNodes, branchEdges, serviceName, description, showError),
-          { name: serviceName, serviceId, description, slot, isCommon, nodes, edges, isNewService } as SaveFlowConfig,
+          {
+            name: serviceName,
+            serviceId,
+            description,
+            slot,
+            examples,
+            entities,
+            isCommon,
+            nodes,
+            edges,
+            isNewService,
+          } as SaveFlowConfig,
           false,
           status,
         );
       }
     }
+
+    onSuccess?.(undefined);
   } catch (e: any) {
     onError(e);
+    throw e;
   }
 };
 
@@ -197,10 +366,9 @@ async function saveService(
   config: SaveFlowConfig,
   updateServiceDb: boolean,
   status: 'draft' | 'ready' = 'ready',
-  onSuccess?: (e: any) => void,
   onError?: (e: any) => void,
 ) {
-  const { isNewService, serviceId, name, description, slot, isCommon, edges, nodes } = config;
+  const { isNewService, serviceId, name, description, slot, examples, entities, isCommon, edges, nodes } = config;
   if (updateServiceDb) {
     useServiceStore.getState().changeServiceName(removeTrailingUnderscores(name));
   }
@@ -212,6 +380,8 @@ async function saveService(
         serviceId,
         description,
         slot,
+        examples,
+        entities,
         type: 'POST',
         content: content,
         isCommon,
@@ -225,7 +395,6 @@ async function saveService(
         },
       },
     )
-    .then(onSuccess)
     .catch(onError);
 }
 
@@ -238,12 +407,13 @@ const validateMCQ = (node: NodeDataProps | undefined) => {
 };
 
 export const validateCondition = (node: NodeDataProps | undefined) => {
-  const invalidRulesExist = hasInvalidRules(node?.rules?.children ?? []);
-  const isInvalid = node?.rules?.children === undefined || invalidRulesExist || node?.rules?.children.length === 0;
+  const rulesChildren = Array.isArray(node?.rules?.children) ? node.rules.children : [];
+  const invalidRulesExist = hasInvalidRules(rulesChildren);
+  const isInvalid = !Array.isArray(node?.rules?.children) || invalidRulesExist || node.rules.children.length === 0;
   return isInvalid ? (i18next.t('toast.missing-condition-rules') ?? 'Error') : null;
 };
 
-function getYamlContent(
+export function getYamlContent(
   nodes: Node<NodeDataProps>[],
   edges: Edge[],
   name: string,
@@ -308,7 +478,8 @@ function getYamlContent(
   finishedFlow.set('declaration', {
     call: 'declare',
     version: 0.1,
-    description: description ?? `Description placeholder for '${name ?? ''}'`,
+    description:
+      description && description.trim().length > 0 ? description : `Description placeholder for '${name ?? ''}'`,
     method: 'post',
     accepts: 'json',
     returns: 'json',
@@ -351,7 +522,7 @@ function getYamlContent(
   try {
     allRelations.forEach((r) => {
       const [parentNodeId, childNodeId] = r.split(',');
-      const parentNode = nodes.findLast((node) => node.id === parentNodeId) as Node<NodeDataProps> | undefined;
+      const parentNode = nodes.findLast((node) => node.id === parentNodeId);
       if (
         !parentNode?.type ||
         parentNode.type !== 'custom' ||
@@ -360,7 +531,7 @@ function getYamlContent(
         return;
       }
 
-      const childNode = nodes.find((node) => node.id === childNodeId) as Node<NodeDataProps> | undefined;
+      const childNode = nodes.find((node) => node.id === childNodeId);
       const parentStepName = toSnakeCase(parentNode.data.label);
 
       if (parentNode.data.stepType === StepType.Textfield) {
@@ -372,7 +543,7 @@ function getYamlContent(
       }
 
       if (parentNode.data.stepType === StepType.Condition) {
-        return handleConditionStep(allRelations, parentNodeId, nodes, parentNode, finishedFlow, parentStepName);
+        return handleConditionStep(allRelations, parentNodeId, nodes, parentNode, finishedFlow, parentStepName, edges);
       }
 
       if (parentNode.data.stepType === StepType.Input) {
@@ -380,7 +551,7 @@ function getYamlContent(
       }
 
       if (parentNode.data.stepType === StepType.MultiChoiceQuestion) {
-        return handleMultiChoiceQuestion(finishedFlow, parentStepName, parentNode, childNode);
+        return handleMultiChoiceQuestion(finishedFlow, parentStepName, parentNode, childNode, name);
       }
 
       if (parentNode.data.stepType === StepType.DynamicChoices) {
@@ -389,6 +560,10 @@ function getYamlContent(
 
       if (parentNode.data.stepType === StepType.UserDefined) {
         return handleEndpointStep(parentNode, finishedFlow, parentStepName, childNode);
+      }
+
+      if (parentNode.data.stepType === StepType.JumpToService) {
+        return handleJumpToServiceStep(parentNode, finishedFlow, parentStepName);
       }
 
       const nextStep = childNode ? toSnakeCase(childNode.data.label ?? 'format_messages') : 'format_messages';
@@ -518,28 +693,52 @@ function getBranchNodes(
   return branchNodes;
 }
 
+function replaceSpacesOutsideTags(input: string, placeholder: string): string {
+  let result = '';
+  let i = 0;
+  while (i < input.length) {
+    const ch = input[i];
+    if (ch === '<') {
+      const closingIndex = input.indexOf('>', i + 1);
+      if (closingIndex > i + 1) {
+        result += input.slice(i, closingIndex + 1);
+        i = closingIndex + 1;
+        continue;
+      }
+    }
+    result += ch === ' ' ? placeholder : ch;
+    i++;
+  }
+  return result;
+}
+
+function toMarkdownMessage(raw: string): string {
+  const spacePlaceholder = '___SPACE___';
+  const withPlaceholders = replaceSpacesOutsideTags(
+    decodeHtmlEntities(raw).replaceAll('{{', '${').replaceAll('}}', '}'),
+    spacePlaceholder,
+  );
+  const markdown = htmlToMarkdown
+    .translate(withPlaceholders)
+    .replaceAll(spacePlaceholder, ' ')
+    .replaceAll(/\\([-~>[\]_*#().!`=<\\])/g, String.raw`\\$1`);
+
+  const trimmed = markdown.trim().toLowerCase();
+  return trimmed === 'yes' || trimmed === 'no' ? `\${"${trimmed}"}` : markdown;
+}
+
 function handleTextField(
   finishedFlow: Map<any, any>,
   parentStepName: string,
   parentNode: Node,
   childNode: Node<NodeDataProps> | undefined,
 ) {
-  const htmlToMarkdown = new NodeHtmlMarkdown({
-    textReplace: [
-      [/\\_/g, '_'],
-      [/\\\[/g, '['],
-      [/\\\]/g, ']'],
-    ],
-  });
+  const finalMessage = toMarkdownMessage(typeof parentNode.data.message === 'string' ? parentNode.data.message : '');
 
   finishedFlow.set(parentStepName, {
     assign: {
       res: {
-        result: `${htmlToMarkdown.translate(
-          typeof parentNode.data.message === 'string'
-            ? parentNode.data.message.replace('{{', '${').replace('}}', '}')
-            : '',
-        )}`,
+        result: finalMessage,
       },
     },
     next: childNode ? toSnakeCase(childNode.data.label ?? 'format_messages') : 'format_messages',
@@ -549,33 +748,41 @@ function handleTextField(
 function handleConditionStep(
   allRelations: any[],
   parentNodeId: any,
-  nodes: Node[],
+  nodes: Node<NodeDataProps>[],
   parentNode: Node<NodeDataProps>,
   finishedFlow: Map<any, any>,
   parentStepName: string,
+  edges: Edge[],
 ) {
   const conditionRelations: string[] = allRelations.filter((r) => r.startsWith(parentNodeId));
-  const firstChildNode = conditionRelations[0].split(',')[1];
-  const secondChildNode = conditionRelations[1].split(',')[1];
 
-  const firstChild = nodes.find((node) => node.id === firstChildNode) as Node<NodeDataProps> | undefined;
-  const secondChild = nodes.find((node) => node.id === secondChildNode) as Node<NodeDataProps> | undefined;
-
-  const invalidRulesExist = hasInvalidRules(parentNode.data.rules?.children ?? []);
+  const rulesChildren = Array.isArray(parentNode.data.rules?.children) ? parentNode.data.rules.children : [];
+  const invalidRulesExist = hasInvalidRules(rulesChildren);
   const isInvalid =
-    parentNode.data.rules?.children === undefined || invalidRulesExist || parentNode.data.rules?.children.length === 0;
+    !Array.isArray(parentNode.data.rules?.children) || invalidRulesExist || parentNode.data.rules.children.length === 0;
   if (isInvalid) {
     throw new Error(i18next.t('toast.missing-condition-rules') ?? 'Error');
   }
 
+  const outgoingEdges = edges.filter((e) => e.source === parentNodeId);
+  const successEdge = outgoingEdges.find((e) => e.label === 'Success') ?? outgoingEdges[0];
+  const failureEdge = outgoingEdges.find((e) => e.label === 'Failure') ?? outgoingEdges[1];
+
+  const successChildId = successEdge?.target ?? conditionRelations[0]?.split(',')[1];
+  const failureChildId = failureEdge?.target ?? conditionRelations[1]?.split(',')[1];
+
+  const successChild = nodes.find((node) => node.id === successChildId);
+  const failureChild = nodes.find((node) => node.id === failureChildId);
+
+  const assignedVariableNames = getAssignedVariableNames(nodes);
   finishedFlow.set(parentStepName, {
     switch: [
       {
-        condition: `\${${buildConditionString(parentNode.data.rules)}}`,
-        next: toSnakeCase(firstChild?.data?.label ?? '') ?? '',
+        condition: `\${${buildConditionString(parentNode.data.rules, assignedVariableNames)}}`,
+        next: toSnakeCase(successChild?.data?.label ?? '') ?? '',
       },
     ],
-    next: toSnakeCase(secondChild?.data?.label ?? '') ?? '',
+    next: toSnakeCase(failureChild?.data?.label ?? '') ?? '',
   });
 }
 
@@ -597,11 +804,25 @@ function handleAssignStep(
 
   finishedFlow.set(parentStepName, {
     assign: parentNode.data.assignElements?.reduce((acc: Record<string, any>, e: Assign) => {
-      acc[e.key] = e.value;
+      acc[e.key] = normalizeAssignValue(e.value);
       return acc;
     }, {}),
     next: childNode ? toSnakeCase(childNode.data.label ?? 'format_messages') : 'format_messages',
   });
+}
+
+/**
+ * Ruuter injects JSON.parse() around *_res variables when they appear inside function calls
+ * (e.g. String(testAPI_res.response.body[...])), causing failures because _res variables
+ * are already parsed objects. Strip String() wrappers from API response variable expressions
+ * so Ruuter handles them via direct property access (which works correctly).
+ */
+function normalizeAssignValue(value: string): string {
+  const match = /^\$\{String\(([\s\S]*)\)\}$/.exec(value);
+  if (match && /\b\w+_res\b/.test(match[1])) {
+    return '${' + match[1] + '}';
+  }
+  return value;
 }
 
 function handleEndpointStep(
@@ -613,50 +834,123 @@ function handleEndpointStep(
   const endpointDefinition = parentNode.data.endpoint?.definitions[0];
   const paramsVariables = endpointDefinition?.params?.variables;
   const bodyVariables = endpointDefinition?.body?.variables;
-  const isRawBodySelected = endpointDefinition?.body?.isRowSelected ?? false;
+  const isRawBodySelected = endpointDefinition?.body?.isRawSelected ?? false;
   const rawBody = endpointDefinition?.body?.rawData ?? {};
   const headersVariables = endpointDefinition?.headers?.variables;
   const methodType = endpointDefinition?.methodType?.toLowerCase();
-  const hasNonEqualOperator = paramsVariables?.some((param: any) => param.operator && param.operator !== '=');
+  const hasNonEqualOperator = Array.isArray(paramsVariables) && paramsVariables.some(hasNonEqualOperatorParam);
+
+  const baseUrl = getEndpointBaseUrl(endpointDefinition?.url, hasNonEqualOperator);
+  const { resolvedUrl, pathPlaceholderNames } = resolveUrlWithPathParams(baseUrl, paramsVariables);
 
   const stepConfig: any = {
     call: `http.${methodType ?? 'post'}`,
     args: {
-      url: hasNonEqualOperator ? (endpointDefinition?.url ?? '') : (endpointDefinition?.url?.split('?')[0] ?? ''),
+      url: resolvedUrl,
     },
     result: `${parentNode.data.endpoint?.name.replaceAll(' ', '_')}_res`,
     next: childNode ? toSnakeCase(childNode.data.label ?? 'format_messages') : 'format_messages',
   };
 
-  if (Array.isArray(paramsVariables) && paramsVariables.length > 0 && !hasNonEqualOperator) {
-    stepConfig.args.query = paramsVariables.reduce((acc: any, e: any) => {
-      acc[e.name] = e.value;
-      return acc;
-    }, {});
+  applyEndpointQuery(stepConfig, paramsVariables, pathPlaceholderNames, hasNonEqualOperator);
+  applyEndpointBody(stepConfig, isRawBodySelected, rawBody, bodyVariables);
+  applyEndpointHeaders(stepConfig, headersVariables);
+
+  finishedFlow.set(parentStepName, stepConfig);
+}
+
+function hasNonEqualOperatorParam(param: any): boolean {
+  return Boolean(param?.operator && param.operator !== '=');
+}
+
+function getEndpointBaseUrl(url: unknown, hasNonEqualOperator: boolean): string {
+  const urlString = typeof url === 'string' ? url : '';
+  // Preserve existing behavior: if a non-equal operator is used, keep the full URL
+  // (including any inline query string); otherwise strip the inline query string.
+  return hasNonEqualOperator ? urlString : (urlString.split('?')[0] ?? '');
+}
+
+function resolveUrlWithPathParams(
+  baseUrl: string,
+  paramsVariables: any[] | undefined,
+): { resolvedUrl: string; pathPlaceholderNames: Set<string> } {
+  // Resolve path param placeholders ({name}) directly into the URL so Ruuter does not
+  // attempt Spring-style URI template expansion at runtime and fail with
+  // "Not enough variable values available to expand '<name>'".
+  const urlPathPart = baseUrl.split('?')[0];
+  const pathPlaceholderNames = new Set([...urlPathPart.matchAll(/(?<!\$)\{([^{}]+)\}/g)].map((m) => m[1]));
+
+  let resolvedUrl = baseUrl;
+  if (!Array.isArray(paramsVariables) || pathPlaceholderNames.size === 0) {
+    return { resolvedUrl, pathPlaceholderNames };
   }
 
+  for (const param of paramsVariables) {
+    const name = String(param?.name ?? '');
+    if (!name) continue;
+    if (!pathPlaceholderNames.has(name)) continue;
+    if (param?.value == null) continue;
+    resolvedUrl = resolvedUrl.split(`{${name}}`).join(String(param.value));
+  }
+
+  return { resolvedUrl, pathPlaceholderNames };
+}
+
+function applyEndpointQuery(
+  stepConfig: any,
+  paramsVariables: any[] | undefined,
+  pathPlaceholderNames: Set<string>,
+  hasNonEqualOperator: boolean,
+) {
+  if (!Array.isArray(paramsVariables) || paramsVariables.length === 0 || hasNonEqualOperator) return;
+
+  const queryOnlyParams = paramsVariables.filter((e: any) => {
+    const name = String(e?.name ?? '');
+    return !pathPlaceholderNames.has(name);
+  });
+
+  if (queryOnlyParams.length === 0) return;
+
+  stepConfig.args.query = queryOnlyParams.reduce((acc: any, e: any) => {
+    const name = String(e?.name ?? '');
+    if (!name) return acc;
+    acc[name] = e?.value;
+    return acc;
+  }, {});
+}
+
+function applyEndpointBody(
+  stepConfig: any,
+  isRawBodySelected: boolean,
+  rawBody: any,
+  bodyVariables: any[] | undefined,
+) {
   if (isRawBodySelected) {
     try {
-      const rawJson = JSON.parse(rawBody?.value ?? '');
+      const rawJsonStr = String(rawBody?.value ?? '').replace(/(?<!")(\$\{[^}]+\})(?!")/g, '"$1"');
+      const rawJson = JSON.parse(rawJsonStr);
       stepConfig.args.body = rawJson;
     } catch (e: any) {
       console.log(`Unable to save JSON to Yaml. ${e.message}`);
     }
-  } else if (Array.isArray(bodyVariables) && bodyVariables.length > 0) {
+    return;
+  }
+
+  if (Array.isArray(bodyVariables) && bodyVariables.length > 0) {
     stepConfig.args.body = bodyVariables.reduce((acc: any, e: any) => {
       acc[e.name] = e.value;
       return acc;
     }, {});
   }
+}
 
+function applyEndpointHeaders(stepConfig: any, headersVariables: any[] | undefined) {
   if (Array.isArray(headersVariables) && headersVariables.length > 0) {
     stepConfig.args.headers = headersVariables.reduce((acc: any, e: any) => {
       acc[e.name] = e.value;
       return acc;
     }, {});
   }
-
-  finishedFlow.set(parentStepName, stepConfig);
 }
 
 function handleMultiChoiceQuestion(
@@ -664,15 +958,46 @@ function handleMultiChoiceQuestion(
   parentStepName: string,
   parentNode: Node<NodeDataProps>,
   childNode: Node<NodeDataProps> | undefined,
+  serviceName: string,
 ) {
+  const rootServiceName = serviceName.replace(/_mcq_\d+_\d+$/, '');
+  parentNode.data.multiChoiceQuestion?.buttons.forEach((b) => {
+    b.payload = b.payload.replace(/\/[^/]*_mcq_/, `/${rootServiceName}_mcq_`);
+  });
+
+  const finalQuestion = toMarkdownMessage(parentNode?.data?.multiChoiceQuestion?.question ?? '');
+
   return finishedFlow.set(parentStepName, {
     assign: {
       buttons: parentNode?.data?.multiChoiceQuestion?.buttons ?? [],
       res: {
-        result: parentNode?.data?.multiChoiceQuestion?.question ?? '',
+        result: finalQuestion,
       },
     },
     next: childNode ? toSnakeCase(childNode.data.label ?? 'format_messages') : 'format_messages',
+  });
+}
+
+function handleJumpToServiceStep(parentNode: Node<NodeDataProps>, finishedFlow: Map<any, any>, parentStepName: string) {
+  const resultName = `${parentStepName}_result`;
+  const returnStepName = 'return_next_service_res';
+
+  finishedFlow.set(parentStepName, {
+    template: '[#SERVICE_PROJECT_LAYER]/jump-to-service',
+    requestType: 'templates',
+    body: {
+      chatId: "${chatId ?? ''}",
+      authorId: "${authorId ?? ''}",
+      serviceName: parentNode.data.jumpToService?.serviceName ?? '',
+      input: (parentNode.data.jumpToService?.input ?? []).map((e: Assign) => normalizeAssignValue(e.value)),
+    },
+    result: resultName,
+    next: returnStepName,
+  });
+
+  finishedFlow.set(returnStepName, {
+    return: `\${${resultName}.response ?? ''}`,
+    next: 'end',
   });
 }
 
@@ -751,6 +1076,17 @@ const getTemplateDataFromNode = (node: Node): { templateName: string; body?: any
       resultName: 'SiGa',
     };
   }
+  if (node.data.stepType === StepType.JumpToService) {
+    return {
+      templateName: '[#SERVICE_PROJECT_LAYER]/jump-to-service',
+      body: {
+        chatId: "${chatId ?? ''}",
+        authorId: "${authorId ?? ''}",
+        serviceName: node.data.jumpToService?.serviceName ?? '',
+        input: (node.data.jumpToService?.input ?? []).map((e: Assign) => normalizeAssignValue(e.value)),
+      },
+    };
+  }
   if (node.data.stepType === StepType.FinishingStepRedirect) {
     return {
       templateName: '[#SERVICE_PROJECT_LAYER]/direct-to-cs',
@@ -783,15 +1119,15 @@ export const saveFlowClick = async (status: 'draft' | 'ready' = 'ready', showErr
   const serviceId = useServiceStore.getState().serviceId;
   const description = useServiceStore.getState().description;
   const slot = useServiceStore.getState().slot;
+  const examples = useServiceStore.getState().examples;
+  const entities = useServiceStore.getState().entities;
   const isCommon = useServiceStore.getState().isCommon;
   const isNewService = useServiceStore.getState().isNewService;
   const edges = useServiceStore.getState().edges;
   const nodes = useServiceStore.getState().nodes as Node<NodeDataProps>[];
 
   await saveFlow({
-    name: !name
-      ? `${t('newService.defaultServiceName').toString()}_${format(new Date(), 'dd_MM_yyyy_HH_mm_ss')}`
-      : name,
+    name: name || `${t('newService.defaultServiceName').toString()}_${format(new Date(), 'dd_MM_yyyy_HH_mm_ss')}`,
     edges,
     nodes,
     onSuccess: () => {
@@ -806,12 +1142,11 @@ export const saveFlowClick = async (status: 'draft' | 'ready' = 'ready', showErr
         title: i18next.t('newService.toast.failed'),
         message: e.response?.status === 409 ? t('newService.toast.serviceNameAlreadyExists') : e?.message,
       });
-      throw new Error(
-        e.response?.status === 409 ? t('newService.toast.serviceNameAlreadyExists').toString() : e?.message,
-      );
     },
     description,
     slot,
+    examples,
+    entities,
     isCommon,
     serviceId,
     isNewService,

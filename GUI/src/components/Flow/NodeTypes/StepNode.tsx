@@ -3,10 +3,12 @@ import ExclamationBadge from 'components/ExclamationBadge';
 import Track from 'components/Track';
 import { FC, memo, useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import sanitizeHtml from 'sanitize-html';
 import useServiceStore from 'store/new-services.store';
 import { StepType } from 'types';
 import { NodeDataProps } from 'types/service-flow';
 import { validateStep } from 'utils/flow-utils';
+import { decodeHtmlEntities, ensureAbsoluteUrl } from 'utils/string-util';
 
 type StepNodeProps = {
   data: NodeDataProps;
@@ -21,8 +23,28 @@ const StepNode: FC<StepNodeProps> = ({ data }) => {
     fontWeight: 500,
   };
   const createMarkup = (text: string) => {
+    const decodedText = decodeHtmlEntities(text);
+    const sanitizedText = sanitizeHtml(decodedText, {
+      allowedTags: ['a', 'b', 'strong', 'i', 'em', 'u', 'p', 'br', 'ul', 'ol', 'li', 'code'],
+      allowedAttributes: {
+        a: ['href', 'target', 'rel'],
+      },
+      disallowedTagsMode: 'discard',
+      transformTags: {
+        a: (_tagName, attribs) => ({
+          tagName: 'a',
+          attribs: {
+            ...attribs,
+            href: ensureAbsoluteUrl(attribs.href ?? ''),
+            target: '_blank',
+            rel: 'noopener noreferrer',
+          },
+        }),
+      },
+    });
+
     return {
-      __html: text,
+      __html: sanitizedText,
     };
   };
 
@@ -52,7 +74,9 @@ const StepNode: FC<StepNodeProps> = ({ data }) => {
   }, [data, endpoints]);
 
   useEffect(() => {
-    void updateIsTestedAndPassed();
+    updateIsTestedAndPassed().catch(() => {
+      setIsTestedAndPassed(false);
+    });
   }, [updateIsTestedAndPassed]);
 
   return (
@@ -66,10 +90,18 @@ const StepNode: FC<StepNodeProps> = ({ data }) => {
         {data.label}
       </p>
       {data.stepType === StepType.Textfield && (
-        <div style={boldText} dangerouslySetInnerHTML={createMarkup(data.message ?? '')}></div>
+        <div
+          className="step-node-content"
+          style={{ ...boldText }}
+          dangerouslySetInnerHTML={createMarkup(data.message ?? '')}
+        />
       )}
       {data.stepType === StepType.MultiChoiceQuestion && (
-        <div style={boldText} dangerouslySetInnerHTML={createMarkup(data.multiChoiceQuestion?.question ?? '')}></div>
+        <div
+          className="step-node-content"
+          style={{ ...boldText }}
+          dangerouslySetInnerHTML={createMarkup(data.multiChoiceQuestion?.question ?? '')}
+        />
       )}
       {data.stepType === StepType.Auth && <p style={boldText}>&quot;{t('serviceFlow.popup.loginWithTARA')}&quot;</p>}
       {data.stepType === StepType.Input && (
@@ -102,6 +134,9 @@ const StepNode: FC<StepNodeProps> = ({ data }) => {
       {data.stepType === StepType.FinishingStepEnd && <p style={boldText}>“{t('serviceFlow.popup.serviceEnded')}”</p>}
       {data.stepType === StepType.FinishingStepRedirect && (
         <p style={boldText}>{t('serviceFlow.popup.redirectToCustomerSupport')}</p>
+      )}
+      {data.stepType === StepType.JumpToService && data.jumpToService?.serviceName && (
+        <p style={boldText}>&rarr; {data.jumpToService.serviceName}</p>
       )}
       {data.stepType === StepType.Rule && (
         <p>

@@ -3,8 +3,9 @@ import { createColumnHelper } from '@tanstack/react-table';
 import Label from 'components/Label';
 import Tooltip from 'components/Tooltip';
 import i18n from 'i18n';
+import { AiOutlineInfoCircle } from 'react-icons/ai';
 import { IoCopyOutline } from 'react-icons/io5';
-import { MdDeleteOutline, MdOutlineArrowForward, MdOutlineDescription, MdOutlineEdit } from 'react-icons/md';
+import { MdDeleteOutline, MdOutlineDescription, MdOutlineEdit } from 'react-icons/md';
 import { NavigateFunction } from 'react-router-dom';
 import { ROUTES } from 'resources/routes-constants';
 import useServiceListStore from 'store/services.store';
@@ -15,20 +16,11 @@ import { Service, ServiceState } from 'types';
 interface GetColumnsConfig {
   isCommon: boolean;
   navigate: NavigateFunction;
-  checkIntentConnection: () => void;
   hideDeletePopup: () => void;
   showReadyPopup: () => void;
-  showIntentConnectionModal: () => void;
 }
 
-export const getColumns = ({
-  isCommon,
-  navigate,
-  checkIntentConnection,
-  hideDeletePopup,
-  showReadyPopup,
-  showIntentConnectionModal,
-}: GetColumnsConfig) => {
+export const getColumns = ({ isCommon, navigate, hideDeletePopup, showReadyPopup }: GetColumnsConfig) => {
   const columnHelper = createColumnHelper<Service>();
   const userInfo = useStore.getState().userInfo;
 
@@ -36,11 +28,27 @@ export const getColumns = ({
     columnHelper.accessor('name', {
       header: i18n.t('overview.service.name') ?? '',
       meta: {
-        size: 530,
+        size: 620,
       },
       cell: (props) => (
         <Track align="right" justify="start">
-          <label style={{ paddingRight: 3 }}>{props.cell.getValue()}</label>
+          <button
+            style={{
+              paddingRight: 3,
+              cursor: 'pointer',
+              color: '#005aa3',
+              background: 'none',
+              border: 'none',
+              padding: 0,
+              font: 'inherit',
+            }}
+            onClick={() => {
+              useServiceListStore.getState().setSelectedService(props.row.original);
+              navigate(ROUTES.replaceWithId(ROUTES.EDITSERVICE_ROUTE, props.row.original.serviceId));
+            }}
+          >
+            {props.cell.getValue()}
+          </button>
           <Tooltip
             content={
               <Track isMultiline={true}>
@@ -79,44 +87,63 @@ export const getColumns = ({
         </Track>
       ),
     }),
-    columnHelper.accessor('linkedIntent', {
-      header: i18n.t('overview.service.linkedIntent') ?? '',
+    columnHelper.accessor('description', {
+      header: i18n.t('overview.service.description') ?? '',
       meta: {
         size: 200,
       },
-      cell: (props) => (
-        <Track justify="start">
-          {props.cell.getValue() ? (
-            <Button
-              style={{
-                textDecoration: props.row.original.state === ServiceState.Ready ? undefined : 'none',
-                boxShadow: 'none',
-              }}
-              appearance="text"
-              onClick={() => {
-                useServiceListStore.getState().setSelectedService(props.row.original);
-                if (props.row.original.state === ServiceState.Ready) {
-                  showIntentConnectionModal();
-                }
-              }}
+      cell: (props) => {
+        const description = props.row.original.description ?? '';
+        const isLong = description.length > 80;
+        const truncated = isLong ? `${description.slice(0, 80)}...` : description;
+
+        return (
+          <Track align="right" justify="start">
+            <label style={{ pointerEvents: 'none' }}>{truncated}</label>
+            <Tooltip
+              content={
+                <Track isMultiline={true}>
+                  <label
+                    style={{
+                      fontSize: '15px',
+                      maxWidth: '200px',
+                      maxHeight: '400px',
+                      overflow: 'auto',
+                      overflowWrap: 'break-word',
+                      wordWrap: 'break-word',
+                      wordBreak: 'break-word',
+                    }}
+                  >
+                    {description}
+                  </label>
+                  <Button
+                    appearance="text"
+                    onClick={() => {
+                      void navigator.clipboard.writeText(description);
+                      useToastStore.getState().success({
+                        title: i18n.t('overview.descriptionCopiedSuccessfully'),
+                      });
+                    }}
+                    style={{ paddingLeft: '5px' }}
+                  >
+                    <Icon style={{ color: 'black' }} icon={<IoCopyOutline />} size="small" />
+                  </Button>
+                </Track>
+              }
             >
-              <label style={{ paddingLeft: '15px', color: 'black' }}>{props.cell.getValue()}</label>
-            </Button>
-          ) : (
-            <Button
-              appearance="text"
-              onClick={() => {
-                useServiceListStore.getState().setSelectedService(props.row.original);
-                showIntentConnectionModal();
-              }}
-              disabled={props.row.original.state === ServiceState.Draft}
-            >
-              <Icon icon={<MdOutlineArrowForward color="rgba(0, 0, 0, 0.54)" />} />
-              {i18n.t('overview.popup.connectToIntent')}
-            </Button>
-          )}
-        </Track>
-      ),
+              <div style={{ cursor: 'pointer' }}>
+                {isLong && (
+                  <Icon
+                    style={{ paddingTop: '6px' }}
+                    icon={<AiOutlineInfoCircle fontSize={20} color="#005aa3" />}
+                    size="medium"
+                  />
+                )}
+              </div>
+            </Tooltip>
+          </Track>
+        );
+      },
     }),
     columnHelper.accessor('state', {
       header: i18n.t('overview.service.state') ?? '',
@@ -125,12 +152,11 @@ export const getColumns = ({
       },
       cell: (props) => (
         <Track
-          justify="around"
+          justify="start"
           onClick={() => {
             useServiceListStore.getState().setSelectedService(props.row.original);
             const state = props.row.original.state;
-            if (state === ServiceState.Ready && props.row.original.linkedIntent != '') {
-              checkIntentConnection();
+            if (state === ServiceState.Ready) {
               showReadyPopup();
             }
           }}
@@ -161,6 +187,29 @@ export const getColumns = ({
         </Track>
       ),
     }),
+    // columnHelper.display({
+    //   id: 'export',
+    //   meta: {
+    //     size: 90,
+    //   },
+    //   cell: (props) => (
+    //     <Track align="right" justify="start">
+    //       <Button
+    //         appearance="text"
+    //         onClick={async () => {
+    //           const response = await api.post<Service>(getServiceById(), {
+    //             id: props.row.original.serviceId,
+    //             search: '',
+    //           });
+    //           await exportServices([response.data]);
+    //         }}
+    //       >
+    //         <Icon icon={<AiOutlineExport />} size="medium" />
+    //         {i18n.t('overview.export')}
+    //       </Button>
+    //     </Track>
+    //   ),
+    // }),
     columnHelper.display({
       id: 'delete',
       meta: {

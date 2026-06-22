@@ -1,12 +1,15 @@
-import { Handle, NodeProps, Position, useUpdateNodeInternals } from '@xyflow/react';
+import { Handle, NodeProps, Position, useStore, useUpdateNodeInternals } from '@xyflow/react';
 import './Node.scss';
 import Button from 'components/Button';
 import Icon from 'components/Icon';
 import Track from 'components/Track';
-import React, { FC, useEffect } from 'react';
+import React, { FC, useEffect, useMemo } from 'react';
 import { MdDeleteOutline, MdOutlineEdit, MdOutlineRemoveRedEye } from 'react-icons/md';
 import useServiceStore from 'store/services.store';
+import { StepType } from 'types';
 import { NodeDataProps } from 'types/service-flow';
+import { CONDITION_SOURCE_HANDLE_ID, conditionHasEmptyBranches } from 'utils/conditional-flow-utils';
+import { MCQ_SOURCE_HANDLE_ID, mcqHasEmptyBranches } from 'utils/mcq-flow-utils';
 
 import StepNode from './StepNode';
 
@@ -17,13 +20,35 @@ type CustomNodeProps = {
 const CustomNode: FC<NodeProps & CustomNodeProps> = (props) => {
   const { data, isConnectable, id } = props;
   const orientation = useServiceStore((state) => state.orientation);
-  const shouldOffsetHandles = data.childrenCount > 1;
+  const isMcq = data.stepType === StepType.MultiChoiceQuestion;
+  const isCondition = data.stepType === StepType.Condition;
+  const shouldOffsetHandles = !isMcq && !isCondition && data.childrenCount > 1;
+
+  const edges = useStore((state) => state.edges);
+  const nodes = useStore((state) => state.nodes);
+
+  const mcqCanConnect = useMemo(() => !isMcq || mcqHasEmptyBranches(id, nodes, edges), [edges, id, isMcq, nodes]);
+  const conditionCanConnect = useMemo(
+    () => !isCondition || conditionHasEmptyBranches(id, nodes, edges),
+    [edges, id, isCondition, nodes],
+  );
+
+  const canConnect = isConnectable && mcqCanConnect && conditionCanConnect;
 
   const updateNodeInternals = useUpdateNodeInternals();
 
   useEffect(() => {
     updateNodeInternals(id);
-  }, [data.childrenCount, id, updateNodeInternals, orientation]);
+  }, [
+    data.childrenCount,
+    id,
+    isMcq,
+    isCondition,
+    mcqCanConnect,
+    conditionCanConnect,
+    updateNodeInternals,
+    orientation,
+  ]);
 
   const isFinishingStep = () => {
     return data.type === 'finishing-step';
@@ -38,6 +63,30 @@ const CustomNode: FC<NodeProps & CustomNodeProps> = (props) => {
   };
 
   const bottomHandles = (): React.JSX.Element => {
+    if (isMcq) {
+      return (
+        <Handle
+          id={MCQ_SOURCE_HANDLE_ID}
+          type="source"
+          position={getSourcePosition()}
+          isConnectable={canConnect}
+          hidden={isFinishingStep()}
+        />
+      );
+    }
+
+    if (isCondition) {
+      return (
+        <Handle
+          id={CONDITION_SOURCE_HANDLE_ID}
+          type="source"
+          position={getSourcePosition()}
+          isConnectable={canConnect}
+          hidden={isFinishingStep()}
+        />
+      );
+    }
+
     return (
       <>
         {new Array(data.childrenCount).fill(0).map((_, i) => (
@@ -73,6 +122,10 @@ const CustomNode: FC<NodeProps & CustomNodeProps> = (props) => {
             onClick={() => {
               data.setClickedNode(id);
               data.onEdit(id);
+              // Workaround for a bug that prevents @radix-ui/react-dialog and jsoneditor working together
+              // https://github.com/radix-ui/primitives/issues/2122
+              // Second part of the fix is in Popup.tsx
+              setTimeout(() => (document.body.style.pointerEvents = ''), 0);
             }}
           >
             <Icon icon={data.readonly ? <MdOutlineRemoveRedEye /> : <MdOutlineEdit />} size="medium" />

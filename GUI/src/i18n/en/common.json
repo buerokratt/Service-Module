@@ -66,7 +66,8 @@
     "paste": "Paste",
     "cut": "Cut",
     "undo": "Undo",
-    "redo": "Redo"
+    "redo": "Redo",
+    "retry": "Retry"
   },
   "menu": {
     "overview": "Overview",
@@ -87,6 +88,11 @@
     "openMenu": "Open menu",
     "openIcon": "Open menu icon",
     "closeIcon": "Close menu icon"
+  },
+  "multiDomains": {
+    "chooseDomain": "Select domain:",
+    "allDomains": "All",
+    "noDomains": "No domains available. Please contact your system administrator."
   },
   "intents": {
     "entities": "Entities",
@@ -145,6 +151,20 @@
     "edit": "Edit",
     "delete": "Delete",
     "cancel": "Cancel",
+    "importMany": "Import",
+    "import": {
+      "importSuccess": "{{count}} service{{lengthCheck}} imported successfully",
+      "importFailure": "Could not import the following files (Wrong format or corrupted): {{files}}",
+      "failedToImport": "Failed to import services"
+    },
+    "exportMany": "Export",
+    "exportAll": "Export All",
+    "export": "Export",
+    "exportAllConfirmation": "Are you sure you want to export all services?",
+    "noServicesFound": "No services found",
+    "error": {
+      "fetchingServices": "Error fetching services"
+    },
     "trainingModuleLink": {
       "text": "For the service to be accessible to users a new model needs to be trained. Model training happens on the Training Module page",
       "train": "Train new model"
@@ -152,7 +172,7 @@
     "service": {
       "name": "Name",
       "state": "State",
-      "linkedIntent": "Linked Intent",
+      "description": "Description",
       "states": {
         "active": "Active",
         "inactive": "Inactive",
@@ -214,6 +234,26 @@
     "test": "Test URL",
     "isCommon": "Common Service",
     "slot": "Slot",
+    "serviceName": {
+      "title": "Name",
+      "placeholder": "Title is mandatory",
+      "tooltip": "Service name displayed to users and in system"
+    },
+    "serviceDescription": {
+      "title": "Description",
+      "placeholder": "Describe what the service does...",
+      "tooltip": "Short description of the service’s purpose or function. Recommended: clear and concise."
+    },
+    "examples": {
+      "title": "Examples",
+      "placeholder": "Add examples of what the user could ask to start the service",
+      "tooltip": "Enter sample user questions that trigger this service (e.g. ‘When is Midsummer festival?’). It is recommended to include at least 5 examples"
+    },
+    "keywords": {
+      "title": "Keywords",
+      "placeholder": "Add essential service keywords (e.g. ‘holiday’, ‘year’)",
+      "tooltip": "Enter key terms used by AI to recognize intent. Keywords should reflect input concepts (e.g. ‘holiday’, ‘year’)."
+    },
     "endpoint": {
       "add": "+ Add API endpoint",
       "addTestEnv": "+ Add test environment",
@@ -227,7 +267,6 @@
       "live": "Live endpoint",
       "name": "Endpoint name",
       "params": "Params",
-      "publicEndpoint": "Public endpoint",
       "required": "Variable is required",
       "single": "Endpoint",
       "testEnv": "Test environment",
@@ -236,10 +275,30 @@
       "variable": "Variable",
       "operator": "Operator",
       "unsupported": "Sorry, we currently only support GET and POST requests.",
+      "noEndpointSelected": "Please fetch and select an endpoint before saving",
       "insertName": "Insert endpoint name...",
+      "insertDescription": "Insert endpoint description...",
+      "paramType": "Type",
+      "paramDescription": "Description",
+      "paramMandatory": "Mandatory",
+      "mandatoryYes": "Yes",
+      "mandatoryNo": "No",
+      "mandatoryNameValueRequired": "Name and value are mandatory",
+      "nameTypeDescriptionRequired": "Name, type and description are required for all parameters",
+      "missingPathParam": "Missing value for '{{name}}'",
+      "unresolvedPlaceholder": "Unresolved placeholder '{{name}}'",
+      "paramTypeTooltip": "Type defines what data a parameter accepts.\n\nSTRING (default) – text (e.g. \"Tallinn\", \"ABC123\")\nNUMBER – numbers (e.g. 10, 10.5)\nBOOLEAN – true or false\nDATE – date or datetime (e.g. 2025-01-01, ISO 8601)",
+      "response": "Response",
+      "testUrlFirst": "Execute Test URL before saving",
       "type": "Endpoint type",
+      "endpoints": "Endpoints",
+      "fetchEndpointsSuccess": "Endpoints fetched successfully",
       "nameAlreadyExists": "API title must be unique",
-      "formatJson": "Format JSON"
+      "formatJson": "Format JSON",
+      "global": "Global",
+      "tooltip": {
+        "global": "The global endpoint is stored in the API Registry and uses a single shared data source. When added to a service canvas, a local copy is created that is not automatically updated when the global endpoint changes; the copy can be edited directly on the canvas."
+      }
     },
     "trainingModuleSetup": "Training module setup",
     "serviceSetup": "Service setup",
@@ -251,7 +310,7 @@
     "uses": "Service uses",
     "defaultServiceName": "unnamed_service",
     "noElementsAvailable": "No elements available",
-    "createNewEndpoint": "Create new endpoint",
+    "createNewEndpoint": "New endpoint",
     "editEndpoint": "Edit endpoint",
     "toast": {
       "serviceMissingFields": "Service name and description are required",
@@ -277,6 +336,7 @@
     "chooseMemorySlots": "Choose memory slots"
   },
   "serviceFlow": {
+    "serviceConfiguration": "Settings",
     "element": {
       "taraAuthentication": "Tara authorization",
       "textfield": "Send message to client",
@@ -302,6 +362,13 @@
         "serviceNameTooltip": "The name of the service that will be executed when a choice is made\nExample: test_service",
         "keyTooltip": "The key will be used as the title for each choice\nExample: name for the above list",
         "payloadKeysTooltip": "Comma-separated keys to be the data sent to the service when a choice is made\nExample: name,price"
+      },
+      "jumpToService": {
+        "title": "Next service",
+        "targetService": "Target service",
+        "selectService": "Select a service...",
+        "noActiveServices": "No active services available",
+        "parameters": "Parameters"
       }
     },
     "popup": {
@@ -334,7 +401,7 @@
       "or": "OR",
       "not": "NOT",
       "addRule": "+ Rule",
-      "addElement": "+ Element",
+      "addElement": "+ New variable",
       "addGroup": "+ Group",
       "remove": "Remove",
       "signType": "Sign Type",
@@ -345,10 +412,18 @@
       "removeValueAssignment": "Remove element assigned as value",
       "assignManualEdit": "Manually edit variable assignment",
       "openObjectEditor": "Open object editor",
-      "confirmImport": "The current service will be rewritten!"
+      "confirmImport": "The current service will be rewritten!",
+      "importFlowOnly": "Import Flow Only"
+    },
+    "mcq": {
+      "selectBranchTitle": "Select branch",
+      "emptyBranchesMessage": "This multi-choice question has {{count}} empty branches. Which branch do you want to connect?"
+    },
+    "condition": {
+      "emptyPathsMessage": "This conditional node has {{count}} empty paths. Which path do you want to connect?"
     },
     "previousVariables": {
-      "assignElements": "Assign Elements",
+      "assignElements": "Assigned Variables",
       "dateAndTime": {
         "title": "Date and time",
         "base": "Base",
@@ -417,6 +492,8 @@
     "autoFocus": "Auto-View: ON/OFF",
     "apiElements": {
       "title": "API elements",
+      "searchPlaceholder": "Search...",
+      "newApi": "+ New API",
       "delete": "Delete",
       "deletionImpossible": "Deletion impossible",
       "deletionImpossibleMessage": "Deletion is impossible. This API element is used in the following services. Please remove the API element from these services first.",
@@ -500,6 +577,9 @@
     "ROLE_UNAUTHENTICATED": "Unauthenticated"
   },
   "chat": {
+    "unanswered": "Unanswered",
+    "forwarded": "Forwarded",
+    "pending": "Pending",
     "service-test-error": {
       "title": "Service test error",
       "dslName": "Service file",
@@ -624,5 +704,49 @@
     "containsInvalidProperties": "Contains invalid properties",
     "containsInvalidItems": "Contains invalid items",
     "editor": "Object Editor"
+  },
+  "apiRegistry": {
+    "title": "API Registry",
+    "createEndpoint": "Create endpoint",
+    "columns": {
+      "name": "Name",
+      "lastTest": "Last test",
+      "status": "Status",
+      "schema": "Schema",
+      "llmIndexStatus": "Index",
+      "actions": "Actions"
+    },
+    "tooltip": {
+      "fullName": "Full name",
+      "description": "Description",
+      "method": "Method",
+      "url": "URL"
+    },
+    "status": {
+      "verified": "Verified",
+      "failed": "Failed",
+      "unverified": "Unverified"
+    },
+    "actions": {
+      "copy": "Copy",
+      "test": "Test",
+      "edit": "Edit",
+      "delete": "Delete",
+      "retryIndexing": "Retry Indexing",
+      "reIndex": "Reindex"
+    },
+    "deleteConfirm": "Are you sure you want to delete this endpoint?",
+    "reIndexConfirm": "Re-index this endpoint?",
+    "noSchema": "—",
+    "noLastTest": "—",
+    "copySuccess": "Endpoint copied",
+    "copyError": "Failed to copy endpoint",
+    "loadError": "Error loading endpoints",
+    "deleteSuccess": "Endpoint deleted",
+    "deleteError": "Failed to delete endpoint",
+    "testSuccess": "Test successful",
+    "testError": "Test failed",
+    "reIndexSuccess": "Re-index started",
+    "reIndexError": "Re-index failed"
   }
 }

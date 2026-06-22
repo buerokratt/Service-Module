@@ -9,6 +9,10 @@ export const stringToTemplate = (value: string | number) => {
   return value ? '${' + value + '}' : '${""}';
 };
 
+export const stringToEscapedTemplate = (value: string | number) => {
+  return value ? '$= ' + value + ' =' : '$= "" =';
+};
+
 export const templateToString = (value: string | number) => {
   const valueString = String(value);
   if (!isTemplate(value)) {
@@ -20,14 +24,14 @@ export const templateToString = (value: string | number) => {
 };
 
 export const toSnakeCase = (value: string) => {
-  return value.toLowerCase().trim().replace(/\s+/g, '_').replace(/-+/g, '_').replace(/_+/g, '_');
+  return value.toLowerCase().trim().replaceAll(/\s+/g, '_').replaceAll(/-+/g, '_').replaceAll(/_+/g, '_');
 };
 
 export const fromSnakeCase = (value: string) => {
   const parts = value.split('_');
 
   // Check if the last part is a number
-  const lastPart = parts[parts.length - 1];
+  const lastPart = parts.at(-1) ?? '';
   const isLastPartNumber = /^\d+$/.test(lastPart);
 
   if (isLastPartNumber && parts.length > 1) {
@@ -92,7 +96,7 @@ export function removeNestedTemplates(str: string): string {
     changed = false;
     iterationCount++;
 
-    str = str.replace(
+    str = str.replaceAll(
       /\$\{([^${}]*)\$\{([^}]*)\}([^}]*)\}/g,
       (match: string, p1: string, p2: string, p3: string): string => {
         changed = true;
@@ -112,7 +116,7 @@ export function removeNestedTemplates(str: string): string {
     changed = false;
     iterationCount++;
 
-    str = str.replace(
+    str = str.replaceAll(
       /\$\{([^{}]*)\{([^}]*)\}([^}]*)\}/g,
       (match: string, p1: string, p2: string, p3: string): string => {
         changed = true;
@@ -147,3 +151,30 @@ export function removeWrapperQuotes(str: string): string {
 
   return str.substring(start, end + 1);
 }
+
+export function decodeHtmlEntities(value: string): string {
+  if (typeof value !== 'string' || value.length === 0) return value;
+
+  if (typeof document !== 'undefined') {
+    const textarea = document.createElement('textarea');
+    textarea.innerHTML = value;
+    return textarea.value;
+  }
+
+  return value
+    .replaceAll(/&#x([0-9A-F]+);/gi, (_, hex: string) => String.fromCodePoint(Number.parseInt(hex, 16)))
+    .replaceAll(/&#(\d+);/g, (_, code: string) => String.fromCodePoint(Number.parseInt(code, 10)))
+    .replaceAll('&amp;', '&')
+    .replaceAll('&gt;', '>')
+    .replaceAll('&lt;', '<')
+    .replaceAll('&quot;', '"')
+    .replaceAll('&#39;', "'")
+    .replaceAll('&apos;', "'");
+}
+
+export const ensureAbsoluteUrl = (href: string): string => {
+  if (/^[a-z][a-z\d+\-.]*:\/\//i.test(href) || href.startsWith('//')) {
+    return href;
+  }
+  return `https://${href}`;
+};

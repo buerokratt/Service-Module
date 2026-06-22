@@ -12,12 +12,19 @@
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  max-height: 100%;
-  overflow-y: auto;
+  max-height: 90vh;
+  overflow-y: hidden;
+  display: flex;
+  flex-direction: column;
   width: 100%;
   min-width: 600px;
   max-width: 650px;
   z-index: 1000;
+
+  &--large {
+    min-width: 800px;
+    max-width: 900px;
+  }
 
   &__overlay {
     position: fixed;
@@ -29,10 +36,13 @@
   &__header,
   &__footer {
     padding: get-spacing(viljandi);
+    flex-shrink: 0;
   }
 
   &__body {
     padding: get-spacing(haapsalu);
+    overflow-y: auto;
+    flex: 1 1 auto;
   }
 
   &__header {

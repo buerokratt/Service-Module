@@ -1,0 +1,40 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Returns all endpoints with pagination, sorting and search support"
+  method: post
+  accepts: json
+  returns: json
+  namespace: service
+  allowlist:
+    body:
+      - field: pagination
+        type: boolean
+        description: "Body field 'pagination'"
+      - field: page
+        type: number
+        description: "Body field 'page'"
+      - field: page_size
+        type: number
+        description: "Body field 'page_size'"
+      - field: sorting
+        type: string
+        description: "Body field 'sorting'"
+      - field: search
+        type: string
+        description: "Body field 'search'"
+
+get_paginated_endpoints:
+  call: http.post
+  args:
+    url: "[#SERVICE_RESQL]/endpoints/get_paginated_endpoints"
+    body:
+      pagination: ${incoming.body.pagination}
+      page: ${incoming.body.page}
+      page_size: ${incoming.body.page_size}
+      sorting: ${incoming.body.sorting}
+      search: ${incoming.body.search}
+  result: res
+
+return_result:
+  return: ${res.response.body}

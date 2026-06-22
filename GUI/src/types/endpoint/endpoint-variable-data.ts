@@ -4,6 +4,7 @@ export type EndpointVariableData = {
   id: string;
   name: string;
   required?: boolean;
+  mandatory?: boolean;
   description?: string;
   type: string;
   operator?: RequestOperator;
@@ -16,4 +17,6 @@ export type EndpointVariableData = {
   default?: string;
   value?: string;
   testValue?: string;
+  /** 'path' for URL path placeholders like {id}; 'query' for query-string params */
+  paramType?: 'path' | 'query';
 };

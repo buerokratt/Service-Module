@@ -1,10 +1,4 @@
-WITH LatestEndpoints AS (
-  SELECT DISTINCT ON (e.endpoint_id) e.*
-  FROM endpoints AS e
-  WHERE (e.service_id = :id::uuid OR e.is_common = true)
-  ORDER BY e.endpoint_id, e.id DESC
-),
-UserPreferences AS (
+WITH UserPreferences AS (
   SELECT endpoints
   FROM user_step_preference
   WHERE user_id_code = :user_id_code
@@ -12,20 +6,22 @@ UserPreferences AS (
   LIMIT 1
 )
 SELECT
-  le.endpoint_id,
-  le.name,
-  le.type,
-  le.is_common,
-  le.definitions
-FROM LatestEndpoints AS le
+  e.endpoint_id,
+  e.name,
+  e.description,
+  e.type,
+  e.definitions
+FROM endpoints AS e
 CROSS JOIN UserPreferences AS up
-WHERE le.deleted IS FALSE
+WHERE (e.service_id = :id::uuid OR e.deleted = false)
+  AND e.deleted IS FALSE
+  AND (:search IS NULL OR :search = '' OR LOWER(e.name) LIKE LOWER('%' || :search || '%'))
 ORDER BY 
   CASE 
     WHEN up.endpoints IS NULL OR array_length(up.endpoints, 1) = 0 THEN 1
-    ELSE array_position(up.endpoints, le.endpoint_id)
+    ELSE array_position(up.endpoints, e.endpoint_id)
   END,
   CASE 
-    WHEN up.endpoints IS NULL OR array_length(up.endpoints, 1) = 0 THEN le.id
+    WHEN up.endpoints IS NULL OR array_length(up.endpoints, 1) = 0 THEN e.id
     ELSE NULL
   END DESC; 

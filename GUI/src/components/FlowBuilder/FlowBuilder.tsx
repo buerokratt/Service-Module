@@ -7,8 +7,10 @@ import LassoSelectionControls from 'components/Flow/Controls/LassoSelectionContr
 import UndoRedoControls from 'components/Flow/Controls/UndoRedoControls';
 import edgeTypes from 'components/Flow/EdgeTypes';
 import { Lasso } from 'components/Flow/LassoSelection/Lasso';
+import McqBranchSelectModal from 'components/Flow/McqBranchSelectModal';
 import nodeTypes from 'components/Flow/NodeTypes';
 import useLayout from 'hooks/flow/useLayout';
+import useMcqConnect from 'hooks/flow/useMcqConnect';
 import { useOnNodesDelete } from 'hooks/flow/useOnNodeDelete';
 import { ChangeEventHandler, FC, useCallback, useEffect, useState } from 'react';
 import '@xyflow/react/dist/style.css';
@@ -17,7 +19,9 @@ import { MdCenterFocusStrong, MdOutlineCenterFocusStrong } from 'react-icons/md'
 import useNewServiceStore from 'store/new-services.store';
 import useServiceStore from 'store/services.store';
 import { StepType } from 'types';
+import { applySimpleConnection } from 'utils/mcq-flow-utils';
 import '../Flow/LassoSelection/Lasso.css';
+import './FlowBuilder.scss';
 
 import { useThemeSyncWithFlow } from '../../hooks/useThemeSyncWithFlow';
 import HorizontalFlow from '../../static/icons/horizontal_flow.svg';
@@ -29,6 +33,7 @@ type FlowBuilderProps = {
 };
 
 const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
+  useLayout();
   const { getNodes, getEdges, setNodes, setEdges, getNode } = useReactFlow();
   const setReactFlowInstance = useNewServiceStore((state) => state.setReactFlowInstance);
   const [colorMode, setColorMode] = useState<ColorMode>('light');
@@ -54,42 +59,29 @@ const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
   useLayout(orientation);
   const autoView = useServiceStore((state) => state.autoView);
   const toggleAutoView = useServiceStore((state) => state.toggleAutoView);
+  const { fitView } = useReactFlow();
 
-  const { runLayout } = useLayout(orientation);
+  const { runLayout } = useLayout();
+  const { pendingConnection, handleConnect, isValidConnection, confirmBranch, cancelBranchSelection } = useMcqConnect();
 
   const onConnect = useCallback(
-    ({ source, target }: any) => {
+    (connection: { source?: string | null; target?: string | null; sourceHandle?: string | null }) => {
+      if (handleConnect(connection)) return;
+
       const nodes = getNodes();
       const edges = getEdges();
-
-      const parentOutgoingEdges = edges.filter((edge) => edge.source === source);
-
-      const ghostEdges = parentOutgoingEdges.filter((edge) => {
-        const targetNode = nodes.find((n) => n.id === edge.target);
-        return targetNode?.type === 'ghost';
+      const { nodes: finalNodes, edges: finalEdges } = applySimpleConnection({
+        nodes,
+        edges,
+        connection,
       });
 
-      if (ghostEdges.length > 0) {
-        const ghostNodeIds = ghostEdges.map((edge) => edge.target);
-        const updatedEdges = edges.filter((edge) => !ghostEdges.includes(edge));
-        const updatedNodes = nodes.filter((node) => !ghostNodeIds.includes(node.id));
-        setNodes(updatedNodes);
-        setEdges(updatedEdges);
-      }
-
-      setEdges((eds) => [
-        ...eds,
-        {
-          id: `${source}->${target}`,
-          source: source,
-          target: target,
-          type: 'step',
-        },
-      ]);
+      setNodes(finalNodes);
+      setEdges(finalEdges);
       setHasUnsavedChanges(true);
-      saveToHistory();
+      saveToHistory({ nodes: finalNodes, edges: finalEdges });
     },
-    [getEdges, getNodes, setEdges, setHasUnsavedChanges, setNodes, saveToHistory],
+    [getEdges, getNodes, handleConnect, setEdges, setHasUnsavedChanges, setNodes, saveToHistory],
   );
 
   const zIndexStyle = { zIndex: 20 };
@@ -98,16 +90,11 @@ const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
     setColorMode(evt.target.value as ColorMode);
   };
 
-  const isValidConnection = useCallback((connection: any) => {
-    return connection.source !== connection.target;
-  }, []);
-
   const onSelectionChange = useCallback(
     ({ nodes: selectedNodes }: { nodes: Node[] }) => {
       setFlowSelectedNodes(selectedNodes);
-      setHasUnsavedChanges(true);
     },
-    [setFlowSelectedNodes, setHasUnsavedChanges],
+    [setFlowSelectedNodes],
   );
 
   const onBeforeDelete = useCallback(
@@ -115,8 +102,8 @@ const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
       setDeletedNodes(null);
       try {
         if (edgesToDelete.length > 0 && nodesToDelete.length === 0) {
-          const shouldPreventDelete = getNode(edgesToDelete[0].source)?.data.stepType === StepType.MultiChoiceQuestion;
-          if (shouldPreventDelete) {
+          const sourceStepType = getNode(edgesToDelete[0].source)?.data.stepType;
+          if (sourceStepType === StepType.MultiChoiceQuestion) {
             return Promise.resolve(false);
           }
         }
@@ -163,9 +150,10 @@ const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
         panOnScroll
         nodeTypes={nodeTypes}
         edgeTypes={edgeTypes}
-        onInit={(instance) => {
+        onInit={async (instance) => {
           setReactFlowInstance(instance);
           useNewServiceStore.getState().loadEndpointsResponseVariables();
+          await fitView({ duration: 200, padding: 5 });
         }}
         nodesDraggable={false}
         onSelectionChange={onSelectionChange}
@@ -173,13 +161,13 @@ const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
         onEdgesDelete={(edges) => {
           onEdgesDelete(edges);
           setHasUnsavedChanges(true);
-          saveToHistory();
+          setTimeout(() => saveToHistory(), 0);
         }}
         onBeforeDelete={onBeforeDelete}
         onNodesDelete={(nodes) => {
           onNodesDelete(nodes);
           setHasUnsavedChanges(true);
-          saveToHistory();
+          setTimeout(() => saveToHistory(), 0);
         }}
         fitView
         fitViewOptions={{ padding: 5 }}
@@ -188,7 +176,7 @@ const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
         defaultEdgeOptions={{ type: 'step', deletable: false }}
       >
         <Chat />
-        <MiniMap style={zIndexStyle} />
+        <MiniMap className={'minimap'} />
         <Background color="#D2D3D8" gap={16} lineWidth={9} />
         {isLassoActive && <Lasso />}
         <Panel position="top-left" style={zIndexStyle}>
@@ -216,18 +204,26 @@ const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
           </Track>
         </Panel>
         <Panel position="bottom-left">
-          <Track gap={10} direction="horizontal" align="center" style={{ paddingLeft: '110px', paddingBottom: '7px' }}>
-            <Controls orientation="horizontal" showInteractive={false} style={{ marginBottom: '12px' }} />
-            <Tooltip content={t('serviceFlow.autoFocus')}>
-              <span>
-                <Switch
-                  checked={autoView}
-                  onCheckedChange={toggleAutoView}
-                  onLabel={<Icon icon={<MdCenterFocusStrong fontSize={30} />} size="medium" />}
-                  offLabel={<Icon icon={<MdOutlineCenterFocusStrong fontSize={30} />} size="medium" />}
-                />
-              </span>
-            </Tooltip>
+          <Track gap={10} direction="horizontal" align="center" style={{}}>
+            <Controls
+              orientation="horizontal"
+              showInteractive={false}
+              style={{ marginLeft: '0' }}
+              className={'zoom-controls'}
+              fitViewOptions={{ padding: 5 }}
+            />
+            <div className={'center-controls'}>
+              <Tooltip content={t('serviceFlow.autoFocus')}>
+                <span>
+                  <Switch
+                    checked={autoView}
+                    onCheckedChange={toggleAutoView}
+                    onLabel={<Icon icon={<MdCenterFocusStrong fontSize={30} />} size="medium" />}
+                    offLabel={<Icon icon={<MdOutlineCenterFocusStrong fontSize={30} />} size="medium" />}
+                  />
+                </span>
+              </Tooltip>
+            </div>
           </Track>
         </Panel>
       </ReactFlow>
@@ -248,6 +244,18 @@ const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
             </Button>
           </Track>
         </Modal>
+      )}
+      {pendingConnection && (
+        <McqBranchSelectModal
+          emptyBranches={pendingConnection.emptyBranches}
+          onSelect={confirmBranch}
+          onClose={cancelBranchSelection}
+          description={
+            pendingConnection.nodeType === StepType.Condition
+              ? t('serviceFlow.condition.emptyPathsMessage', { count: pendingConnection.emptyBranches.length })
+              : undefined
+          }
+        />
       )}
     </>
   );

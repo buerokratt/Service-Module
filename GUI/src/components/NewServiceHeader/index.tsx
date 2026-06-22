@@ -1,7 +1,9 @@
 import { t } from 'i18next';
-import { FC, useState } from 'react';
-import '@buerokratt-ria/header/src/Header.scss';
+import React, { FC, useState } from 'react';
+import { FaGear } from 'react-icons/fa6';
+import { TiArrowLeft } from 'react-icons/ti';
 import { useNavigate, useParams } from 'react-router-dom';
+import '@buerokratt-ria/header/src/Header.scss';
 import { deleteService } from 'resources/api-constants';
 import { ROUTES } from 'resources/routes-constants';
 import useServiceStore from 'store/new-services.store';
@@ -9,9 +11,13 @@ import useToastStore from 'store/toasts.store';
 import { ServiceState } from 'types';
 import { removeTrailingUnderscores } from 'utils/string-util';
 
-import { Button, HeaderStepCounter, Modal, Track } from '..';
+import { Button, Modal, Track } from '..';
 import api from '../../services/api-dev';
 import useServiceListStore from '../../store/services.store';
+import Dialog from '../Dialog';
+import Icon from '../Icon';
+import SettingsModal from '../ServiceConfigurationForm';
+
 import './NewServiceHeader.scss';
 
 type NewServiceHeaderProps = {
@@ -21,10 +27,18 @@ type NewServiceHeaderProps = {
   saveOnClick: () => void;
 };
 
-const NewServiceHeader: FC<NewServiceHeaderProps> = ({ activeStep, backOnClick, continueOnClick, saveOnClick }) => {
+const showEmptyNameError = () => {
+  useToastStore.getState().error({
+    title: t('newService.serviceName.title'),
+    message: t('newService.serviceName.placeholder'),
+  });
+};
+
+const NewServiceHeader: FC<NewServiceHeaderProps> = ({ backOnClick, continueOnClick, saveOnClick }) => {
   const name = removeTrailingUnderscores(useServiceStore((state) => state.serviceNameDashed()));
   const serviceState = useServiceStore((state) => state.serviceState);
   const selectedService = useServiceListStore((state) => state.selectedService);
+  const [showServiceConfig, setShowServiceConfig] = useState<boolean>(false);
   const navigate = useNavigate();
   const [isSaving, setIsSaving] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -34,12 +48,26 @@ const NewServiceHeader: FC<NewServiceHeaderProps> = ({ activeStep, backOnClick, 
 
   return (
     <>
-      <header className="header">
+      <header className="new-service-header">
+        {showServiceConfig && (
+          <Dialog
+            title={t('serviceFlow.serviceConfiguration')}
+            onClose={() => setShowServiceConfig(false)}
+            size="large"
+          >
+            <SettingsModal id={id} />
+          </Dialog>
+        )}
         <Track justify="between" gap={16}>
-          <Button appearance="text" style={{ textDecoration: 'none', boxShadow: 'none' }} onClick={backOnClick}>
-            <h1>{`< ${t('menu.backToServiceListing')}`}</h1>
+          <Button appearance="primary" className={'icon_button'} onClick={backOnClick}>
+            <Icon icon={<TiArrowLeft size={20} />} />
+            {t('menu.backToServiceListing')}
           </Button>
-          <HeaderStepCounter activeStep={activeStep} />
+          <Button appearance="primary" className={'icon_button'} onClick={() => setShowServiceConfig(true)}>
+            {t('serviceFlow.serviceConfiguration')}
+            <Icon icon={<FaGear size={18} />} size="medium" />
+          </Button>
+          <div className="naming">{name || '...'}</div>
           <Button
             appearance={isDeleting ? 'loading' : 'error'}
             disabled={
@@ -54,10 +82,19 @@ const NewServiceHeader: FC<NewServiceHeaderProps> = ({ activeStep, backOnClick, 
           <Button
             appearance={isSaving ? 'loading' : 'primary'}
             onClick={async () => {
-              setIsSaving(true);
-              await useServiceStore.getState().onServiceSave(ServiceState.Draft, false);
-              setIsSaving(false);
-              saveOnClick();
+              if (!name) {
+                showEmptyNameError();
+              } else {
+                setIsSaving(true);
+                try {
+                  await useServiceStore.getState().onServiceSave(ServiceState.Draft, false);
+                  saveOnClick();
+                } catch (error) {
+                  console.error(error);
+                } finally {
+                  setIsSaving(false);
+                }
+              }
             }}
           >
             {t('global.save')}

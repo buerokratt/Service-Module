@@ -54,25 +54,51 @@
     max-width: 350px;
     width: 100%;
     min-height: 65px;
+    max-height: 65px;
     align-content: center;
 
+    .step-node-content {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      max-width: 318px;
+
+      p,
+      div,
+      ul,
+      ol,
+      li {
+        display: inline;
+      }
+
+      br {
+        display: none;
+      }
+    }
+
     &.selected {
-      border: dashed 1px get-color(black-coral-1);
+      border: dashed 2px get-color(black-coral-5);
+      box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.08);
 
       &.end {
-        border: 1px solid get-color(jasper-15);
+        border: 2px solid get-color(jasper-15);
+        box-shadow: 0 0 0 3px rgba(get-color(jasper-10), 0.25);
       }
       &.step {
-        border: 1px solid get-color(sapphire-blue-7);
+        border: 2px solid get-color(sapphire-blue-7);
+        box-shadow: 0 0 0 3px rgba(get-color(sapphire-blue-7), 0.2);
       }
       &.rule {
-        border: 1px solid get-color(black-coral-8);
+        border: 2px solid get-color(black-coral-8);
+        box-shadow: 0 0 0 3px rgba(get-color(black-coral-8), 0.2);
       }
       &.finishing-step {
-        border: 1px solid get-color(jasper-8);
+        border: 2px solid get-color(jasper-8);
+        box-shadow: 0 0 0 3px rgba(get-color(jasper-8), 0.2);
       }
       &.dynamic-choices {
-        border: 1px solid get-color(purple-8);
+        border: 2px solid get-color(purple-8);
+        box-shadow: 0 0 0 3px rgba(get-color(purple-8), 0.2);
       }
     }
 
@@ -166,6 +192,18 @@
   }
 }
 
+[data-theme='light'] .react-flow {
+  &__edge {
+    &.selected {
+      .react-flow__edge-path {
+        stroke: get-color(sapphire-blue-9);
+        stroke-width: 2.5px;
+        filter: drop-shadow(0 0 4px rgba(23, 105, 171, 0.2));
+      }
+    }
+  }
+}
+
 .edge-button {
   pointer-events: all;
   cursor: pointer;
@@ -192,12 +230,6 @@
 [data-theme='dark'] .react-flow {
   &__node {
     color: var(--dark-text-secondary);
-
-    &.selected {
-      &.step {
-        border: 1px solid get-color(sapphire-blue-2);
-      }
-    }
 
     &.start,
     &.end {
@@ -242,13 +274,45 @@
     }
 
     &.selected {
-      border: dashed 1px get-color(black-coral-10);
+      border: dashed 2px get-color(black-coral-8);
+      box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.08);
+
+      &.end {
+        border: 2px solid get-color(jasper-11);
+        box-shadow: 0 0 0 3px rgba(200, 60, 60, 0.25);
+      }
+      &.step {
+        border: 2px solid get-color(sapphire-blue-2);
+        box-shadow: 0 0 0 3px rgba(80, 140, 220, 0.25);
+      }
+      &.rule {
+        border: 2px solid get-color(black-coral-8);
+        box-shadow: 0 0 0 3px rgba(150, 150, 160, 0.25);
+      }
+      &.finishing-step {
+        border: 2px solid get-color(jasper-11);
+        box-shadow: 0 0 0 3px rgba(200, 60, 60, 0.25);
+      }
+      &.dynamic-choices {
+        border: 2px solid get-color(purple-11);
+        box-shadow: 0 0 0 3px rgba(140, 80, 200, 0.25);
+      }
     }
   }
 
   &__edge-path {
-    stroke: get-color(black-coral-10);
+    stroke: get-color(black-coral-6);
     stroke-width: 1.5px;
+  }
+
+  &__edge {
+    &.selected {
+      .react-flow__edge-path {
+        stroke: get-color(sapphire-blue-4);
+        stroke-width: 2.5px;
+        filter: drop-shadow(0 0 5px rgba(139, 180, 213, 0.2));
+      }
+    }
   }
 }
 

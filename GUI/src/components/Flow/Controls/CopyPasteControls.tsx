@@ -20,7 +20,7 @@ interface CopyPasteControlsProps {
 const CopyPasteControls: FC<CopyPasteControlsProps> = ({ onNodesDelete }) => {
   const { getNodes, getEdges, setNodes, setEdges } = useReactFlow();
   const { t } = useTranslation();
-  const { setHasUnsavedChanges } = useServiceStore();
+  const { setHasUnsavedChanges, saveToHistory, setNodes: setStoreNodes, setEdges: setStoreEdges } = useServiceStore();
   const [hasClipboardData, setHasClipboardData] = useState<boolean>(false);
   const selectedNodes = useServiceStore((state) => state.flowSelectedNodes);
   const reactFlowInstance = useServiceStore.getState().reactFlowInstance;
@@ -147,9 +147,11 @@ const CopyPasteControls: FC<CopyPasteControlsProps> = ({ onNodesDelete }) => {
       const uniqueLabel = generateUniqueLabel(node.data.label as string, allExistingNodes);
       processedLabels.add(uniqueLabel);
 
+      const position = node.position ?? { x: 0, y: 0 };
       return {
         ...node,
         id: newId,
+        position: { x: position.x, y: position.y },
         selected: false,
         data: {
           ...node.data,
@@ -257,6 +259,7 @@ const CopyPasteControls: FC<CopyPasteControlsProps> = ({ onNodesDelete }) => {
         if (
           stepType === StepType.FinishingStepEnd ||
           stepType === StepType.FinishingStepRedirect ||
+          stepType === StepType.JumpToService ||
           stepType === StepType.DynamicChoices ||
           stepType === StepType.Condition ||
           stepType === StepType.Input ||
@@ -293,14 +296,31 @@ const CopyPasteControls: FC<CopyPasteControlsProps> = ({ onNodesDelete }) => {
       }
     });
 
-    setNodes((prevNodes) => [...prevNodes, ...newNodes, ...ghostNodes]);
-    setEdges((prevEdges) => [...prevEdges, ...newEdges, ...ghostEdges]);
+    const currentEdges = getEdges();
+    const finalNodes = [...currentNodes, ...newNodes, ...ghostNodes];
+    const finalEdges = [...currentEdges, ...newEdges, ...ghostEdges];
+    setStoreNodes(finalNodes);
+    setStoreEdges(finalEdges);
+    setNodes(finalNodes);
+    setEdges(finalEdges);
     setHasUnsavedChanges(true);
+    saveToHistory({ nodes: finalNodes, edges: finalEdges });
 
     useToastStore
       .getState()
       .success({ title: t('serviceFlow.nodesPasted', { count: newNodes.length, s: newNodes.length > 1 ? 's' : '' }) });
-  }, [fallbackClipboardData, getNodes, setNodes, setEdges, setHasUnsavedChanges, t]);
+  }, [
+    fallbackClipboardData,
+    getEdges,
+    getNodes,
+    setNodes,
+    setEdges,
+    setStoreNodes,
+    setStoreEdges,
+    setHasUnsavedChanges,
+    t,
+    saveToHistory,
+  ]);
 
   const cutNodes = useCallback(async () => {
     if (selectedNodes.length === 0) {
@@ -318,14 +338,21 @@ const CopyPasteControls: FC<CopyPasteControlsProps> = ({ onNodesDelete }) => {
     }
 
     setHasUnsavedChanges(true);
+    saveToHistory();
 
     useToastStore.getState().success({
       title: t('serviceFlow.nodesCut', { count: selectedNodes.length, s: selectedNodes.length > 1 ? 's' : '' }),
     });
-  }, [selectedNodes, copyNodes, onNodesDelete, reactFlowInstance, setHasUnsavedChanges, t]);
+  }, [selectedNodes, copyNodes, onNodesDelete, reactFlowInstance, setHasUnsavedChanges, t, saveToHistory]);
 
   useEffect(() => {
     const handleKeyDown = async (event: KeyboardEvent) => {
+      const isDialogOpen =
+        (event.target instanceof Element && event.target.closest('[role="dialog"], [role="alertdialog"]')) ||
+        document.querySelector('[role="dialog"]:not([aria-hidden="true"])');
+
+      if (isDialogOpen) return;
+
       const isMac = navigator.userAgent.toUpperCase().indexOf('MAC') >= 0;
       const isCtrlOrCmd = isMac ? event.metaKey : event.ctrlKey;
 

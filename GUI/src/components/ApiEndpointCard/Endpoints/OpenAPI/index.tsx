@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import api from 'services/api';
+import { extractMapValues, getEndpointBody } from 'store/new-services.store';
+import useToastStore from 'store/toasts.store';
 import { v4 as uuid } from 'uuid';
 
 import { Button, FormInput, FormSelect, RequestVariables, Track } from '../../..';
 import { getOpenApiSpec } from '../../../../resources/api-constants';
-import useServiceStore from '../../../../store/new-services.store';
 import { Option, RequestTab } from '../../../../types';
 import { ApiSpecProperty } from '../../../../types/api-spec-property';
 import {
@@ -14,6 +15,9 @@ import {
   EndpointVariableData,
   PreDefinedEndpointEnvVariables,
 } from '../../../../types/endpoint';
+import { generateJsonRequest } from '../../../../utils/json-request-utils';
+import { useTheme } from '../../../../utils/useTheme';
+import { TestPayload } from '../Custom';
 
 type EndpointOpenAPIProps = {
   endpoint: EndpointData;
@@ -21,6 +25,9 @@ type EndpointOpenAPIProps = {
   requestValues: PreDefinedEndpointEnvVariables;
   requestTab: RequestTab;
   setRequestTab: React.Dispatch<React.SetStateAction<RequestTab>>;
+  onTestSuccess?: (payload: TestPayload) => void;
+  onDescriptionChange?: (description: string) => void;
+  onMandatoryViolationChange?: (hasViolation: boolean) => void;
 };
 
 const EndpointOpenAPI: React.FC<EndpointOpenAPIProps> = ({
@@ -31,23 +38,54 @@ const EndpointOpenAPI: React.FC<EndpointOpenAPIProps> = ({
   requestValues,
   requestTab,
   setRequestTab,
+  onTestSuccess,
+  onDescriptionChange,
+  onMandatoryViolationChange,
 }) => {
   const [openApiUrl, setOpenApiUrl] = useState<string>(endpoint?.definitions[0]?.openApiUrl ?? '');
+  const [description, setDescription] = useState<string>(() => {
+    const initial = endpoint.description ?? '';
+    if (initial) onDescriptionChange?.(initial);
+    return initial;
+  });
   const [selectedEndpoint, setSelectedEndpoint] = useState<EndpointDefinition | undefined>(
     endpoint.definitions.find((e) => e.isSelected),
   );
   const [openApiEndpoints, setOpenApiEndpoints] = useState<EndpointDefinition[]>(endpoint.definitions ?? []);
   const [key, setKey] = useState<number>(0);
-  const { triggerJsonRequest } = useServiceStore();
+  const [isTesting, setIsTesting] = useState(false);
+  const [responseContent, setResponseContent] = useState<string | null>(endpoint.responseSchema ?? null);
+  const [isResponseOpen, setIsResponseOpen] = useState(!!endpoint.responseSchema);
   const { t } = useTranslation();
+  const theme = useTheme();
+
+  // Adding "key" dependency breaks focus in variable inputs
 
   useEffect(() => setKey((prevKey) => prevKey + 1), [isLive]);
 
-  const handleJsonRequestClick = () => {
-    if (selectedEndpoint) {
-      const endpointData = { ...endpoint, definitions: [selectedEndpoint] };
-      triggerJsonRequest(endpointData);
-    }
+  const handleTestClick = () => {
+    if (!selectedEndpoint) return;
+    setIsTesting(true);
+    const request = {
+      url: selectedEndpoint.url,
+      method: selectedEndpoint.methodType ?? 'GET',
+      headers: extractMapValues(selectedEndpoint.headers) as Record<string, string>,
+      params: extractMapValues(selectedEndpoint.params) as Record<string, string>,
+      body: getEndpointBody(selectedEndpoint),
+    };
+    generateJsonRequest(selectedEndpoint)
+      .then((content) => {
+        const schema = JSON.stringify(content, undefined, 4);
+        setResponseContent(schema);
+        endpoint.responseSchema = schema;
+        setIsResponseOpen(true);
+        useToastStore.getState().success({ title: t('newService.endpoint.success') });
+        onTestSuccess?.({ request, responseBody: content });
+      })
+      .catch((error) => {
+        useToastStore.getState().error({ title: (error as Error).message ?? t('newService.endpoint.error') });
+      })
+      .finally(() => setIsTesting(false));
   };
 
   const getEndpointSchema = (
@@ -112,11 +150,11 @@ const EndpointOpenAPI: React.FC<EndpointOpenAPIProps> = ({
         variableData.schemaData = parsedSubSchema;
       }
       if (data.type === 'array') {
-        if (!Object.keys(data.items).includes('$ref')) {
-          variableData.arrayType = data.items.type;
-        } else {
+        if (Object.keys(data.items).includes('$ref')) {
           variableData.arrayType = 'schema';
           variableData.arrayData = parseSchemaProperty(apiSpec, getPropertySchema(apiSpec, data.items.$ref));
+        } else {
+          variableData.arrayType = data.items.type;
         }
       }
       if (Object.keys(data).includes('enum')) variableData.enum = data.enum;
@@ -154,7 +192,7 @@ const EndpointOpenAPI: React.FC<EndpointOpenAPIProps> = ({
         required: param.required,
         description: param.description,
         in: param.in,
-        type: param.type,
+        type: param.type ?? param.schema?.type,
         enum: param.enum,
         default: param.default,
         format: param.format,
@@ -163,8 +201,18 @@ const EndpointOpenAPI: React.FC<EndpointOpenAPIProps> = ({
   };
 
   const fetchOpenApiSpecMock = async () => {
-    const result = await api.post<{ response: ApiSpecProperty }>(getOpenApiSpec(), { url: openApiUrl });
+    let result;
+    try {
+      result = await api.post<{ response: ApiSpecProperty }>(getOpenApiSpec(), { url: openApiUrl });
+    } catch {
+      useToastStore.getState().error({ title: t('newService.endpoint.error') });
+      return;
+    }
     const apiSpec = result.data.response;
+    if (!apiSpec?.paths) {
+      useToastStore.getState().error({ title: t('newService.endpoint.error') });
+      return;
+    }
     const url = new URL(openApiUrl).origin + (apiSpec.basePath ?? '');
     const paths: EndpointDefinition[] = [];
 
@@ -208,21 +256,21 @@ const EndpointOpenAPI: React.FC<EndpointOpenAPIProps> = ({
             ? {
                 variables: body,
                 rawData: {},
-                isRowSelected: false,
+                isRawSelected: false,
               }
             : undefined,
           headers: headers
             ? {
                 variables: headers,
                 rawData: {},
-                isRowSelected: false,
+                isRawSelected: false,
               }
             : undefined,
           params: params
             ? {
                 variables: params,
                 rawData: {},
-                isRowSelected: false,
+                isRawSelected: false,
               }
             : undefined,
           response,
@@ -231,23 +279,45 @@ const EndpointOpenAPI: React.FC<EndpointOpenAPIProps> = ({
     });
     setOpenApiEndpoints(paths);
     endpoint.definitions = paths;
-    endpoint.definitions[0].openApiUrl = openApiUrl;
+    if (paths.length > 0) endpoint.definitions[0].openApiUrl = openApiUrl;
     setKey(key + 1);
+    useToastStore.getState().success({ title: t('newService.endpoint.fetchEndpointsSuccess') });
   };
 
   const onSelectEndpoint = (selection: Option | null) => {
-    const newSelectedEndpoint = openApiEndpoints.find((openApiEndpoint) => openApiEndpoint.label === selection?.label);
+    const newSelectedEndpoint = openApiEndpoints.find((ep) => ep.label === selection?.label);
     setSelectedEndpoint(newSelectedEndpoint);
     if (!newSelectedEndpoint) return;
     endpoint.definitions = [];
     endpoint.definitions.push(newSelectedEndpoint);
-    setKey(key + 1);
+    setKey((k) => k + 1);
   };
 
   return (
     <Track direction="vertical" align="stretch" gap={16}>
+      {/* Description */}
       <div>
-        <label htmlFor="endpointUrl">{t('newService.endpoint.url')}</label>
+        <label htmlFor="endpointDescription" style={{ color: theme === 'dark' ? 'white' : 'black' }}>
+          {t('newService.description')}
+        </label>
+        <FormInput
+          name="endpointDescription"
+          label=""
+          placeholder={t('newService.endpoint.insertDescription') ?? ''}
+          value={description}
+          onChange={(e) => {
+            setDescription(e.target.value);
+            endpoint.description = e.target.value;
+            onDescriptionChange?.(e.target.value);
+          }}
+        />
+      </div>
+
+      {/* Open API URL + Ask for endpoints */}
+      <div>
+        <label htmlFor="endpointUrl" style={{ color: theme === 'dark' ? 'white' : 'black' }}>
+          {t('newService.endpoint.url')}
+        </label>
         <Track gap={8}>
           <FormInput
             name="endpointUrl"
@@ -265,28 +335,31 @@ const EndpointOpenAPI: React.FC<EndpointOpenAPIProps> = ({
           </Button>
         </Track>
       </div>
-      {openApiEndpoints.length > 0 && (
-        <div>
-          <label htmlFor="select-endpoint">{t('newService.endpoint.single')}</label>
-          <FormSelect
-            name={'select-endpoint'}
-            label={''}
-            style={{ fontSize: '15px' }}
-            defaultValue={selectedEndpoint?.label}
-            options={openApiEndpoints.map((openApiEndpoint) => {
-              return { label: openApiEndpoint.label, value: openApiEndpoint.label };
-            })}
-            onSelectionChange={onSelectEndpoint}
-          />
-        </div>
-      )}
+
+      {/* Endpoints dropdown — always visible */}
+      <div>
+        <label htmlFor="select-endpoint" style={{ color: theme === 'dark' ? 'white' : 'black' }}>
+          {t('newService.endpoint.endpoints')}
+        </label>
+        <FormSelect
+          name="select-endpoint"
+          label=""
+          style={{ fontSize: '15px' }}
+          defaultValue={selectedEndpoint?.label}
+          options={openApiEndpoints.map((ep) => ({ label: ep.label, value: ep.label }))}
+          onSelectionChange={onSelectEndpoint}
+        />
+      </div>
+
+      {/* Params / Header / Body + Test URL + Response */}
       {selectedEndpoint &&
-        (selectedEndpoint?.supported ? (
+        (selectedEndpoint.supported ? (
           <>
-            <Track justify="between" gap={16}>
-              <p>{selectedEndpoint?.description}</p>
-              <Button onClick={handleJsonRequestClick}>{t('newService.test')}</Button>
-            </Track>
+            {selectedEndpoint.description && (
+              <p style={{ margin: 0, fontSize: 13, color: theme === 'dark' ? '#ccc' : '#666' }}>
+                {selectedEndpoint.description}
+              </p>
+            )}
             <RequestVariables
               key={key}
               disableRawData
@@ -296,7 +369,55 @@ const EndpointOpenAPI: React.FC<EndpointOpenAPIProps> = ({
               requestTab={requestTab}
               setRequestTab={setRequestTab}
               onParametersChange={() => {}}
+              onMandatoryViolationChange={onMandatoryViolationChange}
             />
+            <Track justify="end">
+              <Button appearance={isTesting ? 'loading' : 'primary'} onClick={handleTestClick}>
+                {t('newService.test')}
+              </Button>
+            </Track>
+            <div>
+              <button
+                type="button"
+                onClick={() => setIsResponseOpen((o) => !o)}
+                style={{
+                  width: '100%',
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  background: 'none',
+                  border: 'none',
+                  borderTop: '1px solid #D2D3D8',
+                  padding: '8px 4px',
+                  cursor: 'pointer',
+                  fontWeight: 600,
+                  fontSize: 14,
+                  color: theme === 'dark' ? 'white' : '#34394C',
+                }}
+              >
+                <span>{t('newService.endpoint.response')}</span>
+                <span>{isResponseOpen ? '▲' : '▼'}</span>
+              </button>
+              {isResponseOpen && (
+                <textarea
+                  readOnly
+                  value={responseContent ?? ''}
+                  placeholder="{...}"
+                  style={{
+                    width: '100%',
+                    minHeight: 100,
+                    resize: 'vertical',
+                    fontFamily: 'monospace',
+                    fontSize: 13,
+                    padding: '8px',
+                    border: '1px solid #D2D3D8',
+                    borderRadius: 4,
+                    backgroundColor: '#F0F0F2',
+                    boxSizing: 'border-box',
+                  }}
+                />
+              )}
+            </div>
           </>
         ) : (
           <p>{t('newService.endpoint.unsupported')}</p>

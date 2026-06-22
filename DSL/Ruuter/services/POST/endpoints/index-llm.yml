@@ -1,0 +1,129 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Triggers LLM api-tools RAG indexing for an endpoint. Used by create/update flows and manual re-index."
+  method: post
+  accepts: json
+  returns: json
+  namespace: service
+  allowlist:
+    body:
+      - field: endpointId
+        type: string
+        description: "Endpoint UUID to index"
+    headers:
+      - field: cookie
+        type: string
+        description: "Cookie field"
+
+assign_id:
+  assign:
+    endpointId: ${incoming.body.endpointId}
+
+check_required:
+  switch:
+    - condition: ${endpointId == null || endpointId === ''}
+      next: return_bad_request
+
+fetch_endpoint:
+  call: http.post
+  args:
+    url: "[#SERVICE_RESQL]/endpoints/get_endpoint_by_id"
+    body:
+      endpointId: ${endpointId}
+  result: endpoint_result
+
+check_endpoint_found:
+  switch:
+    - condition: ${endpoint_result.response.body == null || endpoint_result.response.body.length === 0}
+      next: mark_failed_not_found
+
+assign_endpoint:
+  assign:
+    endpoint: ${endpoint_result.response.body[0]}
+
+assign_params:
+  assign:
+    llm_params: ${JSON.parse(endpoint.selectedParams ?? '[]')}
+
+mark_in_progress:
+  call: http.post
+  args:
+    url: "[#SERVICE_RESQL]/endpoints/update_endpoint_llm_sync_status"
+    body:
+      endpointId: ${endpointId}
+      status: IN_PROGRESS
+  result: in_progress_res
+
+call_llm_index:
+  call: http.post
+  args:
+    url: "[#LLM_RUUTER_PUBLIC]/api-tools/index"
+    body:
+      endpointId: ${endpoint.endpointId ?? endpointId}
+      name: ${endpoint.name}
+      description: ${endpoint.description}
+      url: ${endpoint.selectedUrl}
+      method: ${endpoint.selectedMethod}
+      params: ${llm_params}
+  result: llm_result
+
+check_llm_result:
+  switch:
+    - condition: ${llm_result != null && llm_result.response != null && 200 <= llm_result.response.statusCodeValue && llm_result.response.statusCodeValue < 300 && llm_result.response.body.response.success === true}
+      next: mark_indexed
+  next: mark_failed_llm_call
+
+mark_indexed:
+  call: http.post
+  args:
+    url: "[#SERVICE_RESQL]/endpoints/update_endpoint_llm_sync_status"
+    body:
+      endpointId: ${endpointId}
+      status: SUCCESS
+  result: update_res
+  next: return_ok
+
+mark_failed_llm_call:
+  call: http.post
+  args:
+    url: "[#SERVICE_RESQL]/endpoints/update_endpoint_llm_sync_status"
+    body:
+      endpointId: ${endpointId}
+      status: FAILED
+  result: update_res
+  next: log_llm_failure
+
+log_llm_failure:
+  log: "LLM indexing failed for endpoint ${endpointId}"
+  next: return_failed
+
+mark_failed_not_found:
+  call: http.post
+  args:
+    url: "[#SERVICE_RESQL]/endpoints/update_endpoint_llm_sync_status"
+    body:
+      endpointId: ${endpointId}
+      status: FAILED
+  result: update_res
+  next: return_not_found
+
+return_ok:
+  status: 200
+  return: "Endpoint indexed successfully"
+  next: end
+
+return_failed:
+  status: 500
+  return: "LLM indexing failed"
+  next: end
+
+return_not_found:
+  status: 404
+  return: "Endpoint not found, LLM indexing skipped"
+  next: end
+
+return_bad_request:
+  status: 400
+  return: "endpointId is required"
+  next: end

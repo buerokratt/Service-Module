@@ -1,2 +1,4 @@
-INSERT INTO user_step_preference(steps, endpoints, user_id_code)
-VALUES(:steps::step_type[], :endpoints::uuid[], :user_id_code);
+UPDATE user_step_preference
+SET
+    steps = :steps::step_type[]
+WHERE user_id_code = :user_id_code;

@@ -1,0 +1,124 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Test an endpoint: makes the HTTP call, captures response schema, persists results to DB"
+  method: post
+  accepts: json
+  returns: json
+  namespace: service
+  allowlist:
+    body:
+      - field: endpointId
+        type: string
+      - field: request
+        type: object
+
+check_required:
+  switch:
+    - condition: ${incoming.body.endpointId == null || incoming.body.request == null}
+      next: return_bad_request
+  next: assign_vars
+
+assign_vars:
+  assign:
+    endpointId: ${incoming.body.endpointId}
+    current_request: ${incoming.body.request}
+  next: check_method
+
+check_method:
+  switch:
+    - condition: ${current_request.method.toLowerCase() == 'post'}
+      next: call_post
+    - condition: ${current_request.method.toLowerCase() == 'put'}
+      next: call_put
+    - condition: ${current_request.method.toLowerCase() == 'delete'}
+      next: call_delete
+  next: call_get
+
+call_get:
+  call: http.get
+  args:
+    url: ${current_request.url}
+    headers: $! current_request.headers !
+    query: $! current_request.params !
+  result: testResult
+  next: evaluate_result
+
+call_post:
+  call: http.post
+  args:
+    url: ${current_request.url}
+    headers: $! current_request.headers !
+    query: $! current_request.params !
+    body: $! current_request.body !
+  result: testResult
+  next: evaluate_result
+
+call_put:
+  call: http.put
+  args:
+    url: ${current_request.url}
+    headers: $! current_request.headers !
+    query: $! current_request.params !
+    body: $! current_request.body !
+  result: testResult
+  next: evaluate_result
+
+call_delete:
+  call: http.delete
+  args:
+    url: ${current_request.url}
+    headers: $! current_request.headers !
+    query: $! current_request.params !
+  result: testResult
+  next: evaluate_result
+
+evaluate_result:
+  assign:
+    statusCode: ${testResult.response.statusCodeValue}
+    isSuccess: ${200 <= testResult.response.statusCodeValue && testResult.response.statusCodeValue < 300}
+    is204: ${testResult.response.statusCodeValue === 204}
+    responseBody: ${testResult.response.body}
+  next: check_capture_schema
+
+check_capture_schema:
+  switch:
+    - condition: ${isSuccess && !is204 && responseBody != null}
+      next: save_result_with_schema
+  next: save_result_no_schema
+
+save_result_with_schema:
+  call: http.post
+  args:
+    url: "[#SERVICE_RESQL]/endpoints/test_endpoint"
+    body:
+      endpointId: ${endpointId}
+      verificationStatus: ${isSuccess}
+      lastStatusCode: ${String(statusCode)}
+      captureSchema: true
+      responseSchema: ${JSON.stringify(responseBody)}
+  result: saveRes
+  next: return_result
+
+save_result_no_schema:
+  call: http.post
+  args:
+    url: "[#SERVICE_RESQL]/endpoints/test_endpoint"
+    body:
+      endpointId: ${endpointId}
+      verificationStatus: ${isSuccess}
+      lastStatusCode: ${String(statusCode)}
+      captureSchema: false
+      responseSchema: "[]"
+  result: saveRes
+  next: return_result
+
+return_result:
+  status: 200
+  return: "ok"
+  next: end
+
+return_bad_request:
+  status: 400
+  return: "endpointId and url are required"
+  next: end

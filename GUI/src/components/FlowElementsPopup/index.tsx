@@ -9,10 +9,17 @@ import useServiceListStore from 'store/services.store';
 import useToastStore from 'store/toasts.store';
 import { DynamicChoices } from 'types/dynamic-choices';
 import { EndpointData } from 'types/endpoint';
+import { JumpToService } from 'types/jump-to-service';
 import { MultiChoiceQuestionButton } from 'types/multi-choice-question';
 import { NodeDataProps } from 'types/service-flow';
 import { getValueByPath } from 'utils/object-util';
-import { isTemplate, removeTrailingUnderscores, stringToTemplate, templateToString } from 'utils/string-util';
+import {
+  getLastDigits,
+  isTemplate,
+  removeTrailingUnderscores,
+  stringToTemplate,
+  templateToString,
+} from 'utils/string-util';
 
 import { Button, Track } from '..';
 import Popup from '../Popup';
@@ -25,54 +32,56 @@ import DynamicChoicesContent from './DynamicChoicesContent';
 import EndConversationContent from './EndConversationContent';
 import FileGenerateContent from './FileGenerateContent';
 import FileSignContent from './FileSignContent';
-import JsonRequestContent from './JsonRequestContent';
+import JumpToServiceContent from './JumpToServiceContent';
 import MultiChoiceQuestionContent from './MultiChoiceQuestionContent';
 import OpenWebPageContent from './OpenWebPageContent';
 import OpenWebPageTestContent from './OpenWebPageTestContent';
 import RasaRulesContent from './RasaRulesContent';
-import TextfieldContent from './TextfieldContent';
 import TextfieldTestContent from './TextfieldTestContent';
-import { servicesRequestsExplain } from '../../resources/api-constants';
-import api from '../../services/api-dev';
 import { StepType } from '../../types';
-import { getInitialGroup } from './RuleBuilder/types';
+import { getInitialGroup, GroupOrRule } from './RuleBuilder/types';
+import TextfieldContent from './TextfieldContent';
 import './styles.scss';
 
 const FlowElementsPopup: React.FC = () => {
   const { t } = useTranslation();
   const [selectedTab, setSelectedTab] = useState<string | null>(null);
   const [isSaveEnabled, setIsSaveEnabled] = useState(true);
-  const { isJsonRequestVisible, jsonRequestContent, setJsonRequestVisible, setJsonRequestContent } = useServiceStore();
   const node = useServiceStore((state) => state.selectedNode);
   const selectedService = useServiceListStore((state) => state.selectedService);
   const instance = useServiceStore.getState().reactFlowInstance;
-
-  const isUserDefinedNode = node?.data?.stepType === StepType.UserDefined;
 
   const serviceName = useServiceStore((state) => removeTrailingUnderscores(state.serviceNameDashed()));
   const rules = useServiceStore((state) => state.rules);
   const assignElements = useServiceStore((state) => state.assignElements);
   const endpointsVariables = useServiceStore((state) => state.endpointsResponseVariables);
+  const storeEndpoints = useServiceStore((state) => state.endpoints);
+
+  const enrichedNodeEndpoint = useMemo(() => {
+    const ep = node?.data?.endpoint;
+    if (!ep) return ep;
+    const storeEp = storeEndpoints.find((e) => e.endpointId === ep.endpointId);
+    const responseSchema = ep.responseSchema ?? storeEp?.responseSchema;
+    return responseSchema ? { ...ep, responseSchema } : ep;
+  }, [node?.data?.endpoint, storeEndpoints]);
   const stepType = node?.data.stepType;
+
+  const mcqNodeNumber = useMemo(() => String(getLastDigits(node?.data.label ?? '')), [node?.data.label]);
 
   const defaultMultiChoiceQuestionButtons = useMemo(
     () => [
       {
         id: '1',
         title: 'Jah',
-        payload: `#service, /${selectedService?.type ?? 'POST'}/services/active/${serviceName}_mcq_${
-          node?.data.label[node?.data.label.length - 1]
-        }_0`,
+        payload: `#service, /${selectedService?.type ?? 'POST'}/services/active/${serviceName}_mcq_${mcqNodeNumber}_0`,
       },
       {
         id: '2',
         title: 'Ei',
-        payload: `#service, /${selectedService?.type ?? 'POST'}/services/active/${serviceName}_mcq_${
-          node?.data.label[node?.data.label.length - 1]
-        }_1`,
+        payload: `#service, /${selectedService?.type ?? 'POST'}/services/active/${serviceName}_mcq_${mcqNodeNumber}_1`,
       },
     ],
-    [selectedService?.type, serviceName, node?.data.label],
+    [selectedService?.type, serviceName, mcqNodeNumber],
   );
 
   const defaultDynamicChoices: DynamicChoices = useMemo(
@@ -85,13 +94,11 @@ const FlowElementsPopup: React.FC = () => {
     [],
   );
 
-  useEffect(() => {
-    if (node) {
-      node.data.rules = node.data.rules
-        ? { ...node.data.rules, children: rules }
-        : { ...getInitialGroup(), children: rules };
-    }
-  }, [node, rules]);
+  // Copy buttons to avoid shared object references between popup state and node data.
+  const copyMcqButtons = (buttons: MultiChoiceQuestionButton[]) =>
+    buttons.map((button) => ({
+      ...button,
+    }));
 
   // StepType.Textfield
   const [textfieldMessage, setTextfieldMessage] = useState<string | null>(null);
@@ -109,11 +116,14 @@ const FlowElementsPopup: React.FC = () => {
     node?.data.multiChoiceQuestion?.question ?? '',
   );
   const [multiChoiceQuestionButtons, setMultiChoiceQuestionButtons] = useState<MultiChoiceQuestionButton[]>(
-    node?.data.multiChoiceQuestion?.buttons ?? defaultMultiChoiceQuestionButtons,
+    copyMcqButtons(node?.data.multiChoiceQuestion?.buttons ?? defaultMultiChoiceQuestionButtons),
   );
   const [dynamicChoices, setDynamicChoices] = useState<DynamicChoices>(
     node?.data.dynamicChoices ?? defaultDynamicChoices,
   );
+
+  const defaultJumpToService: JumpToService = useMemo(() => ({ serviceName: '', input: [] }), []);
+  const [jumpToService, setJumpToService] = useState<JumpToService>(node?.data.jumpToService ?? defaultJumpToService);
 
   const [nodeEndpoint, setNodeEndpoint] = useState<EndpointData | undefined>(node?.data.endpoint);
   const [title, setTitle] = useState(node?.data.label ?? '');
@@ -127,8 +137,10 @@ const FlowElementsPopup: React.FC = () => {
     switch (stepType) {
       case StepType.Input:
       case StepType.Condition:
-        if (node.data?.rules) {
+        if (node.data?.rules && Array.isArray(node.data.rules.children)) {
           useServiceStore.getState().changeRulesNode(node.data.rules.children);
+        } else {
+          useServiceStore.getState().changeRulesNode([]);
         }
         break;
 
@@ -142,17 +154,23 @@ const FlowElementsPopup: React.FC = () => {
 
       case StepType.MultiChoiceQuestion:
         setMultiChoiceQuestionQuestion(node.data?.multiChoiceQuestion?.question ?? '');
-        setMultiChoiceQuestionButtons(node.data?.multiChoiceQuestion?.buttons ?? defaultMultiChoiceQuestionButtons);
+        setMultiChoiceQuestionButtons(
+          copyMcqButtons(node.data?.multiChoiceQuestion?.buttons ?? defaultMultiChoiceQuestionButtons),
+        );
         break;
 
       case StepType.DynamicChoices:
         setDynamicChoices(node.data?.dynamicChoices ?? defaultDynamicChoices);
         break;
 
+      case StepType.JumpToService:
+        setJumpToService(node.data?.jumpToService ?? defaultJumpToService);
+        break;
+
       default:
         break;
     }
-  }, [defaultDynamicChoices, defaultMultiChoiceQuestionButtons, node, stepType]);
+  }, [defaultDynamicChoices, defaultJumpToService, defaultMultiChoiceQuestionButtons, node, stepType]);
 
   if (!node) return <></>;
 
@@ -160,8 +178,6 @@ const FlowElementsPopup: React.FC = () => {
 
   const onClose = () => {
     setSelectedTab(null);
-    setJsonRequestVisible(false);
-    setJsonRequestContent(null);
     setTextfieldMessage(null);
     setWebpageName(null);
     setWebpageUrl(null);
@@ -169,9 +185,10 @@ const FlowElementsPopup: React.FC = () => {
     setFileContent(null);
     setTextfieldMessagePlaceholders({});
     setMultiChoiceQuestionQuestion('');
-    setMultiChoiceQuestionButtons(defaultMultiChoiceQuestionButtons);
+    setMultiChoiceQuestionButtons(copyMcqButtons(defaultMultiChoiceQuestionButtons));
     setIsSaveEnabled(true);
     setDynamicChoices(defaultDynamicChoices);
+    setJumpToService(defaultJumpToService);
     useServiceStore.getState().resetSelectedNode();
     useServiceStore.getState().resetRules();
     useServiceStore.getState().resetAssign();
@@ -189,20 +206,23 @@ const FlowElementsPopup: React.FC = () => {
         fileName: fileName ?? node.data?.fileName,
         fileContent: fileContent ?? node.data?.fileContent,
         signOption: signOption ?? node.data?.signOption,
-        multiChoiceQuestion: {
-          question: multiChoiceQuestionQuestion,
-          buttons: multiChoiceQuestionButtons,
-        },
-        dynamicChoices: dynamicChoices,
+        multiChoiceQuestion:
+          node.data.stepType === StepType.MultiChoiceQuestion
+            ? {
+                question: multiChoiceQuestionQuestion,
+                buttons: copyMcqButtons(multiChoiceQuestionButtons),
+              }
+            : undefined,
+        dynamicChoices: node.data.stepType === StepType.DynamicChoices ? dynamicChoices : undefined,
+        jumpToService: node.data.stepType === StepType.JumpToService ? jumpToService : undefined,
         endpoint: nodeEndpoint ?? node.data?.endpoint,
         testingPassed: undefined,
+        childrenCount: node.data.stepType === StepType.MultiChoiceQuestion ? 1 : node.data.childrenCount,
       },
     };
 
     if (stepType === StepType.Input || stepType === StepType.Condition) {
-      updatedNode.data.rules = updatedNode.data.rules
-        ? { ...updatedNode.data.rules, children: rules }
-        : { ...getInitialGroup(), children: rules };
+      prepareRulesForSaving(updatedNode);
     }
 
     if (stepType === StepType.MultiChoiceQuestion) {
@@ -210,112 +230,109 @@ const FlowElementsPopup: React.FC = () => {
     }
 
     if (stepType === StepType.UserDefined) {
-      const newLabel = updatedNode.data.label?.toString().split(' ');
-      if (updatedNode.data.endpoint?.name) {
-        newLabel[0] = updatedNode.data.endpoint?.name ?? node.data.label?.toString().split(' ')[0];
-        const nodeWithSameLabel = instance
-          ?.getNodes()
-          .find((n) => n.data.label === newLabel.join(' ') && n.id !== updatedNode.id);
-        if (nodeWithSameLabel) {
-          useToastStore.getState().error({
-            title: t('newService.toast.elementNameAlreadyExists'),
-            message: t('newService.toast.elementNameAlreadyExistsMessage'),
-          });
-          return;
-        }
-        updatedNode.data.label = newLabel.join(' ');
-      }
-      useServiceStore.getState().loadEndpointsResponseVariables();
+      prepareEndpointsForSaving(updatedNode);
     }
 
     if (stepType === StepType.Assign) {
-      const flatEndpointVariables = endpointsVariables.map((endpoint) => endpoint.chips).flat();
-      assignElements.forEach((element) => {
-        // Convert simple values such as "some input" to simple string
-        if (!isTemplate(element.value)) {
-          element.value = stringToTemplate('"' + element.value + '"');
-          return;
-        }
-
-        const fullPath = templateToString(element.value);
-        const endpointVariable = flatEndpointVariables.find((variable) => fullPath.startsWith(String(variable.value)));
-
-        if (!endpointVariable) {
-          // Element is not an object so no data for ObjectTree
-          return;
-        }
-
-        const value = String(endpointVariable.value);
-        const remainingPath = fullPath.substring(
-          fullPath[value.length] === '['
-            ? // Uses array notation, e.g. endpointVariable[1].something; needed for backwards compatibility
-              value.length
-            : // Uses object notation, e.g. endpointVariable.1.something
-              value.length + 1,
-        );
-        element.data = remainingPath ? getValueByPath(endpointVariable.data, remainingPath) : endpointVariable.data;
-      });
-      updatedNode.data.assignElements = assignElements;
+      prepareAssignForSaving(updatedNode);
     }
 
     useServiceStore.getState().handlePopupSave(updatedNode);
     onClose();
   };
 
-  const handleJsonRequestClick = async () => {
-    if (isJsonRequestVisible) {
-      setJsonRequestVisible(false);
-      return;
+  const prepareAssignForSaving = (updatedNode: Node<NodeDataProps>) => {
+    const flatEndpointVariables = endpointsVariables.flatMap((endpoint) => endpoint.chips);
+    assignElements.forEach((element) => {
+      const key = removeTrailingUnderscores(element.key);
+      element.key = key;
+
+      // Convert simple values such as "some input" to simple string
+      if (!isTemplate(element.value)) {
+        element.value = stringToTemplate('"' + element.value + '"');
+        return;
+      }
+
+      const fullPath = templateToString(element.value);
+      const endpointVariable = flatEndpointVariables.find((variable) => fullPath.startsWith(String(variable.value)));
+
+      if (!endpointVariable) {
+        // Element is not an object so no data for ObjectTree
+        return;
+      }
+
+      const value = String(endpointVariable.value);
+      const remainingPath = fullPath.substring(
+        fullPath[value.length] === '['
+          ? // Uses array notation, e.g. endpointVariable[1].something; needed for backwards compatibility
+            value.length
+          : // Uses object notation, e.g. endpointVariable.1.something
+            value.length + 1,
+      );
+      element.data = remainingPath ? getValueByPath(endpointVariable.data, remainingPath) : endpointVariable.data;
+    });
+    updatedNode.data.assignElements = assignElements;
+  };
+
+  const prepareEndpointsForSaving = (updatedNode: Node<NodeDataProps>) => {
+    filterOutEndpointsTrailingUnderscores(updatedNode);
+    const newLabel = updatedNode.data.label?.toString().split(' ');
+    if (updatedNode.data.endpoint?.name) {
+      newLabel[0] = updatedNode.data.endpoint?.name ?? node.data.label?.toString().split(' ')[0];
+      const nodeWithSameLabel = instance
+        ?.getNodes()
+        .find((n) => n.data.label === newLabel.join(' ') && n.id !== updatedNode.id);
+      if (nodeWithSameLabel) {
+        useToastStore.getState().error({
+          title: t('newService.toast.elementNameAlreadyExists'),
+          message: t('newService.toast.elementNameAlreadyExistsMessage'),
+        });
+        return;
+      }
+      updatedNode.data.label = newLabel.join(' ');
     }
+    useServiceStore.getState().loadEndpointsResponseVariables();
+  };
 
-    try {
-      const endpoint = node.data.endpoint?.definitions[0];
-
-      if (!endpoint) return;
-
-      const response = await api.post(servicesRequestsExplain(), {
-        requests: [
-          {
-            url: endpoint.url,
-            method: endpoint.methodType,
-            headers: extractMapValues(endpoint.headers),
-            body: extractMapValues(endpoint.body),
-            params: extractMapValues(endpoint.params),
-          },
-        ],
-      });
-      setJsonRequestContent(response.data.response);
-      setJsonRequestVisible(true);
-    } catch (error) {
-      console.error('Error: ', error);
+  const filterOutEndpointsTrailingUnderscores = (updatedNode: Node<NodeDataProps>) => {
+    if (updatedNode.data?.endpoint?.definitions) {
+      for (const definition of updatedNode.data.endpoint.definitions) {
+        for (const section of ['body', 'headers', 'params'] as const) {
+          if (definition[section]?.variables) {
+            for (const v of definition[section].variables) {
+              v.name = removeTrailingUnderscores(v.name);
+            }
+          }
+        }
+      }
     }
   };
 
-  function extractMapValues(element: any) {
-    if (element?.rawData && element?.rawData?.length > 0) {
-      return element.rawData.value;
+  const prepareRulesForSaving = (updatedNode: Node<NodeDataProps>) => {
+    const rulesArray = Array.isArray(rules) ? rules : [];
+    for (const item of rulesArray) {
+      const processRuleField = (obj: GroupOrRule) => {
+        if ('field' in obj) obj.field = removeTrailingUnderscores(obj.field);
+        else {
+          for (const child of obj.children) {
+            processRuleField(child);
+          }
+        }
+      };
+      processRuleField(item);
     }
-
-    let result: any = {};
-    if (element?.variables) {
-      for (const entry of element.variables) {
-        result = { ...result, [entry.name]: entry.value };
-      }
-    }
-    return result;
-  }
-
-  const getJsonRequestButtonTitle = () => {
-    if (!isUserDefinedNode || selectedTab === t('serviceFlow.tabs.test')) return '';
-    if (isJsonRequestVisible) return t('serviceFlow.popup.hideJsonRequest');
-    return t('serviceFlow.popup.showJsonRequest');
+    updatedNode.data.rules = node.data.rules
+      ? { ...node.data.rules, children: rulesArray }
+      : { ...getInitialGroup(), children: rulesArray };
   };
 
   const saveMultiChoicePopup = (originalNode: Node<NodeDataProps>, updatedNode: Node<NodeDataProps>) => {
     if (!instance) return;
 
-    const currentButtons = originalNode.data.multiChoiceQuestion?.buttons ?? defaultMultiChoiceQuestionButtons;
-    const newButtons = updatedNode.data.multiChoiceQuestion?.buttons ?? [];
+    const currentButtons = copyMcqButtons(
+      originalNode.data.multiChoiceQuestion?.buttons ?? defaultMultiChoiceQuestionButtons,
+    );
+    const newButtons = copyMcqButtons(updatedNode.data.multiChoiceQuestion?.buttons ?? []);
 
     const edges = instance.getEdges();
     const nodes = instance.getNodes();
@@ -337,7 +354,8 @@ const FlowElementsPopup: React.FC = () => {
       }));
 
     const updatedEdges = edges.map((edge) => {
-      if (!edge.label || !connectedEdges.some((ce) => ce.id === edge.id)) return edge;
+      if (!edge.label || edge.source !== originalNode.id || !connectedEdges.some((ce) => ce.id === edge.id))
+        return edge;
       const rename = renamedButtons.find((r) => r.oldTitle === edge.label);
       if (rename) {
         return { ...edge, label: rename.newTitle };
@@ -362,10 +380,11 @@ const FlowElementsPopup: React.FC = () => {
     const buttonsNeedingEdges = addedButtons.filter((btn) => !existingButtonTitles.has(btn.title));
 
     const newEdges = buttonsNeedingEdges.map((button) => {
+      const ghostNodeId = `${originalNode.id}-ghost-${button.id}`;
       const newEdge: Edge = {
         id: `${originalNode.id}->${button.id}`,
         source: originalNode.id,
-        target: `ghost-${button.id}`,
+        target: ghostNodeId,
         type: 'step',
         animated: true,
         deletable: false,
@@ -387,6 +406,8 @@ const FlowElementsPopup: React.FC = () => {
       draggable: false,
     }));
 
+    updatedNode.data.childrenCount = 1;
+
     let finalNodes = [...nodes.filter((n) => n.id !== updatedNode.id), updatedNode, ...newGhostNodes];
     let finalEdges = [...filteredEdges, ...newEdges];
 
@@ -403,14 +424,11 @@ const FlowElementsPopup: React.FC = () => {
 
   return (
     <Popup
-      style={{ maxWidth: 700 }}
+      style={{ maxWidth: stepType === StepType.UserDefined ? 900 : 700 }}
       title={title}
       onClose={onClose}
       footer={
         <Track direction="horizontal" gap={16} justify="between" style={{ width: '100%' }}>
-          <Button appearance="text" onClick={handleJsonRequestClick}>
-            {getJsonRequestButtonTitle()}
-          </Button>
           <Track gap={16}>
             {!isReadonly && (
               <Button appearance="secondary" onClick={onClose}>
@@ -446,11 +464,6 @@ const FlowElementsPopup: React.FC = () => {
             <Tabs.Trigger className="vertical-tabs__trigger" value={t('serviceFlow.tabs.setup')}>
               {t('serviceFlow.tabs.setup')}
             </Tabs.Trigger>
-            {!isReadonly && (
-              <Tabs.Trigger className="vertical-tabs__trigger" value={t('serviceFlow.tabs.test')}>
-                {t('serviceFlow.tabs.test')}
-              </Tabs.Trigger>
-            )}
           </Tabs.List>
           <Tabs.Content value={t('serviceFlow.tabs.setup')} className="vertical-tabs__body">
             {stepType === StepType.Textfield && (
@@ -504,10 +517,15 @@ const FlowElementsPopup: React.FC = () => {
                 onDynamicChoicesChange={setDynamicChoices}
               />
             )}
+            {stepType === StepType.JumpToService && (
+              <DndProvider backend={HTML5Backend}>
+                <JumpToServiceContent node={node} jumpToService={jumpToService} onChange={setJumpToService} />
+              </DndProvider>
+            )}
             {stepType === StepType.UserDefined && (
               <ApiContent
                 node={node}
-                endpoint={node.data.endpoint}
+                endpoint={enrichedNodeEndpoint}
                 onEndpointChange={(endpoint) => {
                   if (!endpoint) return;
                   setNodeEndpoint(endpoint);
@@ -517,13 +535,13 @@ const FlowElementsPopup: React.FC = () => {
             {stepType === StepType.MultiChoiceQuestion && (
               <MultiChoiceQuestionContent
                 question={multiChoiceQuestionQuestion}
+                defaultQuestion={node.data.multiChoiceQuestion?.question ?? multiChoiceQuestionQuestion}
                 buttons={multiChoiceQuestionButtons}
                 setQuestion={setMultiChoiceQuestionQuestion}
                 setButtons={setMultiChoiceQuestionButtons}
                 setIsSaveEnabled={setIsSaveEnabled}
               />
             )}
-            <JsonRequestContent isVisible={isJsonRequestVisible} jsonContent={jsonRequestContent} />
           </Tabs.Content>
           {!isReadonly && (
             <Tabs.Content value={t('serviceFlow.tabs.test')} className="vertical-tabs__body">

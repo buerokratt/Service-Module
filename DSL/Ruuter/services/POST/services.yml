@@ -17,6 +17,9 @@ declaration:
       - field: sorting
         type: string
         description: "Body field 'sorting'"
+      - field: is_common
+        type: boolean
+        description: "Body field 'is_common'"  
 
 get_services_list:
   call: http.post
@@ -26,24 +29,15 @@ get_services_list:
       page: ${incoming.body.page}
       page_size: ${incoming.body.page_size}
       sorting: ${incoming.body.sorting}
-  limit: 400
+      is_common: ${incoming.body.is_common}
+  limit: 600
   result: services_res
 
 assign_services_result:
   assign:
     services: ${services_res.response.body}
 
-get_approved_triggers:
-  call: http.post
-  args:
-    url: "[#SERVICE_TRAINING_RESQL]/get-approved-tiggers"
-  result: triggers_res
-
-assign_training_result:
-  assign:
-    triggers: ${triggers_res.response.body}
-
 return_ok:
   status: 200
-  return: ${[services, triggers]}
+  return: ${[services]}
   next: end

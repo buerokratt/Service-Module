@@ -9,16 +9,24 @@ type ModalProps = {
   description?: string;
   footer?: ReactNode;
   onClose: () => void;
+  size?: 'default' | 'large';
 };
 
-const Modal: FC<PropsWithChildren<ModalProps>> = ({ title, footer, onClose, children, description }) => {
+const Modal: FC<PropsWithChildren<ModalProps>> = ({
+  title,
+  footer,
+  onClose,
+  children,
+  description,
+  size = 'default',
+}) => {
   return (
     <RadixDialog.Root defaultOpen={true} onOpenChange={onClose}>
       <RadixDialog.Portal>
         <RadixDialog.Overlay className="modal__overlay" />
         <RadixDialog.Content
           onClick={(e) => e.stopPropagation()}
-          className="modal"
+          className={`modal${size === 'large' ? ' modal--large' : ''}`}
           aria-describedby={description ? 'modal-description' : undefined}
         >
           {title && (

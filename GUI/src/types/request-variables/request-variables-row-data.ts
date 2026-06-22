@@ -7,9 +7,11 @@ export type RequestVariablesRowData = {
   nestedLevel: number;
   arrayType?: string;
   description?: string;
+  mandatory?: boolean;
   operator?: RequestOperator;
   endpointVariableId?: string;
   type?: string;
   value?: string;
   variable?: string;
+  paramType?: 'path' | 'query';
 };

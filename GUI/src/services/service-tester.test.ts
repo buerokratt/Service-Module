@@ -1262,7 +1262,7 @@ describe('addSuccessMessages', () => {
 
     addSuccessMessages(responseData);
 
-    expect(mockAddBotMessage).toHaveBeenCalledWith('Test response content');
+    expect(mockAddBotMessage).toHaveBeenCalledWith('Test response content', undefined);
     expect(mockAddSuccess).toHaveBeenCalledWith('chat.service-test-success');
   });
 });

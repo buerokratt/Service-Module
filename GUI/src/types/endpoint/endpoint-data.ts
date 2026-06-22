@@ -6,9 +6,11 @@ export type EndpointData = {
   name: string;
   fileName?: string;
   type?: EndpointType;
-  isCommon?: boolean;
   isNew?: boolean;
   hasTestEnv?: boolean;
   serviceId?: string;
+  description?: string;
   definitions: EndpointDefinition[];
+  responseSchema?: string;
+  llm_index_status?: 'SUCCESS' | 'FAILED' | 'IN_PROGRESS' | null;
 };

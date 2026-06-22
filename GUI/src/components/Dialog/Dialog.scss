@@ -1,6 +1,7 @@
 @import 'src/styles/tools/spacing';
 @import 'src/styles/tools/color';
 @import 'src/styles/settings/variables/other';
+@import 'src/styles/settings/variables/_colors';
 @import 'src/styles/settings/variables/typography';
 
 .dialog {
@@ -59,5 +60,22 @@
 
   &__footer {
     border-top: 1px solid get-color(black-coral-2);
+  }
+}
+
+[data-theme='dark'] .dialog {
+  color: var(--dark-text-secondary);
+
+  &__header {
+    color: var(--dark-text-primary);
+    background-color: var(--dark-bg-main);
+  }
+
+  &__body {
+    background-color: var(--dark-bg-secondary);
+  }
+
+  &__close {
+    color: var(--dark-text-label);
   }
 }
