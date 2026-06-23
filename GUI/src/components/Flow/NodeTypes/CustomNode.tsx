@@ -8,6 +8,7 @@ import { MdDeleteOutline, MdOutlineEdit, MdOutlineRemoveRedEye } from 'react-ico
 import useServiceStore from 'store/services.store';
 import { StepType } from 'types';
 import { NodeDataProps } from 'types/service-flow';
+import { CONDITION_SOURCE_HANDLE_ID, conditionHasEmptyBranches } from 'utils/conditional-flow-utils';
 import { MCQ_SOURCE_HANDLE_ID, mcqHasEmptyBranches } from 'utils/mcq-flow-utils';
 
 import StepNode from './StepNode';
@@ -20,20 +21,34 @@ const CustomNode: FC<NodeProps & CustomNodeProps> = (props) => {
   const { data, isConnectable, id } = props;
   const orientation = useServiceStore((state) => state.orientation);
   const isMcq = data.stepType === StepType.MultiChoiceQuestion;
-  const shouldOffsetHandles = !isMcq && data.childrenCount > 1;
+  const isCondition = data.stepType === StepType.Condition;
+  const shouldOffsetHandles = !isMcq && !isCondition && data.childrenCount > 1;
 
   const edges = useStore((state) => state.edges);
   const nodes = useStore((state) => state.nodes);
 
   const mcqCanConnect = useMemo(() => !isMcq || mcqHasEmptyBranches(id, nodes, edges), [edges, id, isMcq, nodes]);
+  const conditionCanConnect = useMemo(
+    () => !isCondition || conditionHasEmptyBranches(id, nodes, edges),
+    [edges, id, isCondition, nodes],
+  );
 
-  const canConnect = isConnectable && mcqCanConnect;
+  const canConnect = isConnectable && mcqCanConnect && conditionCanConnect;
 
   const updateNodeInternals = useUpdateNodeInternals();
 
   useEffect(() => {
     updateNodeInternals(id);
-  }, [data.childrenCount, id, isMcq, mcqCanConnect, updateNodeInternals, orientation]);
+  }, [
+    data.childrenCount,
+    id,
+    isMcq,
+    isCondition,
+    mcqCanConnect,
+    conditionCanConnect,
+    updateNodeInternals,
+    orientation,
+  ]);
 
   const isFinishingStep = () => {
     return data.type === 'finishing-step';
@@ -52,6 +67,18 @@ const CustomNode: FC<NodeProps & CustomNodeProps> = (props) => {
       return (
         <Handle
           id={MCQ_SOURCE_HANDLE_ID}
+          type="source"
+          position={getSourcePosition()}
+          isConnectable={canConnect}
+          hidden={isFinishingStep()}
+        />
+      );
+    }
+
+    if (isCondition) {
+      return (
+        <Handle
+          id={CONDITION_SOURCE_HANDLE_ID}
           type="source"
           position={getSourcePosition()}
           isConnectable={canConnect}

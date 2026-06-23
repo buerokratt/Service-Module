@@ -1,6 +1,13 @@
 import { Connection, useReactFlow } from '@xyflow/react';
 import { useCallback, useState } from 'react';
 import useServiceStore from 'store/new-services.store';
+import { StepType } from 'types';
+import {
+  applyConditionBranchConnection,
+  conditionHasEmptyBranches,
+  getConditionNodeIdFromConnection,
+  getEmptyConditionBranches,
+} from 'utils/conditional-flow-utils';
 import {
   applyMcqBranchConnection,
   applySimpleConnection,
@@ -12,6 +19,7 @@ import {
 export type PendingMcqConnection = {
   readonly connection: Connection;
   readonly emptyBranches: McqEmptyBranch[];
+  readonly nodeType: StepType.MultiChoiceQuestion | StepType.Condition;
 };
 
 function useMcqConnect() {
@@ -49,7 +57,26 @@ function useMcqConnect() {
     [commitConnection, getEdges, getNodes],
   );
 
-  const applyMcqIncomingConnection = useCallback(
+  const applyConditionOutgoingConnection = useCallback(
+    (connection: Connection, branch: McqEmptyBranch) => {
+      const { source, target } = connection;
+      if (!source || !target) return;
+
+      const nodes = getNodes();
+      const edges = getEdges();
+      const result = applyConditionBranchConnection({
+        nodes,
+        edges,
+        conditionId: source,
+        targetId: target,
+        branch,
+      });
+      commitConnection(result.nodes, result.edges);
+    },
+    [commitConnection, getEdges, getNodes],
+  );
+
+  const applyIncomingConnection = useCallback(
     (connection: Connection) => {
       const nodes = getNodes();
       const edges = getEdges();
@@ -62,35 +89,68 @@ function useMcqConnect() {
   const handleConnect = useCallback(
     (connection: Connection) => {
       const mcqId = getMcqNodeIdFromConnection(connection, getNode);
-      if (!mcqId) return false;
+      if (mcqId) {
+        if (connection.target === mcqId) {
+          applyIncomingConnection(connection);
+          return true;
+        }
 
-      if (connection.target === mcqId) {
-        applyMcqIncomingConnection(connection);
+        const nodes = getNodes();
+        const edges = getEdges();
+        const emptyBranches = getEmptyMcqBranches(mcqId, nodes, edges);
+        if (emptyBranches.length === 0) return true;
+
+        if (emptyBranches.length === 1) {
+          applyMcqOutgoingConnection(connection, emptyBranches[0]);
+          return true;
+        }
+        setPendingConnection({ connection, emptyBranches, nodeType: StepType.MultiChoiceQuestion });
         return true;
       }
 
-      const nodes = getNodes();
-      const edges = getEdges();
-      const emptyBranches = getEmptyMcqBranches(mcqId, nodes, edges);
-      if (emptyBranches.length === 0) return true;
+      const conditionId = getConditionNodeIdFromConnection(connection, getNode);
+      if (conditionId) {
+        if (connection.target === conditionId) {
+          applyIncomingConnection(connection);
+          return true;
+        }
 
-      if (emptyBranches.length === 1) {
-        applyMcqOutgoingConnection(connection, emptyBranches[0]);
-      } else {
-        setPendingConnection({ connection, emptyBranches });
+        const nodes = getNodes();
+        const edges = getEdges();
+        const emptyBranches = getEmptyConditionBranches(conditionId, nodes, edges);
+        if (emptyBranches.length === 0) return true;
+
+        if (emptyBranches.length === 1) {
+          applyConditionOutgoingConnection(connection, emptyBranches[0]);
+          return true;
+        }
+        setPendingConnection({ connection, emptyBranches, nodeType: StepType.Condition });
+        return true;
       }
-      return true;
+
+      return false;
     },
-    [applyMcqIncomingConnection, applyMcqOutgoingConnection, getEdges, getNode, getNodes],
+    [
+      applyIncomingConnection,
+      applyMcqOutgoingConnection,
+      applyConditionOutgoingConnection,
+      getEdges,
+      getNode,
+      getNodes,
+    ],
   );
 
   const confirmBranch = useCallback(
     (branch: McqEmptyBranch) => {
       if (!pendingConnection) return;
-      applyMcqOutgoingConnection(pendingConnection.connection, branch);
+      if (pendingConnection.nodeType === StepType.MultiChoiceQuestion) {
+        applyMcqOutgoingConnection(pendingConnection.connection, branch);
+      } else {
+        applyConditionOutgoingConnection(pendingConnection.connection, branch);
+      }
       setPendingConnection(null);
     },
-    [applyMcqOutgoingConnection, pendingConnection],
+    [applyMcqOutgoingConnection, applyConditionOutgoingConnection, pendingConnection],
   );
 
   const cancelBranchSelection = useCallback(() => {
@@ -102,10 +162,19 @@ function useMcqConnect() {
       if (connection.source === connection.target) return false;
 
       const mcqId = getMcqNodeIdFromConnection(connection, getNode);
-      if (!mcqId) return true;
+      if (mcqId) {
+        if (connection.source === mcqId) {
+          return getEmptyMcqBranches(mcqId, getNodes(), getEdges()).length > 0;
+        }
+        return true;
+      }
 
-      if (connection.source === mcqId) {
-        return getEmptyMcqBranches(mcqId, getNodes(), getEdges()).length > 0;
+      const conditionId = getConditionNodeIdFromConnection(connection, getNode);
+      if (conditionId) {
+        if (connection.source === conditionId) {
+          return conditionHasEmptyBranches(conditionId, getNodes(), getEdges());
+        }
+        return true;
       }
 
       return true;

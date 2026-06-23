@@ -102,8 +102,8 @@ const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
       setDeletedNodes(null);
       try {
         if (edgesToDelete.length > 0 && nodesToDelete.length === 0) {
-          const shouldPreventDelete = getNode(edgesToDelete[0].source)?.data.stepType === StepType.MultiChoiceQuestion;
-          if (shouldPreventDelete) {
+          const sourceStepType = getNode(edgesToDelete[0].source)?.data.stepType;
+          if (sourceStepType === StepType.MultiChoiceQuestion) {
             return Promise.resolve(false);
           }
         }
@@ -250,6 +250,11 @@ const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
           emptyBranches={pendingConnection.emptyBranches}
           onSelect={confirmBranch}
           onClose={cancelBranchSelection}
+          description={
+            pendingConnection.nodeType === StepType.Condition
+              ? t('serviceFlow.condition.emptyPathsMessage', { count: pendingConnection.emptyBranches.length })
+              : undefined
+          }
         />
       )}
     </>

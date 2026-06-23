@@ -543,7 +543,7 @@ export function getYamlContent(
       }
 
       if (parentNode.data.stepType === StepType.Condition) {
-        return handleConditionStep(allRelations, parentNodeId, nodes, parentNode, finishedFlow, parentStepName);
+        return handleConditionStep(allRelations, parentNodeId, nodes, parentNode, finishedFlow, parentStepName, edges);
       }
 
       if (parentNode.data.stepType === StepType.Input) {
@@ -752,13 +752,9 @@ function handleConditionStep(
   parentNode: Node<NodeDataProps>,
   finishedFlow: Map<any, any>,
   parentStepName: string,
+  edges: Edge[],
 ) {
   const conditionRelations: string[] = allRelations.filter((r) => r.startsWith(parentNodeId));
-  const firstChildNode = conditionRelations[0].split(',')[1];
-  const secondChildNode = conditionRelations[1].split(',')[1];
-
-  const firstChild = nodes.find((node) => node.id === firstChildNode);
-  const secondChild = nodes.find((node) => node.id === secondChildNode);
 
   const rulesChildren = Array.isArray(parentNode.data.rules?.children) ? parentNode.data.rules.children : [];
   const invalidRulesExist = hasInvalidRules(rulesChildren);
@@ -768,15 +764,25 @@ function handleConditionStep(
     throw new Error(i18next.t('toast.missing-condition-rules') ?? 'Error');
   }
 
+  const outgoingEdges = edges.filter((e) => e.source === parentNodeId);
+  const successEdge = outgoingEdges.find((e) => e.label === 'Success') ?? outgoingEdges[0];
+  const failureEdge = outgoingEdges.find((e) => e.label === 'Failure') ?? outgoingEdges[1];
+
+  const successChildId = successEdge?.target ?? conditionRelations[0]?.split(',')[1];
+  const failureChildId = failureEdge?.target ?? conditionRelations[1]?.split(',')[1];
+
+  const successChild = nodes.find((node) => node.id === successChildId);
+  const failureChild = nodes.find((node) => node.id === failureChildId);
+
   const assignedVariableNames = getAssignedVariableNames(nodes);
   finishedFlow.set(parentStepName, {
     switch: [
       {
         condition: `\${${buildConditionString(parentNode.data.rules, assignedVariableNames)}}`,
-        next: toSnakeCase(firstChild?.data?.label ?? '') ?? '',
+        next: toSnakeCase(successChild?.data?.label ?? '') ?? '',
       },
     ],
-    next: toSnakeCase(secondChild?.data?.label ?? '') ?? '',
+    next: toSnakeCase(failureChild?.data?.label ?? '') ?? '',
   });
 }
 
@@ -980,6 +986,8 @@ function handleJumpToServiceStep(parentNode: Node<NodeDataProps>, finishedFlow: 
     template: '[#SERVICE_PROJECT_LAYER]/jump-to-service',
     requestType: 'templates',
     body: {
+      chatId: "${chatId ?? ''}",
+      authorId: "${authorId ?? ''}",
       serviceName: parentNode.data.jumpToService?.serviceName ?? '',
       input: (parentNode.data.jumpToService?.input ?? []).map((e: Assign) => normalizeAssignValue(e.value)),
     },
@@ -1072,6 +1080,8 @@ const getTemplateDataFromNode = (node: Node): { templateName: string; body?: any
     return {
       templateName: '[#SERVICE_PROJECT_LAYER]/jump-to-service',
       body: {
+        chatId: "${chatId ?? ''}",
+        authorId: "${authorId ?? ''}",
         serviceName: node.data.jumpToService?.serviceName ?? '',
         input: (node.data.jumpToService?.input ?? []).map((e: Assign) => normalizeAssignValue(e.value)),
       },
