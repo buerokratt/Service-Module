@@ -338,7 +338,7 @@ describe('Nonce step injection', () => {
 
     // Ruuter resolves ${var.response...} against whatever already ran by that point in the
     // YAML, so the nonce-fetch step must be declared before the step that consumes its result.
-    const keys = Object.keys(result);
+    const keys = Object.keys(result as Record<string, unknown>);
     expect(keys.indexOf('backup_conversations_get_new_nonce')).toBeLessThan(keys.indexOf('backup_conversations'));
   });
 
@@ -369,12 +369,10 @@ describe('Nonce step injection', () => {
       result: 'empty_messages_nonce',
       next: 'empty_messages',
     });
-    const keys = Object.keys(result);
+    const keys = Object.keys(result as Record<string, unknown>);
     expect(keys.indexOf('backup_conversations_get_new_nonce')).toBeLessThan(keys.indexOf('backup_conversations'));
     expect(keys.indexOf('empty_messages_get_new_nonce')).toBeLessThan(keys.indexOf('empty_messages'));
 
-    expect(result.empty_messages.args.headers['x-ruuter-nonce']).toBe(
-      '${empty_messages_nonce.response.body[0].nonce}',
-    );
+    expect(result.empty_messages.args.headers['x-ruuter-nonce']).toBe('${empty_messages_nonce.response.body[0].nonce}');
   });
 });

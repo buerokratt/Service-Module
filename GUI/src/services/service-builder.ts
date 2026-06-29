@@ -863,7 +863,11 @@ function handleEndpointStep(
 
   finishedFlow.set(parentStepName, stepConfig);
 
-  if (Object.keys(stepConfig.args.headers ?? {}).some((key) => key.toLowerCase() === 'x-ruuter-nonce')) {
+  if (
+    Object.keys((stepConfig.args.headers ?? {}) as Record<string, unknown>).some(
+      (key) => key.toLowerCase() === 'x-ruuter-nonce',
+    )
+  ) {
     nonceStepsNeeded.push(parentStepName);
   }
 }
@@ -967,7 +971,9 @@ function injectNonceStep(finishedFlow: Map<any, any>, stepName: string) {
   const headers = step?.args?.headers;
   if (!headers) return;
 
-  const nonceHeaderKey = Object.keys(headers).find((key) => key.toLowerCase() === 'x-ruuter-nonce');
+  const nonceHeaderKey = Object.keys(headers as Record<string, unknown>).find(
+    (key) => key.toLowerCase() === 'x-ruuter-nonce',
+  );
   if (!nonceHeaderKey) return;
 
   const nonceStepName = `${stepName}_get_new_nonce`;
