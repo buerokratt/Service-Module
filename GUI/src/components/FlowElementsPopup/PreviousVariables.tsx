@@ -28,7 +28,7 @@ type PreviousVariablesProps = {
 
 // Unique key for predefined elements, used below to identify it
 // All other assign element keys are UUIDs
-const predefinedInputKeys = ['-1', '-2'];
+const predefinedInputKeys = ['-1', '-2', '-3', '-4', '-5'];
 
 const PreviousVariables: FC<PreviousVariablesProps> = ({ node }) => {
   const { t } = useTranslation();
@@ -110,9 +110,19 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ node }) => {
         value: stringToTemplate(''),
       },
       {
-        id: predefinedInputKeys[1],
+        id: predefinedInputKeys[2],
         key: 'Chat Id',
         value: stringToTemplate('chatId'),
+      },
+      {
+        id: predefinedInputKeys[3],
+        key: 'Nonce Key',
+        value: 'x-ruuter-nonce',
+      },
+      {
+        id: predefinedInputKeys[4],
+        key: 'Nonce Value',
+        value: stringToTemplate('nonce'),
       },
     ];
 

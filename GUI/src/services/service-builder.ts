@@ -519,6 +519,8 @@ export function getYamlContent(
     next: firstNode ? toSnakeCase(firstNode.data.label?.toString() ?? 'format_messages') : 'format_messages',
   });
 
+  const nonceStepsNeeded: string[] = [];
+
   try {
     allRelations.forEach((r) => {
       const [parentNodeId, childNodeId] = r.split(',');
@@ -559,7 +561,7 @@ export function getYamlContent(
       }
 
       if (parentNode.data.stepType === StepType.UserDefined) {
-        return handleEndpointStep(parentNode, finishedFlow, parentStepName, childNode);
+        return handleEndpointStep(parentNode, finishedFlow, parentStepName, childNode, nonceStepsNeeded);
       }
 
       if (parentNode.data.stepType === StepType.JumpToService) {
@@ -576,6 +578,8 @@ export function getYamlContent(
       throw new Error(i18next.t('toast.cannot-save-flow') ?? (e?.message as string) ?? 'Error');
     }
   }
+
+  nonceStepsNeeded.forEach((stepName) => injectNonceStep(finishedFlow, stepName));
 
   finishedFlow.set('format_messages', {
     call: 'http.post',
@@ -830,6 +834,7 @@ function handleEndpointStep(
   finishedFlow: Map<any, any>,
   parentStepName: string,
   childNode: Node<NodeDataProps> | undefined,
+  nonceStepsNeeded: string[],
 ) {
   const endpointDefinition = parentNode.data.endpoint?.definitions[0];
   const paramsVariables = endpointDefinition?.params?.variables;
@@ -857,6 +862,10 @@ function handleEndpointStep(
   applyEndpointHeaders(stepConfig, headersVariables);
 
   finishedFlow.set(parentStepName, stepConfig);
+
+  if (Object.keys(stepConfig.args.headers ?? {}).some((key) => key.toLowerCase() === 'x-ruuter-nonce')) {
+    nonceStepsNeeded.push(parentStepName);
+  }
 }
 
 function hasNonEqualOperatorParam(param: any): boolean {
@@ -951,6 +960,60 @@ function applyEndpointHeaders(stepConfig: any, headersVariables: any[] | undefin
       return acc;
     }, {});
   }
+}
+
+function injectNonceStep(finishedFlow: Map<any, any>, stepName: string) {
+  const step = finishedFlow.get(stepName);
+  const headers = step?.args?.headers;
+  if (!headers) return;
+
+  const nonceHeaderKey = Object.keys(headers).find((key) => key.toLowerCase() === 'x-ruuter-nonce');
+  if (!nonceHeaderKey) return;
+
+  const nonceStepName = `${stepName}_get_new_nonce`;
+  const nonceResultName = `${stepName}_nonce`;
+
+  headers[nonceHeaderKey] = `\${${nonceResultName}.response.body[0].nonce}`;
+
+  redirectReferencesTo(finishedFlow, stepName, nonceStepName);
+
+  insertStepBefore(finishedFlow, stepName, nonceStepName, {
+    call: 'http.post',
+    args: {
+      url: '[#SERVICE_TRAINING_RESQL]/get-new-nonce',
+    },
+    result: nonceResultName,
+    next: stepName,
+  });
+}
+
+function insertStepBefore(finishedFlow: Map<any, any>, beforeKey: string, newKey: string, newValue: any) {
+  const entries = Array.from(finishedFlow.entries());
+  finishedFlow.clear();
+  for (const [key, value] of entries) {
+    if (key === beforeKey) {
+      finishedFlow.set(newKey, newValue);
+    }
+    finishedFlow.set(key, value);
+  }
+}
+
+function redirectReferencesTo(finishedFlow: Map<any, any>, targetStepName: string, newStepName: string) {
+  finishedFlow.forEach((step, stepName) => {
+    if (stepName === targetStepName) return;
+
+    if (step?.next === targetStepName) {
+      step.next = newStepName;
+    }
+
+    if (Array.isArray(step?.switch)) {
+      step.switch.forEach((branch: any) => {
+        if (branch?.next === targetStepName) {
+          branch.next = newStepName;
+        }
+      });
+    }
+  });
 }
 
 function handleMultiChoiceQuestion(
