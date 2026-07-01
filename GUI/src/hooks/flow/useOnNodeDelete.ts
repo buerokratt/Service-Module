@@ -236,7 +236,7 @@ export const useOnNodesDelete = () => {
             type: 'step',
             animated: true,
             deletable: false,
-            label: '+',
+            label: deleted[0].label ?? '+',
           };
 
           setNodes((nds) => [...nds, ghostNode]);
