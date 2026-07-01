@@ -38,13 +38,9 @@ export function useNodeHighlight(nodes: Node[], edges: Edge[]) {
     const connectedNodeIds = new Set([highlightedNodeId, ...incomers.map((n) => n.id), ...outgoers.map((n) => n.id)]);
 
     const displayNodes = nodes.map((n) => {
-      const base = stripClasses(n.className ?? '', 'node-highlighted', 'node-highlighted--source', 'node-dimmed');
-      const isSource = n.id === highlightedNodeId;
-      const isConnected = connectedNodeIds.has(n.id);
-      let extra = 'node-dimmed';
-      if (isSource) extra = 'node-highlighted node-highlighted--source';
-      else if (isConnected) extra = 'node-highlighted';
-      return { ...n, className: `${base} ${extra}`.trim() };
+      const base = stripClasses(n.className ?? '', 'node-highlighted', 'node-dimmed');
+      const isHighlighted = connectedNodeIds.has(n.id) && n.type === 'custom';
+      return { ...n, className: `${base}${isHighlighted ? ' node-highlighted' : ''}`.trim() };
     });
 
     const displayEdges = edges.map((e) => {

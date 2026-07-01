@@ -72,10 +72,6 @@
   }
 
   &.node-highlighted {
-    opacity: 1;
-  }
-
-  &.node-highlighted--source {
     filter: drop-shadow(0 0 6px rgba(69, 135, 188, 0.55));
     outline: 2px solid get-color(sapphire-blue-7);
     border-radius: 6px;
