@@ -67,7 +67,7 @@ export const applyMcqBranchConnection = ({
       type: 'step',
       label: branch.label,
       animated: false,
-      deletable: false,
+      deletable: true,
     },
   ];
 
