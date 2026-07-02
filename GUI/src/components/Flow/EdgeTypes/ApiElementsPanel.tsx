@@ -207,186 +207,204 @@ const ApiElementsPanel: React.FC<ApiElementsPanelProps> = ({ onAddToCanvas }) =>
       {/* Table + footer */}
       {tableOpen && (
         <div className="collapsible__content" style={{ padding: 0 }}>
-          {loading ? (
-            <p style={{ padding: '8px 16px', margin: 0 }}>{t('global.loading')}</p>
-          ) : (
-            <div className="data-table__scrollWrapper" style={{ overflowX: 'hidden' }}>
-              <table
-                className="data-table"
-                style={{ tableLayout: 'fixed', width: '100%', borderCollapse: 'separate', borderSpacing: '0 6px' }}
-              >
-                <thead>
-                  <tr style={{ height: 36 }}>
-                    <th
-                      onClick={() => handleSort('name')}
-                      style={{
-                        cursor: 'pointer',
-                        userSelect: 'none',
-                      }}
-                    >
-                      <SortIcon colId="name" currentSortId={currentSortId} currentDesc={currentDesc} />{' '}
-                      {t('apiRegistry.columns.name')}
-                    </th>
-                    <th
-                      onClick={() => handleSort('status')}
-                      style={{
-                        cursor: 'pointer',
-                        userSelect: 'none',
-                        width: 90,
-                        textAlign: 'center',
-                      }}
-                    >
-                      <SortIcon colId="status" currentSortId={currentSortId} currentDesc={currentDesc} />{' '}
-                      {t('apiRegistry.columns.status')}
-                    </th>
-                    <th
-                      onClick={() => handleSort('schema')}
-                      style={{
-                        cursor: 'pointer',
-                        userSelect: 'none',
-                        width: 100,
-                        textAlign: 'center',
-                        whiteSpace: 'nowrap',
-                      }}
-                    >
-                      <SortIcon colId="schema" currentSortId={currentSortId} currentDesc={currentDesc} />{' '}
-                      {t('apiRegistry.columns.schema')}
-                    </th>
-                    <th style={{ width: 112 }} />
-                  </tr>
-                </thead>
-                <tbody>
-                  {endpoints.map((endpoint, index) => {
-                    const meta = verificationMap[endpoint.endpointId];
-                    const status = meta?.verificationStatus ?? 'unverified';
-                    const isVerified = status === 'verified';
-                    const isUntested = status === 'unverified';
-                    const statusColor = isVerified ? '#27ae60' : '#e74c3c';
-                    let statusCode: string;
-                    if (isUntested) {
-                      statusCode = '---';
-                    } else {
-                      statusCode = meta?.lastStatusCode ? String(meta.lastStatusCode) : '---';
-                    }
-                    const schemaCaptured = meta?.schemaCaptured ?? false;
-                    const isTesting = testingId === endpoint.endpointId;
-                    const def = endpoint.definitions?.[0];
-                    return (
-                      <tr
-                        key={endpoint.endpointId}
-                        style={{ cursor: 'pointer' }}
-                        onClick={() => handleRowClick(endpoint, index)}
-                      >
-                        <td style={{ overflow: 'hidden' }}>
-                          <Tooltip content={<EndpointTooltipContent def={def} name={endpoint.name} />}>
-                            <span
-                              style={{
-                                display: 'inline-flex',
-                                alignItems: 'center',
-                                gap: 4,
-                                overflow: 'hidden',
-                                maxWidth: '100%',
-                              }}
-                            >
-                              <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                                {endpoint.name}
-                              </span>
-                              <Icon icon={<MdInfoOutline />} size="small" style={{ color: '#3f82ff', flexShrink: 0 }} />
-                            </span>
-                          </Tooltip>
-                        </td>
+          <div className="data-table__scrollWrapper" style={{ overflowX: 'hidden' }}>
+            <table
+              className="data-table"
+              style={{ tableLayout: 'fixed', width: '100%', borderCollapse: 'separate', borderSpacing: '0 6px' }}
+            >
+              <thead>
+                <tr style={{ height: 36 }}>
+                  <th
+                    onClick={() => handleSort('name')}
+                    style={{
+                      cursor: 'pointer',
+                      userSelect: 'none',
+                    }}
+                  >
+                    <SortIcon colId="name" currentSortId={currentSortId} currentDesc={currentDesc} />{' '}
+                    {t('apiRegistry.columns.name')}
+                  </th>
+                  <th
+                    onClick={() => handleSort('status')}
+                    style={{
+                      cursor: 'pointer',
+                      userSelect: 'none',
+                      width: 90,
+                      textAlign: 'center',
+                    }}
+                  >
+                    <SortIcon colId="status" currentSortId={currentSortId} currentDesc={currentDesc} />{' '}
+                    {t('apiRegistry.columns.status')}
+                  </th>
+                  <th
+                    onClick={() => handleSort('schema')}
+                    style={{
+                      cursor: 'pointer',
+                      userSelect: 'none',
+                      width: 100,
+                      textAlign: 'center',
+                      whiteSpace: 'nowrap',
+                    }}
+                  >
+                    <SortIcon colId="schema" currentSortId={currentSortId} currentDesc={currentDesc} />{' '}
+                    {t('apiRegistry.columns.schema')}
+                  </th>
+                  <th style={{ width: 112 }} />
+                </tr>
+              </thead>
+              <tbody>
+                {loading
+                  ? Array.from({ length: pagination.pageSize }, (_, i) => (
+                      <tr key={`skeleton-${i}`} style={{ height: 48 }}>
                         <td>
-                          <Track gap={6} align="center">
-                            <Icon
-                              icon={isVerified ? <MdCheckCircle /> : <MdCancel />}
-                              size="small"
-                              style={{ color: statusColor }}
-                            />
-                            <span style={{ color: statusColor, fontWeight: 600 }}>{statusCode}</span>
-                          </Track>
+                          <div className="api-elements-panel__skeleton-bar" style={{ width: '70%' }} />
                         </td>
                         <td style={{ textAlign: 'center' }}>
-                          <Icon
-                            icon={schemaCaptured ? <MdCheckCircle /> : <MdCancel />}
-                            size="small"
-                            style={{ color: schemaCaptured ? '#27ae60' : '#e74c3c' }}
+                          <div className="api-elements-panel__skeleton-bar" style={{ width: 50, margin: '0 auto' }} />
+                        </td>
+                        <td style={{ textAlign: 'center' }}>
+                          <div
+                            className="api-elements-panel__skeleton-bar"
+                            style={{ width: 18, height: 18, margin: '0 auto', borderRadius: '50%' }}
                           />
                         </td>
-                        <td>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                            <button
-                              type="button"
-                              title={t('apiRegistry.actions.test')}
-                              disabled={isTesting}
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleTest(endpoint).catch(() => {
-                                  useToastStore.getState().error({ title: t('global.notificationError') });
-                                });
-                              }}
-                              className="api-elements-panel__action-btn"
-                              style={{
-                                background: 'none',
-                                border: 'none',
-                                cursor: isTesting ? 'default' : 'pointer',
-                                padding: 6,
-                                opacity: isTesting ? 0.4 : 1,
-                                lineHeight: 1,
-                                fontSize: 18,
-                                display: 'flex',
-                              }}
-                            >
-                              <MdFormatListBulleted />
-                            </button>
-                            <button
-                              type="button"
-                              title={t('apiRegistry.actions.edit')}
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setEditingEndpoint(endpoint);
-                              }}
-                              className="api-elements-panel__action-btn"
-                              style={{
-                                background: 'none',
-                                border: 'none',
-                                cursor: 'pointer',
-                                padding: 6,
-                                lineHeight: 1,
-                                fontSize: 18,
-                                display: 'flex',
-                              }}
-                            >
-                              <MdEdit />
-                            </button>
-                            <button
-                              type="button"
-                              title={t('apiRegistry.actions.delete')}
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setDeletingEndpoint(endpoint);
-                              }}
-                              className="api-elements-panel__action-btn"
-                              style={{
-                                background: 'none',
-                                border: 'none',
-                                cursor: 'pointer',
-                                padding: 6,
-                                lineHeight: 1,
-                                fontSize: 18,
-                                display: 'flex',
-                              }}
-                            >
-                              <MdDeleteOutline />
-                            </button>
-                          </div>
-                        </td>
+                        <td />
                       </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-          )}
+                    ))
+                  : endpoints.map((endpoint, index) => {
+                      const meta = verificationMap[endpoint.endpointId];
+                      const status = meta?.verificationStatus ?? 'unverified';
+                      const isVerified = status === 'verified';
+                      const isUntested = status === 'unverified';
+                      const statusColor = isVerified ? '#27ae60' : '#e74c3c';
+                      let statusCode: string;
+                      if (isUntested) {
+                        statusCode = '---';
+                      } else {
+                        statusCode = meta?.lastStatusCode ? String(meta.lastStatusCode) : '---';
+                      }
+                      const schemaCaptured = meta?.schemaCaptured ?? false;
+                      const isTesting = testingId === endpoint.endpointId;
+                      const def = endpoint.definitions?.[0];
+                      return (
+                        <tr
+                          key={endpoint.endpointId}
+                          style={{ cursor: 'pointer' }}
+                          onClick={() => handleRowClick(endpoint, index)}
+                        >
+                          <td style={{ overflow: 'hidden' }}>
+                            <Tooltip content={<EndpointTooltipContent def={def} name={endpoint.name} />}>
+                              <span
+                                style={{
+                                  display: 'inline-flex',
+                                  alignItems: 'center',
+                                  gap: 4,
+                                  overflow: 'hidden',
+                                  maxWidth: '100%',
+                                }}
+                              >
+                                <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                  {endpoint.name}
+                                </span>
+                                <Icon
+                                  icon={<MdInfoOutline />}
+                                  size="small"
+                                  style={{ color: '#3f82ff', flexShrink: 0 }}
+                                />
+                              </span>
+                            </Tooltip>
+                          </td>
+                          <td>
+                            <Track gap={6} align="center">
+                              <Icon
+                                icon={isVerified ? <MdCheckCircle /> : <MdCancel />}
+                                size="small"
+                                style={{ color: statusColor }}
+                              />
+                              <span style={{ color: statusColor, fontWeight: 600 }}>{statusCode}</span>
+                            </Track>
+                          </td>
+                          <td style={{ textAlign: 'center' }}>
+                            <Icon
+                              icon={schemaCaptured ? <MdCheckCircle /> : <MdCancel />}
+                              size="small"
+                              style={{ color: schemaCaptured ? '#27ae60' : '#e74c3c' }}
+                            />
+                          </td>
+                          <td>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                              <button
+                                type="button"
+                                title={t('apiRegistry.actions.test')}
+                                disabled={isTesting}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleTest(endpoint).catch(() => {
+                                    useToastStore.getState().error({ title: t('global.notificationError') });
+                                  });
+                                }}
+                                className="api-elements-panel__action-btn"
+                                style={{
+                                  background: 'none',
+                                  border: 'none',
+                                  cursor: isTesting ? 'default' : 'pointer',
+                                  padding: 6,
+                                  opacity: isTesting ? 0.4 : 1,
+                                  lineHeight: 1,
+                                  fontSize: 18,
+                                  display: 'flex',
+                                }}
+                              >
+                                <MdFormatListBulleted />
+                              </button>
+                              <button
+                                type="button"
+                                title={t('apiRegistry.actions.edit')}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setEditingEndpoint(endpoint);
+                                }}
+                                className="api-elements-panel__action-btn"
+                                style={{
+                                  background: 'none',
+                                  border: 'none',
+                                  cursor: 'pointer',
+                                  padding: 6,
+                                  lineHeight: 1,
+                                  fontSize: 18,
+                                  display: 'flex',
+                                }}
+                              >
+                                <MdEdit />
+                              </button>
+                              <button
+                                type="button"
+                                title={t('apiRegistry.actions.delete')}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setDeletingEndpoint(endpoint);
+                                }}
+                                className="api-elements-panel__action-btn"
+                                style={{
+                                  background: 'none',
+                                  border: 'none',
+                                  cursor: 'pointer',
+                                  padding: 6,
+                                  lineHeight: 1,
+                                  fontSize: 18,
+                                  display: 'flex',
+                                }}
+                              >
+                                <MdDeleteOutline />
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })}
+              </tbody>
+            </table>
+          </div>
           <div
             className="data-table__pagination-wrapper"
             style={{
