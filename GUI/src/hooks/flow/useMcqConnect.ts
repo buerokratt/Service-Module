@@ -5,14 +5,12 @@ import { StepType } from 'types';
 import {
   applyConditionBranchConnection,
   conditionHasEmptyBranches,
-  getConditionNodeIdFromConnection,
   getEmptyConditionBranches,
 } from 'utils/conditional-flow-utils';
 import {
   applyMcqBranchConnection,
   applySimpleConnection,
   getEmptyMcqBranches,
-  getMcqNodeIdFromConnection,
   McqEmptyBranch,
 } from 'utils/mcq-flow-utils';
 
@@ -88,13 +86,11 @@ function useMcqConnect() {
 
   const handleConnect = useCallback(
     (connection: Connection) => {
-      const mcqId = getMcqNodeIdFromConnection(connection, getNode);
-      if (mcqId) {
-        if (connection.target === mcqId) {
-          applyIncomingConnection(connection);
-          return true;
-        }
+      const sourceNode = connection.source ? getNode(connection.source) : undefined;
+      const targetNode = connection.target ? getNode(connection.target) : undefined;
 
+      if (sourceNode?.data?.stepType === StepType.MultiChoiceQuestion) {
+        const mcqId = sourceNode.id;
         const nodes = getNodes();
         const edges = getEdges();
         const emptyBranches = getEmptyMcqBranches(mcqId, nodes, edges);
@@ -108,13 +104,8 @@ function useMcqConnect() {
         return true;
       }
 
-      const conditionId = getConditionNodeIdFromConnection(connection, getNode);
-      if (conditionId) {
-        if (connection.target === conditionId) {
-          applyIncomingConnection(connection);
-          return true;
-        }
-
+      if (sourceNode?.data?.stepType === StepType.Condition) {
+        const conditionId = sourceNode.id;
         const nodes = getNodes();
         const edges = getEdges();
         const emptyBranches = getEmptyConditionBranches(conditionId, nodes, edges);
@@ -125,6 +116,14 @@ function useMcqConnect() {
           return true;
         }
         setPendingConnection({ connection, emptyBranches, nodeType: StepType.Condition });
+        return true;
+      }
+
+      if (
+        targetNode?.data?.stepType === StepType.MultiChoiceQuestion ||
+        targetNode?.data?.stepType === StepType.Condition
+      ) {
+        applyIncomingConnection(connection);
         return true;
       }
 
@@ -161,20 +160,14 @@ function useMcqConnect() {
     (connection: Connection) => {
       if (connection.source === connection.target) return false;
 
-      const mcqId = getMcqNodeIdFromConnection(connection, getNode);
-      if (mcqId) {
-        if (connection.source === mcqId) {
-          return getEmptyMcqBranches(mcqId, getNodes(), getEdges()).length > 0;
-        }
-        return true;
+      const sourceNode = connection.source ? getNode(connection.source) : undefined;
+
+      if (sourceNode?.data?.stepType === StepType.MultiChoiceQuestion) {
+        return getEmptyMcqBranches(sourceNode.id, getNodes(), getEdges()).length > 0;
       }
 
-      const conditionId = getConditionNodeIdFromConnection(connection, getNode);
-      if (conditionId) {
-        if (connection.source === conditionId) {
-          return conditionHasEmptyBranches(conditionId, getNodes(), getEdges());
-        }
-        return true;
+      if (sourceNode?.data?.stepType === StepType.Condition) {
+        return conditionHasEmptyBranches(sourceNode.id, getNodes(), getEdges());
       }
 
       return true;

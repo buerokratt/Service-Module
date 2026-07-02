@@ -11,18 +11,6 @@ export type McqEmptyBranch = {
   readonly handleIndex: number;
 };
 
-export const getMcqNodeIdFromConnection = (
-  connection: Connection,
-  getNode: (id: string) => Node | undefined,
-): string | null => {
-  const sourceNode = connection.source ? getNode(connection.source) : undefined;
-  const targetNode = connection.target ? getNode(connection.target) : undefined;
-
-  if (sourceNode?.data?.stepType === StepType.MultiChoiceQuestion) return sourceNode.id;
-  if (targetNode?.data?.stepType === StepType.MultiChoiceQuestion) return targetNode.id;
-  return null;
-};
-
 export const getMcqButtons = (mcqNode: Node): MultiChoiceQuestionButton[] =>
   mcqNode.data?.multiChoiceQuestion?.buttons ?? [];
 
