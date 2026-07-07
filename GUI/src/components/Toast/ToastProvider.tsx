@@ -21,7 +21,7 @@ export const ToastProvider: FC<PropsWithChildren> = ({ children }) => {
       {toasts.map((toast) => (
         <Toast key={toast.id} toast={toast} />
       ))}
-      <RadixToast.Viewport className="toast__list" />
+      <RadixToast.Viewport className="service-toast__list" style={{ '--toast-count': toasts.length } as React.CSSProperties} />
     </RadixToast.Provider>
   );
 };

@@ -2,11 +2,11 @@ import * as RadixToast from '@radix-ui/react-toast';
 import clsx from 'clsx';
 import React, { FC, useState } from 'react';
 import {
-  MdCheckCircleOutline,
-  MdErrorOutline,
+  MdCheck,
+  MdFlag,
+  MdInfo,
   MdOutlineClose,
-  MdOutlineInfo,
-  MdOutlineWarningAmber,
+  MdWarning,
 } from 'react-icons/md';
 
 import { Icon } from '../../components';
@@ -18,28 +18,31 @@ type ToastProps = {
 };
 
 const toastIcons = {
-  info: <MdOutlineInfo />,
-  success: <MdCheckCircleOutline />,
-  warning: <MdOutlineWarningAmber />,
-  error: <MdErrorOutline />,
+  info: <MdInfo />,
+  success: <MdCheck />,
+  warning: <MdFlag />,
+  error: <MdWarning />,
 };
 
 const Toast: FC<ToastProps> = ({ toast }) => {
   const [open, setOpen] = useState(true);
 
-  const toastClasses = clsx('toast', `toast--${toast.type}`);
+  const toastClasses = clsx('service-toast', `service-toast--${toast.type}`);
 
   const close = () => useToastStore.getState().close(toast.id);
 
   return (
     <RadixToast.Root className={toastClasses} onEscapeKeyDown={close} open={open} onOpenChange={setOpen}>
-      <RadixToast.Title className="toast__title h5">
-        <Icon icon={toastIcons[toast.type]} />
-        {toast.title}
-      </RadixToast.Title>
-      {toast.message && <RadixToast.Description className="toast__content">{toast.message}</RadixToast.Description>}
-      <RadixToast.Close onClick={close} className="toast__close">
-        <Icon icon={<MdOutlineClose />} size="medium" />
+      <Icon icon={toastIcons[toast.type]} />
+      <div className="service-toast__body">
+        <RadixToast.Title className="service-toast__title h6">
+          {toast.title}
+          {toast.message ? ':' : ''}
+        </RadixToast.Title>
+        {toast.message && <RadixToast.Description className="service-toast__content">{toast.message}</RadixToast.Description>}
+      </div>
+      <RadixToast.Close onClick={close} className="service-toast__close">
+        <Icon icon={<MdOutlineClose />} size="small" />
       </RadixToast.Close>
     </RadixToast.Root>
   );
