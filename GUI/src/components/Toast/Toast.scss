@@ -55,7 +55,6 @@ $toast-step: $toast-height + $toast-gap;
     width: min(440px, calc(100% - 32px));
     min-width: 300px;
     max-width: 100vw;
-    min-height: calc(var(--toast-count, 0) * #{$toast-step});
     z-index: 9999;
     list-style: none;
     padding: 0;
@@ -88,7 +87,7 @@ $toast-step: $toast-height + $toast-gap;
       }
     }
 
-    &:hover .service-toast {
+    &:has(.service-toast:hover) .service-toast {
       @for $i from 1 through 8 {
         &:nth-last-child(#{$i}) {
           transform: translateY(#{($i - 1) * $toast-step}) scale(1);

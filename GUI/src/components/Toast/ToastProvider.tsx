@@ -1,5 +1,5 @@
 import * as RadixToast from '@radix-ui/react-toast';
-import React, { FC, PropsWithChildren } from 'react';
+import { FC, PropsWithChildren } from 'react';
 import { useTranslation } from 'react-i18next';
 import useToastStore from 'store/toasts.store';
 
@@ -21,7 +21,7 @@ export const ToastProvider: FC<PropsWithChildren> = ({ children }) => {
       {toasts.map((toast) => (
         <Toast key={toast.id} toast={toast} />
       ))}
-      <RadixToast.Viewport className="service-toast__list" style={{ '--toast-count': toasts.length } as React.CSSProperties} />
+      <RadixToast.Viewport className="service-toast__list" />
     </RadixToast.Provider>
   );
 };
