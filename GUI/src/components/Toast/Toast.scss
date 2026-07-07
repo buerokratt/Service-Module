@@ -21,7 +21,9 @@ $toast-step: $toast-height + $toast-gap;
   left: 0;
   right: 0;
   overflow: hidden;
-  transition: transform 0.2s ease, opacity 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    opacity 0.2s ease;
 
   > .icon {
     flex-shrink: 0;

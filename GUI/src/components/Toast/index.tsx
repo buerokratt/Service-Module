@@ -1,13 +1,7 @@
 import * as RadixToast from '@radix-ui/react-toast';
 import clsx from 'clsx';
 import React, { FC, useState } from 'react';
-import {
-  MdCheck,
-  MdFlag,
-  MdInfo,
-  MdOutlineClose,
-  MdWarning,
-} from 'react-icons/md';
+import { MdCheck, MdFlag, MdInfo, MdOutlineClose, MdWarning } from 'react-icons/md';
 
 import { Icon } from '../../components';
 import useToastStore, { ToastTypeWithId } from '../../store/toasts.store';
@@ -39,7 +33,9 @@ const Toast: FC<ToastProps> = ({ toast }) => {
           {toast.title}
           {toast.message ? ':' : ''}
         </RadixToast.Title>
-        {toast.message && <RadixToast.Description className="service-toast__content">{toast.message}</RadixToast.Description>}
+        {toast.message && (
+          <RadixToast.Description className="service-toast__content">{toast.message}</RadixToast.Description>
+        )}
       </div>
       <RadixToast.Close onClick={close} className="service-toast__close">
         <Icon icon={<MdOutlineClose />} size="small" />
