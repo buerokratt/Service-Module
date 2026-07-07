@@ -21,23 +21,21 @@ const toastIcons = {
 const Toast: FC<ToastProps> = ({ toast }) => {
   const [open, setOpen] = useState(true);
 
-  const toastClasses = clsx('service-toast', `service-toast--${toast.type}`);
+  const toastClasses = clsx('toast', `toast--${toast.type}`);
 
   const close = () => useToastStore.getState().close(toast.id);
 
   return (
     <RadixToast.Root className={toastClasses} onEscapeKeyDown={close} open={open} onOpenChange={setOpen}>
       <Icon icon={toastIcons[toast.type]} />
-      <div className="service-toast__body">
-        <RadixToast.Title className="service-toast__title h6">
+      <div className="toast__body">
+        <RadixToast.Title className="toast__title h6">
           {toast.title}
           {toast.message ? ':' : ''}
         </RadixToast.Title>
-        {toast.message && (
-          <RadixToast.Description className="service-toast__content">{toast.message}</RadixToast.Description>
-        )}
+        {toast.message && <RadixToast.Description className="toast__content">{toast.message}</RadixToast.Description>}
       </div>
-      <RadixToast.Close onClick={close} className="service-toast__close">
+      <RadixToast.Close onClick={close} className="toast__close">
         <Icon icon={<MdOutlineClose />} size="small" />
       </RadixToast.Close>
     </RadixToast.Root>

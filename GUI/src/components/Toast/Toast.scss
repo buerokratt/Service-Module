@@ -8,7 +8,7 @@ $toast-height: 48px;
 $toast-gap: 8px;
 $toast-step: $toast-height + $toast-gap;
 
-.service-toast {
+.toast {
   height: $toast-height;
   padding: 0 40px 0 16px;
   border-radius: 8px;
@@ -62,7 +62,7 @@ $toast-step: $toast-height + $toast-gap;
     padding: 0;
     margin: 0;
 
-    .service-toast {
+    .toast {
       &:nth-last-child(1) {
         transform: translateY(0) scale(1);
         opacity: 1;
@@ -89,7 +89,7 @@ $toast-step: $toast-height + $toast-gap;
       }
     }
 
-    &:has(.service-toast:hover) .service-toast {
+    &:has(.toast:hover) .toast {
       @for $i from 1 through 8 {
         &:nth-last-child(#{$i}) {
           transform: translateY(#{($i - 1) * $toast-step}) scale(1);
@@ -161,7 +161,7 @@ $toast-step: $toast-height + $toast-gap;
   }
 }
 
-[data-theme='dark'] .service-toast {
+[data-theme='dark'] .toast {
   color: var(--dark-text-secondary);
 
   &__close {
