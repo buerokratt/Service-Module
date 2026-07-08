@@ -28,7 +28,7 @@ type PreviousVariablesProps = {
 
 // Unique key for predefined elements, used below to identify it
 // All other assign element keys are UUIDs
-const predefinedInputKeys = ['-1', '-2', '-3', '-4', '-5'];
+const predefinedInputKeys = ['-1', '-2', '-3', '-4', '-5', '-6'];
 
 const PreviousVariables: FC<PreviousVariablesProps> = ({ node }) => {
   const { t } = useTranslation();
@@ -36,6 +36,7 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ node }) => {
   let endpointsVariables = useServiceStore((state) => state.endpointsResponseVariables);
   const nodes = useServiceStore((state) => state.nodes);
   const edges = useServiceStore((state) => state.edges);
+  const serviceName = useServiceStore((state) => state.name);
   const [endpoints, setEndpoints] = useState<EndpointResponseVariable[]>([]);
   const [assignedVariables, setAssignedVariables] = useState<Assign[]>([]);
   const [endpointsObjectTree, setEndpointsObjectTree] = useState<{
@@ -124,10 +125,15 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ node }) => {
         key: 'Nonce Value',
         value: stringToTemplate('nonce'),
       },
+      {
+        id: predefinedInputKeys[5],
+        key: 'Service Name',
+        value: serviceName,
+      },
     ];
 
     setAssignedVariables([...assignElements, ...predefinedInputElements, ...newAssignElements]);
-  }, [edges, endpointsVariables, newAssignElements, node.id, nodes]);
+  }, [edges, endpointsVariables, newAssignElements, node.id, nodes, serviceName]);
 
   function getParentNode(nodes: Node[], edges: Edge[], node: Node): Node | undefined {
     const parentEdge = edges.findLast((edge) => edge.target === node.id);
