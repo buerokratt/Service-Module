@@ -49,6 +49,22 @@ import useTestServiceStore from './test-services.store';
 import useToastStore from './toasts.store';
 import api from '../services/api-dev';
 
+const HIGHLIGHT_CLASS_RE = /\b(node-highlighted|node-dimmed)\b/g;
+
+function stripNodeHighlight(node: Node): Node {
+  if (!node.className) return node;
+  const cleaned = node.className.replace(HIGHLIGHT_CLASS_RE, '').replace(/\s+/g, ' ').trim();
+  return cleaned === node.className ? node : { ...node, className: cleaned || undefined };
+}
+
+function stripEdgeHighlight(edge: Edge): Edge {
+  if (!edge.data) return edge;
+  const data = edge.data;
+  if (!('isHighlighted' in data) && !('isDimmed' in data)) return edge;
+  const rest = Object.fromEntries(Object.entries(data).filter(([k]) => k !== 'isHighlighted' && k !== 'isDimmed'));
+  return { ...edge, data: rest };
+}
+
 export interface ServiceStoreState {
   endpoints: EndpointData[];
   name: string;
@@ -716,7 +732,7 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
   setClickedNode: (clickedNode) => set({ clickedNode }),
   onNodesChange: (changes: NodeChange[]) => {
     get().setNodes((prevNode) => {
-      const changedNodes = applyNodeChanges(changes, prevNode);
+      const changedNodes = applyNodeChanges(changes, prevNode).map(stripNodeHighlight);
       const newNodes = alignNodesInCaseAnyGotOverlapped(changes, changedNodes, get().edges);
       changes.forEach((change) => {
         if (change.type === 'add') {
@@ -727,7 +743,7 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
     });
   },
   onEdgesChange: (changes: EdgeChange[]) => {
-    get().setEdges((eds) => applyEdgeChanges(changes, eds));
+    get().setEdges((eds) => applyEdgeChanges(changes, eds).map(stripEdgeHighlight));
   },
   onNodeAdded: (_: Node) => {
     const cleanupGhostNodes = async () => {
