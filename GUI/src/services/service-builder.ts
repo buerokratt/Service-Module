@@ -23,6 +23,7 @@ import {
 import api from '../services/api-dev';
 
 const htmlToMarkdown = new NodeHtmlMarkdown({
+  bulletMarker: '•',
   textReplace: [
     [/\\_/g, '_'],
     [/\\\[/g, '['],
