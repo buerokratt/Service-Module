@@ -23,6 +23,7 @@ import {
 import api from '../services/api-dev';
 
 const htmlToMarkdown = new NodeHtmlMarkdown({
+  bulletMarker: '•',
   textReplace: [
     [/\\_/g, '_'],
     [/\\\[/g, '['],
@@ -484,7 +485,7 @@ export function getYamlContent(
     accepts: 'json',
     returns: 'json',
     namespace: 'service',
-    allowList: {
+    allowlist: {
       body: [
         {
           field: 'chatId',
@@ -717,13 +718,15 @@ function replaceSpacesOutsideTags(input: string, placeholder: string): string {
 }
 
 function toMarkdownMessage(raw: string): string {
-  const spacePlaceholder = '___SPACE___';
+  const spacePlaceholder = '';
+  const leadingSpacePlaceholderRun = new RegExp(`^${spacePlaceholder}+`, 'gm');
   const withPlaceholders = replaceSpacesOutsideTags(
     decodeHtmlEntities(raw).replaceAll('{{', '${').replaceAll('}}', '}'),
     spacePlaceholder,
   );
   const markdown = htmlToMarkdown
     .translate(withPlaceholders)
+    .replaceAll(leadingSpacePlaceholderRun, (match) => '\u00A0'.repeat(match.length))
     .replaceAll(spacePlaceholder, ' ')
     .replaceAll(/\\([-~>[\]_*#().!`=<\\])/g, String.raw`\\$1`);
 

@@ -35,7 +35,7 @@ type FlowBuilderProps = {
 
 const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
   useLayout();
-  const { getNodes, getEdges, setNodes, setEdges, getNode } = useReactFlow();
+  const { getNodes, getEdges, setNodes, setEdges } = useReactFlow();
   const setReactFlowInstance = useNewServiceStore((state) => state.setReactFlowInstance);
   const [colorMode, setColorMode] = useState<ColorMode>('light');
   const { t } = useTranslation();
@@ -100,16 +100,9 @@ const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
   );
 
   const onBeforeDelete = useCallback(
-    ({ nodes: nodesToDelete, edges: edgesToDelete }: { nodes: Node[]; edges: Edge[] }) => {
+    ({ nodes: nodesToDelete }: { nodes: Node[]; edges: Edge[] }) => {
       setDeletedNodes(null);
       try {
-        if (edgesToDelete.length > 0 && nodesToDelete.length === 0) {
-          const sourceStepType = getNode(edgesToDelete[0].source)?.data.stepType;
-          if (sourceStepType === StepType.MultiChoiceQuestion) {
-            return Promise.resolve(false);
-          }
-        }
-
         if (
           nodesToDelete.length === 0 ||
           ![StepType.MultiChoiceQuestion, StepType.Condition, StepType.Input].includes(
@@ -129,7 +122,7 @@ const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
         return Promise.resolve(true);
       }
     },
-    [getNode, hasConnectedNodes, setDeletedNodes, setIsDeleteConnectionsModalVisible],
+    [hasConnectedNodes, setDeletedNodes, setIsDeleteConnectionsModalVisible],
   );
 
   const handleToggleLasso = useCallback(() => {
