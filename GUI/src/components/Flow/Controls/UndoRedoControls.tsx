@@ -9,7 +9,13 @@ const UndoRedoControls: FC = () => {
   const { undo, redo, canUndo, canRedo } = useServiceStore();
 
   useEffect(() => {
+    const isEditableTarget = (target: EventTarget | null) =>
+      target instanceof HTMLElement &&
+      (target.isContentEditable || target.tagName === 'INPUT' || target.tagName === 'TEXTAREA');
+
     const handleKeyDown = (event: KeyboardEvent) => {
+      if (isEditableTarget(event.target)) return;
+
       if (event.ctrlKey || event.metaKey) {
         if (event.key === 'z' && !event.shiftKey && canUndo()) {
           event.preventDefault();
