@@ -100,7 +100,7 @@ const JumpToServiceContent: FC<JumpToServiceContentProps> = ({ node, jumpToServi
                   aria-label={t('serviceFlow.element.jumpToService.navigateToService')}
                   title={t('serviceFlow.element.jumpToService.navigateToService')}
                 >
-                  <Icon icon={<MdOpenInNew color='#005aa3'/>} size="medium" />
+                  <Icon icon={<MdOpenInNew color="#005aa3" />} size="medium" />
                 </Button>
               )}
             </Track>
