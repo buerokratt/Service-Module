@@ -1,8 +1,8 @@
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 import { t } from 'i18next';
 import React, { FC, useEffect, useState } from 'react';
-import { FaGear } from 'react-icons/fa6';
 import { CgChevronDown, CgChevronUp } from 'react-icons/cg';
+import { FaGear } from 'react-icons/fa6';
 import { TiArrowLeft } from 'react-icons/ti';
 import { useNavigate, useParams } from 'react-router-dom';
 import '@buerokratt-ria/header/src/Header.scss';
