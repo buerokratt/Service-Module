@@ -149,7 +149,13 @@ generate_service_json:
       examples: ${service_data_result.response.body[0].examples}
       entities: ${service_data_result.response.body[0].entities}
   result: service_json_result
-  next: create_in_storage
+  next: check_if_azure_storage_is_enabled
+
+check_if_azure_storage_is_enabled:
+  switch:
+    - condition: ${[#AZURE_STORAGE_ENABLED] === true}
+      next: create_in_storage
+  next: activate_all_mcq_services  
 
 create_in_storage:
   call: http.post
@@ -204,7 +210,13 @@ deactivate_service:
       file_path: "[#RUUTER_SERVICES_PATH]/${ruuter_type}/[#RUUTER_SERVICES_DIR_PATH]/${old_file_status_path}/${name + old_file_end}"
       new_path: "[#RUUTER_SERVICES_PATH]/${ruuter_type}/[#RUUTER_SERVICES_DIR_PATH]/inactive/${name}.tmp"
   result: deactivate_service_result
-  next: delete_from_storage
+  next: check_if_azure_storage_is_enabled_before_delete
+
+check_if_azure_storage_is_enabled_before_delete:
+  switch:
+    - condition: ${[#AZURE_STORAGE_ENABLED] === true}
+      next: delete_from_storage
+  next: dactivate_all_mcq_services
 
 delete_from_storage:
   call: http.delete
