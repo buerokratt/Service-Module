@@ -37,11 +37,26 @@
   cursor: pointer;
   font-family: inherit;
   color: inherit;
+  position: relative;
 
   &:hover,
   &:focus {
     background-color: #e4e4e8;
   }
+}
+
+.naming__label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.naming__chevron {
+  position: absolute;
+  right: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  flex-shrink: 0;
 }
 
 .service-switch-dropdown {

@@ -2,6 +2,7 @@ import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 import { t } from 'i18next';
 import React, { FC, useEffect, useState } from 'react';
 import { FaGear } from 'react-icons/fa6';
+import { CgChevronDown, CgChevronUp } from 'react-icons/cg';
 import { TiArrowLeft } from 'react-icons/ti';
 import { useNavigate, useParams } from 'react-router-dom';
 import '@buerokratt-ria/header/src/Header.scss';
@@ -90,7 +91,12 @@ const NewServiceHeader: FC<NewServiceHeaderProps> = ({ backOnClick, continueOnCl
           <DropdownMenu.Root open={isServiceDropdownOpen} onOpenChange={setIsServiceDropdownOpen}>
             <DropdownMenu.Trigger asChild>
               <button type="button" className="naming naming--trigger">
-                {name || '...'}
+                <span className="naming__label">{name || '...'}</span>
+                {isServiceDropdownOpen ? (
+                  <CgChevronUp className="naming__chevron" size={25} />
+                ) : (
+                  <CgChevronDown className="naming__chevron" size={25} />
+                )}
               </button>
             </DropdownMenu.Trigger>
             <DropdownMenu.Portal>
