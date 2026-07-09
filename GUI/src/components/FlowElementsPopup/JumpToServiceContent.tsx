@@ -1,13 +1,18 @@
 import { Node } from '@xyflow/react';
+import Button from 'components/Button';
 import { FormSelect } from 'components/FormElements';
 import { FC, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { MdOpenInNew } from 'react-icons/md';
+import { useNavigate } from 'react-router-dom';
 import { getNavigableServicesList } from 'resources/api-constants';
 import api from 'services/api-dev';
 import { Assign } from 'types/assign';
 import { JumpToService } from 'types/jump-to-service';
 import { NodeDataProps } from 'types/service-flow';
+import { navigateToService } from 'utils/service-navigation-utils';
 
+import Icon from '../Icon';
 import Track from '../Track';
 import JumpToServiceInputBuilder from './JumpToServiceInputBuilder';
 import PreviousVariables from './PreviousVariables';
@@ -22,6 +27,7 @@ type JumpToServiceContentProps = {
 
 const JumpToServiceContent: FC<JumpToServiceContentProps> = ({ node, jumpToService, onChange }) => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const [services, setServices] = useState<ServiceOption[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -61,6 +67,11 @@ const JumpToServiceContent: FC<JumpToServiceContentProps> = ({ node, jumpToServi
     onChange({ ...jumpToService, input });
   };
 
+  const handleNavigateToService = () => {
+    if (!jumpToService.serviceId) return;
+    navigateToService(jumpToService.serviceId, navigate);
+  };
+
   return (
     <Track direction="vertical" align="stretch" gap={16}>
       <Track direction="vertical" align="stretch" gap={16} style={{ padding: '16px 16px 0' }}>
@@ -70,14 +81,29 @@ const JumpToServiceContent: FC<JumpToServiceContentProps> = ({ node, jumpToServi
           </Track>
         ) : (
           <>
-            <FormSelect
-              label={t('serviceFlow.element.jumpToService.targetService')}
-              name="targetService"
-              placeholder={t('serviceFlow.element.jumpToService.selectService')}
-              options={serviceOptions}
-              defaultValue={defaultServiceValue ?? undefined}
-              onSelectionChange={handleServiceChange}
-            />
+            <Track direction="horizontal" gap={8}>
+              <div style={{ flex: 1 }}>
+                <FormSelect
+                  label={t('serviceFlow.element.jumpToService.targetService')}
+                  name="targetService"
+                  placeholder={t('serviceFlow.element.jumpToService.selectService')}
+                  options={serviceOptions}
+                  defaultValue={defaultServiceValue ?? undefined}
+                  onSelectionChange={handleServiceChange}
+                />
+              </div>
+              {jumpToService.serviceId && (
+                <Button
+                  appearance="icon"
+                  size="s"
+                  onClick={handleNavigateToService}
+                  aria-label={t('serviceFlow.element.jumpToService.navigateToService')}
+                  title={t('serviceFlow.element.jumpToService.navigateToService')}
+                >
+                  <Icon icon={<MdOpenInNew color='#005aa3'/>} size="medium" />
+                </Button>
+              )}
+            </Track>
             {services.length === 0 && (
               <p style={{ color: '#888', fontSize: '13px' }}>
                 {t('serviceFlow.element.jumpToService.noActiveServices')}
