@@ -2,7 +2,7 @@ import { Node } from '@xyflow/react';
 import { FormSelect } from 'components/FormElements';
 import { FC, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { getActiveServicesList } from 'resources/api-constants';
+import { getNavigableServicesList } from 'resources/api-constants';
 import api from 'services/api-dev';
 import { Assign } from 'types/assign';
 import { JumpToService } from 'types/jump-to-service';
@@ -27,7 +27,7 @@ const JumpToServiceContent: FC<JumpToServiceContentProps> = ({ node, jumpToServi
 
   useEffect(() => {
     api
-      .get(getActiveServicesList())
+      .get(getNavigableServicesList())
       .then((res) => {
         const data: { serviceId: string; name: string }[] = Array.isArray(res.data) ? res.data : [];
         setServices(data.map((s) => ({ name: s.name, serviceId: s.serviceId })));

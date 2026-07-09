@@ -1,14 +1,16 @@
+import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 import { t } from 'i18next';
-import React, { FC, useState } from 'react';
+import React, { FC, useEffect, useState } from 'react';
 import { FaGear } from 'react-icons/fa6';
 import { TiArrowLeft } from 'react-icons/ti';
 import { useNavigate, useParams } from 'react-router-dom';
 import '@buerokratt-ria/header/src/Header.scss';
-import { deleteService } from 'resources/api-constants';
+import { deleteService, getNavigableServicesList } from 'resources/api-constants';
 import { ROUTES } from 'resources/routes-constants';
 import useServiceStore from 'store/new-services.store';
 import useToastStore from 'store/toasts.store';
 import { ServiceState } from 'types';
+import { navigateToService } from 'utils/service-navigation-utils';
 import { removeTrailingUnderscores } from 'utils/string-util';
 
 import { Button, Modal, Track } from '..';
@@ -19,6 +21,8 @@ import Icon from '../Icon';
 import SettingsModal from '../ServiceConfigurationForm';
 
 import './NewServiceHeader.scss';
+
+type ServiceOption = { readonly name: string; readonly serviceId: string };
 
 type NewServiceHeaderProps = {
   activeStep: number;
@@ -44,7 +48,23 @@ const NewServiceHeader: FC<NewServiceHeaderProps> = ({ backOnClick, continueOnCl
   const [isDeleting, setIsDeleting] = useState(false);
   const [isContinuing, setIsContinuing] = useState(false);
   const [isDeleteServiceModalVisible, setIsDeleteServiceModalVisible] = useState(false);
+  const [isServiceDropdownOpen, setIsServiceDropdownOpen] = useState(false);
+  const [services, setServices] = useState<ServiceOption[]>([]);
   const { id } = useParams();
+
+  useEffect(() => {
+    if (!isServiceDropdownOpen) return;
+
+    api
+      .get(getNavigableServicesList())
+      .then((res) => {
+        const data: { serviceId: string; name: string }[] = Array.isArray(res.data) ? res.data : [];
+        setServices(data.map((s) => ({ name: s.name, serviceId: s.serviceId })));
+      })
+      .catch(console.error);
+  }, [isServiceDropdownOpen]);
+
+  const otherServices = services.filter((service) => service.serviceId !== id);
 
   return (
     <>
@@ -67,7 +87,32 @@ const NewServiceHeader: FC<NewServiceHeaderProps> = ({ backOnClick, continueOnCl
             {t('serviceFlow.serviceConfiguration')}
             <Icon icon={<FaGear size={18} />} size="medium" />
           </Button>
-          <div className="naming">{name || '...'}</div>
+          <DropdownMenu.Root open={isServiceDropdownOpen} onOpenChange={setIsServiceDropdownOpen}>
+            <DropdownMenu.Trigger asChild>
+              <button type="button" className="naming naming--trigger">
+                {name || '...'}
+              </button>
+            </DropdownMenu.Trigger>
+            <DropdownMenu.Portal>
+              <DropdownMenu.Content className="service-switch-dropdown" sideOffset={5} align="center">
+                {otherServices.length === 0 ? (
+                  <div className="service-switch-dropdown__empty">
+                    {t('serviceFlow.element.jumpToService.noActiveServices')}
+                  </div>
+                ) : (
+                  otherServices.map((service) => (
+                    <DropdownMenu.Item
+                      key={service.serviceId}
+                      className="service-switch-dropdown__item"
+                      onSelect={() => navigateToService(service.serviceId, navigate)}
+                    >
+                      {service.name}
+                    </DropdownMenu.Item>
+                  ))
+                )}
+              </DropdownMenu.Content>
+            </DropdownMenu.Portal>
+          </DropdownMenu.Root>
           <Button
             appearance={isDeleting ? 'loading' : 'error'}
             disabled={
