@@ -18,6 +18,7 @@ const FormRichText: FC<FormRichTextProps> = ({ defaultValue, onChange, quill }) 
       [{ list: 'ordered' }, { list: 'bullet' }],
       ['link'],
     ],
+    uploader: false,
   };
 
   useEffect(() => {
@@ -50,8 +51,48 @@ const FormRichText: FC<FormRichTextProps> = ({ defaultValue, onChange, quill }) 
     };
 
     editorElement.addEventListener('keydown', handleTabKey, true);
+
+    const handleDrop = (e: DragEvent) => {
+      const text = e.dataTransfer?.getData('text/plain');
+      if (!text) return;
+
+      e.preventDefault();
+
+      const docWithCaretPosition = document as Document & {
+        caretPositionFromPoint?(x: number, y: number): { offsetNode: Node; offset: number } | null;
+      };
+
+      let native: Range | null = null;
+      if (typeof docWithCaretPosition.caretPositionFromPoint === 'function') {
+        const position = docWithCaretPosition.caretPositionFromPoint(e.clientX, e.clientY);
+        if (position) {
+          native = document.createRange();
+          native.setStart(position.offsetNode, position.offset);
+          native.setEnd(position.offsetNode, position.offset);
+        }
+      } else if (
+        // Safari has no caretPositionFromPoint; fall back to the deprecated but still
+        // supported caretRangeFromPoint.
+        // eslint-disable-next-line sonarjs/deprecation
+        document.caretRangeFromPoint
+      ) {
+        // eslint-disable-next-line sonarjs/deprecation
+        native = document.caretRangeFromPoint(e.clientX, e.clientY);
+      }
+
+      const normalized = native && quillInstance.selection.normalizeNative(native);
+      const range = normalized ? quillInstance.selection.normalizedToRange(normalized) : quillInstance.getSelection(true);
+      if (!range) return;
+
+      quillInstance.insertText(range.index, text, 'user');
+      quillInstance.setSelection(range.index + text.length, 0, 'user');
+      quillInstance.focus();
+    };
+
+    editorElement.addEventListener('drop', handleDrop);
     return () => {
       editorElement.removeEventListener('keydown', handleTabKey, true);
+      editorElement.removeEventListener('drop', handleDrop);
       quillInstance.off('text-change', normalizeLinks);
     };
   }, [quill]);
