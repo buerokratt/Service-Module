@@ -486,6 +486,13 @@ export function getYamlContent(
     returns: 'json',
     namespace: 'service',
     allowlist: {
+      header: [
+        {
+          field: 'x-ruuter-nonce',
+          type: 'string',
+          description: 'The nonce for the request',
+        },
+      ],
       body: [
         {
           field: 'chatId',
