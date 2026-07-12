@@ -16,6 +16,7 @@ export const changeServiceStatus = (): string => `${baseUrl}/services/status`;
 export const createNewService = (): string => `${baseUrl}/services/add`;
 export const testService = (state: ServiceState, serviceName: string): string =>
   `${baseUrl}/services/${state.toLowerCase()}/${serviceName}`;
+export const getNewNonce = (): string => `${baseUrl}/get-new-nonce`;
 export const editService = (id: string): string => `${baseUrl}/services/edit?id=${id}`;
 export const getServicesList = (): string => `${baseUrl}/services`;
 export const getActiveServicesList = (): string => `${baseUrl}/active-services`;
