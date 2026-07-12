@@ -81,7 +81,9 @@ const FormRichText: FC<FormRichTextProps> = ({ defaultValue, onChange, quill }) 
       }
 
       const normalized = native && quillInstance.selection.normalizeNative(native);
-      const range = normalized ? quillInstance.selection.normalizedToRange(normalized) : quillInstance.getSelection(true);
+      const range = normalized
+        ? quillInstance.selection.normalizedToRange(normalized)
+        : quillInstance.getSelection(true);
       if (!range) return;
 
       quillInstance.insertText(range.index, text, 'user');
