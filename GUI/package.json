@@ -52,7 +52,7 @@
     "react-idle-timer": "^5.7.2",
     "react-json-tree": "^0.20.0",
     "react-loading-indicators": "^1.0.1",
-    "react-quill": "^2.0.0",
+    "react-quill-new": "^3.8.3",
     "react-router-dom": "^6.6.2",
     "react-textarea-autosize": "^8.4.0",
     "rxjs": "^7.8.0",
