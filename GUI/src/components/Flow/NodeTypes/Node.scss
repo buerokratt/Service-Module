@@ -49,6 +49,15 @@
     color: get-color(black-coral-6);
   }
 
+  .jump-to-service-link {
+    color: get-color(sapphire-blue-10);
+    text-decoration: underline;
+
+    &:hover {
+      text-decoration: none;
+    }
+  }
+
   .file-name-extension {
     color: get-color(black-coral-6);
   }
