@@ -1,5 +1,5 @@
 import * as RadixToast from '@radix-ui/react-toast';
-import React, { FC, PropsWithChildren } from 'react';
+import { FC, PropsWithChildren } from 'react';
 import { useTranslation } from 'react-i18next';
 import useToastStore from 'store/toasts.store';
 
