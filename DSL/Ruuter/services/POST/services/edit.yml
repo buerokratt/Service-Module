@@ -267,14 +267,20 @@ check for_state:
 check_remove_blob_then_draft:
   switch:
     - condition: ${old_state === 'active'}
-      next: delete_from_storage_edit
+      next: check_if_azure_storage_is_enabled_before_delete_edit
   next: change_state_to_draft
 
 check_remove_blob_then_ok:
   switch:
     - condition: ${old_state === 'active'}
-      next: delete_from_storage_edit
+      next: check_if_azure_storage_is_enabled_before_delete_edit
   next: return_ok
+
+check_if_azure_storage_is_enabled_before_delete_edit:
+  switch:
+    - condition: ${[#AZURE_STORAGE_ENABLED] === true}
+      next: delete_from_storage_edit
+  next: after_delete_from_storage_edit
 
 delete_from_storage_edit:
   call: http.delete
@@ -359,7 +365,13 @@ generate_service_json:
       examples: ${service_data_result.response.body[0].examples}
       entities: ${service_data_result.response.body[0].entities}
   result: service_json_result
-  next: replace_in_storage
+  next: check_if_azure_storage_is_enabled
+
+check_if_azure_storage_is_enabled:
+  switch:
+    - condition: ${[#AZURE_STORAGE_ENABLED] === true}
+      next: replace_in_storage
+  next: return_ok
 
 replace_in_storage:
   call: http.post
