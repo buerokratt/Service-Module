@@ -8,6 +8,9 @@ const stripClasses = (cls: string, ...toRemove: string[]) =>
     .replace(/\s+/g, ' ')
     .trim();
 
+const omitHighlightData = (data: unknown) =>
+  Object.fromEntries(Object.entries((data as object) ?? {}).filter(([k]) => k !== 'isHighlighted' && k !== 'isDimmed'));
+
 export function useNodeHighlight(nodes: Node[], edges: Edge[]) {
   const [highlightedNodeId, setHighlightedNodeId] = useState<string | null>(null);
 
@@ -20,14 +23,26 @@ export function useNodeHighlight(nodes: Node[], edges: Edge[]) {
     setHighlightedNodeId(null);
   }, []);
 
+  const clearHighlight = (currentNodes: Node[], currentEdges: Edge[]) => ({
+    displayNodes: currentNodes.map((n) => ({
+      ...n,
+      className: stripClasses(n.className ?? '', 'node-highlighted', 'node-dimmed') || undefined,
+    })),
+    displayEdges: currentEdges.map((e) => ({
+      ...e,
+      className: stripClasses(e.className ?? '', 'edge-highlighted', 'edge-dimmed') || undefined,
+      data: omitHighlightData(e.data),
+    })),
+  });
+
   const { displayNodes, displayEdges } = useMemo(() => {
     if (!highlightedNodeId) {
-      return { displayNodes: nodes, displayEdges: edges };
+      return clearHighlight(nodes, edges);
     }
 
     const node = nodes.find((n) => n.id === highlightedNodeId);
     if (!node) {
-      return { displayNodes: nodes, displayEdges: edges };
+      return clearHighlight(nodes, edges);
     }
 
     const connectedEdges = getConnectedEdges([node], edges);
