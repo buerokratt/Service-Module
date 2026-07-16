@@ -370,7 +370,8 @@
         "selectService": "Select a service...",
         "noActiveServices": "No active services available",
         "parameters": "Parameters",
-        "navigateToService": "Open this service"
+        "navigateToService": "Open this service",
+        "alreadyOnService": "You are already viewing this service"
       }
     },
     "popup": {

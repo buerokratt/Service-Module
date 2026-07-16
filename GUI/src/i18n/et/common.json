@@ -370,7 +370,8 @@
         "selectService": "Vali teenus...",
         "noActiveServices": "Aktiivseid teenuseid pole saadaval",
         "parameters": "Parameetrid",
-        "navigateToService": "Ava see teenus"
+        "navigateToService": "Ava see teenus",
+        "alreadyOnService": "Sa vaatad juba seda teenust"
       }
     },
     "popup": {
