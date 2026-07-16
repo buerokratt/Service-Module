@@ -430,6 +430,9 @@
       "environmentVariables": {
         "title": "Keskkonnamuutujad"
       },
+      "apiResponses": {
+        "title": "API vastused"
+      },
       "dateAndTime": {
         "title": "Kuupäev ja kellaaeg",
         "base": "Põhi",

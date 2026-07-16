@@ -362,7 +362,9 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
         variables.push(variable);
       });
 
-      set({ endpointsResponseVariables: variables });
+      const uniqueVariables = Array.from(new Map(variables.map((variable) => [variable.name, variable])).values());
+
+      set({ endpointsResponseVariables: uniqueVariables });
     } catch (e) {
       console.error(e);
     }
