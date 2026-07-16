@@ -6,7 +6,10 @@ import useToastStore from 'store/toasts.store';
 
 export const navigateToService = (serviceId: string, navigate: NavigateFunction) => {
   if (serviceId === useServiceStore.getState().serviceId) {
-    useToastStore.getState().info({ title: t('serviceFlow.element.jumpToService.alreadyOnService') });
+    useToastStore.getState().info({
+      title: t('serviceFlow.element.jumpToService.title'),
+      message: t('serviceFlow.element.jumpToService.alreadyOnService'),
+    });
     return;
   }
 

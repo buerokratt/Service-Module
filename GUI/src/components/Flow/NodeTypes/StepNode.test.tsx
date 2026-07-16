@@ -62,7 +62,8 @@ describe('StepNode jump-to-service navigation', () => {
     expect(resetStateSpy).not.toHaveBeenCalled();
     expect(useServiceStore.getState().nextLocation).toBeNull();
     expect(useToastStore.getState().toasts).toHaveLength(1);
-    expect(useToastStore.getState().toasts[0].title).toBe('serviceFlow.element.jumpToService.alreadyOnService');
+    expect(useToastStore.getState().toasts[0].title).toBe('serviceFlow.element.jumpToService.title');
+    expect(useToastStore.getState().toasts[0].message).toBe('serviceFlow.element.jumpToService.alreadyOnService');
   });
 
   it('navigates directly to the target service when there are no unsaved changes', () => {
