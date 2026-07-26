@@ -30,8 +30,6 @@ export interface Group extends WithConnector {
   id: string;
   children: GroupOrRule[];
   not: boolean;
-  // Deprecated: previously the single AND/OR used to combine every child of this group.
-  // Kept only so groups saved before per-child connectors were introduced keep serializing the same way.
   type?: GroupType;
 }
 
