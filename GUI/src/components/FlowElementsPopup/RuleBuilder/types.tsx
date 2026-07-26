@@ -8,7 +8,14 @@ export interface RuleGroupBuilderProps {
   seedGroup?: Group | GroupOrRule[];
 }
 
-export interface Rule {
+export type GroupType = 'and' | 'or';
+
+interface WithConnector {
+  connector?: GroupType;
+  connectorNot?: boolean;
+}
+
+export interface Rule extends WithConnector {
   id: string;
   field: string;
   operator: string;
@@ -19,20 +26,20 @@ export interface Rule {
   isValueManual?: boolean;
 }
 
-export type GroupType = 'and' | 'or';
-
-export interface Group {
+export interface Group extends WithConnector {
   id: string;
   children: GroupOrRule[];
-  type: GroupType;
   not: boolean;
+  // Deprecated: previously the single AND/OR used to combine every child of this group.
+  // Kept only so groups saved before per-child connectors were introduced keep serializing the same way.
+  type?: GroupType;
 }
 
 export type GroupOrRule = Group | Rule;
 
 export const isInstanceOfRule = (x: GroupOrRule): boolean => 'operator' in x;
 
-export const getInitialRule = () => {
+export const getInitialRule = (connector: GroupType = 'and') => {
   return {
     id: uuidv4(),
     field: '',
@@ -42,14 +49,26 @@ export const getInitialRule = () => {
     valueDragElement: undefined,
     isFieldManual: false,
     isValueManual: false,
+    connector,
+    connectorNot: false,
   };
 };
 
-export const getInitialGroup = () => {
+export const getInitialGroup = (connector: GroupType = 'and') => {
   return {
     id: uuidv4(),
     children: [getInitialRule()],
-    type: 'and',
     not: false,
+    connector,
+    connectorNot: false,
   } as Group;
 };
+
+// Fills in a connector for children saved before per-child connectors existed,
+// falling back to the group's old uniform `type` so existing flows keep evaluating the same way.
+export const withMigratedConnectors = (children: GroupOrRule[], legacyType?: GroupType): GroupOrRule[] =>
+  children.map((child, index) => ({
+    ...child,
+    connector: child.connector ?? (index === 0 ? undefined : (legacyType ?? 'and')),
+    connectorNot: child.connectorNot ?? false,
+  }));
