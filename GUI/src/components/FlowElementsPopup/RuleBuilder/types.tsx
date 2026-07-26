@@ -64,8 +64,6 @@ export const getInitialGroup = (connector: GroupType = 'and') => {
   } as Group;
 };
 
-// Fills in a connector for children saved before per-child connectors existed,
-// falling back to the group's old uniform `type` so existing flows keep evaluating the same way.
 export const withMigratedConnectors = (children: GroupOrRule[], legacyType?: GroupType): GroupOrRule[] =>
   children.map((child, index) => ({
     ...child,
