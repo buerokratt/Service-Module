@@ -49,9 +49,6 @@ export const useRuleBuilder = (config: UseRuleBuilderProps) => {
   const onChangeRef = useRef(config.onChange);
   onChangeRef.current = config.onChange;
 
-  // The parent renders the connector (AND/OR/NOT) toggle for a subgroup, mutating this
-  // group's connector fields from outside. Re-sync local state so that doesn't get
-  // clobbered by the next time this group's own onChange effect below fires.
   useEffect(() => {
     if (config.root || !config.group) return;
     setGroupInfo((prev) => ({

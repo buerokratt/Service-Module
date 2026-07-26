@@ -266,8 +266,6 @@ const buildConditionString = (group: any, assignedVariableNames: Set<string>): s
       return '';
     }
 
-    // Groups saved before per-child connectors existed have no connector on their children,
-    // so fall back to the group's old uniform AND/OR to keep evaluating the same way.
     const legacyType: GroupType = subgroup.type ?? 'and';
 
     const combined = subgroup.children.reduce((accumulated: string, child: GroupOrRule, index: number) => {
