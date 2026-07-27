@@ -5,10 +5,10 @@ import { useTranslation } from 'react-i18next';
 import { GroupType } from './types';
 
 interface ConnectorToggleProps {
-  connector: GroupType;
-  connectorNot: boolean;
-  onChangeConnector: (connector: GroupType) => void;
-  onToggleNot: () => void;
+  readonly connector: GroupType;
+  readonly connectorNot: boolean;
+  readonly onChangeConnector: (connector: GroupType) => void;
+  readonly onToggleNot: () => void;
 }
 
 const ConnectorToggle: React.FC<ConnectorToggleProps> = ({

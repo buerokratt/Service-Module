@@ -11,8 +11,8 @@ export interface RuleGroupBuilderProps {
 export type GroupType = 'and' | 'or';
 
 interface WithConnector {
-  connector?: GroupType;
-  connectorNot?: boolean;
+  readonly connector?: GroupType;
+  readonly connectorNot?: boolean;
 }
 
 export interface Rule extends WithConnector {
