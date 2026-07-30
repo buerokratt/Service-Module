@@ -424,6 +424,7 @@ const FlowElementsPopup: React.FC = () => {
 
   return (
     <Popup
+      contentOverflow={stepType === StepType.JumpToService ? 'visible' : 'auto'}
       style={{ maxWidth: stepType === StepType.UserDefined ? 900 : 700 }}
       title={title}
       onClose={onClose}

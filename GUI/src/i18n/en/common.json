@@ -330,7 +330,8 @@
       "elementNameAlreadyExistsMessage": "An Element with the same name already exists"
     },
     "popup": {
-      "unsavedChanges": "You have unsaved changes. Are you sure you want to leave? Unsaved changes will be lost."
+      "unsavedChanges": "You have unsaved changes. Are you sure you want to leave? Unsaved changes will be lost.",
+      "saveAndContinue": "Save and continue"
     },
     "titleRequired": "Title is mandatory",
     "chooseMemorySlots": "Choose memory slots"
@@ -368,7 +369,8 @@
         "targetService": "Target service",
         "selectService": "Select a service...",
         "noActiveServices": "No active services available",
-        "parameters": "Parameters"
+        "parameters": "Parameters",
+        "navigateToService": "Open this service"
       }
     },
     "popup": {

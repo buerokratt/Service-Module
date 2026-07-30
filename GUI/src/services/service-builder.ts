@@ -3,7 +3,7 @@ import { AxiosError } from 'axios';
 import { Group, Rule } from 'components/FlowElementsPopup/RuleBuilder/types';
 import { format } from 'date-fns';
 import i18next, { t } from 'i18next';
-import { NodeHtmlMarkdown } from 'node-html-markdown';
+import { NodeHtmlMarkdown, PostProcessResult, TranslatorConfigObject } from 'node-html-markdown';
 import { createNewService, editService } from 'resources/api-constants';
 import useServiceStore from 'store/new-services.store';
 import useToastStore from 'store/toasts.store';
@@ -22,14 +22,31 @@ import {
 
 import api from '../services/api-dev';
 
-const htmlToMarkdown = new NodeHtmlMarkdown({
-  bulletMarker: '•',
-  textReplace: [
-    [/\\_/g, '_'],
-    [/\\\[/g, '['],
-    [/\\\]/g, ']'],
-  ],
-});
+const customTranslators: TranslatorConfigObject = {
+  li: ({ options: { bulletMarker }, listKind, listItemNumber }) => ({
+    prefix: listKind === 'OL' && listItemNumber !== undefined ? `${listItemNumber}\\. ` : `${bulletMarker} `,
+    surroundingNewlines: 1,
+    postprocess: ({ content }) =>
+      content.trim() === ''
+        ? PostProcessResult.RemoveNode
+        : content
+            .trim()
+            .replace(/([^\r\n])(?:\r?\n)+/g, '$1  \n')
+            .replace(/(\S)[^\S\r\n]+$/gm, '$1  '),
+  }),
+};
+
+const htmlToMarkdown = new NodeHtmlMarkdown(
+  {
+    bulletMarker: '•',
+    textReplace: [
+      [/\\_/g, '_'],
+      [/\\\[/g, '['],
+      [/\\\]/g, ']'],
+    ],
+  },
+  customTranslators,
+);
 
 /**
  * Normalises MCQ button payloads on all MultiChoiceQuestion nodes.

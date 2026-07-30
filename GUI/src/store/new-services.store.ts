@@ -50,6 +50,7 @@ import useToastStore from './toasts.store';
 import api from '../services/api-dev';
 
 const HIGHLIGHT_CLASS_RE = /\b(node-highlighted|node-dimmed)\b/g;
+const EDGE_HIGHLIGHT_CLASS_RE = /\b(edge-highlighted|edge-dimmed)\b/g;
 
 function stripNodeHighlight(node: Node): Node {
   if (!node.className) return node;
@@ -58,11 +59,19 @@ function stripNodeHighlight(node: Node): Node {
 }
 
 function stripEdgeHighlight(edge: Edge): Edge {
-  if (!edge.data) return edge;
+  const cleanedClassName = edge.className
+    ? edge.className.replace(EDGE_HIGHLIGHT_CLASS_RE, '').replace(/\s+/g, ' ').trim()
+    : edge.className;
   const data = edge.data;
-  if (!('isHighlighted' in data) && !('isDimmed' in data)) return edge;
-  const rest = Object.fromEntries(Object.entries(data).filter(([k]) => k !== 'isHighlighted' && k !== 'isDimmed'));
-  return { ...edge, data: rest };
+  const hasHighlightData = !!data && ('isHighlighted' in data || 'isDimmed' in data);
+
+  if (cleanedClassName === edge.className && !hasHighlightData) return edge;
+
+  const rest = hasHighlightData
+    ? Object.fromEntries(Object.entries(data).filter(([k]) => k !== 'isHighlighted' && k !== 'isDimmed'))
+    : data;
+
+  return { ...edge, className: cleanedClassName || undefined, data: rest };
 }
 
 export interface ServiceStoreState {
@@ -475,6 +484,7 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
       if (!endpoints || !Array.isArray(endpoints)) endpoints = [];
 
       nodes = nodes.map((node: any) => {
+        node = stripNodeHighlight(node as Node);
         if (node.type !== 'custom') return node;
         node.data = {
           ...node.data,
@@ -485,6 +495,7 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
         };
         return node;
       });
+      edges = edges.map(stripEdgeHighlight);
 
       /*The structuredClone approach failed with DataCloneError because flow nodes contain function references 
       (onDelete, onEdit, setClickedNode, update), 
