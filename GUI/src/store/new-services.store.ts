@@ -15,6 +15,7 @@ import i18next from 'i18next';
 import {
   getAllEndpoints,
   getEndpointValidation,
+  getNavigableServicesList,
   getSecretVariables,
   getServiceById,
   getTaraAuthResponseVariables,
@@ -94,6 +95,8 @@ export interface ServiceStoreState {
   isYesNoQuestion: boolean;
   stepPreferences: string[];
   endpointsResponseVariables: EndpointResponseVariable[];
+  navigableServices: Map<string, string>;
+  loadNavigableServiceIds: () => Promise<void>;
   setIsYesNoQuestion: (value: boolean) => void;
   changeAssignNode: (assign: Assign[]) => void;
   changeRulesNode: (rules: GroupOrRule[]) => void;
@@ -261,6 +264,7 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
   isYesNoQuestion: false,
   stepPreferences: [],
   endpointsResponseVariables: [],
+  navigableServices: new Map(),
   history: [{ nodes: initialNodes, edges: initialEdges }],
   historyIndex: 0,
   setIsYesNoQuestion: (value: boolean) => set({ isYesNoQuestion: value }),
@@ -585,6 +589,15 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
       });
     } catch (error) {
       console.error('Failed to load step preferences:', error);
+    }
+  },
+  loadNavigableServiceIds: async () => {
+    try {
+      const response = await api.get<{ serviceId: string; name: string }[]>(getNavigableServicesList());
+      const data = Array.isArray(response.data) ? response.data : [];
+      set({ navigableServices: new Map(data.map((s) => [s.serviceId, s.name])) });
+    } catch (error) {
+      console.error('Failed to load navigable services:', error);
     }
   },
   loadSecretVariables: async () => {
