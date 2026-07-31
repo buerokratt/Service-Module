@@ -32,7 +32,11 @@ const jumpToServiceData: NodeDataProps = {
 describe('StepNode jump-to-service navigation', () => {
   beforeEach(() => {
     mockNavigate.mockClear();
-    useServiceStore.setState({ hasUnsavedChanges: false, nextLocation: null });
+    useServiceStore.setState({
+      hasUnsavedChanges: false,
+      nextLocation: null,
+      navigableServices: new Map([['other-service-id', 'Other Service']]),
+    });
   });
 
   it('navigates directly to the target service when there are no unsaved changes', () => {
