@@ -593,7 +593,8 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
   },
   loadNavigableServiceIds: async () => {
     try {
-      const response = await api.get<{ serviceId: string; name: string }[]>(getNavigableServicesList());
+      const response =
+        await api.get<{ readonly serviceId: string; readonly name: string }[]>(getNavigableServicesList());
       const data = Array.isArray(response.data) ? response.data : [];
       set({ navigableServices: new Map(data.map((s) => [s.serviceId, s.name])) });
     } catch (error) {
