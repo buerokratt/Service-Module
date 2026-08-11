@@ -484,18 +484,21 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
       if (!endpoints || !Array.isArray(endpoints)) endpoints = [];
 
       nodes = nodes.map((node: any) => {
-        node = stripNodeHighlight(node as Node);
-        if (node.type !== 'custom') return node;
-        node.data = {
-          ...node.data,
+        const { selected, ...rest } = stripNodeHighlight(node as Node);
+        if (rest.type !== 'custom') return rest;
+        rest.data = {
+          ...rest.data,
           onDelete: get().onDelete,
           setClickedNode: get().setClickedNode,
           onEdit: get().handleNodeEdit,
           update: updateFlowInputRules,
         };
-        return node;
+        return rest;
       });
-      edges = edges.map(stripEdgeHighlight);
+      edges = edges.map((edge: any) => {
+        const { selected, ...rest } = stripEdgeHighlight(edge);
+        return rest;
+      });
 
       /*The structuredClone approach failed with DataCloneError because flow nodes contain function references 
       (onDelete, onEdit, setClickedNode, update), 
