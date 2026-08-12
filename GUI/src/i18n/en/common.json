@@ -457,6 +457,9 @@
       "environmentVariables": {
         "title": "Environment Variables"
       },
+      "apiResponses": {
+        "title": "API Responses"
+      },
       "helpers": {
         "title": "Tools",
         "map": "Change items",
