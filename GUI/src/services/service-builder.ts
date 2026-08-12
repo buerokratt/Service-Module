@@ -404,8 +404,8 @@ async function saveService(
         content: content,
         isCommon,
         structure: JSON.stringify({
-          edges: edges.map(({ selected, ...edge }) => edge),
-          nodes: nodes.map(({ selected, ...node }) => node),
+          edges: edges.map(({ selected: _selected, ...edge }) => edge),
+          nodes: nodes.map(({ selected: _selected, ...node }) => node),
         }),
         updateServiceDb: updateServiceDb,
         state: status,
