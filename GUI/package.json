@@ -79,6 +79,11 @@
     "test:coverage": "vitest run --coverage",
     "typecheck": "./typecheck.sh"
   },
+  "overrides": {
+    "sanitize-html": {
+      "htmlparser2": "10.1.0"
+    }
+  },
   "browserslist": [
     "defaults",
     "not IE 11"

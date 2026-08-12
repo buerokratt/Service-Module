@@ -20,15 +20,20 @@ const StepNode: FC<StepNodeProps> = ({ data }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const endpoints = useServiceStore((state) => state.endpoints);
+  const navigableServices = useServiceStore((state) => state.navigableServices);
   const [isTestedAndPassed, setIsTestedAndPassed] = useState<boolean | null>(null);
+
+  const jumpToServiceId = data.jumpToService?.serviceId;
+  const isJumpToServiceValid = !!jumpToServiceId && navigableServices.has(jumpToServiceId);
+  const jumpToServiceName =
+    (jumpToServiceId && navigableServices.get(jumpToServiceId)) || data.jumpToService?.serviceName;
 
   const handleJumpToServiceClick = (event: MouseEvent) => {
     event.stopPropagation();
 
-    const serviceId = data.jumpToService?.serviceId;
-    if (!serviceId) return;
+    if (!isJumpToServiceValid || !jumpToServiceId) return;
 
-    navigateToService(serviceId, navigate);
+    navigateToService(jumpToServiceId, navigate);
   };
 
   const boldText = {
@@ -149,12 +154,18 @@ const StepNode: FC<StepNodeProps> = ({ data }) => {
       )}
       {data.stepType === StepType.JumpToService && data.jumpToService?.serviceName && (
         <p
-          style={{ ...boldText, cursor: data.jumpToService.serviceId ? 'pointer' : 'default' }}
-          className={data.jumpToService.serviceId ? 'jump-to-service-link' : undefined}
-          onClick={data.jumpToService.serviceId ? handleJumpToServiceClick : undefined}
-          title={data.jumpToService.serviceId ? t('serviceFlow.element.jumpToService.navigateToService') : undefined}
+          style={{ ...boldText, cursor: isJumpToServiceValid ? 'pointer' : 'not-allowed' }}
+          className={isJumpToServiceValid ? 'jump-to-service-link' : 'jump-to-service-link-disabled'}
+          onClick={isJumpToServiceValid ? handleJumpToServiceClick : undefined}
+          title={
+            isJumpToServiceValid
+              ? t('serviceFlow.element.jumpToService.navigateToService')
+              : t('serviceFlow.element.jumpToService.deletedService', {
+                  serviceName: jumpToServiceName,
+                })
+          }
         >
-          &rarr; {data.jumpToService.serviceName}
+          &rarr; {jumpToServiceName}
         </p>
       )}
       {data.stepType === StepType.Rule && (

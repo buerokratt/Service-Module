@@ -371,6 +371,7 @@
         "noActiveServices": "No active services available",
         "parameters": "Parameters",
         "navigateToService": "Open this service",
+        "deletedService": "{{serviceName}} service has been deleted and can no longer be opened",
         "alreadyOnService": "You are already viewing this service"
       }
     },

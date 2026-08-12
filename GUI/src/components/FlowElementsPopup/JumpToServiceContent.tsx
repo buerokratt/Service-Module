@@ -53,6 +53,9 @@ const JumpToServiceContent: FC<JumpToServiceContentProps> = ({ node, jumpToServi
         ) ?? null)
       : null;
 
+  const isLinkedServiceDeleted =
+    !isLoading && !!jumpToService.serviceId && !services.some((s) => s.serviceId === jumpToService.serviceId);
+
   const handleServiceChange = (selection: { label: string; value: { name: string; serviceId: string } } | null) => {
     if (!selection) return;
     const service = services.find((s) => s.serviceId === selection.value.serviceId);
@@ -92,7 +95,7 @@ const JumpToServiceContent: FC<JumpToServiceContentProps> = ({ node, jumpToServi
                   onSelectionChange={handleServiceChange}
                 />
               </div>
-              {jumpToService.serviceId && (
+              {jumpToService.serviceId && !isLinkedServiceDeleted && (
                 <Button
                   appearance="icon"
                   size="s"
@@ -104,7 +107,14 @@ const JumpToServiceContent: FC<JumpToServiceContentProps> = ({ node, jumpToServi
                 </Button>
               )}
             </Track>
-            {services.length === 0 && (
+            {isLinkedServiceDeleted && (
+              <p style={{ color: '#c00', fontSize: '13px' }}>
+                {t('serviceFlow.element.jumpToService.deletedService', {
+                  serviceName: jumpToService.serviceName,
+                })}
+              </p>
+            )}
+            {!isLinkedServiceDeleted && services.length === 0 && (
               <p style={{ color: '#888', fontSize: '13px' }}>
                 {t('serviceFlow.element.jumpToService.noActiveServices')}
               </p>

@@ -371,6 +371,7 @@
         "noActiveServices": "Aktiivseid teenuseid pole saadaval",
         "parameters": "Parameetrid",
         "navigateToService": "Ava see teenus",
+        "deletedService": "Teenus {{serviceName}} on kustutatud ja seda ei saa enam avada",
         "alreadyOnService": "Sa vaatad juba seda teenust"
       }
     },
