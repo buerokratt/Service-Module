@@ -42,7 +42,7 @@ const jumpToServiceData: NodeDataProps = {
 describe('StepNode jump-to-service navigation', () => {
   beforeEach(() => {
     mockNavigate.mockClear();
-    useServiceStore.setState({ hasUnsavedChanges: false, nextLocation: null });
+    useServiceStore.setState({ serviceId: 'current-service-id', hasUnsavedChanges: false, nextLocation: null });
     useToastStore.setState({ toasts: [] });
   });
 
