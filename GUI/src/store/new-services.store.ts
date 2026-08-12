@@ -10,7 +10,7 @@ import {
   ReactFlowInstance,
 } from '@xyflow/react';
 import { AxiosResponse } from 'axios';
-import { GroupOrRule } from 'components/FlowElementsPopup/RuleBuilder/types';
+import { Group } from 'components/FlowElementsPopup/RuleBuilder/types';
 import i18next from 'i18next';
 import {
   getAllEndpoints,
@@ -94,13 +94,13 @@ export interface ServiceStoreState {
   isNewService: boolean;
   serviceState?: ServiceState;
   assignElements: Assign[];
-  rules: GroupOrRule[];
+  rules: Group | undefined;
   isYesNoQuestion: boolean;
   stepPreferences: string[];
   endpointsResponseVariables: EndpointResponseVariable[];
   setIsYesNoQuestion: (value: boolean) => void;
   changeAssignNode: (assign: Assign[]) => void;
-  changeRulesNode: (rules: GroupOrRule[]) => void;
+  changeRulesNode: (rules: Group | undefined) => void;
   markAsNewService: () => void;
   unmarkAsNewService: () => void;
   setServiceId: (id: string) => void;
@@ -261,7 +261,7 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
   isTestButtonVisible: false,
   isTestButtonEnabled: true,
   assignElements: [],
-  rules: [],
+  rules: undefined,
   isYesNoQuestion: false,
   stepPreferences: [],
   endpointsResponseVariables: [],
@@ -441,7 +441,7 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
       nodes: initialNodes,
       isTestButtonEnabled: true,
       assignElements: [],
-      rules: [],
+      rules: undefined,
       isYesNoQuestion: false,
       clickedNode: null,
       isTestButtonVisible: false,
@@ -453,7 +453,7 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
     useTestServiceStore.getState().reset();
   },
   resetAssign: () => set({ assignElements: [] }),
-  resetRules: () => set({ rules: [], isYesNoQuestion: false }),
+  resetRules: () => set({ rules: undefined, isYesNoQuestion: false }),
   loadService: async (id, resetState, search) => {
     if (resetState === true) {
       get().resetState();

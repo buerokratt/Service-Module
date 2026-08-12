@@ -138,9 +138,9 @@ const FlowElementsPopup: React.FC = () => {
       case StepType.Input:
       case StepType.Condition:
         if (node.data?.rules && Array.isArray(node.data.rules.children)) {
-          useServiceStore.getState().changeRulesNode(node.data.rules.children);
+          useServiceStore.getState().changeRulesNode(node.data.rules);
         } else {
-          useServiceStore.getState().changeRulesNode([]);
+          useServiceStore.getState().changeRulesNode(undefined);
         }
         break;
 
@@ -309,21 +309,19 @@ const FlowElementsPopup: React.FC = () => {
   };
 
   const prepareRulesForSaving = (updatedNode: Node<NodeDataProps>) => {
-    const rulesArray = Array.isArray(rules) ? rules : [];
-    for (const item of rulesArray) {
-      const processRuleField = (obj: GroupOrRule) => {
-        if ('field' in obj) obj.field = removeTrailingUnderscores(obj.field);
-        else {
-          for (const child of obj.children) {
-            processRuleField(child);
-          }
+    const rootGroup = rules ?? getInitialGroup();
+    const processRuleField = (obj: GroupOrRule) => {
+      if ('field' in obj) obj.field = removeTrailingUnderscores(obj.field);
+      else {
+        for (const child of obj.children) {
+          processRuleField(child);
         }
-      };
-      processRuleField(item);
+      }
+    };
+    for (const child of rootGroup.children) {
+      processRuleField(child);
     }
-    updatedNode.data.rules = node.data.rules
-      ? { ...node.data.rules, children: rulesArray }
-      : { ...getInitialGroup(), children: rulesArray };
+    updatedNode.data.rules = rootGroup;
   };
 
   const saveMultiChoicePopup = (originalNode: Node<NodeDataProps>, updatedNode: Node<NodeDataProps>) => {
