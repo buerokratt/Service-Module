@@ -1,6 +1,6 @@
 import { Edge, Node } from '@xyflow/react';
 import { AxiosError } from 'axios';
-import { Group, Rule } from 'components/FlowElementsPopup/RuleBuilder/types';
+import { Group, GroupOrRule, GroupType, Rule } from 'components/FlowElementsPopup/RuleBuilder/types';
 import { format } from 'date-fns';
 import i18next, { t } from 'i18next';
 import { NodeHtmlMarkdown, PostProcessResult, TranslatorConfigObject } from 'node-html-markdown';
@@ -252,37 +252,37 @@ const buildConditionString = (group: any, assignedVariableNames: Set<string>): s
     return isNumericString(rawField) ? rawField : `"${rawField}"`;
   };
 
+  const buildRuleTerm = (rule: Rule): string => {
+    const rawField = rule.field.replaceAll('${', '').replaceAll('}', '');
+    const absoluteValue = removeWrapperQuotes(rule.value.replaceAll('${', '').replaceAll('}', ''));
+    const value = formatField(absoluteValue);
+    const field = formatField(rawField);
+    return `${field} ${rule.operator} ${value}`;
+  };
+
   if ('children' in group) {
     const subgroup = group as Group;
     if (subgroup.children.length === 0) {
       return '';
     }
 
-    const conditions = subgroup.children.map((child) => {
-      if ('children' in child) {
-        return `(${buildConditionString(child, assignedVariableNames)})`;
-      } else {
-        const rule = child;
-        const rawField = rule.field.replaceAll('${', '').replaceAll('}', '');
-        const absoluteValue = removeWrapperQuotes(rule.value.replaceAll('${', '').replaceAll('}', ''));
-        const value = formatField(absoluteValue);
-        const field = formatField(rawField);
-        return `${field} ${rule.operator} ${value}`;
-      }
-    });
+    const legacyType: GroupType = subgroup.type ?? 'and';
 
-    if (subgroup.not) {
-      return `!(${subgroup.type === 'and' ? conditions.join(' && ') : conditions.join(' || ')})`;
-    } else {
-      return subgroup.type === 'and' ? conditions.join(' && ') : conditions.join(' || ');
-    }
+    const combined = subgroup.children.reduce((accumulated: string, child: GroupOrRule, index: number) => {
+      const term =
+        'children' in child ? `(${buildConditionString(child, assignedVariableNames)})` : buildRuleTerm(child as Rule);
+      const signedTerm = child.connectorNot ? `!(${term})` : term;
+
+      if (index === 0) return signedTerm;
+
+      const connector = child.connector ?? legacyType;
+      const operator = connector === 'and' ? '&&' : '||';
+      return `${accumulated} ${operator} ${signedTerm}`;
+    }, '');
+
+    return subgroup.not ? `!(${combined})` : combined;
   } else {
-    const rule = group as Rule;
-    const rawField = rule.field.replaceAll('${', '').replaceAll('}', '');
-    const absoluteValue = removeWrapperQuotes(rule.value.replaceAll('${', '').replaceAll('}', ''));
-    const value = formatField(absoluteValue);
-    const field = formatField(rawField);
-    return `${field} ${rule.operator} ${value}`;
+    return buildRuleTerm(group as Rule);
   }
 };
 
@@ -403,7 +403,10 @@ async function saveService(
         type: 'POST',
         content: content,
         isCommon,
-        structure: JSON.stringify({ edges, nodes }),
+        structure: JSON.stringify({
+          edges: edges.map(({ selected: _selected, ...edge }) => edge),
+          nodes: nodes.map(({ selected: _selected, ...node }) => node),
+        }),
         updateServiceDb: updateServiceDb,
         state: status,
       },
@@ -503,6 +506,13 @@ export function getYamlContent(
     returns: 'json',
     namespace: 'service',
     allowlist: {
+      header: [
+        {
+          field: 'x-ruuter-nonce',
+          type: 'string',
+          description: 'The nonce for the request',
+        },
+      ],
       body: [
         {
           field: 'chatId',

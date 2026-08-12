@@ -58,6 +58,11 @@
     }
   }
 
+  .jump-to-service-link-disabled {
+    color: get-color(black-coral-6);
+    text-decoration: line-through;
+  }
+
   .file-name-extension {
     color: get-color(black-coral-6);
   }

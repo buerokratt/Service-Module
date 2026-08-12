@@ -15,7 +15,7 @@ const ConditionBuilderContent: React.FC = () => {
   const isYesNoQuestion = useServiceStore((state) => state.isYesNoQuestion);
   const rules = useServiceStore((state) => state.rules);
   const node = useServiceStore((state) => state.selectedNode);
-  const seedGroup = node?.data?.rules || (Array.isArray(rules) && rules.length > 0 ? rules : undefined);
+  const seedGroup = node?.data?.rules || (rules && rules.children.length > 0 ? rules : undefined);
 
   return (
     <Track direction="vertical" align="stretch">
@@ -34,7 +34,7 @@ const ConditionBuilderContent: React.FC = () => {
       {isYesNoQuestion && <YesNoPopupContent />}
       {!isYesNoQuestion && (
         <RuleBuilder
-          onChange={(group: Group) => useServiceStore.getState().changeRulesNode(group.children)}
+          onChange={(group: Group) => useServiceStore.getState().changeRulesNode(group)}
           seedGroup={seedGroup}
         />
       )}

@@ -1,6 +1,7 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import useServiceStore from 'store/new-services.store';
+import useToastStore from 'store/toasts.store';
 import { StepType } from 'types';
 import { NodeDataProps } from 'types/service-flow';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -10,6 +11,15 @@ import StepNode from './StepNode';
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({ t: (key: string) => key }),
 }));
+
+vi.mock('i18next', () => {
+  const mockI18n = {
+    use: vi.fn().mockReturnThis(),
+    init: vi.fn().mockResolvedValue(undefined),
+    t: (key: string) => key,
+  };
+  return { default: mockI18n, t: mockI18n.t };
+});
 
 const mockNavigate = vi.fn();
 vi.mock('react-router-dom', async () => {
@@ -32,7 +42,33 @@ const jumpToServiceData: NodeDataProps = {
 describe('StepNode jump-to-service navigation', () => {
   beforeEach(() => {
     mockNavigate.mockClear();
-    useServiceStore.setState({ hasUnsavedChanges: false, nextLocation: null });
+    useServiceStore.setState({
+      serviceId: 'current-service-id',
+      hasUnsavedChanges: false,
+      nextLocation: null,
+      navigableServices: new Map([['other-service-id', 'Other Service']]),
+    });
+    useToastStore.setState({ toasts: [] });
+  });
+
+  it('does not navigate away and shows a toast when the node references the currently open service (self-loop)', () => {
+    useServiceStore.setState({ serviceId: 'other-service-id', hasUnsavedChanges: false, nextLocation: null });
+    const resetStateSpy = vi.spyOn(useServiceStore.getState(), 'resetState');
+
+    render(
+      <MemoryRouter>
+        <StepNode data={jumpToServiceData} />
+      </MemoryRouter>,
+    );
+
+    fireEvent.click(screen.getByText(/Other Service/));
+
+    expect(mockNavigate).not.toHaveBeenCalled();
+    expect(resetStateSpy).not.toHaveBeenCalled();
+    expect(useServiceStore.getState().nextLocation).toBeNull();
+    expect(useToastStore.getState().toasts).toHaveLength(1);
+    expect(useToastStore.getState().toasts[0].title).toBe('serviceFlow.element.jumpToService.title');
+    expect(useToastStore.getState().toasts[0].message).toBe('serviceFlow.element.jumpToService.alreadyOnService');
   });
 
   it('navigates directly to the target service when there are no unsaved changes', () => {

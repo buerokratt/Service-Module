@@ -370,7 +370,9 @@
         "selectService": "Select a service...",
         "noActiveServices": "No active services available",
         "parameters": "Parameters",
-        "navigateToService": "Open this service"
+        "navigateToService": "Open this service",
+        "deletedService": "{{serviceName}} service has been deleted and can no longer be opened",
+        "alreadyOnService": "You are already viewing this service"
       }
     },
     "popup": {
@@ -455,6 +457,9 @@
       "noName": "<No name>",
       "environmentVariables": {
         "title": "Environment Variables"
+      },
+      "apiResponses": {
+        "title": "API Responses"
       },
       "helpers": {
         "title": "Tools",
