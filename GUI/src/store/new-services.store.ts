@@ -10,7 +10,7 @@ import {
   ReactFlowInstance,
 } from '@xyflow/react';
 import { AxiosResponse } from 'axios';
-import { GroupOrRule } from 'components/FlowElementsPopup/RuleBuilder/types';
+import { Group } from 'components/FlowElementsPopup/RuleBuilder/types';
 import i18next from 'i18next';
 import {
   getAllEndpoints,
@@ -59,6 +59,10 @@ function stripNodeHighlight(node: Node): Node {
   return cleaned === node.className ? node : { ...node, className: cleaned || undefined };
 }
 
+function omitSelected<T extends { selected?: boolean }>({ selected: _selected, ...rest }: T): Omit<T, 'selected'> {
+  return rest;
+}
+
 function stripEdgeHighlight(edge: Edge): Edge {
   const cleanedClassName = edge.className
     ? edge.className.replace(EDGE_HIGHLIGHT_CLASS_RE, '').replace(/\s+/g, ' ').trim()
@@ -91,7 +95,7 @@ export interface ServiceStoreState {
   isNewService: boolean;
   serviceState?: ServiceState;
   assignElements: Assign[];
-  rules: GroupOrRule[];
+  rules: Group | undefined;
   isYesNoQuestion: boolean;
   stepPreferences: string[];
   endpointsResponseVariables: EndpointResponseVariable[];
@@ -99,7 +103,7 @@ export interface ServiceStoreState {
   loadNavigableServiceIds: () => Promise<void>;
   setIsYesNoQuestion: (value: boolean) => void;
   changeAssignNode: (assign: Assign[]) => void;
-  changeRulesNode: (rules: GroupOrRule[]) => void;
+  changeRulesNode: (rules: Group | undefined) => void;
   markAsNewService: () => void;
   unmarkAsNewService: () => void;
   setServiceId: (id: string) => void;
@@ -260,7 +264,7 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
   isTestButtonVisible: false,
   isTestButtonEnabled: true,
   assignElements: [],
-  rules: [],
+  rules: undefined,
   isYesNoQuestion: false,
   stepPreferences: [],
   endpointsResponseVariables: [],
@@ -366,7 +370,9 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
         variables.push(variable);
       });
 
-      set({ endpointsResponseVariables: variables });
+      const uniqueVariables = Array.from(new Map(variables.map((variable) => [variable.name, variable])).values());
+
+      set({ endpointsResponseVariables: uniqueVariables });
     } catch (e) {
       console.error(e);
     }
@@ -439,7 +445,7 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
       nodes: initialNodes,
       isTestButtonEnabled: true,
       assignElements: [],
-      rules: [],
+      rules: undefined,
       isYesNoQuestion: false,
       clickedNode: null,
       isTestButtonVisible: false,
@@ -451,7 +457,7 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
     useTestServiceStore.getState().reset();
   },
   resetAssign: () => set({ assignElements: [] }),
-  resetRules: () => set({ rules: [], isYesNoQuestion: false }),
+  resetRules: () => set({ rules: undefined, isYesNoQuestion: false }),
   loadService: async (id, resetState, search) => {
     if (resetState === true) {
       get().resetState();
@@ -488,18 +494,18 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
       if (!endpoints || !Array.isArray(endpoints)) endpoints = [];
 
       nodes = nodes.map((node: any) => {
-        node = stripNodeHighlight(node as Node);
-        if (node.type !== 'custom') return node;
-        node.data = {
-          ...node.data,
+        const rest = omitSelected(stripNodeHighlight(node as Node));
+        if (rest.type !== 'custom') return rest;
+        rest.data = {
+          ...rest.data,
           onDelete: get().onDelete,
           setClickedNode: get().setClickedNode,
           onEdit: get().handleNodeEdit,
           update: updateFlowInputRules,
         };
-        return node;
+        return rest;
       });
-      edges = edges.map(stripEdgeHighlight);
+      edges = edges.map((edge: Edge) => omitSelected(stripEdgeHighlight(edge)));
 
       /*The structuredClone approach failed with DataCloneError because flow nodes contain function references 
       (onDelete, onEdit, setClickedNode, update), 
