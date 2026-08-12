@@ -58,6 +58,10 @@ function stripNodeHighlight(node: Node): Node {
   return cleaned === node.className ? node : { ...node, className: cleaned || undefined };
 }
 
+function omitSelected<T extends { selected?: boolean }>({ selected: _selected, ...rest }: T): Omit<T, 'selected'> {
+  return rest;
+}
+
 function stripEdgeHighlight(edge: Edge): Edge {
   const cleanedClassName = edge.className
     ? edge.className.replace(EDGE_HIGHLIGHT_CLASS_RE, '').replace(/\s+/g, ' ').trim()
@@ -484,18 +488,18 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
       if (!endpoints || !Array.isArray(endpoints)) endpoints = [];
 
       nodes = nodes.map((node: any) => {
-        node = stripNodeHighlight(node as Node);
-        if (node.type !== 'custom') return node;
-        node.data = {
-          ...node.data,
+        const rest = omitSelected(stripNodeHighlight(node as Node));
+        if (rest.type !== 'custom') return rest;
+        rest.data = {
+          ...rest.data,
           onDelete: get().onDelete,
           setClickedNode: get().setClickedNode,
           onEdit: get().handleNodeEdit,
           update: updateFlowInputRules,
         };
-        return node;
+        return rest;
       });
-      edges = edges.map(stripEdgeHighlight);
+      edges = edges.map((edge: Edge) => omitSelected(stripEdgeHighlight(edge)));
 
       /*The structuredClone approach failed with DataCloneError because flow nodes contain function references 
       (onDelete, onEdit, setClickedNode, update), 

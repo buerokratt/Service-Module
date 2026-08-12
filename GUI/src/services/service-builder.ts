@@ -403,7 +403,10 @@ async function saveService(
         type: 'POST',
         content: content,
         isCommon,
-        structure: JSON.stringify({ edges, nodes }),
+        structure: JSON.stringify({
+          edges: edges.map(({ selected: _selected, ...edge }) => edge),
+          nodes: nodes.map(({ selected: _selected, ...node }) => node),
+        }),
         updateServiceDb: updateServiceDb,
         state: status,
       },
