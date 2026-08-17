@@ -3,8 +3,9 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { MdDeleteOutline } from 'react-icons/md';
 
+import ConnectorToggle from './ConnectorToggle';
 import RuleElement from './ruleElement';
-import { Group, isInstanceOfRule, Rule, RuleGroupBuilderProps } from './types';
+import { Group, GroupOrRule, isInstanceOfRule, Rule, RuleGroupBuilderProps } from './types';
 import { useRuleBuilder } from './useRuleBuilder';
 import '../styles.scss';
 
@@ -17,8 +18,8 @@ const RuleBuilder: React.FC<RuleGroupBuilderProps> = ({ group, onRemove, onChang
     addGroup,
     remove,
     toggleNot,
-    changeToAnd,
-    changeToOr,
+    changeConnector,
+    toggleConnectorNot,
     changeRule,
     onSubGroupChange,
   } = useRuleBuilder({
@@ -28,8 +29,6 @@ const RuleBuilder: React.FC<RuleGroupBuilderProps> = ({ group, onRemove, onChang
     seedGroup,
   });
 
-  const andButtonClassName = groupInfo.type === 'and' ? 'rule-green' : 'rule-gray';
-  const orButtonClassName = groupInfo.type === 'or' ? 'rule-green' : 'rule-gray';
   const notButtonClassName = groupInfo.not ? 'rule-red' : 'rule-gray';
 
   return (
@@ -38,12 +37,6 @@ const RuleBuilder: React.FC<RuleGroupBuilderProps> = ({ group, onRemove, onChang
         <Track>
           <button className={`small-rule-group-button ${notButtonClassName}`} onClick={toggleNot}>
             {t('serviceFlow.popup.not')}
-          </button>
-          <button className={`small-rule-group-button ${andButtonClassName}`} onClick={changeToAnd}>
-            {t('serviceFlow.popup.and')}
-          </button>
-          <button className={`small-rule-group-button ${orButtonClassName}`} onClick={changeToOr}>
-            {t('serviceFlow.popup.or')}
           </button>
         </Track>
         <Track gap={8}>
@@ -60,18 +53,23 @@ const RuleBuilder: React.FC<RuleGroupBuilderProps> = ({ group, onRemove, onChang
           )}
         </Track>
       </Track>
-      {elements?.map((element) =>
-        isInstanceOfRule(element) ? (
-          <RuleElement key={element.id} rule={element as Rule} onRemove={remove} onChange={changeRule} />
-        ) : (
-          <RuleBuilder
-            key={element.id}
-            group={element as Group}
-            onRemove={remove}
-            onChange={onSubGroupChange(element.id)}
-          />
-        ),
-      )}
+      {elements?.map((element: GroupOrRule, index: number) => (
+        <React.Fragment key={element.id}>
+          {index > 0 && (
+            <ConnectorToggle
+              connector={element.connector ?? 'and'}
+              connectorNot={!!element.connectorNot}
+              onChangeConnector={(connector) => changeConnector(element.id, connector)}
+              onToggleNot={() => toggleConnectorNot(element.id)}
+            />
+          )}
+          {isInstanceOfRule(element) ? (
+            <RuleElement rule={element as Rule} onRemove={remove} onChange={changeRule} />
+          ) : (
+            <RuleBuilder group={element as Group} onRemove={remove} onChange={onSubGroupChange(element.id)} />
+          )}
+        </React.Fragment>
+      ))}
     </Track>
   );
 };

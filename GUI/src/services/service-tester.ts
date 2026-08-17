@@ -1,6 +1,6 @@
 import { Node } from '@xyflow/react';
 import { t } from 'i18next';
-import { testService } from 'resources/api-constants';
+import { getNewNonce, testService } from 'resources/api-constants';
 import useServiceStore, { ServiceStoreState } from 'store/new-services.store';
 import useTestServiceStore from 'store/test-services.store';
 import { NodeDataProps } from 'types/service-flow';
@@ -43,14 +43,21 @@ export const runServiceTest = async (input: string, serviceName?: string) => {
   const stateToUse = state == ServiceState.Ready ? ServiceState.Draft : state;
 
   try {
-    await executeServiceTest(headerValue, stateToUse, nameToUse, input.split(','));
+    const testNonce = await fetchNonce();
+    await executeServiceTest(headerValue, stateToUse, nameToUse, input.split(','), testNonce);
 
-    const response = await executeService(stateToUse, nameToUse, input.split(','));
+    const runNonce = await fetchNonce();
+    const response = await executeService(stateToUse, nameToUse, input.split(','), runNonce);
 
     addSuccessMessages(response.data);
   } catch (error) {
     handleTestError(error, serviceStore);
   }
+};
+
+export const fetchNonce = async (): Promise<string> => {
+  const response = await api.get<string>(getNewNonce());
+  return response.data;
 };
 
 export function getInvalidNodes(nodes: Node[]): { label: string; error: string }[] {
@@ -122,9 +129,16 @@ export const clearPreviousTestStates = (serviceStore: ServiceStoreState) => {
   );
 };
 
-export const executeServiceTest = async (headerValue: string, state: ServiceState, name: string, input: string[]) => {
+export const executeServiceTest = async (
+  headerValue: string,
+  state: ServiceState,
+  name: string,
+  input: string[],
+  nonce: string,
+) => {
   const testApi = createApiInstance({
     'x-ruuter-testing': headerValue,
+    'x-ruuter-nonce': nonce,
   });
   return testApi.post(testService(state, name), { input });
 };
@@ -213,8 +227,8 @@ export function translateError(error: ServiceTestError, nodeLabel: string): Reco
   return translateObjectKeys(translatedError, 'chat.service-test-error');
 }
 
-export const executeService = async (state: ServiceState, name: string, input: string[]) => {
-  return api.post<ServiceResponse>(testService(state, name), { input });
+export const executeService = async (state: ServiceState, name: string, input: string[], nonce: string) => {
+  return api.post<ServiceResponse>(testService(state, name), { input }, { headers: { 'x-ruuter-nonce': nonce } });
 };
 
 export const addSuccessMessages = (responseData: ServiceResponse): void => {

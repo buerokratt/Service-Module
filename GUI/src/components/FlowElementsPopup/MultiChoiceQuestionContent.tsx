@@ -2,7 +2,7 @@ import FormError from 'components/FormElements/FormError';
 import { FC, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MdCheck, MdDeleteOutline, MdEdit } from 'react-icons/md';
-import ReactQuill from 'react-quill';
+import ReactQuill from 'react-quill-new';
 import useServiceStore from 'store/new-services.store';
 import useServiceListStore from 'store/services.store';
 import { generateUniqueId } from 'utils/flow-utils';

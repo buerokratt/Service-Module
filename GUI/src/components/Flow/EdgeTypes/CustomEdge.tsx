@@ -14,7 +14,7 @@ import {
   sortableKeyboardCoordinates,
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
-import { BaseEdge, EdgeLabelRenderer, EdgeProps, getBezierPath } from '@xyflow/react';
+import { BaseEdge, Edge, EdgeLabelRenderer, EdgeProps, getBezierPath } from '@xyflow/react';
 import { Collapsible, Dropdown, StepElement, Track } from 'components';
 import useEdgeAdd from 'hooks/flow/useEdgeAdd';
 import { CSSProperties, memo, useEffect, useState } from 'react';
@@ -33,6 +33,8 @@ function reorderElements<T>(elements: T[], activeId: string | number, overId: st
   return arrayMove(elements, oldIndex, newIndex);
 }
 
+type HighlightData = { readonly isHighlighted?: boolean; readonly isDimmed?: boolean };
+
 function CustomEdge({
   id,
   label,
@@ -44,7 +46,8 @@ function CustomEdge({
   targetPosition,
   style,
   markerEnd,
-}: EdgeProps) {
+  data: highlightData,
+}: EdgeProps<Edge<HighlightData>>) {
   const [edgePath, edgeCenterX, edgeCenterY] = getBezierPath({
     sourceX,
     sourceY,
@@ -138,7 +141,7 @@ function CustomEdge({
                 transform: `translate(${edgeCenterX}px, ${edgeCenterY}px) translate(-50%, -50%)`,
               }}
               onClick={() => {}}
-              className="edge-button nodrag nopan"
+              className={`edge-button nodrag nopan${highlightData?.isDimmed ? ' edge-button--dimmed' : ''}${highlightData?.isHighlighted ? ' edge-button--highlighted' : ''}`}
             >
               {label ?? '+'}
             </button>

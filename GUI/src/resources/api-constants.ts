@@ -16,9 +16,10 @@ export const changeServiceStatus = (): string => `${baseUrl}/services/status`;
 export const createNewService = (): string => `${baseUrl}/services/add`;
 export const testService = (state: ServiceState, serviceName: string): string =>
   `${baseUrl}/services/${state.toLowerCase()}/${serviceName}`;
+export const getNewNonce = (): string => `${baseUrl}/get-new-nonce`;
 export const editService = (id: string): string => `${baseUrl}/services/edit?id=${id}`;
 export const getServicesList = (): string => `${baseUrl}/services`;
-export const getActiveServicesList = (): string => `${baseUrl}/active-services`;
+export const getNavigableServicesList = (): string => `${baseUrl}/navigable-services`;
 export const getConnectionRequests = (): string => `${baseUrl}/services/connection-requests`;
 export const getAvailableIntents = (): string => `${baseUrl}/services/available-intents`;
 export const jsonToYml = (): string => `${baseUrl}/saveJsonToYml`;
