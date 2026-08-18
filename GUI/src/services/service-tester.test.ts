@@ -1297,4 +1297,14 @@ describe('addSuccessMessages', () => {
     expect(mockAddBotMessage).toHaveBeenCalledWith('Test response content', undefined);
     expect(mockAddSuccess).toHaveBeenCalledWith('chat.service-test-success');
   });
+
+  it('should not throw and should skip the bot message when the response array is empty', () => {
+    const responseData = {
+      response: [],
+    };
+
+    expect(() => addSuccessMessages(responseData)).not.toThrow();
+    expect(mockAddBotMessage).not.toHaveBeenCalled();
+    expect(mockAddSuccess).toHaveBeenCalledWith('chat.service-test-success');
+  });
 });

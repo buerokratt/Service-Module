@@ -25,12 +25,35 @@ check_for_body:
   switch:
     - condition: ${incoming.body == null || incoming.body.serviceName == null || incoming.body.serviceName == ""}
       next: missing_service_name
+  next: get_service_status
+
+get_service_status:
+  call: http.post
+  args:
+    url: "[#SERVICE_RESQL]/get-service-status-by-name"
+    body:
+      service_name: ${incoming.body.serviceName}
+  result: service_status_res
+  next: assign_service_status
+
+assign_service_status:
+  assign:
+    service_status: "${service_status_res.response.body[0] && service_status_res.response.body[0].currentState === 'active' ? 'active' : 'draft'}"
+  next: get_new_nonce
+
+get_new_nonce:
+  call: http.post
+  args:
+    url: "[#SERVICE_TRAINING_RESQL]/get-new-nonce"
+  result: nonce_res
   next: trigger_service
 
 trigger_service:
   call: http.post
   args:
-    url: "[#SERVICE_RUUTER]/services/active/${incoming.body.serviceName}"
+    url: "[#SERVICE_RUUTER]/services/${service_status}/${incoming.body.serviceName}"
+    headers:
+      x-ruuter-nonce: ${nonce_res.response.body[0].nonce}
     body:
       chatId: ${incoming.body.chatId}
       authorId: ${incoming.body.authorId} 
