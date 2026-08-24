@@ -130,7 +130,7 @@ delete_mcq_files:
     url: "[#SERVICE_DMAPPER]/file-manager/delete-all-that-starts-with"
     body:
       path: "[#RUUTER_SERVICES_PATH]/${ruuter_type}/[#RUUTER_SERVICES_DIR_PATH]/${old_file_status_path}"
-      keyword: "${name_res.response.body[0].name}_"
+      keyword: "${name_res.response.body[0].name}_mcq_"
   result: deleted_mcq
 
 return_ok:

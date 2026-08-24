@@ -197,7 +197,7 @@ activate_all_mcq_services:
     body:
       file_path: "[#RUUTER_SERVICES_PATH]/${ruuter_type}/[#RUUTER_SERVICES_DIR_PATH]/${old_file_status_path}"
       new_path: "[#RUUTER_SERVICES_PATH]/${ruuter_type}/[#RUUTER_SERVICES_DIR_PATH]/active"
-      keyword: "${name}_"
+      keyword: "${name}_mcq_"
       format: "yml"
   result: active_move_results
   next: return_ok
@@ -257,7 +257,7 @@ dactivate_all_mcq_services:
     body:
       file_path: "[#RUUTER_SERVICES_PATH]/${ruuter_type}/[#RUUTER_SERVICES_DIR_PATH]/${old_file_status_path}"
       new_path: "[#RUUTER_SERVICES_PATH]/${ruuter_type}/[#RUUTER_SERVICES_DIR_PATH]/inactive"
-      keyword: "${name}_"
+      keyword: "${name}_mcq_"
       format: "tmp"
   result: inactive_move_results
   next: return_ok
@@ -279,7 +279,7 @@ draft_all_mcq_services:
     body:
       file_path: "[#RUUTER_SERVICES_PATH]/${ruuter_type}/[#RUUTER_SERVICES_DIR_PATH]/${old_file_status_path}"
       new_path: "[#RUUTER_SERVICES_PATH]/${ruuter_type}/[#RUUTER_SERVICES_DIR_PATH]/draft"
-      keyword: "${name}_"
+      keyword: "${name}_mcq_"
       format: "tmp"
   result: inactive_move_results
   next: return_ok
