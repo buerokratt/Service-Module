@@ -5,10 +5,11 @@ SELECT
   current_state AS state,
   ruuter_type AS type,
   slot,
-  CEIL((SELECT COUNT(DISTINCT service_id) FROM services WHERE NOT deleted AND (:is_common::TEXT = '' OR is_common = (:is_common::TEXT)::BOOLEAN)) / :page_size::DECIMAL) AS total_pages
+  CEIL((SELECT COUNT(DISTINCT service_id) FROM services WHERE NOT deleted AND (:is_common::TEXT = '' OR is_common = (:is_common::TEXT)::BOOLEAN) AND (:search IS NULL OR :search = '' OR LOWER(name) LIKE LOWER('%' || :search || '%'))) / :page_size::DECIMAL) AS total_pages
 FROM services
-WHERE NOT deleted 
+WHERE NOT deleted
   AND (:is_common::TEXT = '' OR is_common = (:is_common::TEXT)::BOOLEAN)
+  AND (:search IS NULL OR :search = '' OR LOWER(name) LIKE LOWER('%' || :search || '%'))
 ORDER BY 
   CASE WHEN :sorting = 'name asc' THEN name END ASC,
   CASE WHEN :sorting = 'name desc' THEN name END DESC,

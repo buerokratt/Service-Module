@@ -232,8 +232,10 @@ export const executeService = async (state: ServiceState, name: string, input: s
 };
 
 export const addSuccessMessages = (responseData: ServiceResponse): void => {
-  const res = responseData.response[0];
+  const res = responseData.response?.[0];
   const store = useTestServiceStore.getState();
-  store.addBotMessage(res.content, res.buttons);
+  if (res) {
+    store.addBotMessage(res.content, res.buttons);
+  }
   store.addSuccess('chat.service-test-success');
 };
