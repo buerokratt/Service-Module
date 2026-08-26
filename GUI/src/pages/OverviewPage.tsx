@@ -33,16 +33,16 @@ const OverviewPage: React.FC = () => {
             style={{ display: 'none' }}
             multiple
           />
-          <Button onClick={triggerFileInput}>{t('overview.importMany')}</Button>
-          <Button onClick={() => setIsExportModalVisible(true)}>{t('overview.exportMany')}</Button>
+          <Button appearance="secondary" onClick={triggerFileInput}>
+            {t('overview.importMany')}
+          </Button>
+          <Button appearance="secondary" onClick={() => setIsExportModalVisible(true)}>
+            {t('overview.exportMany')}
+          </Button>
           <Button onClick={() => navigate(ROUTES.NEWSERVICE_ROUTE)}>{t('overview.create')}</Button>
         </Track>
       </Track>
       <ServicesTable />
-      <Track justify="between">
-        <h1>{t('overview.commonServices')}</h1>
-      </Track>
-      <ServicesTable isCommon />
       <ExportServicesModal isVisible={isExportModalVisible} onClose={() => setIsExportModalVisible(false)} />
     </>
   );

@@ -18,12 +18,11 @@ import {
 } from '@tanstack/react-table';
 import clsx from 'clsx';
 import { Icon, Track } from 'components';
-import React, { CSSProperties, FC, ReactNode, useId } from 'react';
-import { useTranslation } from 'react-i18next';
-import { MdExpandLess, MdExpandMore, MdOutlineEast, MdOutlineWest, MdUnfoldMore } from 'react-icons/md';
-import { Link } from 'react-router-dom';
+import React, { CSSProperties, FC, ReactNode } from 'react';
+import { MdExpandLess, MdExpandMore, MdUnfoldMore } from 'react-icons/md';
 
 import Filter from './Filter';
+import TablePagination from './Pagination';
 import './DataTable.scss';
 
 type DataTableProps = {
@@ -48,6 +47,10 @@ type DataTableProps = {
   meta?: TableMeta<any>;
   withScrollWrapper?: boolean;
   renderSubRow?: (row: Row<any>) => ReactNode;
+  renderBeforeRow?: (row: Row<any>, index: number) => ReactNode;
+  stickyHeader?: boolean;
+  hidePagination?: boolean;
+  emptyMessage?: string;
   alwaysShowPagination?: boolean;
 };
 
@@ -63,7 +66,8 @@ declare module '@tanstack/table-core' {
 
 declare module '@tanstack/react-table' {
   interface TableMeta<TData extends RowData> {
-    getRowStyles: (row: Row<TData>) => CSSProperties;
+    getRowStyles?: (row: Row<TData>) => CSSProperties;
+    getRowProps?: (row: Row<TData>) => Record<string, string>;
     onRowClick?: (row: Row<TData>) => void;
   }
 }
@@ -98,10 +102,12 @@ const DataTable: FC<DataTableProps> = ({
   meta,
   withScrollWrapper = true,
   renderSubRow,
+  renderBeforeRow,
+  stickyHeader = false,
+  hidePagination = false,
+  emptyMessage,
   alwaysShowPagination = false,
 }) => {
-  const id = useId();
-  const { t } = useTranslation();
   const tablePagination = pagination ?? {
     pageIndex: 0,
     pageSize: 10,
@@ -151,7 +157,7 @@ const DataTable: FC<DataTableProps> = ({
       className={`data-table${withScrollWrapper ? '__scrollWrapper' : ''}`}
       style={withScrollWrapper ? undefined : { overflowX: 'hidden' }}
     >
-      <table className="data-table">
+      <table className={clsx('data-table', stickyHeader && 'data-table--sticky-header')}>
         {!disableHead && (
           <thead>
             {table.getHeaderGroups().map((headerGroup) => (
@@ -161,7 +167,7 @@ const DataTable: FC<DataTableProps> = ({
                     {header.isPlaceholder ? null : (
                       <Track gap={8}>
                         {sortable && header.column.getCanSort() && (
-                          <button onClick={header.column.getToggleSortingHandler()}>
+                          <button type="button" onClick={header.column.getToggleSortingHandler()}>
                             {{
                               asc: <Icon icon={<MdExpandMore fontSize={20} />} size="medium" />,
                               desc: <Icon icon={<MdExpandLess fontSize={20} />} size="medium" />,
@@ -182,84 +188,52 @@ const DataTable: FC<DataTableProps> = ({
         )}
         <tbody>
           {tableBodyPrefix}
-          {table.getRowModel().rows.map((row) => (
-            <React.Fragment key={row.id}>
-              <tr style={table.options.meta?.getRowStyles(row)} onClick={() => table.options.meta?.onRowClick?.(row)}>
-                {row.getVisibleCells().map((cell) => (
-                  <td key={cell.id} style={renderSubRow ? { borderBottom: 'none' } : undefined}>
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </td>
-                ))}
-              </tr>
-              {renderSubRow && (
-                <tr>
-                  <td
-                    colSpan={row.getVisibleCells().length}
-                    style={{ padding: '0 16px 8px 16px', borderBottom: '1px solid #D2D3D8' }}
+          {table.getRowModel().rows.length === 0 && emptyMessage ? (
+            <tr>
+              <td colSpan={columns.length} className="data-table__empty">
+                {emptyMessage}
+              </td>
+            </tr>
+          ) : (
+            table.getRowModel().rows.map((row, index) => {
+              const subRowContent = renderSubRow?.(row);
+              const beforeRowContent = renderBeforeRow?.(row, index);
+              return (
+                <React.Fragment key={row.id}>
+                  {beforeRowContent}
+                  <tr
+                    style={table.options.meta?.getRowStyles?.(row)}
+                    {...table.options.meta?.getRowProps?.(row)}
+                    onClick={() => table.options.meta?.onRowClick?.(row)}
                   >
-                    {renderSubRow(row)}
-                  </td>
-                </tr>
-              )}
-            </React.Fragment>
-          ))}
+                    {row.getVisibleCells().map((cell) => (
+                      <td key={cell.id} style={subRowContent ? { borderBottom: 'none' } : undefined}>
+                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      </td>
+                    ))}
+                  </tr>
+                  {subRowContent && (
+                    <tr className="data-table__sub-row">
+                      <td colSpan={row.getVisibleCells().length} className="data-table__sub-row-cell">
+                        {subRowContent}
+                      </td>
+                    </tr>
+                  )}
+                </React.Fragment>
+              );
+            })
+          )}
         </tbody>
       </table>
-      {tablePagination && (
-        <div className="data-table__pagination-wrapper">
-          {(alwaysShowPagination ||
-            table.getPageCount() * table.getState().pagination.pageSize > table.getState().pagination.pageSize) && (
-            <div className="data-table__pagination">
-              <button className="previous" onClick={() => table.previousPage()} disabled={!table.getCanPreviousPage()}>
-                <MdOutlineWest />
-              </button>
-              <nav role="navigation" aria-label={t('global.paginationNavigation') ?? ''}>
-                <ul className="links">
-                  {Array.from({ length: table.getPageCount() }).map((_, index) => (
-                    <li
-                      key={`${id}-${index}`}
-                      className={clsx({ active: table.getState().pagination.pageIndex === index })}
-                    >
-                      <Link
-                        to={`?page=${index + 1}`}
-                        onClick={() => table.setPageIndex(index)}
-                        aria-label={t('global.gotoPage') + index}
-                        aria-current={table.getState().pagination.pageIndex === index}
-                      >
-                        {index + 1}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              </nav>
-              <button
-                className="next"
-                onClick={() => {
-                  table.nextPage();
-                }}
-                disabled={!table.getCanNextPage()}
-              >
-                <MdOutlineEast />
-              </button>
-            </div>
-          )}
-          <div className="data-table__page-size">
-            <label htmlFor={id}>{t('global.resultCount')}</label>
-            <select
-              id={id}
-              value={table.getState().pagination.pageSize}
-              onChange={(e) => {
-                table.setPageSize(Number(e.target.value));
-              }}
-            >
-              {[5, 10, 20, 30, 50].map((pageSize) => (
-                <option key={pageSize} value={pageSize}>
-                  {pageSize}
-                </option>
-              ))}
-            </select>
-          </div>
-        </div>
+      {tablePagination && !hidePagination && (
+        <TablePagination
+          pageIndex={table.getState().pagination.pageIndex}
+          pageSize={table.getState().pagination.pageSize}
+          pageCount={table.getPageCount()}
+          alwaysShow={alwaysShowPagination}
+          onPageChange={(pageIndex) => table.setPageIndex(pageIndex)}
+          onPageSizeChange={(pageSize) => table.setPageSize(pageSize)}
+        />
       )}
     </div>
   );
