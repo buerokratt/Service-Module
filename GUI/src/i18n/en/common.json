@@ -162,6 +162,27 @@
     "export": "Export",
     "exportAllConfirmation": "Are you sure you want to export all services?",
     "noServicesFound": "No services found",
+    "searchPlaceholder": "Search services",
+    "clearSearch": "Clear search",
+    "pin": "Pin service",
+    "unpin": "Unpin service",
+    "pinnedServices": "Pinned services",
+    "allServices": "All services",
+    "dependencies": {
+      "toggleView": "Toggle dependency view",
+      "columnTooltip": "Left (branch): services this service jumps to (uses). Right (merge): services that jump to this service (use it). Click a count to focus and expand the dependency view.",
+      "loopback": "Self-reference",
+      "loopbackNote": "This service references itself in its flow.",
+      "incoming": "{{count}} services using this service",
+      "outgoing": "{{count}} services used by this service",
+      "incomingTooltip": "Services using this service — other services with a next-service node pointing here",
+      "outgoingTooltip": "Services used by this service — next-service targets in this service's flow",
+      "servicesUsingThis": "Services using this service",
+      "currentService": "Current service",
+      "servicesUsedByThis": "Services used by this service",
+      "noneUsingThis": "No services use this service",
+      "noneUsedByThis": "This service does not use other services"
+    },
     "error": {
       "fetchingServices": "Error fetching services"
     },
@@ -171,6 +192,15 @@
     },
     "service": {
       "name": "Name",
+      "type": "Type",
+      "common": "Common",
+      "regular": "Regular",
+      "deleted": "DELETED",
+      "examples": "Example questions",
+      "keywords": "Keywords",
+      "noExamples": "No example questions",
+      "noKeywords": "No keywords",
+      "noDescription": "No description",
       "state": "State",
       "description": "Description",
       "states": {

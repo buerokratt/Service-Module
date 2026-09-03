@@ -162,6 +162,27 @@
     "export": "Ekspordi",
     "exportAllConfirmation": "Kas olete kindel, et soovite eksportida kõik teenused?",
     "noServicesFound": "Ühtegi teenust ei leitud",
+    "searchPlaceholder": "Otsi teenuseid",
+    "clearSearch": "Tühjenda otsing",
+    "pin": "Kinnita teenus",
+    "unpin": "Eemalda kinnitamine",
+    "pinnedServices": "Kinnitatud teenused",
+    "allServices": "Kõik teenused",
+    "dependencies": {
+      "toggleView": "Lülita sõltuvuste vaade",
+      "columnTooltip": "Vasak (haru): teenused, millele see teenus viitab (kasutab). Parem (ühinemine): teenused, mis viitavad sellele teenusele (kasutavad seda). Klõpsa arvul, et fokuseerida ja avada sõltuvuste vaade.",
+      "loopback": "Iseviide",
+      "loopbackNote": "See teenus viitab oma voos iseendale.",
+      "incoming": "{{count}} seda teenust kasutavat teenust",
+      "outgoing": "{{count}} selle teenuse poolt kasutatavat teenust",
+      "incomingTooltip": "Seda teenust kasutavad teenused — teised teenused, mille järgmise teenuse sõlm osutab siia",
+      "outgoingTooltip": "Selle teenuse poolt kasutatavad teenused — järgmise teenuse sihtmärgid selle teenuse voos",
+      "servicesUsingThis": "Seda teenust kasutavad teenused",
+      "currentService": "Praegune teenus",
+      "servicesUsedByThis": "Selle teenuse poolt kasutatavad teenused",
+      "noneUsingThis": "Ükski teenus seda ei kasuta",
+      "noneUsedByThis": "See teenus ei kasuta teisi teenuseid"
+    },
     "error": {
       "fetchingServices": "Teenuste päring ebaõnnestus"
     },
@@ -171,6 +192,15 @@
     },
     "service": {
       "name": "Nimetus",
+      "type": "Tüüp",
+      "common": "Üldine",
+      "regular": "Tavaline",
+      "deleted": "KUSTUTATUD",
+      "examples": "Näidis küsimused",
+      "keywords": "Märksõnad",
+      "noExamples": "Näidis küsimusi pole",
+      "noKeywords": "Märksõnu pole",
+      "noDescription": "Kirjeldus puudub",
       "description": "Kirjeldus",
       "state": "Olek",
       "states": {

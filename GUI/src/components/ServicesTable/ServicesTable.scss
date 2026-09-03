@@ -1,5 +1,154 @@
 @import 'src/styles/settings/variables/_colors';
 
+.services-table__search {
+  position: relative;
+  margin-bottom: 16px;
+
+  .input {
+    width: 100%;
+  }
+
+  .input__wrapper input {
+    padding-left: 40px;
+    padding-right: 36px;
+  }
+}
+
+.services-table__search-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #8f91a8;
+  pointer-events: none;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+}
+
+.services-table__search-clear {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+  color: #8f91a8;
+}
+
+.services-table {
+  display: flex;
+  flex-direction: column;
+  max-height: calc(100vh - 280px);
+  min-height: 480px;
+
+  &__content {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    padding: 0 16px;
+
+    .data-table {
+      margin-bottom: 0;
+    }
+  }
+
+  .data-table__pagination-wrapper {
+    flex-shrink: 0;
+    border-top: 1px solid #e5e7eb;
+    background: #fff;
+  }
+
+  &__section-row {
+    td {
+      padding: 8px 16px 4px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: #8f91a8;
+      background: #f5f8fc;
+      border-bottom: none;
+    }
+  }
+
+  &__expand-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    color: rgba(0, 0, 0, 0.54);
+    flex-shrink: 0;
+  }
+
+  &__name-link {
+    cursor: pointer;
+    color: #005aa3;
+    background: none;
+    border: none;
+    padding: 0;
+    font: inherit;
+    text-align: left;
+  }
+
+  &__info-icon {
+    margin-left: 4px;
+    cursor: help;
+    flex-shrink: 0;
+  }
+
+  &__dependency-panel {
+    margin: 0 -8px 8px;
+    padding: 0 8px;
+    border-top: 1px solid #d2d3d8;
+    background: #f9fafb;
+  }
+}
+
+.dependency-count-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: none;
+  color: #555867;
+  cursor: pointer;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 400;
+  padding: 0;
+  min-width: auto;
+
+  &__count {
+    min-width: 1ch;
+  }
+
+  .icon {
+    color: #8f91a8;
+  }
+
+  &:hover {
+    color: #005aa3;
+
+    .icon {
+      color: #005aa3;
+    }
+  }
+}
+
+.service-state-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+
 .data-table {
   td {
     padding-right: 0;
@@ -14,8 +163,21 @@
   }
 }
 
-[dark-theme='dark'] .data-table {
+[dark-theme='dark'] .data-table,
+[data-theme='dark'] .services-table {
   .icon {
+    color: var(--dark-text-label);
+  }
+
+  .data-table__pagination-wrapper {
+    border-color: var(--dark-border);
+    background: var(--dark-bg-light);
+  }
+}
+
+[data-theme='dark'] .services-table__search {
+  .services-table__search-icon,
+  .services-table__search-clear {
     color: var(--dark-text-label);
   }
 }
