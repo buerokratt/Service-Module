@@ -22,13 +22,13 @@ extractRequestData:
 getDomains:
   call: http.post
   args:
-    url: "[#SERVICE_USERS_RESQL]/get-widget-domains"
+    url: "[#SERVICE_RESQL]/get-widget-domains"
   result: domains
 
 getUserDomains:
   call: http.post
   args:
-    url: "[#SERVICE_USERS_RESQL]/get-user-domains"
+    url: "[#SERVICE_RESQL]/get-user-domains"
     body:
       user_login: ${user_id}
   result: user_domains
