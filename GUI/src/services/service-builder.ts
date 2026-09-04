@@ -1016,7 +1016,7 @@ function injectNonceStep(finishedFlow: Map<any, any>, stepName: string) {
   insertStepBefore(finishedFlow, stepName, nonceStepName, {
     call: 'http.post',
     args: {
-      url: '[#SERVICE_TRAINING_RESQL]/get-new-nonce',
+      url: '[#SERVICE_RESQL]/get-new-nonce',
     },
     result: nonceResultName,
     next: stepName,
