@@ -29,6 +29,7 @@ const ServiceFlowPage: FC = () => {
       if (!id) {
         await Promise.all([
           useServiceStore.getState().loadStepPreferences(),
+          useServiceStore.getState().loadNavigableServiceIds(),
           useServiceStore.getState().loadAllEndpoints(
             false,
             1,
@@ -41,7 +42,11 @@ const ServiceFlowPage: FC = () => {
       }
 
       setLoading(true);
-      await Promise.all([useServiceStore.getState().loadService(id), useServiceStore.getState().loadStepPreferences()]);
+      await Promise.all([
+        useServiceStore.getState().loadService(id),
+        useServiceStore.getState().loadStepPreferences(),
+        useServiceStore.getState().loadNavigableServiceIds(),
+      ]);
       setLoading(false);
     };
 

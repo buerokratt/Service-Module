@@ -54,6 +54,23 @@
   &__action-btn {
     color: #555867;
   }
+
+  &__skeleton-bar {
+    height: 14px;
+    border-radius: 4px;
+    background: #d2d3d8;
+    animation: api-elements-skeleton-pulse 1.2s ease-in-out infinite;
+  }
+}
+
+@keyframes api-elements-skeleton-pulse {
+  0%,
+  100% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
 }
 
 [data-theme='dark'] {
@@ -91,6 +108,10 @@
 
     &__action-btn {
       color: var(--dark-text-secondary);
+    }
+
+    &__skeleton-bar {
+      background: var(--dark-bg-extra-light);
     }
   }
 }

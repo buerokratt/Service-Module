@@ -1,21 +1,9 @@
-import { Connection, Edge, getIncomers, getOutgoers, Node } from '@xyflow/react';
+import { Edge, getIncomers, getOutgoers, Node } from '@xyflow/react';
 import { StepType } from 'types';
 import { McqEmptyBranch } from 'utils/mcq-flow-utils';
 
 export const CONDITION_SOURCE_HANDLE_ID = 'condition-out';
 export const CONDITION_LABELS = ['Success', 'Failure'] as const;
-
-export const getConditionNodeIdFromConnection = (
-  connection: Connection,
-  getNode: (id: string) => Node | undefined,
-): string | null => {
-  const sourceNode = connection.source ? getNode(connection.source) : undefined;
-  const targetNode = connection.target ? getNode(connection.target) : undefined;
-
-  if (sourceNode?.data?.stepType === StepType.Condition) return sourceNode.id;
-  if (targetNode?.data?.stepType === StepType.Condition) return targetNode.id;
-  return null;
-};
 
 export const getEmptyConditionBranches = (conditionNodeId: string, nodes: Node[], edges: Edge[]): McqEmptyBranch[] => {
   const conditionNode = nodes.find((n) => n.id === conditionNodeId);

@@ -1,0 +1,19 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Description placeholder for 'GET-NEW-NONCE'"
+  method: get
+  accepts: json
+  returns: json
+  namespace: service
+
+get_new_nonce:
+  call: http.post
+  args:
+    url: "[#SERVICE_TRAINING_RESQL]/get-new-nonce"
+  result: nonce_res
+
+return_result:
+  wrapper: false
+  return: ${nonce_res.response.body[0].nonce}
+  next: end

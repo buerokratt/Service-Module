@@ -1,9 +1,9 @@
 import { Edge, Node } from '@xyflow/react';
 import { AxiosError } from 'axios';
-import { Group, Rule } from 'components/FlowElementsPopup/RuleBuilder/types';
+import { Group, GroupOrRule, GroupType, Rule } from 'components/FlowElementsPopup/RuleBuilder/types';
 import { format } from 'date-fns';
 import i18next, { t } from 'i18next';
-import { NodeHtmlMarkdown } from 'node-html-markdown';
+import { NodeHtmlMarkdown, PostProcessResult, TranslatorConfigObject } from 'node-html-markdown';
 import { createNewService, editService } from 'resources/api-constants';
 import useServiceStore from 'store/new-services.store';
 import useToastStore from 'store/toasts.store';
@@ -22,13 +22,31 @@ import {
 
 import api from '../services/api-dev';
 
-const htmlToMarkdown = new NodeHtmlMarkdown({
-  textReplace: [
-    [/\\_/g, '_'],
-    [/\\\[/g, '['],
-    [/\\\]/g, ']'],
-  ],
-});
+const customTranslators: TranslatorConfigObject = {
+  li: ({ options: { bulletMarker }, listKind, listItemNumber }) => ({
+    prefix: listKind === 'OL' && listItemNumber !== undefined ? `${listItemNumber}\\. ` : `${bulletMarker} `,
+    surroundingNewlines: 1,
+    postprocess: ({ content }) =>
+      content.trim() === ''
+        ? PostProcessResult.RemoveNode
+        : content
+            .trim()
+            .replace(/([^\r\n])(?:\r?\n)+/g, '$1  \n')
+            .replace(/(\S)[^\S\r\n]+$/gm, '$1  '),
+  }),
+};
+
+const htmlToMarkdown = new NodeHtmlMarkdown(
+  {
+    bulletMarker: '•',
+    textReplace: [
+      [/\\_/g, '_'],
+      [/\\\[/g, '['],
+      [/\\\]/g, ']'],
+    ],
+  },
+  customTranslators,
+);
 
 /**
  * Normalises MCQ button payloads on all MultiChoiceQuestion nodes.
@@ -234,37 +252,37 @@ const buildConditionString = (group: any, assignedVariableNames: Set<string>): s
     return isNumericString(rawField) ? rawField : `"${rawField}"`;
   };
 
+  const buildRuleTerm = (rule: Rule): string => {
+    const rawField = rule.field.replaceAll('${', '').replaceAll('}', '');
+    const absoluteValue = removeWrapperQuotes(rule.value.replaceAll('${', '').replaceAll('}', ''));
+    const value = formatField(absoluteValue);
+    const field = formatField(rawField);
+    return `${field} ${rule.operator} ${value}`;
+  };
+
   if ('children' in group) {
     const subgroup = group as Group;
     if (subgroup.children.length === 0) {
       return '';
     }
 
-    const conditions = subgroup.children.map((child) => {
-      if ('children' in child) {
-        return `(${buildConditionString(child, assignedVariableNames)})`;
-      } else {
-        const rule = child;
-        const rawField = rule.field.replaceAll('${', '').replaceAll('}', '');
-        const absoluteValue = removeWrapperQuotes(rule.value.replaceAll('${', '').replaceAll('}', ''));
-        const value = formatField(absoluteValue);
-        const field = formatField(rawField);
-        return `${field} ${rule.operator} ${value}`;
-      }
-    });
+    const legacyType: GroupType = subgroup.type ?? 'and';
 
-    if (subgroup.not) {
-      return `!(${subgroup.type === 'and' ? conditions.join(' && ') : conditions.join(' || ')})`;
-    } else {
-      return subgroup.type === 'and' ? conditions.join(' && ') : conditions.join(' || ');
-    }
+    const combined = subgroup.children.reduce((accumulated: string, child: GroupOrRule, index: number) => {
+      const term =
+        'children' in child ? `(${buildConditionString(child, assignedVariableNames)})` : buildRuleTerm(child as Rule);
+      const signedTerm = child.connectorNot ? `!(${term})` : term;
+
+      if (index === 0) return signedTerm;
+
+      const connector = child.connector ?? legacyType;
+      const operator = connector === 'and' ? '&&' : '||';
+      return `${accumulated} ${operator} ${signedTerm}`;
+    }, '');
+
+    return subgroup.not ? `!(${combined})` : combined;
   } else {
-    const rule = group as Rule;
-    const rawField = rule.field.replaceAll('${', '').replaceAll('}', '');
-    const absoluteValue = removeWrapperQuotes(rule.value.replaceAll('${', '').replaceAll('}', ''));
-    const value = formatField(absoluteValue);
-    const field = formatField(rawField);
-    return `${field} ${rule.operator} ${value}`;
+    return buildRuleTerm(group as Rule);
   }
 };
 
@@ -385,7 +403,10 @@ async function saveService(
         type: 'POST',
         content: content,
         isCommon,
-        structure: JSON.stringify({ edges, nodes }),
+        structure: JSON.stringify({
+          edges: edges.map(({ selected: _selected, ...edge }) => edge),
+          nodes: nodes.map(({ selected: _selected, ...node }) => node),
+        }),
         updateServiceDb: updateServiceDb,
         state: status,
       },
@@ -484,7 +505,14 @@ export function getYamlContent(
     accepts: 'json',
     returns: 'json',
     namespace: 'service',
-    allowList: {
+    allowlist: {
+      header: [
+        {
+          field: 'x-ruuter-nonce',
+          type: 'string',
+          description: 'The nonce for the request',
+        },
+      ],
       body: [
         {
           field: 'chatId',
@@ -518,6 +546,8 @@ export function getYamlContent(
     },
     next: firstNode ? toSnakeCase(firstNode.data.label?.toString() ?? 'format_messages') : 'format_messages',
   });
+
+  const nonceStepsNeeded: string[] = [];
 
   try {
     allRelations.forEach((r) => {
@@ -559,7 +589,7 @@ export function getYamlContent(
       }
 
       if (parentNode.data.stepType === StepType.UserDefined) {
-        return handleEndpointStep(parentNode, finishedFlow, parentStepName, childNode);
+        return handleEndpointStep(parentNode, finishedFlow, parentStepName, childNode, nonceStepsNeeded);
       }
 
       if (parentNode.data.stepType === StepType.JumpToService) {
@@ -576,6 +606,8 @@ export function getYamlContent(
       throw new Error(i18next.t('toast.cannot-save-flow') ?? (e?.message as string) ?? 'Error');
     }
   }
+
+  nonceStepsNeeded.forEach((stepName) => injectNonceStep(finishedFlow, stepName));
 
   finishedFlow.set('format_messages', {
     call: 'http.post',
@@ -713,13 +745,15 @@ function replaceSpacesOutsideTags(input: string, placeholder: string): string {
 }
 
 function toMarkdownMessage(raw: string): string {
-  const spacePlaceholder = '___SPACE___';
+  const spacePlaceholder = '';
+  const leadingSpacePlaceholderRun = new RegExp(`^${spacePlaceholder}+`, 'gm');
   const withPlaceholders = replaceSpacesOutsideTags(
     decodeHtmlEntities(raw).replaceAll('{{', '${').replaceAll('}}', '}'),
     spacePlaceholder,
   );
   const markdown = htmlToMarkdown
     .translate(withPlaceholders)
+    .replaceAll(leadingSpacePlaceholderRun, (match) => '\u00A0'.repeat(match.length))
     .replaceAll(spacePlaceholder, ' ')
     .replaceAll(/\\([-~>[\]_*#().!`=<\\])/g, String.raw`\\$1`);
 
@@ -830,6 +864,7 @@ function handleEndpointStep(
   finishedFlow: Map<any, any>,
   parentStepName: string,
   childNode: Node<NodeDataProps> | undefined,
+  nonceStepsNeeded: string[],
 ) {
   const endpointDefinition = parentNode.data.endpoint?.definitions[0];
   const paramsVariables = endpointDefinition?.params?.variables;
@@ -857,6 +892,14 @@ function handleEndpointStep(
   applyEndpointHeaders(stepConfig, headersVariables);
 
   finishedFlow.set(parentStepName, stepConfig);
+
+  if (
+    Object.keys((stepConfig.args.headers ?? {}) as Record<string, unknown>).some(
+      (key) => key.toLowerCase() === 'x-ruuter-nonce',
+    )
+  ) {
+    nonceStepsNeeded.push(parentStepName);
+  }
 }
 
 function hasNonEqualOperatorParam(param: any): boolean {
@@ -951,6 +994,62 @@ function applyEndpointHeaders(stepConfig: any, headersVariables: any[] | undefin
       return acc;
     }, {});
   }
+}
+
+function injectNonceStep(finishedFlow: Map<any, any>, stepName: string) {
+  const step = finishedFlow.get(stepName);
+  const headers = step?.args?.headers;
+  if (!headers) return;
+
+  const nonceHeaderKey = Object.keys(headers as Record<string, unknown>).find(
+    (key) => key.toLowerCase() === 'x-ruuter-nonce',
+  );
+  if (!nonceHeaderKey) return;
+
+  const nonceStepName = `${stepName}_get_new_nonce`;
+  const nonceResultName = `${stepName}_nonce`;
+
+  headers[nonceHeaderKey] = `\${${nonceResultName}.response.body[0].nonce}`;
+
+  redirectReferencesTo(finishedFlow, stepName, nonceStepName);
+
+  insertStepBefore(finishedFlow, stepName, nonceStepName, {
+    call: 'http.post',
+    args: {
+      url: '[#SERVICE_TRAINING_RESQL]/get-new-nonce',
+    },
+    result: nonceResultName,
+    next: stepName,
+  });
+}
+
+function insertStepBefore(finishedFlow: Map<any, any>, beforeKey: string, newKey: string, newValue: any) {
+  const entries = Array.from(finishedFlow.entries());
+  finishedFlow.clear();
+  for (const [key, value] of entries) {
+    if (key === beforeKey) {
+      finishedFlow.set(newKey, newValue);
+    }
+    finishedFlow.set(key, value);
+  }
+}
+
+function redirectReferencesTo(finishedFlow: Map<any, any>, targetStepName: string, newStepName: string) {
+  finishedFlow.forEach((step, stepName) => {
+    if (stepName === targetStepName) return;
+
+    if (step?.next === targetStepName) {
+      step.next = newStepName;
+    }
+
+    if (Array.isArray(step?.switch)) {
+      step.switch.forEach((branch: any) => {
+        if (branch?.next === targetStepName) {
+          branch.next = newStepName;
+        }
+      });
+    }
+  });
 }
 
 function handleMultiChoiceQuestion(

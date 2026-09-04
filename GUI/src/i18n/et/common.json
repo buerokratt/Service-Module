@@ -330,7 +330,8 @@
       "elementNameAlreadyExistsMessage": "Elementi sama nimega element juba eksisteerib"
     },
     "popup": {
-      "unsavedChanges": "Sul on salvestamata muudatusi. Kas soovid kindlasti lahkuda? Salvestamata muudatused lähevad kaotsi."
+      "unsavedChanges": "Sul on salvestamata muudatusi. Kas soovid kindlasti lahkuda? Salvestamata muudatused lähevad kaotsi.",
+      "saveAndContinue": "Salvesta ja jätka"
     },
     "titleRequired": "Pealkiri on kohustuslik",
     "chooseMemorySlots": "Vali mälukohad"
@@ -368,7 +369,10 @@
         "targetService": "Sihtteenус",
         "selectService": "Vali teenus...",
         "noActiveServices": "Aktiivseid teenuseid pole saadaval",
-        "parameters": "Parameetrid"
+        "parameters": "Parameetrid",
+        "navigateToService": "Ava see teenus",
+        "deletedService": "Teenus {{serviceName}} on kustutatud ja seda ei saa enam avada",
+        "alreadyOnService": "Sa vaatad juba seda teenust"
       }
     },
     "popup": {
@@ -427,6 +431,9 @@
       "noName": "<Nimeta>",
       "environmentVariables": {
         "title": "Keskkonnamuutujad"
+      },
+      "apiResponses": {
+        "title": "API vastused"
       },
       "dateAndTime": {
         "title": "Kuupäev ja kellaaeg",
