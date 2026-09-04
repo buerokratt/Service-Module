@@ -327,7 +327,7 @@ describe('Nonce step injection', () => {
 
     expect(result.backup_conversations_get_new_nonce).toEqual({
       call: 'http.post',
-      args: { url: '[#SERVICE_TRAINING_RESQL]/get-new-nonce' },
+      args: { url: '[#SERVICE_RESQL]/get-new-nonce' },
       result: 'backup_conversations_nonce',
       next: 'backup_conversations',
     });
@@ -365,7 +365,7 @@ describe('Nonce step injection', () => {
     expect(result.backup_conversations.next).toBe('empty_messages_get_new_nonce');
     expect(result.empty_messages_get_new_nonce).toEqual({
       call: 'http.post',
-      args: { url: '[#SERVICE_TRAINING_RESQL]/get-new-nonce' },
+      args: { url: '[#SERVICE_RESQL]/get-new-nonce' },
       result: 'empty_messages_nonce',
       next: 'empty_messages',
     });

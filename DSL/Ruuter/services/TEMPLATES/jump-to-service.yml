@@ -44,7 +44,7 @@ assign_service_status:
 get_new_nonce:
   call: http.post
   args:
-    url: "[#SERVICE_TRAINING_RESQL]/get-new-nonce"
+    url: "[#SERVICE_RESQL]/get-new-nonce"
   result: nonce_res
   next: trigger_service
 
