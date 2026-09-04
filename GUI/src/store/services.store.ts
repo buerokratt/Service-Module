@@ -70,6 +70,7 @@ const useServiceListStore = create<ServiceStoreState>()(
           page_size: pagination.pageSize,
           sorting: sort,
           is_common: false,
+          search: '',
         });
         const services =
           result.data.response[0].map?.((item: any) => ({
@@ -99,6 +100,7 @@ const useServiceListStore = create<ServiceStoreState>()(
           page_size: pagination.pageSize,
           sorting: sort,
           is_common: true,
+          search: '',
         });
         const services =
           result.data.response[0].map?.((item: any) => ({

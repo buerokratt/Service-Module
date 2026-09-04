@@ -11,6 +11,7 @@ import McqBranchSelectModal from 'components/Flow/McqBranchSelectModal';
 import nodeTypes from 'components/Flow/NodeTypes';
 import useLayout from 'hooks/flow/useLayout';
 import useMcqConnect from 'hooks/flow/useMcqConnect';
+import { useNodeHighlight } from 'hooks/flow/useNodeHighlight';
 import { useOnNodesDelete } from 'hooks/flow/useOnNodeDelete';
 import { ChangeEventHandler, FC, useCallback, useEffect, useState } from 'react';
 import '@xyflow/react/dist/style.css';
@@ -34,7 +35,7 @@ type FlowBuilderProps = {
 
 const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
   useLayout();
-  const { getNodes, getEdges, setNodes, setEdges, getNode } = useReactFlow();
+  const { getNodes, getEdges, setNodes, setEdges } = useReactFlow();
   const setReactFlowInstance = useNewServiceStore((state) => state.setReactFlowInstance);
   const [colorMode, setColorMode] = useState<ColorMode>('light');
   const { t } = useTranslation();
@@ -63,6 +64,7 @@ const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
 
   const { runLayout } = useLayout();
   const { pendingConnection, handleConnect, isValidConnection, confirmBranch, cancelBranchSelection } = useMcqConnect();
+  const { displayNodes, displayEdges, handleNodeClick, handlePaneClick } = useNodeHighlight(nodes, edges);
 
   const onConnect = useCallback(
     (connection: { source?: string | null; target?: string | null; sourceHandle?: string | null }) => {
@@ -98,16 +100,9 @@ const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
   );
 
   const onBeforeDelete = useCallback(
-    ({ nodes: nodesToDelete, edges: edgesToDelete }: { nodes: Node[]; edges: Edge[] }) => {
+    ({ nodes: nodesToDelete }: { nodes: Node[]; edges: Edge[] }) => {
       setDeletedNodes(null);
       try {
-        if (edgesToDelete.length > 0 && nodesToDelete.length === 0) {
-          const shouldPreventDelete = getNode(edgesToDelete[0].source)?.data.stepType === StepType.MultiChoiceQuestion;
-          if (shouldPreventDelete) {
-            return Promise.resolve(false);
-          }
-        }
-
         if (
           nodesToDelete.length === 0 ||
           ![StepType.MultiChoiceQuestion, StepType.Condition, StepType.Input].includes(
@@ -127,7 +122,7 @@ const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
         return Promise.resolve(true);
       }
     },
-    [getNode, hasConnectedNodes, setDeletedNodes, setIsDeleteConnectionsModalVisible],
+    [hasConnectedNodes, setDeletedNodes, setIsDeleteConnectionsModalVisible],
   );
 
   const handleToggleLasso = useCallback(() => {
@@ -141,8 +136,8 @@ const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
   return (
     <>
       <ReactFlow
-        nodes={nodes}
-        edges={edges}
+        nodes={displayNodes}
+        edges={displayEdges}
         onNodesChange={useNewServiceStore.getState().onNodesChange}
         onEdgesChange={useNewServiceStore.getState().onEdgesChange}
         snapToGrid
@@ -156,6 +151,8 @@ const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
           await fitView({ duration: 200, padding: 5 });
         }}
         nodesDraggable={false}
+        onNodeClick={handleNodeClick}
+        onPaneClick={handlePaneClick}
         onSelectionChange={onSelectionChange}
         onConnect={onConnect}
         onEdgesDelete={(edges) => {
@@ -250,6 +247,11 @@ const FlowBuilder: FC<FlowBuilderProps> = ({ nodes, edges }) => {
           emptyBranches={pendingConnection.emptyBranches}
           onSelect={confirmBranch}
           onClose={cancelBranchSelection}
+          description={
+            pendingConnection.nodeType === StepType.Condition
+              ? t('serviceFlow.condition.emptyPathsMessage', { count: pendingConnection.emptyBranches.length })
+              : undefined
+          }
         />
       )}
     </>

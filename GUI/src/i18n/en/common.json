@@ -330,7 +330,8 @@
       "elementNameAlreadyExistsMessage": "An Element with the same name already exists"
     },
     "popup": {
-      "unsavedChanges": "You have unsaved changes. Are you sure you want to leave? Unsaved changes will be lost."
+      "unsavedChanges": "You have unsaved changes. Are you sure you want to leave? Unsaved changes will be lost.",
+      "saveAndContinue": "Save and continue"
     },
     "titleRequired": "Title is mandatory",
     "chooseMemorySlots": "Choose memory slots"
@@ -368,7 +369,10 @@
         "targetService": "Target service",
         "selectService": "Select a service...",
         "noActiveServices": "No active services available",
-        "parameters": "Parameters"
+        "parameters": "Parameters",
+        "navigateToService": "Open this service",
+        "deletedService": "{{serviceName}} service has been deleted and can no longer be opened",
+        "alreadyOnService": "You are already viewing this service"
       }
     },
     "popup": {
@@ -419,6 +423,9 @@
       "selectBranchTitle": "Select branch",
       "emptyBranchesMessage": "This multi-choice question has {{count}} empty branches. Which branch do you want to connect?"
     },
+    "condition": {
+      "emptyPathsMessage": "This conditional node has {{count}} empty paths. Which path do you want to connect?"
+    },
     "previousVariables": {
       "assignElements": "Assigned Variables",
       "dateAndTime": {
@@ -450,6 +457,9 @@
       "noName": "<No name>",
       "environmentVariables": {
         "title": "Environment Variables"
+      },
+      "apiResponses": {
+        "title": "API Responses"
       },
       "helpers": {
         "title": "Tools",

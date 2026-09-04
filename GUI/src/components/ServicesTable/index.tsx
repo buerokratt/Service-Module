@@ -15,6 +15,15 @@ type ServicesTableProps = {
   isCommon?: boolean;
 };
 
+const DEFAULT_PAGE_SIZE = 10;
+const PAGE_SIZE_OPTIONS = new Set([10, 20, 30, 50]);
+const PAGE_SIZE_STORAGE_KEY = 'page-size';
+
+const getStoredPageSize = (): number => {
+  const stored = Number(localStorage.getItem(PAGE_SIZE_STORAGE_KEY));
+  return PAGE_SIZE_OPTIONS.has(stored) ? stored : DEFAULT_PAGE_SIZE;
+};
+
 const ServicesTable: FC<ServicesTableProps> = ({ isCommon = false }) => {
   const { t } = useTranslation();
   const [isDeletePopupVisible, setIsDeletePopupVisible] = useState(false);
@@ -22,7 +31,7 @@ const ServicesTable: FC<ServicesTableProps> = ({ isCommon = false }) => {
   const navigate = useNavigate();
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
-    pageSize: 10,
+    pageSize: getStoredPageSize(),
   });
   const [sorting, setSorting] = useState<SortingState>([{ id: 'name', desc: false }]);
 
@@ -121,6 +130,9 @@ const ServicesTable: FC<ServicesTableProps> = ({ isCommon = false }) => {
         sorting={sorting}
         setPagination={(state: PaginationState) => {
           if (state.pageIndex === pagination.pageIndex && state.pageSize === pagination.pageSize) return;
+          if (state.pageSize !== pagination.pageSize) {
+            localStorage.setItem(PAGE_SIZE_STORAGE_KEY, String(state.pageSize));
+          }
           setPagination(state);
           if (isCommon) {
             loadCommonServices(state, sorting);
@@ -137,7 +149,7 @@ const ServicesTable: FC<ServicesTableProps> = ({ isCommon = false }) => {
           }
         }}
         isClientSide={false}
-        pagesCount={services[services.length - 1]?.totalPages ?? 1}
+        pagesCount={services.at(-1)?.totalPages ?? 1}
       />
     </Card>
   );

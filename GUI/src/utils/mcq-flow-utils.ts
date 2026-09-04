@@ -11,18 +11,6 @@ export type McqEmptyBranch = {
   readonly handleIndex: number;
 };
 
-export const getMcqNodeIdFromConnection = (
-  connection: Connection,
-  getNode: (id: string) => Node | undefined,
-): string | null => {
-  const sourceNode = connection.source ? getNode(connection.source) : undefined;
-  const targetNode = connection.target ? getNode(connection.target) : undefined;
-
-  if (sourceNode?.data?.stepType === StepType.MultiChoiceQuestion) return sourceNode.id;
-  if (targetNode?.data?.stepType === StepType.MultiChoiceQuestion) return targetNode.id;
-  return null;
-};
-
 export const getMcqButtons = (mcqNode: Node): MultiChoiceQuestionButton[] =>
   mcqNode.data?.multiChoiceQuestion?.buttons ?? [];
 
@@ -79,7 +67,7 @@ export const applyMcqBranchConnection = ({
       type: 'step',
       label: branch.label,
       animated: false,
-      deletable: false,
+      deletable: true,
     },
   ];
 
@@ -114,10 +102,15 @@ export const applySimpleConnection = ({
   let finalNodes = nodes;
   let finalEdges = edges;
 
+  let preservedLabel: string | undefined;
   if (ghostEdges.length > 0) {
     const ghostNodeIds = new Set(ghostEdges.map((edge) => edge.target));
     finalEdges = edges.filter((edge) => !ghostEdges.includes(edge));
     finalNodes = nodes.filter((node) => !ghostNodeIds.has(node.id));
+    if (ghostEdges.length === 1) {
+      const label = ghostEdges[0].label;
+      if (typeof label === 'string' && label !== '+') preservedLabel = label;
+    }
   }
 
   finalEdges = [
@@ -127,6 +120,7 @@ export const applySimpleConnection = ({
       source,
       target,
       type: 'step',
+      ...(preservedLabel === undefined ? {} : { label: preservedLabel }),
     },
   ];
 

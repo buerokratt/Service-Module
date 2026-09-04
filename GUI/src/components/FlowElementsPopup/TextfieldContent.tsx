@@ -1,7 +1,7 @@
 import { Node } from '@xyflow/react';
 import { t } from 'i18next';
 import { CSSProperties, FC, useRef, useState } from 'react';
-import ReactQuill from 'react-quill';
+import ReactQuill from 'react-quill-new';
 import { NodeDataProps } from 'types/service-flow';
 
 import { FormRichText, Track } from '..';

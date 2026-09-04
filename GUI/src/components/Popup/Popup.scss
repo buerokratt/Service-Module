@@ -18,6 +18,10 @@
   max-width: 900px;
   z-index: 101;
 
+  &--overflow-visible {
+    overflow: visible;
+  }
+
   &__overlay {
     position: fixed;
     inset: 0;

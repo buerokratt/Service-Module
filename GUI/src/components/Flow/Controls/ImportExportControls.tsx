@@ -21,7 +21,7 @@ import {
 import { removeTrailingUnderscores } from 'utils/string-util';
 
 const ImportExportControls: FC = () => {
-  const { getNodes, getEdges, setNodes, setEdges } = useReactFlow();
+  const { getNodes, getEdges } = useReactFlow();
   const { t } = useTranslation();
   const { setHasUnsavedChanges, saveToHistory, setNodes: setStoreNodes, setEdges: setStoreEdges } = useServiceStore();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -165,8 +165,6 @@ const ImportExportControls: FC = () => {
     saveToHistory();
     setStoreNodes(nodes);
     setStoreEdges(edges);
-    setNodes(nodes);
-    setEdges(edges);
     saveToHistory({ nodes, edges });
     setHasUnsavedChanges(true);
     closeImportModal();
@@ -174,8 +172,6 @@ const ImportExportControls: FC = () => {
     importedFlowData,
     getNodes,
     getEdges,
-    setNodes,
-    setEdges,
     setStoreNodes,
     setStoreEdges,
     setHasUnsavedChanges,

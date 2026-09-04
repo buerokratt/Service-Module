@@ -28,7 +28,7 @@ type PreviousVariablesProps = {
 
 // Unique key for predefined elements, used below to identify it
 // All other assign element keys are UUIDs
-const predefinedInputKeys = ['-1', '-2'];
+const predefinedInputKeys = ['-1', '-2', '-3', '-4', '-5', '-6'];
 
 const PreviousVariables: FC<PreviousVariablesProps> = ({ node }) => {
   const { t } = useTranslation();
@@ -36,6 +36,7 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ node }) => {
   let endpointsVariables = useServiceStore((state) => state.endpointsResponseVariables);
   const nodes = useServiceStore((state) => state.nodes);
   const edges = useServiceStore((state) => state.edges);
+  const serviceName = useServiceStore((state) => state.name);
   const [endpoints, setEndpoints] = useState<EndpointResponseVariable[]>([]);
   const [assignedVariables, setAssignedVariables] = useState<Assign[]>([]);
   const [endpointsObjectTree, setEndpointsObjectTree] = useState<{
@@ -86,7 +87,10 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ node }) => {
     const endpointNodes = previousNodes.filter((node) => node.data.stepType === StepType.UserDefined);
     const names = endpointNodes.map((node) => node.data.label?.toString().split(' ')[0]);
     const filteredEndpointsVariables = endpointsVariables.filter((endpoint) => names.includes(endpoint.name));
-    setEndpoints(filteredEndpointsVariables);
+    const uniqueEndpointsVariables = Array.from(
+      new Map(filteredEndpointsVariables.map((endpoint) => [endpoint.name, endpoint])).values(),
+    );
+    setEndpoints(uniqueEndpointsVariables);
 
     // Get Assign variables
     const assignNodes: Node<NodeDataProps>[] =
@@ -109,10 +113,30 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ node }) => {
         key: 'Empty Content Type',
         value: stringToTemplate(''),
       },
+      {
+        id: predefinedInputKeys[2],
+        key: 'Chat Id',
+        value: stringToTemplate('chatId'),
+      },
+      {
+        id: predefinedInputKeys[3],
+        key: 'Nonce Key',
+        value: 'x-ruuter-nonce',
+      },
+      {
+        id: predefinedInputKeys[4],
+        key: 'Nonce Value',
+        value: stringToTemplate('nonce'),
+      },
+      {
+        id: predefinedInputKeys[5],
+        key: 'Service Name',
+        value: serviceName,
+      },
     ];
 
     setAssignedVariables([...assignElements, ...predefinedInputElements, ...newAssignElements]);
-  }, [edges, endpointsVariables, newAssignElements, node.id, nodes]);
+  }, [edges, endpointsVariables, newAssignElements, node.id, nodes, serviceName]);
 
   function getParentNode(nodes: Node[], edges: Edge[], node: Node): Node | undefined {
     const parentEdge = edges.findLast((edge) => edge.target === node.id);
@@ -175,59 +199,75 @@ const PreviousVariables: FC<PreviousVariablesProps> = ({ node }) => {
               style={{ borderBottom: border, borderTop: border }}
             />
           )}
-          {endpoints.map((endpoint) => (
-            <Track key={v4()} direction="vertical" align="left" style={{ ...popupBodyCss, borderBottom: border }}>
-              <label
-                htmlFor="json"
-                style={{ marginBottom: '10px', textTransform: 'capitalize', cursor: 'auto' }}
-              >{`${endpoint.name}`}</label>
-              <Track
-                direction="horizontal"
-                gap={4}
-                justify="start"
-                isMultiline
-                style={{ maxHeight: '30vh', overflow: 'auto' }}
-              >
-                {endpoint.chips.map((chip) => {
-                  const typeColor = getTypeColor(chip.data);
-                  const dragData: Assign = {
-                    id: v4(),
-                    key: chip.name,
-                    value: stringToTemplate(chip.value),
-                    data: chip.data,
-                  };
+          {endpoints.length > 0 && (
+            <Collapsible
+              title={t('serviceFlow.previousVariables.apiResponses.title')}
+              appearance="normal"
+              defaultOpen={true}
+              contentStyle={{ padding: '0px' }}
+              headerDivider={false}
+              style={{ borderRadius: '0px', borderBottom: '1px solid #d2d3d8', borderTop: '0px' }}
+            >
+              {endpoints.map((endpoint) => (
+                <Track
+                  key={endpoint.name}
+                  direction="vertical"
+                  align="left"
+                  style={{ ...popupBodyCss, borderBottom: border }}
+                >
+                  <label
+                    htmlFor="json"
+                    style={{ marginBottom: '10px', textTransform: 'capitalize', cursor: 'auto' }}
+                  >{`${endpoint.name}`}</label>
+                  <Track
+                    direction="horizontal"
+                    gap={4}
+                    justify="start"
+                    isMultiline
+                    style={{ maxHeight: '30vh', overflow: 'auto' }}
+                  >
+                    {endpoint.chips.map((chip) => {
+                      const typeColor = getTypeColor(chip.data);
+                      const dragData: Assign = {
+                        id: v4(),
+                        key: chip.name,
+                        value: stringToTemplate(chip.value),
+                        data: chip.data,
+                      };
 
-                  return isObject(chip.data) ? (
-                    <Tooltip content={`${JSON.stringify(chip.data)} : ${typeColor.type}`} key={dragData.id}>
-                      <OutputElementBox
-                        dragData={dragData}
-                        style={{ cursor: 'pointer' }}
-                        borderColor={typeColor.color}
-                        onClick={() => {
-                          setEndpointsObjectTree(
-                            endpointsObjectTree?.path === chip.value
-                              ? null
-                              : {
-                                  data: chip.data,
-                                  path: chip.value,
-                                },
-                          );
-                        }}
-                      >
-                        {endpointsObjectTree?.path === chip.value ? chip.name + ' ▲' : chip.name + ' ▼'}
-                      </OutputElementBox>
-                    </Tooltip>
-                  ) : (
-                    <Tooltip content={`${chip.data} : ${typeColor.type}`} key={dragData.id}>
-                      <OutputElementBox borderColor={typeColor.color} dragData={dragData}>
-                        {chip.name}
-                      </OutputElementBox>
-                    </Tooltip>
-                  );
-                })}
-              </Track>
-            </Track>
-          ))}
+                      return isObject(chip.data) ? (
+                        <Tooltip content={`${JSON.stringify(chip.data)} : ${typeColor.type}`} key={dragData.id}>
+                          <OutputElementBox
+                            dragData={dragData}
+                            style={{ cursor: 'pointer' }}
+                            borderColor={typeColor.color}
+                            onClick={() => {
+                              setEndpointsObjectTree(
+                                endpointsObjectTree?.path === chip.value
+                                  ? null
+                                  : {
+                                      data: chip.data,
+                                      path: chip.value,
+                                    },
+                              );
+                            }}
+                          >
+                            {endpointsObjectTree?.path === chip.value ? chip.name + ' ▲' : chip.name + ' ▼'}
+                          </OutputElementBox>
+                        </Tooltip>
+                      ) : (
+                        <Tooltip content={`${chip.data} : ${typeColor.type}`} key={dragData.id}>
+                          <OutputElementBox borderColor={typeColor.color} dragData={dragData}>
+                            {chip.name}
+                          </OutputElementBox>
+                        </Tooltip>
+                      );
+                    })}
+                  </Track>
+                </Track>
+              ))}
+            </Collapsible>
+          )}
         </>
       )}
       {isObject(endpointsObjectTree?.data) && (

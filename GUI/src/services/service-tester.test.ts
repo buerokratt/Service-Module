@@ -9,6 +9,7 @@ import {
   clearPreviousTestStates,
   executeService,
   executeServiceTest,
+  fetchNonce,
   getInvalidNodes,
   handleTestError,
   hasResponseData,
@@ -28,12 +29,14 @@ vi.mock('i18next', () => ({
 vi.mock('./api', () => ({
   default: {
     post: vi.fn(),
+    get: vi.fn(),
   },
   createApiInstance: vi.fn(),
 }));
 
 vi.mock('resources/api-constants', () => ({
   testService: vi.fn(),
+  getNewNonce: vi.fn(),
 }));
 
 // Mock dependencies for handleTestError
@@ -715,11 +718,13 @@ describe('executeServiceTest', () => {
     const state = ServiceState.Active;
     const name = 'test-service';
     const input = 'test-input';
+    const nonce = 'test-nonce';
 
-    await executeServiceTest(headerValue, state, name, input);
+    await executeServiceTest(headerValue, state, name, input, nonce);
 
     expect(mockCreateApiInstance).toHaveBeenCalledWith({
       'x-ruuter-testing': headerValue,
+      'x-ruuter-nonce': nonce,
     });
   });
 
@@ -728,8 +733,9 @@ describe('executeServiceTest', () => {
     const state = ServiceState.Active;
     const name = 'test-service';
     const input = 'test-input';
+    const nonce = 'test-nonce';
 
-    await executeServiceTest(headerValue, state, name, input);
+    await executeServiceTest(headerValue, state, name, input, nonce);
 
     expect(mockTestService).toHaveBeenCalledWith(state, name);
   });
@@ -739,9 +745,10 @@ describe('executeServiceTest', () => {
     const state = ServiceState.Active;
     const name = 'test-service';
     const input = 'test-input';
+    const nonce = 'test-nonce';
     const expectedEndpoint = '/test-endpoint';
 
-    await executeServiceTest(headerValue, state, name, input);
+    await executeServiceTest(headerValue, state, name, input, nonce);
 
     expect(mockPost).toHaveBeenCalledWith(expectedEndpoint, { input });
   });
@@ -751,13 +758,37 @@ describe('executeServiceTest', () => {
     const state = ServiceState.Active;
     const name = 'test-service';
     const input = 'test-input';
+    const nonce = 'test-nonce';
     const expectedResponse = { success: true, data: 'test-data' };
 
     mockPost.mockResolvedValue(expectedResponse);
 
-    const result = await executeServiceTest(headerValue, state, name, input);
+    const result = await executeServiceTest(headerValue, state, name, input, nonce);
 
     expect(result).toBe(expectedResponse);
+  });
+});
+
+describe('fetchNonce', () => {
+  let mockApiGet: ReturnType<typeof vi.fn>;
+  let mockGetNewNonce: ReturnType<typeof vi.fn>;
+
+  beforeEach(async () => {
+    vi.clearAllMocks();
+    mockApiGet = vi.mocked((await import('./api')).default.get);
+    mockGetNewNonce = vi.mocked((await import('resources/api-constants')).getNewNonce);
+
+    mockGetNewNonce.mockReturnValue('/get-new-nonce');
+  });
+
+  it('should call getNewNonce and return the nonce from the response', async () => {
+    mockApiGet.mockResolvedValue({ data: 'abc123' });
+
+    const result = await fetchNonce();
+
+    expect(mockGetNewNonce).toHaveBeenCalled();
+    expect(mockApiGet).toHaveBeenCalledWith('/get-new-nonce');
+    expect(result).toBe('abc123');
   });
 });
 
@@ -1231,11 +1262,12 @@ describe('executeService', () => {
     const state = ServiceState.Active;
     const name = 'test-service';
     const input = 'test-input';
+    const nonce = 'test-nonce';
 
-    await executeService(state, name, input);
+    await executeService(state, name, input, nonce);
 
     expect(mockTestService).toHaveBeenCalledWith(state, name);
-    expect(mockApi).toHaveBeenCalledWith('/test-endpoint', { input });
+    expect(mockApi).toHaveBeenCalledWith('/test-endpoint', { input }, { headers: { 'x-ruuter-nonce': nonce } });
   });
 });
 
@@ -1263,6 +1295,16 @@ describe('addSuccessMessages', () => {
     addSuccessMessages(responseData);
 
     expect(mockAddBotMessage).toHaveBeenCalledWith('Test response content', undefined);
+    expect(mockAddSuccess).toHaveBeenCalledWith('chat.service-test-success');
+  });
+
+  it('should not throw and should skip the bot message when the response array is empty', () => {
+    const responseData = {
+      response: [],
+    };
+
+    expect(() => addSuccessMessages(responseData)).not.toThrow();
+    expect(mockAddBotMessage).not.toHaveBeenCalled();
     expect(mockAddSuccess).toHaveBeenCalledWith('chat.service-test-success');
   });
 });

@@ -112,7 +112,7 @@ delete_all_mcq_files:
     url: "[#SERVICE_DMAPPER]/file-manager/delete-all-that-starts-with"
     body:
       path: "[#RUUTER_SERVICES_PATH]/${type}/services/draft"
-      keyword: "${name}_"
+      keyword: "${name}_mcq_"
   result: deleteRes 
 
 convert_json_content_to_yml:

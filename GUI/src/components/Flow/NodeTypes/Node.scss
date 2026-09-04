@@ -5,6 +5,10 @@
 @import 'src/styles/settings/variables/_colors';
 
 .react-flow__node {
+  transition:
+    opacity 0.2s ease,
+    filter 0.2s ease;
+
   .icon {
     color: rgba(0, 0, 0, 0.54);
   }
@@ -45,6 +49,20 @@
     color: get-color(black-coral-6);
   }
 
+  .jump-to-service-link {
+    color: get-color(sapphire-blue-10);
+    text-decoration: underline;
+
+    &:hover {
+      text-decoration: none;
+    }
+  }
+
+  .jump-to-service-link-disabled {
+    color: get-color(black-coral-6);
+    text-decoration: line-through;
+  }
+
   .file-name-extension {
     color: get-color(black-coral-6);
   }
@@ -66,10 +84,36 @@
       padding-top: 5px;
     }
   }
+
+  &.node-highlighted {
+    filter: drop-shadow(0 0 6px rgba(69, 135, 188, 0.55));
+    outline: 2px solid get-color(sapphire-blue-7);
+    border-radius: 6px;
+    outline-offset: 3px;
+  }
 }
 
 [data-theme='dark'] .react-flow__node {
   .icon {
     color: var(--dark-text-label);
   }
+}
+
+.react-flow__edge {
+  transition: opacity 0.2s ease;
+
+  &.edge-highlighted {
+    opacity: 1;
+
+    .react-flow__edge-path {
+      stroke: get-color(sapphire-blue-7);
+      stroke-width: 2;
+    }
+  }
+}
+
+.edge-button--highlighted {
+  background-color: get-color(sapphire-blue-7) !important;
+  color: white !important;
+  border-color: get-color(sapphire-blue-7) !important;
 }

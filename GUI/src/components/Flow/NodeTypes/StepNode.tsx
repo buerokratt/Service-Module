@@ -1,13 +1,15 @@
 import CheckBadge from 'components/CheckBadge';
 import ExclamationBadge from 'components/ExclamationBadge';
 import Track from 'components/Track';
-import { FC, memo, useCallback, useEffect, useState } from 'react';
+import { FC, memo, MouseEvent, useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 import sanitizeHtml from 'sanitize-html';
 import useServiceStore from 'store/new-services.store';
 import { StepType } from 'types';
 import { NodeDataProps } from 'types/service-flow';
 import { validateStep } from 'utils/flow-utils';
+import { navigateToService } from 'utils/service-navigation-utils';
 import { decodeHtmlEntities, ensureAbsoluteUrl } from 'utils/string-util';
 
 type StepNodeProps = {
@@ -16,8 +18,23 @@ type StepNodeProps = {
 
 const StepNode: FC<StepNodeProps> = ({ data }) => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const endpoints = useServiceStore((state) => state.endpoints);
+  const navigableServices = useServiceStore((state) => state.navigableServices);
   const [isTestedAndPassed, setIsTestedAndPassed] = useState<boolean | null>(null);
+
+  const jumpToServiceId = data.jumpToService?.serviceId;
+  const isJumpToServiceValid = !!jumpToServiceId && navigableServices.has(jumpToServiceId);
+  const jumpToServiceName =
+    (jumpToServiceId && navigableServices.get(jumpToServiceId)) || data.jumpToService?.serviceName;
+
+  const handleJumpToServiceClick = (event: MouseEvent) => {
+    event.stopPropagation();
+
+    if (!isJumpToServiceValid || !jumpToServiceId) return;
+
+    navigateToService(jumpToServiceId, navigate);
+  };
 
   const boldText = {
     fontWeight: 500,
@@ -136,7 +153,20 @@ const StepNode: FC<StepNodeProps> = ({ data }) => {
         <p style={boldText}>{t('serviceFlow.popup.redirectToCustomerSupport')}</p>
       )}
       {data.stepType === StepType.JumpToService && data.jumpToService?.serviceName && (
-        <p style={boldText}>&rarr; {data.jumpToService.serviceName}</p>
+        <p
+          style={{ ...boldText, cursor: isJumpToServiceValid ? 'pointer' : 'not-allowed' }}
+          className={isJumpToServiceValid ? 'jump-to-service-link' : 'jump-to-service-link-disabled'}
+          onClick={isJumpToServiceValid ? handleJumpToServiceClick : undefined}
+          title={
+            isJumpToServiceValid
+              ? t('serviceFlow.element.jumpToService.navigateToService')
+              : t('serviceFlow.element.jumpToService.deletedService', {
+                  serviceName: jumpToServiceName,
+                })
+          }
+        >
+          &rarr; {jumpToServiceName}
+        </p>
       )}
       {data.stepType === StepType.Rule && (
         <p>

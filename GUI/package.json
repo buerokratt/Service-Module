@@ -4,8 +4,8 @@
   "type": "module",
   "private": true,
   "dependencies": {
-    "@buerokratt-ria/header": "^0.1.52",
-    "@buerokratt-ria/menu": "^0.2.13",
+    "@buerokratt-ria/header": "^0.1.53",
+    "@buerokratt-ria/menu": "^0.2.15",
     "@buerokratt-ria/styles": "^0.0.1",
     "@dnd-kit/core": "^6.3.1",
     "@dnd-kit/modifiers": "^9.0.0",
@@ -52,11 +52,11 @@
     "react-idle-timer": "^5.7.2",
     "react-json-tree": "^0.20.0",
     "react-loading-indicators": "^1.0.1",
-    "react-quill": "^2.0.0",
+    "react-quill-new": "^3.8.3",
     "react-router-dom": "^6.6.2",
     "react-textarea-autosize": "^8.4.0",
     "rxjs": "^7.8.0",
-    "sanitize-html": "^2.17.0",
+    "sanitize-html": "^2.17.6",
     "sass": "^1.57.1",
     "sass-loader": "^13.2.0",
     "to-json-schema": "^0.2.5",
@@ -78,6 +78,11 @@
     "test:ui": "vitest --ui",
     "test:coverage": "vitest run --coverage",
     "typecheck": "./typecheck.sh"
+  },
+  "overrides": {
+    "sanitize-html": {
+      "htmlparser2": "10.1.0"
+    }
   },
   "browserslist": [
     "defaults",
@@ -102,7 +107,7 @@
     "@types/react": "^18.2.0",
     "@types/react-datepicker": "^4.8.0",
     "@types/react-dom": "^18.2.0",
-    "@types/sanitize-html": "^2.16.0",
+    "@types/sanitize-html": "^2.16.1",
     "@types/to-json-schema": "^0.2.1",
     "@types/uuid": "^9.0.1",
     "@vitejs/plugin-react": "^5.1.1",

@@ -10,11 +10,12 @@ import {
   ReactFlowInstance,
 } from '@xyflow/react';
 import { AxiosResponse } from 'axios';
-import { GroupOrRule } from 'components/FlowElementsPopup/RuleBuilder/types';
+import { Group } from 'components/FlowElementsPopup/RuleBuilder/types';
 import i18next from 'i18next';
 import {
   getAllEndpoints,
   getEndpointValidation,
+  getNavigableServicesList,
   getSecretVariables,
   getServiceById,
   getTaraAuthResponseVariables,
@@ -49,6 +50,35 @@ import useTestServiceStore from './test-services.store';
 import useToastStore from './toasts.store';
 import api from '../services/api-dev';
 
+const HIGHLIGHT_CLASS_RE = /\b(node-highlighted|node-dimmed)\b/g;
+const EDGE_HIGHLIGHT_CLASS_RE = /\b(edge-highlighted|edge-dimmed)\b/g;
+
+function stripNodeHighlight(node: Node): Node {
+  if (!node.className) return node;
+  const cleaned = node.className.replace(HIGHLIGHT_CLASS_RE, '').replace(/\s+/g, ' ').trim();
+  return cleaned === node.className ? node : { ...node, className: cleaned || undefined };
+}
+
+function omitSelected<T extends { selected?: boolean }>({ selected: _selected, ...rest }: T): Omit<T, 'selected'> {
+  return rest;
+}
+
+function stripEdgeHighlight(edge: Edge): Edge {
+  const cleanedClassName = edge.className
+    ? edge.className.replace(EDGE_HIGHLIGHT_CLASS_RE, '').replace(/\s+/g, ' ').trim()
+    : edge.className;
+  const data = edge.data;
+  const hasHighlightData = !!data && ('isHighlighted' in data || 'isDimmed' in data);
+
+  if (cleanedClassName === edge.className && !hasHighlightData) return edge;
+
+  const rest = hasHighlightData
+    ? Object.fromEntries(Object.entries(data).filter(([k]) => k !== 'isHighlighted' && k !== 'isDimmed'))
+    : data;
+
+  return { ...edge, className: cleanedClassName || undefined, data: rest };
+}
+
 export interface ServiceStoreState {
   endpoints: EndpointData[];
   name: string;
@@ -65,13 +95,15 @@ export interface ServiceStoreState {
   isNewService: boolean;
   serviceState?: ServiceState;
   assignElements: Assign[];
-  rules: GroupOrRule[];
+  rules: Group | undefined;
   isYesNoQuestion: boolean;
   stepPreferences: string[];
   endpointsResponseVariables: EndpointResponseVariable[];
+  navigableServices: Map<string, string>;
+  loadNavigableServiceIds: () => Promise<void>;
   setIsYesNoQuestion: (value: boolean) => void;
   changeAssignNode: (assign: Assign[]) => void;
-  changeRulesNode: (rules: GroupOrRule[]) => void;
+  changeRulesNode: (rules: Group | undefined) => void;
   markAsNewService: () => void;
   unmarkAsNewService: () => void;
   setServiceId: (id: string) => void;
@@ -232,10 +264,11 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
   isTestButtonVisible: false,
   isTestButtonEnabled: true,
   assignElements: [],
-  rules: [],
+  rules: undefined,
   isYesNoQuestion: false,
   stepPreferences: [],
   endpointsResponseVariables: [],
+  navigableServices: new Map(),
   history: [{ nodes: initialNodes, edges: initialEdges }],
   historyIndex: 0,
   setIsYesNoQuestion: (value: boolean) => set({ isYesNoQuestion: value }),
@@ -337,7 +370,9 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
         variables.push(variable);
       });
 
-      set({ endpointsResponseVariables: variables });
+      const uniqueVariables = Array.from(new Map(variables.map((variable) => [variable.name, variable])).values());
+
+      set({ endpointsResponseVariables: uniqueVariables });
     } catch (e) {
       console.error(e);
     }
@@ -410,7 +445,7 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
       nodes: initialNodes,
       isTestButtonEnabled: true,
       assignElements: [],
-      rules: [],
+      rules: undefined,
       isYesNoQuestion: false,
       clickedNode: null,
       isTestButtonVisible: false,
@@ -422,7 +457,7 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
     useTestServiceStore.getState().reset();
   },
   resetAssign: () => set({ assignElements: [] }),
-  resetRules: () => set({ rules: [], isYesNoQuestion: false }),
+  resetRules: () => set({ rules: undefined, isYesNoQuestion: false }),
   loadService: async (id, resetState, search) => {
     if (resetState === true) {
       get().resetState();
@@ -459,16 +494,18 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
       if (!endpoints || !Array.isArray(endpoints)) endpoints = [];
 
       nodes = nodes.map((node: any) => {
-        if (node.type !== 'custom') return node;
-        node.data = {
-          ...node.data,
+        const rest = omitSelected(stripNodeHighlight(node as Node));
+        if (rest.type !== 'custom') return rest;
+        rest.data = {
+          ...rest.data,
           onDelete: get().onDelete,
           setClickedNode: get().setClickedNode,
           onEdit: get().handleNodeEdit,
           update: updateFlowInputRules,
         };
-        return node;
+        return rest;
       });
+      edges = edges.map((edge: Edge) => omitSelected(stripEdgeHighlight(edge)));
 
       /*The structuredClone approach failed with DataCloneError because flow nodes contain function references 
       (onDelete, onEdit, setClickedNode, update), 
@@ -558,6 +595,16 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
       });
     } catch (error) {
       console.error('Failed to load step preferences:', error);
+    }
+  },
+  loadNavigableServiceIds: async () => {
+    try {
+      const response =
+        await api.get<{ readonly serviceId: string; readonly name: string }[]>(getNavigableServicesList());
+      const data = Array.isArray(response.data) ? response.data : [];
+      set({ navigableServices: new Map(data.map((s) => [s.serviceId, s.name])) });
+    } catch (error) {
+      console.error('Failed to load navigable services:', error);
     }
   },
   loadSecretVariables: async () => {
@@ -716,7 +763,7 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
   setClickedNode: (clickedNode) => set({ clickedNode }),
   onNodesChange: (changes: NodeChange[]) => {
     get().setNodes((prevNode) => {
-      const changedNodes = applyNodeChanges(changes, prevNode);
+      const changedNodes = applyNodeChanges(changes, prevNode).map(stripNodeHighlight);
       const newNodes = alignNodesInCaseAnyGotOverlapped(changes, changedNodes, get().edges);
       changes.forEach((change) => {
         if (change.type === 'add') {
@@ -727,7 +774,7 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
     });
   },
   onEdgesChange: (changes: EdgeChange[]) => {
-    get().setEdges((eds) => applyEdgeChanges(changes, eds));
+    get().setEdges((eds) => applyEdgeChanges(changes, eds).map(stripEdgeHighlight));
   },
   onNodeAdded: (_: Node) => {
     const cleanupGhostNodes = async () => {
