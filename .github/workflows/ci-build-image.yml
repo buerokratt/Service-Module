@@ -2,7 +2,7 @@ name: Build and publish GUI
 
 on:
   push:
-    branches: [ v3.3.2 ]
+    branches: [ v3.3.3 ]
     paths:
       - '.env.gui'
 
