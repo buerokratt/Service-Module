@@ -1,4 +1,5 @@
 import * as RadixDialog from '@radix-ui/react-dialog';
+import clsx from 'clsx';
 import React, { FC, HTMLAttributes, PropsWithChildren, ReactNode, useEffect, useRef, useState } from 'react';
 import { MdCheck, MdClose, MdOutlineClose, MdOutlineEdit } from 'react-icons/md';
 
@@ -16,6 +17,7 @@ type DialogProps = HTMLAttributes<HTMLDivElement> & {
   onTitleEditCancel?: () => void;
   titleEditable?: boolean;
   titleError?: string;
+  contentOverflow?: 'auto' | 'visible';
 };
 
 const Popup: FC<PropsWithChildren<DialogProps>> = ({
@@ -29,6 +31,7 @@ const Popup: FC<PropsWithChildren<DialogProps>> = ({
   onTitleSave,
   onTitleEditCancel,
   titleError,
+  contentOverflow = 'auto',
   children,
   ...rest
 }) => {
@@ -95,7 +98,7 @@ const Popup: FC<PropsWithChildren<DialogProps>> = ({
       <RadixDialog.Portal>
         <RadixDialog.Overlay className="popup__overlay" />
         <RadixDialog.Content
-          className="popup"
+          className={clsx('popup', contentOverflow === 'visible' && 'popup--overflow-visible')}
           aria-describedby={description ? 'dialog-description' : undefined}
           onPointerDownOutside={handleOutsideInteraction}
           onInteractOutside={handleOutsideInteraction}
