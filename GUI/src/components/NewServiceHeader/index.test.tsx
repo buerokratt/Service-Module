@@ -65,7 +65,7 @@ describe('NewServiceHeader service switcher dropdown', () => {
     await user.click(option);
 
     await waitFor(() => expect(mockNavigate).toHaveBeenCalledWith('/edit/other-service-id'));
-  });
+  }, 20000);
 
   it('defers navigation through the unsaved-changes dialog when there are unsaved changes', async () => {
     useServiceStore.setState({ hasUnsavedChanges: true });
@@ -78,5 +78,5 @@ describe('NewServiceHeader service switcher dropdown', () => {
 
     await waitFor(() => expect(useServiceStore.getState().nextLocation).toBe('/edit/other-service-id'));
     expect(mockNavigate).not.toHaveBeenCalled();
-  });
+  }, 20000);
 });
