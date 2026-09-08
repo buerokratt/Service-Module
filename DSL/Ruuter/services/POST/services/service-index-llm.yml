@@ -1,0 +1,116 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Triggers LLM service enriching for a service. Used by manual re-index and service activation flow."
+  method: post
+  accepts: json
+  returns: json
+  namespace: service
+  allowlist:
+    body:
+      - field: serviceId
+        type: string
+        description: "Service UUID to index"
+      - field: name
+        type: string
+        description: "Service name"
+      - field: description
+        type: string
+        description: "Service description"
+      - field: examples
+        type: array
+        description: "Example queries"
+      - field: entities
+        type: array
+        description: "Expected entity names"
+      - field: type
+        type: string
+        description: "HTTP method (GET/POST)"
+      - field: state
+        type: string
+        description: "Service state (active/inactive/draft)"
+      - field: isCommon
+        type: boolean
+        description: "Is common service"
+    headers:
+      - field: cookie
+        type: string
+        description: "Cookie field"
+
+assign_id:
+  assign:
+    serviceId: ${incoming.body.serviceId}
+
+check_required:
+  switch:
+    - condition: ${serviceId == null || serviceId === ''}
+      next: return_bad_request
+
+mark_in_progress:
+  call: http.post
+  args:
+    url: "[#SERVICE_RESQL]/services/update_service_llm_sync_status"
+    body:
+      serviceId: ${serviceId}
+      status: IN_PROGRESS
+  result: in_progress_res
+
+call_llm_enrich:
+  call: http.post
+  args:
+    url: "[#LLM_RUUTER_PUBLIC]/services/enrich"
+    body:
+      service_id: ${serviceId}
+      name: ${incoming.body.name}
+      description: ${incoming.body.description}
+      examples: ${incoming.body.examples}
+      entities: ${incoming.body.entities}
+      ruuter_type: ${incoming.body.type}
+      current_state: ${incoming.body.state}
+      is_common: ${incoming.body.isCommon}
+  result: llm_enrich_result
+
+check_llm_enrich_result:
+  switch:
+    - condition: ${llm_enrich_result != null && llm_enrich_result.response != null && 200 <= llm_enrich_result.response.statusCodeValue && llm_enrich_result.response.statusCodeValue < 300 && llm_enrich_result.response.body.response.success === true}
+      next: mark_indexed
+  next: mark_failed_llm_call
+
+mark_indexed:
+  call: http.post
+  args:
+    url: "[#SERVICE_RESQL]/services/update_service_llm_sync_status"
+    body:
+      serviceId: ${serviceId}
+      status: SUCCESS
+  result: update_res
+  next: return_ok
+
+mark_failed_llm_call:
+  call: http.post
+  args:
+    url: "[#SERVICE_RESQL]/services/update_service_llm_sync_status"
+    body:
+      serviceId: ${serviceId}
+      status: FAILED
+  result: update_res
+  next: log_llm_failure
+
+log_llm_failure:
+  log: "LLM indexing failed for service ${serviceId}"
+  next: return_failed
+
+return_ok:
+  status: 200
+  return: "Service enrichment job queued successfully. Processing asynchronously."
+  next: end
+
+return_failed:
+  status: 500
+  return: "LLM indexing failed"
+  next: end
+
+return_bad_request:
+  status: 400
+  return: "serviceId is required"
+  next: end

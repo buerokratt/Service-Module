@@ -200,21 +200,23 @@ activate_all_mcq_services:
       keyword: "${name}_mcq_"
       format: "yml"
   result: active_move_results
-  next: call_llm_enrich
+  next: call_llm_index
 
-call_llm_enrich:
+call_llm_index:
   call: http.post
   args:
-    url: "[#LLM_RUUTER_PUBLIC]/services/enrich"
+    url: "[#SERVICE_RUUTER]/services/service-index-llm"
+    headers:
+      cookie: ${incoming.headers.cookie}
     body:
-      service_id: ${id}
+      serviceId: ${id}
       name: ${name}
       description: ${service_data_result.response.body[0].description}
       examples: ${service_data_result.response.body[0].examples}
       entities: ${service_data_result.response.body[0].entities}
-      ruuter_type: ${ruuter_type}
-      current_state: ${new_state}
-      is_common: ${service_data_result.response.body[0].isCommon}
+      type: ${ruuter_type}
+      state: ${new_state}
+      isCommon: ${service_data_result.response.body[0].isCommon}
   result: llm_enrich_result
   error: llm_enrich_error
   next: return_ok
