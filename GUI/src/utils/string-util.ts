@@ -173,8 +173,19 @@ export function decodeHtmlEntities(value: string): string {
 }
 
 export const ensureAbsoluteUrl = (href: string): string => {
-  if (/^[a-z][a-z\d+\-.]*:\/\//i.test(href) || href.startsWith('//')) {
-    return href;
+  const trimmed = href.trim();
+  if (!trimmed) return href;
+  if (/^[a-z][a-z\d+\-.]*:\/\//i.test(trimmed) || trimmed.startsWith('//')) {
+    return trimmed;
   }
-  return `https://${href}`;
+  // Non-hierarchical URI schemes (mailto:, tel:, data:, ...) are valid as is;
+  // prefixing them would break the link (e.g. "mailto:a@b.ee" -> "https://mailto:a@b.ee").
+  if (/^(mailto|tel|sms|callto|sip|sips|data|skype):/i.test(trimmed)) {
+    return trimmed;
+  }
+  // In-page anchors and relative references are not bare domains either.
+  if (/^[#/?.]/.test(trimmed)) {
+    return trimmed;
+  }
+  return `https://${trimmed}`;
 };
