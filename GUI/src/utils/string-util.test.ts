@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import {
+  ensureAbsoluteUrl,
   fromSnakeCase,
   getLastDigits,
   isTemplate,
@@ -130,6 +131,30 @@ describe('String Utils', () => {
     it('should handle edge cases', () => {
       expect(removeTrailingUnderscores('')).toBe('');
       expect(removeTrailingUnderscores('___')).toBe('');
+    });
+  });
+
+  describe('ensureAbsoluteUrl', () => {
+    it('should leave absolute urls untouched', () => {
+      expect(ensureAbsoluteUrl('https://example.com/page')).toBe('https://example.com/page');
+      expect(ensureAbsoluteUrl('http://example.com')).toBe('http://example.com');
+      expect(ensureAbsoluteUrl('//example.com/page')).toBe('//example.com/page');
+    });
+
+    it('should prepend https:// to bare domains', () => {
+      expect(ensureAbsoluteUrl('example.com')).toBe('https://example.com');
+      expect(ensureAbsoluteUrl('www.example.com/path')).toBe('https://www.example.com/path');
+    });
+
+    it('should not mangle mailto: and tel: links', () => {
+      expect(ensureAbsoluteUrl('mailto:info@example.com')).toBe('mailto:info@example.com');
+      expect(ensureAbsoluteUrl('tel:+3721234567')).toBe('tel:+3721234567');
+    });
+
+    it('should not mangle anchors, relative paths, or empty hrefs', () => {
+      expect(ensureAbsoluteUrl('#section')).toBe('#section');
+      expect(ensureAbsoluteUrl('/services/123')).toBe('/services/123');
+      expect(ensureAbsoluteUrl('')).toBe('');
     });
   });
 
