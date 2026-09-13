@@ -1079,7 +1079,7 @@ function handleMultiChoiceQuestion(
 
 function handleJumpToServiceStep(parentNode: Node<NodeDataProps>, finishedFlow: Map<any, any>, parentStepName: string) {
   const resultName = `${parentStepName}_result`;
-  const returnStepName = 'return_next_service_res';
+  const returnStepName = `${parentStepName}_return_next_service_res`;
 
   finishedFlow.set(parentStepName, {
     template: '[#SERVICE_PROJECT_LAYER]/jump-to-service',
