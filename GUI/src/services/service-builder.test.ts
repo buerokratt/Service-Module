@@ -376,3 +376,81 @@ describe('Nonce step injection', () => {
     expect(result.empty_messages.args.headers['x-ruuter-nonce']).toBe('${empty_messages_nonce.response.body[0].nonce}');
   });
 });
+
+describe('Jump to service step', () => {
+  const baseNodeData = {
+    onDelete: vi.fn(),
+    onEdit: vi.fn(),
+    type: 'custom',
+    readonly: false,
+    childrenCount: 0,
+    setClickedNode: vi.fn(),
+  };
+
+  const buildEndpointNode = (id: string, label: string): Node<NodeDataProps> => ({
+    id,
+    type: 'custom',
+    position: { x: 0, y: 0 },
+    data: {
+      ...baseNodeData,
+      label,
+      stepType: StepType.UserDefined,
+      endpoint: {
+        endpointId: id,
+        name: label,
+        definitions: [
+          {
+            id: `${id}-def`,
+            label,
+            path: '/back-up-removable-chats',
+            methodType: 'post',
+            type: 'custom',
+            dataType: 'custom',
+            supported: true,
+            isSelected: true,
+            url: '[#CHATBOT_RUUTER_PRIVATE]/chats/back-up-removable-chats',
+            headers: { variables: [], rawData: {} },
+          },
+        ],
+      },
+    },
+  });
+
+  const buildJumpToServiceNode = (id: string, label: string, serviceName: string): Node<NodeDataProps> => ({
+    id,
+    type: 'custom',
+    position: { x: 0, y: 0 },
+    data: {
+      ...baseNodeData,
+      label,
+      stepType: StepType.JumpToService,
+      jumpToService: { serviceName, input: [] },
+    },
+  });
+
+  it('gives each jump-to-service node its own return step, instead of all of them sharing one', () => {
+    const source1 = buildEndpointNode('node-1', 'Source One');
+    const jump1 = buildJumpToServiceNode('jump-1', 'Järgmine teenus - 1', 'service_a');
+    const source2 = buildEndpointNode('node-2', 'Source Two');
+    const jump2 = buildJumpToServiceNode('jump-2', 'Järgmine teenus - 2', 'service_b');
+
+    const nodes: Node<NodeDataProps>[] = [source1, jump1, source2, jump2];
+    const edges: Edge[] = [
+      { id: 'e1', source: 'node-1', target: 'jump-1' },
+      { id: 'e2', source: 'node-2', target: 'jump-2' },
+    ];
+
+    const result = getYamlContent(nodes, edges, 'test_service', '', false);
+
+    expect(result.järgmine_teenus_1.next).not.toBe(result.järgmine_teenus_2.next);
+
+    expect(result[result.järgmine_teenus_1.next]).toEqual({
+      return: '${järgmine_teenus_1_result.response ?? \'\'}',
+      next: 'end',
+    });
+    expect(result[result.järgmine_teenus_2.next]).toEqual({
+      return: '${järgmine_teenus_2_result.response ?? \'\'}',
+      next: 'end',
+    });
+  });
+});
