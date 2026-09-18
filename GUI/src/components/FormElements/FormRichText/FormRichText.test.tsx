@@ -14,12 +14,7 @@ describe('FormRichText', () => {
     const editor = quillRef.current!.getEditor();
 
     act(() => {
-      // Apply block formatting before clearing, so Quill leaves behind markup
-      // (e.g. a list wrapper around the empty line) that does not match the
-      // literal string '<p><br></p>'.
       editor.formatLine(0, editor.getLength(), 'list', 'bullet', 'user');
-      // Mirrors selecting all text and pressing Backspace: only the visible
-      // content is removed, not Quill's implicit trailing newline.
       editor.deleteText(0, editor.getLength() - 1, 'user');
     });
 
