@@ -102,7 +102,7 @@ delete_old_mcq_files:
   args:
     url: "[#SERVICE_DMAPPER]/file-manager/delete-all-that-starts-with"
     body:
-      path: "[#RUUTER_SERVICES_PATH]/${type}/services/active"
+      path: "[#RUUTER_SERVICES_POST_PATH]/active"
       keyword: "${get_service_result.response.body[0].name}_mcq_"
   result: deleteOldRes
   next: delete_all_mcq_files
@@ -112,7 +112,7 @@ delete_all_mcq_files:
   args:
     url: "[#SERVICE_DMAPPER]/file-manager/delete-all-that-starts-with"
     body:
-      path: "[#RUUTER_SERVICES_PATH]/${type}/services/active"
+      path: "[#RUUTER_SERVICES_POST_PATH]/active"
       keyword: "${name}_mcq_"
   result: deleteRes
   next: check_for_content
@@ -130,22 +130,7 @@ convert_json_content_to_yml:
     body:
       data: ${content}
   result: ymlResult
-
-check_for_type:
-  switch:
-    - condition: ${type === 'GET'}
-      next: add_get_dsl
   next: add_post_dsl
-
-add_get_dsl:
-  call: http.post
-  args:
-    url: "[#SERVICE_DMAPPER]/file-manager/create"
-    body:
-      file_path: "[#RUUTER_SERVICES_GET_PATH]/draft/${name}.tmp"
-      content: ${ymlResult.response.body.yaml}
-  result: results
-  next: check_for_required_parameters
 
 add_post_dsl:
   call: http.post
@@ -227,7 +212,7 @@ delete_old_main_file:
   args:
     url: "[#SERVICE_DMAPPER]/file-manager/delete"
     body:
-      file_path: "[#RUUTER_SERVICES_PATH]/${type}/[#RUUTER_SERVICES_DIR_PATH]/${old_state}/${old_name}.${old_ext}"
+      file_path: "[#RUUTER_SERVICES_POST_PATH]/${old_state}/${old_name}.${old_ext}"
   result: delete_old_main_result
   next: service_edit
 
@@ -236,8 +221,8 @@ rename_dsl:
   args:
     url: "[#SERVICE_DMAPPER]/file-manager/move"
     body:
-      file_path: "[#RUUTER_SERVICES_PATH]/${type}/[#RUUTER_SERVICES_DIR_PATH]/${old_state}/${old_name}.${old_ext}"
-      new_path: "[#RUUTER_SERVICES_PATH]/${type}/[#RUUTER_SERVICES_DIR_PATH]/${new_state_dir}/${name}.${new_ext}"
+      file_path: "[#RUUTER_SERVICES_POST_PATH]/${old_state}/${old_name}.${old_ext}"
+      new_path: "[#RUUTER_SERVICES_POST_PATH]/${new_state_dir}/${name}.${new_ext}"
   result: results
 
 service_edit:

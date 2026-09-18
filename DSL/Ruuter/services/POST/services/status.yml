@@ -100,7 +100,7 @@ check_file_exists:
   args:
     url: "[#SERVICE_DMAPPER]/file-manager/exists"
     body:
-      file_path: "[#RUUTER_SERVICES_PATH]/${ruuter_type}/[#RUUTER_SERVICES_DIR_PATH]/${old_file_status_path}/${name + old_file_end}"
+      file_path: "[#RUUTER_SERVICES_POST_PATH]/${old_file_status_path}/${name + old_file_end}"
   result: service_file_exists_result
   next: validate_file_exists
 
@@ -123,8 +123,8 @@ activate_service:
   args:
     url: "[#SERVICE_DMAPPER]/file-manager/move"
     body:
-      file_path: "[#RUUTER_SERVICES_PATH]/${ruuter_type}/[#RUUTER_SERVICES_DIR_PATH]/${old_file_status_path}/${name + old_file_end}"
-      new_path: "[#RUUTER_SERVICES_PATH]/${ruuter_type}/[#RUUTER_SERVICES_DIR_PATH]/active/${name}.yml"
+      file_path: "[#RUUTER_SERVICES_POST_PATH]/${old_file_status_path}/${name + old_file_end}"
+      new_path: "[#RUUTER_SERVICES_POST_PATH]/active/${name}.yml"
   result: activate_service_result
   next: get_service_data_for_json
 
@@ -195,8 +195,8 @@ activate_all_mcq_services:
   args:
     url: "[#SERVICE_DMAPPER]/file-manager/move-all-that-starts-with"
     body:
-      file_path: "[#RUUTER_SERVICES_PATH]/${ruuter_type}/[#RUUTER_SERVICES_DIR_PATH]/${old_file_status_path}"
-      new_path: "[#RUUTER_SERVICES_PATH]/${ruuter_type}/[#RUUTER_SERVICES_DIR_PATH]/active"
+      file_path: "[#RUUTER_SERVICES_POST_PATH]/${old_file_status_path}"
+      new_path: "[#RUUTER_SERVICES_POST_PATH]/active"
       keyword: "${name}_mcq_"
       format: "yml"
   result: active_move_results
@@ -230,8 +230,8 @@ deactivate_service:
   args:
     url: "[#SERVICE_DMAPPER]/file-manager/move"
     body:
-      file_path: "[#RUUTER_SERVICES_PATH]/${ruuter_type}/[#RUUTER_SERVICES_DIR_PATH]/${old_file_status_path}/${name + old_file_end}"
-      new_path: "[#RUUTER_SERVICES_PATH]/${ruuter_type}/[#RUUTER_SERVICES_DIR_PATH]/inactive/${name}.tmp"
+      file_path: "[#RUUTER_SERVICES_POST_PATH]/${old_file_status_path}/${name + old_file_end}"
+      new_path: "[#RUUTER_SERVICES_POST_PATH]/inactive/${name}.tmp"
   result: deactivate_service_result
   next: check_if_azure_storage_is_enabled_before_delete
 
@@ -278,8 +278,8 @@ dactivate_all_mcq_services:
   args:
     url: "[#SERVICE_DMAPPER]/file-manager/move-all-that-starts-with"
     body:
-      file_path: "[#RUUTER_SERVICES_PATH]/${ruuter_type}/[#RUUTER_SERVICES_DIR_PATH]/${old_file_status_path}"
-      new_path: "[#RUUTER_SERVICES_PATH]/${ruuter_type}/[#RUUTER_SERVICES_DIR_PATH]/inactive"
+      file_path: "[#RUUTER_SERVICES_POST_PATH]/${old_file_status_path}"
+      new_path: "[#RUUTER_SERVICES_POST_PATH]/inactive"
       keyword: "${name}_mcq_"
       format: "tmp"
   result: inactive_move_results
@@ -290,8 +290,8 @@ draft_service:
   args:
     url: "[#SERVICE_DMAPPER]/file-manager/move"
     body:
-      file_path: "[#RUUTER_SERVICES_PATH]/${ruuter_type}/[#RUUTER_SERVICES_DIR_PATH]/${old_file_status_path}/${name + old_file_end}"
-      new_path: "[#RUUTER_SERVICES_PATH]/${ruuter_type}/[#RUUTER_SERVICES_DIR_PATH]/draft/${name}.tmp"
+      file_path: "[#RUUTER_SERVICES_POST_PATH]/${old_file_status_path}/${name + old_file_end}"
+      new_path: "[#RUUTER_SERVICES_POST_PATH]/draft/${name}.tmp"
   result: draft_service_result
   next: draft_all_mcq_services
 
@@ -300,8 +300,8 @@ draft_all_mcq_services:
   args:
     url: "[#SERVICE_DMAPPER]/file-manager/move-all-that-starts-with"
     body:
-      file_path: "[#RUUTER_SERVICES_PATH]/${ruuter_type}/[#RUUTER_SERVICES_DIR_PATH]/${old_file_status_path}"
-      new_path: "[#RUUTER_SERVICES_PATH]/${ruuter_type}/[#RUUTER_SERVICES_DIR_PATH]/draft"
+      file_path: "[#RUUTER_SERVICES_POST_PATH]/${old_file_status_path}"
+      new_path: "[#RUUTER_SERVICES_POST_PATH]/draft"
       keyword: "${name}_mcq_"
       format: "tmp"
   result: inactive_move_results
