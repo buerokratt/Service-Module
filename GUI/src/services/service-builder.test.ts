@@ -475,11 +475,11 @@ describe('Jump to service step', () => {
     expect(result.järgmine_teenus_1.next).not.toBe(result.järgmine_teenus_2.next);
 
     expect(result[result.järgmine_teenus_1.next]).toEqual({
-      return: '${järgmine_teenus_1_result.response ?? \'\'}',
+      return: "${järgmine_teenus_1_result.response ?? ''}",
       next: 'end',
     });
     expect(result[result.järgmine_teenus_2.next]).toEqual({
-      return: '${järgmine_teenus_2_result.response ?? \'\'}',
+      return: "${järgmine_teenus_2_result.response ?? ''}",
       next: 'end',
     });
   });

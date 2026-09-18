@@ -6,7 +6,11 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import useServiceStore from './new-services.store';
 
 vi.mock('i18next', () => {
-  const mockI18n = { use: vi.fn().mockReturnThis(), init: vi.fn().mockResolvedValue(undefined), t: (key: string) => key };
+  const mockI18n = {
+    use: vi.fn().mockReturnThis(),
+    init: vi.fn().mockResolvedValue(undefined),
+    t: (key: string) => key,
+  };
   return { default: mockI18n, t: mockI18n.t };
 });
 
@@ -51,10 +55,7 @@ describe('onContinueClick flow completeness gate', () => {
   });
 
   it('blocks moving to Ready when a Next Service node has no resolvable target', async () => {
-    const nodes = [
-      startNode,
-      stepNode('jump-1', { stepType: StepType.JumpToService, jumpToService: { input: [] } }),
-    ];
+    const nodes = [startNode, stepNode('jump-1', { stepType: StepType.JumpToService, jumpToService: { input: [] } })];
     const edges: Edge[] = [{ id: 'e1', source: 'start-1', target: 'jump-1' }];
     useServiceStore.setState({ nodes, edges });
 
