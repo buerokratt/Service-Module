@@ -57,7 +57,7 @@ describe('StepNode jump-to-service navigation', () => {
 
     render(
       <MemoryRouter>
-        <StepNode data={jumpToServiceData} />
+        <StepNode id="jump-to-service-test-node" data={jumpToServiceData} />
       </MemoryRouter>,
     );
 
@@ -74,7 +74,7 @@ describe('StepNode jump-to-service navigation', () => {
   it('navigates directly to the target service when there are no unsaved changes', () => {
     render(
       <MemoryRouter>
-        <StepNode data={jumpToServiceData} />
+        <StepNode id="jump-to-service-test-node" data={jumpToServiceData} />
       </MemoryRouter>,
     );
 
@@ -89,7 +89,7 @@ describe('StepNode jump-to-service navigation', () => {
 
     render(
       <MemoryRouter>
-        <StepNode data={jumpToServiceData} />
+        <StepNode id="jump-to-service-test-node" data={jumpToServiceData} />
       </MemoryRouter>,
     );
 

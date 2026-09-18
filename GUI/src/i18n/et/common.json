@@ -316,6 +316,10 @@
     "toast": {
       "serviceMissingFields": "Nõutav on teenuse nimi ja kirjeldus",
       "missingFields": "Puuduvad väljad",
+      "incompleteFlow": "Lõpetamata teenuse voog",
+      "unconnectedServiceBlocks": "Ühenda kõik teenuse plokid.",
+      "unfinishedFlows": "Lõpeta kõik lõpetamata vood.",
+      "unresolvedJumpToService": "Lahenda kõik järgmise teenuse viited.",
       "savedSuccessfully": "Salvestatud",
       "success": "Õnnestus",
       "failed": "Ebaõnnestus",
