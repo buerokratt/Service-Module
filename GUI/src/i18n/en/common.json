@@ -316,6 +316,10 @@
     "toast": {
       "serviceMissingFields": "Service name and description are required",
       "missingFields": "Missing Fields",
+      "incompleteFlow": "Incomplete Service Flow",
+      "unconnectedServiceBlocks": "Connect all service blocks.",
+      "unfinishedFlows": "Complete all unfinished flows.",
+      "unresolvedJumpToService": "Resolve all Next Service references.",
       "savedSuccessfully": "Saved Successfully",
       "success": "Success",
       "failed": "Failed",
