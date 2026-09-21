@@ -35,6 +35,12 @@ describe('Validation Functions', () => {
       const result = validateTextField(nodeData as NodeDataProps);
       expect(result).toBe('toast.missing-textfield-message');
     });
+
+    it('should return error when message is an empty string', () => {
+      const nodeData = { message: '' };
+      const result = validateTextField(nodeData as NodeDataProps);
+      expect(result).toBe('toast.missing-textfield-message');
+    });
   });
 
   describe('validateOpenWebpage', () => {
@@ -61,6 +67,18 @@ describe('Validation Functions', () => {
       const result = validateOpenWebpage(nodeData as NodeDataProps);
       expect(result).toBe('toast.missing-website');
     });
+
+    it('should return error when link is an empty string', () => {
+      const nodeData = { link: '', linkText: 'Example' };
+      const result = validateOpenWebpage(nodeData as NodeDataProps);
+      expect(result).toBe('toast.missing-website');
+    });
+
+    it('should return error when linkText is an empty string', () => {
+      const nodeData = { link: 'https://example.com', linkText: '' };
+      const result = validateOpenWebpage(nodeData as NodeDataProps);
+      expect(result).toBe('toast.missing-website');
+    });
   });
 
   describe('validateFileGenerate', () => {
@@ -78,6 +96,18 @@ describe('Validation Functions', () => {
 
     it('should return error when fileContent is undefined', () => {
       const nodeData = { fileName: 'test.txt', fileContent: undefined };
+      const result = validateFileGenerate(nodeData as NodeDataProps);
+      expect(result).toBe('toast.missing-file-generation');
+    });
+
+    it('should return error when fileName is an empty string', () => {
+      const nodeData = { fileName: '', fileContent: 'Test content' };
+      const result = validateFileGenerate(nodeData as NodeDataProps);
+      expect(result).toBe('toast.missing-file-generation');
+    });
+
+    it('should return error when fileContent is an empty string', () => {
+      const nodeData = { fileName: 'test.txt', fileContent: '' };
       const result = validateFileGenerate(nodeData as NodeDataProps);
       expect(result).toBe('toast.missing-file-generation');
     });
@@ -445,11 +475,11 @@ describe('Jump to service step', () => {
     expect(result.järgmine_teenus_1.next).not.toBe(result.järgmine_teenus_2.next);
 
     expect(result[result.järgmine_teenus_1.next]).toEqual({
-      return: '${järgmine_teenus_1_result.response ?? \'\'}',
+      return: "${järgmine_teenus_1_result.response ?? ''}",
       next: 'end',
     });
     expect(result[result.järgmine_teenus_2.next]).toEqual({
-      return: '${järgmine_teenus_2_result.response ?? \'\'}',
+      return: "${järgmine_teenus_2_result.response ?? ''}",
       next: 'end',
     });
   });

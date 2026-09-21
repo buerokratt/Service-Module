@@ -470,7 +470,7 @@ const FlowElementsPopup: React.FC = () => {
                 defaultMessage={node.data.message ?? textfieldMessage ?? undefined}
                 node={node}
                 onChange={(message, placeholders) => {
-                  setTextfieldMessage(message);
+                  setTextfieldMessage(message ?? '');
                   setTextfieldMessagePlaceholders(placeholders);
                 }}
               />

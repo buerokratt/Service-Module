@@ -641,21 +641,21 @@ export function getYamlContent(
 }
 
 export const validateTextField = (nodeData: NodeDataProps): string | null => {
-  if (nodeData?.message === undefined) {
+  if (!nodeData?.message) {
     return i18next.t('toast.missing-textfield-message');
   }
   return null;
 };
 
 export const validateOpenWebpage = (nodeData: NodeDataProps): string | null => {
-  if (nodeData?.link === undefined || nodeData?.linkText === undefined) {
+  if (!nodeData?.link || !nodeData?.linkText) {
     return i18next.t('toast.missing-website');
   }
   return null;
 };
 
 export const validateFileGenerate = (nodeData: NodeDataProps): string | null => {
-  if (nodeData?.fileName === undefined || nodeData?.fileContent === undefined) {
+  if (!nodeData?.fileName || !nodeData?.fileContent) {
     return i18next.t('toast.missing-file-generation');
   }
   return null;

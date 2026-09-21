@@ -106,8 +106,8 @@ const FormRichText: FC<FormRichTextProps> = ({ defaultValue, onChange, quill }) 
       modules={modules}
       style={{ width: '100%' }}
       preserveWhitespace
-      onChange={(value) => {
-        value = value === '<p><br></p>' ? '' : value;
+      onChange={(value, _delta, _source, editor) => {
+        value = editor.getText().trim().length === 0 ? '' : value;
         const normalized = value.replaceAll(
           /(<a\s[^>]*?)href=(["'])(?!https?:\/\/|\/\/)([^"'\s>]+)\2/gi,
           (_, pre, quote, href) => `${pre}href=${quote}https://${href}${quote}`,
