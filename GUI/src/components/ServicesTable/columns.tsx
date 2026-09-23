@@ -19,9 +19,16 @@ interface GetColumnsConfig {
   navigate: NavigateFunction;
   hideDeletePopup: () => void;
   showReadyPopup: () => void;
+  checkingServiceId: string | null;
 }
 
-export const getColumns = ({ isCommon, navigate, hideDeletePopup, showReadyPopup }: GetColumnsConfig) => {
+export const getColumns = ({
+  isCommon,
+  navigate,
+  hideDeletePopup,
+  showReadyPopup,
+  checkingServiceId,
+}: GetColumnsConfig) => {
   const columnHelper = createColumnHelper<Service>();
   const userInfo = useStore.getState().userInfo;
 
@@ -151,22 +158,32 @@ export const getColumns = ({ isCommon, navigate, hideDeletePopup, showReadyPopup
       meta: {
         size: 120,
       },
-      cell: (props) => (
-        <Track
-          justify="start"
-          onClick={() => {
-            useServiceListStore.getState().setSelectedService(props.row.original);
-            const state = props.row.original.state;
-            if (state === ServiceState.Ready) {
-              showReadyPopup();
-            }
-          }}
-        >
-          <Label type={getServiceStateLabelType(props.row.original.state)}>
-            {i18n.t(`overview.service.states.${props.row.original.state}`)}
-          </Label>
-        </Track>
-      ),
+      cell: (props) => {
+        const isChecking = checkingServiceId === props.row.original.serviceId;
+
+        return (
+          <Track
+            justify="start"
+            onClick={() => {
+              if (isChecking) return;
+              useServiceListStore.getState().setSelectedService(props.row.original);
+              const state = props.row.original.state;
+              if (state === ServiceState.Ready) {
+                showReadyPopup();
+              }
+            }}
+          >
+            <Label type={getServiceStateLabelType(props.row.original.state)}>
+              <span className="service-state-cell">
+                <span style={{ visibility: isChecking ? 'hidden' : 'visible' }}>
+                  {i18n.t(`overview.service.states.${props.row.original.state}`)}
+                </span>
+                {isChecking && <span className="service-state-spinner" />}
+              </span>
+            </Label>
+          </Track>
+        );
+      },
     }),
     columnHelper.display({
       id: 'edit',

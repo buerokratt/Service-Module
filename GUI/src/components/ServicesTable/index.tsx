@@ -32,7 +32,7 @@ const ServicesTable: FC<ServicesTableProps> = ({ isCommon = false }) => {
   const { t } = useTranslation();
   const [isDeletePopupVisible, setIsDeletePopupVisible] = useState(false);
   const [activationBlockers, setActivationBlockers] = useState<ActivationBlocker[] | null>(null);
-  const [isCheckingActivation, setIsCheckingActivation] = useState(false);
+  const [checkingServiceId, setCheckingServiceId] = useState<string | null>(null);
   const services = useServiceListStore((state) => (isCommon ? state.commonServices : state.notCommonServices));
   const navigate = useNavigate();
   const [pagination, setPagination] = useState<PaginationState>({
@@ -61,7 +61,7 @@ const ServicesTable: FC<ServicesTableProps> = ({ isCommon = false }) => {
 
   const changeServiceState = useCallback(
     (activate: boolean = false, draft: boolean = false) => {
-      useServiceListStore
+      return useServiceListStore
         .getState()
         .changeServiceState(
           () => {},
@@ -72,7 +72,6 @@ const ServicesTable: FC<ServicesTableProps> = ({ isCommon = false }) => {
           pagination,
           sorting,
         )
-        .then(() => {})
         .catch((e) => {
           console.error(e);
         });
@@ -82,23 +81,23 @@ const ServicesTable: FC<ServicesTableProps> = ({ isCommon = false }) => {
 
   const attemptActivation = useCallback(async () => {
     const service = useServiceListStore.getState().selectedService;
-    if (!service || isCheckingActivation) return;
+    if (!service || checkingServiceId) return;
 
-    setIsCheckingActivation(true);
+    setCheckingServiceId(service.serviceId);
     try {
       const blockers = await useServiceListStore.getState().loadActivationBlockers(service);
       if (blockers.length > 0) {
         setActivationBlockers(blockers);
-      } else {
-        changeServiceState(true);
+        return;
       }
+      await changeServiceState(true);
     } catch (e) {
       console.error(e);
       useToastStore.getState().error({ title: t('overview.service.toast.failed.state') });
     } finally {
-      setIsCheckingActivation(false);
+      setCheckingServiceId(null);
     }
-  }, [changeServiceState, isCheckingActivation, t]);
+  }, [changeServiceState, checkingServiceId, t]);
 
   const columns = useMemo(() => {
     return getColumns({
@@ -108,8 +107,9 @@ const ServicesTable: FC<ServicesTableProps> = ({ isCommon = false }) => {
       showReadyPopup: () => {
         void attemptActivation();
       },
+      checkingServiceId,
     });
-  }, [isCommon, attemptActivation, navigate]);
+  }, [isCommon, attemptActivation, navigate, checkingServiceId]);
 
   const deleteSelectedService = () => {
     setIsDeletingService(true);

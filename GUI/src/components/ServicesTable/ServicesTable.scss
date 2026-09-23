@@ -20,6 +20,24 @@
   }
 }
 
+.service-state-cell {
+  display: grid;
+  place-items: center;
+
+  > * {
+    grid-area: 1 / 1;
+  }
+}
+
+.service-state-spinner {
+  width: 12px;
+  height: 12px;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
 .activation-blockers-list {
   display: flex;
   flex-direction: column;
