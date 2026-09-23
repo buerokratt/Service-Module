@@ -178,7 +178,8 @@
         "active": "Aktiivne",
         "inactive": "Mitteaktiivne",
         "draft": "Mustand",
-        "ready": "Valmis"
+        "ready": "Valmis",
+        "missing": "Puudub"
       },
       "toast": {
         "deleted": "Teenus kustutatud",
@@ -217,7 +218,10 @@
       "noSlotsAvailable": "Ühtegi pesa pole saadaval",
       "connectionQuestion": "Kas olete kindel, et soovite teenuse selle teemaga ühendada?",
       "createNewIntent": "Loo uus teema",
-      "deleteNodeConnections": "Kas soovid kustutada kõik loogikateed, mis on seotud selle plokiga, või jätta need alles?"
+      "deleteNodeConnections": "Kas soovid kustutada kõik loogikateed, mis on seotud selle plokiga, või jätta need alles?",
+      "activationBlocked": {
+        "title": "Teenust ei saa aktiveerida. Järgmised seotud teenused peavad olema aktiivsed:"
+      }
     }
   },
   "connectionRequests": {

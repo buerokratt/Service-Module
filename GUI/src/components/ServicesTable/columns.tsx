@@ -12,6 +12,7 @@ import useServiceListStore from 'store/services.store';
 import useStore from 'store/store';
 import useToastStore from 'store/toasts.store';
 import { Service, ServiceState } from 'types';
+import { getServiceStateLabelType } from 'utils/service-state-label';
 
 interface GetColumnsConfig {
   isCommon: boolean;
@@ -161,7 +162,7 @@ export const getColumns = ({ isCommon, navigate, hideDeletePopup, showReadyPopup
             }
           }}
         >
-          <Label type={getLabelType(props.row.original.state)}>
+          <Label type={getServiceStateLabelType(props.row.original.state)}>
             {i18n.t(`overview.service.states.${props.row.original.state}`)}
           </Label>
         </Track>
@@ -236,19 +237,4 @@ export const getColumns = ({ isCommon, navigate, hideDeletePopup, showReadyPopup
       ),
     }),
   ];
-};
-
-const getLabelType = (serviceState: ServiceState) => {
-  switch (serviceState) {
-    case ServiceState.Ready:
-      return 'warning-dark';
-    case ServiceState.Active:
-      return 'success-light';
-    case ServiceState.Draft:
-      return 'disabled';
-    case ServiceState.Inactive:
-      return 'warning-dark';
-    default:
-      return 'info';
-  }
 };

@@ -178,7 +178,8 @@
         "active": "Active",
         "inactive": "Inactive",
         "draft": "Draft",
-        "ready": "Ready"
+        "ready": "Ready",
+        "missing": "Missing"
       },
       "toast": {
         "deleted": "Service has been successfully deleted",
@@ -217,7 +218,10 @@
       "noSlotsAvailable": "No slots available",
       "connectionQuestion": "Are you sure you want to connect to this intent?",
       "createNewIntent": "Create new intent",
-      "deleteNodeConnections": "Would you like to also delete all the logic paths connected to this node or leave them hanging?"
+      "deleteNodeConnections": "Would you like to also delete all the logic paths connected to this node or leave them hanging?",
+      "activationBlocked": {
+        "title": "Cannot activate service. The following connected services must be Active:"
+      }
     }
   },
   "connectionRequests": {

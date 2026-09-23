@@ -1,11 +1,33 @@
 import { PaginationState, SortingState } from '@tanstack/react-table';
-import { changeServiceStatus, deleteService as deleteServiceApi, getServicesList } from 'resources/api-constants';
+import { Node } from '@xyflow/react';
+import {
+  changeServiceStatus,
+  deleteService as deleteServiceApi,
+  getServiceById,
+  getServicesList,
+} from 'resources/api-constants';
 import { Service, ServiceState } from 'types';
+import { ActivationBlocker } from 'types/activation-blocker';
+import { findActivationBlockers, ServiceFlowLookup } from 'utils/service-activation';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
 import useToastStore from './toasts.store';
 import api from '../services/api-dev';
+
+const fetchServiceFlow = async (serviceId: string): Promise<ServiceFlowLookup | undefined> => {
+  try {
+    const response = await api.post<Service>(getServiceById(), { id: serviceId, search: '' });
+    const data = response.data;
+    if (!data?.serviceId) return undefined;
+
+    const structure = JSON.parse(data.structure?.value ?? '{}');
+    return { name: data.name, state: data.state, nodes: (structure?.nodes ?? []) as Node[] };
+  } catch (error) {
+    console.error(error);
+    return undefined;
+  }
+};
 
 interface ServiceStoreState {
   services: Service[];
@@ -24,6 +46,7 @@ interface ServiceStoreState {
   deleteService: (id: string) => void;
   selectedService: Service | undefined;
   setSelectedService: (service: Service) => void;
+  loadActivationBlockers: (service: Service) => Promise<ActivationBlocker[]>;
   changeServiceState: (
     onEnd: () => void,
     successMessage: string,
@@ -135,6 +158,11 @@ const useServiceListStore = create<ServiceStoreState>()(
         set({
           selectedService: service,
         });
+      },
+      loadActivationBlockers: async (service: Service) => {
+        const rootFlow = await fetchServiceFlow(service.serviceId);
+        if (!rootFlow) return [];
+        return findActivationBlockers(rootFlow.nodes, fetchServiceFlow);
       },
       changeServiceState: async (onEnd, successMessage, errorMessage, activate, draft, pagination, sorting) => {
         const selectedService = get().selectedService;
