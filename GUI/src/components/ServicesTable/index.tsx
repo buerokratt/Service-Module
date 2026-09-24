@@ -2,9 +2,13 @@ import { PaginationState, SortingState } from '@tanstack/react-table';
 import { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
+import { ROUTES } from 'resources/routes-constants';
 import useServiceListStore from 'store/services.store';
+import useToastStore from 'store/toasts.store';
+import { ActivationBlocker } from 'types/activation-blocker';
+import { getServiceStateLabelType } from 'utils/service-state-label';
 
-import { Button, Card, Modal, Track } from '..';
+import { Button, Card, Label, Modal, Track } from '..';
 import DataTable from '../DataTable';
 import { getColumns } from './columns';
 
@@ -27,6 +31,8 @@ const getStoredPageSize = (): number => {
 const ServicesTable: FC<ServicesTableProps> = ({ isCommon = false }) => {
   const { t } = useTranslation();
   const [isDeletePopupVisible, setIsDeletePopupVisible] = useState(false);
+  const [activationBlockers, setActivationBlockers] = useState<ActivationBlocker[] | null>(null);
+  const [serviceIdBeingChecked, setServiceIdBeingChecked] = useState<string | null>(null);
   const services = useServiceListStore((state) => (isCommon ? state.commonServices : state.notCommonServices));
   const navigate = useNavigate();
   const [pagination, setPagination] = useState<PaginationState>({
@@ -55,7 +61,7 @@ const ServicesTable: FC<ServicesTableProps> = ({ isCommon = false }) => {
 
   const changeServiceState = useCallback(
     (activate: boolean = false, draft: boolean = false) => {
-      useServiceListStore
+      return useServiceListStore
         .getState()
         .changeServiceState(
           () => {},
@@ -66,7 +72,6 @@ const ServicesTable: FC<ServicesTableProps> = ({ isCommon = false }) => {
           pagination,
           sorting,
         )
-        .then(() => {})
         .catch((e) => {
           console.error(e);
         });
@@ -74,16 +79,37 @@ const ServicesTable: FC<ServicesTableProps> = ({ isCommon = false }) => {
     [t, pagination, sorting],
   );
 
+  const attemptActivation = useCallback(async () => {
+    const service = useServiceListStore.getState().selectedService;
+    if (!service || serviceIdBeingChecked) return;
+
+    setServiceIdBeingChecked(service.serviceId);
+    try {
+      const blockers = await useServiceListStore.getState().loadActivationBlockers(service);
+      if (blockers.length > 0) {
+        setActivationBlockers(blockers);
+        return;
+      }
+      await changeServiceState(true);
+    } catch (e) {
+      console.error(e);
+      useToastStore.getState().error({ title: t('overview.service.toast.failed.state') });
+    } finally {
+      setServiceIdBeingChecked(null);
+    }
+  }, [changeServiceState, serviceIdBeingChecked, t]);
+
   const columns = useMemo(() => {
     return getColumns({
       isCommon,
       navigate,
       hideDeletePopup: () => setIsDeletePopupVisible(true),
       showReadyPopup: () => {
-        changeServiceState(true);
+        void attemptActivation();
       },
+      serviceIdBeingChecked,
     });
-  }, [isCommon, changeServiceState, navigate]);
+  }, [isCommon, attemptActivation, navigate, serviceIdBeingChecked]);
 
   const deleteSelectedService = () => {
     setIsDeletingService(true);
@@ -120,6 +146,51 @@ const ServicesTable: FC<ServicesTableProps> = ({ isCommon = false }) => {
               {t('overview.delete')}
             </Button>
           </Track>
+        </Modal>
+      )}
+      {activationBlockers && activationBlockers.length > 0 && (
+        <Modal
+          title={t('overview.popup.activationBlocked.title')}
+          onClose={() => setActivationBlockers(null)}
+          footer={
+            <Button appearance="primary" onClick={() => setActivationBlockers(null)}>
+              {t('global.continue')}
+            </Button>
+          }
+        >
+          <ul className="activation-blockers-list">
+            {activationBlockers.map((blocker) => {
+              const content = (
+                <Track justify="between">
+                  <strong>{blocker.name}</strong>
+                  <Label type={getServiceStateLabelType(blocker.state)}>
+                    {t(`overview.service.states.${blocker.state}`)}
+                  </Label>
+                </Track>
+              );
+
+              return (
+                <li key={blocker.serviceId}>
+                  {blocker.state === 'missing' ? (
+                    <div className="activation-blockers-list__item activation-blockers-list__item--static">
+                      {content}
+                    </div>
+                  ) : (
+                    <button
+                      type="button"
+                      className="activation-blockers-list__item"
+                      onClick={() => {
+                        setActivationBlockers(null);
+                        navigate(ROUTES.replaceWithId(ROUTES.EDITSERVICE_ROUTE, blocker.serviceId));
+                      }}
+                    >
+                      {content}
+                    </button>
+                  )}
+                </li>
+              );
+            })}
+          </ul>
         </Modal>
       )}
       <DataTable
