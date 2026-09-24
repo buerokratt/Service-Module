@@ -32,7 +32,7 @@ const ServicesTable: FC<ServicesTableProps> = ({ isCommon = false }) => {
   const { t } = useTranslation();
   const [isDeletePopupVisible, setIsDeletePopupVisible] = useState(false);
   const [activationBlockers, setActivationBlockers] = useState<ActivationBlocker[] | null>(null);
-  const [checkingServiceId, setCheckingServiceId] = useState<string | null>(null);
+  const [serviceIdBeingChecked, setServiceIdBeingChecked] = useState<string | null>(null);
   const services = useServiceListStore((state) => (isCommon ? state.commonServices : state.notCommonServices));
   const navigate = useNavigate();
   const [pagination, setPagination] = useState<PaginationState>({
@@ -81,9 +81,9 @@ const ServicesTable: FC<ServicesTableProps> = ({ isCommon = false }) => {
 
   const attemptActivation = useCallback(async () => {
     const service = useServiceListStore.getState().selectedService;
-    if (!service || checkingServiceId) return;
+    if (!service || serviceIdBeingChecked) return;
 
-    setCheckingServiceId(service.serviceId);
+    setServiceIdBeingChecked(service.serviceId);
     try {
       const blockers = await useServiceListStore.getState().loadActivationBlockers(service);
       if (blockers.length > 0) {
@@ -95,9 +95,9 @@ const ServicesTable: FC<ServicesTableProps> = ({ isCommon = false }) => {
       console.error(e);
       useToastStore.getState().error({ title: t('overview.service.toast.failed.state') });
     } finally {
-      setCheckingServiceId(null);
+      setServiceIdBeingChecked(null);
     }
-  }, [changeServiceState, checkingServiceId, t]);
+  }, [changeServiceState, serviceIdBeingChecked, t]);
 
   const columns = useMemo(() => {
     return getColumns({
@@ -107,9 +107,9 @@ const ServicesTable: FC<ServicesTableProps> = ({ isCommon = false }) => {
       showReadyPopup: () => {
         void attemptActivation();
       },
-      checkingServiceId,
+      serviceIdBeingChecked,
     });
-  }, [isCommon, attemptActivation, navigate, checkingServiceId]);
+  }, [isCommon, attemptActivation, navigate, serviceIdBeingChecked]);
 
   const deleteSelectedService = () => {
     setIsDeletingService(true);

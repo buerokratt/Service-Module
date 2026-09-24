@@ -19,7 +19,7 @@ interface GetColumnsConfig {
   navigate: NavigateFunction;
   hideDeletePopup: () => void;
   showReadyPopup: () => void;
-  checkingServiceId: string | null;
+  serviceIdBeingChecked: string | null;
 }
 
 export const getColumns = ({
@@ -27,7 +27,7 @@ export const getColumns = ({
   navigate,
   hideDeletePopup,
   showReadyPopup,
-  checkingServiceId,
+  serviceIdBeingChecked,
 }: GetColumnsConfig) => {
   const columnHelper = createColumnHelper<Service>();
   const userInfo = useStore.getState().userInfo;
@@ -159,13 +159,13 @@ export const getColumns = ({
         size: 120,
       },
       cell: (props) => {
-        const isChecking = checkingServiceId === props.row.original.serviceId;
+        const isServiceMatch = serviceIdBeingChecked === props.row.original.serviceId;
 
         return (
           <Track
             justify="start"
             onClick={() => {
-              if (isChecking) return;
+              if (isServiceMatch) return;
               useServiceListStore.getState().setSelectedService(props.row.original);
               const state = props.row.original.state;
               if (state === ServiceState.Ready) {
@@ -175,10 +175,10 @@ export const getColumns = ({
           >
             <Label type={getServiceStateLabelType(props.row.original.state)}>
               <span className="service-state-cell">
-                <span style={{ visibility: isChecking ? 'hidden' : 'visible' }}>
+                <span style={{ visibility: isServiceMatch ? 'hidden' : 'visible' }}>
                   {i18n.t(`overview.service.states.${props.row.original.state}`)}
                 </span>
-                {isChecking && <span className="service-state-spinner" />}
+                {isServiceMatch && <span className="service-state-spinner" />}
               </span>
             </Label>
           </Track>
