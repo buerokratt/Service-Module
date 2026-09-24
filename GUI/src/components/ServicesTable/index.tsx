@@ -2,10 +2,10 @@ import { PaginationState, SortingState } from '@tanstack/react-table';
 import { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
+import { ROUTES } from 'resources/routes-constants';
 import useServiceListStore from 'store/services.store';
 import useToastStore from 'store/toasts.store';
 import { ActivationBlocker } from 'types/activation-blocker';
-import { navigateToService } from 'utils/service-navigation-utils';
 import { getServiceStateLabelType } from 'utils/service-state-label';
 
 import { Button, Card, Label, Modal, Track } from '..';
@@ -181,7 +181,7 @@ const ServicesTable: FC<ServicesTableProps> = ({ isCommon = false }) => {
                       className="activation-blockers-list__item"
                       onClick={() => {
                         setActivationBlockers(null);
-                        navigateToService(blocker.serviceId, navigate);
+                        navigate(ROUTES.replaceWithId(ROUTES.EDITSERVICE_ROUTE, blocker.serviceId));
                       }}
                     >
                       {content}
