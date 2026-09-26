@@ -12,7 +12,6 @@ export interface Service {
   readonly name: string;
   readonly state: ServiceState;
   readonly type: 'GET' | 'POST';
-  readonly isCommon: boolean;
   readonly description?: string;
   readonly slot: string;
   readonly examples: string[];

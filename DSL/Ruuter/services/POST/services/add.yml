@@ -24,9 +24,6 @@ declaration:
       - field: examples
         type: object
         description: "Body field 'Examples'"
-      - field: isCommon
-        type: boolean
-        description: "Body field 'isCommon'"
       - field: name
         type: string
         description: "Body field 'name'"
@@ -48,7 +45,7 @@ declaration:
 
 check_for_required_parameters:
   switch:
-    - condition: ${incoming.body.name == null || incoming.body.description == null || incoming.body.type == null || incoming.body.content == null || incoming.body.serviceId == null || incoming.body.isCommon == null || incoming.body.structure == null}
+    - condition: ${incoming.body.name == null || incoming.body.description == null || incoming.body.type == null || incoming.body.content == null || incoming.body.serviceId == null || incoming.body.structure == null}
       next: return_incorrect_request
   next: extract_request_data
 
@@ -62,7 +59,6 @@ extract_request_data:
     type: ${incoming.body.type.toUpperCase()}
     content: ${incoming.body.content}
     serviceId: ${incoming.body.serviceId}
-    isCommon: ${incoming.body.isCommon}
     structure: ${incoming.body.structure}
     state: ${incoming.body.state}
   next: check_if_update_service_db
@@ -100,7 +96,6 @@ service_add:
       examples: ${examples}
       ruuter_type: ${type}
       service_id: ${serviceId}
-      is_common: ${isCommon}
       state: ${state}
       structure: ${structure}
   result: createdService

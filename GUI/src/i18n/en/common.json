@@ -146,7 +146,6 @@
   },
   "overview": {
     "services": "Services",
-    "commonServices": "Common Services",
     "create": "Create new service",
     "descriptionCopiedSuccessfully": "Description copied successfully",
     "edit": "Edit",
@@ -237,7 +236,6 @@
   "newService": {
     "endpoints": "Endpoints",
     "test": "Test URL",
-    "isCommon": "Common Service",
     "slot": "Slot",
     "serviceName": {
       "title": "Name",

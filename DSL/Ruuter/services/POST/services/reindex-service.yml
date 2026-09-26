@@ -61,7 +61,6 @@ call_index_llm:
       entities: ${service.entities}
       type: ${service.type}
       state: ${service.state}
-      isCommon: ${service.isCommon}
   result: index_llm_result
 
 check_index_llm_result:

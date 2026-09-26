@@ -146,7 +146,6 @@
   },
   "overview": {
     "services": "Teenused",
-    "commonServices": "Üldteenused",
     "create": "Loo uus teenus",
     "descriptionCopiedSuccessfully": "Kirjeldus edukalt kopeeritud",
     "edit": "Muuda",
@@ -257,7 +256,6 @@
       "tooltip": "Sisesta teenuse tuvastamiseks olulised märksõnad, mida tehisintellekt kasutab kavatsuse tuvastamisel."
     },
     "test": "Testi URLi",
-    "isCommon": "Üldteenus",
     "slot": "Mälukoht",
     "endpoint": {
       "add": "+ Lisa API otspunkt",

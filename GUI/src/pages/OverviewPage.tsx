@@ -39,10 +39,6 @@ const OverviewPage: React.FC = () => {
         </Track>
       </Track>
       <ServicesTable />
-      <Track justify="between">
-        <h1>{t('overview.commonServices')}</h1>
-      </Track>
-      <ServicesTable isCommon />
       <ExportServicesModal isVisible={isExportModalVisible} onClose={() => setIsExportModalVisible(false)} />
     </>
   );

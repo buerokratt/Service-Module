@@ -9,13 +9,11 @@ import { MdDeleteOutline, MdOutlineDescription, MdOutlineEdit } from 'react-icon
 import { NavigateFunction } from 'react-router-dom';
 import { ROUTES } from 'resources/routes-constants';
 import useServiceListStore from 'store/services.store';
-import useStore from 'store/store';
 import useToastStore from 'store/toasts.store';
 import { Service, ServiceState } from 'types';
 import { getServiceStateLabelType } from 'utils/service-state-label';
 
 interface GetColumnsConfig {
-  isCommon: boolean;
   navigate: NavigateFunction;
   hideDeletePopup: () => void;
   showReadyPopup: () => void;
@@ -23,14 +21,12 @@ interface GetColumnsConfig {
 }
 
 export const getColumns = ({
-  isCommon,
   navigate,
   hideDeletePopup,
   showReadyPopup,
   serviceIdBeingChecked,
 }: GetColumnsConfig) => {
   const columnHelper = createColumnHelper<Service>();
-  const userInfo = useStore.getState().userInfo;
 
   return [
     columnHelper.accessor('name', {
@@ -237,9 +233,7 @@ export const getColumns = ({
         <Track align="right">
           <Button
             disabled={
-              isCommon === true && !userInfo?.authorities.includes('ROLE_ADMINISTRATOR')
-                ? true
-                : props.row.original.state != ServiceState.Draft && props.row.original.state != ServiceState.Ready
+              props.row.original.state != ServiceState.Draft && props.row.original.state != ServiceState.Ready
             }
             appearance="text"
             onClick={() => {

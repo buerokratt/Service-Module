@@ -15,10 +15,6 @@ import { getColumns } from './columns';
 import '../../styles/main.scss';
 import './ServicesTable.scss';
 
-type ServicesTableProps = {
-  isCommon?: boolean;
-};
-
 const DEFAULT_PAGE_SIZE = 10;
 const PAGE_SIZE_OPTIONS = new Set([10, 20, 30, 50]);
 const PAGE_SIZE_STORAGE_KEY = 'page-size';
@@ -28,12 +24,12 @@ const getStoredPageSize = (): number => {
   return PAGE_SIZE_OPTIONS.has(stored) ? stored : DEFAULT_PAGE_SIZE;
 };
 
-const ServicesTable: FC<ServicesTableProps> = ({ isCommon = false }) => {
+const ServicesTable: FC = () => {
   const { t } = useTranslation();
   const [isDeletePopupVisible, setIsDeletePopupVisible] = useState(false);
   const [activationBlockers, setActivationBlockers] = useState<ActivationBlocker[] | null>(null);
   const [serviceIdBeingChecked, setServiceIdBeingChecked] = useState<string | null>(null);
-  const services = useServiceListStore((state) => (isCommon ? state.commonServices : state.notCommonServices));
+  const services = useServiceListStore((state) => state.services);
   const navigate = useNavigate();
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
@@ -45,19 +41,11 @@ const ServicesTable: FC<ServicesTableProps> = ({ isCommon = false }) => {
     void useServiceListStore.getState().loadServicesList(paginationState, sortingState);
   };
 
-  const loadCommonServices = (paginationState: PaginationState, sortingState: SortingState) => {
-    void useServiceListStore.getState().loadCommonServicesList(paginationState, sortingState);
-  };
-
   const [isDeletingService, setIsDeletingService] = useState(false);
 
   useEffect(() => {
-    if (isCommon) {
-      loadCommonServices(pagination, sorting);
-    } else {
-      loadServices(pagination, sorting);
-    }
-  }, [isCommon, pagination, sorting]);
+    loadServices(pagination, sorting);
+  }, [pagination, sorting]);
 
   const changeServiceState = useCallback(
     (activate: boolean = false, draft: boolean = false) => {
@@ -101,7 +89,6 @@ const ServicesTable: FC<ServicesTableProps> = ({ isCommon = false }) => {
 
   const columns = useMemo(() => {
     return getColumns({
-      isCommon,
       navigate,
       hideDeletePopup: () => setIsDeletePopupVisible(true),
       showReadyPopup: () => {
@@ -109,7 +96,7 @@ const ServicesTable: FC<ServicesTableProps> = ({ isCommon = false }) => {
       },
       serviceIdBeingChecked,
     });
-  }, [isCommon, attemptActivation, navigate, serviceIdBeingChecked]);
+  }, [attemptActivation, navigate, serviceIdBeingChecked]);
 
   const deleteSelectedService = () => {
     setIsDeletingService(true);
@@ -119,7 +106,6 @@ const ServicesTable: FC<ServicesTableProps> = ({ isCommon = false }) => {
         async () => {
           setIsDeletePopupVisible(false);
           await useServiceListStore.getState().loadServicesList(pagination, sorting);
-          await useServiceListStore.getState().loadCommonServicesList(pagination, sorting);
         },
         t('overview.service.toast.deleted'),
         t('overview.service.toast.failed.delete'),
@@ -205,19 +191,11 @@ const ServicesTable: FC<ServicesTableProps> = ({ isCommon = false }) => {
             localStorage.setItem(PAGE_SIZE_STORAGE_KEY, String(state.pageSize));
           }
           setPagination(state);
-          if (isCommon) {
-            loadCommonServices(state, sorting);
-          } else {
-            loadServices(state, sorting);
-          }
+          loadServices(state, sorting);
         }}
         setSorting={(state: SortingState) => {
           setSorting(state);
-          if (isCommon) {
-            loadCommonServices(pagination, state);
-          } else {
-            loadServices(pagination, state);
-          }
+          loadServices(pagination, state);
         }}
         isClientSide={false}
         pagesCount={services.at(-1)?.totalPages ?? 1}

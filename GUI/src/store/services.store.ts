@@ -31,19 +31,13 @@ const fetchServiceFlow = async (serviceId: string): Promise<ServiceFlowLookup | 
 
 interface ServiceStoreState {
   services: Service[];
-  commonServices: Service[];
-  notCommonServices: Service[];
   servicesPagination: PaginationState;
   servicesSorting: SortingState;
-  commonServicesPagination: PaginationState;
-  commonServicesSorting: SortingState;
   orientation: 'horizontal' | 'vertical';
   toggleOrientation: () => void;
   autoView: boolean;
   toggleAutoView: () => void;
   loadServicesList: (pagination: PaginationState, sorting: SortingState) => Promise<void>;
-  loadCommonServicesList: (pagination: PaginationState, sorting: SortingState) => Promise<void>;
-  deleteService: (id: string) => void;
   selectedService: Service | undefined;
   setSelectedService: (service: Service) => void;
   loadActivationBlockers: (service: Service) => Promise<ActivationBlocker[]>;
@@ -69,12 +63,8 @@ const useServiceListStore = create<ServiceStoreState>()(
   persist(
     (set, get) => ({
       services: [],
-      commonServices: [],
-      notCommonServices: [],
       servicesPagination: { pageIndex: 0, pageSize: 10 },
       servicesSorting: [{ id: 'name', desc: false }],
-      commonServicesPagination: { pageIndex: 0, pageSize: 10 },
-      commonServicesSorting: [{ id: 'name', desc: false }],
       orientation: 'vertical',
       autoView: false,
       toggleAutoView: () =>
@@ -92,7 +82,6 @@ const useServiceListStore = create<ServiceStoreState>()(
           page: pagination.pageIndex + 1,
           page_size: pagination.pageSize,
           sorting: sort,
-          is_common: false,
           search: '',
         });
         const services =
@@ -103,54 +92,15 @@ const useServiceListStore = create<ServiceStoreState>()(
             slot: item.slot,
             state: item.state,
             type: item.type,
-            isCommon: item.iscommon,
             serviceId: item.serviceId,
             usedCount: 0,
             totalPages: item.totalPages,
             endpoints: [],
           })) ?? [];
         set({
-          notCommonServices: services,
+          services,
           servicesPagination: pagination,
           servicesSorting: sorting,
-        });
-      },
-      loadCommonServicesList: async (pagination, sorting) => {
-        const order = sorting[0]?.desc ? 'desc' : 'asc';
-        const sort = sorting.length === 0 ? 'id asc' : sorting[0]?.id + ' ' + order;
-        const result = await api.post(getServicesList(), {
-          page: pagination.pageIndex + 1,
-          page_size: pagination.pageSize,
-          sorting: sort,
-          is_common: true,
-          search: '',
-        });
-        const services =
-          result.data.response[0].map?.((item: any) => ({
-            id: item.id,
-            name: item.name,
-            description: item.description,
-            state: item.state,
-            type: item.type,
-            isCommon: item.iscommon,
-            serviceId: item.serviceId,
-            totalPages: item.totalPages,
-            usedCount: 0,
-            endpoints: [],
-            slot: '',
-          })) ?? [];
-
-        set({
-          commonServices: services,
-          commonServicesPagination: pagination,
-          commonServicesSorting: sorting,
-        });
-      },
-      deleteService: (id) => {
-        const services = get().services.filter((e: Service) => e.serviceId !== id);
-        set({
-          commonServices: services.filter((e: Service) => e.isCommon),
-          notCommonServices: services.filter((e: Service) => !e.isCommon),
         });
       },
       selectedService: undefined,
@@ -187,7 +137,6 @@ const useServiceListStore = create<ServiceStoreState>()(
           });
           useToastStore.getState().success({ title: successMessage });
           await useServiceListStore.getState().loadServicesList(pagination, sorting);
-          await useServiceListStore.getState().loadCommonServicesList(pagination, sorting);
         } catch (error) {
           console.error(error);
           useToastStore.getState().error({ title: errorMessage });

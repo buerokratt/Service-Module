@@ -88,7 +88,6 @@ export interface ServiceStoreState {
   slot: string;
   examples: string[];
   entities: string[];
-  isCommon: boolean;
   edges: Edge[];
   // In the future, this needs to use a common interface with NodeDataProps and not Node
   nodes: Node[];
@@ -113,7 +112,6 @@ export interface ServiceStoreState {
   setEdges: (edges: Edge[] | ((prev: Edge[]) => Edge[])) => void;
   setFlowSelectedNodes: (nodes: Node[]) => void;
   vaildServiceInfo: () => boolean;
-  setIsCommon: (isCommon: boolean) => void;
   secrets: PreDefinedEndpointEnvVariables;
   availableVariables: PreDefinedEndpointEnvVariables;
   isTestButtonVisible: boolean;
@@ -288,7 +286,6 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
       isTestButtonVisible: true,
     }),
   isSaveButtonEnabled: () => get().endpoints.length > 0,
-  setIsCommon: (value: boolean) => set({ isCommon: value }),
   markAsNewService: () => set({ isNewService: true }),
   unmarkAsNewService: () => set({ isNewService: false }),
   setServiceId: (id) => set({ serviceId: id }),
@@ -523,7 +520,6 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
       set({
         serviceId: id,
         name: settings?.title ?? serviceResponse.data.name,
-        isCommon: serviceResponse.data.isCommon,
         description: settings?.description ?? serviceResponse.data.description,
         slot: serviceResponse.data.slot,
         examples: settings?.examples ?? serviceResponse.data.examples,
