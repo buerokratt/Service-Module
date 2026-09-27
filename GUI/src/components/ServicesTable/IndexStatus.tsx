@@ -1,7 +1,7 @@
 import clsx from 'clsx';
-import { FC } from 'react';
+import { FC, ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
-import { MdCancel, MdCheckCircle } from 'react-icons/md';
+import { MdCheck, MdClose } from 'react-icons/md';
 import { ServiceIndexStatus } from 'types/service';
 
 import { ReactComponent as RefreshIcon } from '../../static/icons/referesh.svg';
@@ -12,26 +12,26 @@ type IndexStatusProps = {
   onReindex?: () => void;
 };
 
+const STATUS_GLYPHS: Record<ServiceIndexStatus, ReactNode> = {
+  SUCCESS: <MdCheck />,
+  FAILED: <MdClose />,
+  IN_PROGRESS: <span className="index-status__dot" />,
+};
+
 const IndexStatusIcon: FC<{ status?: ServiceIndexStatus | null }> = ({ status }) => {
   const { t } = useTranslation();
   const title = t(`overview.index.status.${status ?? 'NONE'}`) ?? '';
+  const icon = status ? STATUS_GLYPHS[status] : null;
 
-  switch (status) {
-    case 'SUCCESS':
-      return (
-        <MdCheckCircle className="index-status__icon index-status__icon--success" title={title} aria-label={title} />
-      );
-    case 'FAILED':
-      return <MdCancel className="index-status__icon index-status__icon--failed" title={title} aria-label={title} />;
-    case 'IN_PROGRESS':
-      return (
-        <span className="index-status__icon index-status__icon--processing" title={title} aria-label={title}>
-          <span />
-        </span>
-      );
-    default:
-      return <span className="index-status__icon index-status__icon--none" title={title} aria-label={title} />;
-  }
+  return (
+    <span
+      className={clsx('index-status__icon', `index-status__icon--${status?.toLowerCase() ?? 'none'}`)}
+      title={title}
+      aria-label={title}
+    >
+      {icon}
+    </span>
+  );
 };
 
 const IndexStatus: FC<IndexStatusProps> = ({ status, canReindex, onReindex }) => {

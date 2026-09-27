@@ -351,41 +351,39 @@ $outgoing-color: #686b78;
   gap: 8px;
 
   &__icon {
+    display: inline-grid;
     flex-shrink: 0;
-    font-size: 22px;
+    place-items: center;
+    box-sizing: border-box;
+    width: 18px;
+    height: 18px;
+    margin: 2px;
+    border-radius: 50%;
+    color: get-color(white);
+    font-size: 13px;
 
     &--success {
-      color: get-color(sea-green-10);
+      background-color: get-color(sea-green-10);
     }
 
     &--failed {
-      color: get-color(jasper-10);
+      background-color: get-color(jasper-10);
     }
 
-    &--processing,
-    &--none {
-      display: inline-grid;
-      place-items: center;
-      width: 18px;
-      height: 18px;
-      margin: 2px;
-      border-radius: 50%;
-    }
-
-    &--processing {
+    &--in_progress {
       background-color: #f5b25a;
-
-      > span {
-        width: 6px;
-        height: 6px;
-        border-radius: 50%;
-        background-color: get-color(white);
-      }
     }
 
     &--none {
       border: 2px solid get-color(black-coral-4);
     }
+  }
+
+  &__dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background-color: currentColor;
   }
 
   &__reindex {
