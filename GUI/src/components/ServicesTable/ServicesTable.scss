@@ -121,7 +121,7 @@ $outgoing-color: #686b78;
   &__header-with-info {
     display: inline-flex;
     align-items: center;
-    gap: 16px;
+    gap: 8px;
   }
 
   &__info-button {
@@ -182,7 +182,7 @@ $outgoing-color: #686b78;
   &__actions {
     display: flex;
     align-items: center;
-    gap: 16px;
+    gap: 12px;
   }
 
   &__pin {
@@ -553,18 +553,24 @@ $connector-color: #a6a8b1;
 }
 
 .services-table {
+  $root: &;
+  $expander-width: 48px;
+
   flex: 1;
   display: flex;
   flex-direction: column;
   min-height: 0;
   overflow: auto;
 
-  &__table {
-    flex-shrink: 0;
-  }
+  $column-shares: (
+    dependencies: 17%,
+    state: 12%,
+    index: 15%,
+    actions: 21%,
+  );
 
   &__table {
-    min-width: 960px;
+    flex-shrink: 0;
     border-collapse: separate;
     border-spacing: 0;
 
@@ -572,31 +578,36 @@ $connector-color: #a6a8b1;
       position: sticky;
       top: 0;
       z-index: 2;
+      padding: 18px 0 18px 16px;
       border-bottom: none;
       background-color: get-color(white);
       box-shadow: inset 0 -1px 0 get-color(black-coral-2);
       white-space: nowrap;
     }
+
+    td {
+      white-space: nowrap;
+    }
+
+    td#{$root}__col--name {
+      min-width: 240px;
+      max-width: 0;
+    }
+
+    td#{$root}__col--actions,
+    th#{$root}__col--actions {
+      padding-right: 16px;
+    }
   }
 
-  &__table &__col--name {
-    width: 100%;
-    min-width: 240px;
-    max-width: 0;
+  &__col--expander {
+    width: $expander-width;
   }
 
-  &__table td#{&}__col--actions,
-  &__table th#{&}__col--actions {
-    padding-right: 16px;
-  }
-
-  &__table &__col--expander,
-  &__table &__col--dependencies,
-  &__table &__col--state,
-  &__table &__col--index,
-  &__table &__col--actions {
-    width: 1%;
-    white-space: nowrap;
+  @each $column, $share in $column-shares {
+    &__col--#{$column} {
+      width: $share;
+    }
   }
 
   &__header {
@@ -604,6 +615,10 @@ $connector-color: #a6a8b1;
     align-items: center;
     gap: 8px;
     min-height: 24px;
+
+    &--name {
+      gap: calc(#{$expander-width} - 20px);
+    }
   }
 
   &__sort {

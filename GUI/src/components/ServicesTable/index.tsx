@@ -365,31 +365,43 @@ const ServicesTable: FC = () => {
       <section className="services-panel services-panel--table">
         <div className="services-table" ref={scrollRef}>
           <table className="data-table services-table__table">
+            <colgroup>
+              {table.getVisibleLeafColumns().map((column) => (
+                <col key={column.id} className={`services-table__col--${column.id}`} />
+              ))}
+            </colgroup>
             <thead ref={headRef}>
               {table.getHeaderGroups().map((headerGroup) => (
                 <tr key={headerGroup.id}>
-                  {headerGroup.headers.map((header) => (
-                    <th key={header.id} className={`services-table__col--${header.column.id}`}>
-                      {header.isPlaceholder ? null : (
-                        <span className="services-table__header">
-                          {header.column.getCanSort() && (
-                            <button
-                              type="button"
-                              className="services-table__sort"
-                              onClick={header.column.getToggleSortingHandler()}
-                              aria-label={t('overview.table.sort') ?? ''}
-                            >
-                              {{
-                                asc: <MdExpandMore />,
-                                desc: <MdExpandLess />,
-                              }[header.column.getIsSorted() as string] ?? <MdUnfoldMore />}
-                            </button>
-                          )}
-                          {flexRender(header.column.columnDef.header, header.getContext())}
-                        </span>
-                      )}
-                    </th>
-                  ))}
+                  {/* The name header also spans the expander column so its sort icon lines up with the chevrons. */}
+                  {headerGroup.headers
+                    .filter((header) => header.column.id !== 'expander')
+                    .map((header) => (
+                      <th
+                        key={header.id}
+                        colSpan={header.column.id === 'name' ? 2 : 1}
+                        className={`services-table__col--${header.column.id}`}
+                      >
+                        {header.isPlaceholder ? null : (
+                          <span className={`services-table__header services-table__header--${header.column.id}`}>
+                            {header.column.getCanSort() && (
+                              <button
+                                type="button"
+                                className="services-table__sort"
+                                onClick={header.column.getToggleSortingHandler()}
+                                aria-label={t('overview.table.sort') ?? ''}
+                              >
+                                {{
+                                  asc: <MdExpandMore />,
+                                  desc: <MdExpandLess />,
+                                }[header.column.getIsSorted() as string] ?? <MdUnfoldMore />}
+                              </button>
+                            )}
+                            {flexRender(header.column.columnDef.header, header.getContext())}
+                          </span>
+                        )}
+                      </th>
+                    ))}
                 </tr>
               ))}
             </thead>
