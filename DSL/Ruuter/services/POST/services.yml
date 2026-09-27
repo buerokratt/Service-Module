@@ -30,6 +30,9 @@ get_services_list:
       page_size: ${incoming.body.page_size}
       sorting: ${incoming.body.sorting}
       search: ${incoming.body.search}
+      state: ""
+      dependencies: ""
+      exclude_pinned_for: ""
   limit: 600
   result: services_res
 

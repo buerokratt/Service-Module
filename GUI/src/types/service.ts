@@ -7,6 +7,8 @@ export type EndpointDefinitionJson = {
   null: boolean;
 };
 
+export type ServiceIndexStatus = 'SUCCESS' | 'IN_PROGRESS' | 'FAILED';
+
 export interface Service {
   readonly id: number;
   readonly name: string;
@@ -25,4 +27,10 @@ export interface Service {
   >;
   readonly serviceId: string;
   readonly totalPages: number;
+  readonly totalCount?: number;
+  readonly indexStatus?: ServiceIndexStatus | null;
+  readonly incomingCount?: number;
+  readonly outgoingCount?: number;
+  readonly problemCount?: number;
+  readonly isPinned?: boolean;
 }

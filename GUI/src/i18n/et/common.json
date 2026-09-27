@@ -178,7 +178,8 @@
         "inactive": "Mitteaktiivne",
         "draft": "Mustand",
         "ready": "Valmis",
-        "missing": "Puudub"
+        "missing": "Puudub",
+        "deleted": "Kustutatud"
       },
       "toast": {
         "deleted": "Teenus kustutatud",
@@ -189,7 +190,8 @@
           "requestConnection": "Ühendamistaotlus ebaõnnestus",
           "availableIntents": "Saadaolevate teemade päring ebaõnnestus",
           "cancelledConnection": "Ühendamistaotluse tühistamine ebaõnnestus",
-          "failedToConnectToIntent": "Kavatsusega ühenduse loomine ebaõnnestus"
+          "failedToConnectToIntent": "Kavatsusega ühenduse loomine ebaõnnestus",
+          "pin": "Kinnitatud teenuste uuendamine ebaõnnestus"
         },
         "requestedConnection": "Ühendamist taotletakse",
         "cancelledConnection": "Ühendamistaotlus tühistati",
@@ -221,6 +223,80 @@
       "activationBlocked": {
         "title": "Teenust ei saa aktiveerida. Järgmised seotud teenused peavad olema aktiivsed:"
       }
+    },
+    "table": {
+      "name": "Teenuse nimetus",
+      "dependencies": "Seosed",
+      "status": "Staatus",
+      "index": "Indeks",
+      "actions": "Tegevused",
+      "sort": "Sorteeri"
+    },
+    "serviceInfo": {
+      "title": "Teenuse andmed",
+      "name": "Teenuse nimi",
+      "description": "Teenuse kirjeldus",
+      "examples": "Näidisküsimused",
+      "keywords": "Märksõnad",
+      "open": "Näita teenuse andmeid"
+    },
+    "dependencies": {
+      "title": "Seosed",
+      "subtitle": "Seoseid näidatakse valitud teenuse suhtes.",
+      "incomingLabel": "Seda teenust kasutavad",
+      "incomingDescription": "mitu teist teenust kasutab valitud teenust",
+      "outgoingLabel": "See teenus kasutab",
+      "outgoingDescription": "mitut teist teenust valitud teenus kasutab",
+      "problems_one": "{{count}} probleem",
+      "problems_other": "{{count}} probleemi",
+      "open": "Näita seoste selgitust",
+      "incomingHeading": "Seda teenust kasutab ({{count}})",
+      "outgoingHeading": "See teenus kasutab ({{count}})",
+      "none": "Seosed puuduvad",
+      "deletedReference": "Seos kustutatud teenusega",
+      "loading": "Seoste laadimine...",
+      "loadFailed": "Seoste laadimine ebaõnnestus",
+      "expand": "Näita seoseid",
+      "collapse": "Peida seosed"
+    },
+    "index": {
+      "reindex": "Indekseeri",
+      "reindexOnlyActive": "Indekseerida saab ainult aktiivseid teenuseid",
+      "status": {
+        "SUCCESS": "Indekseeritud",
+        "FAILED": "Indekseerimine ebaõnnestus",
+        "IN_PROGRESS": "Indekseerimine käib",
+        "NONE": "Indekseerimata"
+      }
+    },
+    "pin": {
+      "pin": "Nähtavale",
+      "pinned": "Nähtaval"
+    },
+    "copiedToClipboard": "Kopeeritud",
+    "filters": {
+      "searchLabel": "Otsi teenuseid",
+      "searchPlaceholder": "Otsi teenuseid...",
+      "dependenciesLabel": "Seosed",
+      "statusLabel": "Staatus",
+      "clear": "Tühjenda filtrid",
+      "filtersCleared": "Filtrid tühjendati, et teenust kuvada",
+      "serviceNotFound": "Teenust ei leitud",
+      "dependencies": {
+        "all": "Kõik seosed",
+        "yes": "Seostega",
+        "no": "Seosteta"
+      },
+      "status": {
+        "all": "Kõik staatused"
+      }
+    },
+    "pagination": {
+      "range": "Kuva {{from}}–{{to}} / {{total}} teenusest",
+      "pageSize": "Kuva",
+      "previous": "Eelmine leht",
+      "next": "Järgmine leht",
+      "page": "Leht {{page}}"
     }
   },
   "connectionRequests": {

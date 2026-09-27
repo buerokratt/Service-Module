@@ -21,7 +21,7 @@ const OverviewPage: React.FC = () => {
   }, []);
 
   return (
-    <>
+    <div className="overview-page">
       <Track justify="between">
         <h1>{t('overview.services')}</h1>
         <Track gap={16}>
@@ -40,7 +40,7 @@ const OverviewPage: React.FC = () => {
       </Track>
       <ServicesTable />
       <ExportServicesModal isVisible={isExportModalVisible} onClose={() => setIsExportModalVisible(false)} />
-    </>
+    </div>
   );
 };
 
