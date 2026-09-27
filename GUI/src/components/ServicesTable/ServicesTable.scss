@@ -448,11 +448,6 @@ $outgoing-color: #686b78;
   }
 }
 
-// ---------------------------------------------------------------------------
-// Overview page layout: filter bar, table header and pagination stay fixed,
-// only the table content scrolls.
-// ---------------------------------------------------------------------------
-
 $node-height: 92px;
 $node-gap: 12px;
 $visible-nodes: 5;
@@ -565,7 +560,6 @@ $connector-color: #a6a8b1;
     }
   }
 
-  // The name column takes the remaining width; all other columns shrink to their content.
   &__table &__col--name {
     width: 100%;
     min-width: 240px;

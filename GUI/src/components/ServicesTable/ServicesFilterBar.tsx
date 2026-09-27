@@ -17,7 +17,6 @@ const ServicesFilterBar: FC<ServicesFilterBarProps> = ({ filters, onChange }) =>
   const { t } = useTranslation();
   const [search, setSearch] = useState(filters.search);
 
-  // Keep the input in sync when filters are changed from outside (e.g. cleared).
   useEffect(() => {
     setSearch(filters.search);
   }, [filters.search]);

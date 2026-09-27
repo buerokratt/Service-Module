@@ -77,7 +77,6 @@ interface ServiceStoreState {
   servicesPagination: PaginationState;
   servicesSorting: SortingState;
   servicesFilters: ServicesFilters;
-  /** Incremented after every list load so dependent views (e.g. dependency panels) can refresh. */
   servicesVersion: number;
   orientation: 'horizontal' | 'vertical';
   toggleOrientation: () => void;
@@ -190,7 +189,6 @@ const useServiceListStore = create<ServiceStoreState>()(
       togglePinService: async (service) => {
         const { servicesPagination, servicesSorting, pinnedServices, services } = get();
         const pin = !service.isPinned;
-        // Optimistic update so the row moves immediately; the reload below settles order and counts.
         set({
           pinnedServices: pin
             ? [...pinnedServices, { ...service, isPinned: true }]

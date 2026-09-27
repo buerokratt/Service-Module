@@ -55,11 +55,9 @@ const ServicesTable: FC = () => {
   const tableData = useMemo(() => [...pinnedServices, ...services], [pinnedServices, services]);
 
   const [pagination, setPagination] = useState<PaginationState>({ pageIndex: 0, pageSize: getStoredPageSize() });
-  // No sorting by default: services are listed in creation order, so new services appear at the bottom.
   const [sorting, setSorting] = useState<SortingState>([]);
   const [filters, setFilters] = useState<ServicesFilters>(() => useServiceListStore.getState().servicesFilters);
 
-  // Dependency views: several can be expanded at once; at most one service is focused.
   const [expandedIds, setExpandedIds] = useState<ReadonlySet<string>>(new Set());
   const [focusedId, setFocusedId] = useState<string | null>(null);
   const [pendingFocusId, setPendingFocusId] = useState<string | null>(null);
@@ -97,7 +95,6 @@ const ServicesTable: FC = () => {
     setScrollTargetId(serviceId);
   }, []);
 
-  // Finish focusing a service once the page containing it has been loaded.
   useEffect(() => {
     if (pendingFocusId && tableData.some((service) => service.serviceId === pendingFocusId)) {
       focusService(pendingFocusId);
@@ -130,7 +127,6 @@ const ServicesTable: FC = () => {
     [expandedIds, focusedId],
   );
 
-  // Dependency indicator in a row: focus that service, or close it if it is already the only open view.
   const toggleFocus = useCallback(
     (service: Service) => {
       const isOnlyOpenView =
@@ -145,7 +141,6 @@ const ServicesTable: FC = () => {
     [expandedIds, focusedId, focusService],
   );
 
-  // Dependency indicator in a dependency node: find the service in the listing (any page), then focus it.
   const locateService = useCallback(
     async (serviceId: string) => {
       if (tableData.some((service) => service.serviceId === serviceId)) {
@@ -162,7 +157,6 @@ const ServicesTable: FC = () => {
           return;
         }
 
-        // Hidden by the active filters: show the complete listing instead.
         if (hasActiveFilters(filters)) {
           const unfiltered = await locate(serviceId, pagination.pageSize, sorting, DEFAULT_SERVICES_FILTERS);
           if (unfiltered?.page || unfiltered?.pinned) {
@@ -264,7 +258,6 @@ const ServicesTable: FC = () => {
     data: tableData,
     columns,
     state: { sorting, pagination },
-    // Filtering happens server-side; the `fuzzy` filter is declared globally by DataTable.
     filterFns: { fuzzy: () => true },
     getRowId: (service) => service.serviceId,
     getCoreRowModel: getCoreRowModel(),

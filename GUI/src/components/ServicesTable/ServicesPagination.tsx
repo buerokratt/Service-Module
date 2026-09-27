@@ -17,7 +17,6 @@ type PageItem = number | 'ellipsis-start' | 'ellipsis-end';
 
 const SIBLINGS = 2;
 
-/** Returns zero-based page indexes with ellipses, e.g. [0, 'ellipsis-start', 4, 5, 6, 7, 8, 'ellipsis-end', 42]. */
 const getPageItems = (pageIndex: number, pageCount: number): PageItem[] => {
   const maxVisible = SIBLINGS * 2 + 5;
   if (pageCount <= maxVisible) return Array.from({ length: pageCount }, (_, i) => i);
