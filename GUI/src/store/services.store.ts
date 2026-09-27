@@ -43,6 +43,10 @@ export interface ServicesFilters {
 
 export const DEFAULT_SERVICES_FILTERS: ServicesFilters = { search: '', state: '', dependencies: 'all' };
 
+export type ServicesLoadState = 'loading' | 'success' | 'error';
+
+let latestServicesRequestId = 0;
+
 const toSortingParam = (sorting: SortingState): string => {
   if (sorting.length === 0) return '';
   const order = sorting[0].desc ? 'desc' : 'asc';
@@ -78,6 +82,8 @@ interface ServiceStoreState {
   servicesSorting: SortingState;
   servicesFilters: ServicesFilters;
   servicesVersion: number;
+  servicesLoadState: ServicesLoadState;
+  isRefreshingServices: boolean;
   orientation: 'horizontal' | 'vertical';
   toggleOrientation: () => void;
   autoView: boolean;
@@ -123,6 +129,8 @@ const useServiceListStore = create<ServiceStoreState>()(
       servicesSorting: [],
       servicesFilters: DEFAULT_SERVICES_FILTERS,
       servicesVersion: 0,
+      servicesLoadState: 'loading',
+      isRefreshingServices: false,
       orientation: 'vertical',
       autoView: false,
       toggleAutoView: () =>
@@ -134,14 +142,26 @@ const useServiceListStore = create<ServiceStoreState>()(
           orientation: state.orientation === 'horizontal' ? 'vertical' : 'horizontal',
         })),
       loadServicesList: async (pagination, sorting, filters = get().servicesFilters) => {
-        const result = await api.post(getServicesOverview(), {
-          page: pagination.pageIndex + 1,
-          page_size: pagination.pageSize,
-          sorting: toSortingParam(sorting),
-          search: filters.search,
-          state: filters.state,
-          dependencies: filters.dependencies,
-        });
+        const requestId = ++latestServicesRequestId;
+        if (get().servicesLoadState === 'success') set({ isRefreshingServices: true });
+        else set({ servicesLoadState: 'loading' });
+
+        let result;
+        try {
+          result = await api.post(getServicesOverview(), {
+            page: pagination.pageIndex + 1,
+            page_size: pagination.pageSize,
+            sorting: toSortingParam(sorting),
+            search: filters.search,
+            state: filters.state,
+            dependencies: filters.dependencies,
+          });
+        } catch (error) {
+          if (requestId === latestServicesRequestId) set({ servicesLoadState: 'error', isRefreshingServices: false });
+          throw error;
+        }
+        if (requestId !== latestServicesRequestId) return;
+
         const response = result.data.response ?? {};
         const services: Service[] = (response.services ?? []).map((item: any) => mapService(item, false));
         const pinnedServices: Service[] = (response.pinned ?? []).map((item: any) => mapService(item, true));
@@ -154,6 +174,8 @@ const useServiceListStore = create<ServiceStoreState>()(
           servicesSorting: sorting,
           servicesFilters: filters,
           servicesVersion: get().servicesVersion + 1,
+          servicesLoadState: 'success',
+          isRefreshingServices: false,
         });
       },
       loadServiceDependencies: async (serviceId) => {

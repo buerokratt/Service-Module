@@ -162,6 +162,22 @@
     "export": "Export",
     "exportAllConfirmation": "Are you sure you want to export all services?",
     "noServicesFound": "No services found",
+    "tableState": {
+      "error": {
+        "title": "Couldn't load services",
+        "description": "The server didn't respond. Check your connection and try again.",
+        "retry": "Try again"
+      },
+      "noMatch": {
+        "title": "No services match your filters",
+        "titleWithSearch": "No services match “{{search}}”",
+        "description": "Try a different name or word from the description, or clear the filters to see all services."
+      },
+      "empty": {
+        "title": "No services yet",
+        "description": "Services you create show up here, along with the services they use and the services that use them."
+      }
+    },
     "error": {
       "fetchingServices": "Error fetching services"
     },

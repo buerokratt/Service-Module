@@ -7,6 +7,7 @@ import {
   useReactTable,
 } from '@tanstack/react-table';
 import clsx from 'clsx';
+import useDelayedFlag from 'hooks/useDelayedFlag';
 import { FC, Fragment, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MdExpandLess, MdExpandMore, MdUnfoldMore } from 'react-icons/md';
@@ -25,6 +26,7 @@ import DependencyView from './DependencyView';
 import { hasActiveFilters } from './filters';
 import ServicesFilterBar from './ServicesFilterBar';
 import ServicesPagination from './ServicesPagination';
+import { ServicesEmpty, ServicesLoadError, ServicesNoMatch, ServicesTableSkeleton } from './ServicesTableStatus';
 
 import '../../styles/main.scss';
 import './ServicesTable.scss';
@@ -52,6 +54,9 @@ const ServicesTable: FC = () => {
   const pinnedServices = useServiceListStore((state) => state.pinnedServices);
   const totalPages = useServiceListStore((state) => state.servicesTotalPages);
   const totalCount = useServiceListStore((state) => state.servicesTotalCount);
+  const loadState = useServiceListStore((state) => state.servicesLoadState);
+  const isRefreshing = useServiceListStore((state) => state.isRefreshingServices);
+  const loadedFilters = useServiceListStore((state) => state.servicesFilters);
   const tableData = useMemo(() => [...pinnedServices, ...services], [pinnedServices, services]);
 
   const [pagination, setPagination] = useState<PaginationState>({ pageIndex: 0, pageSize: getStoredPageSize() });
@@ -65,15 +70,16 @@ const ServicesTable: FC = () => {
   const scrollRef = useRef<HTMLDivElement>(null);
   const headRef = useRef<HTMLTableSectionElement>(null);
 
+  const loadServices = useCallback(() => {
+    useServiceListStore.getState().loadServicesList(pagination, sorting, filters).catch(console.error);
+  }, [pagination, sorting, filters]);
+
   useEffect(() => {
-    useServiceListStore
-      .getState()
-      .loadServicesList(pagination, sorting, filters)
-      .catch((error) => {
-        console.error(error);
-        useToastStore.getState().error({ title: t('overview.error.fetchingServices') });
-      });
-  }, [pagination, sorting, filters, t]);
+    loadServices();
+  }, [loadServices]);
+
+  const showSkeleton = useDelayedFlag(loadState === 'loading');
+  const showRefreshing = useDelayedFlag(isRefreshing);
 
   // A new page, sort or filter starts at the top, unless a located service is about to be scrolled to.
   const pendingFocusRef = useRef(pendingFocusId);
@@ -298,6 +304,24 @@ const ServicesTable: FC = () => {
   };
 
   const rows = table.getRowModel().rows;
+  const visibleRows = loadState === 'success' ? rows : [];
+  const columnIds = table.getVisibleLeafColumns().map((column) => column.id);
+
+  const renderStatusRows = () => {
+    if (loadState === 'loading') return showSkeleton ? <ServicesTableSkeleton columnIds={columnIds} /> : null;
+    if (loadState === 'error') return <ServicesLoadError colSpan={columnIds.length} onRetry={loadServices} />;
+    if (rows.length > 0) return null;
+    if (hasActiveFilters(loadedFilters)) {
+      return (
+        <ServicesNoMatch
+          colSpan={columnIds.length}
+          search={loadedFilters.search}
+          onClearFilters={() => changeFilters(DEFAULT_SERVICES_FILTERS)}
+        />
+      );
+    }
+    return <ServicesEmpty colSpan={columnIds.length} onCreate={() => navigate(ROUTES.NEWSERVICE_ROUTE)} />;
+  };
   const lastPinnedIndex = pinnedServices.length - 1;
 
   return (
@@ -363,7 +387,12 @@ const ServicesTable: FC = () => {
         <ServicesFilterBar filters={filters} onChange={changeFilters} />
       </section>
       <section className="services-panel services-panel--table">
-        <div className="services-table" ref={scrollRef}>
+        {showRefreshing && <div className="services-table__progress" aria-hidden="true" />}
+        <div
+          className={clsx('services-table', showRefreshing && 'services-table--refreshing')}
+          ref={scrollRef}
+          aria-busy={loadState === 'loading' || isRefreshing}
+        >
           <table className="data-table services-table__table">
             <colgroup>
               {table.getVisibleLeafColumns().map((column) => (
@@ -406,7 +435,7 @@ const ServicesTable: FC = () => {
               ))}
             </thead>
             <tbody>
-              {rows.map((row, index) => {
+              {visibleRows.map((row, index) => {
                 const service = row.original;
                 const isExpanded = expandedIds.has(service.serviceId);
                 const rowClassName = clsx(
@@ -440,9 +469,9 @@ const ServicesTable: FC = () => {
                   </Fragment>
                 );
               })}
+              {renderStatusRows()}
             </tbody>
           </table>
-          {rows.length === 0 && <p className="services-table__empty">{t('overview.noServicesFound')}</p>}
         </div>
         <ServicesPagination
           pageIndex={pagination.pageIndex}

@@ -162,6 +162,22 @@
     "export": "Ekspordi",
     "exportAllConfirmation": "Kas olete kindel, et soovite eksportida kõik teenused?",
     "noServicesFound": "Ühtegi teenust ei leitud",
+    "tableState": {
+      "error": {
+        "title": "Teenuseid ei õnnestunud laadida",
+        "description": "Server ei vastanud. Kontrolli ühendust ja proovi uuesti.",
+        "retry": "Proovi uuesti"
+      },
+      "noMatch": {
+        "title": "Filtritele vastavaid teenuseid ei leitud",
+        "titleWithSearch": "Päringule „{{search}}” vastavaid teenuseid ei leitud",
+        "description": "Proovi mõnda teist nime või kirjelduses olevat sõna või tühjenda filtrid, et näha kõiki teenuseid."
+      },
+      "empty": {
+        "title": "Teenuseid veel pole",
+        "description": "Siin kuvatakse sinu loodud teenused koos teenustega, mida need kasutavad, ja teenustega, mis neid kasutavad."
+      }
+    },
     "error": {
       "fetchingServices": "Teenuste päring ebaõnnestus"
     },
