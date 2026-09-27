@@ -81,14 +81,12 @@ const ServicesTable: FC = () => {
   const showSkeleton = useDelayedFlag(loadState === 'loading');
   const showRefreshing = useDelayedFlag(isRefreshing);
 
-  // A new page, sort or filter starts at the top, unless a located service is about to be scrolled to.
   const pendingFocusRef = useRef(pendingFocusId);
   pendingFocusRef.current = pendingFocusId;
   useEffect(() => {
     if (!pendingFocusRef.current) scrollRef.current?.scrollTo({ top: 0 });
   }, [pagination, sorting, filters]);
 
-  // Stay within range when the listing shrinks (e.g. after deleting the last service on the last page).
   useEffect(() => {
     if (pagination.pageIndex > 0 && pagination.pageIndex >= totalPages) {
       setPagination((current) => ({ ...current, pageIndex: Math.max(totalPages - 1, 0) }));
