@@ -394,13 +394,6 @@ const ServicesTable: FC = () => {
               ))}
             </thead>
             <tbody>
-              {rows.length === 0 && (
-                <tr>
-                  <td colSpan={columns.length} className="services-table__empty">
-                    {t('overview.noServicesFound')}
-                  </td>
-                </tr>
-              )}
               {rows.map((row, index) => {
                 const service = row.original;
                 const isExpanded = expandedIds.has(service.serviceId);
@@ -437,6 +430,7 @@ const ServicesTable: FC = () => {
               })}
             </tbody>
           </table>
+          {rows.length === 0 && <p className="services-table__empty">{t('overview.noServicesFound')}</p>}
         </div>
         <ServicesPagination
           pageIndex={pagination.pageIndex}

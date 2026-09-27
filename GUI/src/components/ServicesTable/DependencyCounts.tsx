@@ -5,6 +5,7 @@ import { MdOutlineWarningAmber } from 'react-icons/md';
 
 import { ReactComponent as ReferencedServicesIcon } from '../../static/icons/referenced_services.svg';
 import { ReactComponent as ReferencingServicesIcon } from '../../static/icons/referencing_services.svg';
+import InfoCard, { InfoCardSection } from '../InfoCard';
 
 type DependencyCountsProps = {
   incoming: number;
@@ -50,11 +51,24 @@ const DependencyCounts: FC<DependencyCountsProps> = ({ incoming, outgoing, probl
         </span>
       )}
       {problems > 0 && (
-        <MdOutlineWarningAmber
-          className="dependency-counts__problem"
-          title={t('overview.dependencies.problems', { count: problems }) ?? ''}
-          aria-label={t('overview.dependencies.problems', { count: problems }) ?? ''}
-        />
+        <InfoCard
+          variant="danger"
+          size="compact"
+          title={t('overview.dependencies.problemTitle')}
+          content={
+            <InfoCardSection>
+              <p className="info-card__text">{t('overview.dependencies.problemDescription', { count: problems })}</p>
+            </InfoCardSection>
+          }
+        >
+          <button
+            type="button"
+            className="dependency-counts__problem"
+            aria-label={t('overview.dependencies.problems', { count: problems }) ?? ''}
+          >
+            <MdOutlineWarningAmber aria-hidden />
+          </button>
+        </InfoCard>
       )}
     </span>
   );

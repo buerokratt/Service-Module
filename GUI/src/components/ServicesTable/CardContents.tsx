@@ -10,23 +10,19 @@ export const ServiceInfoContent = ({ service }: { service: Service }) => (
     <InfoCardSection label={i18n.t('overview.serviceInfo.name')}>
       <InfoCardCopyRow value={service.name} />
     </InfoCardSection>
-    {!!service.description && (
-      <InfoCardSection label={i18n.t('overview.serviceInfo.description')}>
-        <InfoCardCopyRow value={service.description} />
-      </InfoCardSection>
-    )}
-    {service.examples?.length > 0 && (
-      <InfoCardSection label={i18n.t('overview.serviceInfo.examples')}>
-        {service.examples.map((example, index) => (
-          <InfoCardCopyRow key={`${index}-${example}`} value={example} />
-        ))}
-      </InfoCardSection>
-    )}
-    {service.entities?.length > 0 && (
-      <InfoCardSection label={i18n.t('overview.serviceInfo.keywords')}>
-        <InfoCardCopyRow value={service.entities.join(', ')} />
-      </InfoCardSection>
-    )}
+    <InfoCardSection label={i18n.t('overview.serviceInfo.description')}>
+      <InfoCardCopyRow value={service.description ?? ''} />
+    </InfoCardSection>
+    <InfoCardSection label={i18n.t('overview.serviceInfo.examples')}>
+      {service.examples?.length ? (
+        service.examples.map((example, index) => <InfoCardCopyRow key={`${index}-${example}`} value={example} />)
+      ) : (
+        <InfoCardCopyRow value="" />
+      )}
+    </InfoCardSection>
+    <InfoCardSection label={i18n.t('overview.serviceInfo.keywords')}>
+      <InfoCardCopyRow value={service.entities?.join(', ') ?? ''} />
+    </InfoCardSection>
   </>
 );
 

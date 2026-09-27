@@ -95,6 +95,7 @@ $outgoing-color: #686b78;
     gap: 12px;
     min-width: 0;
     width: 100%;
+    max-width: 420px;
   }
 
   &__service-link {
@@ -319,9 +320,21 @@ $outgoing-color: #686b78;
   }
 
   &__problem {
+    display: inline-flex;
     flex-shrink: 0;
+    padding: 2px;
+    border: none;
+    border-radius: 4px;
+    background: none;
     color: get-color(jasper-10);
     font-size: 20px;
+    cursor: pointer;
+
+    &:hover,
+    &:focus-visible,
+    &[data-state='open'] {
+      background-color: get-color(jasper-0);
+    }
   }
 }
 
@@ -541,8 +554,14 @@ $connector-color: #a6a8b1;
 
 .services-table {
   flex: 1;
+  display: flex;
+  flex-direction: column;
   min-height: 0;
   overflow: auto;
+
+  &__table {
+    flex-shrink: 0;
+  }
 
   &__table {
     min-width: 960px;
@@ -599,9 +618,16 @@ $connector-color: #a6a8b1;
     cursor: pointer;
   }
 
+  // Fills the space below the header so the message sits in the middle of the table area.
   &__empty {
-    padding: 32px 16px !important;
+    display: grid;
+    flex: 1;
+    place-items: center;
+    min-height: 160px;
+    margin: 0;
+    padding: 32px 16px;
     color: get-color(black-coral-10);
+    font-size: $veera-font-size-100;
     text-align: center;
   }
 
@@ -650,7 +676,7 @@ $connector-color: #a6a8b1;
   align-items: center;
   gap: 16px;
   padding: 10px 16px;
-  box-shadow: 0 -1px 0 get-color(black-coral-10);
+  box-shadow: 0 -1px 0 get-color(black-coral-2);
   font-size: $veera-font-size-80;
 
   &__pages {
@@ -723,7 +749,7 @@ $connector-color: #a6a8b1;
     select {
       height: 30px;
       padding: 0 8px;
-      border: 1px solid #8f91a8;
+      border: 1px solid get-color(black-coral-3);
       border-radius: 4px;
       background-color: get-color(white);
       font: inherit;

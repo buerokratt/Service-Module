@@ -13,6 +13,14 @@
   color: get-color(black-coral-20);
   font-size: $veera-font-size-100;
 
+  &--compact {
+    width: min(520px, calc(100vw - 32px));
+  }
+
+  &--danger &__header {
+    color: get-color(jasper-12);
+  }
+
   &__header {
     display: flex;
     align-items: center;
@@ -61,6 +69,14 @@
   &__value {
     overflow-wrap: anywhere;
     white-space: pre-line;
+
+    &--empty {
+      color: get-color(black-coral-8);
+    }
+  }
+
+  &__text {
+    margin: 0;
   }
 
   &__copy {
@@ -91,8 +107,13 @@
     border-color: var(--dark-text-border);
   }
 
-  &__label {
+  &__label,
+  &__value--empty {
     color: var(--dark-text-label);
+  }
+
+  &--danger &__header {
+    color: get-color(jasper-4);
   }
 
   &__copy {

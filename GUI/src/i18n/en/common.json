@@ -238,7 +238,8 @@
       "description": "Service description",
       "examples": "Example questions",
       "keywords": "Keywords",
-      "open": "Show service details"
+      "open": "Show service details",
+      "empty": "Not set"
     },
     "dependencies": {
       "title": "Dependencies",
@@ -257,7 +258,10 @@
       "loading": "Loading dependencies...",
       "loadFailed": "Failed to load dependencies",
       "expand": "Show dependencies",
-      "collapse": "Hide dependencies"
+      "collapse": "Hide dependencies",
+      "problemTitle": "Dependency problem",
+      "problemDescription_one": "{{count}} dependency on a deleted service",
+      "problemDescription_other": "{{count}} dependencies on deleted services"
     },
     "index": {
       "reindex": "Reindex",

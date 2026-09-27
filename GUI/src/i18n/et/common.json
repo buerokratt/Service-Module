@@ -238,7 +238,8 @@
       "description": "Teenuse kirjeldus",
       "examples": "Näidisküsimused",
       "keywords": "Märksõnad",
-      "open": "Näita teenuse andmeid"
+      "open": "Näita teenuse andmeid",
+      "empty": "Puudub"
     },
     "dependencies": {
       "title": "Seosed",
@@ -257,7 +258,10 @@
       "loading": "Seoste laadimine...",
       "loadFailed": "Seoste laadimine ebaõnnestus",
       "expand": "Näita seoseid",
-      "collapse": "Peida seosed"
+      "collapse": "Peida seosed",
+      "problemTitle": "Probleem seosetes",
+      "problemDescription_one": "{{count}} seos kustutatud teenusega",
+      "problemDescription_other": "{{count}} seost kustutatud teenustega"
     },
     "index": {
       "reindex": "Indekseeri",

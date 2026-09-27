@@ -1,8 +1,9 @@
 import * as RadixPopover from '@radix-ui/react-popover';
+import clsx from 'clsx';
 import { FC, PointerEvent, PropsWithChildren, ReactElement, ReactNode, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { AiOutlineInfoCircle } from 'react-icons/ai';
-import { MdContentCopy } from 'react-icons/md';
+import { MdContentCopy, MdOutlineWarningAmber } from 'react-icons/md';
 import useToastStore from 'store/toasts.store';
 
 import './InfoCard.scss';
@@ -14,6 +15,8 @@ type InfoCardProps = {
   title: ReactNode;
   content: ReactNode;
   children: ReactElement;
+  variant?: 'info' | 'danger';
+  size?: 'default' | 'compact';
 };
 
 /**
@@ -21,14 +24,21 @@ type InfoCardProps = {
  * Opens on hover (with a small delay), click or keyboard, and stays open while the pointer is over the card
  * so its content (e.g. copy buttons) can be interacted with.
  */
-const InfoCard: FC<InfoCardProps> = ({ title, content, children }) => {
+const InfoCard: FC<InfoCardProps> = ({ title, content, children, variant = 'info', size = 'default' }) => {
   const [open, setOpen] = useState(false);
   const timer = useRef<ReturnType<typeof setTimeout>>();
+  const closedByHover = useRef(false);
 
   const schedule = (nextOpen: boolean) => (event: PointerEvent) => {
     if (event.pointerType === 'touch') return;
     clearTimeout(timer.current);
-    timer.current = setTimeout(() => setOpen(nextOpen), nextOpen ? OPEN_DELAY_MS : CLOSE_DELAY_MS);
+    timer.current = setTimeout(
+      () => {
+        closedByHover.current = !nextOpen;
+        setOpen(nextOpen);
+      },
+      nextOpen ? OPEN_DELAY_MS : CLOSE_DELAY_MS,
+    );
   };
 
   useEffect(() => () => clearTimeout(timer.current), []);
@@ -40,17 +50,27 @@ const InfoCard: FC<InfoCardProps> = ({ title, content, children }) => {
       </RadixPopover.Trigger>
       <RadixPopover.Portal>
         <RadixPopover.Content
-          className="info-card"
+          className={clsx('info-card', `info-card--${variant}`, `info-card--${size}`)}
           side="bottom"
           align="start"
           sideOffset={8}
           collisionPadding={16}
           onOpenAutoFocus={(event) => event.preventDefault()}
+          // Only return focus to the trigger for keyboard/click closes; after a hover close it would leave
+          // the icon looking selected (focus ring) without the user having interacted with it.
+          onCloseAutoFocus={(event) => {
+            if (closedByHover.current) event.preventDefault();
+            closedByHover.current = false;
+          }}
           onPointerEnter={schedule(true)}
           onPointerLeave={schedule(false)}
         >
           <div className="info-card__header">
-            <AiOutlineInfoCircle className="info-card__header-icon" />
+            {variant === 'danger' ? (
+              <MdOutlineWarningAmber className="info-card__header-icon" />
+            ) : (
+              <AiOutlineInfoCircle className="info-card__header-icon" />
+            )}
             <span>{title}</span>
           </div>
           <div className="info-card__body">{content}</div>
@@ -77,6 +97,14 @@ type InfoCardCopyRowProps = {
 
 export const InfoCardCopyRow: FC<InfoCardCopyRowProps> = ({ value }) => {
   const { t } = useTranslation();
+
+  if (!value.trim()) {
+    return (
+      <div className="info-card__row">
+        <span className="info-card__value info-card__value--empty">{t('overview.serviceInfo.empty')}</span>
+      </div>
+    );
+  }
 
   return (
     <div className="info-card__row">
