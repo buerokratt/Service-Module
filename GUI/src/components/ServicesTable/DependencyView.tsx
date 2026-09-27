@@ -19,7 +19,6 @@ type LoadState = 'loading' | 'loaded' | 'error';
 
 const nodeKey = (direction: ServiceDependencyDirection, serviceId: string) => `${direction}:${serviceId}`;
 
-/** Horizontal S-curve between two points. */
 const curve = (x1: number, y1: number, x2: number, y2: number) => {
   const dx = (x2 - x1) / 2;
   return `M ${x1} ${y1} C ${x1 + dx} ${y1}, ${x2 - dx} ${y2}, ${x2} ${y2}`;
@@ -54,7 +53,6 @@ const DependencyView: FC<DependencyViewProps> = ({ service, serviceIdBeingChecke
     return () => {
       cancelled = true;
     };
-    // Reload whenever the listing is reloaded (status changes, deletions, pins…).
   }, [service.serviceId, servicesVersion]);
 
   const incoming = dependencies.filter((dependency) => dependency.direction === 'incoming');

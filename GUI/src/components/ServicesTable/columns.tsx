@@ -135,7 +135,6 @@ export const getColumns = ({
     columnHelper.accessor('indexStatus', {
       id: 'index',
       header: i18n.t('overview.table.index') ?? '',
-      // Reindexing logic is implemented separately (#1164); only the UI is provided here.
       cell: (props) => (
         <IndexStatus
           status={props.row.original.indexStatus}

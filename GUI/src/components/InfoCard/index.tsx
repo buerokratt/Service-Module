@@ -19,11 +19,6 @@ type InfoCardProps = {
   size?: 'default' | 'compact';
 };
 
-/**
- * Modal-like information card anchored to its trigger.
- * Opens on hover (with a small delay), click or keyboard, and stays open while the pointer is over the card
- * so its content (e.g. copy buttons) can be interacted with.
- */
 const InfoCard: FC<InfoCardProps> = ({ title, content, children, variant = 'info', size = 'default' }) => {
   const [open, setOpen] = useState(false);
   const timer = useRef<ReturnType<typeof setTimeout>>();
@@ -56,8 +51,6 @@ const InfoCard: FC<InfoCardProps> = ({ title, content, children, variant = 'info
           sideOffset={8}
           collisionPadding={16}
           onOpenAutoFocus={(event) => event.preventDefault()}
-          // Only return focus to the trigger for keyboard/click closes; after a hover close it would leave
-          // the icon looking selected (focus ring) without the user having interacted with it.
           onCloseAutoFocus={(event) => {
             if (closedByHover.current) event.preventDefault();
             closedByHover.current = false;
