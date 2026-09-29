@@ -8,10 +8,10 @@ import { ReactComponent as ReferencingServicesIcon } from '../../static/icons/re
 import InfoCard, { InfoCardSection } from '../InfoCard';
 
 type DependencyCountsProps = {
-  incoming: number;
-  outgoing: number;
-  problems?: number;
-  onClick?: (event: MouseEvent<HTMLButtonElement>) => void;
+  readonly incoming: number;
+  readonly outgoing: number;
+  readonly problems?: number;
+  readonly onClick?: (event: MouseEvent<HTMLButtonElement>) => void;
 };
 
 const DependencyCounts: FC<DependencyCountsProps> = ({ incoming, outgoing, problems = 0, onClick }) => {

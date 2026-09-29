@@ -9,8 +9,8 @@ import { DEPENDENCY_FILTER_OPTIONS, hasActiveFilters, STATUS_FILTER_OPTIONS } fr
 const SEARCH_DEBOUNCE_MS = 300;
 
 type ServicesFilterBarProps = {
-  filters: ServicesFilters;
-  onChange: (filters: ServicesFilters) => void;
+  readonly filters: ServicesFilters;
+  readonly onChange: (filters: ServicesFilters) => void;
 };
 
 const ServicesFilterBar: FC<ServicesFilterBarProps> = ({ filters, onChange }) => {

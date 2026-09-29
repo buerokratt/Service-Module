@@ -4,8 +4,8 @@ import { useTranslation } from 'react-i18next';
 import { ServiceState } from 'types';
 
 type ServiceStatusChipProps = {
-  state: ServiceState | 'deleted';
-  isLoading?: boolean;
+  readonly state: ServiceState | 'deleted';
+  readonly isLoading?: boolean;
 };
 
 const ServiceStatusChip: FC<ServiceStatusChipProps> = ({ state, isLoading = false }) => {

@@ -1,4 +1,5 @@
-import { FC, useCallback, useEffect, useId, useLayoutEffect, useRef, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { FC, useCallback, useId, useLayoutEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import useServiceListStore from 'store/services.store';
 import { Service } from 'types';
@@ -8,14 +9,14 @@ import DependencyNode from './DependencyNode';
 import ServiceStatusChip from './ServiceStatusChip';
 
 type DependencyViewProps = {
-  service: Service;
-  serviceIdBeingChecked: string | null;
-  onOpen: (dependency: ServiceDependency) => void;
-  onLocate: (dependency: ServiceDependency) => void;
-  onActivate: (dependency: ServiceDependency) => void;
+  readonly service: Service;
+  readonly serviceIdBeingChecked: string | null;
+  readonly onOpen: (dependency: ServiceDependency) => void;
+  readonly onLocate: (dependency: ServiceDependency) => void;
+  readonly onActivate: (dependency: ServiceDependency) => void;
 };
 
-type LoadState = 'loading' | 'loaded' | 'error';
+const NO_DEPENDENCIES: ServiceDependency[] = [];
 
 const nodeKey = (direction: ServiceDependencyDirection, serviceId: string) => `${direction}:${serviceId}`;
 
@@ -28,32 +29,16 @@ const DependencyView: FC<DependencyViewProps> = ({ service, serviceIdBeingChecke
   const { t } = useTranslation();
   const markerId = useId().replace(/:/g, '');
   const servicesVersion = useServiceListStore((state) => state.servicesVersion);
-  const [dependencies, setDependencies] = useState<ServiceDependency[]>([]);
-  const [loadState, setLoadState] = useState<LoadState>('loading');
   const [paths, setPaths] = useState<string[]>([]);
   const contentRef = useRef<HTMLDivElement>(null);
   const currentRef = useRef<HTMLDivElement>(null);
   const nodeRefs = useRef(new Map<string, HTMLDivElement>());
 
-  useEffect(() => {
-    let cancelled = false;
-    setLoadState((state) => (state === 'loaded' ? state : 'loading'));
-    useServiceListStore
-      .getState()
-      .loadServiceDependencies(service.serviceId)
-      .then((result) => {
-        if (cancelled) return;
-        setDependencies(result);
-        setLoadState('loaded');
-      })
-      .catch((error) => {
-        console.error(error);
-        if (!cancelled) setLoadState('error');
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, [service.serviceId, servicesVersion]);
+  const { data: dependencies = NO_DEPENDENCIES, status } = useQuery({
+    queryKey: ['service-dependencies', service.serviceId, servicesVersion],
+    queryFn: () => useServiceListStore.getState().loadServiceDependencies(service.serviceId),
+    keepPreviousData: true,
+  });
 
   const incoming = dependencies.filter((dependency) => dependency.direction === 'incoming');
   const outgoing = dependencies.filter((dependency) => dependency.direction === 'outgoing');
@@ -90,7 +75,7 @@ const DependencyView: FC<DependencyViewProps> = ({ service, serviceIdBeingChecke
     const observer = new ResizeObserver(updatePaths);
     observer.observe(content);
     return () => observer.disconnect();
-  }, [updatePaths, dependencies, loadState]);
+  }, [updatePaths, dependencies, status]);
 
   const setNodeRef = (key: string) => (element: HTMLDivElement | null) => {
     if (element) nodeRefs.current.set(key, element);
@@ -131,13 +116,13 @@ const DependencyView: FC<DependencyViewProps> = ({ service, serviceIdBeingChecke
           {heading(t('overview.dependencies.outgoingHeading', { count: outgoing.length }), outgoingProblems)}
         </h4>
       </div>
-      {loadState === 'error' && (
+      {status === 'error' && (
         <p className="dependency-view__status dependency-view__status--error">
           {t('overview.dependencies.loadFailed')}
         </p>
       )}
-      {loadState === 'loading' && <p className="dependency-view__status">{t('overview.dependencies.loading')}</p>}
-      {loadState === 'loaded' && (
+      {status === 'loading' && <p className="dependency-view__status">{t('overview.dependencies.loading')}</p>}
+      {status === 'success' && (
         <div className="dependency-view__scroll">
           <div className="dependency-view__content" ref={contentRef}>
             <svg className="dependency-view__connectors" aria-hidden>

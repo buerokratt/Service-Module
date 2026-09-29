@@ -12,11 +12,11 @@ const OPEN_DELAY_MS = 150;
 const CLOSE_DELAY_MS = 200;
 
 type InfoCardProps = {
-  title: ReactNode;
-  content: ReactNode;
-  children: ReactElement;
-  variant?: 'info' | 'danger';
-  size?: 'default' | 'compact';
+  readonly title: ReactNode;
+  readonly content: ReactNode;
+  readonly children: ReactElement;
+  readonly variant?: 'info' | 'danger';
+  readonly size?: 'default' | 'compact';
 };
 
 const InfoCard: FC<InfoCardProps> = ({ title, content, children, variant = 'info', size = 'default' }) => {
@@ -74,7 +74,7 @@ const InfoCard: FC<InfoCardProps> = ({ title, content, children, variant = 'info
 };
 
 type InfoCardSectionProps = {
-  label?: ReactNode;
+  readonly label?: ReactNode;
 };
 
 export const InfoCardSection: FC<PropsWithChildren<InfoCardSectionProps>> = ({ label, children }) => (
@@ -85,7 +85,7 @@ export const InfoCardSection: FC<PropsWithChildren<InfoCardSectionProps>> = ({ l
 );
 
 type InfoCardCopyRowProps = {
-  value: string;
+  readonly value: string;
 };
 
 export const InfoCardCopyRow: FC<InfoCardCopyRowProps> = ({ value }) => {

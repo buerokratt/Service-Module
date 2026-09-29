@@ -9,11 +9,11 @@ import DependencyCounts from './DependencyCounts';
 import ServiceStatusChip from './ServiceStatusChip';
 
 type DependencyNodeProps = {
-  dependency: ServiceDependency;
-  isBeingChecked: boolean;
-  onOpen: (dependency: ServiceDependency) => void;
-  onLocate: (dependency: ServiceDependency) => void;
-  onActivate: (dependency: ServiceDependency) => void;
+  readonly dependency: ServiceDependency;
+  readonly isBeingChecked: boolean;
+  readonly onOpen: (dependency: ServiceDependency) => void;
+  readonly onLocate: (dependency: ServiceDependency) => void;
+  readonly onActivate: (dependency: ServiceDependency) => void;
 };
 
 const DependencyNode = forwardRef<HTMLDivElement, DependencyNodeProps>(

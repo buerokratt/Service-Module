@@ -133,11 +133,11 @@ const EmptyIllustration: FC = () => (
 );
 
 type ServicesTableStateProps = {
-  colSpan: number;
-  illustration: ReactNode;
-  title: string;
-  description: string;
-  actions: ReactNode;
+  readonly colSpan: number;
+  readonly illustration: ReactNode;
+  readonly title: string;
+  readonly description: string;
+  readonly actions: ReactNode;
 };
 
 const ServicesTableState: FC<ServicesTableStateProps> = ({ colSpan, illustration, title, description, actions }) => (

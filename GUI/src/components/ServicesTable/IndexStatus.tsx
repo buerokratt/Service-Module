@@ -7,9 +7,9 @@ import { ServiceIndexStatus } from 'types/service';
 import { ReactComponent as RefreshIcon } from '../../static/icons/referesh.svg';
 
 type IndexStatusProps = {
-  status?: ServiceIndexStatus | null;
-  canReindex: boolean;
-  onReindex?: () => void;
+  readonly status?: ServiceIndexStatus | null;
+  readonly canReindex: boolean;
+  readonly onReindex?: () => void;
 };
 
 const STATUS_GLYPHS: Record<ServiceIndexStatus, ReactNode> = {
@@ -18,7 +18,7 @@ const STATUS_GLYPHS: Record<ServiceIndexStatus, ReactNode> = {
   IN_PROGRESS: <span className="index-status__dot" />,
 };
 
-const IndexStatusIcon: FC<{ status?: ServiceIndexStatus | null }> = ({ status }) => {
+const IndexStatusIcon: FC<{ readonly status?: ServiceIndexStatus | null }> = ({ status }) => {
   const { t } = useTranslation();
   const title = t(`overview.index.status.${status ?? 'NONE'}`) ?? '';
   const icon = status ? STATUS_GLYPHS[status] : null;

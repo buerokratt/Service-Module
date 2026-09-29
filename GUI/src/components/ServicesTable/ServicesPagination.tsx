@@ -4,13 +4,13 @@ import { useTranslation } from 'react-i18next';
 import { MdOutlineEast, MdOutlineWest } from 'react-icons/md';
 
 type ServicesPaginationProps = {
-  pageIndex: number;
-  pageSize: number;
-  pageCount: number;
-  totalCount: number;
-  pageSizeOptions: number[];
-  onPageChange: (pageIndex: number) => void;
-  onPageSizeChange: (pageSize: number) => void;
+  readonly pageIndex: number;
+  readonly pageSize: number;
+  readonly pageCount: number;
+  readonly totalCount: number;
+  readonly pageSizeOptions: number[];
+  readonly onPageChange: (pageIndex: number) => void;
+  readonly onPageSizeChange: (pageSize: number) => void;
 };
 
 type PageItem = number | 'ellipsis-start' | 'ellipsis-end';
