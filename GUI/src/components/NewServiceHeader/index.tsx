@@ -11,10 +11,12 @@ import { ROUTES } from 'resources/routes-constants';
 import useServiceStore from 'store/new-services.store';
 import useToastStore from 'store/toasts.store';
 import { ServiceState } from 'types';
+import { AffectedService } from 'utils/service-draft-return';
 import { navigateToService } from 'utils/service-navigation-utils';
+import { getServiceStateLabelType } from 'utils/service-state-label';
 import { removeTrailingUnderscores } from 'utils/string-util';
 
-import { Button, Modal, Track } from '..';
+import { Button, Label, Modal, Track } from '..';
 import api from '../../services/api-dev';
 import useServiceListStore from '../../store/services.store';
 import Dialog from '../Dialog';
@@ -51,6 +53,7 @@ const NewServiceHeader: FC<NewServiceHeaderProps> = ({ backOnClick, continueOnCl
   const [isDeleteServiceModalVisible, setIsDeleteServiceModalVisible] = useState(false);
   const [isServiceDropdownOpen, setIsServiceDropdownOpen] = useState(false);
   const [services, setServices] = useState<ServiceOption[]>([]);
+  const [affectedServices, setAffectedServices] = useState<AffectedService[] | null>(null);
   const { id } = useParams();
 
   useEffect(() => {
@@ -66,6 +69,48 @@ const NewServiceHeader: FC<NewServiceHeaderProps> = ({ backOnClick, continueOnCl
   }, [isServiceDropdownOpen]);
 
   const otherServices = services.filter((service) => service.serviceId !== id);
+
+  const saveAsDraft = async () => {
+    setIsSaving(true);
+    try {
+      await useServiceStore.getState().onServiceSave(ServiceState.Draft, false);
+      useServiceStore.setState({ serviceState: ServiceState.Draft });
+      saveOnClick();
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleSave = async () => {
+    if (!name) {
+      showEmptyNameError();
+      return;
+    }
+    if (serviceState !== ServiceState.Active || !id) {
+      await saveAsDraft();
+      return;
+    }
+
+    setIsSaving(true);
+    let affected: AffectedService[];
+    try {
+      affected = await useServiceListStore.getState().loadAffectedActiveServices(id);
+    } catch (error) {
+      console.error(error);
+      useToastStore.getState().error({ title: t('overview.service.toast.failed.state') });
+      setIsSaving(false);
+      return;
+    }
+
+    if (affected.length > 0) {
+      setIsSaving(false);
+      setAffectedServices(affected);
+      return;
+    }
+    await saveAsDraft();
+  };
 
   return (
     <>
@@ -130,24 +175,7 @@ const NewServiceHeader: FC<NewServiceHeaderProps> = ({ backOnClick, continueOnCl
           >
             {t('serviceFlow.apiElements.delete')}
           </Button>
-          <Button
-            appearance={isSaving ? 'loading' : 'primary'}
-            onClick={async () => {
-              if (!name) {
-                showEmptyNameError();
-              } else {
-                setIsSaving(true);
-                try {
-                  await useServiceStore.getState().onServiceSave(ServiceState.Draft, false);
-                  saveOnClick();
-                } catch (error) {
-                  console.error(error);
-                } finally {
-                  setIsSaving(false);
-                }
-              }
-            }}
-          >
+          <Button appearance={isSaving ? 'loading' : 'primary'} disabled={isSaving} onClick={() => void handleSave()}>
             {t('global.save')}
           </Button>
           <Button
@@ -176,6 +204,49 @@ const NewServiceHeader: FC<NewServiceHeaderProps> = ({ backOnClick, continueOnCl
           </Button>
         </Track>
       </header>
+      {affectedServices && (
+        <Modal
+          title={t('overview.popup.returnToDraft.title')}
+          onClose={() => setAffectedServices(null)}
+          footer={
+            <>
+              <Button appearance="secondary" onClick={() => setAffectedServices(null)}>
+                {t('overview.popup.returnToDraft.cancel')}
+              </Button>
+              <Button
+                appearance="primary"
+                onClick={() => {
+                  setAffectedServices(null);
+                  void saveAsDraft();
+                }}
+              >
+                {t('overview.popup.returnToDraft.confirm')}
+              </Button>
+            </>
+          }
+        >
+          <p className="affected-services__description">{t('overview.popup.returnToDraft.description')}</p>
+          <ul className="affected-services">
+            {affectedServices.map((service) => (
+              <li key={service.serviceId}>
+                <button
+                  type="button"
+                  className="affected-services__item"
+                  onClick={() => {
+                    setAffectedServices(null);
+                    navigateToService(service.serviceId, navigate);
+                  }}
+                >
+                  <strong>{service.name}</strong>
+                  <Label type={getServiceStateLabelType(service.state)}>
+                    {t(`overview.service.states.${service.state}`)}
+                  </Label>
+                </button>
+              </li>
+            ))}
+          </ul>
+        </Modal>
+      )}
       {isDeleteServiceModalVisible && (
         <Modal title={t('overview.popup.delete')} onClose={() => setIsDeleteServiceModalVisible(false)}>
           <Track justify="end" gap={16}>

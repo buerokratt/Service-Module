@@ -238,6 +238,12 @@
       "deleteNodeConnections": "Kas soovid kustutada kõik loogikateed, mis on seotud selle plokiga, või jätta need alles?",
       "activationBlocked": {
         "title": "Teenust ei saa aktiveerida. Järgmised seotud teenused peavad olema aktiivsed:"
+      },
+      "returnToDraft": {
+        "title": "Muuda teenus mustandiks?",
+        "description": "Järgmised aktiivsed teenused kasutavad seda teenust. Need jäävad aktiivseks, kuid kasutajad ei saa selle ühenduseni jõudes teenusevooga jätkata.",
+        "cancel": "Tühista",
+        "confirm": "Muuda mustandiks"
       }
     },
     "table": {
