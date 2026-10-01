@@ -483,4 +483,19 @@ describe('Jump to service step', () => {
       next: 'end',
     });
   });
+
+  it('forwards the canvas Test Widget testMode flag to the jump-to-service template', () => {
+    const source = buildEndpointNode('node-1', 'Source One');
+    const jump = buildJumpToServiceNode('jump-1', 'Järgmine teenus - 1', 'service_a');
+    const edges: Edge[] = [{ id: 'e1', source: 'node-1', target: 'jump-1' }];
+
+    const result = getYamlContent([source, jump], edges, 'test_service', '', false);
+
+    expect(result.declaration.allowlist.body).toContainEqual(
+      expect.objectContaining({ field: 'testMode', type: 'boolean' }),
+    );
+    expect(result.järgmine_teenus_1.body.testMode).toBe(
+      "${incoming.body.testMode === true || incoming.body.testMode === 'true'}",
+    );
+  });
 });

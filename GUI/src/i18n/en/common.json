@@ -608,6 +608,13 @@
       "message": "Error message"
     },
     "service-test-success": "Service test successful",
+    "next-service-test-error": {
+      "unavailable": "Next Service target is not available for testing. Only Active, Ready and Draft services can be tested.",
+      "missing": "Next Service target is missing. Select a service in the Next Service step.",
+      "serviceName": "Target service",
+      "state": "Status",
+      "notFound": "Not found"
+    },
     "title": "TEST",
     "input-placeholder": "Enter input, separated by commas",
     "service-input": "Service input",

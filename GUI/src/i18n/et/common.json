@@ -609,6 +609,13 @@
       "message": "Veateade"
     },
     "service-test-success": "Teenuse test on edukas",
+    "next-service-test-error": {
+      "unavailable": "Järgmise teenuse sihtteenus ei ole testimiseks saadaval. Testida saab ainult aktiivseid, valmis ja mustandi olekus teenuseid.",
+      "missing": "Järgmise teenuse sihtteenus puudub. Valige teenus järgmise teenuse sammus.",
+      "serviceName": "Sihtteenus",
+      "state": "Olek",
+      "notFound": "Ei leitud"
+    },
     "title": "TEST",
     "input-placeholder": "Sisestage sisend, eraldatud komadega",
     "service-input": "Teenuse sisend",
