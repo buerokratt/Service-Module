@@ -522,7 +522,7 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
 
       set({
         serviceId: id,
-        name: settings?.title ?? serviceResponse.data.name,
+        name: serviceResponse.data.name,
         isCommon: serviceResponse.data.isCommon,
         description: settings?.description ?? serviceResponse.data.description,
         slot: serviceResponse.data.slot,
