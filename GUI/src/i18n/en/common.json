@@ -353,7 +353,7 @@
       "clientInput": "Client input",
       "assign": "Assign",
       "condition": "Condition",
-      "multiChoiceQuestion": "Multi-choice question",
+      "multiChoiceQuestion": "Multiple-choice question",
       "openNewWebpage": "Open new webpage",
       "fileGeneration": "File generation",
       "fileSigning": "File signing",
@@ -375,7 +375,7 @@
       },
       "jumpToService": {
         "title": "Next service",
-        "targetService": "Target service",
+        "targetService": "Next service",
         "selectService": "Select a service...",
         "noActiveServices": "No active services available",
         "parameters": "Parameters",
@@ -430,13 +430,13 @@
     },
     "mcq": {
       "selectBranchTitle": "Select branch",
-      "emptyBranchesMessage": "This multi-choice question has {{count}} empty branches. Which branch do you want to connect?"
+      "emptyBranchesMessage": "This multiple-choice question has {{count}} empty branches. Which branch do you want to connect?"
     },
     "condition": {
       "emptyPathsMessage": "This conditional node has {{count}} empty paths. Which path do you want to connect?"
     },
     "previousVariables": {
-      "assignElements": "Assigned Variables",
+      "assignElements": "Assigned values",
       "dateAndTime": {
         "title": "Date and time",
         "base": "Base",
