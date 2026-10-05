@@ -31,11 +31,24 @@ function addVirtualRoot(filteredNodes: Node[], filteredEdges: Edge[]): void {
   }
 }
 
+function getTerminalNodePosition(
+  parentNodes: Node[],
+  isParentMultiPath: boolean,
+  orientation: 'horizontal' | 'vertical',
+): Node['position'] {
+  const avg = (axis: 'x' | 'y') => parentNodes.reduce((sum, p) => sum + p.position[axis], 0) / parentNodes.length;
+  const max = (axis: 'x' | 'y') => Math.max(...parentNodes.map((p) => p.position[axis]));
+
+  if (orientation === 'horizontal') return { x: max('x') + 500, y: avg('y') };
+  return { x: avg('x'), y: max('y') + (isParentMultiPath ? 300 : 180) };
+}
+
 function repositionTerminalNodes(
   resultNodes: Node[],
   multiParentNodes: Node[],
   terminalMultiParentIds: Set<string>,
   edges: Edge[],
+  orientation: 'horizontal' | 'vertical',
 ): void {
   for (const node of multiParentNodes) {
     if (!terminalMultiParentIds.has(node.id)) continue;
@@ -45,9 +58,7 @@ function repositionTerminalNodes(
       (n) => n.data.stepType === StepType.MultiChoiceQuestion || n.data.stepType === StepType.Condition,
     );
     if (parentNodes.length > 0) {
-      const avgX = parentNodes.reduce((sum, p) => sum + p.position.x, 0) / parentNodes.length;
-      const maxParentY = Math.max(...parentNodes.map((p) => p.position.y));
-      resultNodes.push({ ...node, position: { x: avgX, y: maxParentY + (isParentMultiPath ? 300 : 180) } });
+      resultNodes.push({ ...node, position: getTerminalNodePosition(parentNodes, isParentMultiPath, orientation) });
     } else {
       resultNodes.push(node);
     }
@@ -94,7 +105,7 @@ function layoutNodes(nodes: Node[], edges: Edge[], orientation: 'horizontal' | '
       .map((d) => ({ ...d.data, position: orientation === 'vertical' ? { x: d.x, y: d.y } : { x: d.y, y: d.x } }))
       .filter((node) => node.id !== 'virtual-root');
 
-    repositionTerminalNodes(resultNodes, multiParentNodes, terminalMultiParentIds, edgesCopy);
+    repositionTerminalNodes(resultNodes, multiParentNodes, terminalMultiParentIds, edgesCopy, orientation);
 
     return resultNodes;
   } catch {
