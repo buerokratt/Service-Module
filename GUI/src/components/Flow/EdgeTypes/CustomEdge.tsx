@@ -37,6 +37,7 @@ type HighlightData = { readonly isHighlighted?: boolean; readonly isDimmed?: boo
 
 function CustomEdge({
   id,
+  target,
   label,
   sourceX,
   sourceY,
@@ -68,6 +69,7 @@ function CustomEdge({
   const { setHasUnsavedChanges } = useServiceStore();
 
   const stepPreferences = useServiceStore((state) => state.stepPreferences);
+  const isUnfinished = useServiceStore((state) => state.nodes.find((node) => node.id === target)?.type === 'ghost');
 
   const onEdgeAdd = useEdgeAdd(id);
 
@@ -142,6 +144,7 @@ function CustomEdge({
               }}
               onClick={() => {}}
               className={`edge-button nodrag nopan${highlightData?.isDimmed ? ' edge-button--dimmed' : ''}${highlightData?.isHighlighted ? ' edge-button--highlighted' : ''}`}
+              title={isUnfinished ? t('newService.toast.unfinishedFlows') : undefined}
             >
               {label ?? '+'}
             </button>

@@ -81,7 +81,7 @@ check_service_file_exists:
   args:
     url: "[#SERVICE_DMAPPER]/file-manager/exists"
     body:
-      file_path: "[#RUUTER_SERVICES_PATH]/${ruuter_type}/[#RUUTER_SERVICES_DIR_PATH]/${old_file_status_path}/${name_res.response.body[0].name}.tmp"
+      file_path: "[#RUUTER_SERVICES_POST_PATH]/${old_file_status_path}/${name_res.response.body[0].name}.tmp"
   result: service_file_exists
   next: validate_service_file_exists
 
@@ -96,7 +96,7 @@ delete_deactivated_service:
   args:
     url: "[#SERVICE_DMAPPER]/file-manager/delete"
     body:
-      file_path: "[#RUUTER_SERVICES_PATH]/${ruuter_type}/[#RUUTER_SERVICES_DIR_PATH]/${old_file_status_path}/${name_res.response.body[0].name}.tmp"
+      file_path: "[#RUUTER_SERVICES_POST_PATH]/${old_file_status_path}/${name_res.response.body[0].name}.tmp"
   result: results
   next: check_result
 
@@ -129,7 +129,7 @@ delete_mcq_files:
   args:
     url: "[#SERVICE_DMAPPER]/file-manager/delete-all-that-starts-with"
     body:
-      path: "[#RUUTER_SERVICES_PATH]/${ruuter_type}/[#RUUTER_SERVICES_DIR_PATH]/${old_file_status_path}"
+      path: "[#RUUTER_SERVICES_POST_PATH]/${old_file_status_path}"
       keyword: "${name_res.response.body[0].name}_mcq_"
   result: deleted_mcq
 

@@ -1,4 +1,4 @@
 databaseChangeLog:
   - includeAll:
       path: changelog/
-      maxDepth: 1
+      errorIfMissingOrEmpty: true

@@ -111,7 +111,7 @@ delete_all_mcq_files:
   args:
     url: "[#SERVICE_DMAPPER]/file-manager/delete-all-that-starts-with"
     body:
-      path: "[#RUUTER_SERVICES_PATH]/${type}/services/draft"
+      path: "[#RUUTER_SERVICES_POST_PATH]/draft"
       keyword: "${name}_mcq_"
   result: deleteRes 
 
@@ -122,22 +122,7 @@ convert_json_content_to_yml:
     body:
       data: ${content}
   result: ymlResult
-
-check_for_type:
-  switch:
-    - condition: ${type === 'GET'}
-      next: add_get_dsl
   next: add_post_dsl
-
-add_get_dsl:
-  call: http.post
-  args:
-    url: "[#SERVICE_DMAPPER]/file-manager/create"
-    body:
-      file_path: "[#RUUTER_SERVICES_GET_PATH]/draft/${name}.tmp"
-      content: ${ymlResult.response.body.yaml}
-  result: results
-  next: check_result
 
 add_post_dsl:
   call: http.post

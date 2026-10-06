@@ -114,7 +114,7 @@ const CustomNode: FC<NodeProps & CustomNodeProps> = (props) => {
   return (
     <>
       <Handle type="target" position={getTargetPosition()} isConnectable={isConnectable} />
-      <StepNode data={data} />
+      <StepNode id={id} data={data} />
       {data.stepType !== 'rule' && (
         <Track style={{ position: 'fixed', top: 8, right: 8 }}>
           <Button

@@ -1,0 +1,110 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Wrapper for manual re-index triggered from the UI. Fetches the service, validates it's active, then calls service-index-llm as a sub-flow and handles crashes (e.g. LLM service unreachable) by writing FAILED to the DB"
+  method: post
+  accepts: json
+  returns: json
+  namespace: service
+  allowlist:
+    body:
+      - field: serviceId
+        type: string
+        description: "Service UUID to re-index"
+    headers:
+      - field: cookie
+        type: string
+        description: "Cookie field"
+
+assign_id:
+  assign:
+    serviceId: ${incoming.body.serviceId}
+
+check_required:
+  switch:
+    - condition: ${serviceId == null || serviceId === ''}
+      next: return_bad_request
+
+fetch_service:
+  call: http.post
+  args:
+    url: "[#SERVICE_RESQL]/get-service-by-id"
+    body:
+      id: ${serviceId}
+  result: service_result
+
+check_service_found:
+  switch:
+    - condition: ${service_result.response.body == null || service_result.response.body.length === 0}
+      next: return_not_found
+
+assign_service:
+  assign:
+    service: ${service_result.response.body[0]}
+
+check_service_active:
+  switch:
+    - condition: ${service.state !== 'active'}
+      next: return_not_active
+
+call_index_llm:
+  call: http.post
+  args:
+    url: "[#SERVICE_RUUTER]/services/service-index-llm"
+    headers:
+      cookie: ${incoming.headers.cookie}
+    body:
+      serviceId: ${serviceId}
+      name: ${service.name}
+      description: ${service.description}
+      examples: ${service.examples}
+      entities: ${service.entities}
+      type: ${service.type}
+      state: ${service.state}
+      isCommon: ${service.isCommon}
+  result: index_llm_result
+
+check_index_llm_result:
+  switch:
+    - condition: ${index_llm_result != null && index_llm_result.response != null && 200 <= index_llm_result.response.statusCodeValue && index_llm_result.response.statusCodeValue < 300}
+      next: return_ok
+  next: mark_llm_sync_failed
+
+mark_llm_sync_failed:
+  call: http.post
+  args:
+    url: "[#SERVICE_RESQL]/services/update_service_llm_sync_status"
+    body:
+      serviceId: ${serviceId}
+      status: FAILED
+  result: update_sync_res
+  next: log_reindex_failure
+
+log_reindex_failure:
+  log: "Re-index failed for service ${serviceId}"
+  next: return_failed
+
+return_ok:
+  status: 200
+  return: "Service re-indexed started"
+  next: end
+
+return_failed:
+  status: 500
+  return: "Re-index failed"
+  next: end
+
+return_not_found:
+  status: 404
+  return: "Service not found, re-index skipped"
+  next: end
+
+return_not_active:
+  status: 400
+  return: "Service is not active, LLM indexing skipped"
+  next: end
+
+return_bad_request:
+  status: 400
+  return: "serviceId is required"
+  next: end

@@ -47,6 +47,29 @@ insert_services:
       structures: ${services.map(s => s.flowData)}
   result: insert_services_res
 
+get_navigable_services:
+  call: http.post
+  args:
+    url: "[#SERVICE_RESQL]/get-navigable-services-list"
+  result: navigable_services_res
+
+build_service_id_map:
+  assign:
+    service_id_by_name: "$=Object.fromEntries(navigable_services_res.response.body.map(s => [s.name, s.serviceId]))="
+
+restore_jump_to_service_links:
+  assign:
+    services: "$=services.map(s => ({ ...s, flowData: JSON.stringify({ ...JSON.parse(s.flowData), nodes: JSON.parse(s.flowData).nodes.map(n => (n.data?.stepType === 'jump-to-service' && n.data?.jumpToService?.serviceName && service_id_by_name[n.data.jumpToService.serviceName]) ? { ...n, data: { ...n.data, jumpToService: { ...n.data.jumpToService, serviceId: service_id_by_name[n.data.jumpToService.serviceName] } } } : n) }) }))="
+
+update_services_structure:
+  call: http.post
+  args:
+    url: "[#SERVICE_RESQL]/update-services-structure"
+    body:
+      names: ${file_names}
+      structures: ${services.map(s => s.flowData)}
+  result: update_services_structure_res
+
 convert_json_content_to_yml:
   call: http.post
   args:

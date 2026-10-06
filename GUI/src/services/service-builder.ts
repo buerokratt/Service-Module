@@ -641,21 +641,21 @@ export function getYamlContent(
 }
 
 export const validateTextField = (nodeData: NodeDataProps): string | null => {
-  if (nodeData?.message === undefined) {
+  if (!nodeData?.message) {
     return i18next.t('toast.missing-textfield-message');
   }
   return null;
 };
 
 export const validateOpenWebpage = (nodeData: NodeDataProps): string | null => {
-  if (nodeData?.link === undefined || nodeData?.linkText === undefined) {
+  if (!nodeData?.link || !nodeData?.linkText) {
     return i18next.t('toast.missing-website');
   }
   return null;
 };
 
 export const validateFileGenerate = (nodeData: NodeDataProps): string | null => {
-  if (nodeData?.fileName === undefined || nodeData?.fileContent === undefined) {
+  if (!nodeData?.fileName || !nodeData?.fileContent) {
     return i18next.t('toast.missing-file-generation');
   }
   return null;
@@ -1016,7 +1016,7 @@ function injectNonceStep(finishedFlow: Map<any, any>, stepName: string) {
   insertStepBefore(finishedFlow, stepName, nonceStepName, {
     call: 'http.post',
     args: {
-      url: '[#SERVICE_TRAINING_RESQL]/get-new-nonce',
+      url: '[#SERVICE_RESQL]/get-new-nonce',
     },
     result: nonceResultName,
     next: stepName,
@@ -1079,7 +1079,7 @@ function handleMultiChoiceQuestion(
 
 function handleJumpToServiceStep(parentNode: Node<NodeDataProps>, finishedFlow: Map<any, any>, parentStepName: string) {
   const resultName = `${parentStepName}_result`;
-  const returnStepName = 'return_next_service_res';
+  const returnStepName = `${parentStepName}_return_next_service_res`;
 
   finishedFlow.set(parentStepName, {
     template: '[#SERVICE_PROJECT_LAYER]/jump-to-service',

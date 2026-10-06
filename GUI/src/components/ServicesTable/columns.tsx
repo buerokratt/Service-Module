@@ -12,15 +12,23 @@ import useServiceListStore from 'store/services.store';
 import useStore from 'store/store';
 import useToastStore from 'store/toasts.store';
 import { Service, ServiceState } from 'types';
+import { getServiceStateLabelType } from 'utils/service-state-label';
 
 interface GetColumnsConfig {
   isCommon: boolean;
   navigate: NavigateFunction;
   hideDeletePopup: () => void;
   showReadyPopup: () => void;
+  serviceIdBeingChecked: string | null;
 }
 
-export const getColumns = ({ isCommon, navigate, hideDeletePopup, showReadyPopup }: GetColumnsConfig) => {
+export const getColumns = ({
+  isCommon,
+  navigate,
+  hideDeletePopup,
+  showReadyPopup,
+  serviceIdBeingChecked,
+}: GetColumnsConfig) => {
   const columnHelper = createColumnHelper<Service>();
   const userInfo = useStore.getState().userInfo;
 
@@ -150,22 +158,32 @@ export const getColumns = ({ isCommon, navigate, hideDeletePopup, showReadyPopup
       meta: {
         size: 120,
       },
-      cell: (props) => (
-        <Track
-          justify="start"
-          onClick={() => {
-            useServiceListStore.getState().setSelectedService(props.row.original);
-            const state = props.row.original.state;
-            if (state === ServiceState.Ready) {
-              showReadyPopup();
-            }
-          }}
-        >
-          <Label type={getLabelType(props.row.original.state)}>
-            {i18n.t(`overview.service.states.${props.row.original.state}`)}
-          </Label>
-        </Track>
-      ),
+      cell: (props) => {
+        const isServiceMatch = serviceIdBeingChecked === props.row.original.serviceId;
+
+        return (
+          <Track
+            justify="start"
+            onClick={() => {
+              if (isServiceMatch) return;
+              useServiceListStore.getState().setSelectedService(props.row.original);
+              const state = props.row.original.state;
+              if (state === ServiceState.Ready) {
+                showReadyPopup();
+              }
+            }}
+          >
+            <Label type={getServiceStateLabelType(props.row.original.state)}>
+              <span className="service-state-cell">
+                <span style={{ visibility: isServiceMatch ? 'hidden' : 'visible' }}>
+                  {i18n.t(`overview.service.states.${props.row.original.state}`)}
+                </span>
+                {isServiceMatch && <span className="service-state-spinner" />}
+              </span>
+            </Label>
+          </Track>
+        );
+      },
     }),
     columnHelper.display({
       id: 'edit',
@@ -236,19 +254,4 @@ export const getColumns = ({ isCommon, navigate, hideDeletePopup, showReadyPopup
       ),
     }),
   ];
-};
-
-const getLabelType = (serviceState: ServiceState) => {
-  switch (serviceState) {
-    case ServiceState.Ready:
-      return 'warning-dark';
-    case ServiceState.Active:
-      return 'success-light';
-    case ServiceState.Draft:
-      return 'disabled';
-    case ServiceState.Inactive:
-      return 'warning-dark';
-    default:
-      return 'info';
-  }
 };

@@ -1,6 +1,8 @@
 import CheckBadge from 'components/CheckBadge';
 import ExclamationBadge from 'components/ExclamationBadge';
 import Track from 'components/Track';
+import { useFlowCompleteness } from 'hooks/flow/useFlowCompleteness';
+import i18next from 'i18next';
 import { FC, memo, MouseEvent, useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
@@ -13,15 +15,21 @@ import { navigateToService } from 'utils/service-navigation-utils';
 import { decodeHtmlEntities, ensureAbsoluteUrl } from 'utils/string-util';
 
 type StepNodeProps = {
+  id: string;
   data: NodeDataProps;
 };
 
-const StepNode: FC<StepNodeProps> = ({ data }) => {
+const StepNode: FC<StepNodeProps> = ({ id, data }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const endpoints = useServiceStore((state) => state.endpoints);
   const navigableServices = useServiceStore((state) => state.navigableServices);
+  const flowCompleteness = useFlowCompleteness();
   const [isTestedAndPassed, setIsTestedAndPassed] = useState<boolean | null>(null);
+
+  const isUnconnected = flowCompleteness.unconnectedNodeIds.has(id);
+  const isUnresolvedJumpToService =
+    data.stepType === StepType.JumpToService && flowCompleteness.unresolvedJumpToServiceNodeIds.has(id);
 
   const jumpToServiceId = data.jumpToService?.serviceId;
   const isJumpToServiceValid = !!jumpToServiceId && navigableServices.has(jumpToServiceId);
@@ -103,7 +111,12 @@ const StepNode: FC<StepNodeProps> = ({ data }) => {
       align="left"
     >
       <p>
-        <TestStatue isTestedAndPassed={isTestedAndPassed} data={data} />
+        <TestStatue
+          isTestedAndPassed={isTestedAndPassed}
+          data={data}
+          isUnconnected={isUnconnected}
+          isUnresolvedJumpToService={isUnresolvedJumpToService}
+        />
         {data.label}
       </p>
       {data.stepType === StepType.Textfield && (
@@ -183,7 +196,20 @@ const StepNode: FC<StepNodeProps> = ({ data }) => {
   );
 };
 
-const TestStatue = ({ isTestedAndPassed, data }: { isTestedAndPassed: boolean | null; data: NodeDataProps }) => {
+const TestStatue = ({
+  isTestedAndPassed,
+  data,
+  isUnconnected,
+  isUnresolvedJumpToService,
+}: {
+  isTestedAndPassed: boolean | null;
+  data: NodeDataProps;
+  isUnconnected: boolean;
+  isUnresolvedJumpToService: boolean;
+}) => {
+  if (isUnconnected) return <ExclamationBadge title={i18next.t('newService.toast.unconnectedServiceBlocks')} />;
+  if (isUnresolvedJumpToService)
+    return <ExclamationBadge title={i18next.t('newService.toast.unresolvedJumpToService')} />;
   if (isTestedAndPassed) return <CheckBadge />;
   if (!validateStep(data).isValid) return <ExclamationBadge />;
   return <ExclamationBadge color="purple" />;
