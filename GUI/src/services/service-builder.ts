@@ -524,6 +524,11 @@ export function getYamlContent(
           type: 'object',
           description: 'The Input from the user',
         },
+        {
+          field: 'testMode',
+          type: 'boolean',
+          description: 'Set only by the canvas Test Widget to allow draft and ready Next Service targets',
+        },
       ],
     },
   });
@@ -1084,6 +1089,7 @@ function handleJumpToServiceStep(parentNode: Node<NodeDataProps>, finishedFlow: 
       authorId: "${authorId ?? ''}",
       serviceName: parentNode.data.jumpToService?.serviceName ?? '',
       input: (parentNode.data.jumpToService?.input ?? []).map((e: Assign) => normalizeAssignValue(e.value)),
+      testMode: "${incoming.body.testMode === true || incoming.body.testMode === 'true'}",
     },
     result: resultName,
     next: returnStepName,

@@ -13,8 +13,16 @@ import { fromSnakeCase, removeTrailingUnderscores } from 'utils/string-util';
 import api, { createApiInstance } from './api';
 
 interface ServiceResponse {
-  response: { content: string; buttons?: string }[];
+  response?: { content: string; buttons?: string }[];
+  nextServiceTestError?: NextServiceTestError;
 }
+
+interface NextServiceTestError {
+  serviceName: string;
+  state: string;
+}
+
+const testRunBody = (input: string[]) => ({ input, testMode: true });
 
 export const runServiceTest = async (input: string, serviceName?: string) => {
   const headerValue = validateTestEnvironment();
@@ -48,6 +56,11 @@ export const runServiceTest = async (input: string, serviceName?: string) => {
 
     const runNonce = await fetchNonce();
     const response = await executeService(stateToUse, nameToUse, input.split(','), runNonce);
+
+    if (response.data?.nextServiceTestError) {
+      reportNextServiceTestError(response.data.nextServiceTestError);
+      return;
+    }
 
     addSuccessMessages(response.data);
   } catch (error) {
@@ -140,7 +153,7 @@ export const executeServiceTest = async (
     'x-ruuter-testing': headerValue,
     'x-ruuter-nonce': nonce,
   });
-  return testApi.post(testService(state, name), { input });
+  return testApi.post(testService(state, name), testRunBody(input));
 };
 
 export const updateNodeTestState = (serviceStore: ServiceStoreState, nodeId: string, passed: boolean) => {
@@ -228,7 +241,25 @@ export function translateError(error: ServiceTestError, nodeLabel: string): Reco
 }
 
 export const executeService = async (state: ServiceState, name: string, input: string[], nonce: string) => {
-  return api.post<ServiceResponse>(testService(state, name), { input }, { headers: { 'x-ruuter-nonce': nonce } });
+  return api.post<ServiceResponse>(testService(state, name), testRunBody(input), {
+    headers: { 'x-ruuter-nonce': nonce },
+  });
+};
+
+export const reportNextServiceTestError = (error: NextServiceTestError): void => {
+  const store = useTestServiceStore.getState();
+
+  if (!error.serviceName) {
+    store.addError('chat.next-service-test-error.missing');
+    return;
+  }
+
+  store.addError('chat.next-service-test-error.unavailable', {
+    [t('chat.next-service-test-error.serviceName')]: error.serviceName,
+    [t('chat.next-service-test-error.state')]: error.state
+      ? t(`overview.service.states.${error.state}`, { defaultValue: error.state })
+      : t('chat.next-service-test-error.notFound'),
+  });
 };
 
 export const addSuccessMessages = (responseData: ServiceResponse): void => {
