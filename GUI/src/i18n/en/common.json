@@ -238,6 +238,12 @@
       "deleteNodeConnections": "Would you like to also delete all the logic paths connected to this node or leave them hanging?",
       "activationBlocked": {
         "title": "Cannot activate service. The following connected services must be Active:"
+      },
+      "returnToDraft": {
+        "title": "Return service to Draft?",
+        "description": "The following Active services use this service. They will remain Active, but users who reach this connection will not be able to continue the service flow.",
+        "cancel": "Cancel",
+        "confirm": "Return to Draft"
       }
     },
     "table": {

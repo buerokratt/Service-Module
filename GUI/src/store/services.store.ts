@@ -15,6 +15,7 @@ import { Service, ServiceState } from 'types';
 import { ActivationBlocker } from 'types/activation-blocker';
 import { ServiceDependency, ServiceLocation } from 'types/service-dependency';
 import { findActivationBlockers, ServiceFlowLookup } from 'utils/service-activation';
+import { AffectedService, findAffectedActiveServices } from 'utils/service-draft-return';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
@@ -100,6 +101,7 @@ interface ServiceStoreState {
   selectedService: Service | undefined;
   setSelectedService: (service: Service) => void;
   loadActivationBlockers: (service: Service) => Promise<ActivationBlocker[]>;
+  loadAffectedActiveServices: (serviceId: string) => Promise<AffectedService[]>;
   changeServiceState: (
     onEnd: () => void,
     successMessage: string,
@@ -236,6 +238,8 @@ const useServiceListStore = create<ServiceStoreState>()(
         if (!rootFlow) return [];
         return findActivationBlockers(rootFlow.nodes, fetchServiceFlow);
       },
+      loadAffectedActiveServices: (serviceId: string) =>
+        findAffectedActiveServices(serviceId, get().loadServiceDependencies),
       changeServiceState: async (onEnd, successMessage, errorMessage, activate, draft, pagination, sorting) => {
         const selectedService = get().selectedService;
         if (!selectedService) return;
