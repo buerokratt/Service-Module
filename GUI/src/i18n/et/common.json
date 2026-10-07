@@ -453,7 +453,7 @@
       "clientInput": "Kliendi sisend",
       "assign": "Määra",
       "condition": "Tingimus",
-      "multiChoiceQuestion": "Mitmevalikuline küsimus",
+      "multiChoiceQuestion": "Valikvastustega küsimus",
       "openNewWebpage": "Uue veebilehe avamine",
       "fileGeneration": "Faili genereerimine",
       "fileSigning": "Faili allkirjastamine",
@@ -475,7 +475,7 @@
       },
       "jumpToService": {
         "title": "Järgmine teenus",
-        "targetService": "Sihtteenус",
+        "targetService": "Järgmine teenus",
         "selectService": "Vali teenus...",
         "noActiveServices": "Aktiivseid teenuseid pole saadaval",
         "parameters": "Parameetrid",
@@ -530,13 +530,13 @@
     },
     "mcq": {
       "selectBranchTitle": "Vali haru",
-      "emptyBranchesMessage": "Sellel valikvastuse küsimusel on {{count}} tühja haru. Millisele harule soovid ühendada?"
+      "emptyBranchesMessage": "Sellel valikvastustega küsimusel on {{count}} tühja haru. Millisele harule soovid ühendada?"
     },
     "condition": {
       "emptyPathsMessage": "Sellel tingimusliku sõlmel on {{count}} tühja teed. Millisele teele soovid ühendada?"
     },
     "previousVariables": {
-      "assignElements": "Määratud Väärtused",
+      "assignElements": "Määratud väärtused",
       "noName": "<Nimeta>",
       "environmentVariables": {
         "title": "Keskkonnamuutujad"
@@ -627,7 +627,7 @@
       "public": "Avalik"
     },
     "multiChoiceQuestion": {
-      "title": "Mitmevalikuline küsimus",
+      "title": "Valikvastustega küsimus",
       "questionPlaceholder": "Sisesta küsimus",
       "questionError": "Küsimus on kohustuslik",
       "addButton": "Lisa nupp +",

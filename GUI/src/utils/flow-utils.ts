@@ -3,6 +3,7 @@ import { Group, Rule } from 'components/FlowElementsPopup/RuleBuilder/types';
 import { t } from 'i18next';
 import { Assign, Step, StepType } from 'types';
 import { NodeDataProps } from 'types/service-flow';
+import { getLastDigits, toSnakeCase } from 'utils/string-util';
 
 interface ValidationResult {
   isValid: boolean;
@@ -11,19 +12,24 @@ interface ValidationResult {
 
 export const getNodeLabel = (step: Step, nodes: Node[]) => {
   const baseLabel = step.label.split(' - ').pop() ?? '';
-  const existingNumbers = nodes
+  const sameTypeLabels = nodes
     .filter((node) => node.data.stepType === step.type)
-    .map((node) => node.data.label as string)
-    .filter((label) => label.startsWith(baseLabel))
-    .map((label) => {
-      const parts = label.split(' - ');
-      if (parts.length > 1) {
-        const num = parseInt(parts[parts.length - 1]);
-        return isNaN(num) ? 0 : num;
-      }
-      return 0;
-    })
-    .sort((a, b) => a - b);
+    .map((node) => (node.data.label as string) ?? '');
+
+  const existingNumbers = (
+    step.type === StepType.MultiChoiceQuestion
+      ? sameTypeLabels.map((label) => getLastDigits(toSnakeCase(label)))
+      : sameTypeLabels
+          .filter((label) => label.startsWith(baseLabel))
+          .map((label) => {
+            const parts = label.split(' - ');
+            if (parts.length > 1) {
+              const num = parseInt(parts[parts.length - 1]);
+              return isNaN(num) ? 0 : num;
+            }
+            return 0;
+          })
+  ).sort((a, b) => a - b);
 
   let nextNumber = 1;
   for (const num of existingNumbers) {

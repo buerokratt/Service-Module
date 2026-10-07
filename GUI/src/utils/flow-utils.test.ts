@@ -625,4 +625,34 @@ describe('getNodeLabel', () => {
     const result = getNodeLabel(step, nodes);
     expect(result).toBe('Test Step - 3');
   });
+
+  it('should number MCQ nodes uniquely across old and new label wording', () => {
+    const step = createMockStep('Valikvastustega küsimus', StepType.MultiChoiceQuestion);
+    const nodes: Node[] = [
+      createMockNode('Mitmevalikuline küsimus - 1', StepType.MultiChoiceQuestion),
+      createMockNode('Valikvastustega küsimus - 2', StepType.MultiChoiceQuestion),
+    ];
+
+    const result = getNodeLabel(step, nodes);
+    expect(result).toBe('Valikvastustega küsimus - 3');
+  });
+
+  it('should number MCQ nodes uniquely regardless of UI language', () => {
+    const step = createMockStep('Multiple-choice question', StepType.MultiChoiceQuestion);
+    const nodes: Node[] = [
+      createMockNode('Valikvastustega küsimus - 1', StepType.MultiChoiceQuestion),
+      createMockNode('Multi-choice question - 3', StepType.MultiChoiceQuestion),
+    ];
+
+    const result = getNodeLabel(step, nodes);
+    expect(result).toBe('Multiple-choice question - 2');
+  });
+
+  it('should treat MCQ labels without a trailing number as number 1', () => {
+    const step = createMockStep('Valikvastustega küsimus', StepType.MultiChoiceQuestion);
+    const nodes: Node[] = [createMockNode('Custom question', StepType.MultiChoiceQuestion)];
+
+    const result = getNodeLabel(step, nodes);
+    expect(result).toBe('Valikvastustega küsimus - 2');
+  });
 });
