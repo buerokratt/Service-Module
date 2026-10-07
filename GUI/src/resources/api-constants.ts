@@ -19,6 +19,11 @@ export const testService = (state: ServiceState, serviceName: string): string =>
 export const getNewNonce = (): string => `${baseUrl}/get-new-nonce`;
 export const editService = (id: string): string => `${baseUrl}/services/edit?id=${id}`;
 export const getServicesList = (): string => `${baseUrl}/services`;
+export const getServicesOverview = (): string => `${baseUrl}/services/overview`;
+export const pinService = (): string => `${baseUrl}/services/pin`;
+export const unpinService = (): string => `${baseUrl}/services/unpin`;
+export const getServiceDependencies = (): string => `${baseUrl}/services/dependencies`;
+export const locateService = (): string => `${baseUrl}/services/locate`;
 export const getNavigableServicesList = (): string => `${baseUrl}/navigable-services`;
 export const getConnectionRequests = (): string => `${baseUrl}/services/connection-requests`;
 export const getAvailableIntents = (): string => `${baseUrl}/services/available-intents`;

@@ -216,7 +216,6 @@ call_llm_index:
       entities: ${service_data_result.response.body[0].entities}
       type: ${ruuter_type}
       state: ${new_state}
-      isCommon: ${service_data_result.response.body[0].isCommon}
   result: llm_enrich_result
   error: llm_enrich_error
   next: return_ok

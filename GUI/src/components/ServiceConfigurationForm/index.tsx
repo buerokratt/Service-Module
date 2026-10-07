@@ -1,4 +1,4 @@
-import { Card, FormInput, Switch, Track } from 'components';
+import { Card, FormInput, Track } from 'components';
 import { FC, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -15,7 +15,6 @@ const SettingsModal: FC<SettingsModalProps> = () => {
 
   const name = useServiceStore((state) => state.serviceNameDashed());
   const description = useServiceStore((state) => state.description);
-  const isCommon = useServiceStore((state) => state.isCommon);
   const examples = useServiceStore((state) => state.examples);
   const entities = useServiceStore((state) => state.entities);
 
@@ -89,22 +88,6 @@ const SettingsModal: FC<SettingsModalProps> = () => {
           </Track>
         </Card>
       </div>
-      <Track style={{ width: '100%', marginTop: '16px' }} justify={'between'} direction={'horizontal'} gap={10}>
-        <Track>
-          <Switch
-            name="isCommon"
-            label={t('newService.isCommon')}
-            onLabel={t('global.yes').toString()}
-            offLabel={t('global.no').toString()}
-            value={isCommon}
-            checked={isCommon}
-            onCheckedChange={(e) => {
-              setHasUnsavedChanges(true);
-              useServiceStore.getState().setIsCommon(e);
-            }}
-          />
-        </Track>
-      </Track>
     </>
   );
 };

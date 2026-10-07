@@ -29,9 +29,6 @@ declaration:
       - field: state
         type: string
         description: "Service state (active/inactive/draft)"
-      - field: isCommon
-        type: boolean
-        description: "Is common service"
     headers:
       - field: cookie
         type: string
@@ -67,7 +64,6 @@ call_llm_enrich:
       entities: ${incoming.body.entities}
       ruuter_type: ${incoming.body.type}
       current_state: ${incoming.body.state}
-      is_common: ${incoming.body.isCommon}
   result: llm_enrich_result
 
 check_llm_enrich_result:

@@ -7,12 +7,13 @@ export type EndpointDefinitionJson = {
   null: boolean;
 };
 
+export type ServiceIndexStatus = 'SUCCESS' | 'IN_PROGRESS' | 'FAILED';
+
 export interface Service {
   readonly id: number;
   readonly name: string;
   readonly state: ServiceState;
   readonly type: 'GET' | 'POST';
-  readonly isCommon: boolean;
   readonly description?: string;
   readonly slot: string;
   readonly examples: string[];
@@ -26,4 +27,10 @@ export interface Service {
   >;
   readonly serviceId: string;
   readonly totalPages: number;
+  readonly totalCount?: number;
+  readonly indexStatus?: ServiceIndexStatus | null;
+  readonly incomingCount?: number;
+  readonly outgoingCount?: number;
+  readonly problemCount?: number;
+  readonly isPinned?: boolean;
 }

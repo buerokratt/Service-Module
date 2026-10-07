@@ -146,7 +146,6 @@
   },
   "overview": {
     "services": "Teenused",
-    "commonServices": "Üldteenused",
     "create": "Loo uus teenus",
     "descriptionCopiedSuccessfully": "Kirjeldus edukalt kopeeritud",
     "edit": "Muuda",
@@ -163,6 +162,22 @@
     "export": "Ekspordi",
     "exportAllConfirmation": "Kas olete kindel, et soovite eksportida kõik teenused?",
     "noServicesFound": "Ühtegi teenust ei leitud",
+    "tableState": {
+      "error": {
+        "title": "Teenuseid ei õnnestunud laadida",
+        "description": "Server ei vastanud. Kontrolli ühendust ja proovi uuesti.",
+        "retry": "Proovi uuesti"
+      },
+      "noMatch": {
+        "title": "Filtritele vastavaid teenuseid ei leitud",
+        "titleWithSearch": "Päringule „{{search}}” vastavaid teenuseid ei leitud",
+        "description": "Proovi mõnda teist nime või kirjelduses olevat sõna või tühjenda filtrid, et näha kõiki teenuseid."
+      },
+      "empty": {
+        "title": "Teenuseid veel pole",
+        "description": "Siin kuvatakse sinu loodud teenused koos teenustega, mida need kasutavad, ja teenustega, mis neid kasutavad."
+      }
+    },
     "error": {
       "fetchingServices": "Teenuste päring ebaõnnestus"
     },
@@ -179,7 +194,8 @@
         "inactive": "Mitteaktiivne",
         "draft": "Mustand",
         "ready": "Valmis",
-        "missing": "Puudub"
+        "missing": "Puudub",
+        "deleted": "Kustutatud"
       },
       "toast": {
         "deleted": "Teenus kustutatud",
@@ -190,7 +206,8 @@
           "requestConnection": "Ühendamistaotlus ebaõnnestus",
           "availableIntents": "Saadaolevate teemade päring ebaõnnestus",
           "cancelledConnection": "Ühendamistaotluse tühistamine ebaõnnestus",
-          "failedToConnectToIntent": "Kavatsusega ühenduse loomine ebaõnnestus"
+          "failedToConnectToIntent": "Kavatsusega ühenduse loomine ebaõnnestus",
+          "pin": "Kinnitatud teenuste uuendamine ebaõnnestus"
         },
         "requestedConnection": "Ühendamist taotletakse",
         "cancelledConnection": "Ühendamistaotlus tühistati",
@@ -222,6 +239,84 @@
       "activationBlocked": {
         "title": "Teenust ei saa aktiveerida. Järgmised seotud teenused peavad olema aktiivsed:"
       }
+    },
+    "table": {
+      "name": "Teenuse nimetus",
+      "dependencies": "Seosed",
+      "status": "Staatus",
+      "index": "Indeks",
+      "actions": "Tegevused",
+      "sort": "Sorteeri"
+    },
+    "serviceInfo": {
+      "title": "Teenuse andmed",
+      "name": "Teenuse nimi",
+      "description": "Teenuse kirjeldus",
+      "examples": "Näidisküsimused",
+      "keywords": "Märksõnad",
+      "open": "Näita teenuse andmeid",
+      "empty": "Puudub"
+    },
+    "dependencies": {
+      "title": "Seosed",
+      "subtitle": "Seoseid näidatakse valitud teenuse suhtes.",
+      "incomingLabel": "Seda teenust kasutavad",
+      "incomingDescription": "mitu teist teenust kasutab valitud teenust",
+      "outgoingLabel": "See teenus kasutab",
+      "outgoingDescription": "mitut teist teenust valitud teenus kasutab",
+      "problems_one": "{{count}} probleem",
+      "problems_other": "{{count}} probleemi",
+      "open": "Näita seoste selgitust",
+      "incomingHeading": "Seda teenust kasutab ({{count}})",
+      "outgoingHeading": "See teenus kasutab ({{count}})",
+      "none": "Seosed puuduvad",
+      "deletedReference": "Seos kustutatud teenusega",
+      "loading": "Seoste laadimine...",
+      "loadFailed": "Seoste laadimine ebaõnnestus",
+      "expand": "Näita seoseid",
+      "collapse": "Peida seosed",
+      "problemTitle": "Probleem seosetes",
+      "problemDescription_one": "{{count}} seos kustutatud teenusega",
+      "problemDescription_other": "{{count}} seost kustutatud teenustega"
+    },
+    "index": {
+      "reindex": "Indekseeri",
+      "reindexOnlyActive": "Indekseerida saab ainult aktiivseid teenuseid",
+      "status": {
+        "SUCCESS": "Indekseeritud",
+        "FAILED": "Indekseerimine ebaõnnestus",
+        "IN_PROGRESS": "Indekseerimine käib",
+        "NONE": "Indekseerimata"
+      }
+    },
+    "pin": {
+      "pin": "Nähtavale",
+      "pinned": "Nähtaval"
+    },
+    "copiedToClipboard": "Kopeeritud",
+    "filters": {
+      "searchLabel": "Otsi teenuseid",
+      "searchPlaceholder": "Otsi teenuseid...",
+      "dependenciesLabel": "Seosed",
+      "statusLabel": "Staatus",
+      "clear": "Tühjenda filtrid",
+      "filtersCleared": "Filtrid tühjendati, et teenust kuvada",
+      "serviceNotFound": "Teenust ei leitud",
+      "dependencies": {
+        "all": "Kõik seosed",
+        "yes": "Seostega",
+        "no": "Seosteta"
+      },
+      "status": {
+        "all": "Kõik staatused"
+      }
+    },
+    "pagination": {
+      "range": "Kuva {{from}}–{{to}} / {{total}} teenusest",
+      "pageSize": "Kuva",
+      "previous": "Eelmine leht",
+      "next": "Järgmine leht",
+      "page": "Leht {{page}}"
     }
   },
   "connectionRequests": {
@@ -257,7 +352,6 @@
       "tooltip": "Sisesta teenuse tuvastamiseks olulised märksõnad, mida tehisintellekt kasutab kavatsuse tuvastamisel."
     },
     "test": "Testi URLi",
-    "isCommon": "Üldteenus",
     "slot": "Mälukoht",
     "endpoint": {
       "add": "+ Lisa API otspunkt",

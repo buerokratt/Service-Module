@@ -72,7 +72,6 @@ prepare_results:
       entities: ${service_results.response.body[0].entities}
       state: ${service_results.response.body[0].state}
       type: ${service_results.response.body[0].type}
-      isCommon: ${service_results.response.body[0].isCommon}
       structure: ${service_results.response.body[0].structure}
       endpoints: ${endpoints_results.response.body}
       serviceId: ${service_results.response.body[0].serviceId}
