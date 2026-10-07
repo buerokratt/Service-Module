@@ -1,14 +1,21 @@
 import { PaginationState, SortingState } from '@tanstack/react-table';
 import { Node } from '@xyflow/react';
+import i18n from 'i18n';
 import {
   changeServiceStatus,
   deleteService as deleteServiceApi,
   getServiceById,
-  getServicesList,
+  getServiceDependencies,
+  getServicesOverview,
+  locateService as locateServiceApi,
+  pinService as pinServiceApi,
+  unpinService as unpinServiceApi,
 } from 'resources/api-constants';
 import { Service, ServiceState } from 'types';
 import { ActivationBlocker } from 'types/activation-blocker';
+import { ServiceDependency, ServiceLocation } from 'types/service-dependency';
 import { findActivationBlockers, ServiceFlowLookup } from 'utils/service-activation';
+import { AffectedService, findAffectedActiveServices } from 'utils/service-draft-return';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
@@ -29,24 +36,72 @@ const fetchServiceFlow = async (serviceId: string): Promise<ServiceFlowLookup | 
   }
 };
 
+export interface ServicesFilters {
+  readonly search: string;
+  readonly state: string;
+  readonly dependencies: 'all' | 'yes' | 'no';
+}
+
+export const DEFAULT_SERVICES_FILTERS: ServicesFilters = { search: '', state: '', dependencies: 'all' };
+
+export type ServicesLoadState = 'loading' | 'success' | 'error';
+
+let latestServicesRequestId = 0;
+
+const toSortingParam = (sorting: SortingState): string => {
+  if (sorting.length === 0) return '';
+  const order = sorting[0].desc ? 'desc' : 'asc';
+  return `${sorting[0].id} ${order}`;
+};
+
+const mapService = (item: any, isPinned: boolean): Service => ({
+  id: item.id,
+  name: item.name,
+  description: item.description,
+  examples: item.examples ?? [],
+  entities: item.entities ?? [],
+  slot: item.slot,
+  state: item.state,
+  type: item.type,
+  serviceId: item.serviceId,
+  totalPages: item.totalPages ?? 1,
+  totalCount: item.totalCount ?? 0,
+  indexStatus: item.indexStatus ?? null,
+  incomingCount: item.incomingCount ?? 0,
+  outgoingCount: item.outgoingCount ?? 0,
+  problemCount: item.problemCount ?? 0,
+  isPinned,
+  endpoints: [],
+});
+
 interface ServiceStoreState {
   services: Service[];
-  commonServices: Service[];
-  notCommonServices: Service[];
+  pinnedServices: Service[];
+  servicesTotalCount: number;
+  servicesTotalPages: number;
   servicesPagination: PaginationState;
   servicesSorting: SortingState;
-  commonServicesPagination: PaginationState;
-  commonServicesSorting: SortingState;
+  servicesFilters: ServicesFilters;
+  servicesVersion: number;
+  servicesLoadState: ServicesLoadState;
+  isRefreshingServices: boolean;
   orientation: 'horizontal' | 'vertical';
   toggleOrientation: () => void;
   autoView: boolean;
   toggleAutoView: () => void;
-  loadServicesList: (pagination: PaginationState, sorting: SortingState) => Promise<void>;
-  loadCommonServicesList: (pagination: PaginationState, sorting: SortingState) => Promise<void>;
-  deleteService: (id: string) => void;
+  loadServicesList: (pagination: PaginationState, sorting: SortingState, filters?: ServicesFilters) => Promise<void>;
+  togglePinService: (service: Service) => Promise<void>;
+  loadServiceDependencies: (serviceId: string) => Promise<ServiceDependency[]>;
+  locateService: (
+    serviceId: string,
+    pageSize: number,
+    sorting: SortingState,
+    filters: ServicesFilters,
+  ) => Promise<ServiceLocation | undefined>;
   selectedService: Service | undefined;
   setSelectedService: (service: Service) => void;
   loadActivationBlockers: (service: Service) => Promise<ActivationBlocker[]>;
+  loadAffectedActiveServices: (serviceId: string) => Promise<AffectedService[]>;
   changeServiceState: (
     onEnd: () => void,
     successMessage: string,
@@ -69,12 +124,15 @@ const useServiceListStore = create<ServiceStoreState>()(
   persist(
     (set, get) => ({
       services: [],
-      commonServices: [],
-      notCommonServices: [],
+      pinnedServices: [],
+      servicesTotalCount: 0,
+      servicesTotalPages: 1,
       servicesPagination: { pageIndex: 0, pageSize: 10 },
-      servicesSorting: [{ id: 'name', desc: false }],
-      commonServicesPagination: { pageIndex: 0, pageSize: 10 },
-      commonServicesSorting: [{ id: 'name', desc: false }],
+      servicesSorting: [],
+      servicesFilters: DEFAULT_SERVICES_FILTERS,
+      servicesVersion: 0,
+      servicesLoadState: 'loading',
+      isRefreshingServices: false,
       orientation: 'vertical',
       autoView: false,
       toggleAutoView: () =>
@@ -85,73 +143,89 @@ const useServiceListStore = create<ServiceStoreState>()(
         set((state) => ({
           orientation: state.orientation === 'horizontal' ? 'vertical' : 'horizontal',
         })),
-      loadServicesList: async (pagination, sorting) => {
-        const order = sorting[0]?.desc ? 'desc' : 'asc';
-        const sort = sorting.length === 0 ? 'name asc' : sorting[0]?.id + ' ' + order;
-        const result = await api.post(getServicesList(), {
-          page: pagination.pageIndex + 1,
-          page_size: pagination.pageSize,
-          sorting: sort,
-          is_common: false,
-          search: '',
-        });
-        const services =
-          result.data.response[0].map?.((item: any) => ({
-            id: item.id,
-            name: item.name,
-            description: item.description,
-            slot: item.slot,
-            state: item.state,
-            type: item.type,
-            isCommon: item.iscommon,
-            serviceId: item.serviceId,
-            usedCount: 0,
-            totalPages: item.totalPages,
-            endpoints: [],
-          })) ?? [];
+      loadServicesList: async (pagination, sorting, filters = get().servicesFilters) => {
+        const requestId = ++latestServicesRequestId;
+        if (get().servicesLoadState === 'success') set({ isRefreshingServices: true });
+        else set({ servicesLoadState: 'loading' });
+
+        let result;
+        try {
+          result = await api.post(getServicesOverview(), {
+            page: pagination.pageIndex + 1,
+            page_size: pagination.pageSize,
+            sorting: toSortingParam(sorting),
+            search: filters.search,
+            state: filters.state,
+            dependencies: filters.dependencies,
+          });
+        } catch (error) {
+          if (requestId === latestServicesRequestId) set({ servicesLoadState: 'error', isRefreshingServices: false });
+          throw error;
+        }
+        if (requestId !== latestServicesRequestId) return;
+
+        const response = result.data.response ?? {};
+        const services: Service[] = (response.services ?? []).map((item: any) => mapService(item, false));
+        const pinnedServices: Service[] = (response.pinned ?? []).map((item: any) => mapService(item, true));
         set({
-          notCommonServices: services,
+          services,
+          pinnedServices,
+          servicesTotalCount: services[0]?.totalCount ?? 0,
+          servicesTotalPages: Math.max(services[0]?.totalPages ?? 1, 1),
           servicesPagination: pagination,
           servicesSorting: sorting,
+          servicesFilters: filters,
+          servicesVersion: get().servicesVersion + 1,
+          servicesLoadState: 'success',
+          isRefreshingServices: false,
         });
       },
-      loadCommonServicesList: async (pagination, sorting) => {
-        const order = sorting[0]?.desc ? 'desc' : 'asc';
-        const sort = sorting.length === 0 ? 'id asc' : sorting[0]?.id + ' ' + order;
-        const result = await api.post(getServicesList(), {
-          page: pagination.pageIndex + 1,
-          page_size: pagination.pageSize,
-          sorting: sort,
-          is_common: true,
-          search: '',
-        });
-        const services =
-          result.data.response[0].map?.((item: any) => ({
-            id: item.id,
-            name: item.name,
-            description: item.description,
-            state: item.state,
-            type: item.type,
-            isCommon: item.iscommon,
-            serviceId: item.serviceId,
-            totalPages: item.totalPages,
-            usedCount: 0,
-            endpoints: [],
-            slot: '',
-          })) ?? [];
-
-        set({
-          commonServices: services,
-          commonServicesPagination: pagination,
-          commonServicesSorting: sorting,
-        });
+      loadServiceDependencies: async (serviceId) => {
+        const result = await api.post(getServiceDependencies(), { service_id: serviceId });
+        return (result.data.response ?? []).map((item: any): ServiceDependency => ({
+          direction: item.direction,
+          serviceId: item.serviceId,
+          name: item.name,
+          state: item.state ?? null,
+          type: item.type ?? null,
+          deleted: !!item.deleted,
+          incomingCount: item.incomingCount ?? 0,
+          outgoingCount: item.outgoingCount ?? 0,
+        }));
       },
-      deleteService: (id) => {
-        const services = get().services.filter((e: Service) => e.serviceId !== id);
-        set({
-          commonServices: services.filter((e: Service) => e.isCommon),
-          notCommonServices: services.filter((e: Service) => !e.isCommon),
+      locateService: async (serviceId, pageSize, sorting, filters) => {
+        const result = await api.post(locateServiceApi(), {
+          service_id: serviceId,
+          page_size: pageSize,
+          sorting: toSortingParam(sorting),
+          search: filters.search,
+          state: filters.state,
+          dependencies: filters.dependencies,
         });
+        const location = result.data.response;
+        if (!location?.serviceId) return undefined;
+        return {
+          serviceId: location.serviceId,
+          pinned: !!location.pinned,
+          page: location.page == null ? null : Number(location.page),
+        };
+      },
+      togglePinService: async (service) => {
+        const { servicesPagination, servicesSorting, pinnedServices, services } = get();
+        const pin = !service.isPinned;
+        set({
+          pinnedServices: pin
+            ? [...pinnedServices, { ...service, isPinned: true }]
+            : pinnedServices.filter((s) => s.serviceId !== service.serviceId),
+          services: pin ? services.filter((s) => s.serviceId !== service.serviceId) : services,
+        });
+        try {
+          await api.post(pin ? pinServiceApi() : unpinServiceApi(), { service_id: service.serviceId });
+        } catch (error) {
+          console.error(error);
+          useToastStore.getState().error({ title: i18n.t('overview.service.toast.failed.pin') });
+        }
+        await get().loadServicesList(servicesPagination, servicesSorting);
       },
       selectedService: undefined,
       setSelectedService: (service: Service) => {
@@ -164,6 +238,8 @@ const useServiceListStore = create<ServiceStoreState>()(
         if (!rootFlow) return [];
         return findActivationBlockers(rootFlow.nodes, fetchServiceFlow);
       },
+      loadAffectedActiveServices: (serviceId: string) =>
+        findAffectedActiveServices(serviceId, get().loadServiceDependencies),
       changeServiceState: async (onEnd, successMessage, errorMessage, activate, draft, pagination, sorting) => {
         const selectedService = get().selectedService;
         if (!selectedService) return;
@@ -187,7 +263,6 @@ const useServiceListStore = create<ServiceStoreState>()(
           });
           useToastStore.getState().success({ title: successMessage });
           await useServiceListStore.getState().loadServicesList(pagination, sorting);
-          await useServiceListStore.getState().loadCommonServicesList(pagination, sorting);
         } catch (error) {
           console.error(error);
           useToastStore.getState().error({ title: errorMessage });

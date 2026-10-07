@@ -204,7 +204,6 @@ interface SaveFlowConfig {
   slot: string;
   examples: string[];
   entities: string[];
-  isCommon: boolean;
   serviceId: string;
   isNewService: boolean;
   status: 'draft' | 'ready';
@@ -296,7 +295,6 @@ export const saveFlow = async ({
   slot,
   examples,
   entities,
-  isCommon,
   serviceId,
   isNewService,
   status = 'ready',
@@ -326,7 +324,6 @@ export const saveFlow = async ({
         slot,
         examples,
         entities,
-        isCommon,
         nodes,
         edges,
         isNewService,
@@ -361,7 +358,6 @@ export const saveFlow = async ({
             slot,
             examples,
             entities,
-            isCommon,
             nodes,
             edges,
             isNewService,
@@ -386,7 +382,7 @@ async function saveService(
   status: 'draft' | 'ready' = 'ready',
   onError?: (e: any) => void,
 ) {
-  const { isNewService, serviceId, name, description, slot, examples, entities, isCommon, edges, nodes } = config;
+  const { isNewService, serviceId, name, description, slot, examples, entities, edges, nodes } = config;
   if (updateServiceDb) {
     useServiceStore.getState().changeServiceName(removeTrailingUnderscores(name));
   }
@@ -402,7 +398,6 @@ async function saveService(
         entities,
         type: 'POST',
         content: content,
-        isCommon,
         structure: JSON.stringify({
           edges: edges.map(({ selected: _selected, ...edge }) => edge),
           nodes: nodes.map(({ selected: _selected, ...node }) => node),
@@ -528,6 +523,11 @@ export function getYamlContent(
           field: 'input',
           type: 'object',
           description: 'The Input from the user',
+        },
+        {
+          field: 'testMode',
+          type: 'boolean',
+          description: 'Set only by the canvas Test Widget to allow draft and ready Next Service targets',
         },
       ],
     },
@@ -1089,6 +1089,7 @@ function handleJumpToServiceStep(parentNode: Node<NodeDataProps>, finishedFlow: 
       authorId: "${authorId ?? ''}",
       serviceName: parentNode.data.jumpToService?.serviceName ?? '',
       input: (parentNode.data.jumpToService?.input ?? []).map((e: Assign) => normalizeAssignValue(e.value)),
+      testMode: "${incoming.body.testMode === true || incoming.body.testMode === 'true'}",
     },
     result: resultName,
     next: returnStepName,
@@ -1220,7 +1221,6 @@ export const saveFlowClick = async (status: 'draft' | 'ready' = 'ready', showErr
   const slot = useServiceStore.getState().slot;
   const examples = useServiceStore.getState().examples;
   const entities = useServiceStore.getState().entities;
-  const isCommon = useServiceStore.getState().isCommon;
   const isNewService = useServiceStore.getState().isNewService;
   const edges = useServiceStore.getState().edges;
   const nodes = useServiceStore.getState().nodes as Node<NodeDataProps>[];
@@ -1246,7 +1246,6 @@ export const saveFlowClick = async (status: 'draft' | 'ready' = 'ready', showErr
     slot,
     examples,
     entities,
-    isCommon,
     serviceId,
     isNewService,
     status,
