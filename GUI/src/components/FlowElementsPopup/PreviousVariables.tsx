@@ -424,7 +424,7 @@ const VariableSection = ({
         borderBottom: assignedObjectTree ? undefined : border,
       }}
     >
-      <label htmlFor="json" style={{ marginBottom: '10px', textTransform: 'capitalize', cursor: 'auto' }}>
+      <label htmlFor="json" style={{ marginBottom: '10px', cursor: 'auto' }}>
         {title}
       </label>
       <Track direction="horizontal" gap={4} justify="start" isMultiline style={{ maxHeight: '30vh', overflow: 'auto' }}>
