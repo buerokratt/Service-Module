@@ -54,6 +54,7 @@ const EndpointOpenAPI: React.FC<EndpointOpenAPIProps> = ({
   const [openApiEndpoints, setOpenApiEndpoints] = useState<EndpointDefinition[]>(endpoint.definitions ?? []);
   const [key, setKey] = useState<number>(0);
   const [isTesting, setIsTesting] = useState(false);
+  const [isFetchingEndpoints, setIsFetchingEndpoints] = useState(false);
   const [responseContent, setResponseContent] = useState<string | null>(endpoint.responseSchema ?? null);
   const [isResponseOpen, setIsResponseOpen] = useState(!!endpoint.responseSchema);
   const { t } = useTranslation();
@@ -339,8 +340,10 @@ const EndpointOpenAPI: React.FC<EndpointOpenAPIProps> = ({
             onChange={(e) => setOpenApiUrl(e.target.value)}
           />
           <Button
+            appearance={isFetchingEndpoints ? 'loading' : 'primary'}
             onClick={() => {
-              void fetchOpenApiSpecMock();
+              setIsFetchingEndpoints(true);
+              void fetchOpenApiSpecMock().finally(() => setIsFetchingEndpoints(false));
             }}
           >
             {t('newService.endpoint.ask')}
