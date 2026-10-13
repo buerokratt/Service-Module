@@ -32,6 +32,7 @@ import {
   EndpointDefinition,
   EndpointEnv,
   EndpointTab,
+  EndpointVariableData,
   PreDefinedEndpointEnvVariables,
 } from 'types/endpoint';
 import { EndpointResponseVariable } from 'types/endpoint/endpoint-response-variables';
@@ -1001,11 +1002,20 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
   canRedo: () => get().historyIndex < get().history.length - 1,
 }));
 
+const UNRESOLVED_PLACEHOLDER_REGEX = /(?<!\$)\{([^{}]+)\}/g;
+
+export function findUnresolvedPathPlaceholder(url: string): string | undefined {
+  return [...url.split('?')[0].matchAll(UNRESOLVED_PLACEHOLDER_REGEX)][0]?.[1];
+}
+
 export function buildExplainRequest(endpoint: EndpointDefinition) {
   let url = endpoint.url || '';
   const allParams = endpoint.params?.variables ?? [];
-  const pathParams = allParams.filter((p) => p.paramType === 'path');
-  const queryParams = allParams.filter((p) => p.paramType !== 'path');
+  const placeholderNames = new Set([...url.split('?')[0].matchAll(UNRESOLVED_PLACEHOLDER_REGEX)].map((m) => m[1]));
+  const isPathParam = (p: EndpointVariableData) =>
+    p.paramType === 'path' || p.in === 'path' || placeholderNames.has(p.name);
+  const pathParams = allParams.filter(isPathParam);
+  const queryParams = allParams.filter((p) => !isPathParam(p));
   for (const param of pathParams) {
     if (param.value?.trim()) {
       url = url.split(`{${param.name}}`).join(encodeURIComponent(param.value));
