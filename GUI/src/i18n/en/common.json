@@ -565,10 +565,10 @@
       },
       "noName": "<No name>",
       "environmentVariables": {
-        "title": "Environment Variables"
+        "title": "Environment variables"
       },
       "apiResponses": {
-        "title": "API Responses"
+        "title": "API responses"
       },
       "helpers": {
         "title": "Tools",

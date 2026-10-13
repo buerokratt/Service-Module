@@ -1323,7 +1323,7 @@ describe('reportNextServiceTestError', () => {
     const mockTestStore = vi.mocked((await import('store/test-services.store')).default);
     (mockTestStore as any).getState.mockReturnValue({ addError: mockAddError });
     vi.mocked(t).mockImplementation(((key: string, options?: { defaultValue?: string }) =>
-      options?.defaultValue ? `${key}|${options.defaultValue}` : key) as any);
+      options?.defaultValue ? `${key}|${options.defaultValue}` : key) as unknown as typeof t);
   });
 
   it('should report an unavailable target with its name and translated state', () => {
