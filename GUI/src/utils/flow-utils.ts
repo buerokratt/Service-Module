@@ -47,6 +47,16 @@ export const generateUniqueId = () => {
   return crypto.randomUUID();
 };
 
+export const getEndpointResultName = (node: Node, nodes: Node[]): string => {
+  const endpointName = (node.data as NodeDataProps).endpoint?.name ?? '';
+  const baseName = endpointName.replaceAll(' ', '_');
+  const firstNode = nodes.find(
+    (n) => n.data.stepType === StepType.UserDefined && (n.data as NodeDataProps).endpoint?.name === endpointName,
+  );
+  if (!firstNode || firstNode.id === node.id) return `${baseName}_res`;
+  return `${baseName}_${node.id.replaceAll('-', '').slice(0, 8)}_res`;
+};
+
 export const generateUniqueLabel = (originalLabel: string, existingNodes: Node[]): string => {
   const parts = originalLabel.split(' - ');
   const baseLabel = parts.length > 1 ? parts.slice(0, -1).join(' - ') : originalLabel;

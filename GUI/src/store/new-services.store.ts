@@ -44,6 +44,7 @@ import {
 } from 'types/request-variables';
 import { initialEdges, initialNodes, NodeDataProps } from 'types/service-flow';
 import { validateFlowCompleteness } from 'utils/flow-completeness';
+import { getEndpointResultName } from 'utils/flow-utils';
 import { formatSchema } from 'utils/json-request-utils';
 import { v4 as uuid } from 'uuid';
 import { create } from 'zustand';
@@ -334,15 +335,17 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
       });
 
       const variables: EndpointResponseVariable[] = [];
+      const allNodes = instance.getNodes();
 
       response.data.response.forEach((res, i) => {
         const endpoint = endpointsFromNodes[i];
+        const resultName = getEndpointResultName(endpointNodes[i], allNodes);
         const chips: Chip[] = [];
 
         for (const [key, value] of Object.entries(res)) {
           chips.push({
             name: key,
-            value: `${endpoint?.name.replace(' ', '_')}_res.response.body.${key}`,
+            value: `${resultName}.response.body.${key}`,
             data: value,
           });
         }
@@ -350,25 +353,26 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
         chips.push(
           {
             name: 'Base Response',
-            value: `${endpoint?.name.replaceAll(' ', '_')}_res.response.body`,
-            data: `${endpoint?.name.replaceAll(' ', '_')}_res.response.body`,
+            value: `${resultName}.response.body`,
+            data: `${resultName}.response.body`,
           },
           {
             name: 'Status Code',
-            value: `${endpoint?.name.replaceAll(' ', '_')}_res.response.statusCodeValue`,
-            data: `${endpoint?.name.replaceAll(' ', '_')}_res.response.statusCodeValue`,
+            value: `${resultName}.response.statusCodeValue`,
+            data: `${resultName}.response.statusCodeValue`,
           },
         );
 
         const variable: EndpointResponseVariable = {
           name: endpoint?.name ?? '',
+          nodeId: endpointNodes[i].id,
           chips: chips,
         };
 
         variables.push(variable);
       });
 
-      const uniqueVariables = Array.from(new Map(variables.map((variable) => [variable.name, variable])).values());
+      const uniqueVariables = Array.from(new Map(variables.map((variable) => [variable.nodeId, variable])).values());
 
       set({ endpointsResponseVariables: uniqueVariables });
     } catch (e) {
