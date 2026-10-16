@@ -1,3 +1,4 @@
+import { relativeApiPath } from './requestRouting';
 import axios, { AxiosError } from 'axios';
 
 const instance = axios.create({
@@ -8,6 +9,11 @@ const instance = axios.create({
     'Cache-Control': 'no-cache, no-store, must-revalidate',
   },
   withCredentials: true,
+});
+
+instance.interceptors.request.use((request) => {
+  request.url = relativeApiPath(request.baseURL || '', request.url || '');
+  return request;
 });
 
 instance.interceptors.response.use(

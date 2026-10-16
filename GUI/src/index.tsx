@@ -1,3 +1,4 @@
+import { isAccountRequest } from './services/requestRouting';
 import { coordinateAuthenticatedRequests } from './services/authenticatedAdapter';
 import headerApi from '@buerokratt-ria/header/src/services/api';
 import headerPrivateApi from '@buerokratt-ria/header/src/services/api-dev';
@@ -34,7 +35,8 @@ const defaultQueryFn: QueryFunction | undefined = async ({ queryKey }) => {
       });
       return data;
     } else {
-      const { data } = await apiDev.get(queryKey[0] as string);
+      const path = queryKey[0] as string;
+      const { data } = await (isAccountRequest(path) ? auth : apiDev).get(path);
       return data;
     }
   }

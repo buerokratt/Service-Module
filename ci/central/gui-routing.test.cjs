@@ -1,0 +1,21 @@
+const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const vm = require('node:vm');
+const ts = require('/app/node_modules/typescript');
+const output = ts.transpileModule(fs.readFileSync('/app/src/services/requestRouting.ts','utf8'), {compilerOptions:{module:ts.ModuleKind.CommonJS}}).outputText;
+const sandbox={exports:{}};
+vm.runInNewContext(output,sandbox);
+const r=sandbox.exports;
+assert.equal(r.isAccountRequest('/accounts/user-role'), true);
+assert.equal(r.isAccountRequest('accounts/customer-support-activity'), true);
+assert.equal(r.isAccountRequest('auth/jwt/userinfo'), true);
+assert.equal(r.isAccountRequest('/agency/all'), false);
+assert.equal(r.isAccountRequest('/services/overview'), false);
+assert.equal(r.relativeApiPath('/api/private/services','/api/private/services/services/overview'), '/services/overview');
+assert.equal(r.relativeApiPath('/api/private/services','/services/overview'), '/services/overview');
+assert.equal(r.relativeApiPath('/api/private/services','/api/private/backoffice/auth/jwt/userinfo'), '/api/private/backoffice/auth/jwt/userinfo');
+console.log('GUI routing contracts PASS');
+
+const axios = require('/app/node_modules/axios/dist/node/axios.cjs');
+const client = axios.create({baseURL:'/api/private/services'});
+assert.equal(client.getUri({url:r.relativeApiPath(client.defaults.baseURL,'/api/private/services/services/overview')}), '/api/private/services/services/overview');

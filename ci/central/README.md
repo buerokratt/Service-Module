@@ -14,3 +14,5 @@ The cluster pull identity also needs read access to every resulting package.
 
 NoOps locks these exact source commits and assembles the operator package. Build
 outputs and credentials are ignored; keep local operator bindings outside Git.
+
+Run-2 acceptance fixes: Route shared account/auth queries to backoffice. Normalize already-prefixed same-API URLs before Axios concatenation, retaining other endpoint paths. Routing contracts run before asset build.

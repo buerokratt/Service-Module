@@ -1,3 +1,4 @@
+import { relativeApiPath } from './requestRouting';
 import { coordinateAuthenticatedRequests } from './authenticatedAdapter';
 import axios, { AxiosError, AxiosRequestConfig } from 'axios';
 
@@ -26,6 +27,11 @@ export const createApiInstance = (additionalHeaders?: Record<string, string>) =>
   coordinateAuthenticatedRequests(client);
   return client;
 };
+
+instance.interceptors.request.use((request) => {
+  request.url = relativeApiPath(request.baseURL || '', request.url || '');
+  return request;
+});
 
 instance.interceptors.response.use(
   (response) => {
