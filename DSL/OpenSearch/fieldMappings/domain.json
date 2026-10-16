@@ -15,7 +15,7 @@
         }
       },
       "intents": {
-        "type": "array",
+        "type": "object",
         "properties": {
           "name": {
             "type": "text"
@@ -23,7 +23,7 @@
         }
       },
       "entities": {
-        "type": "array",
+        "type": "object",
         "properties": {
           "name": {
             "type": "text"
@@ -41,7 +41,7 @@
                 "type": "boolean"
               },
               "mappings": {
-                "type": "array",
+                "type": "object",
                 "properties": {
                   "type": {
                     "type": "text"
@@ -65,13 +65,13 @@
                 "type": "boolean"
               },
               "mappings": {
-                "type": "array",
+                "type": "object",
                 "properties": {
                   "type": {
                     "type": "text"
                   },
                   "conditions": {
-                    "type": "array",
+                    "type": "object",
                     "properties": {
                       "active_loop": {
                         "type": "text"
@@ -92,7 +92,7 @@
           "custom_fallback_form": {
             "properties": {
               "required_slots": {
-                "type": "array",
+                "type": "object",
                 "properties": {
                   "slot": {
                     "type": "text"
@@ -104,7 +104,7 @@
           "direct_to_customer_support_form": {
             "properties": {
               "required_slots": {
-                "type": "array",
+                "type": "object",
                 "properties": {
                   "slot": {
                     "type": "text"
@@ -116,7 +116,7 @@
         }
       },
       "actions": {
-        "type": "array",
+        "type": "object",
         "properties": {
           "action": {
             "type": "text"
@@ -153,14 +153,14 @@
               }
             }
           },
-          "utter_common_hüvasti_jätmine": {
+          "utter_common_h\u00fcvasti_j\u00e4tmine": {
             "properties": {
               "text": {
                 "type": "text"
               }
             }
           },
-          "utter_common_tänamine": {
+          "utter_common_t\u00e4namine": {
             "properties": {
               "text": {
                 "type": "text"

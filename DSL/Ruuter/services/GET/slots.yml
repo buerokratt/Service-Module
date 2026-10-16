@@ -21,6 +21,6 @@ getSlots:
   result: getSlotsResult
 
 returnSuccess:
-  return: ${getSlotsResult.response.body.hits.hits[0].fields.filtered_items[0]}
+  return: ${getSlotsResult.response.body.hits.hits[0]?.fields?.filtered_items?.[0] ?? []}
   wrapper: false
   next: end

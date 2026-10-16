@@ -1,3 +1,4 @@
+import { coordinateAuthenticatedRequests } from './authenticatedAdapter';
 import axios, { AxiosError } from 'axios';
 
 let url = import.meta.env.REACT_APP_RUUTER_API_URL;
@@ -29,3 +30,5 @@ instance.interceptors.response.use(
 );
 
 export default instance;
+
+coordinateAuthenticatedRequests(instance);

@@ -1,3 +1,6 @@
+import { coordinateAuthenticatedRequests } from './services/authenticatedAdapter';
+import headerApi from '@buerokratt-ria/header/src/services/api';
+import headerPrivateApi from '@buerokratt-ria/header/src/services/api-dev';
 import { QueryClient, QueryClientProvider, QueryFunction } from '@tanstack/react-query';
 import React from 'react';
 import { createRoot } from 'react-dom/client';
@@ -64,3 +67,6 @@ root.render(
     </QueryClientProvider>
   </React.StrictMode>,
 );
+
+coordinateAuthenticatedRequests(headerApi);
+coordinateAuthenticatedRequests(headerPrivateApi);

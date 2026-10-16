@@ -1,3 +1,4 @@
+import { coordinateAuthenticatedRequests } from './authenticatedAdapter';
 import axios, { AxiosError, AxiosRequestConfig } from 'axios';
 
 const defaultConfig = {
@@ -21,7 +22,9 @@ export const createApiInstance = (additionalHeaders?: Record<string, string>) =>
     },
   };
 
-  return axios.create(config);
+  const client = axios.create(config);
+  coordinateAuthenticatedRequests(client);
+  return client;
 };
 
 instance.interceptors.response.use(
@@ -34,3 +37,5 @@ instance.interceptors.response.use(
 );
 
 export default instance;
+
+coordinateAuthenticatedRequests(instance);

@@ -1,0 +1,10 @@
+{
+  "service-gui": {
+    "dockerfile": "ci/central/service-gui.Dockerfile",
+    "context": "."
+  },
+  "servicePipeline": {
+    "dockerfile": "ci/central/servicePipeline.Dockerfile",
+    "context": "."
+  }
+}

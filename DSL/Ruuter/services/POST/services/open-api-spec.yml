@@ -16,7 +16,18 @@ check_for_required_parameters:
   switch:
     - condition: ${incoming.body == null || incoming.body.url == null}
       next: return_incorrect_request
-  next: get_spec
+  next: validate_origin
+
+validate_origin:
+  switch:
+    - condition: ${typeof(incoming.body.url) === "string" && incoming.body.url.length <= 2048 && "[#SERVICE_OPENAPI_ALLOWED_ORIGINS]".split(",").includes(incoming.body.url.split("/").slice(0, 3).join("/")) && !incoming.body.url.split("/")[2].includes("@")}
+      next: get_spec
+  next: return_disallowed_origin
+
+return_disallowed_origin:
+  status: 403
+  return: "OpenAPI origin is not configured for this test deployment"
+  next: end
 
 get_spec:
   call: http.get
