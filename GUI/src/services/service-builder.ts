@@ -10,6 +10,7 @@ import useToastStore from 'store/toasts.store';
 import { StepType } from 'types';
 import { Assign } from 'types/assign';
 import { NodeDataProps } from 'types/service-flow';
+import { getEndpointResultName } from 'utils/flow-utils';
 import {
   decodeHtmlEntities,
   getLastDigits,
@@ -589,7 +590,7 @@ export function getYamlContent(
       }
 
       if (parentNode.data.stepType === StepType.UserDefined) {
-        return handleEndpointStep(parentNode, finishedFlow, parentStepName, childNode, nonceStepsNeeded);
+        return handleEndpointStep(parentNode, nodes, finishedFlow, parentStepName, childNode, nonceStepsNeeded);
       }
 
       if (parentNode.data.stepType === StepType.JumpToService) {
@@ -861,6 +862,7 @@ function normalizeAssignValue(value: string): string {
 
 function handleEndpointStep(
   parentNode: Node<NodeDataProps>,
+  nodes: Node[],
   finishedFlow: Map<any, any>,
   parentStepName: string,
   childNode: Node<NodeDataProps> | undefined,
@@ -883,7 +885,7 @@ function handleEndpointStep(
     args: {
       url: resolvedUrl,
     },
-    result: `${parentNode.data.endpoint?.name.replaceAll(' ', '_')}_res`,
+    result: getEndpointResultName(parentNode, nodes),
     next: childNode ? toSnakeCase(childNode.data.label ?? 'format_messages') : 'format_messages',
   };
 

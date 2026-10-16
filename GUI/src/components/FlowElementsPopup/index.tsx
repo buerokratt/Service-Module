@@ -291,7 +291,7 @@ const FlowElementsPopup: React.FC = () => {
       }
       updatedNode.data.label = newLabel.join(' ');
     }
-    useServiceStore.getState().loadEndpointsResponseVariables();
+    setTimeout(() => useServiceStore.getState().loadEndpointsResponseVariables(), 0);
   };
 
   const filterOutEndpointsTrailingUnderscores = (updatedNode: Node<NodeDataProps>) => {
