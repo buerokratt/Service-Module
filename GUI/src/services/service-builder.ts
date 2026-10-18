@@ -331,7 +331,6 @@ export const saveFlow = async ({
       } as SaveFlowConfig,
       true,
       status,
-      onError,
     );
 
     for (const mcqNode of mcqNodes) {
@@ -381,7 +380,6 @@ async function saveService(
   config: SaveFlowConfig,
   updateServiceDb: boolean,
   status: 'draft' | 'ready' = 'ready',
-  onError?: (e: any) => void,
 ) {
   const { isNewService, serviceId, name, description, slot, examples, entities, edges, nodes } = config;
   if (updateServiceDb) {
@@ -411,8 +409,7 @@ async function saveService(
           location: `${import.meta.env.REACT_APP_RUUTER_SERVICES_POST_PATH}/${name}.yml`,
         },
       },
-    )
-    .catch(onError);
+    );
 }
 
 const validateMCQ = (node: NodeDataProps | undefined) => {

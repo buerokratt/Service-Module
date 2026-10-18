@@ -3,8 +3,10 @@ import { StepType } from 'types';
 import { NodeDataProps } from 'types/service-flow';
 import { describe, expect, it, vi } from 'vitest';
 
+import api from './api-dev';
 import {
   getYamlContent,
+  saveFlow,
   validateAssign,
   validateCondition,
   validateDynamicChoices,
@@ -20,6 +22,10 @@ vi.mock('i18next', () => ({
     t: vi.fn((key: string) => key),
   },
   t: vi.fn((key: string) => key),
+}));
+
+vi.mock('./api-dev', () => ({
+  default: { post: vi.fn() },
 }));
 
 describe('Validation Functions', () => {
@@ -497,5 +503,45 @@ describe('Jump to service step', () => {
     expect(result.järgmine_teenus_1.body.testMode).toBe(
       "${incoming.body.testMode === true || incoming.body.testMode === 'true'}",
     );
+  });
+});
+
+describe('saveFlow', () => {
+  const saveConfig = (onSuccess = vi.fn(), onError = vi.fn()) => ({
+    name: 'test_service',
+    edges: [] as Edge[],
+    nodes: [] as Node<NodeDataProps>[],
+    onSuccess,
+    onError,
+    description: '',
+    slot: '',
+    examples: [],
+    entities: [],
+    serviceId: '1',
+    isNewService: true,
+  });
+
+  it('calls onSuccess when the service is saved', async () => {
+    vi.mocked(api.post).mockResolvedValueOnce({ data: {} });
+    const onSuccess = vi.fn();
+    const onError = vi.fn();
+
+    await saveFlow(saveConfig(onSuccess, onError));
+
+    expect(onSuccess).toHaveBeenCalledTimes(1);
+    expect(onError).not.toHaveBeenCalled();
+  });
+
+  it('does not call onSuccess when saving fails (e.g. duplicate service name)', async () => {
+    const error = { response: { status: 409 }, message: 'Conflict' };
+    vi.mocked(api.post).mockRejectedValueOnce(error);
+    const onSuccess = vi.fn();
+    const onError = vi.fn();
+
+    await expect(saveFlow(saveConfig(onSuccess, onError))).rejects.toBe(error);
+
+    expect(onError).toHaveBeenCalledTimes(1);
+    expect(onError).toHaveBeenCalledWith(error);
+    expect(onSuccess).not.toHaveBeenCalled();
   });
 });
