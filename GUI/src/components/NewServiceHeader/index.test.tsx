@@ -32,16 +32,24 @@ vi.mock('react-router-dom', async () => {
   return { ...actual, useNavigate: () => mockNavigate };
 });
 
-const renderHeader = () =>
+const renderHeader = ({ path = '/edit/current-service-id', saveOnClick = vi.fn() } = {}) =>
   render(
-    <MemoryRouter initialEntries={['/edit/current-service-id']}>
+    <MemoryRouter initialEntries={[path]}>
       <Routes>
-        <Route
-          path="/edit/:id"
-          element={
-            <NewServiceHeader activeStep={1} backOnClick={vi.fn()} continueOnClick={vi.fn()} saveOnClick={vi.fn()} />
-          }
-        />
+        {['/edit/:id', '/newService'].map((routePath) => (
+          <Route
+            key={routePath}
+            path={routePath}
+            element={
+              <NewServiceHeader
+                activeStep={1}
+                backOnClick={vi.fn()}
+                continueOnClick={vi.fn()}
+                saveOnClick={saveOnClick}
+              />
+            }
+          />
+        ))}
       </Routes>
     </MemoryRouter>,
   );
@@ -181,5 +189,108 @@ describe('NewServiceHeader returning a service to Draft', () => {
 
     await waitFor(() => expect(mockNavigate).toHaveBeenCalledWith('/edit/a'));
     expect(onServiceSave).not.toHaveBeenCalled();
+  });
+});
+
+describe('NewServiceHeader unsaved changes indicator', () => {
+  const onServiceSave = vi.fn();
+  const queryDot = () => screen.queryByRole('img', { name: 'newService.unsavedChangesIndicator' });
+
+  beforeEach(() => {
+    mockNavigate.mockClear();
+    onServiceSave.mockReset().mockResolvedValue(undefined);
+    vi.mocked(api.post).mockReset();
+    useServiceStore.setState({
+      hasUnsavedChanges: false,
+      nextLocation: null,
+      name: 'Current Service',
+      serviceId: 'current-service-id',
+      serviceState: ServiceState.Draft,
+      onServiceSave,
+    });
+  });
+
+  it('hides the dot for a saved service with no changes', () => {
+    renderHeader();
+
+    expect(queryDot()).not.toBeInTheDocument();
+  });
+
+  it('shows the dot for a saved service with unsaved changes', () => {
+    useServiceStore.setState({ hasUnsavedChanges: true });
+    renderHeader();
+
+    expect(queryDot()).toBeInTheDocument();
+  });
+
+  it('shows the dot for a new service', () => {
+    renderHeader({ path: '/newService' });
+
+    expect(queryDot()).toBeInTheDocument();
+  });
+
+  it('does not change whether Save is enabled', () => {
+    useServiceStore.setState({ hasUnsavedChanges: true });
+    renderHeader();
+
+    expect(screen.getByRole('button', { name: /global\.save/ })).toBeEnabled();
+  });
+
+  it('keeps the dot when the save fails', async () => {
+    useServiceStore.setState({ hasUnsavedChanges: true });
+    onServiceSave.mockRejectedValue(new Error('save failed'));
+    const saveOnClick = vi.fn();
+    const user = userEvent.setup();
+    renderHeader({ saveOnClick });
+
+    await user.click(screen.getByRole('button', { name: /global\.save/ }));
+
+    await waitFor(() => expect(onServiceSave).toHaveBeenCalled());
+    expect(saveOnClick).not.toHaveBeenCalled();
+    expect(useServiceStore.getState().hasUnsavedChanges).toBe(true);
+    expect(queryDot()).toBeInTheDocument();
+  });
+
+  it('keeps the dot when the save is blocked by a missing name', async () => {
+    useServiceStore.setState({ hasUnsavedChanges: true, name: '' });
+    const user = userEvent.setup();
+    renderHeader();
+
+    await user.click(screen.getByRole('button', { name: /global\.save/ }));
+
+    expect(onServiceSave).not.toHaveBeenCalled();
+    expect(queryDot()).toBeInTheDocument();
+  });
+
+  it('keeps the dot and the Active status when the dependency confirmation is cancelled', async () => {
+    useServiceStore.setState({ hasUnsavedChanges: true, serviceState: ServiceState.Active });
+    vi.mocked(api.post).mockResolvedValue({
+      data: {
+        response: [
+          { direction: 'incoming', serviceId: 'a', name: 'Service a', state: 'active', type: 'POST', deleted: false },
+        ],
+      },
+    });
+    const user = userEvent.setup();
+    renderHeader();
+
+    await user.click(screen.getByRole('button', { name: /global\.save/ }));
+    await user.click(await screen.findByRole('button', { name: 'overview.popup.returnToDraft.cancel' }));
+
+    expect(onServiceSave).not.toHaveBeenCalled();
+    expect(useServiceStore.getState().serviceState).toBe(ServiceState.Active);
+    expect(queryDot()).toBeInTheDocument();
+  });
+
+  it('hides the dot once a successful save clears the unsaved changes', async () => {
+    useServiceStore.setState({ hasUnsavedChanges: true });
+    const saveOnClick = vi.fn(() => useServiceStore.setState({ hasUnsavedChanges: false }));
+    const user = userEvent.setup();
+    renderHeader({ saveOnClick });
+
+    await user.click(screen.getByRole('button', { name: /global\.save/ }));
+
+    await waitFor(() => expect(saveOnClick).toHaveBeenCalled());
+    expect(queryDot()).not.toBeInTheDocument();
   });
 });

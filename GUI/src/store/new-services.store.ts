@@ -914,15 +914,11 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
   saveToHistory: (stateOverride?: { nodes: Node[]; edges: Edge[] }) => {
     const { nodes, edges, history, historyIndex } = get();
 
-    const currentState = stateOverride
-      ? {
-          nodes: JSON.parse(JSON.stringify(stateOverride.nodes)),
-          edges: JSON.parse(JSON.stringify(stateOverride.edges)),
-        }
-      : {
-          nodes: JSON.parse(JSON.stringify(nodes)),
-          edges: JSON.parse(JSON.stringify(edges)),
-        };
+    const snapshot = stateOverride ?? { nodes, edges };
+    const currentState = {
+      nodes: JSON.parse(JSON.stringify(snapshot.nodes.map(omitSelected))),
+      edges: JSON.parse(JSON.stringify(snapshot.edges.map(omitSelected))),
+    };
 
     const lastState = history[historyIndex];
 

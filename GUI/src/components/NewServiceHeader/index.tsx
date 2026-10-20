@@ -44,6 +44,7 @@ const showEmptyNameError = () => {
 const NewServiceHeader: FC<NewServiceHeaderProps> = ({ backOnClick, continueOnClick, saveOnClick }) => {
   const name = removeTrailingUnderscores(useServiceStore((state) => state.serviceNameDashed()));
   const serviceState = useServiceStore((state) => state.serviceState);
+  const hasUnsavedChanges = useServiceStore((state) => state.hasUnsavedChanges);
   const selectedService = useServiceListStore((state) => state.selectedService);
   const [showServiceConfig, setShowServiceConfig] = useState<boolean>(false);
   const navigate = useNavigate();
@@ -69,6 +70,7 @@ const NewServiceHeader: FC<NewServiceHeaderProps> = ({ backOnClick, continueOnCl
   }, [isServiceDropdownOpen]);
 
   const otherServices = services.filter((service) => service.serviceId !== id);
+  const needsSaving = !id || hasUnsavedChanges;
 
   const saveAsDraft = async () => {
     setIsSaving(true);
@@ -177,6 +179,14 @@ const NewServiceHeader: FC<NewServiceHeaderProps> = ({ backOnClick, continueOnCl
           </Button>
           <Button appearance={isSaving ? 'loading' : 'primary'} disabled={isSaving} onClick={() => void handleSave()}>
             {t('global.save')}
+            {needsSaving && (
+              <span
+                className="unsaved-changes-dot"
+                role="img"
+                aria-label={t('newService.unsavedChangesIndicator')}
+                title={t('newService.unsavedChangesIndicator')}
+              />
+            )}
           </Button>
           <Button
             appearance={isContinuing ? 'loading' : 'primary'}
