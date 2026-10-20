@@ -385,31 +385,30 @@ async function saveService(
   if (updateServiceDb) {
     useServiceStore.getState().changeServiceName(removeTrailingUnderscores(name));
   }
-  await api
-    .post(
-      isNewService ? createNewService() : editService(serviceId),
-      {
-        name: removeTrailingUnderscores(name),
-        serviceId,
-        description,
-        slot,
-        examples,
-        entities,
-        type: 'POST',
-        content: content,
-        structure: JSON.stringify({
-          edges: edges.map(({ selected: _selected, ...edge }) => edge),
-          nodes: nodes.map(({ selected: _selected, ...node }) => node),
-        }),
-        updateServiceDb: updateServiceDb,
-        state: status,
+  await api.post(
+    isNewService ? createNewService() : editService(serviceId),
+    {
+      name: removeTrailingUnderscores(name),
+      serviceId,
+      description,
+      slot,
+      examples,
+      entities,
+      type: 'POST',
+      content: content,
+      structure: JSON.stringify({
+        edges: edges.map(({ selected: _selected, ...edge }) => edge),
+        nodes: nodes.map(({ selected: _selected, ...node }) => node),
+      }),
+      updateServiceDb: updateServiceDb,
+      state: status,
+    },
+    {
+      params: {
+        location: `${import.meta.env.REACT_APP_RUUTER_SERVICES_POST_PATH}/${name}.yml`,
       },
-      {
-        params: {
-          location: `${import.meta.env.REACT_APP_RUUTER_SERVICES_POST_PATH}/${name}.yml`,
-        },
-      },
-    );
+    },
+  );
 }
 
 const validateMCQ = (node: NodeDataProps | undefined) => {
