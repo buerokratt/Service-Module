@@ -2,9 +2,9 @@ WITH filtered AS (
   SELECT s.id, s.service_id, s.name, s.current_state, s.llm_index_status, d_in.incoming_count, d_out.outgoing_count
   FROM services s
   LEFT JOIN LATERAL (
-    SELECT COUNT(*) AS incoming_count, COUNT(*) FILTER (WHERE src.deleted) AS incoming_problems
+    SELECT COUNT(*) AS incoming_count
     FROM service_dependency_edges e
-    JOIN services src ON src.service_id = e.source_id
+    JOIN services src ON src.service_id = e.source_id AND NOT src.deleted
     WHERE e.target_id = s.service_id
   ) d_in ON TRUE
   LEFT JOIN LATERAL (
