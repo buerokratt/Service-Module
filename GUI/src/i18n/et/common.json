@@ -311,7 +311,8 @@
       "dependencies": {
         "all": "Kõik seosed",
         "yes": "Seostega",
-        "no": "Seosteta"
+        "no": "Seosteta",
+        "problematic": "Probleemne"
       },
       "status": {
         "all": "Kõik staatused"

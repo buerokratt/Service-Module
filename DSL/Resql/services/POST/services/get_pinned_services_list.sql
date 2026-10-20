@@ -32,6 +32,7 @@ WHERE p.user_id_code = :user_id_code
     :dependencies IS NULL OR :dependencies = '' OR :dependencies = 'all'
     OR (:dependencies = 'yes' AND d_in.incoming_count + d_out.outgoing_count > 0)
     OR (:dependencies = 'no' AND d_in.incoming_count + d_out.outgoing_count = 0)
+    OR (:dependencies = 'problematic' AND d_in.incoming_problems + d_out.outgoing_problems > 0)
   )
 ORDER BY
   CASE WHEN :sorting = 'name asc' THEN s.name END ASC,

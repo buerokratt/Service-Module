@@ -33,6 +33,7 @@ WITH filtered AS (
       :dependencies IS NULL OR :dependencies = '' OR :dependencies = 'all'
       OR (:dependencies = 'yes' AND d_in.incoming_count + d_out.outgoing_count > 0)
       OR (:dependencies = 'no' AND d_in.incoming_count + d_out.outgoing_count = 0)
+      OR (:dependencies = 'problematic' AND d_in.incoming_problems + d_out.outgoing_problems > 0)
     )
     AND (
       :exclude_pinned_for IS NULL OR :exclude_pinned_for = ''
