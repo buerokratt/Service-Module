@@ -70,7 +70,7 @@ const NewServiceHeader: FC<NewServiceHeaderProps> = ({ backOnClick, continueOnCl
   }, [isServiceDropdownOpen]);
 
   const otherServices = services.filter((service) => service.serviceId !== id);
-  const needsSaving = !id || hasUnsavedChanges;
+  const hasPendingChanges = !id || hasUnsavedChanges;
 
   const saveAsDraft = async () => {
     setIsSaving(true);
@@ -179,7 +179,7 @@ const NewServiceHeader: FC<NewServiceHeaderProps> = ({ backOnClick, continueOnCl
           </Button>
           <Button appearance={isSaving ? 'loading' : 'primary'} disabled={isSaving} onClick={() => void handleSave()}>
             {t('global.save')}
-            {needsSaving && (
+            {hasPendingChanges && (
               <span
                 className="unsaved-changes-dot"
                 role="img"
