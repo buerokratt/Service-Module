@@ -43,7 +43,7 @@ import {
   RequestVariablesTabsRowsData,
 } from 'types/request-variables';
 import { initialEdges, initialNodes, NodeDataProps } from 'types/service-flow';
-import { validateFlowCompleteness } from 'utils/flow-completeness';
+import { getFlowCompletenessMessageKeys, validateFlowCompleteness } from 'utils/flow-completeness';
 import { getEndpointResultName } from 'utils/flow-utils';
 import { formatSchema } from 'utils/json-request-utils';
 import { v4 as uuid } from 'uuid';
@@ -741,16 +741,9 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
 
     if (!completeness.isComplete) {
       const title = i18next.t('newService.toast.incompleteFlow');
-
-      if (completeness.unconnectedNodeIds.size > 0) {
-        useToastStore.getState().error({ title, message: i18next.t('newService.toast.unconnectedServiceBlocks') });
-      }
-      if (completeness.unfinishedEdgeIds.size > 0) {
-        useToastStore.getState().error({ title, message: i18next.t('newService.toast.unfinishedFlows') });
-      }
-      if (completeness.unresolvedJumpToServiceNodeIds.size > 0) {
-        useToastStore.getState().error({ title, message: i18next.t('newService.toast.unresolvedJumpToService') });
-      }
+      getFlowCompletenessMessageKeys(completeness).forEach((key) => {
+        useToastStore.getState().error({ title, message: i18next.t(key) });
+      });
 
       throw new Error(i18next.t('newService.toast.incompleteFlow') ?? 'Error');
     }

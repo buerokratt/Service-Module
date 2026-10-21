@@ -6,14 +6,15 @@ import { Service } from 'types';
 import { ServiceDependency, ServiceDependencyDirection } from 'types/service-dependency';
 
 import DependencyNode from './DependencyNode';
-import ServiceStatusChip from './ServiceStatusChip';
+import ServiceStatusButton from './ServiceStatusButton';
 
 type DependencyViewProps = {
   readonly service: Service;
   readonly serviceIdBeingChecked: string | null;
   readonly onOpen: (dependency: ServiceDependency) => void;
   readonly onLocate: (dependency: ServiceDependency) => void;
-  readonly onActivate: (dependency: ServiceDependency) => void;
+  readonly onChangeStatus: (dependency: ServiceDependency) => void;
+  readonly onChangeServiceStatus: (service: Service) => void;
 };
 
 const NO_DEPENDENCIES: ServiceDependency[] = [];
@@ -25,7 +26,14 @@ const curve = (x1: number, y1: number, x2: number, y2: number) => {
   return `M ${x1} ${y1} C ${x1 + dx} ${y1}, ${x2 - dx} ${y2}, ${x2} ${y2}`;
 };
 
-const DependencyView: FC<DependencyViewProps> = ({ service, serviceIdBeingChecked, onOpen, onLocate, onActivate }) => {
+const DependencyView: FC<DependencyViewProps> = ({
+  service,
+  serviceIdBeingChecked,
+  onOpen,
+  onLocate,
+  onChangeStatus,
+  onChangeServiceStatus,
+}) => {
   const { t } = useTranslation();
   const markerId = useId().replace(/:/g, '');
   const servicesVersion = useServiceListStore((state) => state.servicesVersion);
@@ -95,7 +103,7 @@ const DependencyView: FC<DependencyViewProps> = ({ service, serviceIdBeingChecke
             isBeingChecked={!dependency.deleted && serviceIdBeingChecked === dependency.serviceId}
             onOpen={onOpen}
             onLocate={onLocate}
-            onActivate={onActivate}
+            onChangeStatus={onChangeStatus}
           />
         ))
       )}
@@ -148,7 +156,11 @@ const DependencyView: FC<DependencyViewProps> = ({ service, serviceIdBeingChecke
               <span className="dependency-view__current-name" title={service.name}>
                 {service.name}
               </span>
-              <ServiceStatusChip state={service.state} />
+              <ServiceStatusButton
+                state={service.state}
+                isLoading={serviceIdBeingChecked === service.serviceId}
+                onClick={() => onChangeServiceStatus(service)}
+              />
             </div>
             {renderColumn('outgoing', outgoing)}
           </div>

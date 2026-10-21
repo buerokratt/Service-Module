@@ -62,3 +62,9 @@ export const validateFlowCompleteness = (
     unresolvedJumpToServiceNodeIds,
   };
 };
+
+export const getFlowCompletenessMessageKeys = (result: FlowCompletenessResult): string[] => [
+  ...(result.unconnectedNodeIds.size > 0 ? ['newService.toast.unconnectedServiceBlocks'] : []),
+  ...(result.unfinishedEdgeIds.size > 0 ? ['newService.toast.unfinishedFlows'] : []),
+  ...(result.unresolvedJumpToServiceNodeIds.size > 0 ? ['newService.toast.unresolvedJumpToService'] : []),
+];

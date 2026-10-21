@@ -6,18 +6,18 @@ import { BsPin, BsPinAngle } from 'react-icons/bs';
 import { MdDeleteOutline, MdKeyboardArrowDown, MdKeyboardArrowRight, MdOutlineEdit } from 'react-icons/md';
 import { NavigateFunction } from 'react-router-dom';
 import { ROUTES } from 'resources/routes-constants';
-import useServiceListStore from 'store/services.store';
+import useServiceListStore, { ServiceStatusTarget } from 'store/services.store';
 import { Service, ServiceState } from 'types';
 
 import { DependenciesLegendContent, ServiceInfoContent } from './CardContents';
 import DependencyCounts from './DependencyCounts';
 import IndexStatus from './IndexStatus';
-import ServiceStatusChip from './ServiceStatusChip';
+import ServiceStatusButton from './ServiceStatusButton';
 
 interface GetColumnsConfig {
   navigate: NavigateFunction;
   hideDeletePopup: () => void;
-  showReadyPopup: () => void;
+  onChangeStatus: (service: ServiceStatusTarget) => void;
   serviceIdBeingChecked: string | null;
   expandedIds: ReadonlySet<string>;
   onToggleExpanded: (service: Service) => void;
@@ -32,7 +32,7 @@ const openService = (navigate: NavigateFunction, service: Service) => {
 export const getColumns = ({
   navigate,
   hideDeletePopup,
-  showReadyPopup,
+  onChangeStatus,
   serviceIdBeingChecked,
   expandedIds,
   onToggleExpanded,
@@ -114,21 +114,12 @@ export const getColumns = ({
       header: i18n.t('overview.table.status') ?? '',
       cell: (props) => {
         const service = props.row.original;
-        const isBeingChecked = serviceIdBeingChecked === service.serviceId;
-        const isActionable = service.state === ServiceState.Ready && !isBeingChecked;
-
         return (
-          <button
-            type="button"
-            className="services-table__status-button"
-            disabled={!isActionable}
-            onClick={() => {
-              useServiceListStore.getState().setSelectedService(service);
-              showReadyPopup();
-            }}
-          >
-            <ServiceStatusChip state={service.state} isLoading={isBeingChecked} />
-          </button>
+          <ServiceStatusButton
+            state={service.state}
+            isLoading={serviceIdBeingChecked === service.serviceId}
+            onClick={() => onChangeStatus(service)}
+          />
         );
       },
     }),

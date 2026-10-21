@@ -13,14 +13,21 @@ import { useTranslation } from 'react-i18next';
 import { MdExpandLess, MdExpandMore, MdUnfoldMore } from 'react-icons/md';
 import { useNavigate } from 'react-router-dom';
 import { ROUTES } from 'resources/routes-constants';
-import useServiceListStore, { DEFAULT_SERVICES_FILTERS, ServicesFilters } from 'store/services.store';
+import useServiceListStore, {
+  DEFAULT_SERVICES_FILTERS,
+  ServicesFilters,
+  ServiceStatusTarget,
+} from 'store/services.store';
 import useToastStore from 'store/toasts.store';
-import { Service } from 'types';
+import { Service, ServiceState } from 'types';
 import { ActivationBlocker } from 'types/activation-blocker';
 import { ServiceDependency } from 'types/service-dependency';
+import { getFlowCompletenessMessageKeys } from 'utils/flow-completeness';
+import { AffectedService } from 'utils/service-draft-return';
 import { getServiceStateLabelType } from 'utils/service-state-label';
 
 import { Button, Label, Modal, Track } from '..';
+import ReturnToDraftModal from '../ReturnToDraftModal';
 import { getColumns } from './columns';
 import DependencyView from './DependencyView';
 import { hasActiveFilters } from './filters';
@@ -50,6 +57,10 @@ const ServicesTable: FC = () => {
   const [isDeletingService, setIsDeletingService] = useState(false);
   const [activationBlockers, setActivationBlockers] = useState<ActivationBlocker[] | null>(null);
   const [serviceIdBeingChecked, setServiceIdBeingChecked] = useState<string | null>(null);
+  const [draftConfirmation, setDraftConfirmation] = useState<{
+    readonly service: ServiceStatusTarget;
+    readonly affectedServices: AffectedService[];
+  } | null>(null);
   const services = useServiceListStore((state) => state.services);
   const pinnedServices = useServiceListStore((state) => state.pinnedServices);
   const totalPages = useServiceListStore((state) => state.servicesTotalPages);
@@ -181,45 +192,55 @@ const ServicesTable: FC = () => {
     [filters, focusService, pagination.pageSize, sorting, t, tableData],
   );
 
-  const changeServiceState = useCallback(
-    (activate: boolean = false, draft: boolean = false) => {
-      return useServiceListStore
-        .getState()
-        .changeServiceState(
-          () => {},
-          t('overview.service.toast.updated'),
-          t('overview.service.toast.failed.state'),
-          activate,
-          draft,
-          pagination,
-          sorting,
-        )
-        .catch((e) => {
-          console.error(e);
-        });
+  const changeServiceStatus = useCallback(
+    async (service: ServiceStatusTarget) => {
+      if (serviceIdBeingChecked) return;
+
+      const store = useServiceListStore.getState();
+      setServiceIdBeingChecked(service.serviceId);
+      try {
+        if (service.state === ServiceState.Draft) {
+          const completeness = await store.loadFlowCompleteness(service.serviceId);
+          if (!completeness.isComplete) {
+            getFlowCompletenessMessageKeys(completeness).forEach((key) => {
+              useToastStore.getState().error({ title: t('newService.toast.incompleteFlow'), message: t(key) });
+            });
+            return;
+          }
+          await store.changeServiceState(service, ServiceState.Ready);
+        } else if (service.state === ServiceState.Ready) {
+          const blockers = await store.loadActivationBlockers(service.serviceId);
+          if (blockers.length > 0) {
+            setActivationBlockers(blockers);
+            return;
+          }
+          await store.changeServiceState(service, ServiceState.Active);
+        } else if (service.state === ServiceState.Active) {
+          const affectedServices = await store.loadAffectedActiveServices(service.serviceId);
+          setDraftConfirmation({ service, affectedServices });
+        }
+      } catch (e) {
+        console.error(e);
+        useToastStore.getState().error({ title: t('overview.service.toast.failed.state') });
+      } finally {
+        setServiceIdBeingChecked(null);
+      }
     },
-    [t, pagination, sorting],
+    [serviceIdBeingChecked, t],
   );
 
-  const attemptActivation = useCallback(async () => {
-    const service = useServiceListStore.getState().selectedService;
-    if (!service || serviceIdBeingChecked) return;
+  const confirmDraft = async () => {
+    if (!draftConfirmation) return;
 
+    const { service } = draftConfirmation;
+    setDraftConfirmation(null);
     setServiceIdBeingChecked(service.serviceId);
     try {
-      const blockers = await useServiceListStore.getState().loadActivationBlockers(service);
-      if (blockers.length > 0) {
-        setActivationBlockers(blockers);
-        return;
-      }
-      await changeServiceState(true);
-    } catch (e) {
-      console.error(e);
-      useToastStore.getState().error({ title: t('overview.service.toast.failed.state') });
+      await useServiceListStore.getState().changeServiceState(service, ServiceState.Draft);
     } finally {
       setServiceIdBeingChecked(null);
     }
-  }, [changeServiceState, serviceIdBeingChecked, t]);
+  };
 
   const dependencyHandlers = useMemo(
     () => ({
@@ -229,17 +250,15 @@ const ServicesTable: FC = () => {
       onLocate: (dependency: ServiceDependency) => {
         void locateService(dependency.serviceId);
       },
-      onActivate: (dependency: ServiceDependency) => {
-        useServiceListStore.getState().setSelectedService({
-          serviceId: dependency.serviceId,
-          name: dependency.name,
-          state: dependency.state,
-          type: dependency.type,
-        } as Service);
-        void attemptActivation();
+      onChangeStatus: (dependency: ServiceDependency) => {
+        if (dependency.deleted || !dependency.state) return;
+        void changeServiceStatus({ serviceId: dependency.serviceId, state: dependency.state, type: dependency.type });
+      },
+      onChangeServiceStatus: (service: Service) => {
+        void changeServiceStatus(service);
       },
     }),
-    [attemptActivation, locateService, navigate],
+    [changeServiceStatus, locateService, navigate],
   );
 
   const columns = useMemo(
@@ -247,15 +266,15 @@ const ServicesTable: FC = () => {
       getColumns({
         navigate,
         hideDeletePopup: () => setIsDeletePopupVisible(true),
-        showReadyPopup: () => {
-          void attemptActivation();
+        onChangeStatus: (service: ServiceStatusTarget) => {
+          void changeServiceStatus(service);
         },
         serviceIdBeingChecked,
         expandedIds,
         onToggleExpanded: toggleExpanded,
         onFocusService: toggleFocus,
       }),
-    [attemptActivation, expandedIds, navigate, serviceIdBeingChecked, toggleExpanded, toggleFocus],
+    [changeServiceStatus, expandedIds, navigate, serviceIdBeingChecked, toggleExpanded, toggleFocus],
   );
 
   const table = useReactTable({
@@ -335,6 +354,19 @@ const ServicesTable: FC = () => {
             </Button>
           </Track>
         </Modal>
+      )}
+      {draftConfirmation && (
+        <ReturnToDraftModal
+          affectedServices={draftConfirmation.affectedServices}
+          cancelLabel={t('overview.popup.setToDraftConfirm.cancel') ?? ''}
+          confirmLabel={t('overview.popup.setToDraftConfirm.confirm') ?? ''}
+          onCancel={() => setDraftConfirmation(null)}
+          onConfirm={() => void confirmDraft()}
+          onOpenService={(serviceId) => {
+            setDraftConfirmation(null);
+            navigate(ROUTES.replaceWithId(ROUTES.EDITSERVICE_ROUTE, serviceId));
+          }}
+        />
       )}
       {activationBlockers && activationBlockers.length > 0 && (
         <Modal
