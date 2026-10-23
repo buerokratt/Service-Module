@@ -72,11 +72,7 @@ export const ToastProvider: FC<PropsWithChildren> = ({ children }) => {
       {toasts.map((toast) => (
         <Toast key={toast.id} toast={toast} />
       ))}
-      <RadixToast.Viewport
-        ref={listRef}
-        className="toast__list"
-        data-expanded={expanded}
-      />
+      <RadixToast.Viewport ref={listRef} className="toast__list" data-expanded={expanded} />
     </RadixToast.Provider>
   );
 };
