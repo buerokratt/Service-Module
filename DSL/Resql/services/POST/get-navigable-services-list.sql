@@ -1,5 +1,5 @@
 
-SELECT service_id, name
+SELECT service_id, name, current_state AS state
 FROM (
   SELECT DISTINCT ON (service_id) service_id, name, current_state
   FROM services

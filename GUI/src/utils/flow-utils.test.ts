@@ -5,7 +5,9 @@ import { Step } from 'types/step';
 import { describe, expect, it, vi } from 'vitest';
 
 import {
+  getEndpointResultNameChanges,
   getNodeLabel,
+  replaceEndpointResultNames,
   validateAssignStep,
   validateDynamicChoicesStep,
   validateFileGenerateStep,
@@ -654,5 +656,51 @@ describe('getNodeLabel', () => {
 
     const result = getNodeLabel(step, nodes);
     expect(result).toBe('Valikvastustega küsimus - 2');
+  });
+});
+
+describe('endpoint result name references', () => {
+  const endpointNode = (id: string, name: string) =>
+    ({ id, position: { x: 0, y: 0 }, data: { stepType: StepType.UserDefined, endpoint: { name } } }) as unknown as Node;
+  const assignNode = (value: string) =>
+    ({
+      id: 'assign',
+      position: { x: 0, y: 0 },
+      data: { stepType: StepType.Assign, assignElements: [{ id: '1', key: 'a', value }] },
+    }) as unknown as Node;
+
+  const first = endpointNode('11111111-aaaa', 'API');
+  const second = endpointNode('22222222-bbbb', 'API');
+
+  it('detects result name change when the second API Call is renamed', () => {
+    const changes = getEndpointResultNameChanges([first, second], [first, endpointNode(second.id, 'Renamed')]);
+    expect(changes).toEqual(new Map([['API_22222222_res', 'Renamed_res']]));
+  });
+
+  it('detects cascading changes when the first API Call is renamed', () => {
+    const changes = getEndpointResultNameChanges([first, second], [endpointNode(first.id, 'Renamed'), second]);
+    expect(changes).toEqual(
+      new Map([
+        ['API_res', 'Renamed_res'],
+        ['API_22222222_res', 'API_res'],
+      ]),
+    );
+  });
+
+  it('returns no changes when the name is unchanged', () => {
+    expect(getEndpointResultNameChanges([first, second], [first, second]).size).toBe(0);
+  });
+
+  it('rewrites references in nested data in a single pass', () => {
+    const changes = new Map([
+      ['API_res', 'Renamed_res'],
+      ['API_22222222_res', 'API_res'],
+    ]);
+    const node = assignNode('${API_22222222_res.response.body.x} ${API_res.response.body} ${MY_API_res.response}');
+    const result = replaceEndpointResultNames(node.data, changes) as any;
+    expect(result.assignElements[0].value).toBe(
+      '${API_res.response.body.x} ${Renamed_res.response.body} ${MY_API_res.response}',
+    );
+    expect((node.data as any).assignElements[0].value).toContain('API_22222222_res');
   });
 });

@@ -10,13 +10,13 @@ SELECT
   s.llm_index_status AS index_status,
   d_in.incoming_count,
   d_out.outgoing_count,
-  d_in.incoming_problems + d_out.outgoing_problems AS problem_count
+  d_out.outgoing_problems AS problem_count
 FROM user_pinned_service p
 JOIN services s ON s.service_id = p.service_id AND NOT s.deleted
 LEFT JOIN LATERAL (
-  SELECT COUNT(*) AS incoming_count, COUNT(*) FILTER (WHERE src.deleted) AS incoming_problems
+  SELECT COUNT(*) AS incoming_count
   FROM service_dependency_edges e
-  JOIN services src ON src.service_id = e.source_id
+  JOIN services src ON src.service_id = e.source_id AND NOT src.deleted
   WHERE e.target_id = s.service_id
 ) d_in ON TRUE
 LEFT JOIN LATERAL (
@@ -32,6 +32,7 @@ WHERE p.user_id_code = :user_id_code
     :dependencies IS NULL OR :dependencies = '' OR :dependencies = 'all'
     OR (:dependencies = 'yes' AND d_in.incoming_count + d_out.outgoing_count > 0)
     OR (:dependencies = 'no' AND d_in.incoming_count + d_out.outgoing_count = 0)
+    OR (:dependencies = 'problematic' AND d_in.incoming_problems + d_out.outgoing_problems > 0)
   )
 ORDER BY
   CASE WHEN :sorting = 'name asc' THEN s.name END ASC,

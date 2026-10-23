@@ -815,8 +815,8 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
     get().resetSelectedNode();
     if (selectedNode?.data.stepType === StepType.FinishingStepEnd) return;
 
-    get().setNodes((prevNodes) =>
-      prevNodes.map((prevNode) => {
+    get().setNodes((prevNodes) => {
+      const nextNodes = prevNodes.map((prevNode) => {
         if (prevNode.id !== selectedNode!.id) return prevNode;
         if (
           prevNode.data.message != updatedNode.data.message ||
@@ -852,8 +852,12 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
             childrenCount: updatedNode.data.childrenCount ?? prevNode.data.childrenCount,
           },
         };
-      }),
-    );
+      });
+
+      const resultNameChanges = getEndpointResultNameChanges(prevNodes, nextNodes);
+      if (resultNameChanges.size === 0) return nextNodes;
+      return nextNodes.map((n) => ({ ...n, data: replaceEndpointResultNames(n.data, resultNameChanges) }));
+    });
 
     get().saveToHistory();
   },
@@ -907,15 +911,11 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
   saveToHistory: (stateOverride?: { nodes: Node[]; edges: Edge[] }) => {
     const { nodes, edges, history, historyIndex } = get();
 
-    const currentState = stateOverride
-      ? {
-          nodes: JSON.parse(JSON.stringify(stateOverride.nodes)),
-          edges: JSON.parse(JSON.stringify(stateOverride.edges)),
-        }
-      : {
-          nodes: JSON.parse(JSON.stringify(nodes)),
-          edges: JSON.parse(JSON.stringify(edges)),
-        };
+    const snapshot = stateOverride ?? { nodes, edges };
+    const currentState = {
+      nodes: JSON.parse(JSON.stringify(snapshot.nodes.map(omitSelected))),
+      edges: JSON.parse(JSON.stringify(snapshot.edges.map(omitSelected))),
+    };
 
     const lastState = history[historyIndex];
 

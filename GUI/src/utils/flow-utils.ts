@@ -57,6 +57,41 @@ export const getEndpointResultName = (node: Node, nodes: Node[]): string => {
   return `${baseName}_${node.id.replaceAll('-', '').slice(0, 8)}_res`;
 };
 
+export const getEndpointResultNameChanges = (prevNodes: Node[], nextNodes: Node[]): Map<string, string> => {
+  const changes = new Map<string, string>();
+  const isEndpointNode = (n: Node) => n.data.stepType === StepType.UserDefined;
+
+  for (const prevNode of prevNodes.filter(isEndpointNode)) {
+    const nextNode = nextNodes.find((n) => n.id === prevNode.id);
+    if (!nextNode || !isEndpointNode(nextNode)) continue;
+    const oldName = getEndpointResultName(prevNode, prevNodes);
+    const newName = getEndpointResultName(nextNode, nextNodes);
+    if (oldName !== newName) changes.set(oldName, newName);
+  }
+
+  return changes;
+};
+
+const escapeRegExp = (value: string) => value.replaceAll(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+export const replaceEndpointResultNames = <T>(value: T, changes: Map<string, string>): T => {
+  if (changes.size === 0) return value;
+
+  const alternatives = [...changes.keys()].sort((a, b) => b.length - a.length).map(escapeRegExp);
+  const pattern = new RegExp(`(?<![A-Za-z0-9_])(${alternatives.join('|')})(?![A-Za-z0-9_])`, 'g');
+
+  const replace = (current: unknown): unknown => {
+    if (typeof current === 'string') return current.replace(pattern, (match) => changes.get(match) ?? match);
+    if (Array.isArray(current)) return current.map(replace);
+    if (current && typeof current === 'object' && Object.getPrototypeOf(current) === Object.prototype) {
+      return Object.fromEntries(Object.entries(current).map(([key, val]) => [key, replace(val)]));
+    }
+    return current;
+  };
+
+  return replace(value) as T;
+};
+
 export const generateUniqueLabel = (originalLabel: string, existingNodes: Node[]): string => {
   const parts = originalLabel.split(' - ');
   const baseLabel = parts.length > 1 ? parts.slice(0, -1).join(' - ') : originalLabel;

@@ -52,7 +52,7 @@ export interface ServiceStatusTarget {
 export interface ServicesFilters {
   readonly search: string;
   readonly state: string;
-  readonly dependencies: 'all' | 'yes' | 'no';
+  readonly dependencies: 'all' | 'yes' | 'no' | 'problematic';
 }
 
 export const DEFAULT_SERVICES_FILTERS: ServicesFilters = { search: '', state: '', dependencies: 'all' };

@@ -12,12 +12,12 @@ WITH filtered AS (
     s.llm_index_status,
     d_in.incoming_count,
     d_out.outgoing_count,
-    d_in.incoming_problems + d_out.outgoing_problems AS problem_count
+    d_out.outgoing_problems AS problem_count
   FROM services s
   LEFT JOIN LATERAL (
-    SELECT COUNT(*) AS incoming_count, COUNT(*) FILTER (WHERE src.deleted) AS incoming_problems
+    SELECT COUNT(*) AS incoming_count
     FROM service_dependency_edges e
-    JOIN services src ON src.service_id = e.source_id
+    JOIN services src ON src.service_id = e.source_id AND NOT src.deleted
     WHERE e.target_id = s.service_id
   ) d_in ON TRUE
   LEFT JOIN LATERAL (
@@ -33,6 +33,7 @@ WITH filtered AS (
       :dependencies IS NULL OR :dependencies = '' OR :dependencies = 'all'
       OR (:dependencies = 'yes' AND d_in.incoming_count + d_out.outgoing_count > 0)
       OR (:dependencies = 'no' AND d_in.incoming_count + d_out.outgoing_count = 0)
+      OR (:dependencies = 'problematic' AND d_in.incoming_problems + d_out.outgoing_problems > 0)
     )
     AND (
       :exclude_pinned_for IS NULL OR :exclude_pinned_for = ''

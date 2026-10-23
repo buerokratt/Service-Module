@@ -316,7 +316,8 @@
       "dependencies": {
         "all": "All dependencies",
         "yes": "With dependencies",
-        "no": "Without dependencies"
+        "no": "Without dependencies",
+        "problematic": "Problematic"
       },
       "status": {
         "all": "All statuses"
@@ -448,7 +449,8 @@
       "saveAndContinue": "Save and continue"
     },
     "titleRequired": "Title is mandatory",
-    "chooseMemorySlots": "Choose memory slots"
+    "chooseMemorySlots": "Choose memory slots",
+    "unsavedChangesIndicator": "Unsaved changes"
   },
   "serviceFlow": {
     "serviceConfiguration": "Settings",

@@ -34,6 +34,7 @@ import { hasActiveFilters } from './filters';
 import ServicesFilterBar from './ServicesFilterBar';
 import ServicesPagination from './ServicesPagination';
 import { ServicesEmpty, ServicesLoadError, ServicesNoMatch, ServicesTableSkeleton } from './ServicesTableStatus';
+import ServiceStatusChip from './ServiceStatusChip';
 
 import '../../styles/main.scss';
 import './ServicesTable.scss';
@@ -383,9 +384,7 @@ const ServicesTable: FC = () => {
               const content = (
                 <Track justify="between">
                   <strong>{blocker.name}</strong>
-                  <Label type={getServiceStateLabelType(blocker.state)}>
-                    {t(`overview.service.states.${blocker.state}`)}
-                  </Label>
+                  <ServiceStatusChip state={blocker.state === 'missing' ? 'deleted' : blocker.state} />
                 </Track>
               );
 
