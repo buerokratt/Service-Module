@@ -44,7 +44,7 @@ import {
 } from 'types/request-variables';
 import { initialEdges, initialNodes, NodeDataProps } from 'types/service-flow';
 import { getFlowCompletenessMessageKeys, validateFlowCompleteness } from 'utils/flow-completeness';
-import { getEndpointResultName } from 'utils/flow-utils';
+import { getEndpointResultName, getEndpointResultNameChanges, replaceEndpointResultNames } from 'utils/flow-utils';
 import { formatSchema } from 'utils/json-request-utils';
 import { v4 as uuid } from 'uuid';
 import { create } from 'zustand';

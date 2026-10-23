@@ -24,9 +24,8 @@ import { ActivationBlocker } from 'types/activation-blocker';
 import { ServiceDependency } from 'types/service-dependency';
 import { getFlowCompletenessMessageKeys } from 'utils/flow-completeness';
 import { AffectedService } from 'utils/service-draft-return';
-import { getServiceStateLabelType } from 'utils/service-state-label';
 
-import { Button, Label, Modal, Track } from '..';
+import { Button, Modal, Track } from '..';
 import ReturnToDraftModal from '../ReturnToDraftModal';
 import { getColumns } from './columns';
 import DependencyView from './DependencyView';
