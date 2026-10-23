@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { act, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import api from 'services/api-dev';
@@ -49,14 +49,50 @@ const renderHeader = () =>
 describe('NewServiceHeader service switcher dropdown', () => {
   beforeEach(() => {
     mockNavigate.mockClear();
-    useServiceStore.setState({ hasUnsavedChanges: false, nextLocation: null, name: 'Current Service' });
+    useServiceStore.setState({
+      hasUnsavedChanges: false,
+      nextLocation: null,
+      name: 'Current Service',
+      serviceState: undefined,
+    });
     vi.mocked(api.get).mockResolvedValue({
       data: [
-        { serviceId: 'current-service-id', name: 'Current Service' },
-        { serviceId: 'other-service-id', name: 'Other Service' },
+        { serviceId: 'current-service-id', name: 'Current Service', state: ServiceState.Active },
+        { serviceId: 'other-service-id', name: 'Other Service', state: ServiceState.Ready },
+        { serviceId: 'draft-service-id', name: 'Draft Service', state: ServiceState.Draft },
       ],
     });
   });
+
+  it('shows the current service status next to its name in the closed dropdown', () => {
+    useServiceStore.setState({ serviceState: ServiceState.Active });
+    renderHeader();
+
+    expect(screen.getByRole('button', { name: 'Current_Service overview.service.states.active' })).toBeInTheDocument();
+  });
+
+  it('updates the closed dropdown status when the service status changes', async () => {
+    useServiceStore.setState({ serviceState: ServiceState.Active });
+    renderHeader();
+
+    act(() => useServiceStore.setState({ serviceState: ServiceState.Draft }));
+
+    expect(
+      await screen.findByRole('button', { name: 'Current_Service overview.service.states.draft' }),
+    ).toBeInTheDocument();
+  });
+
+  it('shows a status tag next to every listed service', async () => {
+    const user = userEvent.setup();
+    renderHeader();
+
+    await user.click(screen.getByRole('button', { name: 'Current_Service' }));
+
+    expect(
+      await screen.findByRole('menuitem', { name: 'Other Service overview.service.states.ready' }),
+    ).toBeInTheDocument();
+    expect(screen.getByRole('menuitem', { name: 'Draft Service overview.service.states.draft' })).toBeInTheDocument();
+  }, 45000);
 
   it('lists other services and navigates immediately with no unsaved changes', async () => {
     const user = userEvent.setup();

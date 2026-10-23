@@ -25,7 +25,7 @@ import ServiceStatusChip from '../ServicesTable/ServiceStatusChip';
 
 import './NewServiceHeader.scss';
 
-type ServiceOption = { readonly name: string; readonly serviceId: string };
+type ServiceOption = { readonly name: string; readonly serviceId: string; readonly state?: ServiceState };
 
 type NewServiceHeaderProps = {
   activeStep: number;
@@ -62,8 +62,8 @@ const NewServiceHeader: FC<NewServiceHeaderProps> = ({ backOnClick, continueOnCl
     api
       .get(getNavigableServicesList())
       .then((res) => {
-        const data: { serviceId: string; name: string }[] = Array.isArray(res.data) ? res.data : [];
-        setServices(data.map((s) => ({ name: s.name, serviceId: s.serviceId })));
+        const data: ServiceOption[] = Array.isArray(res.data) ? res.data : [];
+        setServices(data.map((s) => ({ name: s.name, serviceId: s.serviceId, state: s.state })));
       })
       .catch(console.error);
   }, [isServiceDropdownOpen]);
@@ -137,6 +137,7 @@ const NewServiceHeader: FC<NewServiceHeaderProps> = ({ backOnClick, continueOnCl
             <DropdownMenu.Trigger asChild>
               <button type="button" className="naming naming--trigger">
                 <span className="naming__label">{name || '...'}</span>
+                {serviceState && <ServiceStatusChip state={serviceState} variant="outlined" />}
                 {isServiceDropdownOpen ? (
                   <CgChevronUp className="naming__chevron" size={25} />
                 ) : (
@@ -157,7 +158,8 @@ const NewServiceHeader: FC<NewServiceHeaderProps> = ({ backOnClick, continueOnCl
                       className="service-switch-dropdown__item"
                       onSelect={() => navigateToService(service.serviceId, navigate)}
                     >
-                      {service.name}
+                      <span className="service-switch-dropdown__name">{service.name}</span>
+                      {service.state && <ServiceStatusChip state={service.state} variant="outlined" />}
                     </DropdownMenu.Item>
                   ))
                 )}
