@@ -443,7 +443,8 @@
       "saveAndContinue": "Salvesta ja jätka"
     },
     "titleRequired": "Pealkiri on kohustuslik",
-    "chooseMemorySlots": "Vali mälukohad"
+    "chooseMemorySlots": "Vali mälukohad",
+    "unsavedChangesIndicator": "Salvestamata muudatused"
   },
   "serviceFlow": {
     "serviceConfiguration": "Seaded",

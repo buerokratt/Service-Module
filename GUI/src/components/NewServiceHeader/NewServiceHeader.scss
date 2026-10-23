@@ -128,6 +128,22 @@
   }
 }
 
+.unsaved-changes-dot {
+  position: absolute;
+  top: 8px;
+  right: 14px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: get-color(jasper-10);
+  border: 0.5px solid get-color(white);
+  pointer-events: none;
+}
+
+[data-theme='dark'] .unsaved-changes-dot {
+  border-color: var(--dark-bg-main);
+}
+
 .icon_button {
   width: fit-content;
   padding: 8px 25px;
