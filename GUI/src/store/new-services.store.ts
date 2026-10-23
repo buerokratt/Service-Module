@@ -44,7 +44,7 @@ import {
 } from 'types/request-variables';
 import { initialEdges, initialNodes, NodeDataProps } from 'types/service-flow';
 import { validateFlowCompleteness } from 'utils/flow-completeness';
-import { getEndpointResultName } from 'utils/flow-utils';
+import { getEndpointResultName, getEndpointResultNameChanges, replaceEndpointResultNames } from 'utils/flow-utils';
 import { formatSchema } from 'utils/json-request-utils';
 import { v4 as uuid } from 'uuid';
 import { create } from 'zustand';
@@ -822,8 +822,8 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
     get().resetSelectedNode();
     if (selectedNode?.data.stepType === StepType.FinishingStepEnd) return;
 
-    get().setNodes((prevNodes) =>
-      prevNodes.map((prevNode) => {
+    get().setNodes((prevNodes) => {
+      const nextNodes = prevNodes.map((prevNode) => {
         if (prevNode.id !== selectedNode!.id) return prevNode;
         if (
           prevNode.data.message != updatedNode.data.message ||
@@ -859,8 +859,12 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
             childrenCount: updatedNode.data.childrenCount ?? prevNode.data.childrenCount,
           },
         };
-      }),
-    );
+      });
+
+      const resultNameChanges = getEndpointResultNameChanges(prevNodes, nextNodes);
+      if (resultNameChanges.size === 0) return nextNodes;
+      return nextNodes.map((n) => ({ ...n, data: replaceEndpointResultNames(n.data, resultNameChanges) }));
+    });
 
     get().saveToHistory();
   },
