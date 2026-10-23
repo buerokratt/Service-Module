@@ -239,6 +239,11 @@
       "activationBlocked": {
         "title": "Teenust ei saa aktiveerida. Järgmised seotud teenused peavad olema aktiivsed:"
       },
+      "setToDraftConfirm": {
+        "message": "Kas soovid viia teenuse mustandiks? Teenus ei ole seejärel enam kasutajatele kättesaadav.",
+        "cancel": "Tühista",
+        "confirm": "Vii mustandiks"
+      },
       "returnToDraft": {
         "title": "Muuda teenus mustandiks?",
         "description": "Järgmised aktiivsed teenused kasutavad seda teenust. Need jäävad aktiivseks, kuid kasutajad ei saa selle ühenduseni jõudes teenusevooga jätkata.",

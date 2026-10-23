@@ -239,6 +239,11 @@
       "activationBlocked": {
         "title": "Cannot activate service. The following connected services must be Active:"
       },
+      "setToDraftConfirm": {
+        "message": "Set this service to Draft? It will no longer be available for the end-user.",
+        "cancel": "Cancel",
+        "confirm": "Set to Draft"
+      },
       "returnToDraft": {
         "title": "Return service to Draft?",
         "description": "The following Active services use this service. They will remain Active, but users who reach this connection will not be able to continue the service flow.",

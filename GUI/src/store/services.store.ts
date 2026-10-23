@@ -1,9 +1,10 @@
 import { PaginationState, SortingState } from '@tanstack/react-table';
-import { Node } from '@xyflow/react';
+import { Edge, Node } from '@xyflow/react';
 import i18n from 'i18n';
 import {
   changeServiceStatus,
   deleteService as deleteServiceApi,
+  getNavigableServicesList,
   getServiceById,
   getServiceDependencies,
   getServicesOverview,
@@ -14,6 +15,7 @@ import {
 import { Service, ServiceState } from 'types';
 import { ActivationBlocker } from 'types/activation-blocker';
 import { ServiceDependency, ServiceLocation } from 'types/service-dependency';
+import { FlowCompletenessResult, validateFlowCompleteness } from 'utils/flow-completeness';
 import { findActivationBlockers, ServiceFlowLookup } from 'utils/service-activation';
 import { AffectedService, findAffectedActiveServices } from 'utils/service-draft-return';
 import { create } from 'zustand';
@@ -22,19 +24,30 @@ import { persist } from 'zustand/middleware';
 import useToastStore from './toasts.store';
 import api from '../services/api-dev';
 
-const fetchServiceFlow = async (serviceId: string): Promise<ServiceFlowLookup | undefined> => {
+const fetchServiceFlow = async (serviceId: string): Promise<(ServiceFlowLookup & { edges: Edge[] }) | undefined> => {
   try {
     const response = await api.post<Service>(getServiceById(), { id: serviceId, search: '' });
     const data = response.data;
     if (!data?.serviceId) return undefined;
 
     const structure = JSON.parse(data.structure?.value ?? '{}');
-    return { name: data.name, state: data.state, nodes: (structure?.nodes ?? []) as Node[] };
+    return {
+      name: data.name,
+      state: data.state,
+      nodes: (structure?.nodes ?? []) as Node[],
+      edges: (structure?.edges ?? []) as Edge[],
+    };
   } catch (error) {
     console.error(error);
     return undefined;
   }
 };
+
+export interface ServiceStatusTarget {
+  readonly serviceId: string;
+  readonly state: ServiceState;
+  readonly type: 'GET' | 'POST' | null;
+}
 
 export interface ServicesFilters {
   readonly search: string;
@@ -100,17 +113,10 @@ interface ServiceStoreState {
   ) => Promise<ServiceLocation | undefined>;
   selectedService: Service | undefined;
   setSelectedService: (service: Service) => void;
-  loadActivationBlockers: (service: Service) => Promise<ActivationBlocker[]>;
+  loadFlowCompleteness: (serviceId: string) => Promise<FlowCompletenessResult>;
+  loadActivationBlockers: (serviceId: string) => Promise<ActivationBlocker[]>;
   loadAffectedActiveServices: (serviceId: string) => Promise<AffectedService[]>;
-  changeServiceState: (
-    onEnd: () => void,
-    successMessage: string,
-    errorMessage: string,
-    activate: boolean,
-    draft: boolean,
-    pagination: PaginationState,
-    sorting: SortingState,
-  ) => Promise<void>;
+  changeServiceState: (service: ServiceStatusTarget, state: ServiceState) => Promise<void>;
   deleteSelectedService: (
     onEnd: () => void,
     successMessage: string,
@@ -233,45 +239,45 @@ const useServiceListStore = create<ServiceStoreState>()(
           selectedService: service,
         });
       },
-      loadActivationBlockers: async (service: Service) => {
-        const rootFlow = await fetchServiceFlow(service.serviceId);
+      loadFlowCompleteness: async (serviceId: string) => {
+        const [flow, navigableResponse] = await Promise.all([
+          fetchServiceFlow(serviceId),
+          api.get<{ readonly serviceId: string; readonly name: string }[]>(getNavigableServicesList()),
+        ]);
+        if (!flow) throw new Error(`Service ${serviceId} could not be loaded`);
+
+        const navigable = Array.isArray(navigableResponse.data) ? navigableResponse.data : [];
+        return validateFlowCompleteness(
+          flow.nodes,
+          flow.edges,
+          new Map(navigable.map((service) => [service.serviceId, service.name])),
+        );
+      },
+      loadActivationBlockers: async (serviceId: string) => {
+        const rootFlow = await fetchServiceFlow(serviceId);
         if (!rootFlow) return [];
         return findActivationBlockers(rootFlow.nodes, fetchServiceFlow);
       },
       loadAffectedActiveServices: (serviceId: string) =>
         findAffectedActiveServices(serviceId, get().loadServiceDependencies),
-      changeServiceState: async (onEnd, successMessage, errorMessage, activate, draft, pagination, sorting) => {
-        const selectedService = get().selectedService;
-        if (!selectedService) return;
-
+      changeServiceState: async (service, state) => {
         try {
-          let state;
-          if (selectedService.state === ServiceState.Active && !draft) state = ServiceState.Inactive;
-          else if (selectedService.state === ServiceState.Active && draft) state = ServiceState.Draft;
-          else if (selectedService.state === ServiceState.Draft) state = ServiceState.Ready;
-          else if (
-            (selectedService.state === ServiceState.Ready && activate) ||
-            (selectedService.state === ServiceState.Inactive && !draft)
-          )
-            state = ServiceState.Active;
-          else state = ServiceState.Draft;
-
-          await api.post(changeServiceStatus(), {
-            id: selectedService.serviceId,
-            state,
-            type: selectedService.type,
-          });
-          useToastStore.getState().success({ title: successMessage });
-          await useServiceListStore.getState().loadServicesList(pagination, sorting);
+          await api.post(changeServiceStatus(), { id: service.serviceId, state, type: service.type ?? 'POST' });
         } catch (error) {
           console.error(error);
-          useToastStore.getState().error({ title: errorMessage });
-          throw error;
+          useToastStore.getState().error({ title: i18n.t('overview.service.toast.failed.state') });
+          return;
         }
+
+        const withNewState = (item: Service) => (item.serviceId === service.serviceId ? { ...item, state } : item);
         set({
-          selectedService: undefined,
+          services: get().services.map(withNewState),
+          pinnedServices: get().pinnedServices.map(withNewState),
         });
-        onEnd();
+        useToastStore.getState().success({ title: i18n.t('overview.service.toast.updated') });
+
+        const { servicesPagination, servicesSorting } = get();
+        await get().loadServicesList(servicesPagination, servicesSorting).catch(console.error);
       },
       deleteSelectedService: async (onEnd, successMessage, errorMessage) => {
         const selectedService = get().selectedService;

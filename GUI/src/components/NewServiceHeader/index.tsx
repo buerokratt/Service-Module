@@ -20,6 +20,7 @@ import api from '../../services/api-dev';
 import useServiceListStore from '../../store/services.store';
 import Dialog from '../Dialog';
 import Icon from '../Icon';
+import ReturnToDraftModal from '../ReturnToDraftModal';
 import SettingsModal from '../ServiceConfigurationForm';
 import ServiceStatusChip from '../ServicesTable/ServiceStatusChip';
 
@@ -217,45 +218,18 @@ const NewServiceHeader: FC<NewServiceHeaderProps> = ({ backOnClick, continueOnCl
         </Track>
       </header>
       {affectedServices && (
-        <Modal
-          title={t('overview.popup.returnToDraft.title')}
-          onClose={() => setAffectedServices(null)}
-          footer={
-            <>
-              <Button appearance="secondary" onClick={() => setAffectedServices(null)}>
-                {t('overview.popup.returnToDraft.cancel')}
-              </Button>
-              <Button
-                appearance="primary"
-                onClick={() => {
-                  setAffectedServices(null);
-                  void saveAsDraft();
-                }}
-              >
-                {t('overview.popup.returnToDraft.confirm')}
-              </Button>
-            </>
-          }
-        >
-          <p className="affected-services__description">{t('overview.popup.returnToDraft.description')}</p>
-          <ul className="affected-services">
-            {affectedServices.map((service) => (
-              <li key={service.serviceId}>
-                <button
-                  type="button"
-                  className="affected-services__item"
-                  onClick={() => {
-                    setAffectedServices(null);
-                    navigateToService(service.serviceId, navigate);
-                  }}
-                >
-                  <strong>{service.name}</strong>
-                  <ServiceStatusChip state={service.state} />
-                </button>
-              </li>
-            ))}
-          </ul>
-        </Modal>
+        <ReturnToDraftModal
+          affectedServices={affectedServices}
+          onCancel={() => setAffectedServices(null)}
+          onConfirm={() => {
+            setAffectedServices(null);
+            void saveAsDraft();
+          }}
+          onOpenService={(serviceId) => {
+            setAffectedServices(null);
+            navigateToService(serviceId, navigate);
+          }}
+        />
       )}
       {isDeleteServiceModalVisible && (
         <Modal title={t('overview.popup.delete')} onClose={() => setIsDeleteServiceModalVisible(false)}>
