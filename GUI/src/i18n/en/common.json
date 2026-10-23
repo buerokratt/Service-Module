@@ -311,7 +311,8 @@
       "dependencies": {
         "all": "All dependencies",
         "yes": "With dependencies",
-        "no": "Without dependencies"
+        "no": "Without dependencies",
+        "problematic": "Problematic"
       },
       "status": {
         "all": "All statuses"
