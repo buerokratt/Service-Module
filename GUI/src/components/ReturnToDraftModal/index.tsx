@@ -1,11 +1,10 @@
 import { FC } from 'react';
 import { useTranslation } from 'react-i18next';
 import { AffectedService } from 'utils/service-draft-return';
-import { getServiceStateLabelType } from 'utils/service-state-label';
 
 import Button from '../Button';
-import Label from '../Label';
 import Modal from '../Modal';
+import ServiceStatusChip from '../ServicesTable/ServiceStatusChip';
 
 import './ReturnToDraftModal.scss';
 
@@ -56,9 +55,7 @@ const ReturnToDraftModal: FC<ReturnToDraftModalProps> = ({
                   onClick={() => onOpenService(service.serviceId)}
                 >
                   <strong>{service.name}</strong>
-                  <Label type={getServiceStateLabelType(service.state)}>
-                    {t(`overview.service.states.${service.state}`)}
-                  </Label>
+                  <ServiceStatusChip state={service.state} />
                 </button>
               </li>
             ))}
