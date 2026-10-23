@@ -1,0 +1,53 @@
+@import 'src/styles/settings/variables/_colors';
+@import 'src/styles/tools/color';
+@import 'src/styles/settings/variables/typography';
+
+.service-status-chip {
+  display: inline-grid;
+  place-items: center;
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-size: $veera-font-size-70;
+  font-weight: $veera-font-weight-gamma;
+  line-height: 1.4;
+  text-transform: uppercase;
+  white-space: nowrap;
+
+  > * {
+    grid-area: 1 / 1;
+  }
+
+  &--active {
+    background-color: get-color(sea-green-0);
+    color: get-color(sea-green-12);
+  }
+
+  &--ready {
+    background-color: get-color(sapphire-blue-0);
+    color: get-color(sapphire-blue-12);
+  }
+
+  &--draft {
+    background-color: get-color(black-coral-1);
+    color: get-color(black-coral-12);
+  }
+
+  &--inactive {
+    background-color: get-color(orange-0);
+    color: get-color(orange-12);
+  }
+
+  &--deleted {
+    background-color: get-color(jasper-0);
+    color: get-color(jasper-12);
+  }
+}
+
+.service-state-spinner {
+  width: 12px;
+  height: 12px;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}

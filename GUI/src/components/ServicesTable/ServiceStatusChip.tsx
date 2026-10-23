@@ -3,6 +3,8 @@ import { FC } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ServiceState } from 'types';
 
+import './ServiceStatusChip.scss';
+
 type ServiceStatusChipProps = {
   readonly state: ServiceState | 'deleted';
   readonly isLoading?: boolean;

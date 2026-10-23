@@ -18,15 +18,15 @@ import useToastStore from 'store/toasts.store';
 import { Service } from 'types';
 import { ActivationBlocker } from 'types/activation-blocker';
 import { ServiceDependency } from 'types/service-dependency';
-import { getServiceStateLabelType } from 'utils/service-state-label';
 
-import { Button, Label, Modal, Track } from '..';
+import { Button, Modal, Track } from '..';
 import { getColumns } from './columns';
 import DependencyView from './DependencyView';
 import { hasActiveFilters } from './filters';
 import ServicesFilterBar from './ServicesFilterBar';
 import ServicesPagination from './ServicesPagination';
 import { ServicesEmpty, ServicesLoadError, ServicesNoMatch, ServicesTableSkeleton } from './ServicesTableStatus';
+import ServiceStatusChip from './ServiceStatusChip';
 
 import '../../styles/main.scss';
 import './ServicesTable.scss';
@@ -351,9 +351,7 @@ const ServicesTable: FC = () => {
               const content = (
                 <Track justify="between">
                   <strong>{blocker.name}</strong>
-                  <Label type={getServiceStateLabelType(blocker.state)}>
-                    {t(`overview.service.states.${blocker.state}`)}
-                  </Label>
+                  <ServiceStatusChip state={blocker.state === 'missing' ? 'deleted' : blocker.state} />
                 </Track>
               );
 

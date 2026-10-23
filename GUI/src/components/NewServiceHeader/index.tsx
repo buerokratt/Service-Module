@@ -13,15 +13,15 @@ import useToastStore from 'store/toasts.store';
 import { ServiceState } from 'types';
 import { AffectedService } from 'utils/service-draft-return';
 import { navigateToService } from 'utils/service-navigation-utils';
-import { getServiceStateLabelType } from 'utils/service-state-label';
 import { removeTrailingUnderscores } from 'utils/string-util';
 
-import { Button, Label, Modal, Track } from '..';
+import { Button, Modal, Track } from '..';
 import api from '../../services/api-dev';
 import useServiceListStore from '../../store/services.store';
 import Dialog from '../Dialog';
 import Icon from '../Icon';
 import SettingsModal from '../ServiceConfigurationForm';
+import ServiceStatusChip from '../ServicesTable/ServiceStatusChip';
 
 import './NewServiceHeader.scss';
 
@@ -238,9 +238,7 @@ const NewServiceHeader: FC<NewServiceHeaderProps> = ({ backOnClick, continueOnCl
                   }}
                 >
                   <strong>{service.name}</strong>
-                  <Label type={getServiceStateLabelType(service.state)}>
-                    {t(`overview.service.states.${service.state}`)}
-                  </Label>
+                  <ServiceStatusChip state={service.state} />
                 </button>
               </li>
             ))}
