@@ -5,7 +5,7 @@ import React from 'react';
 import { BrowserRouter } from 'react-router-dom';
 
 import { ToastProvider } from './components/Toast/ToastProvider';
-import useTabCloseEffect from './hooks/useTabCloseEffects';
+import useNotificationsConnection from './hooks/useNotificationsConnection';
 import RootComponent from './RootComponent';
 import useStore from './store/store';
 import { UserInfo } from './types/userInfo';
@@ -30,7 +30,8 @@ const App: React.FC = () => {
     enabled: import.meta.env.REACT_APP_LOCAL !== 'true',
   });
 
-  useTabCloseEffect();
+  const userId = useStore((state) => state.userInfo?.idCode);
+  useNotificationsConnection(Boolean(userId));
 
   return (
     <BrowserRouter basename={import.meta.env.BASE_URL}>
