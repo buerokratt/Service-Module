@@ -10,6 +10,7 @@ WITH filtered AS (
     s.ruuter_type,
     s.slot,
     s.llm_index_status,
+    s.updated_at,
     d_in.incoming_count,
     d_out.outgoing_count,
     d_out.outgoing_problems AS problem_count
@@ -68,5 +69,8 @@ ORDER BY
   CASE WHEN :sorting = 'dependencies desc' THEN incoming_count + outgoing_count END DESC,
   CASE WHEN :sorting = 'index asc' THEN llm_index_status END ASC NULLS LAST,
   CASE WHEN :sorting = 'index desc' THEN llm_index_status END DESC NULLS LAST,
+  CASE WHEN :sorting = 'edited asc' THEN updated_at END ASC,
+  CASE WHEN :sorting IS NULL OR :sorting = '' OR :sorting = 'edited desc' THEN updated_at END DESC,
+  name ASC,
   id ASC
 OFFSET ((GREATEST(:page, 1) - 1) * :page_size) LIMIT :page_size;

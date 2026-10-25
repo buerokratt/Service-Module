@@ -102,7 +102,12 @@ interface ServiceStoreState {
   toggleOrientation: () => void;
   autoView: boolean;
   toggleAutoView: () => void;
-  loadServicesList: (pagination: PaginationState, sorting: SortingState, filters?: ServicesFilters) => Promise<void>;
+  loadServicesList: (
+    pagination: PaginationState,
+    sorting: SortingState,
+    filters?: ServicesFilters,
+    options?: { keepOrder?: boolean },
+  ) => Promise<void>;
   togglePinService: (service: Service) => Promise<void>;
   loadServiceDependencies: (serviceId: string) => Promise<ServiceDependency[]>;
   locateService: (
@@ -149,7 +154,7 @@ const useServiceListStore = create<ServiceStoreState>()(
         set((state) => ({
           orientation: state.orientation === 'horizontal' ? 'vertical' : 'horizontal',
         })),
-      loadServicesList: async (pagination, sorting, filters = get().servicesFilters) => {
+      loadServicesList: async (pagination, sorting, filters = get().servicesFilters, options = {}) => {
         const requestId = ++latestServicesRequestId;
         if (get().servicesLoadState === 'success') set({ isRefreshingServices: true });
         else set({ servicesLoadState: 'loading' });
@@ -173,6 +178,24 @@ const useServiceListStore = create<ServiceStoreState>()(
         const response = result.data.response ?? {};
         const services: Service[] = (response.services ?? []).map((item: any) => mapService(item, false));
         const pinnedServices: Service[] = (response.pinned ?? []).map((item: any) => mapService(item, true));
+
+        if (options.keepOrder) {
+          const freshById = new Map([...pinnedServices, ...services].map((service) => [service.serviceId, service]));
+          const refreshInPlace = (list: Service[]) =>
+            list.map((service) => {
+              const fresh = freshById.get(service.serviceId);
+              return fresh ? { ...fresh, isPinned: service.isPinned } : service;
+            });
+          set({
+            services: refreshInPlace(get().services),
+            pinnedServices: refreshInPlace(get().pinnedServices),
+            servicesVersion: get().servicesVersion + 1,
+            servicesLoadState: 'success',
+            isRefreshingServices: false,
+          });
+          return;
+        }
+
         set({
           services,
           pinnedServices,
@@ -277,7 +300,9 @@ const useServiceListStore = create<ServiceStoreState>()(
         useToastStore.getState().success({ title: i18n.t('overview.service.toast.updated') });
 
         const { servicesPagination, servicesSorting } = get();
-        await get().loadServicesList(servicesPagination, servicesSorting).catch(console.error);
+        await get()
+          .loadServicesList(servicesPagination, servicesSorting, undefined, { keepOrder: true })
+          .catch(console.error);
       },
       deleteSelectedService: async (onEnd, successMessage, errorMessage) => {
         const selectedService = get().selectedService;

@@ -43,4 +43,7 @@ ORDER BY
   CASE WHEN :sorting = 'dependencies desc' THEN d_in.incoming_count + d_out.outgoing_count END DESC,
   CASE WHEN :sorting = 'index asc' THEN s.llm_index_status END ASC NULLS LAST,
   CASE WHEN :sorting = 'index desc' THEN s.llm_index_status END DESC NULLS LAST,
-  p.created_at ASC;
+  CASE WHEN :sorting = 'edited asc' THEN s.updated_at END ASC,
+  CASE WHEN :sorting = 'edited desc' THEN s.updated_at END DESC,
+  s.name ASC,
+  s.id ASC;
