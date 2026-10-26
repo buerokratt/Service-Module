@@ -741,8 +741,12 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
 
     if (!completeness.isComplete) {
       const title = i18next.t('newService.toast.incompleteFlow');
+      const unresolvedReferenceLabels = nodes
+        .filter((node) => completeness.unresolvedEndpointReferenceNodeIds.has(node.id))
+        .map((node) => node.data.label)
+        .join(', ');
       getFlowCompletenessMessageKeys(completeness).forEach((key) => {
-        useToastStore.getState().error({ title, message: i18next.t(key) });
+        useToastStore.getState().error({ title, message: i18next.t(key, { nodes: unresolvedReferenceLabels }) });
       });
 
       throw new Error(i18next.t('newService.toast.incompleteFlow') ?? 'Error');
