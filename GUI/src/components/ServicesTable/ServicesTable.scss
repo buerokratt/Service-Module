@@ -580,6 +580,10 @@ $connector-color: #a6a8b1;
     color: get-color(black-coral-12);
     font-size: 20px;
     cursor: pointer;
+
+    &--active {
+      color: get-color(sapphire-blue-10);
+    }
   }
 
   &--refreshing tbody {

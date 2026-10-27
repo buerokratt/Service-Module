@@ -438,13 +438,21 @@ const ServicesTable: FC = () => {
                         key={header.id}
                         colSpan={header.column.id === 'name' ? 2 : 1}
                         className={`services-table__col--${header.column.id}`}
+                        aria-sort={
+                          { asc: 'ascending' as const, desc: 'descending' as const }[
+                            header.column.getIsSorted() as string
+                          ]
+                        }
                       >
                         {header.isPlaceholder ? null : (
                           <span className={`services-table__header services-table__header--${header.column.id}`}>
                             {header.column.getCanSort() && (
                               <button
                                 type="button"
-                                className="services-table__sort"
+                                className={clsx(
+                                  'services-table__sort',
+                                  header.column.getIsSorted() && 'services-table__sort--active',
+                                )}
                                 onClick={header.column.getToggleSortingHandler()}
                                 aria-label={t('overview.table.sort') ?? ''}
                               >

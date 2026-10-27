@@ -1,5 +1,5 @@
 WITH filtered AS (
-  SELECT s.id, s.service_id, s.name, s.current_state, s.llm_index_status, d_in.incoming_count, d_out.outgoing_count
+  SELECT s.id, s.service_id, s.name, s.current_state, s.llm_index_status, s.updated_at, d_in.incoming_count, d_out.outgoing_count
   FROM services s
   LEFT JOIN LATERAL (
     SELECT COUNT(*) AS incoming_count
@@ -40,6 +40,9 @@ ranked AS (
         CASE WHEN :sorting = 'dependencies desc' THEN incoming_count + outgoing_count END DESC,
         CASE WHEN :sorting = 'index asc' THEN llm_index_status END ASC NULLS LAST,
         CASE WHEN :sorting = 'index desc' THEN llm_index_status END DESC NULLS LAST,
+        CASE WHEN :sorting = 'edited asc' THEN updated_at END ASC,
+        CASE WHEN :sorting IS NULL OR :sorting = '' OR :sorting = 'edited desc' THEN updated_at END DESC,
+        name ASC,
         id ASC
     ) AS position
   FROM filtered
