@@ -33,7 +33,7 @@ check_user_authority:
   switch:
     - condition: ${res.response.body.authorities.includes("ROLE_ADMINISTRATOR") || res.response.body.authorities.includes("ROLE_SERVICE_MANAGER")}
       next: return_authorized
-  next: return_unauthorized
+  next: return_forbidden
 
 return_authorized:
   return: ${res.response.body}
@@ -42,4 +42,9 @@ return_authorized:
 return_unauthorized:
   status: 200
   return: false
+  next: end
+
+return_forbidden:
+  status: 200
+  return: "forbidden"
   next: end
