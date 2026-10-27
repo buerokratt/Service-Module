@@ -430,6 +430,8 @@
       "unconnectedServiceBlocks": "Connect all service blocks.",
       "unfinishedFlows": "Complete all unfinished flows.",
       "unresolvedJumpToService": "Resolve all Next Service references.",
+      "unresolvedEndpointReferences": "Fix references to deleted API calls in: {{nodes}}.",
+      "unresolvedEndpointReference": "This step references a deleted API call.",
       "savedSuccessfully": "Saved Successfully",
       "success": "Success",
       "failed": "Failed",
