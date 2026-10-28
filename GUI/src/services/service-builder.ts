@@ -205,6 +205,7 @@ interface SaveFlowConfig {
   slot: string;
   examples: string[];
   entities: string[];
+  discoverable: boolean;
   serviceId: string;
   isNewService: boolean;
   status: 'draft' | 'ready';
@@ -296,6 +297,7 @@ export const saveFlow = async ({
   slot,
   examples,
   entities,
+  discoverable,
   serviceId,
   isNewService,
   status = 'ready',
@@ -325,6 +327,7 @@ export const saveFlow = async ({
         slot,
         examples,
         entities,
+        discoverable,
         nodes,
         edges,
         isNewService,
@@ -358,6 +361,7 @@ export const saveFlow = async ({
             slot,
             examples,
             entities,
+            discoverable,
             nodes,
             edges,
             isNewService,
@@ -381,7 +385,7 @@ async function saveService(
   updateServiceDb: boolean,
   status: 'draft' | 'ready' = 'ready',
 ) {
-  const { isNewService, serviceId, name, description, slot, examples, entities, edges, nodes } = config;
+  const { isNewService, serviceId, name, description, slot, examples, entities, discoverable, edges, nodes } = config;
   if (updateServiceDb) {
     useServiceStore.getState().changeServiceName(removeTrailingUnderscores(name));
   }
@@ -394,6 +398,7 @@ async function saveService(
       slot,
       examples,
       entities,
+      discoverable,
       type: 'POST',
       content: content,
       structure: JSON.stringify({
@@ -1219,6 +1224,7 @@ export const saveFlowClick = async (status: 'draft' | 'ready' = 'ready', showErr
   const slot = useServiceStore.getState().slot;
   const examples = useServiceStore.getState().examples;
   const entities = useServiceStore.getState().entities;
+  const discoverable = useServiceStore.getState().discoverable;
   const isNewService = useServiceStore.getState().isNewService;
   const edges = useServiceStore.getState().edges;
   const nodes = useServiceStore.getState().nodes as Node<NodeDataProps>[];
@@ -1244,6 +1250,7 @@ export const saveFlowClick = async (status: 'draft' | 'ready' = 'ready', showErr
     slot,
     examples,
     entities,
+    discoverable,
     serviceId,
     isNewService,
     status,

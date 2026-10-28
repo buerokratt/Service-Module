@@ -517,6 +517,7 @@ describe('saveFlow', () => {
     slot: '',
     examples: [],
     entities: [],
+    discoverable: false,
     serviceId: '1',
     isNewService: true,
   });

@@ -20,6 +20,9 @@ declaration:
       - field: examples
         type: object
         description: "Body field 'Examples'"
+      - field: discoverable
+        type: boolean
+        description: "Body field 'discoverable'"
       - field: name
         type: string
         description: "Body field 'name'"
@@ -52,6 +55,7 @@ extract_request_data:
     slot: ${""}
     entities: ${incoming.body.entities}
     examples: ${incoming.body.examples}
+    discoverable: ${incoming.body.discoverable}
     type: ${incoming.body.type}
     content: ${incoming.body.content}
     structure: ${incoming.body.structure}
@@ -179,6 +183,7 @@ assign_values:
     old_ext: "${old_service_result.response.body[0].state === 'active' ? 'yml' : 'tmp'}"
     new_state_dir: "${(state ?? old_service_result.response.body[0].state) === 'active' ? 'active' : 'draft'}"
     new_ext: "${(state ?? old_service_result.response.body[0].state) === 'active' ? 'yml' : 'tmp'}"
+    is_discoverable: ${(discoverable ?? old_service_result.response.body[0].discoverable) === true}
 
 check_new_structure:
   switch:
@@ -232,6 +237,7 @@ service_edit:
       slot: ${slot}
       examples: ${examples}
       entities: ${entities}
+      discoverable: ${discoverable}
       structure: ${new_structure}
       state: ${state ?? 'draft'}
   result: editedService
@@ -240,6 +246,8 @@ check for_state:
   switch:
     - condition: ${state === 'draft'}
       next: check_remove_blob_then_draft
+    - condition: ${state === 'active' && !is_discoverable}
+      next: check_remove_blob_then_ok
     - condition: ${state === 'active'}
       next: check_if_service_data_exists
   next: check_remove_blob_then_ok
