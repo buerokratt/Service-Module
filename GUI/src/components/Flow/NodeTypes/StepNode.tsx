@@ -111,7 +111,16 @@ const StepNode: FC<StepNodeProps> = ({ id, data }) => {
       direction="vertical"
       align="left"
     >
-      <p>
+      <p
+        title={data.label}
+        style={{
+          maxWidth: '100%',
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
+          paddingRight: 40,
+          boxSizing: 'border-box',
+        }}
+      >
         <TestStatue
           isTestedAndPassed={isTestedAndPassed}
           data={data}

@@ -10,34 +10,55 @@ interface ValidationResult {
   error?: string;
 }
 
+export const RESERVED_STEP_NAMES = ['declaration', 'prepare', 'format_messages', 'assign_dynamic_choices_buttons'];
+
+export const isStepNameTaken = (label: string, nodes: Node[], excludeNodeId?: string) => {
+  const stepName = toSnakeCase(label);
+  return (
+    RESERVED_STEP_NAMES.includes(stepName) ||
+    nodes.some((node) => node.id !== excludeNodeId && toSnakeCase(String(node.data?.label ?? '')) === stepName)
+  );
+};
+
+export const getMcqNodeId = (data: Partial<NodeDataProps>) =>
+  data.mcqNodeId ?? getLastDigits(toSnakeCase(data.label ?? ''));
+
+export const getNextMcqNodeId = (nodes: Node[]) => {
+  const usedIds = new Set(
+    nodes
+      .filter((node) => node.data?.stepType === StepType.MultiChoiceQuestion)
+      .map((node) => getMcqNodeId(node.data as NodeDataProps)),
+  );
+  let nextId = 1;
+  while (usedIds.has(nextId)) nextId++;
+  return nextId;
+};
+
+const getLabelNumber = (label: string) => {
+  const parts = label.split(' - ');
+  if (parts.length > 1) {
+    const num = parseInt(parts[parts.length - 1]);
+    return isNaN(num) ? 0 : num;
+  }
+  return 0;
+};
+
 export const getNodeLabel = (step: Step, nodes: Node[]) => {
   const baseLabel = step.label.split(' - ').pop() ?? '';
-  const sameTypeLabels = nodes
-    .filter((node) => node.data.stepType === step.type)
-    .map((node) => (node.data.label as string) ?? '');
+  const sameTypeNodes = nodes.filter((node) => node.data.stepType === step.type);
 
-  const existingNumbers = (
+  const existingNumbers = new Set(
     step.type === StepType.MultiChoiceQuestion
-      ? sameTypeLabels.map((label) => getLastDigits(toSnakeCase(label)))
-      : sameTypeLabels
+      ? sameTypeNodes.map((node) => getMcqNodeId(node.data as NodeDataProps))
+      : sameTypeNodes
+          .map((node) => (node.data.label as string) ?? '')
           .filter((label) => label.startsWith(baseLabel))
-          .map((label) => {
-            const parts = label.split(' - ');
-            if (parts.length > 1) {
-              const num = parseInt(parts[parts.length - 1]);
-              return isNaN(num) ? 0 : num;
-            }
-            return 0;
-          })
-  ).sort((a, b) => a - b);
+          .map(getLabelNumber),
+  );
 
   let nextNumber = 1;
-  for (const num of existingNumbers) {
-    if (num === nextNumber) {
-      nextNumber++;
-    } else if (num > nextNumber) {
-      break;
-    }
+  while (existingNumbers.has(nextNumber) || isStepNameTaken(`${baseLabel} - ${nextNumber}`, nodes)) {
+    nextNumber++;
   }
 
   return `${baseLabel} - ${nextNumber}`;
@@ -96,26 +117,16 @@ export const generateUniqueLabel = (originalLabel: string, existingNodes: Node[]
   const parts = originalLabel.split(' - ');
   const baseLabel = parts.length > 1 ? parts.slice(0, -1).join(' - ') : originalLabel;
 
-  const existingLabels = existingNodes
-    .map((node: any) => node.data?.label)
-    .filter((label) => label?.startsWith(baseLabel))
-    .map((label) => {
-      const labelParts = label.split(' - ');
-      if (labelParts.length > 1) {
-        const num = parseInt(labelParts[labelParts.length - 1] as string);
-        return isNaN(num) ? 0 : num;
-      }
-      return 0;
-    })
-    .sort((a, b) => a - b);
+  const existingNumbers = new Set(
+    existingNodes
+      .map((node: any) => node.data?.label)
+      .filter((label) => label?.startsWith(baseLabel))
+      .map(getLabelNumber),
+  );
 
   let nextNumber = 1;
-  for (const num of existingLabels) {
-    if (num === nextNumber) {
-      nextNumber++;
-    } else if (num > nextNumber) {
-      break;
-    }
+  while (existingNumbers.has(nextNumber) || isStepNameTaken(`${baseLabel} - ${nextNumber}`, existingNodes)) {
+    nextNumber++;
   }
 
   return `${baseLabel} - ${nextNumber}`;

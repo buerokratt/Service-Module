@@ -10,10 +10,9 @@ import useToastStore from 'store/toasts.store';
 import { StepType } from 'types';
 import { Assign } from 'types/assign';
 import { NodeDataProps } from 'types/service-flow';
-import { getEndpointResultName } from 'utils/flow-utils';
+import { getEndpointResultName, getMcqNodeId } from 'utils/flow-utils';
 import {
   decodeHtmlEntities,
-  getLastDigits,
   isNumericString,
   removeTrailingUnderscores,
   removeWrapperQuotes,
@@ -66,7 +65,7 @@ export function normalizeMcqPayloads(nodes: Node<NodeDataProps>[], serviceName: 
     const buttons = node.data.multiChoiceQuestion?.buttons;
     if (!Array.isArray(buttons) || buttons.length === 0) return node;
 
-    const mcqNodeId = getLastDigits(toSnakeCase(node.data.label ?? ''));
+    const mcqNodeId = getMcqNodeId(node.data);
 
     const normalizedButtons = buttons.map((btn, idx) => {
       // Only rewrite payloads that already follow the MCQ payload convention.
@@ -173,7 +172,7 @@ export function buildAllServiceContents(
 
       const foundIndex = mcqNode.data?.multiChoiceQuestion?.buttons.findIndex((b: any) => b.title === edge.label) ?? -1;
       const buttonIndex = foundIndex === -1 ? edgeIdx : foundIndex;
-      const mcqNodeId = getLastDigits(toSnakeCase(mcqNode.data.label ?? ''));
+      const mcqNodeId = getMcqNodeId(mcqNode.data);
       const suffix = `_mcq_${mcqNodeId}_${buttonIndex}`;
       const subServiceName = `${name}${suffix}`;
 
@@ -342,7 +341,7 @@ export const saveFlow = async ({
 
         const foundIndex = mcqNode?.data?.multiChoiceQuestion?.buttons.findIndex((e: any) => e.title === edge.label);
         const buttonIndex = foundIndex === -1 ? edgeIdx : foundIndex;
-        const mcqNodeId = getLastDigits(toSnakeCase(mcqNode.data.label ?? ''));
+        const mcqNodeId = getMcqNodeId(mcqNode.data);
         const serviceName = `${name}_mcq_${mcqNodeId}_${buttonIndex}`;
         const branchNodes = getBranchNodes(nodes, edges, nextNode);
         const branchEdges = edges.filter((edge) =>

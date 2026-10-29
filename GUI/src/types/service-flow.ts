@@ -48,6 +48,7 @@ export type NodeDataProps = {
   rules?: Group;
   assignElements?: Assign[];
   multiChoiceQuestion?: MultiChoiceQuestion;
+  mcqNodeId?: number;
   dynamicChoices?: DynamicChoices;
   jumpToService?: JumpToService;
   childrenCount: number;
