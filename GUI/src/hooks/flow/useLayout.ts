@@ -4,6 +4,7 @@ import { timer } from 'd3-timer';
 import { useCallback, useEffect, useRef } from 'react';
 import useServiceStore from 'store/services.store';
 import { StepType } from 'types';
+import { CONDITION_LABELS } from 'utils/conditional-flow-utils';
 import { getMcqButtons } from 'utils/mcq-flow-utils';
 
 const options = { duration: 300 };
@@ -23,11 +24,18 @@ function getExtraParentEdgeIds(
   return toRemove;
 }
 
-function getMcqBranchOrder(mcqNode: Node, edges: Edge[]): Map<string, number> | null {
-  const titles = getMcqButtons(mcqNode).map((button) => button.title);
+function getBranchLabels(node: Node): readonly string[] | null {
+  if (node.data.stepType === StepType.MultiChoiceQuestion) return getMcqButtons(node).map((button) => button.title);
+  if (node.data.stepType === StepType.Condition) return CONDITION_LABELS;
+  return null;
+}
+
+function getBranchOrder(node: Node, edges: Edge[]): Map<string, number> | null {
+  const labels = getBranchLabels(node);
+  if (!labels) return null;
   const order = new Map<string, number>();
-  for (const edge of edges.filter((e) => e.source === mcqNode.id)) {
-    const index = titles.indexOf(edge.label as string);
+  for (const edge of edges.filter((e) => e.source === node.id)) {
+    const index = labels.indexOf(edge.label as string);
     if (index === -1) return null;
     order.set(edge.target, index);
   }
@@ -104,12 +112,12 @@ function layoutNodes(nodes: Node[], edges: Edge[], orientation: 'horizontal' | '
       .id((d) => d.id)
       .parentId((d: Node) => filteredEdges.find((e: Edge) => e.target === d.id)?.source)(filteredNodes);
 
-    const mcqBranchOrders = new Map<string, Map<string, number> | null>();
+    const branchOrders = new Map<string, Map<string, number> | null>();
     hierarchy.sort((a, b) => {
       const parent = a.parent?.data;
-      if (parent?.data.stepType === StepType.MultiChoiceQuestion) {
-        if (!mcqBranchOrders.has(parent.id)) mcqBranchOrders.set(parent.id, getMcqBranchOrder(parent, filteredEdges));
-        const order = mcqBranchOrders.get(parent.id);
+      if (parent) {
+        if (!branchOrders.has(parent.id)) branchOrders.set(parent.id, getBranchOrder(parent, filteredEdges));
+        const order = branchOrders.get(parent.id);
         const aIndex = order?.get(a.id as string);
         const bIndex = order?.get(b.id as string);
         if (aIndex !== undefined && bIndex !== undefined && aIndex !== bIndex) return aIndex - bIndex;
