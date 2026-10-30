@@ -20,6 +20,7 @@ export interface ServiceExportSettings {
   readonly description?: string;
   readonly examples?: string[];
   readonly keywords?: string[];
+  readonly discoverable?: boolean;
 }
 
 export interface FlowData {

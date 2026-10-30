@@ -47,6 +47,11 @@ check_service_active:
     - condition: ${service.state !== 'active'}
       next: return_not_active
 
+check_service_discoverable:
+  switch:
+    - condition: ${service.discoverable !== true}
+      next: return_not_discoverable
+
 call_index_llm:
   call: http.post
   args:
@@ -101,6 +106,11 @@ return_not_found:
 return_not_active:
   status: 400
   return: "Service is not active, LLM indexing skipped"
+  next: end
+
+return_not_discoverable:
+  status: 400
+  return: "Service is not discoverable, LLM indexing skipped"
   next: end
 
 return_bad_request:

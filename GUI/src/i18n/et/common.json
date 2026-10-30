@@ -363,6 +363,10 @@
       "placeholder": "Lisa teenusele vajalikud märksõnad (nt. ‘riigipüha’, ‘aasta’)",
       "tooltip": "Sisesta teenuse tuvastamiseks olulised märksõnad, mida tehisintellekt kasutab kavatsuse tuvastamisel."
     },
+    "discoverable": {
+      "title": "Avastatav tehisintellektile",
+      "tooltip": "Kui see on sisse lülitatud, saab Bürokratt kasutaja pöördumise põhjal teenuse tuvastada ja käivitada. Teenus peab olema aktiivne. Väljalülitatud teenust saab endiselt käivitada teise teenuse kaudu."
+    },
     "test": "Testi URLi",
     "slot": "Mälukoht",
     "endpoint": {

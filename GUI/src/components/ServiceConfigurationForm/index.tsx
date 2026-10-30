@@ -1,4 +1,4 @@
-import { Card, FormInput, Track } from 'components';
+import { Card, FormInput, Switch, Track } from 'components';
 import { FC, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -17,6 +17,7 @@ const SettingsModal: FC<SettingsModalProps> = () => {
   const description = useServiceStore((state) => state.description);
   const examples = useServiceStore((state) => state.examples);
   const entities = useServiceStore((state) => state.entities);
+  const discoverable = useServiceStore((state) => state.discoverable);
 
   const { setHasUnsavedChanges } = useServiceStore();
   const titleRef = useRef<HTMLInputElement>(null);
@@ -85,6 +86,15 @@ const SettingsModal: FC<SettingsModalProps> = () => {
                 placeholder={'newService.keywords.placeholder'}
               />
             </Track>
+            <Switch
+              label={t('newService.discoverable.title') + ' :'}
+              checked={discoverable}
+              onCheckedChange={(checked) => {
+                setHasUnsavedChanges(true);
+                useServiceStore.getState().setDiscoverable(checked);
+              }}
+              tooltip={<InfoTooltip name={'newService.discoverable.tooltip'} />}
+            />
           </Track>
         </Card>
       </div>

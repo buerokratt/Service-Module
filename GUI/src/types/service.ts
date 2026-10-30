@@ -18,6 +18,7 @@ export interface Service {
   readonly slot: string;
   readonly examples: string[];
   readonly entities: string[];
+  readonly discoverable?: boolean;
   readonly structure?: { value: string };
   readonly endpoints: Array<
     Pick<EndpointData, 'endpointId' | 'name' | 'type' | 'fileName'> & {

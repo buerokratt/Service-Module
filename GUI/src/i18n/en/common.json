@@ -365,6 +365,10 @@
       "placeholder": "Add essential service keywords (e.g. ‘holiday’, ‘year’)",
       "tooltip": "Enter key terms used by AI to recognize intent. Keywords should reflect input concepts (e.g. ‘holiday’, ‘year’)."
     },
+    "discoverable": {
+      "title": "Discoverable by AI",
+      "tooltip": "When enabled, Bürokratt can identify and start this service based on the user's request. The service must be Active. When disabled, it can still be started through another service."
+    },
     "endpoint": {
       "add": "+ Add API endpoint",
       "addTestEnv": "+ Add test environment",

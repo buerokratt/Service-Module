@@ -177,7 +177,7 @@ generate_service_json:
 
 check_if_azure_storage_is_enabled:
   switch:
-    - condition: ${[#AZURE_STORAGE_ENABLED] === true}
+    - condition: ${[#AZURE_STORAGE_ENABLED] === true && service_data_result.response.body[0].discoverable === true}
       next: create_in_storage
   next: activate_all_mcq_services  
 
@@ -210,7 +210,13 @@ activate_all_mcq_services:
       keyword: "${name}_mcq_"
       format: "yml"
   result: active_move_results
-  next: call_llm_index
+  next: check_if_discoverable
+
+check_if_discoverable:
+  switch:
+    - condition: ${service_data_result.response.body[0].discoverable === true}
+      next: call_llm_index
+  next: return_ok
 
 call_llm_index:
   call: http.post

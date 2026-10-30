@@ -90,6 +90,7 @@ export interface ServiceStoreState {
   slot: string;
   examples: string[];
   entities: string[];
+  discoverable: boolean;
   edges: Edge[];
   // In the future, this needs to use a common interface with NodeDataProps and not Node
   nodes: Node[];
@@ -125,6 +126,7 @@ export interface ServiceStoreState {
   setSlot: (slot: string) => void;
   setExamples: (examples: string[]) => void;
   setEntities: (entities: string[]) => void;
+  setDiscoverable: (discoverable: boolean) => void;
   setStepPreferences: (stepPreferences: string[]) => void;
   loadEndpointsResponseVariables: () => void;
   setSecrets: (newSecrets: PreDefinedEndpointEnvVariables) => void;
@@ -254,6 +256,7 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
   slot: '',
   examples: [],
   entities: [],
+  discoverable: false,
   serviceId: uuid(),
   description: '',
   edges: initialEdges,
@@ -393,6 +396,7 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
   setSlot: (slot: string) => set({ slot }),
   setExamples: (examples: string[]) => set({ examples: examples }),
   setEntities: (entities: string[]) => set({ entities: entities }),
+  setDiscoverable: (discoverable: boolean) => set({ discoverable }),
   setStepPreferences: (stepPreferences: string[]) => set({ stepPreferences }),
   setSecrets: (newSecrets: PreDefinedEndpointEnvVariables) => set({ secrets: newSecrets }),
   addProductionVariables: (variables: any) => {
@@ -437,6 +441,7 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
       slot: '',
       examples: [],
       entities: [],
+      discoverable: false,
       secrets: { prod: [], test: [] },
       availableVariables: { prod: [], test: [] },
       reactFlowInstance: null,
@@ -527,6 +532,7 @@ const useServiceStore = create<ServiceStoreState>((set, get) => ({
         slot: serviceResponse.data.slot,
         examples: settings?.examples ?? serviceResponse.data.examples,
         entities: settings?.keywords ?? serviceResponse.data.entities,
+        discoverable: serviceResponse.data.discoverable ?? false,
         edges,
         nodes,
         endpoints,
