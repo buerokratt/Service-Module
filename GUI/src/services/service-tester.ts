@@ -8,7 +8,7 @@ import { ServiceState } from 'types/service-state';
 import { ServiceTestError } from 'types/service-test-error';
 import { validateStep } from 'utils/flow-utils';
 import { translateObjectKeys } from 'utils/i18n-util';
-import { fromSnakeCase, removeTrailingUnderscores } from 'utils/string-util';
+import { removeTrailingUnderscores, toSnakeCase } from 'utils/string-util';
 
 import api, { createApiInstance } from './api';
 
@@ -179,7 +179,7 @@ export const handleTestError = (error: unknown, serviceStore: ServiceStoreState)
     if (isErrorResponse(errorData)) {
       console.error('runServiceTest: Service test error:', errorData);
 
-      const node = serviceStore.nodes.find((node) => node.data.label === fromSnakeCase(errorData.stepName));
+      const node = serviceStore.nodes.find((node) => toSnakeCase(String(node.data.label ?? '')) === errorData.stepName);
 
       if (!node) {
         console.error('runServiceTest: Node not found:', errorData);

@@ -478,14 +478,14 @@ describe('Jump to service step', () => {
 
     const result = getYamlContent(nodes, edges, 'test_service', '', false);
 
-    expect(result.järgmine_teenus_1.next).not.toBe(result.järgmine_teenus_2.next);
+    expect(result.jargmine_teenus_1.next).not.toBe(result.jargmine_teenus_2.next);
 
-    expect(result[result.järgmine_teenus_1.next]).toEqual({
-      return: "${järgmine_teenus_1_result.response ?? ''}",
+    expect(result[result.jargmine_teenus_1.next]).toEqual({
+      return: "${jargmine_teenus_1_result.response ?? ''}",
       next: 'end',
     });
-    expect(result[result.järgmine_teenus_2.next]).toEqual({
-      return: "${järgmine_teenus_2_result.response ?? ''}",
+    expect(result[result.jargmine_teenus_2.next]).toEqual({
+      return: "${jargmine_teenus_2_result.response ?? ''}",
       next: 'end',
     });
   });
@@ -500,7 +500,7 @@ describe('Jump to service step', () => {
     expect(result.declaration.allowlist.body).toContainEqual(
       expect.objectContaining({ field: 'testMode', type: 'boolean' }),
     );
-    expect(result.järgmine_teenus_1.body.testMode).toBe(
+    expect(result.jargmine_teenus_1.body.testMode).toBe(
       "${incoming.body.testMode === true || incoming.body.testMode === 'true'}",
     );
   });

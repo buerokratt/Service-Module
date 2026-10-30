@@ -50,7 +50,7 @@ vi.mock('store/test-services.store', () => ({
 }));
 
 vi.mock('utils/string-util', () => ({
-  fromSnakeCase: vi.fn((str) => str),
+  toSnakeCase: vi.fn((str) => str),
 }));
 
 vi.mock('utils/flow-utils', () => ({
@@ -986,7 +986,7 @@ describe('updateNodeTestState', () => {
 describe('handleTestError', () => {
   let mockServiceStore: any;
   let mockTestStore: any;
-  let mockFromSnakeCase: any;
+  let mockToSnakeCase: any;
   let mockAddError: any;
 
   beforeEach(async () => {
@@ -1003,7 +1003,7 @@ describe('handleTestError', () => {
     };
     mockTestStore = vi.mocked((await import('store/test-services.store')).default);
     mockTestStore.getState.mockReturnValue({ addError: mockAddError });
-    mockFromSnakeCase = vi.mocked((await import('utils/string-util')).fromSnakeCase);
+    mockToSnakeCase = vi.mocked((await import('utils/string-util')).toSnakeCase);
   });
 
   it('should handle error with response data and valid error response', () => {
@@ -1020,7 +1020,7 @@ describe('handleTestError', () => {
     handleTestError(error, mockServiceStore as unknown as ServiceStoreState);
 
     expect(mockAddError).toHaveBeenCalledWith('chat.service-test-error.title', expect.any(Object));
-    expect(mockFromSnakeCase).toHaveBeenCalledWith('test_step');
+    expect(mockToSnakeCase).toHaveBeenCalledWith('test_step');
   });
 
   it('should handle error without response data', () => {
