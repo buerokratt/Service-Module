@@ -888,6 +888,15 @@
     "testSuccess": "Test õnnestus",
     "testError": "Test ebaõnnestus",
     "reIndexSuccess": "Indekseerimine algas",
-    "reIndexError": "Indekseerimine ebaõnnestus"
+    "reIndexError": "Indekseerimine ebaõnnestus",
+    "indexFailed": "Indekseerimine ebaõnnestus: {{name}}",
+    "indexFailureReason": "Viimane indekseerimine ebaõnnestus: {{reason}}",
+    "indexFailureUnknown": "Viimane indekseerimine ebaõnnestus",
+    "indexValidation": {
+      "VALIDATION_NAME_MISSING": "Indekseerimiseks on vaja otspunkti nime.",
+      "VALIDATION_DESCRIPTION_MISSING": "Indekseerimiseks on vaja API kirjeldust.",
+      "VALIDATION_URL_MISSING": "Indekseerimiseks on vaja valitud otspunkti URL-i.",
+      "VALIDATION_METHOD_MISSING": "Indekseerimiseks on vaja valitud HTTP meetodit."
+    }
   }
 }

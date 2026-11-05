@@ -887,6 +887,15 @@
     "testSuccess": "Test successful",
     "testError": "Test failed",
     "reIndexSuccess": "Re-index started",
-    "reIndexError": "Re-index failed"
+    "reIndexError": "Re-index failed",
+    "indexFailed": "Indexing failed: {{name}}",
+    "indexFailureReason": "Last indexing failed: {{reason}}",
+    "indexFailureUnknown": "Last indexing failed",
+    "indexValidation": {
+      "VALIDATION_NAME_MISSING": "Indexing needs an endpoint name.",
+      "VALIDATION_DESCRIPTION_MISSING": "Indexing needs an API description.",
+      "VALIDATION_URL_MISSING": "Indexing needs a selected endpoint URL.",
+      "VALIDATION_METHOD_MISSING": "Indexing needs a selected HTTP method."
+    }
   }
 }
