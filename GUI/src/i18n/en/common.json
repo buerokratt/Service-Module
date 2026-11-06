@@ -301,7 +301,16 @@
       },
       "toast": {
         "started": "Reindex started",
-        "failed": "Reindex failed"
+        "failed": "Reindex failed",
+        "indexFailed": "Indexing failed: {{name}}"
+      },
+      "failureReason": "Last indexing failed: {{reason}}",
+      "failureUnknown": "Last indexing failed",
+      "validation": {
+        "VALIDATION_NAME_MISSING": "Indexing needs a service name.",
+        "VALIDATION_DESCRIPTION_MISSING": "Indexing needs a service description.",
+        "VALIDATION_SERVICE_NOT_ACTIVE": "Only active services can be indexed.",
+        "VALIDATION_SERVICE_NOT_DISCOVERABLE": "Only discoverable services can be indexed."
       }
     },
     "pin": {
