@@ -78,7 +78,7 @@ mark_index_unreachable:
 # surface a validation warning (e.g. missing description) so the GUI can show a toast.
 assign_index_warning:
   assign:
-    index_warning: "${index_llm_result != null && index_llm_result.response != null && index_llm_result.response.body != null && index_llm_result.response.body.response != null && index_llm_result.response.body.response.code != null && String(index_llm_result.response.body.response.code).startsWith('VALIDATION_') ? index_llm_result.response.body.response.code : null}"
+    index_warning: "${index_llm_result != null && index_llm_result.response != null && index_llm_result.response.body != null && index_llm_result.response.body.response != null && index_llm_result.response.body.response.code != null && String(index_llm_result.response.body.response.code).startsWith('VALIDATION_') ? index_llm_result.response.body.response.code : ''}"
 
 assign_response:
   assign:
