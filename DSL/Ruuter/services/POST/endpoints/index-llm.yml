@@ -108,7 +108,7 @@ assign_attempt:
 call_llm_index:
   call: http.post
   args:
-    url: "[#LLM_RUUTER_PUBLIC]/api-tools/index"
+    url: "[#LLM_RUUTER_PRIVATE]/api-tools/index"
     body:
       endpointId: ${endpoint.endpointId ?? endpointId}
       name: ${endpoint.name}

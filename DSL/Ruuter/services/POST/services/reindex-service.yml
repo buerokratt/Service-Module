@@ -76,6 +76,25 @@ check_index_llm_result:
       next: return_accepted
     - condition: ${index_status_code === 404}
       next: return_not_found
+  next: check_index_crashed
+
+# When the LLM module is unreachable, Ruuter aborts the indexing flow after the attempt started
+# (a connection error cannot be caught inside that flow), so it returns 5xx and the attempt would
+# stay IN_PROGRESS until the timeout. Mark it FAILED here; a result already recorded is not touched.
+check_index_crashed:
+  switch:
+    - condition: ${index_llm_result != null && index_llm_result.response != null && index_llm_result.response.statusCodeValue >= 500}
+      next: mark_index_unreachable
+  next: log_reindex_failure
+
+mark_index_unreachable:
+  call: http.post
+  args:
+    url: "[#SERVICE_RESQL]/services/mark_service_llm_index_unreachable"
+    body:
+      serviceId: ${serviceId}
+      failureReason: "LLM module is not reachable. Please try again later."
+  result: mark_unreachable_res
   next: log_reindex_failure
 
 log_reindex_failure:

@@ -99,7 +99,7 @@ assign_attempt:
 call_llm_enrich:
   call: http.post
   args:
-    url: "[#LLM_RUUTER_PUBLIC]/services/enrich"
+    url: "[#LLM_RUUTER_PRIVATE]/services/enrich"
     body:
       service_id: ${serviceId}
       name: ${service.name}
@@ -108,7 +108,7 @@ call_llm_enrich:
       entities: ${service.entities ?? []}
       ruuter_type: ${service.type ?? 'GET'}
       current_state: ${service.state}
-      attempt_no: ${attemptNo}
+      attemptNo: ${attemptNo}
   result: llm_enrich_result
 
 check_llm_enrich_result:
