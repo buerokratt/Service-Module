@@ -1,3 +1,5 @@
+import { createNotificationsClient } from '@buerokratt-ria/notifications';
+import { NotificationsProvider } from '@buerokratt-ria/notifications/react';
 import { QueryClient, QueryClientProvider, QueryFunction } from '@tanstack/react-query';
 import React from 'react';
 import { createRoot } from 'react-dom/client';
@@ -48,6 +50,11 @@ const defaultQueryFn: QueryFunction | undefined = async ({ queryKey }) => {
   return data;
 };
 
+const notificationsClient = createNotificationsClient({
+  apiBaseUrl: import.meta.env.REACT_APP_NOTIFICATIONS_NODE_URL,
+  vapidPublicKey: import.meta.env.REACT_APP_NOTIFICATIONS_VAPID_PUBLIC_KEY,
+});
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -60,7 +67,9 @@ const root = createRoot(document.getElementById('root')!);
 root.render(
   <React.StrictMode>
     <QueryClientProvider client={queryClient}>
-      <App />
+      <NotificationsProvider client={notificationsClient}>
+        <App />
+      </NotificationsProvider>
     </QueryClientProvider>
   </React.StrictMode>,
 );

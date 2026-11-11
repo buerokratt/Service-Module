@@ -89,7 +89,8 @@ services:
       - REACT_APP_MENU_URL=https://admin.dev.buerokratt.ee
       - REACT_APP_RUUTER_V2_SERVICE_API_URL=http://localhost:8086/services
       - REACT_APP_AUTH_BASE_URL=http://localhost:8086/services
-      - REACT_APP_NOTIFICATION_NODE_URL=http://localhost:4040
+      - REACT_APP_NOTIFICATIONS_NODE_URL=http://localhost:3010
+      - REACT_APP_NOTIFICATIONS_VAPID_PUBLIC_KEY=BGtr18_RnioZdJqSdhw3tHEKwklwzm-er3gnHWYolmx0GW-WhAhT-xu46acxbhRZN3_JTyqkFJPI8kFLkyONsGs
       - REACT_APP_AUTH_PATH=/auth
       - REACT_APP_CUSTOMER_SERVICE_LOGIN=http://localhost:3004/et/dev-auth
       - REACT_APP_MENU_PATH=/chat/menu.json
@@ -97,7 +98,7 @@ services:
       - REACT_APP_LOCAL=true
       - REACT_APP_RUUTER_API_URL=http://localhost:8086/services
       - REACT_APP_RUUTER_PRIVATE_API_URL=http://localhost:8086/services
-      - REACT_APP_CSP=upgrade-insecure-requests; default-src 'self'; font-src 'self' data:; img-src 'self' data:; script-src 'self' 'unsafe-eval' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; object-src 'none'; connect-src 'self' http://localhost:8086 http://localhost:8085 https://admin.dev.buerokratt.ee/chat/menu.json;
+      - REACT_APP_CSP=upgrade-insecure-requests; default-src 'self'; font-src 'self' data:; img-src 'self' data:; script-src 'self' 'unsafe-eval' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; object-src 'none'; connect-src 'self' http://localhost:8086 http://localhost:8085 http://localhost:3010 https://admin.dev.buerokratt.ee/chat/menu.json;
       - REACT_APP_CONVERSATIONS_BASE_URL=http://localhost:8080/chat
       - REACT_APP_TRAINING_BASE_URL=http://localhost:8080/training
       - REACT_APP_ANALYTICS_BASE_URL=http://localhost:8080/analytics
